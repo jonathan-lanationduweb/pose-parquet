@@ -1,0 +1,138 @@
+/* Styles globaux : typographie, liens, focus, utilitaires */
+
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 1.5rem); }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--fs-3xl); }
+h2 { font-size: var(--fs-2xl); }
+h3 { font-size: var(--fs-lg); line-height: var(--lh-snug); }
+h4 { font-size: var(--fs-md); line-height: var(--lh-snug); }
+
+p { text-wrap: pretty; }
+
+a { text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+
+a:hover { text-decoration-color: var(--accent); }
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: var(--r-xs);
+}
+
+::selection { background: var(--c-sage-wash); color: var(--c-charcoal); }
+
+/* ---- Utilitaires ---- */
+.wrap { width: 100%; max-width: var(--wrap); margin-inline: auto; padding-inline: var(--gutter); }
+.wrap-wide { width: 100%; max-width: var(--wrap-wide); margin-inline: auto; padding-inline: var(--gutter); }
+.wrap-text { width: 100%; max-width: var(--wrap-text); margin-inline: auto; padding-inline: var(--gutter); }
+
+.section { padding-block: var(--section-y); }
+.section--alt { background: var(--bg-alt); }
+.section--dark { background: var(--bg-invert); color: var(--text-invert); }
+.section--dark h2, .section--dark h3 { color: var(--text-invert); }
+
+.eyebrow {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0 0 var(--sp-3);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.eyebrow::before {
+  content: "";
+  width: 26px;
+  height: 1px;
+  background: var(--accent);
+  flex: none;
+}
+.section--dark .eyebrow { color: var(--c-slate-light); }
+
+.lead { font-size: var(--fs-md); color: var(--text-soft); max-width: 46ch; }
+.section--dark .lead { color: #c9ccc6; }
+
+.section-head { margin-bottom: var(--sp-7); }
+.section-head__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--sp-5);
+}
+
+.text-muted { color: var(--text-muted); }
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  letter-spacing: 0.02em;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%);
+  white-space: nowrap; border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translate(-50%, -120%);
+  background: var(--c-charcoal);
+  color: var(--text-invert);
+  padding: 0.7rem 1.2rem;
+  border-radius: 0 0 var(--r-sm) var(--r-sm);
+  z-index: var(--z-toast);
+  transition: transform var(--dur-2) var(--ease-out);
+}
+.skip-link:focus-visible { transform: translate(-50%, 0); }
+
+/* Séparateur inspiré du calepinage */
+.rule {
+  height: 1px;
+  border: 0;
+  background: var(--line);
+  margin: 0;
+}
+.rule--chevron {
+  height: 14px;
+  background:
+    repeating-linear-gradient(135deg, var(--line-strong) 0 1px, transparent 1px 14px),
+    repeating-linear-gradient(45deg, var(--line-strong) 0 1px, transparent 1px 14px);
+  opacity: 0.7;
+}
+
+/* Utilitaires de composition ponctuels (evitent tout style en ligne) */
+.section--flush-top { padding-top: 0; }
+.u-center { text-align: center; }
+.u-mt-5 { margin-top: var(--sp-5); }
+.u-mt-6 { margin-top: var(--sp-6); }
+.cluster--center { justify-content: center; }
+.lead--center { margin: var(--sp-5) auto var(--sp-6); }
+.meta-list--stack { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+.meta-list--stack li + li::before { content: none; }
+.aside-image { border-radius: var(--r-lg); }

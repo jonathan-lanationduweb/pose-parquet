@@ -1,0 +1,31 @@
+/* Infobulle sur terme technique */
+.tip {
+  position: relative;
+  border-bottom: 1px dotted var(--accent);
+  cursor: help;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+.tip__bubble {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  translate: -50% 4px;
+  width: max-content;
+  max-width: 17rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--r-sm);
+  background: var(--c-charcoal);
+  color: var(--text-invert);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  text-align: left;
+  box-shadow: var(--shadow-2);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--dur-2) var(--ease-out), translate var(--dur-2) var(--ease-out), visibility var(--dur-2);
+  z-index: 5;
+}
+.tip[data-open="true"] .tip__bubble { opacity: 1; visibility: visible; translate: -50% 0; }

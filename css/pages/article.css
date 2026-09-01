@@ -1,0 +1,57 @@
+/* Gabarit editorial : guide, tutoriel, page motif */
+.article-header { padding-block: var(--sp-5) var(--sp-6); }
+.article-header h1 { max-width: 20ch; margin-top: var(--sp-4); }
+.article-header .lead { margin-top: var(--sp-5); font-size: var(--fs-md); max-width: 56ch; }
+.article-header .article-header__meta { margin-top: var(--sp-5); }
+
+.article-cover {
+  margin-bottom: var(--sp-7);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  background: var(--c-paper-2);
+  aspect-ratio: 16 / 7;
+}
+.article-cover img, .article-cover svg { width: 100%; height: 100%; object-fit: cover; }
+
+.article-aside { display: grid; gap: var(--sp-6); }
+.aside-box {
+  padding: var(--sp-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--bg-solid);
+  display: grid;
+  gap: var(--sp-3);
+}
+.aside-box h3 { font-size: 1.02rem; font-family: var(--font-sans); font-weight: 600; letter-spacing: 0; }
+.aside-box p { font-size: 0.9rem; color: var(--text-soft); margin: 0; }
+
+.article-faq { margin-top: var(--sp-8); }
+.article-nav {
+  margin-top: var(--sp-8);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+  justify-content: space-between;
+}
+.article-share { display: flex; gap: 0.5rem; align-items: center; font-size: var(--fs-sm); color: var(--text-muted); }
+
+.reading-progress {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  z-index: calc(var(--z-header) + 1);
+  background: transparent;
+  pointer-events: none;
+}
+.reading-progress span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left;
+}
+
+.aside-box .btn { justify-self: start; }

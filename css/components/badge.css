@@ -1,0 +1,31 @@
+/* Badges et etiquettes de categorie */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.65rem;
+  border-radius: var(--r-full);
+  background: var(--c-paper-3);
+  color: var(--text-soft);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.badge--sage { background: var(--c-sage-wash); color: var(--c-sage-deep); }
+.badge--terracotta { background: var(--c-terracotta-wash); color: #91503a; }
+.badge--dark { background: var(--c-charcoal); color: var(--text-invert); }
+.badge--outline { background: transparent; border: 1px solid var(--line-strong); }
+
+.meta-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+}
+.meta-list li { display: flex; align-items: center; gap: 0.4rem; }
+.meta-list li + li::before { content: "\2014"; color: var(--line-strong); }

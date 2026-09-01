@@ -1,0 +1,123 @@
+/* En-tête minimal, sticky, avec drawer mobile */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(14px) saturate(1.4);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-2) var(--ease-out), background var(--dur-2) var(--ease-out);
+}
+.site-header[data-scrolled="true"] {
+  border-bottom-color: var(--line);
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+}
+
+.site-header__inner {
+  min-height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-5);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 1.16rem;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.brand__mark { width: 26px; height: 26px; flex: none; color: var(--accent-strong); }
+.brand__mark rect { transition: transform var(--dur-3) var(--ease-out); transform-origin: center; }
+.brand:hover .brand__mark rect:nth-child(2) { transform: translateX(2px); }
+.brand:hover .brand__mark rect:nth-child(3) { transform: translateX(-2px); }
+.brand strong { font-weight: 400; }
+.brand span { color: var(--text-muted); }
+
+.nav { display: none; }
+@media (min-width: 68rem) { .nav { display: block; } }
+
+.nav__list { display: flex; align-items: center; gap: 0.15rem; }
+
+.nav__link {
+  display: inline-block;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.925rem;
+  text-decoration: none;
+  color: var(--text-soft);
+  border-radius: var(--r-sm);
+  position: relative;
+  transition: color var(--dur-1) var(--ease-out);
+}
+.nav__link::after {
+  content: "";
+  position: absolute;
+  left: 0.75rem; right: 0.75rem; bottom: 0.34rem;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-2) var(--ease-out);
+}
+.nav__link:hover { color: var(--text); }
+.nav__link:hover::after, .nav__link[aria-current="page"]::after { transform: scaleX(1); }
+.nav__link[aria-current="page"] { color: var(--text); }
+
+.header__actions { display: flex; align-items: center; gap: var(--sp-3); }
+
+.nav-toggle {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 42px; height: 42px;
+  padding: 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+}
+@media (min-width: 68rem) { .nav-toggle { display: none; } }
+.nav-toggle span {
+  display: block; height: 1.5px; width: 100%;
+  background: var(--text);
+  transition: transform var(--dur-2) var(--ease-out), opacity var(--dur-1) linear;
+}
+.nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+/* Drawer mobile */
+.drawer {
+  position: fixed;
+  inset: var(--header-h) 0 0;
+  z-index: var(--z-drawer);
+  background: var(--bg);
+  padding: var(--sp-6) var(--gutter) var(--sp-8);
+  overflow-y: auto;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out), visibility var(--dur-2);
+}
+.drawer[data-open="true"] { opacity: 1; visibility: visible; transform: none; }
+@media (min-width: 68rem) { .drawer { display: none; } }
+
+.drawer__list { display: grid; gap: 0.15rem; }
+.drawer__link {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+}
+.drawer__link span { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--text-muted); }
+.drawer__footer { margin-top: var(--sp-6); display: grid; gap: var(--sp-3); }
+
+body[data-drawer-open="true"] { overflow: hidden; }

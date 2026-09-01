@@ -1,0 +1,17 @@
+/* Fil d'Ariane */
+.breadcrumb { padding-block: var(--sp-4) 0; }
+.breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.6rem;
+  align-items: center;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  list-style: none;
+  margin: 0; padding: 0;
+}
+.breadcrumb li { display: flex; align-items: center; gap: 0.6rem; }
+.breadcrumb li + li::before { content: "/"; color: var(--line-strong); }
+.breadcrumb a { text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb [aria-current="page"] { color: var(--text); }
