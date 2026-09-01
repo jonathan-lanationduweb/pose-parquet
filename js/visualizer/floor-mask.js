@@ -1,21 +1,19 @@
 /**
- * Délimitation de la zone de sol.
+ * Délimitation du sol : cadre de perspective, contour précis, pinceau.
  *
- * V1 : sélection **manuelle**. Quatre poignées déplaçables (souris, tactile,
- * clavier) définissent le quadrilatère du sol. Aucune détection automatique
- * n'est utilisée ni simulée.
+ * V1 assumée : **tout est manuel**. Aucune détection automatique n'est
+ * utilisée ni simulée. L'appel passe par une interface abstraite
+ * `detectFloor(strategy, context)` afin qu'une segmentation automatique
+ * (modèle ONNX en WebGPU/WASM, service externe) puisse être branchée plus
+ * tard sans toucher au reste du visualiseur :
  *
- * L'appel passe par une interface abstraite `detectFloor(strategy, context)`
- * afin qu'une future segmentation automatique (modèle spécialisé ou service
- * externe) puisse être branchée sans toucher au reste du visualiseur :
- *
- *   registerDetector('auto', async ({ canvas }) => quadNormalise);
+ *   registerDetector('auto', async ({ canvas }) => quadOuPolygoneNormalise);
  *   await detectFloor('auto', { canvas });
  */
 
 const detectors = new Map();
 
-/** Stratégie manuelle : renvoie la zone proposée, l'utilisateur l'ajuste. */
+/** Stratégie manuelle : renvoie la proposition, que l'utilisateur ajuste. */
 export function manualFloorDetection({ suggestion }) {
   return (
     suggestion || [
@@ -31,33 +29,45 @@ detectors.set('manual', manualFloorDetection);
 export function registerDetector(name, fn) {
   detectors.set(name, fn);
 }
-
 export function availableDetectors() {
   return [...detectors.keys()];
 }
-
-/**
- * @param {string} strategy 'manual' aujourd'hui, 'auto' demain
- * @param {object} context  { canvas, suggestion }
- * @returns {Promise<{x:number,y:number}[]>} quadrilatère normalisé
- */
 export async function detectFloor(strategy, context) {
   const detector = detectors.get(strategy) || detectors.get('manual');
   return detector(context);
 }
 
-const clamp01 = (v) => Math.max(-0.08, Math.min(1.08, v));
-const LABELS = ['fond gauche', 'fond droite', 'devant droite', 'devant gauche'];
+const clampPt = (v) => Math.max(-0.08, Math.min(1.08, v));
+
+/** La capture de pointeur peut échouer (pointeur déjà relâché) : sans conséquence. */
+const capture = (el, id) => {
+  try {
+    el.setPointerCapture(id);
+  } catch (error) {
+    void error;
+  }
+};
+const release = (el, id) => {
+  try {
+    if (el.hasPointerCapture(id)) el.releasePointerCapture(id);
+  } catch (error) {
+    void error;
+  }
+};
+const FRAME_LABELS = ['fond gauche', 'fond droite', 'devant droite', 'devant gauche'];
 
 /**
- * Superposition de sélection.
+ * Éditeur de zone superposé à la photo.
  * @param {HTMLElement} host conteneur positionné (même boîte que l'image)
- * @param {(quad:{x:number,y:number}[]) => void} onChange
+ * @param {object} handlers
  */
-export function createFloorMask(host, onChange) {
+export function createFloorEditor(host, handlers) {
   const svgNS = 'http://www.w3.org/2000/svg';
-  let quad = manualFloorDetection({});
-  let active = false;
+  let mode = 'off'; // off | frame | polygon | brush
+  let frame = manualFloorDetection({});
+  let polygon = frame.map((p) => ({ ...p }));
+  let brush = { mode: 'remove', radius: 40 };
+  let painting = false;
 
   const layer = document.createElement('div');
   layer.className = 'floor-mask';
@@ -69,68 +79,93 @@ export function createFloorMask(host, onChange) {
   svg.setAttribute('preserveAspectRatio', 'none');
   svg.setAttribute('aria-hidden', 'true');
 
-  const polygon = document.createElementNS(svgNS, 'polygon');
-  polygon.setAttribute('class', 'floor-mask__shape');
-  svg.appendChild(polygon);
+  const shape = document.createElementNS(svgNS, 'polygon');
+  shape.setAttribute('class', 'floor-mask__shape');
+  svg.appendChild(shape);
   layer.appendChild(svg);
 
-  const handles = quad.map((point, index) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'floor-mask__handle';
-    button.dataset.index = String(index);
-    button.setAttribute(
-      'aria-label',
-      `Point ${index + 1} sur 4 — ${LABELS[index]}. Flèches pour déplacer, Maj pour aller plus vite.`
-    );
-    layer.appendChild(button);
-    return button;
-  });
+  const cursor = document.createElement('span');
+  cursor.className = 'floor-mask__cursor';
+  cursor.hidden = true;
+  layer.appendChild(cursor);
+
+  const handleBox = document.createElement('div');
+  handleBox.className = 'floor-mask__handles';
+  layer.appendChild(handleBox);
+
+  const activePoints = () => (mode === 'frame' ? frame : polygon);
 
   const paint = () => {
-    polygon.setAttribute('points', quad.map((p) => `${p.x * 100},${p.y * 100}`).join(' '));
-    handles.forEach((handle, index) => {
-      handle.style.left = `${quad[index].x * 100}%`;
-      handle.style.top = `${quad[index].y * 100}%`;
+    const points = activePoints();
+    shape.setAttribute('points', points.map((p) => `${p.x * 100},${p.y * 100}`).join(' '));
+    handleBox.innerHTML = '';
+    if (mode === 'brush' || mode === 'off') return;
+
+    points.forEach((point, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'floor-mask__handle';
+      button.dataset.index = String(index);
+      button.style.left = `${point.x * 100}%`;
+      button.style.top = `${point.y * 100}%`;
+      const label =
+        mode === 'frame'
+          ? `Coin ${index + 1} sur 4 — ${FRAME_LABELS[index]}`
+          : `Point ${index + 1} sur ${points.length} du contour`;
+      button.setAttribute(
+        'aria-label',
+        `${label}. Flèches pour déplacer, Maj pour aller plus vite${
+          mode === 'polygon' ? ', Suppr pour retirer ce point' : ''
+        }.`
+      );
+      attachHandle(button, index);
+      handleBox.appendChild(button);
     });
   };
 
   const emit = () => {
     paint();
-    onChange(quad.map((p) => ({ ...p })));
+    if (mode === 'frame') handlers.onFrameChange(frame.map((p) => ({ ...p })));
+    else handlers.onPolygonChange(polygon.map((p) => ({ ...p })));
   };
 
-  // --- Déplacement pointeur (souris, stylet, doigt) ---
-  let dragging = null;
-  handles.forEach((handle, index) => {
-    handle.addEventListener('pointerdown', (event) => {
+  function pointFromEvent(event) {
+    const rect = layer.getBoundingClientRect();
+    return {
+      x: clampPt((event.clientX - rect.left) / rect.width),
+      y: clampPt((event.clientY - rect.top) / rect.height),
+    };
+  }
+
+  function attachHandle(button, index) {
+    let pointerId = null;
+
+    button.addEventListener('pointerdown', (event) => {
       event.preventDefault();
-      dragging = { index, id: event.pointerId };
-      handle.setPointerCapture(event.pointerId);
-      handle.dataset.active = 'true';
+      event.stopPropagation();
+      pointerId = event.pointerId;
+      capture(button, pointerId);
+      button.dataset.active = 'true';
     });
 
-    handle.addEventListener('pointermove', (event) => {
-      if (!dragging || dragging.id !== event.pointerId) return;
-      const rect = layer.getBoundingClientRect();
-      quad[dragging.index] = {
-        x: clamp01((event.clientX - rect.left) / rect.width),
-        y: clamp01((event.clientY - rect.top) / rect.height),
-      };
+    button.addEventListener('pointermove', (event) => {
+      if (pointerId === null || event.pointerId !== pointerId) return;
+      const point = pointFromEvent(event);
+      if (mode === 'frame') frame[index] = point;
+      else polygon[index] = point;
       emit();
     });
 
     const stop = (event) => {
-      if (!dragging || dragging.id !== event.pointerId) return;
-      if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
-      delete handle.dataset.active;
-      dragging = null;
+      if (pointerId === null || event.pointerId !== pointerId) return;
+      release(button, pointerId);
+      delete button.dataset.active;
+      pointerId = null;
     };
-    handle.addEventListener('pointerup', stop);
-    handle.addEventListener('pointercancel', stop);
+    button.addEventListener('pointerup', stop);
+    button.addEventListener('pointercancel', stop);
 
-    // --- Clavier : alternative accessible au glisser ---
-    handle.addEventListener('keydown', (event) => {
+    button.addEventListener('keydown', (event) => {
       const stepBase = event.shiftKey ? 0.04 : 0.008;
       const moves = {
         ArrowLeft: [-stepBase, 0],
@@ -138,12 +173,54 @@ export function createFloorMask(host, onChange) {
         ArrowUp: [0, -stepBase],
         ArrowDown: [0, stepBase],
       };
-      if (!moves[event.key]) return;
-      event.preventDefault();
-      const [dx, dy] = moves[event.key];
-      quad[index] = { x: clamp01(quad[index].x + dx), y: clamp01(quad[index].y + dy) };
-      emit();
+      if (moves[event.key]) {
+        event.preventDefault();
+        const [dx, dy] = moves[event.key];
+        const list = activePoints();
+        list[index] = { x: clampPt(list[index].x + dx), y: clampPt(list[index].y + dy) };
+        emit();
+        return;
+      }
+      if (mode === 'polygon' && (event.key === 'Delete' || event.key === 'Backspace')) {
+        event.preventDefault();
+        if (handlers.onRemovePoint(index)) emit();
+      }
     });
+  }
+
+  /* ---- Interaction sur la zone : ajout de point ou pinceau ---- */
+  layer.addEventListener('pointerdown', (event) => {
+    if (mode === 'polygon') {
+      const point = pointFromEvent(event);
+      handlers.onInsertPoint(point);
+      return;
+    }
+    if (mode !== 'brush') return;
+    event.preventDefault();
+    painting = true;
+    capture(layer, event.pointerId);
+    handlers.onStrokeStart(brush.mode, brush.radius, pointFromEvent(event));
+  });
+
+  layer.addEventListener('pointermove', (event) => {
+    if (mode === 'brush') {
+      const rect = layer.getBoundingClientRect();
+      cursor.style.left = `${event.clientX - rect.left}px`;
+      cursor.style.top = `${event.clientY - rect.top}px`;
+      if (painting) handlers.onStrokeMove(pointFromEvent(event));
+    }
+  });
+
+  const endPaint = (event) => {
+    if (!painting) return;
+    painting = false;
+    release(layer, event.pointerId);
+    handlers.onStrokeEnd();
+  };
+  layer.addEventListener('pointerup', endPaint);
+  layer.addEventListener('pointercancel', endPaint);
+  layer.addEventListener('pointerleave', () => {
+    cursor.hidden = mode !== 'brush' ? true : cursor.hidden;
   });
 
   host.appendChild(layer);
@@ -151,20 +228,33 @@ export function createFloorMask(host, onChange) {
 
   return {
     element: layer,
-    getQuad: () => quad.map((p) => ({ ...p })),
-    setQuad(next) {
-      quad = next.map((p) => ({ ...p }));
+    getFrame: () => frame.map((p) => ({ ...p })),
+    getPolygon: () => polygon.map((p) => ({ ...p })),
+    setFrame(next) {
+      frame = next.map((p) => ({ ...p }));
       paint();
     },
-    setActive(value) {
-      active = value;
-      layer.hidden = !value;
-      if (value) window.setTimeout(() => handles[0].focus({ preventScroll: true }), 60);
+    setPolygon(next) {
+      polygon = next.map((p) => ({ ...p }));
+      paint();
     },
-    isActive: () => active,
-    reset(suggestion) {
-      quad = manualFloorDetection({ suggestion });
-      emit();
+    setBrush(next) {
+      brush = { ...brush, ...next };
+      cursor.style.setProperty('--brush', `${brush.radius * 2}px`);
+      cursor.dataset.mode = brush.mode;
     },
+    getBrush: () => ({ ...brush }),
+    setMode(next) {
+      mode = next;
+      layer.hidden = next === 'off';
+      layer.dataset.mode = next;
+      cursor.hidden = next !== 'brush';
+      paint();
+      if (next === 'frame' || next === 'polygon') {
+        const first = handleBox.querySelector('button');
+        if (first) window.setTimeout(() => first.focus({ preventScroll: true }), 60);
+      }
+    },
+    getMode: () => mode,
   };
 }

@@ -24,7 +24,13 @@ export function loadImage(src) {
 
 /** Redimensionne si besoin et renvoie { canvas, width, height }. */
 export function prepare(img) {
-  const ratio = Math.min(1, MAX_WIDTH / img.naturalWidth, MAX_HEIGHT / img.naturalHeight);
+  // Sur un petit écran, on travaille sur une image plus légère : le rendu est
+  // recalculé à chaque réglage, et deux fois moins de pixels, c'est deux fois
+  // moins d'attente. La qualité perçue reste identique à l'affichage.
+  const small = typeof window !== 'undefined' && window.innerWidth < 600;
+  const maxWidth = small ? 1100 : MAX_WIDTH;
+  const maxHeight = small ? 825 : MAX_HEIGHT;
+  const ratio = Math.min(1, maxWidth / img.naturalWidth, maxHeight / img.naturalHeight);
   const width = Math.round(img.naturalWidth * ratio);
   const height = Math.round(img.naturalHeight * ratio);
   const canvas = document.createElement('canvas');

@@ -76,6 +76,11 @@ async function boot() {
     });
   }
 
+  if (has('[data-vz-preview]')) {
+    const { mountPreview } = await import('./visualizer/preview.js');
+    mountAll('[data-vz-preview]', mountPreview);
+  }
+
   if (has('[data-visualiseur]')) {
     const { mountVisualizer } = await import('./visualizer/index.js');
     mountVisualizer(qs('[data-visualiseur]'));
