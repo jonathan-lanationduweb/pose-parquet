@@ -124,3 +124,26 @@
     from { opacity: 0; transform: translateY(6px); }
   }
 }
+
+/* Grands écrans : le plan profite de toute la largeur disponible */
+@media (min-width: 90rem) {
+  .visualizer__canvas { max-width: none; }
+  .visualizer__readout {
+    padding: var(--sp-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    justify-content: flex-start;
+    gap: 0.5rem 2.5rem;
+  }
+}
+
+/* Très petits écrans : rien ne doit dépasser à 320 px */
+.visualizer { grid-template-columns: minmax(0, 1fr); }
+.visualizer__panel, .visualizer__group, .pattern-switch, .seg { min-width: 0; }
+@media (max-width: 26rem) {
+  .visualizer__panel { padding: var(--sp-4); }
+  .seg { flex-wrap: wrap; border-radius: var(--r-md); }
+  .seg button { flex: 1 0 auto; }
+  .pattern-switch button { font-size: 0.86rem; gap: 0.5rem; }
+}
