@@ -16,6 +16,9 @@
     <meta property="og:image" content="https://pose-parquet.com/assets/images/og-default.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="../assets/icons/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="../site.webmanifest" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-400-1.woff2" crossorigin />
     <link rel="stylesheet" href="../css/main.css" />
@@ -80,10 +83,18 @@
         <div class="wrap">
           <div class="grid grid--2">
             <div class="tool-card" data-reveal>
-              <div class="tool-card__head"><h3>Studio de pose</h3><span class="badge badge--sage">Disponible</span></div>
-              <p>Dessinez votre pièce, placez la fenêtre et l'entrée, comparez cinq motifs de pose en direct. Surface, chutes estimées et nombre de lames sont recalculés à chaque changement.</p>
+              <div class="tool-card__head"><h3>Visualiser ma pièce</h3><span class="badge badge--sage">Nouveau</span></div>
+              <p>Importez une photo de votre pièce ou choisissez une pièce d'exemple, puis essayez les teintes, les motifs et les sens de pose. Le parquet suit la perspective et récupère les ombres de la photo.</p>
               <div class="cluster">
-                <a class="btn" href="simulateur-pose.html">Ouvrir le simulateur</a>
+                <a class="btn" href="visualiseur.html">Ouvrir le visualiseur</a>
+                <a class="link-arrow" href="simulateur-pose.html">Passer en mode plan</a>
+              </div>
+            </div>
+            <div class="tool-card" data-reveal data-reveal-delay="60">
+              <div class="tool-card__head"><h3>Mode plan</h3><span class="badge badge--sage">Disponible</span></div>
+              <p>Vue du dessus à l'échelle : dimensions de la pièce, largeur de lame, fenêtre et entrée. Surface, chutes estimées et nombre de lames sont recalculés à chaque changement — à titre indicatif.</p>
+              <div class="cluster">
+                <a class="btn btn--ghost" href="simulateur-pose.html">Ouvrir le mode plan</a>
                 <a class="link-arrow" href="../guides/quel-sens-de-pose-choisir.html">Comprendre le sens de pose</a>
               </div>
             </div>

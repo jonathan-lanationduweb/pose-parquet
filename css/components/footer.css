@@ -10,7 +10,7 @@
 /* Signature typographique géante */
 .footer__wordmark {
   font-family: var(--font-display);
-  font-size: clamp(3.4rem, 1.5rem + 9vw, 11rem);
+  font-size: clamp(2.6rem, 1rem + 8.2vw, 10.5rem);
   line-height: 0.85;
   letter-spacing: -0.03em;
   color: var(--text);
@@ -21,6 +21,7 @@
   gap: 0 0.3em;
 }
 .footer__wordmark span { color: var(--line-strong); }
+@media (max-width: 30rem) { .footer__wordmark { gap: 0; line-height: 0.9; } }
 
 .footer__grid {
   display: grid;

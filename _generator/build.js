@@ -9,6 +9,7 @@ const { TUTOS } = require('./content-tutos');
 const images = require('./images');
 const { PHOTOS, INSPIRATION_PHOTOS } = require('./photos');
 const { buildHomeBody } = require('./home');
+const { buildVisualiseurPage } = require('./visualiseur');
 
 const ROOT = process.env.SITE_ROOT || path.join(process.env.USERPROFILE || '', 'Desktop', 'pose-parquet.com');
 
@@ -98,9 +99,8 @@ function buildDiagrams() {
   fs.writeFileSync(path.join(dir, 'lumiere-avant.svg'), lightFigure('across'), 'utf8');
   fs.writeFileSync(path.join(dir, 'lumiere-apres.svg'), lightFigure('along'), 'utf8');
 
-  const icons = path.join(ROOT, 'assets', 'icons');
-  fs.mkdirSync(icons, { recursive: true });
-  fs.writeFileSync(path.join(icons, 'favicon.svg'), images.favicon(), 'utf8');
+  // Les icônes sont produites par _generator/make-icons.js et ne sont
+  // jamais écrasées ici.
 
   // Les photographies sont telechargees par _generator/fetch-photos.js
   // et ne sont jamais ecrasees par ce script.
@@ -595,10 +595,18 @@ function buildTools() {
         <div class="wrap">
           <div class="grid grid--2">
             <div class="tool-card" data-reveal>
-              <div class="tool-card__head"><h3>Studio de pose</h3><span class="badge badge--sage">Disponible</span></div>
-              <p>Dessinez votre pièce, placez la fenêtre et l'entrée, comparez cinq motifs de pose en direct. Surface, chutes estimées et nombre de lames sont recalculés à chaque changement.</p>
+              <div class="tool-card__head"><h3>Visualiser ma pièce</h3><span class="badge badge--sage">Nouveau</span></div>
+              <p>Importez une photo de votre pièce ou choisissez une pièce d'exemple, puis essayez les teintes, les motifs et les sens de pose. Le parquet suit la perspective et récupère les ombres de la photo.</p>
               <div class="cluster">
-                <a class="btn" href="simulateur-pose.html">Ouvrir le simulateur</a>
+                <a class="btn" href="visualiseur.html">Ouvrir le visualiseur</a>
+                <a class="link-arrow" href="simulateur-pose.html">Passer en mode plan</a>
+              </div>
+            </div>
+            <div class="tool-card" data-reveal data-reveal-delay="60">
+              <div class="tool-card__head"><h3>Mode plan</h3><span class="badge badge--sage">Disponible</span></div>
+              <p>Vue du dessus à l'échelle : dimensions de la pièce, largeur de lame, fenêtre et entrée. Surface, chutes estimées et nombre de lames sont recalculés à chaque changement — à titre indicatif.</p>
+              <div class="cluster">
+                <a class="btn btn--ghost" href="simulateur-pose.html">Ouvrir le mode plan</a>
                 <a class="link-arrow" href="../guides/quel-sens-de-pose-choisir.html">Comprendre le sens de pose</a>
               </div>
             </div>
@@ -642,9 +650,10 @@ function buildTools() {
 
   const body = `      ${crumbs.html}
       <header class="tool-hero wrap">
-        <p class="eyebrow">Studio de pose</p>
+        <p class="eyebrow">Mode plan · outil</p>
         <h1>Une pièce. Plusieurs directions.</h1>
-        <p class="lead">Renseignez vos dimensions, placez la fenêtre et l'entrée, puis comparez les motifs. Le rendu se met à jour immédiatement.</p>
+        <p class="lead">Vue du dessus, à l'échelle : renseignez vos dimensions, placez la fenêtre et l'entrée, comparez les motifs. Les quantités affichées sont des estimations indicatives.</p>
+        <p class="u-mt-5"><a class="link-arrow" href="visualiseur.html">Plutôt voir le rendu dans une photo ? Ouvrir le visualiseur</a></p>
       </header>
 
       <section class="tool-shell">
@@ -981,6 +990,7 @@ buildMotifs();
 buildTutos();
 buildInspiration();
 buildTools();
+buildVisualiseurPage(write);
 buildProjet();
 buildContact();
 buildApropos();

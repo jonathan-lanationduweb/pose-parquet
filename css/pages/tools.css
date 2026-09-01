@@ -16,3 +16,12 @@
 .tool-card .meta-list--stack li { display: grid; gap: 0.15rem; }
 .tool-card .meta-list--stack strong { color: var(--text); font-weight: 600; }
 .tool-card .meta-list--stack li::before { content: none; }
+
+/* Onglets de l'outil (visualiseur / mode plan) */
+.tool-tabs .tabs__list { margin-bottom: clamp(1.25rem, 1rem + 1vw, 2rem); }
+.tool-tabs .tabs__panel { margin-top: 0; }
+.plan-mode__head { display: grid; gap: var(--sp-5); margin-bottom: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
+@media (min-width: 62rem) {
+  .plan-mode__head { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: end; gap: clamp(2rem, 4vw, 4rem); }
+}
+.plan-mode__head h2 { max-width: 15ch; }

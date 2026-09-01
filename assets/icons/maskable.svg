@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Pose Parquet">
+  <rect width="64" height="64" fill="#16181a" />
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6">
+    <path d="M19 34 L32 21 L45 34" stroke="#8ba088" />
+    <path d="M19 46 L32 33 L45 46" stroke="#f2efe8" />
+  </g>
+</svg>

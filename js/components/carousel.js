@@ -3,23 +3,28 @@ import { qs, qsa, on } from '../utils/dom.js';
 /**
  * Carrousel horizontal, JavaScript natif.
  *
- * - défilement natif (scroll-snap) : inertie et swipe tactile parfaits
- * - glisser-déposer à la souris
- * - boutons précédent / suivant
- * - navigation clavier (flèches, Origine, Fin) quand la piste a le focus
- * - barre de progression + compteur
- * - la slide suivante affleure à droite (débord géré en CSS)
+ * Deux modes :
+ *  - « free » (défaut, et seul mode sur mobile) : swipe tactile natif,
+ *    glisser-déposer souris, boutons, clavier.
+ *  - « scroll » : la position horizontale est pilotée par le scroll vertical
+ *    de la page (voir js/components/scroll-carousel.js). Le glisser est
+ *    désactivé et les boutons déplacent la page, pour éviter tout conflit.
+ *
+ * Renvoie une petite API utilisée par le pilote scroll.
  */
 export function initCarousel(root) {
   const viewport = qs('[data-carousel-viewport]', root);
-  if (!viewport) return;
+  if (!viewport) return null;
 
   const slides = qsa('.carousel__slide', viewport);
   const prev = qs('[data-carousel-prev]', root);
   const next = qs('[data-carousel-next]', root);
   const bar = qs('[data-carousel-progress]', root);
   const count = qs('[data-carousel-count]', root);
-  if (!slides.length) return;
+  if (!slides.length) return null;
+
+  let mode = 'free';
+  let onNavigate = null;
 
   const step = () => {
     const gap = parseFloat(getComputedStyle(viewport).columnGap || '0') || 0;
@@ -38,8 +43,8 @@ export function initCarousel(root) {
     const ratio = max > 4 ? viewport.scrollLeft / max : 0;
     const visible = Math.min(1, viewport.clientWidth / Math.max(viewport.scrollWidth, 1));
 
-    if (prev) prev.disabled = viewport.scrollLeft < 8;
-    if (next) next.disabled = viewport.scrollLeft > max - 8;
+    if (prev) prev.disabled = mode === 'free' && viewport.scrollLeft < 8;
+    if (next) next.disabled = mode === 'free' && viewport.scrollLeft > max - 8;
     if (bar) {
       bar.style.width = `${Math.max(visible * 100, 10)}%`;
       bar.style.transform = `translateX(${ratio * (100 / Math.max(visible, 0.1) - 100)}%)`;
@@ -51,9 +56,9 @@ export function initCarousel(root) {
   };
 
   /**
-   * Défilement programmé. Le scroll-snap « mandatory » annule les
-   * animations déclenchées en JavaScript : on le désactive le temps du
-   * déplacement, puis on le rétablit une fois la slide en place.
+   * Défilement programmé. Tween maison plutôt que scrollTo({behavior:'smooth'}) :
+   * le scroll-snap « mandatory » annule les animations natives déclenchées en JS,
+   * et requestAnimationFrame peut être suspendu selon l'état de la fenêtre.
    */
   let snapTimer = null;
   let tween = null;
@@ -76,8 +81,6 @@ export function initCarousel(root) {
       return;
     }
 
-    // Tween piloté par setTimeout : indépendant de requestAnimationFrame,
-    // qui peut être suspendu selon l'état de la fenêtre.
     const duration = 460;
     const startTime = Date.now();
     const frame = () => {
@@ -95,20 +98,25 @@ export function initCarousel(root) {
     frame();
   };
 
-  if (prev) on(prev, 'click', () => scrollTo(viewport.scrollLeft - step()));
-  if (next) on(next, 'click', () => scrollTo(viewport.scrollLeft + step()));
+  const go = (direction) => {
+    if (mode === 'scroll' && onNavigate) onNavigate(direction);
+    else scrollTo(viewport.scrollLeft + direction * step());
+  };
+
+  if (prev) on(prev, 'click', () => go(-1));
+  if (next) on(next, 'click', () => go(1));
 
   on(viewport, 'scroll', update, { passive: true });
   on(window, 'resize', update);
 
-  // ---- Glisser-déposer à la souris (le tactile utilise le scroll natif) ----
+  // ---- Glisser-déposer souris (le tactile utilise le scroll natif) ----
   let pointerId = null;
   let startX = 0;
   let startLeft = 0;
   let moved = 0;
 
   on(viewport, 'pointerdown', (event) => {
-    if (event.pointerType !== 'mouse' || event.button !== 0) return;
+    if (mode !== 'free' || event.pointerType !== 'mouse' || event.button !== 0) return;
     pointerId = event.pointerId;
     startX = event.clientX;
     startLeft = viewport.scrollLeft;
@@ -131,27 +139,31 @@ export function initCarousel(root) {
     pointerId = null;
     if (viewport.dataset.dragging === 'true') {
       delete viewport.dataset.dragging;
-      // Recalage sur la slide la plus proche
       scrollTo(currentIndex() * step());
     }
   };
   on(viewport, 'pointerup', endDrag);
   on(viewport, 'pointercancel', endDrag);
-  on(viewport, 'click', (event) => {
-    if (moved > 6) {
-      event.preventDefault();
-      event.stopPropagation();
-      moved = 0;
-    }
-  }, true);
+  on(
+    viewport,
+    'click',
+    (event) => {
+      if (moved > 6) {
+        event.preventDefault();
+        event.stopPropagation();
+        moved = 0;
+      }
+    },
+    true
+  );
 
   // ---- Clavier ----
   on(viewport, 'keydown', (event) => {
     const actions = {
-      ArrowRight: () => scrollTo(viewport.scrollLeft + step()),
-      ArrowLeft: () => scrollTo(viewport.scrollLeft - step()),
-      Home: () => scrollTo(0),
-      End: () => scrollTo(maxScroll()),
+      ArrowRight: () => go(1),
+      ArrowLeft: () => go(-1),
+      Home: () => (mode === 'scroll' && onNavigate ? onNavigate(-Infinity) : scrollTo(0)),
+      End: () => (mode === 'scroll' && onNavigate ? onNavigate(Infinity) : scrollTo(maxScroll())),
     };
     if (!actions[event.key]) return;
     event.preventDefault();
@@ -160,4 +172,27 @@ export function initCarousel(root) {
 
   update();
   window.setTimeout(update, 350);
+
+  return {
+    root,
+    viewport,
+    slides,
+    step,
+    maxScroll,
+    update,
+    /** Bascule entre pilotage libre et pilotage par le scroll de la page. */
+    setMode(nextMode, handlers = {}) {
+      mode = nextMode;
+      onNavigate = handlers.onNavigate || null;
+      viewport.dataset.mode = nextMode;
+      if (nextMode === 'scroll') {
+        viewport.style.scrollSnapType = 'none';
+        if (prev) prev.disabled = false;
+        if (next) next.disabled = false;
+      } else {
+        viewport.style.scrollSnapType = '';
+      }
+      update();
+    },
+  };
 }

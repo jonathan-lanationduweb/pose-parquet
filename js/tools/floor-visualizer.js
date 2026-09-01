@@ -11,6 +11,11 @@
 import { PATTERNS, getPattern, patternThumb } from './patterns.js';
 import { clamp } from '../utils/dom.js';
 import icons from '../utils/icons.js';
+import { getState, setState, PLAN_TO_PATTERN, PATTERN_TO_PLAN } from '../visualizer/state.js';
+
+/** Passerelle de teintes entre le visualiseur photo et le mode plan. */
+const TONE_TO_PLAN = { clair: 'clair', naturel: 'naturel', miel: 'naturel', brun: 'fume', fume: 'fume', graphite: 'fume' };
+const PLAN_TO_TONE = { clair: 'clair', naturel: 'naturel', fume: 'fume' };
 
 const WALLS = [
   { id: 'top', label: 'Haut' },
@@ -45,7 +50,15 @@ export class FloorVisualizer {
   constructor(root, options = {}) {
     this.root = root;
     this.compact = root.dataset.mode === 'compact';
-    this.state = { ...DEFAULTS, ...options, ...this.readUrlState() };
+    const shared = getState();
+    this.state = {
+      ...DEFAULTS,
+      pattern: PATTERN_TO_PLAN[shared.pattern] || DEFAULTS.pattern,
+      tone: TONE_TO_PLAN[shared.tone] || DEFAULTS.tone,
+      plankWidth: Math.round((shared.plankWidth || 0.14) * 100),
+      ...options,
+      ...this.readUrlState(),
+    };
     this.build();
     this.render();
   }
@@ -67,6 +80,12 @@ export class FloorVisualizer {
   set(patch) {
     Object.assign(this.state, patch);
     this.render();
+    // On partage les choix avec le visualiseur photo (et inversement).
+    const shared = {};
+    if (patch.pattern) shared.pattern = PLAN_TO_PATTERN[patch.pattern] || 'lames';
+    if (patch.tone) shared.tone = PLAN_TO_TONE[patch.tone] || 'naturel';
+    if (patch.plankWidth) shared.plankWidth = patch.plankWidth / 100;
+    if (Object.keys(shared).length) setState(shared, { silent: true });
   }
 
   build() {

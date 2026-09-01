@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Visualiser un parquet dans sa pièce | Pose Parquet</title>
+    <meta name="description" content="Testez un parquet dans votre pièce : importez une photo ou choisissez une pièce d’exemple, puis changez la teinte, le motif et le sens de pose. Rendu en perspective, gratuit et sans envoi de photo." />
+    <link rel="canonical" href="https://pose-parquet.com/outils/visualiseur.html" />
+    <meta name="theme-color" content="#f2efe8" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Pose Parquet" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:title" content="Visualiser un parquet dans sa pièce | Pose Parquet" />
+    <meta property="og:description" content="Testez un parquet dans votre pièce : importez une photo ou choisissez une pièce d’exemple, puis changez la teinte, le motif et le sens de pose. Rendu en perspective, gratuit et sans envoi de photo." />
+    <meta property="og:url" content="https://pose-parquet.com/outils/visualiseur.html" />
+    <meta property="og:image" content="https://pose-parquet.com/assets/images/og-default.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="../assets/icons/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="../site.webmanifest" />
+    <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-400-1.woff2" crossorigin />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/pages/tools.css" />
+    <script type="module" src="../js/main.js"></script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/index.html"},{"@type":"ListItem","position":2,"name":"Outils","item":"https://pose-parquet.com/outils/"},{"@type":"ListItem","position":3,"name":"Visualiser ma pièce","item":"https://pose-parquet.com/"}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Comment la zone du sol est-elle détectée ?","acceptedAnswer":{"@type":"Answer","text":"Elle ne l'est pas automatiquement : vous placez vous-même quatre points aux angles du sol. Ce choix est assumé — une détection automatique fiable demande un modèle de segmentation d'image, qui fera l'objet d'une prochaine version. La sélection manuelle donne un résultat plus juste qu'une fausse détection."}},{"@type":"Question","name":"Ma photo est-elle envoyée quelque part ?","acceptedAnswer":{"@type":"Answer","text":"Non. Elle est lue et traitée directement dans votre navigateur : aucun envoi vers un serveur, aucun stockage. Fermez l'onglet et il n'en reste rien."}},{"@type":"Question","name":"Le rendu correspond-il exactement au produit posé ?","acceptedAnswer":{"@type":"Answer","text":"Non. Les textures sont générées pour la démonstration : elles donnent la teinte, le motif, l'échelle et le sens de pose, pas l'aspect exact d'une référence commerciale. Le rendu sert à décider d'une direction, pas à valider une commande."}},{"@type":"Question","name":"Pourquoi le parquet suit-il la perspective ?","acceptedAnswer":{"@type":"Answer","text":"Les quatre points définissent un quadrilatère : on en déduit la transformation projective qui envoie le plan du sol sur l'image. Les lames proches paraissent donc plus grandes que celles du fond, et les ombres de la photo d'origine sont reportées sur la texture."}}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Visualiseur de parquet","applicationCategory":"DesignApplication","operatingSystem":"Navigateur web","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"url":"https://pose-parquet.com/outils/visualiseur.html"}</script>
+  </head>
+  <body class="page">
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+    <header class="site-header" data-header data-over="false" data-scrolled="false">
+      <div class="wrap-wide site-header__inner">
+        <a class="brand" href="../index.html" aria-label="Pose Parquet, accueil">
+          <svg class="brand__mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 7h20"/><path d="M2 13h13"/><path d="M2 19h18"/></svg><strong>Pose</strong><span>Parquet</span>
+        </a>
+        <nav class="nav" aria-label="Navigation principale">
+          <ul class="nav__list">
+            <li><a class="nav__link" href="../guides/" data-nav-section="guides">Guides</a></li>
+            <li><a class="nav__link" href="../motifs/" data-nav-section="motifs">Motifs</a></li>
+            <li><a class="nav__link" href="../tutoriels/" data-nav-section="tutoriels">Tutoriels</a></li>
+            <li><a class="nav__link" href="../inspiration/" data-nav-section="inspiration">Inspiration</a></li>
+            <li><a class="nav__link" href="../outils/" data-nav-section="outils">Outils</a></li>
+          </ul>
+        </nav>
+        <div class="header__actions">
+          <a class="header__cta" href="../projet/"><span>Votre projet</span></a>
+          <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false"
+            aria-controls="menu-mobile" aria-label="Ouvrir le menu">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+    <div class="drawer" id="menu-mobile" data-drawer data-open="false">
+      <nav class="drawer__list" aria-label="Navigation mobile">
+        <a class="drawer__link" href="../guides/"><span>01</span>Guides</a>
+          <a class="drawer__link" href="../motifs/"><span>02</span>Motifs</a>
+          <a class="drawer__link" href="../tutoriels/"><span>03</span>Tutoriels</a>
+          <a class="drawer__link" href="../inspiration/"><span>04</span>Inspiration</a>
+          <a class="drawer__link" href="../outils/"><span>05</span>Outils</a>
+          <a class="drawer__link" href="../a-propos/"><span>06</span>À propos</a>
+          <a class="drawer__link" href="../contact/"><span>07</span>Contact</a>
+      </nav>
+      <div class="drawer__footer">
+        <a class="btn btn--light btn--block" href="../projet/"><span>Décrire mon projet</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+        <a class="btn btn--outline-light btn--block" href="../outils/simulateur-pose.html"><span>Ouvrir le simulateur</span></a>
+        <p class="drawer__meta">Média indépendant · aucune vente en ligne</p>
+      </div>
+    </div>
+    <main id="contenu">
+      <nav class="breadcrumb wrap-wide" aria-label="Fil d'Ariane"><ol><li><a href="../index.html">Accueil</a></li><li><a href="../outils/">Outils</a></li><li><span aria-current="page">Visualiser ma pièce</span></li></ol></nav>
+      <header class="page-hero">
+        <div class="wrap-wide page-hero__grid">
+          <div>
+            <p class="eyebrow">Visualiseur · outil</p>
+            <h1 class="page-hero__title">Essayez le parquet dans votre pièce.</h1>
+          </div>
+          <div>
+            <p class="page-hero__lead">Importez une photo ou choisissez une pièce d’exemple. Changez le parquet, le motif et le sens de pose en quelques secondes.</p>
+            <div class="cluster u-mt-5">
+              <button class="btn" type="button" data-vz-import><span>Importer ma pièce</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></button>
+              <a class="btn btn--ghost" href="#outil"><span>Essayer une pièce d’exemple</span></a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="section section--flush-top" id="outil" aria-label="Outil de visualisation">
+        <div class="wrap-wide">
+          <div class="tool-tabs" data-tabs>
+            <div class="tabs__list" role="tablist" aria-label="Mode de l’outil">
+              <button class="tabs__tab" type="button" role="tab" id="tab-photo" aria-controls="panel-photo" aria-selected="true">Visualiser ma pièce</button>
+              <button class="tabs__tab" type="button" role="tab" id="tab-plan" aria-controls="panel-plan" aria-selected="false">Mode plan</button>
+            </div>
+
+            <div class="tabs__panel" role="tabpanel" id="panel-photo" aria-labelledby="tab-photo">
+              <div data-visualiseur-shell>
+                <div data-visualiseur data-base="../"></div>
+              </div>
+              <p class="note-inline u-mt-5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>Photo traitée dans votre navigateur, sans aucun envoi. Textures de démonstration : elles donnent la teinte et le motif, pas l’aspect exact d’une référence.</span></p>
+            </div>
+
+            <div class="tabs__panel" role="tabpanel" id="panel-plan" aria-labelledby="tab-plan" hidden>
+              <div class="plan-mode__head">
+                <div>
+                  <p class="eyebrow">Mode plan</p>
+                  <h2>Étudiez le sens de pose, les dimensions et les chutes.</h2>
+                </div>
+                <p class="lead">Vue du dessus, à l’échelle : dimensions de la pièce, largeur de lame, fenêtre, entrée, teinte et motif. Les quantités affichées sont des estimations indicatives.</p>
+              </div>
+              <div data-visualizer data-base="../"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--alt" aria-labelledby="how-title">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Comment ça marche</p>
+              <h2 id="how-title">Trois gestes, aucun compte à créer.</h2>
+            </div>
+            <p class="lead">L’outil fonctionne entièrement dans le navigateur : rien n’est téléversé, rien n’est conservé.</p>
+          </div>
+          <div class="grid grid--3">
+            <div class="tool-card" data-reveal data-reveal-delay="0">
+              <p class="mono">(01)</p>
+              <h3>Choisissez une pièce</h3>
+              <p>Six pièces d’exemple sont prêtes, ou importez une photo de votre propre pièce.</p>
+            </div>
+            <div class="tool-card" data-reveal data-reveal-delay="70">
+              <p class="mono">(02)</p>
+              <h3>Délimitez le sol</h3>
+              <p>Quatre points, déplaçables à la souris, au doigt ou au clavier, encadrent la surface à couvrir.</p>
+            </div>
+            <div class="tool-card" data-reveal data-reveal-delay="140">
+              <p class="mono">(03)</p>
+              <h3>Essayez les parquets</h3>
+              <p>Teinte, motif, sens de pose et largeur de lame : le rendu se recalcule immédiatement.</p>
+            </div>
+          </div>
+          <aside class="callout callout--key">
+        <p class="callout__label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9 17.5 20 6.5"/></svg>À retenir</p>
+        <ul><li>Sélection du sol manuelle et précise, pas de fausse détection automatique.</li><li>Perspective calculée à partir de vos quatre points.</li><li>Ombres et lumières de la photo reportées sur le parquet.</li></ul>
+      </aside>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="faq-title">
+        <div class="wrap-text">
+          <h2 id="faq-title">Questions fréquentes</h2>
+          <div class="accordion" data-multiple="false">
+        <div class="accordion__item" data-open="true">
+          <h3><button class="accordion__trigger" type="button" aria-expanded="true">
+            <span>Comment la zone du sol est-elle détectée ?</span><span class="accordion__icon" aria-hidden="true"></span>
+          </button></h3>
+          <div class="accordion__panel"><div><p>Elle ne l'est pas automatiquement : vous placez vous-même quatre points aux angles du sol. Ce choix est assumé — une détection automatique fiable demande un modèle de segmentation d'image, qui fera l'objet d'une prochaine version. La sélection manuelle donne un résultat plus juste qu'une fausse détection.</p></div></div>
+        </div><div class="accordion__item" data-open="false">
+          <h3><button class="accordion__trigger" type="button" aria-expanded="false">
+            <span>Ma photo est-elle envoyée quelque part ?</span><span class="accordion__icon" aria-hidden="true"></span>
+          </button></h3>
+          <div class="accordion__panel"><div><p>Non. Elle est lue et traitée directement dans votre navigateur : aucun envoi vers un serveur, aucun stockage. Fermez l'onglet et il n'en reste rien.</p></div></div>
+        </div><div class="accordion__item" data-open="false">
+          <h3><button class="accordion__trigger" type="button" aria-expanded="false">
+            <span>Le rendu correspond-il exactement au produit posé ?</span><span class="accordion__icon" aria-hidden="true"></span>
+          </button></h3>
+          <div class="accordion__panel"><div><p>Non. Les textures sont générées pour la démonstration : elles donnent la teinte, le motif, l'échelle et le sens de pose, pas l'aspect exact d'une référence commerciale. Le rendu sert à décider d'une direction, pas à valider une commande.</p></div></div>
+        </div><div class="accordion__item" data-open="false">
+          <h3><button class="accordion__trigger" type="button" aria-expanded="false">
+            <span>Pourquoi le parquet suit-il la perspective ?</span><span class="accordion__icon" aria-hidden="true"></span>
+          </button></h3>
+          <div class="accordion__panel"><div><p>Les quatre points définissent un quadrilatère : on en déduit la transformation projective qui envoie le plan du sol sur l'image. Les lames proches paraissent donc plus grandes que celles du fond, et les ombres de la photo d'origine sont reportées sur la texture.</p></div></div>
+        </div>
+      </div>
+          <aside class="callout">
+        <p class="callout__label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.2 17.5h5.6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z"/></svg>Conseil</p>
+        <p>Pour préparer une commande, passez en <strong>mode plan</strong> : il donne la surface, les chutes estimées et le nombre de lames à partir des dimensions réelles de la pièce.</p>
+      </aside>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="wrap-wide">
+        <p class="footer__wordmark">Pose <span>Parquet</span></p>
+        <div class="footer__grid">
+          <div class="footer__intro">
+            <p>Un média pratique et une boîte à outils autour de la pose du parquet : guides, techniques, motifs et simulateurs.</p>
+            <a class="link-arrow" href="../projet/">Décrire un projet<svg  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+          </div>
+          <div class="footer__col">
+            <h3>Comprendre</h3>
+            <ul>
+              <li><a href="../guides/quel-sens-de-pose-choisir.html">Choisir le sens de pose</a></li>
+              <li><a href="../guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a></li>
+              <li><a href="../guides/parquet-massif-ou-contrecolle.html">Massif ou contrecollé</a></li>
+              <li><a href="../guides/erreurs-a-eviter-avant-de-poser.html">Erreurs à éviter</a></li>
+            </ul>
+          </div>
+          <div class="footer__col">
+            <h3>Motifs</h3>
+            <ul>
+              <li><a href="../motifs/pose-droite.html">Pose droite</a></li>
+              <li><a href="../motifs/pose-diagonale.html">Pose diagonale</a></li>
+              <li><a href="../motifs/point-de-hongrie.html">Point de Hongrie</a></li>
+              <li><a href="../motifs/baton-rompu.html">Bâton rompu</a></li>
+            </ul>
+          </div>
+          <div class="footer__col">
+            <h3>Le site</h3>
+            <ul>
+              <li><a href="../outils/simulateur-pose.html">Simulateur de pose</a></li>
+              <li><a href="../tutoriels/">Tutoriels</a></li>
+              <li><a href="../a-propos/">À propos</a></li>
+              <li><a href="../contact/">Contact</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer__bottom">
+          <p>&copy; 2026 Pose Parquet — site éditorial indépendant.</p>
+          <p>Photographies libres de droits · aucune vente en ligne</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

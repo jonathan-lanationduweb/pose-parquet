@@ -33,7 +33,13 @@ async function boot() {
 
   if (has('[data-carousel]')) {
     const { initCarousel } = await import('./components/carousel.js');
-    mountAll('[data-carousel]', initCarousel);
+    const instances = qsa('[data-carousel]').map((el) => ({ el, api: initCarousel(el) }));
+
+    const scrollDriven = instances.filter(({ el }) => el.hasAttribute('data-scroll-carousel'));
+    if (scrollDriven.length) {
+      const { initScrollCarousel } = await import('./components/scroll-carousel.js');
+      scrollDriven.forEach(({ el, api }) => initScrollCarousel(el, api));
+    }
   }
 
   if (has('[data-modal]')) {
@@ -68,6 +74,11 @@ async function boot() {
     qsa('[data-pattern-thumb]').forEach((slot) => {
       slot.innerHTML = patternThumb(slot.dataset.patternThumb, { w: 160, h: 120 });
     });
+  }
+
+  if (has('[data-visualiseur]')) {
+    const { mountVisualizer } = await import('./visualizer/index.js');
+    mountVisualizer(qs('[data-visualiseur]'));
   }
 
   if (has('[data-visualizer]')) {

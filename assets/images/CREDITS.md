@@ -37,6 +37,12 @@ Elles sont créditées ici par respect du travail des auteurs.
 | `tile-motif.jpg` | Magda Ehlers | [Pexels #15066939](https://www.pexels.com/photo/15066939/) |
 | `tile-renover.jpg` | Pexels | [Pexels #11126101](https://www.pexels.com/photo/11126101/) |
 | `projet-visuel.jpg` | Max Vakhtbovych | [Pexels #6835181](https://www.pexels.com/photo/6835181/) |
+| `room-sejour.jpg` | Curtis Adams | [Pexels #3935327](https://www.pexels.com/photo/3935327/) |
+| `room-piece-claire.jpg` | Max Vakhtbovych | [Pexels #8146330](https://www.pexels.com/photo/8146330/) |
+| `room-chambre.jpg` | Max Vakhtbovych | [Pexels #7587859](https://www.pexels.com/photo/7587859/) |
+| `room-salon.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
+| `room-contraste.jpg` | sanket mahind | [Pexels #18707513](https://www.pexels.com/photo/18707513/) |
+| `room-cuisine.jpg` | Max Vakhtbovych | [Pexels #7060823](https://www.pexels.com/photo/7060823/) |
 | `hero-poster.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
 | `og-default.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
 | `inspi-1.jpg` | Max Vakhtbovych | [Pexels #7587865](https://www.pexels.com/photo/7587865/) |
