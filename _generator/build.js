@@ -606,7 +606,7 @@ function buildTools() {
               <div class="tool-card__head"><h3>Prochainement</h3><span class="badge badge--outline">En préparation</span></div>
               <p>Les outils suivants viendront compléter le studio, avec la même logique : une question concrète, une réponse immédiate.</p>
               <ul class="meta-list meta-list--stack">
-                ${roadmap.map(([title, text]) => `<li><strong>${title}</strong> — ${text}</li>`).join('')}
+                ${roadmap.map(([title, text]) => `<li><strong>${title}</strong><span>${text}</span></li>`).join('')}
               </ul>
             </div>
           </div>
