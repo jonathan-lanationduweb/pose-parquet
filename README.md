@@ -195,6 +195,67 @@ partenaire dans le conteneur `[data-project-form]`.
 
 ---
 
+## Visualiseur de parquet (`js/visualizer/`)
+
+Page : `outils/visualiseur.html`. Deux modes en onglets — **Visualiser ma pièce**
+(photo) et **Mode plan** (l'ancien simulateur vu du dessus).
+
+| Fichier | Rôle |
+| --- | --- |
+| `image-loader.js` | Chargement et redimensionnement (max 1600 × 1200) des pièces d'exemple et des photos importées |
+| `rooms.js` | Catalogue des pièces d'exemple : fichier, crédit, dimensions supposées, quadrilatère du sol |
+| `floor-mask.js` | Sélection manuelle du sol + interface `detectFloor(strategy, ctx)` |
+| `perspective.js` | Homographie 4 points (carré unité → quadrilatère) et son inverse |
+| `patterns.js` | Textures procédurales répétables : lames droites, Point de Hongrie, bâton rompu, 6 teintes |
+| `texture-renderer.js` | Rendu pixel par pixel : projection, choix du niveau de réduction, report des ombres |
+| `controls.js` | Panneau de réglages (natif, accessible au clavier) |
+| `compare.js` | Avant / après piloté par un `input[type=range]` |
+| `state.js` | État partagé avec le mode plan (localStorage) |
+| `index.js` | Orchestration |
+
+**Ce que fait réellement la V1** : la zone de sol est délimitée **à la main**
+(quatre poignées souris / tactile / clavier). Aucune détection automatique
+n'est utilisée ni simulée. La texture est ensuite projetée dans le
+quadrilatère par homographie — d'où la perspective — et modulée par la
+luminance de la photo d'origine, ce qui reporte ombres et reflets.
+
+**Brancher une détection automatique plus tard** :
+
+```js
+import { registerDetector, detectFloor } from './floor-mask.js';
+registerDetector('auto', async ({ canvas }) => quadNormalise); // modèle ou service
+await detectFloor('auto', { canvas });
+```
+
+Les photos importées ne quittent jamais le navigateur : lecture via
+`URL.createObjectURL`, traitement en Canvas, aucun envoi réseau.
+
+---
+
+## Carrousels pilotés par le scroll
+
+Sur écran large (≥ 62rem) et hors « mouvement réduit », les deux grandes
+sections carrousel deviennent des sections hautes à contenu collant :
+la progression verticale dans la section est convertie en défilement
+horizontal (`js/components/scroll-carousel.js`). La molette n'est jamais
+interceptée — on lit `scrollY`, rien de plus. Dans ce mode les flèches
+déplacent la page ; le glisser est désactivé pour éviter tout conflit.
+
+En dessous de 62rem, retour au carrousel classique : scroll-snap, swipe,
+flèches et glisser.
+
+---
+
+## Icônes
+
+`node _generator/make-icons.js` produit `favicon-16/32/48.png`,
+`apple-touch-icon.png` (180) et `icon-192/512.png` (maskable) à partir du
+monogramme double chevron, via un rasteriseur maison (aucune dépendance).
+Les sources vectorielles sont `assets/icons/favicon.svg` et `maskable.svg` ;
+`site.webmanifest` référence l'ensemble en chemins relatifs.
+
+---
+
 ## Médias
 
 Les photographies proviennent de **Pexels** (licence gratuite, usage commercial
