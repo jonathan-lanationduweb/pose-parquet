@@ -85,3 +85,13 @@
   .pf__actions .btn { width: 100%; }
   .pf__actions .btn--ghost { margin-right: 0; }
 }
+
+/* Reprise d'une simulation faite dans le Studio */
+.pf__from-studio {
+  margin: 0 0 var(--sp-5);
+  padding: 0.7rem 0.95rem;
+  border-radius: var(--r-sm);
+  background: var(--c-sage-pale);
+  color: var(--c-sage-deep);
+  font-size: 0.88rem;
+}

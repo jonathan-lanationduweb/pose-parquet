@@ -82,7 +82,7 @@ function heroSection() {
               <p class="hero__lead">Guides, techniques et outils pour comprendre et réussir votre projet parquet — du support au motif, du calepinage à la finition.</p>
               <div class="hero__actions">
                 <a class="btn btn--light btn--lg" href="guides/"><span>Explorer les guides</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
-                <a class="btn btn--outline-light btn--lg" href="outils/visualiseur.html"><span>Visualiser ma pièce</span></a>
+                <a class="btn btn--outline-light btn--lg" href="outils/studio.html"><span>Visualiser ma pièce</span></a>
               </div>
             </div>
             <ul class="hero__meta">
@@ -143,13 +143,13 @@ function simulatorSection() {
           <div class="section-head section-head__row">
             <div>
               <p class="eyebrow">Visualiseur · outil</p>
-              <h2 id="sim-title">Votre pièce,<br />avant les travaux.</h2>
+              <h2 id="sim-title">Essayez votre parquet<br />dans votre pièce.</h2>
             </div>
             <div>
-              <p class="lead">Importez une photo de votre pièce, délimitez le sol, posez le parquet dessus. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée ni conservée.</p>
+              <p class="lead">Importez une photo, choisissez un parquet et comparez plusieurs rendus. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée ni conservée.</p>
               <p class="u-mt-5 u-actions">
-                <a class="btn" href="outils/visualiseur.html"><span>Visualiser ma pièce</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
-                <a class="link-arrow" href="outils/simulateur-pose.html">Ou passer en mode Plan ${ICON.arrow}</a>
+                <a class="btn" href="outils/studio.html"><span>Visualiser ma pièce</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+                <a class="link-arrow" href="outils/simulateur-pose.html">Étudier le sens de pose ${ICON.arrow}</a>
               </p>
             </div>
           </div>
@@ -335,8 +335,8 @@ function toolsSection() {
           <div class="grid grid--3">
             <div class="tool-card" data-reveal>
               <div class="tool-card__head"><h3>Visualiser ma pièce</h3><span class="badge badge--sage">Nouveau</span></div>
-              <p>Votre photo, un parquet posé dessus, en perspective.</p>
-              <a class="btn btn--sm" href="outils/visualiseur.html"><span>Ouvrir</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+              <p>Douze parquets, trois motifs, votre photo. Le sol change à chaque clic.</p>
+              <a class="btn btn--sm" href="outils/studio.html"><span>Ouvrir</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
             </div>
             <div class="tool-card" data-reveal data-reveal-delay="70">
               <div class="tool-card__head"><h3>Mode plan</h3><span class="badge badge--sage">Disponible</span></div>
