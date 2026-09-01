@@ -13,7 +13,7 @@
  * interactions (curseurs, pinceau), puis un rendu pleine résolution au repos.
  */
 import { squareToQuad, invert, bounds } from './perspective.js';
-import { TILE, TILE_METERS } from './patterns.js';
+import { TILE, TILE_METERS } from '../studio/texture.js';
 
 const clamp = (v, min, max) => (v < min ? min : v > max ? max : v);
 

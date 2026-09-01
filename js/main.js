@@ -81,11 +81,6 @@ async function boot() {
     mountAll('[data-vz-preview]', mountPreview);
   }
 
-  if (has('[data-visualiseur]')) {
-    const { mountVisualizer } = await import('./visualizer/index.js');
-    mountVisualizer(qs('[data-visualiseur]'));
-  }
-
   if (has('[data-visualizer]')) {
     const { initVisualizers } = await import('./tools/floor-visualizer.js');
     initVisualizers();

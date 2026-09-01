@@ -9,17 +9,19 @@
  * travaille sur une version réduite de la photo : la page d'accueil ne paie
  * pas le prix d'un rendu plein format.
  */
-import { buildTexture, buildMips, TONES, PATTERNS } from './patterns.js';
+import { buildTexture, buildMips } from '../studio/texture.js';
+import { loadCatalog } from '../studio/catalog.js';
 import { renderFloor } from './texture-renderer.js';
 import { createMask } from './mask.js';
 import { loadImage } from './image-loader.js';
 import { getRoom } from './rooms.js';
 
 const MAX_WIDTH = 1200;
+/** Trois références du catalogue, choisies pour montrer l'écart de rendu. */
 const CHIPS = [
-  { tone: 'naturel', pattern: 'lames', label: 'Chêne naturel' },
-  { tone: 'miel', pattern: 'point-de-hongrie', label: 'Point de Hongrie' },
-  { tone: 'fume', pattern: 'baton-rompu', label: 'Chêne fumé' },
+  { material: 'chene-naturel', pattern: 'lames' },
+  { material: 'chene-miel', pattern: 'point-de-hongrie' },
+  { material: 'chene-fume', pattern: 'baton-rompu' },
 ];
 
 function downscale(prepared) {
@@ -70,40 +72,55 @@ export function mountPreview(root) {
   let targetData = null;
   let mask = null;
   let current = CHIPS[0];
+  let catalog = null;
   const textures = new Map();
 
   const applyRange = () => stage.style.setProperty('--compare', `${range.value}%`);
   range.addEventListener('input', applyRange);
   applyRange();
 
-  CHIPS.forEach((chip) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'vzp__chip';
-    button.dataset.chip = chip.tone;
-    button.setAttribute('aria-pressed', String(chip === current));
-    button.textContent = chip.label;
-    button.addEventListener('click', () => {
-      current = chip;
-      chips
-        .querySelectorAll('[data-chip]')
-        .forEach((el) => el.setAttribute('aria-pressed', String(el.dataset.chip === chip.tone)));
-      const pattern = PATTERNS.find((p) => p.id === chip.pattern);
-      const tone = TONES.find((t) => t.id === chip.tone);
-      caption.textContent = `${tone.label}, ${pattern.label.toLowerCase()}`;
-      draw();
+  /** Les pastilles reprennent trois références du catalogue du Studio. */
+  function buildChips() {
+    chips.innerHTML = '';
+    CHIPS.forEach((chip) => {
+      const material = catalog.get(chip.material);
+      if (!material) return;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'vzp__chip';
+      button.dataset.chip = chip.material;
+      button.setAttribute('aria-pressed', String(chip === current));
+      button.textContent = material.name;
+      button.addEventListener('click', () => {
+        current = chip;
+        chips
+          .querySelectorAll('[data-chip]')
+          .forEach((el) => el.setAttribute('aria-pressed', String(el.dataset.chip === chip.material)));
+        setCaption();
+        draw();
+      });
+      chips.appendChild(button);
     });
-    chips.appendChild(button);
-  });
+    setCaption();
+  }
 
-  const mips = (config) => {
-    const key = `${config.pattern}|${config.tone}`;
-    if (!textures.has(key)) textures.set(key, buildMips(buildTexture({ ...config, plankWidth: 0.14 })));
+  function setCaption() {
+    const material = catalog.get(current.material);
+    const pattern = catalog.patterns.find((item) => item.id === current.pattern);
+    if (material && pattern) caption.textContent = `${material.name}, ${pattern.label.toLowerCase()}`;
+  }
+
+  const mips = (chip) => {
+    const key = `${chip.material}|${chip.pattern}`;
+    if (!textures.has(key)) {
+      const material = catalog.get(chip.material);
+      textures.set(key, buildMips(buildTexture(material, { pattern: chip.pattern })));
+    }
     return textures.get(key);
   };
 
   function draw() {
-    if (!source) return;
+    if (!source || !catalog) return;
     renderFloor({
       source: sourceData,
       target: targetData,
@@ -121,6 +138,8 @@ export function mountPreview(root) {
 
   async function load() {
     try {
+      catalog = await loadCatalog(base);
+      buildChips();
       const prepared = downscale(await loadImage(`${base}assets/images/${room.file}`));
       source = prepared;
       canvas.width = prepared.width;
