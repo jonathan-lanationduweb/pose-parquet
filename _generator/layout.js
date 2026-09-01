@@ -61,53 +61,70 @@ function header(p) {
       </nav>
       <div class="drawer__footer">
         <a class="btn btn--light btn--block" href="${p}projet/"><span>Décrire mon projet</span>${arrow}</a>
-        <a class="btn btn--outline-light btn--block" href="${p}outils/simulateur-pose.html"><span>Ouvrir le simulateur</span></a>
+        <a class="btn btn--outline-light btn--block" href="${p}outils/studio.html"><span>Visualiser ma pièce</span></a>
         <p class="drawer__meta">Média indépendant · aucune vente en ligne</p>
       </div>
     </div>`;
 }
 
+/**
+ * Pied de page compact.
+ *
+ * Trois groupes de liens, pas l'arborescence complète : le pied de page sert
+ * à rebondir, pas à refaire la navigation. La signature typographique reste,
+ * mais serrée — elle signe la page au lieu d'en ouvrir une seconde.
+ */
 function footer(p) {
+  const groups = [
+    {
+      title: 'Comprendre',
+      links: [
+        ['guides/', 'Guides'],
+        ['motifs/', 'Motifs'],
+        ['tutoriels/', 'Tutoriels'],
+      ],
+    },
+    {
+      title: 'Outils',
+      links: [
+        ['outils/studio.html', 'Visualiser ma pièce'],
+        ['outils/simulateur-pose.html', 'Mode Plan'],
+        ['inspiration/', 'Inspiration'],
+      ],
+    },
+    {
+      title: 'À propos',
+      links: [
+        ['a-propos/methode-editoriale.html', 'Notre méthode'],
+        ['contact/', 'Contact'],
+        ['projet/', 'Votre projet'],
+      ],
+    },
+  ];
+
   return `<footer class="site-footer">
-      <div class="wrap-wide">
-        <p class="footer__wordmark">Pose <span>Parquet</span></p>
-        <div class="footer__grid">
-          <div class="footer__intro">
-            <p>Un média pratique et une boîte à outils autour de la pose du parquet : guides, techniques, motifs et simulateurs.</p>
-            <a class="link-arrow" href="${p}projet/">Décrire un projet${arrow.replace('class="btn__icon"', '')}</a>
+      <div class="wrap-wide footer__inner">
+        <div class="footer__top">
+          <div class="footer__brand">
+            <p class="footer__wordmark">Pose <span>Parquet</span></p>
+            <p class="footer__baseline">Guides et outils pour réussir la pose de son parquet.</p>
           </div>
-          <div class="footer__col">
-            <h2>Comprendre</h2>
-            <ul>
-              <li><a href="${p}guides/quel-sens-de-pose-choisir.html">Choisir le sens de pose</a></li>
-              <li><a href="${p}guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a></li>
-              <li><a href="${p}guides/parquet-massif-ou-contrecolle.html">Massif ou contrecollé</a></li>
-              <li><a href="${p}guides/erreurs-a-eviter-avant-de-poser.html">Erreurs à éviter</a></li>
-            </ul>
-          </div>
-          <div class="footer__col">
-            <h2>Motifs</h2>
-            <ul>
-              <li><a href="${p}motifs/pose-droite.html">Pose droite</a></li>
-              <li><a href="${p}motifs/pose-diagonale.html">Pose diagonale</a></li>
-              <li><a href="${p}motifs/point-de-hongrie.html">Point de Hongrie</a></li>
-              <li><a href="${p}motifs/baton-rompu.html">Bâton rompu</a></li>
-            </ul>
-          </div>
-          <div class="footer__col">
-            <h2>Le site</h2>
-            <ul>
-              <li><a href="${p}outils/visualiseur.html">Visualiser ma pièce</a></li>
-              <li><a href="${p}outils/simulateur-pose.html">Mode plan</a></li>
-              <li><a href="${p}a-propos/">À propos</a></li>
-              <li><a href="${p}a-propos/methode-editoriale.html">Méthode éditoriale</a></li>
-              <li><a href="${p}contact/">Contact</a></li>
-            </ul>
-          </div>
+          <nav class="footer__nav" aria-label="Pied de page">
+            ${groups
+              .map(
+                (group) => `<div class="footer__col">
+              <h2>${group.title}</h2>
+              <ul>
+                ${group.links.map(([href, label]) => `<li><a href="${p}${href}">${label}</a></li>`).join('')}
+              </ul>
+            </div>`
+              )
+              .join('')}
+          </nav>
         </div>
         <div class="footer__bottom">
-          <p>&copy; 2026 Pose Parquet — site éditorial indépendant.</p>
-          <p>Photographies sous licence Pexels · aucune vente en ligne</p>
+          <p>&copy; 2026 Pose Parquet — média indépendant, aucune vente en ligne.</p>
+          <p>Photographies sous licence Pexels</p>
         </div>
       </div>
     </footer>`;

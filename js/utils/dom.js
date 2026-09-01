@@ -19,11 +19,21 @@ export function mountAll(selector, factory, scope = document) {
 }
 
 /** Piege le focus dans un conteneur (modale, drawer). */
+/**
+ * Maintient le focus dans un ou plusieurs conteneurs.
+ * @param {Element|Element[]} container un conteneur, ou plusieurs (le bouton de
+ *   fermeture d'un menu vit souvent hors du panneau qu'il ferme).
+ */
 export function trapFocus(container, event) {
-  const focusables = qsa(
-    'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])',
-    container
-  ).filter((el) => el.offsetParent !== null);
+  const roots = Array.isArray(container) ? container : [container];
+  const focusables = roots
+    .flatMap((root) =>
+      qsa(
+        'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])',
+        root
+      )
+    )
+    .filter((el) => el.offsetParent !== null);
   if (!focusables.length) return;
   const first = focusables[0];
   const last = focusables[focusables.length - 1];

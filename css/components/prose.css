@@ -1,8 +1,8 @@
 /* Contenu editorial : corps d'article, encadres, etapes, comparatifs */
-.prose { font-size: 1.02rem; max-width: 40rem; }
+.prose { font-size: 1.02rem; max-width: var(--measure); }
 .prose > * + * { margin-top: var(--sp-4); }
 .prose h2 {
-  font-size: clamp(1.8rem, 1.3rem + 2vw, 2.9rem);
+  font-size: clamp(1.6rem, 1.35rem + 1.2vw, 2.5rem);
   margin-top: clamp(3rem, 2rem + 3vw, 4.5rem);
   padding-top: var(--sp-5);
   border-top: 1px solid var(--line);

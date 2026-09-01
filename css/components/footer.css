@@ -1,61 +1,74 @@
-/* Pied de page : large, sobre, horizontal */
+/**
+ * Pied de page compact.
+ *
+ * Objectif : signer la page, pas en ouvrir une seconde. Une signature serrée,
+ * trois petits groupes de liens, une ligne de mentions. Sur grand écran
+ * l'ensemble tient sous ~420 px de haut ; sur téléphone, tout s'empile sans
+ * jamais devenir une liste interminable.
+ */
 .site-footer {
   background: var(--bg);
   border-top: 1px solid var(--line);
-  padding-block: clamp(3rem, 2rem + 4vw, 6rem) var(--sp-6);
+  padding-block: clamp(2rem, 1.4rem + 2vw, 3rem) clamp(1rem, 0.8rem + 0.6vw, 1.5rem);
 }
 .site-footer a { text-decoration: none; }
 .site-footer a:hover { text-decoration: underline; text-underline-offset: 0.25em; }
 
-/* Signature typographique géante */
+.footer__inner { display: grid; gap: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
+
+.footer__top { display: grid; gap: clamp(1.5rem, 1rem + 2.5vw, 3rem); }
+@media (min-width: 48rem) {
+  .footer__top {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    align-items: start;
+    gap: clamp(2rem, 4vw, 5rem);
+  }
+}
+
+/* Signature : fluide mais bornée, interligne serré, aucune marge superflue */
 .footer__wordmark {
+  margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2.6rem, 1rem + 8.2vw, 10.5rem);
-  line-height: 0.85;
-  letter-spacing: -0.03em;
+  font-size: clamp(2.1rem, 1.4rem + 2.6vw, 3.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.028em;
   color: var(--text);
-  margin: 0 0 clamp(2rem, 1rem + 3vw, 3.5rem);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0 0.3em;
 }
 .footer__wordmark span { color: var(--line-strong); }
-@media (max-width: 30rem) { .footer__wordmark { gap: 0; line-height: 0.9; } }
+.footer__baseline {
+  margin: 0.5rem 0 0;
+  max-width: 32ch;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
 
-.footer__grid {
+.footer__nav {
   display: grid;
-  gap: var(--sp-7);
-  padding-bottom: clamp(2rem, 1rem + 3vw, 3.5rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: clamp(1.25rem, 1rem + 1.5vw, 2.5rem);
 }
-@media (min-width: 55rem) {
-  .footer__grid { grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(0, 0.8fr)); gap: var(--sp-6); }
-}
-
-.footer__intro p { color: var(--text-soft); max-width: 34ch; margin: 0 0 var(--sp-5); font-size: 0.95rem; }
-
 .footer__col h2 {
+  margin: 0 0 0.7rem;
   font-family: var(--font-sans);
   font-size: var(--fs-xs);
   text-transform: uppercase;
   letter-spacing: var(--tracking-eyebrow);
   color: var(--text-muted);
   font-weight: 500;
-  margin-bottom: var(--sp-4);
 }
-.footer__col ul { display: grid; gap: 0.6rem; font-size: 0.94rem; list-style: none; margin: 0; padding: 0; }
+.footer__col ul { display: grid; gap: 0.45rem; margin: 0; padding: 0; list-style: none; font-size: 0.92rem; }
 .footer__col a { color: var(--text-soft); }
 .footer__col a:hover { color: var(--text); }
 
 .footer__bottom {
-  padding-top: var(--sp-5);
-  border-top: 1px solid var(--line);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sp-4) var(--sp-6);
+  gap: 0.35rem var(--sp-5);
   justify-content: space-between;
-  align-items: center;
-  font-size: var(--fs-sm);
+  align-items: baseline;
+  padding-top: clamp(0.9rem, 0.7rem + 0.6vw, 1.25rem);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-xs);
   color: var(--text-muted);
 }
 .footer__bottom p { margin: 0; }

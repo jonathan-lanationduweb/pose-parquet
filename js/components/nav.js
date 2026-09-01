@@ -38,7 +38,11 @@ export function initNav() {
     }
   };
 
-  on(toggle, 'click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+  on(toggle, 'click', () => {
+    const open = toggle.getAttribute('aria-expanded') !== 'true';
+    setOpen(open);
+    if (!open) toggle.focus();
+  });
 
   on(document, 'keydown', (event) => {
     if (drawer.dataset.open !== 'true') return;
@@ -46,7 +50,9 @@ export function initNav() {
       setOpen(false);
       toggle.focus();
     }
-    if (event.key === 'Tab') trapFocus(drawer, event);
+    // Le bouton de fermeture vit dans l'en-tête, hors du panneau : on l'inclut
+    // explicitement dans le cycle, sinon on ne peut pas l'atteindre au clavier.
+    if (event.key === 'Tab') trapFocus([toggle, drawer], event);
   });
 
   qsa('a', drawer).forEach((link) => on(link, 'click', () => setOpen(false)));
