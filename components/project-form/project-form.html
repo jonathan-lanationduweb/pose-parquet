@@ -1,0 +1,23 @@
+<!--
+  Point de montage du formulaire projet.
+
+  Copiez ce bloc dans n'importe quelle page, puis chargez la feuille de style
+  du composant dans le <head> :
+
+    <link rel="stylesheet" href="../components/project-form/project-form.css" />
+
+  js/main.js détecte [data-project-form], importe le composant à la demande
+  et lui fournit la fonction d'envoi (js/forms/submit-adapter.js).
+
+  Pour brancher un autre formulaire (partenaire, backend, iframe), il suffit
+  de remplacer le contenu de ce conteneur : aucune page ne dépend de la
+  structure interne du composant.
+-->
+<div data-project-form>
+  <noscript>
+    <p>
+      Le formulaire nécessite JavaScript. Vous pouvez décrire votre projet par email :
+      <a href="mailto:projet@pose-parquet.com">projet@pose-parquet.com</a>.
+    </p>
+  </noscript>
+</div>

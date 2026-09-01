@@ -1,0 +1,55 @@
+/* Boutons & liens d'action */
+.btn {
+  --btn-bg: var(--c-charcoal);
+  --btn-fg: var(--text-invert);
+  --btn-bd: var(--c-charcoal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.78rem 1.35rem;
+  border: 1px solid var(--btn-bd);
+  border-radius: var(--r-full);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-size: 0.94rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--dur-2) var(--ease-out), background var(--dur-2) var(--ease-out),
+              color var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out),
+              box-shadow var(--dur-2) var(--ease-out);
+}
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-2); }
+.btn:active { transform: translateY(0); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn--accent { --btn-bg: var(--accent-strong); --btn-bd: var(--accent-strong); }
+.btn--ghost { --btn-bg: transparent; --btn-fg: var(--text); --btn-bd: var(--line-strong); }
+.btn--ghost:hover { --btn-bd: var(--text); }
+.btn--light { --btn-bg: var(--c-white); --btn-fg: var(--c-charcoal); --btn-bd: var(--c-white); }
+.btn--outline-light { --btn-bg: transparent; --btn-fg: var(--text-invert); --btn-bd: rgba(255,255,255,0.4); }
+.btn--sm { padding: 0.5rem 0.95rem; font-size: 0.85rem; }
+.btn--lg { padding: 0.95rem 1.75rem; font-size: 1rem; }
+.btn--block { width: 100%; }
+
+.btn__icon { width: 1em; height: 1em; flex: none; transition: transform var(--dur-2) var(--ease-out); }
+.btn:hover .btn__icon { transform: translateX(3px); }
+
+/* Lien fleche editorial */
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 500;
+  font-size: 0.94rem;
+  text-decoration: none;
+  color: var(--text);
+  border-bottom: 1px solid var(--line-strong);
+  padding-bottom: 2px;
+  transition: border-color var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
+}
+.link-arrow svg { width: 0.95em; height: 0.95em; transition: transform var(--dur-2) var(--ease-out); }
+.link-arrow:hover { border-color: var(--accent); color: var(--accent-strong); }
+.link-arrow:hover svg { transform: translateX(4px); }

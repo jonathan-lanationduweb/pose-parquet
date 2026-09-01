@@ -1,0 +1,200 @@
+{
+  "genere": "2026-09-01",
+  "guides": [
+    {
+      "slug": "quel-sens-de-pose-choisir",
+      "titre": "Quel sens de pose choisir pour son parquet ?",
+      "url": "guides/quel-sens-de-pose-choisir.html",
+      "categorie": "Sens de pose",
+      "tags": [
+        "sens-de-pose",
+        "comprendre"
+      ],
+      "lecture": "9 min",
+      "resume": "Cinq critères suffisent à trancher, et ils ne se valent pas. Voici l'ordre dans lequel les regarder."
+    },
+    {
+      "slug": "poser-parquet-sens-de-la-lumiere",
+      "titre": "Poser un parquet dans le sens de la lumière",
+      "url": "guides/poser-parquet-sens-de-la-lumiere.html",
+      "categorie": "Sens de pose",
+      "tags": [
+        "sens-de-pose",
+        "comprendre"
+      ],
+      "lecture": "6 min",
+      "resume": "La règle la plus citée du parquet. Encore faut-il savoir ce qu'elle recouvre et quand elle cesse d'être vraie."
+    },
+    {
+      "slug": "preparer-son-sol-avant-la-pose",
+      "titre": "Comment préparer un sol avant la pose ?",
+      "url": "guides/preparer-son-sol-avant-la-pose.html",
+      "categorie": "Préparation",
+      "tags": [
+        "preparation",
+        "poser"
+      ],
+      "lecture": "10 min",
+      "resume": "Neuf désordres sur dix viennent du support, pas du parquet. Voici les contrôles à mener avant la première lame."
+    },
+    {
+      "slug": "point-de-hongrie-ou-baton-rompu",
+      "titre": "Point de Hongrie ou bâton rompu ?",
+      "url": "guides/point-de-hongrie-ou-baton-rompu.html",
+      "categorie": "Motifs",
+      "tags": [
+        "motifs",
+        "choisir"
+      ],
+      "lecture": "7 min",
+      "resume": "Une coupe d'onglet sépare ces deux motifs. Elle change le rendu, le prix et la pose."
+    },
+    {
+      "slug": "erreurs-a-eviter-avant-de-poser",
+      "titre": "Les erreurs à éviter avant de poser un parquet",
+      "url": "guides/erreurs-a-eviter-avant-de-poser.html",
+      "categorie": "Préparation",
+      "tags": [
+        "preparation",
+        "comprendre"
+      ],
+      "lecture": "8 min",
+      "resume": "Huit erreurs reviennent en boucle sur les chantiers. Toutes se corrigent avant la pose, aucune après."
+    },
+    {
+      "slug": "parquet-massif-ou-contrecolle",
+      "titre": "Parquet massif ou contrecollé : quelles différences pour la pose ?",
+      "url": "guides/parquet-massif-ou-contrecolle.html",
+      "categorie": "Comprendre",
+      "tags": [
+        "comprendre",
+        "choisir"
+      ],
+      "lecture": "8 min",
+      "resume": "Le débat porte rarement sur le bon terrain : ce qui change vraiment, c'est la stabilité dimensionnelle."
+    },
+    {
+      "slug": "sens-de-pose-couloir",
+      "titre": "Sens de pose dans un couloir",
+      "url": "guides/sens-de-pose-couloir.html",
+      "categorie": "Sens de pose",
+      "tags": [
+        "sens-de-pose",
+        "poser"
+      ],
+      "lecture": "5 min",
+      "resume": "Le couloir est le seul espace où la règle de la lumière passe au second plan."
+    },
+    {
+      "slug": "sens-de-pose-piece-etroite",
+      "titre": "Sens de pose dans une pièce étroite",
+      "url": "guides/sens-de-pose-piece-etroite.html",
+      "categorie": "Sens de pose",
+      "tags": [
+        "sens-de-pose",
+        "choisir"
+      ],
+      "lecture": "5 min",
+      "resume": "Poser dans la largeur élargit vraiment — à condition d'en accepter les coupes."
+    }
+  ],
+  "motifs": [
+    {
+      "slug": "pose-droite",
+      "titre": "La pose droite",
+      "url": "motifs/pose-droite.html",
+      "motif": "longueur",
+      "stats": {
+        "Chutes estimées": "7 à 8 %",
+        "Difficulté": "Accessible",
+        "Poses compatibles": "Flottante, collée, clouée"
+      }
+    },
+    {
+      "slug": "pose-longueur",
+      "titre": "La pose dans la longueur",
+      "url": "motifs/pose-longueur.html",
+      "motif": "longueur",
+      "stats": {
+        "Chutes estimées": "≈ 7 %",
+        "Effet visuel": "Allonge la pièce",
+        "Cas favorable": "Séjour large et lumineux"
+      }
+    },
+    {
+      "slug": "pose-largeur",
+      "titre": "La pose dans la largeur",
+      "url": "motifs/pose-largeur.html",
+      "motif": "largeur",
+      "stats": {
+        "Chutes estimées": "≈ 8 %",
+        "Effet visuel": "Élargit la pièce",
+        "Cas favorable": "Pièce très allongée"
+      }
+    },
+    {
+      "slug": "pose-diagonale",
+      "titre": "La pose en diagonale",
+      "url": "motifs/pose-diagonale.html",
+      "motif": "diagonale",
+      "stats": {
+        "Chutes estimées": "12 à 15 %",
+        "Difficulté": "Intermédiaire",
+        "Effet visuel": "Agrandit, dynamise"
+      }
+    },
+    {
+      "slug": "point-de-hongrie",
+      "titre": "Le Point de Hongrie",
+      "url": "motifs/point-de-hongrie.html",
+      "motif": "point-de-hongrie",
+      "stats": {
+        "Chutes estimées": "12 à 15 %",
+        "Difficulté": "Élevée",
+        "Coupe des lames": "Onglet, gauches et droites"
+      }
+    },
+    {
+      "slug": "baton-rompu",
+      "titre": "Le bâton rompu",
+      "url": "motifs/baton-rompu.html",
+      "motif": "baton-rompu",
+      "stats": {
+        "Chutes estimées": "10 à 12 %",
+        "Difficulté": "Élevée",
+        "Coupe des lames": "Lames droites standard"
+      }
+    }
+  ],
+  "tutoriels": [
+    {
+      "slug": "poser-un-parquet-flottant",
+      "titre": "Poser un parquet flottant, étape par étape",
+      "url": "tutoriels/poser-un-parquet-flottant.html",
+      "niveau": "Accessible",
+      "duree": "1 journée pour 20 m²"
+    },
+    {
+      "slug": "coller-un-parquet-contrecolle",
+      "titre": "Coller un parquet contrecollé",
+      "url": "tutoriels/coller-un-parquet-contrecolle.html",
+      "niveau": "Confirmé",
+      "duree": "1 à 2 jours pour 20 m²"
+    },
+    {
+      "slug": "reussir-le-calepinage",
+      "titre": "Réussir son calepinage",
+      "url": "tutoriels/reussir-le-calepinage.html",
+      "niveau": "Accessible",
+      "duree": "1 à 2 heures"
+    }
+  ],
+  "outils": [
+    {
+      "slug": "simulateur-pose",
+      "titre": "Studio de pose",
+      "url": "outils/simulateur-pose.html",
+      "etat": "disponible"
+    }
+  ]
+}

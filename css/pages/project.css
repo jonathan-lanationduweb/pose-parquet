@@ -1,0 +1,13 @@
+/* Page projet + page contact */
+.project-intro { display: grid; gap: var(--sp-6); }
+@media (min-width: 62rem) { .project-intro { grid-template-columns: 1fr 0.85fr; gap: var(--sp-8); align-items: start; } }
+
+.project-points { display: grid; gap: var(--sp-4); }
+.project-points li { display: flex; gap: 0.75rem; align-items: flex-start; color: var(--text-soft); }
+.project-points svg { width: 1.15em; height: 1.15em; flex: none; margin-top: 0.24em; color: var(--accent); }
+
+.contact-grid { display: grid; gap: var(--sp-6); }
+@media (min-width: 58rem) { .contact-grid { grid-template-columns: 1fr 1fr; gap: var(--sp-8); } }
+.contact-card { padding: var(--sp-6); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--bg-solid); display: grid; gap: var(--sp-4); align-content: start; }
+
+.contact-card .btn { justify-self: start; }

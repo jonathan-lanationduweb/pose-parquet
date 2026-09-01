@@ -1,0 +1,6 @@
+/* Pages outils */
+.tool-hero { padding-block: var(--sp-6) var(--sp-5); }
+.tool-hero h1 { max-width: 16ch; }
+.tool-shell { padding-bottom: var(--sp-8); }
+.tools-roadmap { margin-top: var(--sp-8); }
+.tools-roadmap ol { display: grid; gap: var(--sp-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); list-style: none; padding: 0; }

@@ -1,0 +1,124 @@
+/* Studio de pose : simulateur SVG */
+.visualizer {
+  display: grid;
+  gap: var(--sp-5);
+  align-items: start;
+}
+@media (min-width: 62rem) {
+  .visualizer { grid-template-columns: 19.5rem minmax(0, 1fr); gap: var(--sp-6); }
+  .visualizer--compact { grid-template-columns: 16rem minmax(0, 1fr); }
+}
+
+.visualizer__panel {
+  display: grid;
+  gap: var(--sp-5);
+  padding: var(--sp-5);
+  background: var(--bg-solid);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+.visualizer__group { display: grid; gap: 0.7rem; }
+.visualizer__group > legend,
+.visualizer__group-title {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  color: var(--text-muted);
+  font-weight: 600;
+  padding: 0;
+}
+.visualizer__group { border: 0; margin: 0; padding: 0; }
+
+.visualizer__dims { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+.visualizer__num { display: grid; gap: 0.3rem; font-size: 0.86rem; }
+.visualizer__num input {
+  width: 100%;
+  padding: 0.55rem 0.6rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
+.visualizer__num input:focus { outline: none; border-color: var(--accent-strong); box-shadow: 0 0 0 3px var(--c-sage-wash); }
+
+.visualizer__range { display: grid; gap: 0.35rem; font-size: 0.86rem; }
+.visualizer__range output { font-family: var(--font-mono); color: var(--text-muted); font-size: 0.82rem; }
+.visualizer__range input[type="range"] { width: 100%; accent-color: var(--accent-strong); }
+
+.pattern-switch { display: grid; gap: 0.4rem; }
+.pattern-switch button {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  text-align: left;
+  font-size: 0.92rem;
+  color: var(--text-soft);
+  transition: background var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
+}
+.pattern-switch button:hover { background: var(--c-paper-2); color: var(--text); }
+.pattern-switch button[aria-pressed="true"] { border-color: var(--accent-strong); background: var(--c-sage-wash); color: var(--text); }
+.pattern-switch svg { width: 30px; height: 22px; flex: none; border-radius: 2px; background: var(--c-paper-3); }
+
+.seg { display: flex; gap: 0.25rem; padding: 0.25rem; border: 1px solid var(--line); border-radius: var(--r-full); }
+.seg button {
+  flex: 1;
+  padding: 0.4rem 0.5rem;
+  border-radius: var(--r-full);
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  transition: background var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
+}
+.seg button[aria-pressed="true"] { background: var(--c-charcoal); color: var(--text-invert); }
+
+.visualizer__stage {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background:
+    radial-gradient(120% 100% at 50% 0%, var(--c-white), var(--c-paper-2));
+  padding: clamp(0.75rem, 2vw, 1.6rem);
+  display: grid;
+  gap: var(--sp-4);
+}
+.visualizer__canvas { width: 100%; height: auto; display: block; border-radius: var(--r-md); overflow: hidden; }
+.visualizer__canvas svg { width: 100%; height: auto; display: block; }
+
+.visualizer__readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+}
+.visualizer__readout b { color: var(--text); font-weight: 600; }
+
+.visualizer__advice {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--c-sage-wash);
+  font-size: 0.92rem;
+  color: var(--c-sage-deep);
+}
+.visualizer__advice svg { width: 1.1em; height: 1.1em; flex: none; margin-top: 0.2em; }
+.visualizer__advice p { margin: 0; }
+
+.visualizer__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+/* Animation d'apparition des lames */
+@media (prefers-reduced-motion: no-preference) {
+  .plank-anim { animation: plank-in 520ms var(--ease-out) both; }
+  @keyframes plank-in {
+    from { opacity: 0; transform: translateY(6px); }
+  }
+}
