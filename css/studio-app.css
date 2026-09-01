@@ -451,9 +451,25 @@ body.app.is-comparing { overflow: hidden; }
 .cat__card[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 .cat__media { display: block; aspect-ratio: 4 / 5; background: var(--c-mineral); }
 .cat__swatch { width: 100%; height: 100%; object-fit: cover; display: block; }
-.cat__label { display: grid; gap: 0.05rem; padding: 0.45rem 0.55rem 0.55rem; }
-.cat__label strong { font-size: 0.85rem; font-weight: 600; }
-.cat__label span { font-size: 0.7rem; color: var(--text-muted); }
+/* Bloc de libellé de hauteur constante : un nom long ne décale pas la carte
+   voisine, et la ligne secondaire est toujours au même endroit. */
+.cat__label { display: grid; gap: 0.1rem; padding: 0.45rem 0.55rem 0.55rem; align-content: start; }
+.cat__label strong {
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.2;
+  min-height: 1.2em;
+}
+.cat__label span {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 0.7rem;
+  line-height: 1.3;
+  min-height: 2.6em;
+  color: var(--text-muted);
+}
 .cat__empty { color: var(--text-muted); font-size: 0.88rem; }
 
 /* ---------- Motifs et orientation ---------- */

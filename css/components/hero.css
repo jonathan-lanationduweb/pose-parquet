@@ -47,9 +47,9 @@
 
 .hero__title {
   font-size: var(--fs-display);
-  line-height: 0.9;
-  letter-spacing: -0.026em;
-  max-width: 15ch;
+  line-height: var(--lh-display);
+  letter-spacing: var(--tracking-display);
+  max-width: 18ch;
   margin: 0;
   color: #fff;
 }
@@ -152,5 +152,5 @@
 @media (min-width: 62rem) {
   .page-hero__grid { grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr); gap: clamp(2rem, 5vw, 5rem); }
 }
-.page-hero__title { font-size: var(--fs-h1); max-width: 14ch; }
-.page-hero__lead { font-size: var(--fs-lead); color: var(--text-soft); max-width: 44ch; margin: 0; }
+.page-hero__title { font-size: var(--fs-h1); max-width: var(--measure-title); }
+.page-hero__lead { font-size: var(--fs-lead); color: var(--text-soft); max-width: var(--measure-lead); margin: 0; }

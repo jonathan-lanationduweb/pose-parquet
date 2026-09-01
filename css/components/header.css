@@ -100,8 +100,20 @@
 .header__cta:hover span { color: var(--bg); }
 .site-header[data-over="true"] .header__cta:hover span { color: var(--c-ink); }
 
-/* Bouton menu */
+/* Bouton menu — il doit rester visible et cliquable panneau ouvert */
+body[data-drawer-open="true"] .site-header {
+  z-index: calc(var(--z-drawer) + 10);
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  color: var(--text-invert);
+}
+body[data-drawer-open="true"] .site-header .brand span { opacity: 0.6; }
+body[data-drawer-open="true"] .header__cta { display: none; }
+
 .nav-toggle {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   flex-direction: column;
   justify-content: center;
@@ -118,7 +130,12 @@
   background: currentColor;
   transition: transform var(--dur-2) var(--ease-out), opacity var(--dur-1) linear;
 }
-.nav-toggle[aria-expanded="true"] { color: var(--text-invert); }
+/* Panneau sombre ouvert : croix blanc cassé, bordure visible, jamais au hover seulement */
+.nav-toggle[aria-expanded="true"] {
+  color: var(--text-invert);
+  border-color: color-mix(in srgb, var(--text-invert) 55%, transparent);
+  background: color-mix(in srgb, var(--text-invert) 10%, transparent);
+}
 .nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
 .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
 .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
@@ -130,12 +147,13 @@
   z-index: var(--z-drawer);
   background: var(--c-ink);
   color: var(--text-invert);
-  padding: calc(var(--header-h) + 2rem) var(--gutter) var(--sp-7);
+  padding: calc(var(--header-h) + 1.25rem) var(--gutter) calc(var(--sp-6) + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: var(--sp-6);
+  justify-content: flex-start;
+  gap: clamp(1.25rem, 1rem + 2vw, 2rem);
   overflow-y: auto;
+  overscroll-behavior: contain;
   clip-path: inset(0 0 100% 0);
   visibility: hidden;
   transition: clip-path var(--dur-3) var(--ease-out), visibility var(--dur-3);
@@ -148,11 +166,11 @@
   display: flex;
   align-items: baseline;
   gap: 1rem;
-  padding: 0.5rem 0;
+  padding: 0.35rem 0;
   text-decoration: none;
   font-family: var(--font-display);
-  font-size: clamp(2.1rem, 1.2rem + 5vw, 3.4rem);
-  line-height: 1.05;
+  font-size: clamp(1.7rem, 1.1rem + 3.2vw, 2.6rem);
+  line-height: 1.1;
   opacity: 0;
   transform: translateY(14px);
 }

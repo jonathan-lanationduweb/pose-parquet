@@ -143,7 +143,7 @@ function simulatorSection() {
           <div class="section-head section-head__row">
             <div>
               <p class="eyebrow">Visualiseur · outil</p>
-              <h2 id="sim-title">Essayez votre parquet<br />dans votre pièce.</h2>
+              <h2 id="sim-title">Essayez votre parquet dans votre pièce.</h2>
             </div>
             <div>
               <p class="lead">Importez une photo, choisissez un parquet et comparez plusieurs rendus. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée ni conservée.</p>
