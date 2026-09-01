@@ -44,3 +44,33 @@
   color: var(--text-muted);
 }
 .roadmap__item strong { font-size: 1rem; font-weight: 600; color: var(--text); }
+
+/* Landing du Studio : la démonstration vaut mieux qu'un paragraphe */
+.landing-hero { padding-block: clamp(1.5rem, 1rem + 3vw, 3rem) 0; }
+.landing-hero__grid { display: grid; gap: clamp(1.5rem, 1rem + 3vw, 3.5rem); align-items: center; }
+@media (min-width: 62rem) {
+  .landing-hero__grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); }
+}
+.landing-hero__title {
+  margin: 0.4rem 0 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 1.4rem + 4vw, 4.4rem);
+  line-height: var(--lh-title);
+  letter-spacing: var(--tracking-display);
+}
+.landing-hero__lead { margin: var(--sp-4) 0 0; max-width: 44ch; font-size: var(--fs-lead); color: var(--text-soft); }
+.landing-hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-4); margin-top: var(--sp-5); }
+.landing-hero__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem var(--sp-5);
+  margin: var(--sp-6) 0 0;
+  padding: var(--sp-4) 0 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+.landing-hero__facts b { font-family: var(--font-display); font-size: 1.5rem; color: var(--text); margin-right: 0.3rem; }
+.landing-hero__demo { min-width: 0; }

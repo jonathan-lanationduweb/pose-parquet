@@ -70,7 +70,7 @@ export const projectFormConfig = {
     },
     {
       id: 'lieu-type',
-      title: 'Quel type de lieu ?',
+      title: 'Quelle pièce et quelle surface ?',
       fields: [
         {
           name: 'logement',
@@ -110,11 +110,25 @@ export const projectFormConfig = {
           width: 'half',
           hint: 'Une estimation suffit à ce stade.',
         },
+        {
+          name: 'support',
+          label: 'Support existant',
+          type: 'radio',
+          required: true,
+          options: [
+            { value: 'dalle', label: 'Dalle béton' },
+            { value: 'chape', label: 'Chape' },
+            { value: 'carrelage', label: 'Carrelage' },
+            { value: 'parquet', label: 'Ancien parquet' },
+            { value: 'autre', label: 'Autre' },
+            { value: 'inconnu', label: 'Je ne sais pas' },
+          ],
+        },
       ],
     },
     {
       id: 'technique',
-      title: 'Le parquet et son support',
+      title: 'Quel parquet souhaitez-vous ?',
       hint: 'Aucune inquiétude : « je ne sais pas » est une réponse valable.',
       fields: [
         {
@@ -130,40 +144,8 @@ export const projectFormConfig = {
           ],
         },
         {
-          name: 'support',
-          label: 'Support existant',
-          type: 'radio',
-          required: true,
-          options: [
-            { value: 'dalle', label: 'Dalle béton' },
-            { value: 'chape', label: 'Chape' },
-            { value: 'carrelage', label: 'Carrelage' },
-            { value: 'parquet', label: 'Ancien parquet' },
-            { value: 'autre', label: 'Autre' },
-            { value: 'inconnu', label: 'Je ne sais pas' },
-          ],
-        },
-        {
-          name: 'pose',
-          label: 'Type de pose souhaité',
-          type: 'radio',
-          required: true,
-          options: [
-            { value: 'collee', label: 'Collée' },
-            { value: 'flottante', label: 'Flottante' },
-            { value: 'clouee', label: 'Clouée' },
-            { value: 'inconnu', label: 'Je ne sais pas' },
-          ],
-        },
-      ],
-    },
-    {
-      id: 'style',
-      title: 'Orientation et style',
-      fields: [
-        {
           name: 'orientation',
-          label: 'Orientation ou motif souhaité',
+          label: 'Motif ou orientation souhaités',
           type: 'radio',
           required: true,
           options: [
@@ -174,7 +156,7 @@ export const projectFormConfig = {
             { value: 'baton-rompu', label: 'Bâton rompu' },
             { value: 'inconnu', label: 'Je ne sais pas' },
           ],
-          hint: 'Le simulateur de pose peut vous aider à trancher.',
+          hint: 'Le Studio peut vous aider à trancher.',
         },
         {
           name: 'style',
@@ -189,6 +171,13 @@ export const projectFormConfig = {
             { value: 'brut-atelier', label: 'Brut, esprit atelier' },
           ],
         },
+      ],
+    },
+    {
+      id: 'delai',
+      title: 'Quand souhaitez-vous réaliser ce projet ?',
+      hint: 'Une estimation suffit : elle nous aide à organiser la réponse.',
+      fields: [
         {
           name: 'delai',
           label: 'Délai envisagé',

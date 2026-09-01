@@ -86,6 +86,57 @@ function fieldMarkup(field, id) {
   }
 }
 
+const MOTIF_LABELS = {
+  lames: 'lames droites',
+  'point-de-hongrie': 'Point de Hongrie',
+  'baton-rompu': 'bâton rompu',
+};
+const ANGLE_LABELS = {
+  0: 'lames dans la largeur',
+  90: 'lames dans la profondeur',
+  45: 'pose en diagonale',
+  '-45': 'pose en diagonale',
+};
+
+/**
+ * Reprise d'une simulation faite dans le Studio.
+ *
+ * Seuls le parquet, le motif et l'orientation transitent par l'URL — jamais la
+ * photo, qui ne quitte pas le navigateur. Les valeurs sont insérées comme
+ * texte, jamais comme HTML.
+ */
+function prefillFromStudio(form) {
+  const params = new URLSearchParams(window.location.search);
+  const parquet = params.get('parquet');
+  const motif = params.get('motif');
+  if (!parquet && !motif) return;
+
+  const angle = Number(params.get('orientation') || 0);
+  let orientation = motif === 'point-de-hongrie' || motif === 'baton-rompu' ? motif : null;
+  if (!orientation && motif === 'lames') {
+    orientation = angle === 90 ? 'longueur' : Math.abs(angle) === 45 ? 'diagonale' : 'largeur';
+  }
+  if (orientation) {
+    const input = form.querySelector(`input[name="orientation"][value="${orientation}"]`);
+    // Après un rechargement, le navigateur restaure lui-même l'état des champs
+    // et écrase ce que l'on vient d'écrire : on repasse donc juste après lui.
+    if (input) window.setTimeout(() => { input.checked = true; }, 0);
+  }
+
+  const parts = [];
+  if (parquet) parts.push(parquet);
+  if (motif) parts.push(MOTIF_LABELS[motif] || motif);
+  if (motif === 'lames' && ANGLE_LABELS[String(angle)]) parts.push(ANGLE_LABELS[String(angle)]);
+
+  const note = document.createElement('p');
+  note.className = 'pf__from-studio';
+  note.textContent = `Reprise de votre simulation : ${parts.join(' · ')}. Votre photo n’a pas été transmise.`;
+  form.prepend(note);
+
+  const message = form.querySelector('textarea[name="message"]');
+  if (message && !message.value) message.value = `Simulation réalisée dans le Studio : ${parts.join(', ')}.`;
+}
+
 export function mountProjectForm(root, options = {}) {
   if (!root) return null;
   const config = options.config || projectFormConfig;
@@ -149,6 +200,8 @@ export function mountProjectForm(root, options = {}) {
 
   const fieldsByName = new Map();
   config.steps.forEach((step) => step.fields.forEach((field) => fieldsByName.set(field.name, field)));
+
+  prefillFromStudio(form);
 
   const applyConditionalVisibility = () => {
     fieldsByName.forEach((field) => {
