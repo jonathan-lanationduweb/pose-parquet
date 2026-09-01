@@ -4,6 +4,8 @@ Média pratique et boîte à outils autour de la pose du parquet.
 Site statique en **HTML / CSS / JavaScript natif (ES Modules)**, sans framework
 ni dépendance externe.
 
+Dépôt : <https://github.com/jonathan-lanationduweb/pose-parquet>
+
 ---
 
 ## Lancer le site en local
@@ -53,7 +55,7 @@ pose-parquet.com/
 │   └── project-form/       Composant formulaire projet, autonome et remplaçable
 │
 ├── assets/
-│   ├── images/             Visuels SVG placeholders (remplaçables un pour un)
+│   ├── images/             Photographies (JPEG) + schémas vectoriels + CREDITS.md
 │   ├── icons/favicon.svg
 │   └── videos/             Emplacement de la vidéo du hero (voir README dédié)
 │
@@ -82,11 +84,12 @@ communes sur les 29 pages d'un coup (`node _generator/build.js`).
 Point de montage :
 
 ```html
-<div data-visualizer data-base="../"></div>          <!-- version complète -->
-<div data-visualizer data-mode="compact" data-base="../"></div>  <!-- version courte -->
+<div data-visualizer data-base="../"></div>
+<div data-visualizer data-mode="compact" data-base="../"></div>
 ```
 
 - `data-base` : préfixe de chemin vers la racine (`""` à la racine, `"../"` ailleurs).
+- `data-mode="compact"` : version courte, intégrée dans les articles.
 - Rendu 100 % SVG, recalculé à chaque changement d'état.
 - Paramètres : longueur, largeur, largeur de lame, position de la fenêtre,
   position de l'entrée, teinte, motif.
@@ -101,11 +104,12 @@ Tout se passe dans `js/tools/patterns.js` : ajouter une entrée au tableau `PATT
   id: 'mon-motif',
   label: 'Mon motif',
   short: 'Description courte.',
-  build: (ctx) => [ /* { points: [[x, y], ...], shade: 0..1 } */ ],
+  build: (ctx) => [],
   advice: (ctx) => 'Conseil affiché sous le rendu.',
 }
 ```
 
+`build(ctx)` renvoie une liste de lames `{ points: [[x, y], ...], shade: 0..1 }`.
 `ctx` fournit `length`, `width`, `plankWidth`, `plankLength` (en centimètres) et
 la configuration de la pièce. Le sélecteur, les miniatures et le rendu se mettent
 à jour automatiquement.
@@ -145,17 +149,29 @@ partenaire dans le conteneur `[data-project-form]`.
 
 ## Médias
 
-Les visuels sont des **SVG placeholders** générés, dimensionnés comme les visuels
-définitifs. Pour les remplacer, déposer un fichier de même nom (ou mettre à jour
-le `src`) dans `assets/images/`.
+Les photographies proviennent de **Pexels** (licence gratuite, usage commercial
+autorisé). Elles sont téléchargées localement dans `assets/images/` : aucun appel
+à un service externe à l'exécution. Les auteurs sont listés dans
+`assets/images/CREDITS.md`.
+
+Pour changer une image : modifier son identifiant Pexels dans
+`_generator/photos.js`, puis relancer le téléchargement.
+
+```bash
+node _generator/fetch-photos.js --force
+```
+
+Sans `--force`, seules les images manquantes sont téléchargées. Il reste
+évidemment possible de déposer simplement un fichier de même nom dans
+`assets/images/`.
+
+Trois visuels restent vectoriels car ils expliquent un principe plutôt qu'ils
+n'illustrent une ambiance : `guide-sens-proportions.svg`, `lumiere-avant.svg`
+et `lumiere-apres.svg`. Ils sont produits par `node _generator/build.js`.
 
 Vidéo du hero : déposer `assets/videos/hero.mp4` puis renseigner l'attribut
-`data-src` de la balise `<video>` de `index.html`. Tant qu'il est vide, l'image
-`hero-poster.svg` sert de fallback et aucune vidéo n'est téléchargée.
-
-Pour les partages sociaux, remplacer `assets/images/og-default.svg` par un JPG ou
-PNG de 1200 × 630 px (les réseaux sociaux n'acceptent pas le SVG) et ajuster la
-balise `og:image` dans les pages.
+`data-src` de la balise vidéo de `index.html`. Tant qu'il est vide, l'image
+`hero-poster.jpg` sert de fallback et aucune vidéo n'est téléchargée.
 
 ---
 
