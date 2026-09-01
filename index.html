@@ -6,28 +6,29 @@
     <title>Pose Parquet — Comprendre, préparer et réussir la pose de son parquet</title>
     <meta name="description" content="Média pratique et boîte à outils sur la pose du parquet : guides, motifs, tutoriels, inspiration et un simulateur de sens de pose gratuit." />
     <link rel="canonical" href="https://pose-parquet.com/" />
-    <meta name="theme-color" content="#f6f4ef" />
+    <meta name="theme-color" content="#f2efe8" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Pose Parquet" />
     <meta property="og:locale" content="fr_FR" />
     <meta property="og:title" content="Pose Parquet — Comprendre, préparer et réussir la pose de son parquet" />
     <meta property="og:description" content="Média pratique et boîte à outils sur la pose du parquet : guides, motifs, tutoriels, inspiration et un simulateur de sens de pose gratuit." />
     <meta property="og:url" content="https://pose-parquet.com/" />
-    <meta property="og:image" content="https://pose-parquet.com/assets/images/og-default.jpg" />
+    <meta property="og:image" content="https://pose-parquet.com/assets/images/hero-wide.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" as="font" type="font/woff2" href="assets/fonts/instrument-serif-400-3.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-400-1.woff2" crossorigin />
     <link rel="stylesheet" href="css/main.css" />
     <link rel="stylesheet" href="css/pages/home.css" />
-    <link rel="stylesheet" href="css/pages/listing.css" />
     <script type="module" src="js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Pose Parquet","url":"https://pose-parquet.com","inLanguage":"fr-FR","description":"Comprendre, préparer, visualiser et réussir la pose de son parquet."}</script>
   </head>
   <body class="page">
     <a class="skip-link" href="#contenu">Aller au contenu</a>
-    <header class="site-header" data-header>
+    <header class="site-header" data-header data-over="false" data-scrolled="false">
       <div class="wrap-wide site-header__inner">
         <a class="brand" href="index.html" aria-label="Pose Parquet, accueil">
-          <svg class="brand__mark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1" y="4" width="22" height="4" rx="1"/><rect x="1" y="10" width="14" height="4" rx="1"/><rect x="1" y="16" width="19" height="4" rx="1"/></svg><strong>Pose</strong><span>Parquet</span>
+          <svg class="brand__mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 7h20"/><path d="M2 13h13"/><path d="M2 19h18"/></svg><strong>Pose</strong><span>Parquet</span>
         </a>
         <nav class="nav" aria-label="Navigation principale">
           <ul class="nav__list">
@@ -36,11 +37,10 @@
             <li><a class="nav__link" href="tutoriels/" data-nav-section="tutoriels">Tutoriels</a></li>
             <li><a class="nav__link" href="inspiration/" data-nav-section="inspiration">Inspiration</a></li>
             <li><a class="nav__link" href="outils/" data-nav-section="outils">Outils</a></li>
-            <li><a class="nav__link" href="a-propos/" data-nav-section="a-propos">À propos</a></li>
           </ul>
         </nav>
         <div class="header__actions">
-          <a class="btn btn--sm" href="projet/">Mon projet</a>
+          <a class="header__cta" href="projet/"><span>Votre projet</span></a>
           <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false"
             aria-controls="menu-mobile" aria-label="Ouvrir le menu">
             <span></span><span></span><span></span>
@@ -48,364 +48,519 @@
         </div>
       </div>
     </header>
-    <!-- Le tiroir mobile est hors du <header> : le backdrop-filter de
-         l'en-tete creerait sinon un bloc conteneur pour cet element fixe. -->
     <div class="drawer" id="menu-mobile" data-drawer data-open="false">
-        <nav class="drawer__list" aria-label="Navigation mobile">
-          <a class="drawer__link" href="guides/"><span>01</span>Guides</a>
+      <nav class="drawer__list" aria-label="Navigation mobile">
+        <a class="drawer__link" href="guides/"><span>01</span>Guides</a>
           <a class="drawer__link" href="motifs/"><span>02</span>Motifs</a>
           <a class="drawer__link" href="tutoriels/"><span>03</span>Tutoriels</a>
           <a class="drawer__link" href="inspiration/"><span>04</span>Inspiration</a>
           <a class="drawer__link" href="outils/"><span>05</span>Outils</a>
           <a class="drawer__link" href="a-propos/"><span>06</span>À propos</a>
-        </nav>
-        <div class="drawer__footer">
-          <a class="btn btn--block" href="projet/">Décrire mon projet</a>
-          <a class="btn btn--ghost btn--block" href="outils/simulateur-pose.html">Ouvrir le simulateur</a>
-        </div>
+          <a class="drawer__link" href="contact/"><span>07</span>Contact</a>
+      </nav>
+      <div class="drawer__footer">
+        <a class="btn btn--light btn--block" href="projet/"><span>Décrire mon projet</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+        <a class="btn btn--outline-light btn--block" href="outils/simulateur-pose.html"><span>Ouvrir le simulateur</span></a>
+        <p class="drawer__meta">Média indépendant · aucune vente en ligne</p>
+      </div>
     </div>
     <main id="contenu">
-      <section class="hero">
-        <div class="wrap-wide hero__grid">
-          <div>
-            <p class="eyebrow">Guides · Motifs · Outils</p>
-            <h1 class="hero__title">Un parquet bien posé commence <em>avant</em> la première lame.</h1>
-            <p class="hero__lead">Guides, techniques et outils pour comprendre et réussir votre projet parquet — du support au motif, du calepinage à la finition.</p>
-            <div class="hero__actions">
-              <a class="btn btn--lg" href="guides/">Explorer les guides</a>
-              <a class="btn btn--ghost btn--lg" href="outils/simulateur-pose.html">Visualiser ma pièce</a>
-            </div>
-            <div class="hero__stats">
-              <div class="hero__stat"><strong>5</strong><span>motifs simulés</span></div>
-              <div class="hero__stat"><strong>8</strong><span>guides pratiques</span></div>
-              <div class="hero__stat"><strong>0</strong><span>produit vendu</span></div>
-            </div>
-          </div>
-          <figure class="hero__media" data-hero-media>
-            <img src="assets/images/hero-poster.jpg" alt="Séjour vide au parquet clair, éclairé par une grande fenêtre" width="1000" height="1100" fetchpriority="high" decoding="async" />
-            <video muted loop playsinline preload="none" data-src="" aria-hidden="true"></video>
-            <figcaption class="hero__media-caption"><span>Séjour · 5,4 × 3,8 m</span><span class="mono">pose droite</span></figcaption>
-          </figure>
+      <section class="hero" data-hero>
+        <div class="hero__media" data-hero-media>
+          <img src="assets/images/hero-wide.jpg" alt="Grande pièce vide au parquet clair traversée par la lumière"
+            width="2200" height="1300" fetchpriority="high" decoding="async" />
+          <video muted loop playsinline preload="none" data-src="" aria-hidden="true"></video>
         </div>
-        <div class="wrap-wide">
-          <div class="pattern-strip" aria-hidden="true">
-            <div class="pattern-strip__track">
-              <span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Pose droite</span><span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Point de Hongrie</span><span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Bâton rompu</span><span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Diagonale</span><span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Frise périphérique</span><span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Pose collée</span><span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Pose flottante</span><span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Calepinage</span><span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Pose droite</span><span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Point de Hongrie</span><span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Bâton rompu</span><span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Diagonale</span><span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Frise périphérique</span><span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Pose collée</span><span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Pose flottante</span><span class="pattern-strip__item"><svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>Calepinage</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" aria-labelledby="parcours-title">
-        <div class="wrap">
-          <div class="section-head">
-            <p class="eyebrow">Vous en êtes où ?</p>
-            <h2 id="parcours-title">Quatre points d'entrée</h2>
-          </div>
-          <div class="grid home-steps">
-            <a class="step-card" href="guides/preparer-son-sol-avant-la-pose.html" data-reveal data-reveal-delay="0">
-              <span class="step-card__num">01</span>
-              <h3 class="step-card__title">Je prépare mon sol</h3>
-              <p class="step-card__text">Support, humidité, ragréage, sous-couche.</p>
-              <span class="step-card__more">Explorer <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
-            </a>
-            <a class="step-card" href="guides/parquet-massif-ou-contrecolle.html" data-reveal data-reveal-delay="70">
-              <span class="step-card__num">02</span>
-              <h3 class="step-card__title">Je choisis ma pose</h3>
-              <p class="step-card__text">Flottante, collée, clouée : ce qui décide vraiment.</p>
-              <span class="step-card__more">Explorer <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
-            </a>
-            <a class="step-card" href="motifs/" data-reveal data-reveal-delay="140">
-              <span class="step-card__num">03</span>
-              <h3 class="step-card__title">Je choisis mon motif</h3>
-              <p class="step-card__text">Droite, diagonale, Point de Hongrie, bâton rompu.</p>
-              <span class="step-card__more">Explorer <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
-            </a>
-            <a class="step-card" href="guides/erreurs-a-eviter-avant-de-poser.html" data-reveal data-reveal-delay="210">
-              <span class="step-card__num">04</span>
-              <h3 class="step-card__title">J'ai déjà un parquet</h3>
-              <p class="step-card__text">Entretien, réparation, rénovation.</p>
-              <span class="step-card__more">Explorer <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <section class="section section--alt" aria-labelledby="sim-title">
-        <div class="wrap">
-          <div class="home-sim" data-reveal>
-            <div class="home-sim__head">
-              <div>
-                <p class="eyebrow">Studio de pose</p>
-                <h2 id="sim-title">Une pièce. Plusieurs directions.</h2>
-                <p class="lead">Changez de motif et voyez immédiatement ce que cela donne dans vos dimensions.</p>
+        <div class="wrap-wide hero__inner">
+          <p class="eyebrow">Guides · Motifs · Outils</p>
+          <h1 class="hero__title">Un parquet bien posé commence <em>avant</em> la première lame.</h1>
+          <div class="hero__row">
+            <div>
+              <p class="hero__lead">Guides, techniques et outils pour comprendre et réussir votre projet parquet — du support au motif, du calepinage à la finition.</p>
+              <div class="hero__actions">
+                <a class="btn btn--light btn--lg" href="guides/"><span>Explorer les guides</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+                <a class="btn btn--outline-light btn--lg" href="outils/simulateur-pose.html"><span>Visualiser ma pièce</span></a>
               </div>
-              <a class="btn" href="outils/simulateur-pose.html">Ouvrir le simulateur complet</a>
             </div>
-            <div data-visualizer data-mode="compact" data-base=""></div>
+            <ul class="hero__meta">
+              <li><b>5</b> motifs simulés</li>
+              <li><b>8</b> guides pratiques</li>
+              <li><b>0</b> produit vendu</li>
+            </ul>
           </div>
         </div>
+        <a class="hero__scroll" href="#parcours">Découvrir <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg></a>
       </section>
 
-      <section class="section" aria-labelledby="guides-title">
-        <div class="wrap">
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__track">
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Pose droite</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Point de Hongrie</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Bâton rompu</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Diagonale</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Calepinage</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Pose collée</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Pose flottante</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Frise périphérique</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Ragréage</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Sens de la lumière</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Pose droite</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Point de Hongrie</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Bâton rompu</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Diagonale</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Calepinage</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Pose collée</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Pose flottante</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Frise périphérique</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Ragréage</span>
+          <span class="marquee__item"><svg viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 13 8 3l6 10 6-10"/></svg>Sens de la lumière</span>
+        </div>
+      </div>
+
+      <section class="section" id="parcours" aria-labelledby="parcours-title">
+        <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
-              <p class="eyebrow">Guides du moment</p>
-              <h2 id="guides-title">Ce qu'il faut savoir avant de commander</h2>
+              <p class="eyebrow">Vous en êtes où ?</p>
+              <h2 id="parcours-title">Quatre entrées, un seul chantier.</h2>
             </div>
-            <div class="carousel__controls">
-              <button class="carousel__btn" type="button" data-carousel-prev aria-label="Guides précédents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H6"/><path d="m12 19-7-7 7-7"/></svg></button>
-              <button class="carousel__btn" type="button" data-carousel-next aria-label="Guides suivants"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></button>
-            </div>
+            <p class="lead">Chaque étape a ses décisions et ses pièges. Commencez par celle qui vous concerne aujourd’hui.</p>
           </div>
-          <div class="carousel" data-carousel>
-            <div class="carousel__viewport" data-carousel-viewport tabindex="0" role="region" aria-label="Carrousel de guides">
-              <article class="card" data-tags="sens-de-pose comprendre" data-reveal>
-            <div class="card__media">
-              <img src="assets/images/cover-quel-sens-de-pose-choisir.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
-              <span class="badge">Sens de pose</span>
-            </div>
-            <div class="card__body">
-              <h3 class="card__title"><a href="guides/quel-sens-de-pose-choisir.html">Quel sens de pose choisir pour son parquet ?</a></h3>
-              <p class="card__text">Cinq critères suffisent à trancher, et ils ne se valent pas. Voici l'ordre dans lequel les regarder.</p>
-              <div class="card__footer">
-                <ul class="meta-list"><li>9 min</li><li>24 août 2026</li></ul>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg>
+          <div class="tiles">
+            <a class="tile tile--mineral" href="guides/preparer-son-sol-avant-la-pose.html" data-reveal data-reveal-delay="0">
+              <div class="tile__head">
+                <h3 class="tile__title">Je prépare mon sol</h3>
+                <span class="tile__num">(01)</span>
               </div>
-            </div>
-          </article>
-              <article class="card" data-tags="sens-de-pose comprendre" data-reveal>
-            <div class="card__media">
-              <img src="assets/images/cover-poser-parquet-sens-de-la-lumiere.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
-              <span class="badge">Sens de pose</span>
-            </div>
-            <div class="card__body">
-              <h3 class="card__title"><a href="guides/poser-parquet-sens-de-la-lumiere.html">Poser un parquet dans le sens de la lumière</a></h3>
-              <p class="card__text">La règle la plus citée du parquet. Encore faut-il savoir ce qu'elle recouvre et quand elle cesse d'être vraie.</p>
-              <div class="card__footer">
-                <ul class="meta-list"><li>6 min</li><li>20 août 2026</li></ul>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg>
+              <p class="tile__text">Planéité, humidité, ragréage, sous-couche : ce qui se joue avant toute pose.</p>
+              <span class="tile__more">Explorer <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+              <div class="tile__media"><img src="assets/images/tile-preparer.jpg" alt="" loading="lazy" decoding="async" width="1000" height="900" /></div>
+            </a>
+            <a class="tile tile--sage" href="guides/parquet-massif-ou-contrecolle.html" data-reveal data-reveal-delay="70">
+              <div class="tile__head">
+                <h3 class="tile__title">Je choisis ma pose</h3>
+                <span class="tile__num">(02)</span>
               </div>
-            </div>
-          </article>
-              <article class="card" data-tags="preparation poser" data-reveal>
-            <div class="card__media">
-              <img src="assets/images/cover-preparer-son-sol-avant-la-pose.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
-              <span class="badge">Préparation</span>
-            </div>
-            <div class="card__body">
-              <h3 class="card__title"><a href="guides/preparer-son-sol-avant-la-pose.html">Comment préparer un sol avant la pose ?</a></h3>
-              <p class="card__text">Neuf désordres sur dix viennent du support, pas du parquet. Voici les contrôles à mener avant la première lame.</p>
-              <div class="card__footer">
-                <ul class="meta-list"><li>10 min</li><li>18 août 2026</li></ul>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg>
+              <p class="tile__text">Flottante, collée, clouée : le support et le produit décident plus que le goût.</p>
+              <span class="tile__more">Explorer <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+              <div class="tile__pattern" aria-hidden="true"><span></span><span></span><span></span></div>
+            </a>
+            <a class="tile tile--slate" href="motifs/" data-reveal data-reveal-delay="140">
+              <div class="tile__head">
+                <h3 class="tile__title">Je choisis mon motif</h3>
+                <span class="tile__num">(03)</span>
               </div>
-            </div>
-          </article>
-              <article class="card" data-tags="motifs choisir" data-reveal>
-            <div class="card__media">
-              <img src="assets/images/cover-point-de-hongrie-ou-baton-rompu.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
-              <span class="badge">Motifs</span>
-            </div>
-            <div class="card__body">
-              <h3 class="card__title"><a href="guides/point-de-hongrie-ou-baton-rompu.html">Point de Hongrie ou bâton rompu ?</a></h3>
-              <p class="card__text">Une coupe d'onglet sépare ces deux motifs. Elle change le rendu, le prix et la pose.</p>
-              <div class="card__footer">
-                <ul class="meta-list"><li>7 min</li><li>14 août 2026</li></ul>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg>
+              <p class="tile__text">Droite, diagonale, Point de Hongrie, bâton rompu : six écritures au sol.</p>
+              <span class="tile__more">Explorer <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+              <div class="tile__media"><img src="assets/images/tile-motif.jpg" alt="" loading="lazy" decoding="async" width="1000" height="900" /></div>
+            </a>
+            <a class="tile tile--clay" href="guides/erreurs-a-eviter-avant-de-poser.html" data-reveal data-reveal-delay="210">
+              <div class="tile__head">
+                <h3 class="tile__title">J’ai déjà un parquet</h3>
+                <span class="tile__num">(04)</span>
               </div>
-            </div>
-          </article>
-              <article class="card" data-tags="preparation comprendre" data-reveal>
-            <div class="card__media">
-              <img src="assets/images/cover-erreurs-a-eviter-avant-de-poser.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
-              <span class="badge">Préparation</span>
-            </div>
-            <div class="card__body">
-              <h3 class="card__title"><a href="guides/erreurs-a-eviter-avant-de-poser.html">Les erreurs à éviter avant de poser un parquet</a></h3>
-              <p class="card__text">Huit erreurs reviennent en boucle sur les chantiers. Toutes se corrigent avant la pose, aucune après.</p>
-              <div class="card__footer">
-                <ul class="meta-list"><li>8 min</li><li>10 août 2026</li></ul>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg>
-              </div>
-            </div>
-          </article>
-              <article class="card" data-tags="comprendre choisir" data-reveal>
-            <div class="card__media">
-              <img src="assets/images/cover-parquet-massif-ou-contrecolle.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
-              <span class="badge">Comprendre</span>
-            </div>
-            <div class="card__body">
-              <h3 class="card__title"><a href="guides/parquet-massif-ou-contrecolle.html">Parquet massif ou contrecollé : quelles différences pour la pose ?</a></h3>
-              <p class="card__text">Le débat porte rarement sur le bon terrain : ce qui change vraiment, c'est la stabilité dimensionnelle.</p>
-              <div class="card__footer">
-                <ul class="meta-list"><li>8 min</li><li>6 août 2026</li></ul>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg>
-              </div>
-            </div>
-          </article>
-            </div>
-            <div class="carousel__progress"><span data-carousel-progress></span></div>
+              <p class="tile__text">Entretien, réparation, rénovation : prolonger plutôt que remplacer.</p>
+              <span class="tile__more">Explorer <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+              <div class="tile__media"><img src="assets/images/tile-renover.jpg" alt="" loading="lazy" decoding="async" width="1000" height="900" /></div>
+            </a>
           </div>
         </div>
       </section>
 
-      <section class="section section--dark" aria-labelledby="focus-title">
-        <div class="wrap">
-          <div class="split split--wide-left focus-pattern">
-            <div class="focus-pattern__viz" data-pattern-thumb="point-de-hongrie" data-reveal></div>
+      <section class="section section--mineral" aria-labelledby="sim-title">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
             <div>
-              <p class="eyebrow">Focus motif</p>
-              <h2 id="focus-title">Le Point de Hongrie, une flèche au sol</h2>
-              <p class="lead">Des lames coupées à 45°, des pointes parfaitement alignées : le motif le plus exigeant, et le plus spectaculaire dans une pièce en longueur.</p>
-              <ul class="focus-pattern__list">
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>Lames gauches et droites, à commander ensemble.</span></li>
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>12 à 15 % de chutes à prévoir dès le premier lot.</span></li>
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>Un axe tracé au cordeau, vérifié sur toute la longueur.</span></li>
-              </ul>
-              <p class="u-mt-6"><a class="btn btn--light" href="motifs/point-de-hongrie.html">Découvrir le motif</a></p>
+              <p class="eyebrow">Studio de pose · outil</p>
+              <h2 id="sim-title">Une pièce.<br />Plusieurs directions.</h2>
+            </div>
+            <div>
+              <p class="lead">Entrez vos dimensions, placez la fenêtre, comparez cinq motifs. Le rendu, la surface et les chutes se recalculent à chaque changement.</p>
+              <p class="u-mt-5"><a class="btn" href="outils/simulateur-pose.html"><span>Ouvrir le simulateur complet</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a></p>
             </div>
           </div>
+          <div data-visualizer data-mode="compact" data-base="" data-reveal></div>
+        </div>
+      </section>
+
+      <section class="section" data-carousel aria-labelledby="guides-title">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row section-head__row--tight">
+            <div>
+              <p class="eyebrow">Guides du moment</p>
+              <h2 id="guides-title">Ce qu’il faut savoir avant de commander.</h2>
+            </div>
+            <div class="carousel__controls">
+              <span class="carousel__hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 12h16"/><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/></svg>Glissez</span>
+              <span class="carousel__count" data-carousel-count>01 / 06</span>
+              <button class="icon-btn" type="button" data-carousel-prev aria-label="Guides précédents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H6"/><path d="m12 19-7-7 7-7"/></svg></button>
+              <button class="icon-btn" type="button" data-carousel-next aria-label="Guides suivants"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <div class="carousel carousel--editorial">
+            <div class="carousel__viewport" data-carousel-viewport tabindex="0" role="region"
+              aria-label="Carrousel de guides, utilisez les flèches du clavier">
+            <article class="carousel__slide">
+              <div class="slide-card">
+                <div class="slide-card__media">
+                  <img src="assets/images/cover-quel-sens-de-pose-choisir.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+                  <span class="slide-card__cat">Sens de pose</span>
+                </div>
+                <div class="slide-card__body">
+                  <h3 class="slide-card__title"><a href="guides/quel-sens-de-pose-choisir.html">Quel sens de pose choisir pour son parquet ?</a></h3>
+                  <p class="slide-card__text">Cinq critères suffisent à trancher, et ils ne se valent pas. Voici l'ordre dans lequel les regarder.</p>
+                  <div class="slide-card__foot">
+                    <span class="slide-card__link">Lire le guide <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+                    <span class="slide-card__meta">9 min</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+            <article class="carousel__slide">
+              <div class="slide-card">
+                <div class="slide-card__media">
+                  <img src="assets/images/cover-poser-parquet-sens-de-la-lumiere.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+                  <span class="slide-card__cat">Sens de pose</span>
+                </div>
+                <div class="slide-card__body">
+                  <h3 class="slide-card__title"><a href="guides/poser-parquet-sens-de-la-lumiere.html">Poser un parquet dans le sens de la lumière</a></h3>
+                  <p class="slide-card__text">La règle la plus citée du parquet. Encore faut-il savoir ce qu'elle recouvre et quand elle cesse d'être vraie.</p>
+                  <div class="slide-card__foot">
+                    <span class="slide-card__link">Lire le guide <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+                    <span class="slide-card__meta">6 min</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+            <article class="carousel__slide">
+              <div class="slide-card">
+                <div class="slide-card__media">
+                  <img src="assets/images/cover-preparer-son-sol-avant-la-pose.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+                  <span class="slide-card__cat">Préparation</span>
+                </div>
+                <div class="slide-card__body">
+                  <h3 class="slide-card__title"><a href="guides/preparer-son-sol-avant-la-pose.html">Comment préparer un sol avant la pose ?</a></h3>
+                  <p class="slide-card__text">Neuf désordres sur dix viennent du support, pas du parquet. Voici les contrôles à mener avant la première lame.</p>
+                  <div class="slide-card__foot">
+                    <span class="slide-card__link">Lire le guide <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+                    <span class="slide-card__meta">10 min</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+            <article class="carousel__slide">
+              <div class="slide-card">
+                <div class="slide-card__media">
+                  <img src="assets/images/cover-point-de-hongrie-ou-baton-rompu.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+                  <span class="slide-card__cat">Motifs</span>
+                </div>
+                <div class="slide-card__body">
+                  <h3 class="slide-card__title"><a href="guides/point-de-hongrie-ou-baton-rompu.html">Point de Hongrie ou bâton rompu ?</a></h3>
+                  <p class="slide-card__text">Une coupe d'onglet sépare ces deux motifs. Elle change le rendu, le prix et la pose.</p>
+                  <div class="slide-card__foot">
+                    <span class="slide-card__link">Lire le guide <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+                    <span class="slide-card__meta">7 min</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+            <article class="carousel__slide">
+              <div class="slide-card">
+                <div class="slide-card__media">
+                  <img src="assets/images/cover-erreurs-a-eviter-avant-de-poser.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+                  <span class="slide-card__cat">Préparation</span>
+                </div>
+                <div class="slide-card__body">
+                  <h3 class="slide-card__title"><a href="guides/erreurs-a-eviter-avant-de-poser.html">Les erreurs à éviter avant de poser un parquet</a></h3>
+                  <p class="slide-card__text">Huit erreurs reviennent en boucle sur les chantiers. Toutes se corrigent avant la pose, aucune après.</p>
+                  <div class="slide-card__foot">
+                    <span class="slide-card__link">Lire le guide <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+                    <span class="slide-card__meta">8 min</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+            <article class="carousel__slide">
+              <div class="slide-card">
+                <div class="slide-card__media">
+                  <img src="assets/images/cover-parquet-massif-ou-contrecolle.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+                  <span class="slide-card__cat">Comprendre</span>
+                </div>
+                <div class="slide-card__body">
+                  <h3 class="slide-card__title"><a href="guides/parquet-massif-ou-contrecolle.html">Parquet massif ou contrecollé : quelles différences pour la pose ?</a></h3>
+                  <p class="slide-card__text">Le débat porte rarement sur le bon terrain : ce qui change vraiment, c'est la stabilité dimensionnelle.</p>
+                  <div class="slide-card__foot">
+                    <span class="slide-card__link">Lire le guide <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+                    <span class="slide-card__meta">8 min</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+            </div>
+            <div class="wrap-wide"><div class="carousel__progress"><span data-carousel-progress></span></div></div>
+        </div>
+      </section>
+
+      <section class="immersive" aria-labelledby="focus-title">
+        <div class="immersive__bg">
+          <img src="assets/images/immersive-hongrie.jpg" alt="Lumière rasante sur un parquet posé en Point de Hongrie"
+            loading="lazy" decoding="async" width="2000" height="1500" />
+        </div>
+        <div class="wrap-wide">
+          <div class="immersive__head" data-reveal>
+            <p class="eyebrow eyebrow--plain">Focus motif · 04</p>
+            <h2 id="focus-title">Le Point de Hongrie, une flèche au sol.</h2>
+          </div>
+          <div class="immersive__steps immersive__steps--right">
+            <div class="step-block" data-reveal data-reveal-delay="0">
+                <span class="step-block__num">(01)</span>
+                <h3>Une flèche continue</h3>
+                <p>Les lames coupées à 45° forment une pointe qui file vers le fond de la pièce et guide le regard.</p>
+              </div>
+              <div class="step-block" data-reveal data-reveal-delay="90">
+                <span class="step-block__num">(02)</span>
+                <h3>Un axe sans pardon</h3>
+                <p>Tout se joue au traçage : un demi-degré d’écart devient visible sur toute la longueur du sol.</p>
+              </div>
+              <div class="step-block" data-reveal data-reveal-delay="180">
+                <span class="step-block__num">(03)</span>
+                <h3>Des lames gauches et droites</h3>
+                <p>Elles se commandent ensemble, en quantités égales, avec 12 à 15 % de chutes prévues dès le premier lot.</p>
+              </div>
+            <p data-reveal><a class="btn btn--light" href="motifs/point-de-hongrie.html"><span>Découvrir le motif</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--dark" data-carousel aria-labelledby="inspi-title">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row section-head__row--tight">
+            <div>
+              <p class="eyebrow">Inspiration</p>
+              <h2 id="inspi-title">Voir avant de choisir.</h2>
+            </div>
+            <div class="carousel__controls">
+              <span class="carousel__count" data-carousel-count>01 / 08</span>
+              <button class="icon-btn icon-btn--light" type="button" data-carousel-prev aria-label="Visuels précédents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H6"/><path d="m12 19-7-7 7-7"/></svg></button>
+              <button class="icon-btn icon-btn--light" type="button" data-carousel-next aria-label="Visuels suivants"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <div class="carousel carousel--gallery">
+            <div class="carousel__viewport" data-carousel-viewport tabindex="0" role="region"
+              aria-label="Galerie d’inspiration, utilisez les flèches du clavier">
+            <div class="carousel__slide">
+              <a class="shot" href="inspiration/">
+                <img src="assets/images/inspi-1.jpg" alt="Séjour — Traversant, pose droite" loading="lazy" decoding="async" width="900" height="700" />
+                <span class="shot__caption">
+                  <span class="shot__cat">Séjour</span>
+                  <span class="shot__title">Traversant, pose droite</span>
+                </span>
+              </a>
+            </div>
+            <div class="carousel__slide">
+              <a class="shot" href="inspiration/">
+                <img src="assets/images/inspi-2.jpg" alt="Chambre — Point de Hongrie" loading="lazy" decoding="async" width="900" height="700" />
+                <span class="shot__caption">
+                  <span class="shot__cat">Chambre</span>
+                  <span class="shot__title">Point de Hongrie</span>
+                </span>
+              </a>
+            </div>
+            <div class="carousel__slide">
+              <a class="shot" href="inspiration/">
+                <img src="assets/images/inspi-6.jpg" alt="Salon — Diagonale, chêne blond" loading="lazy" decoding="async" width="900" height="700" />
+                <span class="shot__caption">
+                  <span class="shot__cat">Salon</span>
+                  <span class="shot__title">Diagonale, chêne blond</span>
+                </span>
+              </a>
+            </div>
+            <div class="carousel__slide">
+              <a class="shot" href="inspiration/">
+                <img src="assets/images/inspi-3.jpg" alt="Cuisine — Contrecollé collé" loading="lazy" decoding="async" width="900" height="700" />
+                <span class="shot__caption">
+                  <span class="shot__cat">Cuisine</span>
+                  <span class="shot__title">Contrecollé collé</span>
+                </span>
+              </a>
+            </div>
+            <div class="carousel__slide">
+              <a class="shot" href="inspiration/">
+                <img src="assets/images/inspi-5.jpg" alt="Bureau — Bâton rompu fumé" loading="lazy" decoding="async" width="900" height="700" />
+                <span class="shot__caption">
+                  <span class="shot__cat">Bureau</span>
+                  <span class="shot__title">Bâton rompu fumé</span>
+                </span>
+              </a>
+            </div>
+            <div class="carousel__slide">
+              <a class="shot" href="inspiration/">
+                <img src="assets/images/inspi-4.jpg" alt="Couloir — Lames étroites dans l’axe" loading="lazy" decoding="async" width="900" height="700" />
+                <span class="shot__caption">
+                  <span class="shot__cat">Couloir</span>
+                  <span class="shot__title">Lames étroites dans l’axe</span>
+                </span>
+              </a>
+            </div>
+            <div class="carousel__slide">
+              <a class="shot" href="inspiration/">
+                <img src="assets/images/inspi-7.jpg" alt="Combles — Parquet clair, lames larges" loading="lazy" decoding="async" width="900" height="700" />
+                <span class="shot__caption">
+                  <span class="shot__cat">Combles</span>
+                  <span class="shot__title">Parquet clair, lames larges</span>
+                </span>
+              </a>
+            </div>
+            <div class="carousel__slide">
+              <a class="shot" href="inspiration/">
+                <img src="assets/images/inspi-8.jpg" alt="Entrée — Frise périphérique" loading="lazy" decoding="async" width="900" height="700" />
+                <span class="shot__caption">
+                  <span class="shot__cat">Entrée</span>
+                  <span class="shot__title">Frise périphérique</span>
+                </span>
+              </a>
+            </div>
+            </div>
+            <div class="wrap-wide"><div class="carousel__progress"><span data-carousel-progress></span></div></div>
         </div>
       </section>
 
       <section class="section" aria-labelledby="tuto-title">
-        <div class="wrap">
-          <div class="section-head section-head__row">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row section-head__row--tight">
             <div>
               <p class="eyebrow">Tutoriels</p>
-              <h2 id="tuto-title">Passer au geste</h2>
+              <h2 id="tuto-title">Passer au geste.</h2>
             </div>
             <a class="link-arrow" href="tutoriels/">Tous les tutoriels <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
           </div>
-          <div class="grid grid--3">
-            <article class="tuto-card" data-reveal data-reveal-delay="0">
-              <div class="tuto-card__viz"><img src="assets/images/tile-poser-un-parquet-flottant.jpg" alt="" loading="lazy" decoding="async" width="300" height="300" /></div>
-              <div>
-                <h3><a href="tutoriels/poser-un-parquet-flottant.html">Poser un parquet flottant, étape par étape</a></h3>
-                <p>Accessible · 1 journée pour 20 m²</p>
-              </div>
-            </article>
-            <article class="tuto-card" data-reveal data-reveal-delay="60">
-              <div class="tuto-card__viz"><img src="assets/images/tile-coller-un-parquet-contrecolle.jpg" alt="" loading="lazy" decoding="async" width="300" height="300" /></div>
-              <div>
-                <h3><a href="tutoriels/coller-un-parquet-contrecolle.html">Coller un parquet contrecollé</a></h3>
-                <p>Confirmé · 1 à 2 jours pour 20 m²</p>
-              </div>
-            </article>
-            <article class="tuto-card" data-reveal data-reveal-delay="120">
-              <div class="tuto-card__viz"><img src="assets/images/tile-reussir-le-calepinage.jpg" alt="" loading="lazy" decoding="async" width="300" height="300" /></div>
-              <div>
-                <h3><a href="tutoriels/reussir-le-calepinage.html">Réussir son calepinage</a></h3>
-                <p>Accessible · 1 à 2 heures</p>
-              </div>
-            </article>
+          <div class="list-rows">
+            <a class="list-row" href="tutoriels/poser-un-parquet-flottant.html">
+              <span class="list-row__num">(01)</span>
+              <span class="list-row__title">Poser un parquet flottant, étape par étape</span>
+              <p class="list-row__text">Le tutoriel de référence : de la sous-couche aux plinthes, avec les points de contrôle.</p>
+              <span class="list-row__meta">Accessible · 1 journée pour 20 m²</span>
+            </a>
+            <a class="list-row" href="tutoriels/coller-un-parquet-contrecolle.html">
+              <span class="list-row__num">(02)</span>
+              <span class="list-row__title">Coller un parquet contrecollé</span>
+              <p class="list-row__text">La pose la plus stable et la plus silencieuse — et la moins tolérante à l'improvisation.</p>
+              <span class="list-row__meta">Confirmé · 1 à 2 jours pour 20 m²</span>
+            </a>
+            <a class="list-row" href="tutoriels/reussir-le-calepinage.html">
+              <span class="list-row__num">(03)</span>
+              <span class="list-row__title">Réussir son calepinage</span>
+              <p class="list-row__text">Une heure de traçage évite deux jours de rattrapage.</p>
+              <span class="list-row__meta">Accessible · 1 à 2 heures</span>
+            </a>
           </div>
         </div>
       </section>
 
-      <section class="section section--alt home-inspi" aria-labelledby="inspi-title">
+      <section class="section section--alt" aria-labelledby="outils-title">
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
-              <p class="eyebrow">Inspiration</p>
-              <h2 id="inspi-title">Voir avant de choisir</h2>
+              <p class="eyebrow">Boîte à outils</p>
+              <h2 id="outils-title">Décider, pas seulement lire.</h2>
             </div>
-            <a class="link-arrow" href="inspiration/">Toute la galerie <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+            <p class="lead">Des outils courts, utilisables depuis un téléphone sur le chantier comme depuis un bureau au moment de trancher.</p>
           </div>
-          <div class="gallery">
-            <figure class="gallery__item gallery__item--wide">
-              <img src="assets/images/inspi-1.jpg" alt="Séjour contemporain au parquet clair posé dans la longueur" loading="lazy" decoding="async" width="900" height="700" />
-              <figcaption class="gallery__caption"><span>Séjour traversant</span><span class="mono">Pose droite · chêne clair</span></figcaption>
-            </figure>
-            <figure class="gallery__item gallery__item--md">
-              <img src="assets/images/inspi-2.jpg" alt="Pièce aux murs bleus et parquet en chevrons" loading="lazy" decoding="async" width="900" height="700" />
-              <figcaption class="gallery__caption"><span>Chambre parisienne</span><span class="mono">Point de Hongrie · chêne naturel</span></figcaption>
-            </figure>
-            <figure class="gallery__item gallery__item--sm">
-              <img src="assets/images/inspi-3.jpg" alt="Cuisine ouverte sur salle à manger, sol en parquet" loading="lazy" decoding="async" width="900" height="700" />
-              <figcaption class="gallery__caption"><span>Cuisine ouverte</span><span class="mono">Pose collée · contrecollé</span></figcaption>
-            </figure>
-            <figure class="gallery__item gallery__item--sm">
-              <img src="assets/images/inspi-4.jpg" alt="Couloir minimaliste aux portes en bois et parquet posé dans l’axe" loading="lazy" decoding="async" width="900" height="700" />
-              <figcaption class="gallery__caption"><span>Couloir en enfilade</span><span class="mono">Pose droite · lames étroites</span></figcaption>
-            </figure>
-            <figure class="gallery__item gallery__item--md">
-              <img src="assets/images/inspi-5.jpg" alt="Bureau sous combles avec plancher bois et mobilier moderne" loading="lazy" decoding="async" width="900" height="700" />
-              <figcaption class="gallery__caption"><span>Bureau graphique</span><span class="mono">Bâton rompu · chêne fumé</span></figcaption>
-            </figure>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" aria-labelledby="outils-title">
-        <div class="wrap">
-          <div class="section-head">
-            <p class="eyebrow">Outils</p>
-            <h2 id="outils-title">La boîte à outils</h2>
-          </div>
-          <div class="home-tools">
+          <div class="grid grid--3">
             <div class="tool-card" data-reveal>
               <div class="tool-card__head"><h3>Simulateur de pose</h3><span class="badge badge--sage">Disponible</span></div>
               <p>Cinq motifs, vos dimensions, la lumière au bon endroit.</p>
-              <a class="link-arrow" href="outils/simulateur-pose.html">Ouvrir <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+              <a class="btn btn--sm" href="outils/simulateur-pose.html"><span>Ouvrir</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
             </div>
-            <div class="tool-card tool-card--soon" data-reveal data-reveal-delay="60">
+            <div class="tool-card tool-card--soon" data-reveal data-reveal-delay="70">
               <div class="tool-card__head"><h3>Calculateur de surface</h3><span class="badge badge--outline">Bientôt</span></div>
-              <p>Surfaces complexes, décrochés et chutes selon le motif.</p>
+              <p>Surfaces complexes, décrochés et chutes selon le motif retenu.</p>
             </div>
-            <div class="tool-card tool-card--soon" data-reveal data-reveal-delay="120">
+            <div class="tool-card tool-card--soon" data-reveal data-reveal-delay="140">
               <div class="tool-card__head"><h3>Checklist avant pose</h3><span class="badge badge--outline">Bientôt</span></div>
-              <p>Le point complet à faire la veille du chantier.</p>
+              <p>Le point complet à faire la veille du chantier, support compris.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="section" aria-labelledby="cluster-title">
-        <div class="wrap">
-          <div class="section-head">
-            <p class="eyebrow">Derniers guides</p>
-            <h2 id="cluster-title">Le dossier sens de pose</h2>
-          </div>
-          <div class="cluster-list">
-            <a href="guides/quel-sens-de-pose-choisir.html"><strong>Quel sens de pose choisir pour son parquet ?</strong><span>9 min</span></a>
-            <a href="guides/poser-parquet-sens-de-la-lumiere.html"><strong>Poser un parquet dans le sens de la lumière</strong><span>6 min</span></a>
-            <a href="guides/sens-de-pose-couloir.html"><strong>Sens de pose dans un couloir</strong><span>5 min</span></a>
-            <a href="guides/sens-de-pose-piece-etroite.html"><strong>Sens de pose dans une pièce étroite</strong><span>5 min</span></a>
-            <a href="outils/simulateur-pose.html"><strong>Simulateur de sens de pose</strong><span>outil</span></a>
+      <section class="section" aria-labelledby="projet-title">
+        <div class="wrap-wide">
+          <div class="feature feature--wide-media">
+            <div class="feature__body">
+              <p class="eyebrow">Votre projet</p>
+              <h2 id="projet-title">Décrivez votre pièce, on s’occupe des questions utiles.</h2>
+              <ul class="feature__list">
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>Cinq étapes courtes, aucune question inutile.</span></li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>« Je ne sais pas » est une réponse valable partout.</span></li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>Aucun démarchage : vos coordonnées servent uniquement à répondre.</span></li>
+              </ul>
+              <div class="cluster">
+                <a class="btn" href="projet/"><span>Décrire mon projet</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+                <a class="link-arrow" href="outils/simulateur-pose.html">Passer d’abord par le simulateur <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+              </div>
+            </div>
+            <div class="feature__media" data-reveal>
+              <img src="assets/images/projet-visuel.jpg" alt="Pièce lumineuse au parquet clair" loading="lazy" decoding="async" width="1400" height="1100" />
+            </div>
           </div>
         </div>
       </section>
-      <section class="section">
-      <div class="wrap">
-        <div class="cta-band" data-reveal>
-          <div>
-            <h2>Un projet de pose à préparer ?</h2>
-            <p>Décrivez votre pièce, votre support et le rendu recherché en cinq étapes. Vous recevez une réponse construite, sans démarchage.</p>
+
+      <section class="section section--flush-top" aria-labelledby="cluster-title">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row section-head__row--tight">
+            <div>
+              <p class="eyebrow">Dossier</p>
+              <h2 id="cluster-title">Le sens de pose, de A à Z.</h2>
+            </div>
+            <a class="link-arrow" href="outils/simulateur-pose.html">Simulateur de sens de pose <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
           </div>
-          <div class="cta-band__actions">
-            <a class="btn btn--light" href="projet/">Décrire mon projet</a>
-            <a class="btn btn--outline-light" href="outils/simulateur-pose.html">Ouvrir le simulateur</a>
+          <div class="list-rows">
+            <a class="list-row" href="guides/quel-sens-de-pose-choisir.html">
+              <span class="list-row__num">(01)</span>
+              <span class="list-row__title">Quel sens de pose choisir pour son parquet ?</span>
+              <p class="list-row__text">Cinq critères suffisent à trancher, et ils ne se valent pas. Voici l'ordre dans lequel les regarder.</p>
+              <span class="list-row__meta">9 min</span>
+            </a>
+            <a class="list-row" href="guides/poser-parquet-sens-de-la-lumiere.html">
+              <span class="list-row__num">(02)</span>
+              <span class="list-row__title">Poser un parquet dans le sens de la lumière</span>
+              <p class="list-row__text">La règle la plus citée du parquet. Encore faut-il savoir ce qu'elle recouvre et quand elle cesse d'être vraie.</p>
+              <span class="list-row__meta">6 min</span>
+            </a>
+            <a class="list-row" href="guides/sens-de-pose-couloir.html">
+              <span class="list-row__num">(03)</span>
+              <span class="list-row__title">Sens de pose dans un couloir</span>
+              <p class="list-row__text">Le couloir est le seul espace où la règle de la lumière passe au second plan.</p>
+              <span class="list-row__meta">5 min</span>
+            </a>
+            <a class="list-row" href="guides/sens-de-pose-piece-etroite.html">
+              <span class="list-row__num">(04)</span>
+              <span class="list-row__title">Sens de pose dans une pièce étroite</span>
+              <p class="list-row__text">Poser dans la largeur élargit vraiment — à condition d'en accepter les coupes.</p>
+              <span class="list-row__meta">5 min</span>
+            </a>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
     </main>
     <footer class="site-footer">
       <div class="wrap-wide">
-        <div class="footer__top">
+        <p class="footer__wordmark">Pose <span>Parquet</span></p>
+        <div class="footer__grid">
           <div class="footer__intro">
-            <a class="footer__brand" href="index.html"><svg class="brand__mark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1" y="4" width="22" height="4" rx="1"/><rect x="1" y="10" width="14" height="4" rx="1"/><rect x="1" y="16" width="19" height="4" rx="1"/></svg><span>Pose Parquet</span></a>
             <p>Un média pratique et une boîte à outils autour de la pose du parquet : guides, techniques, motifs et simulateurs.</p>
+            <a class="link-arrow" href="projet/">Décrire un projet<svg  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
           </div>
           <div class="footer__col">
             <h3>Comprendre</h3>
             <ul>
-              <li><a href="guides/parquet-massif-ou-contrecolle.html">Massif ou contrecollé</a></li>
-              <li><a href="guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a></li>
               <li><a href="guides/quel-sens-de-pose-choisir.html">Choisir le sens de pose</a></li>
+              <li><a href="guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a></li>
+              <li><a href="guides/parquet-massif-ou-contrecolle.html">Massif ou contrecollé</a></li>
               <li><a href="guides/erreurs-a-eviter-avant-de-poser.html">Erreurs à éviter</a></li>
             </ul>
           </div>
@@ -422,7 +577,7 @@
             <h3>Le site</h3>
             <ul>
               <li><a href="outils/simulateur-pose.html">Simulateur de pose</a></li>
-              <li><a href="projet/">Décrire un projet</a></li>
+              <li><a href="tutoriels/">Tutoriels</a></li>
               <li><a href="a-propos/">À propos</a></li>
               <li><a href="contact/">Contact</a></li>
             </ul>
@@ -430,9 +585,8 @@
         </div>
         <div class="footer__bottom">
           <p>&copy; 2026 Pose Parquet — site éditorial indépendant.</p>
-          <p>Contenus rédigés et illustrés en interne. Aucune vente en ligne.</p>
+          <p>Photographies libres de droits · aucune vente en ligne</p>
         </div>
-        <div class="footer__pattern" aria-hidden="true"></div>
       </div>
     </footer>
   </body>

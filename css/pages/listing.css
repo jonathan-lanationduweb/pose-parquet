@@ -1,26 +1,32 @@
-/* Pages de rubrique (guides, tutoriels, motifs, inspiration) */
+/* Pages de rubrique : guides, tutoriels, motifs, inspiration, à propos */
+
 .listing-featured {
   display: grid;
-  gap: var(--sp-5);
-  margin-bottom: var(--sp-7);
+  gap: clamp(1.5rem, 1rem + 2vw, 3rem);
+  margin-bottom: clamp(3rem, 2rem + 3vw, 5rem);
 }
-@media (min-width: 60rem) { .listing-featured { grid-template-columns: 1.35fr 0.65fr; } }
+@media (min-width: 62rem) {
+  .listing-featured { grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr); align-items: stretch; }
+}
 
+/* Grande carte à la une : image plein cadre, texte en surimpression */
 .feature-card {
   position: relative;
   display: grid;
   align-content: end;
-  gap: var(--sp-3);
-  min-height: 24rem;
-  padding: var(--sp-6);
-  border-radius: var(--r-xl);
+  gap: var(--sp-4);
+  min-height: clamp(22rem, 18rem + 16vw, 34rem);
+  padding: clamp(1.6rem, 1.2rem + 2vw, 3rem);
+  border-radius: var(--r-block);
   overflow: hidden;
-  background: var(--c-charcoal);
-  color: var(--text-invert);
+  background: var(--c-ink);
+  color: #fff;
   isolation: isolate;
 }
-.feature-card img, .feature-card svg.feature-card__bg {
-  position: absolute; inset: 0; z-index: -2;
+.feature-card img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
   width: 100%; height: 100%;
   object-fit: cover;
   transition: transform var(--dur-4) var(--ease-out);
@@ -28,15 +34,55 @@
 .feature-card::after {
   content: "";
   position: absolute; inset: 0; z-index: -1;
-  background: linear-gradient(to top, rgba(18,20,19,0.82) 12%, rgba(18,20,19,0.15) 65%);
+  background: linear-gradient(to top, rgba(12,14,15,0.86) 8%, rgba(12,14,15,0.2) 62%, rgba(12,14,15,0.35));
 }
 .feature-card:hover img { transform: scale(1.04); }
-.feature-card h2, .feature-card h3 { font-size: var(--fs-xl); max-width: 18ch; }
+.feature-card .eyebrow { color: rgba(255,255,255,0.78); margin: 0; }
+.feature-card h2, .feature-card h3 {
+  font-size: clamp(1.9rem, 1.3rem + 2.6vw, 3.4rem);
+  color: #fff;
+  max-width: 16ch;
+}
 .feature-card h2 a, .feature-card h3 a { text-decoration: none; }
 .feature-card h2 a::after, .feature-card h3 a::after { content: ""; position: absolute; inset: 0; }
-.feature-card p { color: #dcdedb; max-width: 46ch; margin: 0; }
+.feature-card p { color: rgba(255,255,255,0.82); max-width: 44ch; margin: 0; }
 
-.listing-side { display: grid; gap: var(--sp-4); align-content: start; }
+.listing-side { display: grid; gap: var(--sp-5); align-content: start; }
+
+/* Liste compacte de liens (colonne latérale, dossiers) */
+.cluster-list { display: grid; border-top: 1px solid var(--line); }
+.cluster-list a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--line);
+  text-decoration: none;
+  transition: padding-left var(--dur-3) var(--ease-out), color var(--dur-2) var(--ease-out);
+}
+.cluster-list a:hover { padding-left: 0.6rem; color: var(--accent); }
+.cluster-list strong {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.1rem, 1rem + 0.5vw, 1.3rem);
+  letter-spacing: var(--tracking-display);
+}
+.cluster-list span { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--text-muted); white-space: nowrap; }
+
+/* Filtres */
+.filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: clamp(2rem, 1.5rem + 2vw, 3rem); }
+.filter-chip {
+  padding: 0.5rem 1.05rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  font-size: 0.88rem;
+  color: var(--text-soft);
+  background: transparent;
+  transition: background var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out);
+}
+.filter-chip:hover { border-color: var(--text-muted); color: var(--text); }
+.filter-chip[aria-pressed="true"] { background: var(--c-ink); border-color: var(--c-ink); color: #fff; }
 
 .section-nav {
   display: flex;
@@ -47,5 +93,10 @@
   margin-bottom: var(--sp-6);
 }
 
-.feature-card .eyebrow { color: #cdd3ce; }
-.feature-card .eyebrow::before { background: var(--c-sage); }
+.empty-note {
+  padding: var(--sp-6);
+  text-align: center;
+  color: var(--text-muted);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-card);
+}

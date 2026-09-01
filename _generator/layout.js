@@ -11,10 +11,14 @@ const NAV = [
   { href: 'tutoriels/', label: 'Tutoriels', section: 'tutoriels', num: '03' },
   { href: 'inspiration/', label: 'Inspiration', section: 'inspiration', num: '04' },
   { href: 'outils/', label: 'Outils', section: 'outils', num: '05' },
-  { href: 'a-propos/', label: 'À propos', section: 'a-propos', num: '06' },
 ];
 
-const mark = `<svg class="brand__mark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1" y="4" width="22" height="4" rx="1"/><rect x="1" y="10" width="14" height="4" rx="1"/><rect x="1" y="16" width="19" height="4" rx="1"/></svg>`;
+const DRAWER_EXTRA = [
+  { href: 'a-propos/', label: 'À propos', section: 'a-propos', num: '06' },
+  { href: 'contact/', label: 'Contact', section: 'contact', num: '07' },
+];
+
+const mark = `<svg class="brand__mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 7h20"/><path d="M2 13h13"/><path d="M2 19h18"/></svg>`;
 
 const arrow = `<svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg>`;
 
@@ -23,12 +27,16 @@ function header(p) {
     (item) =>
       `<li><a class="nav__link" href="${p}${item.href}" data-nav-section="${item.section}">${item.label}</a></li>`
   ).join('\n            ');
-  const drawerLinks = NAV.map(
-    (item) => `<a class="drawer__link" href="${p}${item.href}"><span>${item.num}</span>${item.label}</a>`
-  ).join('\n          ');
+
+  const drawerLinks = [...NAV, ...DRAWER_EXTRA]
+    .map(
+      (item, index) =>
+        `<a class="drawer__link" href="${p}${item.href}"><span>${item.num}</span>${item.label}</a>`
+    )
+    .join('\n          ');
 
   return `<a class="skip-link" href="#contenu">Aller au contenu</a>
-    <header class="site-header" data-header>
+    <header class="site-header" data-header data-over="false" data-scrolled="false">
       <div class="wrap-wide site-header__inner">
         <a class="brand" href="${p}index.html" aria-label="Pose Parquet, accueil">
           ${mark}<strong>Pose</strong><span>Parquet</span>
@@ -39,7 +47,7 @@ function header(p) {
           </ul>
         </nav>
         <div class="header__actions">
-          <a class="btn btn--sm" href="${p}projet/">Mon projet</a>
+          <a class="header__cta" href="${p}projet/"><span>Votre projet</span></a>
           <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false"
             aria-controls="menu-mobile" aria-label="Ouvrir le menu">
             <span></span><span></span><span></span>
@@ -47,33 +55,33 @@ function header(p) {
         </div>
       </div>
     </header>
-    <!-- Le tiroir mobile est hors du <header> : le backdrop-filter de
-         l'en-tete creerait sinon un bloc conteneur pour cet element fixe. -->
     <div class="drawer" id="menu-mobile" data-drawer data-open="false">
-        <nav class="drawer__list" aria-label="Navigation mobile">
-          ${drawerLinks}
-        </nav>
-        <div class="drawer__footer">
-          <a class="btn btn--block" href="${p}projet/">Décrire mon projet</a>
-          <a class="btn btn--ghost btn--block" href="${p}outils/simulateur-pose.html">Ouvrir le simulateur</a>
-        </div>
+      <nav class="drawer__list" aria-label="Navigation mobile">
+        ${drawerLinks}
+      </nav>
+      <div class="drawer__footer">
+        <a class="btn btn--light btn--block" href="${p}projet/"><span>Décrire mon projet</span>${arrow}</a>
+        <a class="btn btn--outline-light btn--block" href="${p}outils/simulateur-pose.html"><span>Ouvrir le simulateur</span></a>
+        <p class="drawer__meta">Média indépendant · aucune vente en ligne</p>
+      </div>
     </div>`;
 }
 
 function footer(p) {
   return `<footer class="site-footer">
       <div class="wrap-wide">
-        <div class="footer__top">
+        <p class="footer__wordmark">Pose <span>Parquet</span></p>
+        <div class="footer__grid">
           <div class="footer__intro">
-            <a class="footer__brand" href="${p}index.html">${mark}<span>Pose Parquet</span></a>
             <p>Un média pratique et une boîte à outils autour de la pose du parquet : guides, techniques, motifs et simulateurs.</p>
+            <a class="link-arrow" href="${p}projet/">Décrire un projet${arrow.replace('class="btn__icon"', '')}</a>
           </div>
           <div class="footer__col">
             <h3>Comprendre</h3>
             <ul>
-              <li><a href="${p}guides/parquet-massif-ou-contrecolle.html">Massif ou contrecollé</a></li>
-              <li><a href="${p}guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a></li>
               <li><a href="${p}guides/quel-sens-de-pose-choisir.html">Choisir le sens de pose</a></li>
+              <li><a href="${p}guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a></li>
+              <li><a href="${p}guides/parquet-massif-ou-contrecolle.html">Massif ou contrecollé</a></li>
               <li><a href="${p}guides/erreurs-a-eviter-avant-de-poser.html">Erreurs à éviter</a></li>
             </ul>
           </div>
@@ -90,7 +98,7 @@ function footer(p) {
             <h3>Le site</h3>
             <ul>
               <li><a href="${p}outils/simulateur-pose.html">Simulateur de pose</a></li>
-              <li><a href="${p}projet/">Décrire un projet</a></li>
+              <li><a href="${p}tutoriels/">Tutoriels</a></li>
               <li><a href="${p}a-propos/">À propos</a></li>
               <li><a href="${p}contact/">Contact</a></li>
             </ul>
@@ -98,9 +106,8 @@ function footer(p) {
         </div>
         <div class="footer__bottom">
           <p>&copy; 2026 Pose Parquet — site éditorial indépendant.</p>
-          <p>Contenus rédigés et illustrés en interne. Aucune vente en ligne.</p>
+          <p>Photographies libres de droits · aucune vente en ligne</p>
         </div>
-        <div class="footer__pattern" aria-hidden="true"></div>
       </div>
     </footer>`;
 }
@@ -122,24 +129,24 @@ function breadcrumb(p, trail) {
       '@type': 'ListItem',
       position: index + 1,
       name: item.label,
-      item: `${SITE.domain}/${item.href || ''}`.replace(/\/$/, '/'),
+      item: `${SITE.domain}/${item.href || ''}`,
     })),
   };
   return {
-    html: `<nav class="breadcrumb wrap" aria-label="Fil d'Ariane"><ol>${items}</ol></nav>`,
+    html: `<nav class="breadcrumb wrap-wide" aria-label="Fil d'Ariane"><ol>${items}</ol></nav>`,
     jsonld,
   };
 }
 
 /**
  * @param {object} page
- * @param {string} page.title      balise <title>
+ * @param {string} page.title       balise <title>
  * @param {string} page.description meta description
- * @param {string} page.path       chemin canonique (ex. 'guides/x.html')
- * @param {number} page.depth      0 = racine, 1 = sous-dossier
- * @param {string} page.body       contenu HTML du <main>
- * @param {string[]} [page.css]    feuilles de style additionnelles (relatives à /css/)
- * @param {object[]} [page.jsonld] données structurées
+ * @param {string} page.path        chemin canonique (ex. 'guides/x.html')
+ * @param {number} page.depth       0 = racine, 1 = sous-dossier
+ * @param {string} page.body        contenu HTML du <main>
+ * @param {string[]} [page.css]     feuilles additionnelles, relatives à la racine
+ * @param {object[]} [page.jsonld]  données structurées
  */
 function layout(page) {
   const p = page.depth === 0 ? '' : '../';
@@ -150,7 +157,9 @@ function layout(page) {
   const jsonld = (page.jsonld || [])
     .map((data) => `\n    <script type="application/ld+json">${JSON.stringify(data)}</script>`)
     .join('');
-  const ogImage = `${SITE.domain}/assets/images/og-default.jpg`;
+  const ogImage = page.ogImage
+    ? `${SITE.domain}/${page.ogImage}`
+    : `${SITE.domain}/assets/images/og-default.jpg`;
 
   return `<!doctype html>
 <html lang="fr">
@@ -160,7 +169,7 @@ function layout(page) {
     <title>${page.title}</title>
     <meta name="description" content="${page.description}" />
     <link rel="canonical" href="${canonical}" />
-    <meta name="theme-color" content="#f6f4ef" />
+    <meta name="theme-color" content="#f2efe8" />
     <meta property="og:type" content="${page.ogType || 'website'}" />
     <meta property="og:site_name" content="${SITE.name}" />
     <meta property="og:locale" content="fr_FR" />
@@ -170,6 +179,8 @@ function layout(page) {
     <meta property="og:image" content="${ogImage}" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="${p}assets/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/instrument-serif-400-3.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/inter-400-1.woff2" crossorigin />
     <link rel="stylesheet" href="${p}css/main.css" />${extraCss}
     <script type="module" src="${p}js/main.js"></script>${jsonld}
   </head>

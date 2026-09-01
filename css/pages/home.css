@@ -1,39 +1,15 @@
-/* Page d'accueil */
-.home-steps { grid-template-columns: repeat(auto-fit, minmax(min(100%, 15.5rem), 1fr)); }
+/* Page d'accueil : ajustements propres à la composition */
+.home-sim { border-radius: var(--r-block); overflow: hidden; }
 
-.home-sim {
-  border-radius: var(--r-xl);
-  background: var(--bg-solid);
-  border: 1px solid var(--line);
-  padding: clamp(1.1rem, 2.5vw, 2.2rem);
-}
-.home-sim__head { display: grid; gap: var(--sp-4); margin-bottom: var(--sp-5); }
-@media (min-width: 58rem) {
-  .home-sim__head { grid-template-columns: 1fr auto; align-items: end; }
+/* Le simulateur de la home respire davantage sur grand écran */
+@media (min-width: 62rem) {
+  .section--mineral [data-visualizer] { gap: clamp(1.5rem, 1rem + 2vw, 3rem); }
 }
 
-.focus-pattern {
-  position: relative;
-  overflow: hidden;
+/* Les cartes du parcours gardent une hauteur homogène */
+@media (min-width: 62rem) {
+  .tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
-.focus-pattern__viz {
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  background: var(--c-paper-2);
-  border: 1px solid var(--line);
+@media (min-width: 40rem) and (max-width: 61.99rem) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-.focus-pattern__viz svg { width: 100%; height: auto; display: block; }
-.focus-pattern__list { margin-top: var(--sp-5); display: grid; gap: var(--sp-3); }
-.focus-pattern__list li { display: flex; gap: 0.7rem; align-items: flex-start; color: var(--text-soft); font-size: 0.95rem; }
-.focus-pattern__list svg { width: 1.05em; height: 1.05em; flex: none; margin-top: 0.28em; color: var(--accent); }
-
-.home-inspi { padding-bottom: 0; }
-
-.home-tools { display: grid; gap: var(--sp-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); }
-
-.home-project {
-  display: grid;
-  gap: var(--sp-5);
-  align-items: center;
-}
-@media (min-width: 58rem) { .home-project { grid-template-columns: 1.2fr 0.8fr; gap: var(--sp-7); } }

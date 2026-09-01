@@ -6,7 +6,7 @@
     <title>À propos de Pose Parquet | Média pratique sur la pose du parquet</title>
     <meta name="description" content="Pose Parquet est un média indépendant consacré à la pose du parquet : guides, motifs, tutoriels et outils de visualisation. Aucune vente, aucune publicité." />
     <link rel="canonical" href="https://pose-parquet.com/a-propos/" />
-    <meta name="theme-color" content="#f6f4ef" />
+    <meta name="theme-color" content="#f2efe8" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Pose Parquet" />
     <meta property="og:locale" content="fr_FR" />
@@ -16,6 +16,8 @@
     <meta property="og:image" content="https://pose-parquet.com/assets/images/og-default.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-400-1.woff2" crossorigin />
     <link rel="stylesheet" href="../css/main.css" />
     <link rel="stylesheet" href="../css/pages/listing.css" />
     <script type="module" src="../js/main.js"></script>
@@ -23,10 +25,10 @@
   </head>
   <body class="page">
     <a class="skip-link" href="#contenu">Aller au contenu</a>
-    <header class="site-header" data-header>
+    <header class="site-header" data-header data-over="false" data-scrolled="false">
       <div class="wrap-wide site-header__inner">
         <a class="brand" href="../index.html" aria-label="Pose Parquet, accueil">
-          <svg class="brand__mark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1" y="4" width="22" height="4" rx="1"/><rect x="1" y="10" width="14" height="4" rx="1"/><rect x="1" y="16" width="19" height="4" rx="1"/></svg><strong>Pose</strong><span>Parquet</span>
+          <svg class="brand__mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 7h20"/><path d="M2 13h13"/><path d="M2 19h18"/></svg><strong>Pose</strong><span>Parquet</span>
         </a>
         <nav class="nav" aria-label="Navigation principale">
           <ul class="nav__list">
@@ -35,11 +37,10 @@
             <li><a class="nav__link" href="../tutoriels/" data-nav-section="tutoriels">Tutoriels</a></li>
             <li><a class="nav__link" href="../inspiration/" data-nav-section="inspiration">Inspiration</a></li>
             <li><a class="nav__link" href="../outils/" data-nav-section="outils">Outils</a></li>
-            <li><a class="nav__link" href="../a-propos/" data-nav-section="a-propos">À propos</a></li>
           </ul>
         </nav>
         <div class="header__actions">
-          <a class="btn btn--sm" href="../projet/">Mon projet</a>
+          <a class="header__cta" href="../projet/"><span>Votre projet</span></a>
           <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false"
             aria-controls="menu-mobile" aria-label="Ouvrir le menu">
             <span></span><span></span><span></span>
@@ -47,28 +48,32 @@
         </div>
       </div>
     </header>
-    <!-- Le tiroir mobile est hors du <header> : le backdrop-filter de
-         l'en-tete creerait sinon un bloc conteneur pour cet element fixe. -->
     <div class="drawer" id="menu-mobile" data-drawer data-open="false">
-        <nav class="drawer__list" aria-label="Navigation mobile">
-          <a class="drawer__link" href="../guides/"><span>01</span>Guides</a>
+      <nav class="drawer__list" aria-label="Navigation mobile">
+        <a class="drawer__link" href="../guides/"><span>01</span>Guides</a>
           <a class="drawer__link" href="../motifs/"><span>02</span>Motifs</a>
           <a class="drawer__link" href="../tutoriels/"><span>03</span>Tutoriels</a>
           <a class="drawer__link" href="../inspiration/"><span>04</span>Inspiration</a>
           <a class="drawer__link" href="../outils/"><span>05</span>Outils</a>
           <a class="drawer__link" href="../a-propos/"><span>06</span>À propos</a>
-        </nav>
-        <div class="drawer__footer">
-          <a class="btn btn--block" href="../projet/">Décrire mon projet</a>
-          <a class="btn btn--ghost btn--block" href="../outils/simulateur-pose.html">Ouvrir le simulateur</a>
-        </div>
+          <a class="drawer__link" href="../contact/"><span>07</span>Contact</a>
+      </nav>
+      <div class="drawer__footer">
+        <a class="btn btn--light btn--block" href="../projet/"><span>Décrire mon projet</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+        <a class="btn btn--outline-light btn--block" href="../outils/simulateur-pose.html"><span>Ouvrir le simulateur</span></a>
+        <p class="drawer__meta">Média indépendant · aucune vente en ligne</p>
+      </div>
     </div>
     <main id="contenu">
-      <nav class="breadcrumb wrap" aria-label="Fil d'Ariane"><ol><li><a href="../index.html">Accueil</a></li><li><span aria-current="page">À propos</span></li></ol></nav>
-      <header class="page-hero wrap">
-        <p class="eyebrow">À propos</p>
-        <h1 class="page-hero__title">Un média pratique sur la pose du parquet</h1>
-        <p class="page-hero__lead">Pose Parquet documente ce qui se décide avant la première lame : le support, le sens, le motif, la méthode.</p>
+      <nav class="breadcrumb wrap-wide" aria-label="Fil d'Ariane"><ol><li><a href="../index.html">Accueil</a></li><li><span aria-current="page">À propos</span></li></ol></nav>
+      <header class="page-hero">
+        <div class="wrap-wide page-hero__grid">
+          <div>
+            <p class="eyebrow">À propos</p>
+            <h1 class="page-hero__title">Un média pratique sur la pose du parquet</h1>
+          </div>
+          <p class="page-hero__lead">Pose Parquet documente ce qui se décide avant la première lame : le support, le sens, le motif, la méthode.</p>
+        </div>
       </header>
 
       <section class="section section--flush-top">
@@ -112,17 +117,18 @@
     </main>
     <footer class="site-footer">
       <div class="wrap-wide">
-        <div class="footer__top">
+        <p class="footer__wordmark">Pose <span>Parquet</span></p>
+        <div class="footer__grid">
           <div class="footer__intro">
-            <a class="footer__brand" href="../index.html"><svg class="brand__mark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1" y="4" width="22" height="4" rx="1"/><rect x="1" y="10" width="14" height="4" rx="1"/><rect x="1" y="16" width="19" height="4" rx="1"/></svg><span>Pose Parquet</span></a>
             <p>Un média pratique et une boîte à outils autour de la pose du parquet : guides, techniques, motifs et simulateurs.</p>
+            <a class="link-arrow" href="../projet/">Décrire un projet<svg  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
           </div>
           <div class="footer__col">
             <h3>Comprendre</h3>
             <ul>
-              <li><a href="../guides/parquet-massif-ou-contrecolle.html">Massif ou contrecollé</a></li>
-              <li><a href="../guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a></li>
               <li><a href="../guides/quel-sens-de-pose-choisir.html">Choisir le sens de pose</a></li>
+              <li><a href="../guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a></li>
+              <li><a href="../guides/parquet-massif-ou-contrecolle.html">Massif ou contrecollé</a></li>
               <li><a href="../guides/erreurs-a-eviter-avant-de-poser.html">Erreurs à éviter</a></li>
             </ul>
           </div>
@@ -139,7 +145,7 @@
             <h3>Le site</h3>
             <ul>
               <li><a href="../outils/simulateur-pose.html">Simulateur de pose</a></li>
-              <li><a href="../projet/">Décrire un projet</a></li>
+              <li><a href="../tutoriels/">Tutoriels</a></li>
               <li><a href="../a-propos/">À propos</a></li>
               <li><a href="../contact/">Contact</a></li>
             </ul>
@@ -147,9 +153,8 @@
         </div>
         <div class="footer__bottom">
           <p>&copy; 2026 Pose Parquet — site éditorial indépendant.</p>
-          <p>Contenus rédigés et illustrés en interne. Aucune vente en ligne.</p>
+          <p>Photographies libres de droits · aucune vente en ligne</p>
         </div>
-        <div class="footer__pattern" aria-hidden="true"></div>
       </div>
     </footer>
   </body>

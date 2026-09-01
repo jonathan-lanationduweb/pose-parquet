@@ -1,59 +1,62 @@
 /* =========================================================
    Design tokens — Pose Parquet
-   Univers : magazine d'architecture + carnet technique
+   Direction : éditorial graphique, blocs pleine largeur,
+   très grande typographie serif, aplats minéraux.
    ========================================================= */
 
 :root {
   /* ---- Couleurs de base ---- */
-  --c-paper:        #f6f4ef; /* blanc cassé, fond principal */
-  --c-paper-2:      #efece5; /* fond alterné */
-  --c-paper-3:      #e6e2d9; /* aplat minéral */
-  --c-charcoal:     #1c1e1d; /* gris charbon, texte fort */
-  --c-charcoal-2:   #33383a;
-  --c-slate:        #6d7b84; /* gris bleuté */
-  --c-slate-light:  #a5afb5;
-  --c-sage:         #7c8f7b; /* vert sauge, accent principal */
-  --c-sage-deep:    #5c6d5c;
-  --c-sage-wash:    #e8ece6;
-  --c-terracotta:   #c17a5b; /* accent secondaire, usage rare */
-  --c-terracotta-wash: #f3e6df;
-  --c-white:        #ffffff;
+  --c-bone:        #f2efe8; /* blanc cassé, fond principal */
+  --c-paper:       #fbf9f5; /* surfaces claires */
+  --c-mineral:     #e3ded4; /* aplat minéral */
+  --c-mineral-2:   #d5cfc3;
+  --c-ink:         #16181a; /* charbon */
+  --c-ink-2:       #2b3134;
+  --c-slate:       #6c7a80; /* gris bleuté */
+  --c-slate-pale:  #ccd8dc;
+  --c-sage:        #8ba088; /* vert sauge */
+  --c-sage-deep:   #46594a;
+  --c-sage-pale:   #dae2d4;
+  --c-clay:        #c07f5e; /* accent terre cuite, usage rare */
+  --c-clay-pale:   #eed9cb;
+  --c-white:       #ffffff;
 
-  /* ---- Rôles sémantiques ---- */
-  --bg:             var(--c-paper);
-  --bg-alt:         var(--c-paper-2);
-  --bg-solid:       var(--c-white);
-  --bg-invert:      var(--c-charcoal);
-  --text:           var(--c-charcoal);
-  --text-soft:      #55605f;
-  --text-muted:     var(--c-slate);
-  --text-invert:    #f2f1ec;
-  --accent:         var(--c-sage);
-  --accent-strong:  var(--c-sage-deep);
-  --accent-alt:     var(--c-terracotta);
-  --line:           #d9d5cb;
-  --line-strong:    #c2bcae;
-  --focus:          #2f6f5e;
+  /* ---- Rôles ---- */
+  --bg:            var(--c-bone);
+  --bg-alt:        var(--c-paper);
+  --bg-invert:     var(--c-ink);
+  --surface:       var(--c-white);
+  --text:          var(--c-ink);
+  --text-soft:     #4c5457;
+  --text-muted:    var(--c-slate);
+  --text-invert:   #f4f2ec;
+  --accent:        var(--c-sage-deep);
+  --accent-soft:   var(--c-sage);
+  --line:          #dcd6ca;
+  --line-strong:   #c3bcac;
+  --focus:         #2f6f5e;
 
   /* ---- Typographie ---- */
-  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, "Liberation Mono", monospace;
+  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
 
-  /* Échelle fluide */
-  --fs-xs:   0.75rem;
-  --fs-sm:   0.8125rem;
-  --fs-base: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
-  --fs-md:   clamp(1.075rem, 1rem + 0.35vw, 1.2rem);
-  --fs-lg:   clamp(1.25rem, 1.12rem + 0.6vw, 1.55rem);
-  --fs-xl:   clamp(1.6rem, 1.35rem + 1.1vw, 2.2rem);
-  --fs-2xl:  clamp(2rem, 1.55rem + 2vw, 3.1rem);
-  --fs-3xl:  clamp(2.5rem, 1.7rem + 3.4vw, 4.6rem);
+  /* Échelle : très grands titres, texte courant sobre */
+  --fs-display: clamp(3.1rem, 1.4rem + 7vw, 8.2rem);
+  --fs-h1:      clamp(2.7rem, 1.5rem + 5.2vw, 6.2rem);
+  --fs-h2:      clamp(2.3rem, 1.4rem + 4vw, 4.8rem);
+  --fs-h3:      clamp(1.55rem, 1.15rem + 1.6vw, 2.5rem);
+  --fs-h4:      clamp(1.15rem, 1rem + 0.7vw, 1.5rem);
+  --fs-lead:    clamp(1.02rem, 0.95rem + 0.35vw, 1.2rem);
+  --fs-base:    1rem;
+  --fs-sm:      0.875rem;
+  --fs-xs:      0.75rem;
 
-  --lh-tight: 1.08;
-  --lh-snug: 1.28;
-  --lh-body: 1.65;
-  --tracking-eyebrow: 0.14em;
+  --lh-display: 0.92;
+  --lh-title:   1.02;
+  --lh-body:    1.62;
+  --tracking-display: -0.022em;
+  --tracking-eyebrow: 0.16em;
 
   /* ---- Espacements ---- */
   --sp-1: 0.25rem;
@@ -63,56 +66,65 @@
   --sp-5: 1.5rem;
   --sp-6: 2rem;
   --sp-7: 3rem;
-  --sp-8: 4rem;
-  --sp-9: 6rem;
-  --sp-10: 8rem;
-  --section-y: clamp(3.5rem, 2rem + 6vw, 7rem);
+  --sp-8: 4.5rem;
+  --sp-9: 6.5rem;
+  --section-y: clamp(4.5rem, 2rem + 8vw, 10rem);
 
-  /* ---- Grille & largeurs ---- */
-  --wrap: 1240px;
-  --wrap-wide: 1520px;
-  --wrap-text: 44rem;
-  --gutter: clamp(1.1rem, 0.6rem + 2.2vw, 3rem);
+  /* ---- Grille ---- */
+  --wrap: 1180px;
+  --wrap-wide: 1560px;
+  --wrap-text: 42rem;
+  --gutter: clamp(1.25rem, 0.5rem + 2.6vw, 3.5rem);
 
   /* ---- Formes ---- */
-  --r-xs: 3px;
-  --r-sm: 6px;
-  --r-md: 12px;
-  --r-lg: 20px;
-  --r-xl: 28px;
-  --r-full: 999px;
+  --r-xs: 4px;
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-media: 22px;
+  --r-card: 28px;
+  --r-block: 34px;
+  --r-pill: 100px;
 
-  /* ---- Ombres (discrètes, papier) ---- */
-  --shadow-1: 0 1px 2px rgba(28, 30, 29, 0.05);
-  --shadow-2: 0 10px 30px -18px rgba(28, 30, 29, 0.45);
-  --shadow-3: 0 28px 60px -32px rgba(28, 30, 29, 0.55);
+  /* ---- Ombres ---- */
+  --shadow-1: 0 1px 2px rgba(22, 24, 26, 0.05);
+  --shadow-2: 0 18px 40px -26px rgba(22, 24, 26, 0.5);
+  --shadow-3: 0 40px 80px -40px rgba(22, 24, 26, 0.55);
 
   /* ---- Mouvement ---- */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --dur-1: 140ms;
-  --dur-2: 260ms;
-  --dur-3: 480ms;
+  --dur-1: 150ms;
+  --dur-2: 280ms;
+  --dur-3: 520ms;
   --dur-4: 900ms;
 
   /* ---- Divers ---- */
-  --header-h: 68px;
+  --header-h: 76px;
   --z-header: 100;
   --z-drawer: 200;
   --z-modal: 300;
-  --z-toast: 400;
 }
 
-/* Motif « lames de parquet » réutilisable */
+/* Aplats de section réutilisables */
+:root {
+  --tint-sage: var(--c-sage-pale);
+  --tint-slate: var(--c-slate-pale);
+  --tint-mineral: var(--c-mineral);
+  --tint-clay: var(--c-clay-pale);
+}
+
+/* Motifs graphiques issus du calepinage */
 :root {
   --plank-lines: repeating-linear-gradient(
     to bottom,
-    transparent 0 11px,
-    color-mix(in srgb, var(--line-strong) 65%, transparent) 11px 12px
+    transparent 0 13px,
+    color-mix(in srgb, var(--line-strong) 60%, transparent) 13px 14px
   );
   --plank-lines-diag: repeating-linear-gradient(
     45deg,
-    transparent 0 9px,
-    color-mix(in srgb, var(--line-strong) 55%, transparent) 9px 10px
+    transparent 0 10px,
+    color-mix(in srgb, var(--line-strong) 50%, transparent) 10px 11px
   );
+  --chevron-lines: repeating-linear-gradient(135deg, currentColor 0 1px, transparent 1px 16px),
+    repeating-linear-gradient(45deg, currentColor 0 1px, transparent 1px 16px);
 }

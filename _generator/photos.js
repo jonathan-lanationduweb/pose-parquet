@@ -103,6 +103,40 @@ const PHOTOS = {
     alt: 'Comparaison d’échantillons de bois et de matières sur un plan de travail',
   },
 
+
+  // --- Refonte : visuels pleine largeur -----------------------------------
+  'hero-wide': {
+    id: 13702811, w: 2200, h: 1300, credit: 'Curtis Adams',
+    alt: 'Grande pièce vide au parquet clair, arches et lumière naturelle',
+  },
+  'immersive-hongrie': {
+    id: 16101859, w: 2000, h: 1500, credit: 'Francesca Cruccu',
+    alt: 'Lumière rasante dessinant les chevrons d un parquet en Point de Hongrie',
+  },
+  'immersive-parcours': {
+    id: 18707513, w: 2000, h: 1400, credit: 'sanket mahind',
+    alt: 'Pièce vide au parquet clair traversée par l ombre d une fenêtre',
+  },
+  'tile-preparer': {
+    id: 11806489, w: 1000, h: 900, credit: 'Vladimir Srajber',
+    alt: 'Ragréage en cours sur un sol intérieur',
+  },
+  'tile-poser': {
+    id: 4263067, w: 1000, h: 900, credit: 'K',
+    alt: 'Poseur assemblant des lames de parquet',
+  },
+  'tile-motif': {
+    id: 15066939, w: 1000, h: 900, credit: 'Magda Ehlers',
+    alt: 'Parquet en chevrons vu de dessus',
+  },
+  'tile-renover': {
+    id: 11126101, w: 1000, h: 900, credit: 'Pexels',
+    alt: 'Vieux plancher bois patiné',
+  },
+  'projet-visuel': {
+    id: 6835181, w: 1400, h: 1100, credit: 'Max Vakhtbovych',
+    alt: 'Pièce lumineuse au parquet clair, baies vitrées',
+  },
   // --- Hero et partage ----------------------------------------------------
   'hero-poster': {
     id: 7027842, w: 1000, h: 1100, credit: 'Curtis Adams',

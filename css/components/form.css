@@ -7,20 +7,21 @@
 
 .input, .textarea, .select {
   width: 100%;
-  padding: 0.75rem 0.9rem;
-  background: var(--bg-solid);
+  padding: 0.85rem 1.15rem;
+  background: var(--surface);
   border: 1px solid var(--line-strong);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-pill);
+  background: transparent;
   font-size: 0.97rem;
   transition: border-color var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
 }
 .input:hover, .textarea:hover, .select:hover { border-color: var(--text-muted); }
 .input:focus, .textarea:focus, .select:focus {
   outline: none;
-  border-color: var(--accent-strong);
-  box-shadow: 0 0 0 3px var(--c-sage-wash);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--c-sage-pale);
 }
-.textarea { min-height: 7.5rem; resize: vertical; }
+.textarea { min-height: 8rem; resize: vertical; border-radius: var(--r-media); }
 .field[data-invalid="true"] .input,
 .field[data-invalid="true"] .textarea,
 .field[data-invalid="true"] .select { border-color: #b8543a; }
@@ -39,13 +40,13 @@
 .choice-grid { display: grid; gap: 0.6rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr)); }
 .choice {
   position: relative;
+  border-radius: var(--r-pill);
   display: flex;
   align-items: center;
   gap: 0.65rem;
   padding: 0.8rem 0.9rem;
   border: 1px solid var(--line-strong);
-  border-radius: var(--r-sm);
-  background: var(--bg-solid);
+  background: transparent;
   cursor: pointer;
   font-size: 0.93rem;
   transition: border-color var(--dur-2) var(--ease-out), background var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
@@ -56,7 +57,7 @@
   width: 16px; height: 16px;
   flex: none;
   border: 1px solid var(--line-strong);
-  border-radius: var(--r-full);
+  border-radius: var(--r-pill);
   display: grid;
   place-items: center;
   transition: border-color var(--dur-2) var(--ease-out);
@@ -64,15 +65,15 @@
 .choice__dot::after {
   content: "";
   width: 8px; height: 8px;
-  border-radius: var(--r-full);
-  background: var(--accent-strong);
+  border-radius: var(--r-pill);
+  background: var(--accent);
   transform: scale(0);
   transition: transform var(--dur-2) var(--ease-out);
 }
-.choice input:checked ~ .choice__dot { border-color: var(--accent-strong); }
+.choice input:checked ~ .choice__dot { border-color: var(--accent); }
 .choice input:checked ~ .choice__dot::after { transform: scale(1); }
-.choice:has(input:checked) { border-color: var(--accent-strong); background: var(--c-sage-wash); }
+.choice:has(input:checked) { border-color: var(--accent); background: var(--c-sage-pale); }
 .choice:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 .consent { display: flex; gap: 0.7rem; align-items: flex-start; font-size: var(--fs-sm); color: var(--text-soft); }
-.consent input { margin-top: 0.25rem; accent-color: var(--accent-strong); width: 1rem; height: 1rem; }
+.consent input { margin-top: 0.25rem; accent-color: var(--accent); width: 1rem; height: 1rem; }
