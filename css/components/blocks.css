@@ -111,6 +111,16 @@
 }
 .immersive__steps--right { margin-left: auto; }
 .step-block { display: grid; gap: 0.6rem; }
+/* Sur petit écran, les textes passent sur une photo chargée : on pose un voile local */
+@media (max-width: 62rem) {
+  .step-block {
+    padding: clamp(1rem, 0.8rem + 1vw, 1.5rem);
+    border-radius: var(--r-md);
+    background: rgba(12, 14, 15, 0.42);
+    backdrop-filter: blur(3px);
+  }
+  .immersive__steps { gap: 1.25rem; }
+}
 .step-block__num {
   font-family: var(--font-mono);
   font-size: 0.72rem;

@@ -137,6 +137,32 @@ const PHOTOS = {
     id: 6835181, w: 1400, h: 1100, credit: 'Max Vakhtbovych',
     alt: 'Pièce lumineuse au parquet clair, baies vitrées',
   },
+
+  // --- Pièces d'exemple du visualiseur ------------------------------------
+  'room-sejour': {
+    id: 3935327, w: 1600, h: 1067, credit: 'Curtis Adams',
+    alt: 'Séjour vide et lumineux, grandes fenêtres',
+  },
+  'room-piece-claire': {
+    id: 8146330, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
+    alt: 'Pièce vide et moderne, lumière douce',
+  },
+  'room-chambre': {
+    id: 7587859, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
+    alt: 'Chambre aux murs bleus ouverte sur le jardin',
+  },
+  'room-salon': {
+    id: 7027842, w: 1600, h: 1067, credit: 'Curtis Adams',
+    alt: 'Salon avec moulures et lustre',
+  },
+  'room-contraste': {
+    id: 18707513, w: 1600, h: 1067, credit: 'sanket mahind',
+    alt: 'Pièce contrastée traversée par l ombre d une fenêtre',
+  },
+  'room-cuisine': {
+    id: 7060823, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
+    alt: 'Cuisine ouverte sur la salle à manger',
+  },
   // --- Hero et partage ----------------------------------------------------
   'hero-poster': {
     id: 7027842, w: 1000, h: 1100, credit: 'Curtis Adams',

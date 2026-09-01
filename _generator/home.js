@@ -177,7 +177,8 @@ function carouselEditorial(guides) {
     )
     .join('\n            ');
 
-  return `      <section class="section" data-carousel aria-labelledby="guides-title">
+  return `      <section class="section scroll-track" data-carousel data-scroll-carousel data-scroll-factor="0.9" aria-labelledby="guides-title">
+        <div class="scroll-track__sticky" data-scroll-sticky>
         <div class="wrap-wide">
           <div class="section-head section-head__row section-head__row--tight">
             <div>
@@ -186,6 +187,7 @@ function carouselEditorial(guides) {
             </div>
             <div class="carousel__controls">
               <span class="carousel__hint">${ICON.drag}Glissez</span>
+              <span class="carousel__hint carousel__hint--scroll">${ICON.down}Défilez</span>
               <span class="carousel__count" data-carousel-count>01 / ${String(guides.length).padStart(2, '0')}</span>
               <button class="icon-btn" type="button" data-carousel-prev aria-label="Guides précédents">${ICON.arrowLeft}</button>
               <button class="icon-btn" type="button" data-carousel-next aria-label="Guides suivants">${ICON.arrow}</button>
@@ -198,6 +200,7 @@ function carouselEditorial(guides) {
             ${slides}
             </div>
             <div class="wrap-wide"><div class="carousel__progress"><span data-carousel-progress></span></div></div>
+        </div>
         </div>
       </section>`;
 }
@@ -260,7 +263,8 @@ function carouselGallery() {
             </div>`
   ).join('\n            ');
 
-  return `      <section class="section section--dark" data-carousel aria-labelledby="inspi-title">
+  return `      <section class="section section--dark scroll-track" data-carousel data-scroll-carousel data-scroll-factor="0.85" aria-labelledby="inspi-title">
+        <div class="scroll-track__sticky" data-scroll-sticky>
         <div class="wrap-wide">
           <div class="section-head section-head__row section-head__row--tight">
             <div>
@@ -280,6 +284,7 @@ function carouselGallery() {
             ${slides}
             </div>
             <div class="wrap-wide"><div class="carousel__progress"><span data-carousel-progress></span></div></div>
+        </div>
         </div>
       </section>`;
 }
@@ -324,13 +329,14 @@ function toolsSection() {
           </div>
           <div class="grid grid--3">
             <div class="tool-card" data-reveal>
-              <div class="tool-card__head"><h3>Simulateur de pose</h3><span class="badge badge--sage">Disponible</span></div>
-              <p>Cinq motifs, vos dimensions, la lumière au bon endroit.</p>
-              <a class="btn btn--sm" href="outils/simulateur-pose.html"><span>Ouvrir</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+              <div class="tool-card__head"><h3>Visualiser ma pièce</h3><span class="badge badge--sage">Nouveau</span></div>
+              <p>Votre photo, un parquet posé dessus, en perspective.</p>
+              <a class="btn btn--sm" href="outils/visualiseur.html"><span>Ouvrir</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
             </div>
-            <div class="tool-card tool-card--soon" data-reveal data-reveal-delay="70">
-              <div class="tool-card__head"><h3>Calculateur de surface</h3><span class="badge badge--outline">Bientôt</span></div>
-              <p>Surfaces complexes, décrochés et chutes selon le motif retenu.</p>
+            <div class="tool-card" data-reveal data-reveal-delay="70">
+              <div class="tool-card__head"><h3>Mode plan</h3><span class="badge badge--sage">Disponible</span></div>
+              <p>Cinq motifs, vos dimensions, la lumière au bon endroit.</p>
+              <a class="btn btn--sm btn--ghost" href="outils/simulateur-pose.html"><span>Ouvrir</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
             </div>
             <div class="tool-card tool-card--soon" data-reveal data-reveal-delay="140">
               <div class="tool-card__head"><h3>Checklist avant pose</h3><span class="badge badge--outline">Bientôt</span></div>

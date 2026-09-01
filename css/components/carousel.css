@@ -155,3 +155,45 @@
   .carousel__viewport { scroll-behavior: auto; }
   .slide-card__media img, .shot img { transition: none; }
 }
+
+/* ---------- Carrousel piloté par le scroll (écrans larges) ---------- */
+.scroll-track { position: relative; }
+.scroll-track[data-scroll-active="true"] { padding-block: 0; }
+.scroll-track[data-scroll-active="true"] .scroll-track__sticky {
+  position: sticky;
+  top: 0;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(1.5rem, 1rem + 2vw, 3rem);
+  padding-block: clamp(3rem, 2rem + 4vw, 6rem);
+}
+/* En mode piloté, la piste ne défile plus au doigt : le scroll de page mène */
+.carousel__viewport[data-mode="scroll"] { cursor: default; overflow-x: hidden; }
+.carousel__viewport[data-mode="scroll"] .carousel__slide { scroll-snap-align: none; }
+
+/* Indice visuel : on ne montre la mention « glissez » qu'en mode libre */
+.carousel__viewport[data-mode="scroll"] ~ * .carousel__hint,
+.scroll-track[data-scroll-active="true"] .carousel__hint { display: none; }
+.scroll-track[data-scroll-active="true"] .carousel__hint--scroll { display: inline-flex; }
+.carousel__hint--scroll { display: none; }
+
+/* Le bloc collant doit tenir dans la fenêtre : on cadre les slides en hauteur */
+.scroll-track[data-scroll-active="true"] .scroll-track__sticky {
+  height: 100svh;
+  padding-block: calc(var(--header-h) + 1rem) clamp(1.5rem, 1rem + 2vw, 3rem);
+  overflow: hidden;
+}
+.scroll-track[data-scroll-active="true"] .slide-card { height: min(56svh, 30rem); }
+.scroll-track[data-scroll-active="true"] .slide-card__media {
+  aspect-ratio: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.scroll-track[data-scroll-active="true"] .shot {
+  height: min(62svh, 34rem);
+  aspect-ratio: auto;
+}
+.scroll-track[data-scroll-active="true"] .carousel--gallery .carousel__slide { align-self: center; }
+.scroll-track[data-scroll-active="true"] .carousel__progress { margin-top: clamp(1rem, 0.5rem + 1vw, 1.75rem); }
