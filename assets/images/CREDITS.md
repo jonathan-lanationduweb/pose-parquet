@@ -29,6 +29,14 @@ Elles sont créditées ici par respect du travail des auteurs.
 | `preparation-ragreage.jpg` | Vladimir Srajber | [Pexels #11806489](https://www.pexels.com/photo/11806489/) |
 | `massif-contrecolle.jpg` | cottonbro studio | [Pexels #7504591](https://www.pexels.com/photo/7504591/) |
 | `apropos-studio.jpg` | cottonbro studio | [Pexels #6583355](https://www.pexels.com/photo/6583355/) |
+| `hero-wide.jpg` | Curtis Adams | [Pexels #13702811](https://www.pexels.com/photo/13702811/) |
+| `immersive-hongrie.jpg` | Francesca Cruccu | [Pexels #16101859](https://www.pexels.com/photo/16101859/) |
+| `immersive-parcours.jpg` | sanket mahind | [Pexels #18707513](https://www.pexels.com/photo/18707513/) |
+| `tile-preparer.jpg` | Vladimir Srajber | [Pexels #11806489](https://www.pexels.com/photo/11806489/) |
+| `tile-poser.jpg` | K | [Pexels #4263067](https://www.pexels.com/photo/4263067/) |
+| `tile-motif.jpg` | Magda Ehlers | [Pexels #15066939](https://www.pexels.com/photo/15066939/) |
+| `tile-renover.jpg` | Pexels | [Pexels #11126101](https://www.pexels.com/photo/11126101/) |
+| `projet-visuel.jpg` | Max Vakhtbovych | [Pexels #6835181](https://www.pexels.com/photo/6835181/) |
 | `hero-poster.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
 | `og-default.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
 | `inspi-1.jpg` | Max Vakhtbovych | [Pexels #7587865](https://www.pexels.com/photo/7587865/) |

@@ -4,6 +4,10 @@ Média pratique et boîte à outils autour de la pose du parquet.
 Site statique en **HTML / CSS / JavaScript natif (ES Modules)**, sans framework
 ni dépendance externe.
 
+Direction artistique : composition éditoriale plein cadre — photographies
+immersives, très grande typographie serif (Instrument Serif), aplats minéraux,
+carrousels et apparitions au scroll.
+
 Dépôt : <https://github.com/jonathan-lanationduweb/pose-parquet>
 
 ---
@@ -36,9 +40,10 @@ pose-parquet.com/
 ├── contact/  a-propos/
 │
 ├── css/
-│   ├── main.css            Point d'entrée (importe tokens, reset, global, layout, composants)
+│   ├── main.css            Point d'entrée (importe fonts, tokens, reset, global, composants)
+│   ├── fonts.css           @font-face auto-hébergés (généré)
 │   ├── tokens.css          Couleurs, typographie, espacements, mouvements
-│   ├── reset.css  global.css  layout.css
+│   ├── reset.css  global.css
 │   ├── components/         Un fichier par composant du design system
 │   └── pages/              Styles spécifiques à un gabarit de page
 │
@@ -46,8 +51,9 @@ pose-parquet.com/
 │   ├── main.js             Chef d'orchestre : importe un module seulement si la page l'utilise
 │   ├── utils/              dom.js, motion.js, icons.js
 │   ├── animations/         reveal.js (apparition au scroll)
-│   ├── components/         nav, accordion, tabs, carousel, modal/lightbox, tooltip,
-│   │                       toc + progression de lecture, before-after, filters, hero-media
+│   ├── components/         nav (menu plein écran), carousel (drag/swipe/clavier),
+│   │                       accordion, tabs, modal/lightbox, tooltip, toc,
+│   │                       before-after, filters, hero-media
 │   ├── tools/              patterns.js (registre des motifs) + floor-visualizer.js (simulateur)
 │   └── forms/              submit-adapter.js (abstraction d'envoi)
 │
@@ -56,6 +62,7 @@ pose-parquet.com/
 │
 ├── assets/
 │   ├── images/             Photographies (JPEG) + schémas vectoriels + CREDITS.md
+│   ├── fonts/              Instrument Serif + Inter (woff2 auto-hébergés)
 │   ├── icons/favicon.svg
 │   └── videos/             Emplacement de la vidéo du hero (voir README dédié)
 │
@@ -113,6 +120,47 @@ Tout se passe dans `js/tools/patterns.js` : ajouter une entrée au tableau `PATT
 `ctx` fournit `length`, `width`, `plankWidth`, `plankLength` (en centimètres) et
 la configuration de la pièce. Le sélecteur, les miniatures et le rendu se mettent
 à jour automatiquement.
+
+---
+
+## Carrousels
+
+Deux carrousels, un seul composant (`js/components/carousel.js`) :
+
+- **éditorial** (guides) : image, catégorie, titre, extrait, lien ;
+- **galerie** (inspiration) : grandes photographies, formats alternés.
+
+Marquage attendu :
+
+```html
+<section data-carousel>
+  <button data-carousel-prev></button>
+  <button data-carousel-next></button>
+  <span data-carousel-count></span>
+  <div class="carousel carousel--editorial">
+    <div class="carousel__viewport" data-carousel-viewport tabindex="0" role="region">
+      <article class="carousel__slide">…</article>
+    </div>
+    <div class="carousel__progress"><span data-carousel-progress></span></div>
+  </div>
+</section>
+```
+
+Fonctions : glisser-déposer à la souris, swipe tactile natif, boutons
+précédent / suivant, clavier (flèches, Origine, Fin), barre de progression,
+compteur, et affleurement de la slide suivante sur desktop.
+
+Le défilement programmé utilise un tween maison plutôt que
+`scrollTo({ behavior: 'smooth' })` : le `scroll-snap-type: mandatory` annule
+les animations de défilement déclenchées en JavaScript.
+
+---
+
+## Polices
+
+`node _generator/fetch-fonts.js` télécharge Instrument Serif (titres) et Inter
+(interface) depuis Google Fonts — licence SIL OFL — vers `assets/fonts/`, puis
+régénère `css/fonts.css`. Aucune requête externe à l'exécution du site.
 
 ---
 

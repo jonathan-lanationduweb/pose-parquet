@@ -8,6 +8,7 @@ const { MOTIFS } = require('./content-motifs');
 const { TUTOS } = require('./content-tutos');
 const images = require('./images');
 const { PHOTOS, INSPIRATION_PHOTOS } = require('./photos');
+const { buildHomeBody } = require('./home');
 
 const ROOT = process.env.SITE_ROOT || path.join(process.env.USERPROFILE || '', 'Desktop', 'pose-parquet.com');
 
@@ -215,19 +216,25 @@ function editorialPage(item, options) {
 
   const body = `      <div class="reading-progress" data-reading-progress aria-hidden="true"><span></span></div>
       ${crumbs.html}
-      <header class="article-header wrap">
-        <p class="eyebrow">${item.category || sectionLabel}</p>
-        <h1>${item.h1}</h1>
-        <p class="lead">${item.lead}</p>
-        <ul class="meta-list article-header__meta">
-          <li>${item.reading} de lecture</li>
-          ${item.date ? `<li>Mis à jour le ${frDate(item.date)}</li>` : ''}
-          ${item.level ? `<li>Niveau ${item.level}</li>` : ''}
-          ${item.duration ? `<li>${item.duration}</li>` : ''}
-        </ul>
+      <header class="article-header">
+        <div class="wrap-wide article-header__grid">
+          <div>
+            <p class="eyebrow">${item.category || sectionLabel}</p>
+            <h1>${item.h1}</h1>
+          </div>
+          <div>
+            <p class="lead">${item.lead}</p>
+            <ul class="meta-list article-header__meta">
+              <li>${item.reading} de lecture</li>
+              ${item.date ? `<li>Mis à jour le ${frDate(item.date)}</li>` : ''}
+              ${item.level ? `<li>Niveau ${item.level}</li>` : ''}
+              ${item.duration ? `<li>${item.duration}</li>` : ''}
+            </ul>
+          </div>
+        </div>
       </header>
 
-      <div class="wrap">
+      <div class="wrap-wide">
         <div class="article-cover" data-reveal>
           <img src="${base}assets/images/cover-${item.slug}.jpg" alt="${photoAlt(`cover-${item.slug}`) || item.h1}"
             width="1400" height="875" decoding="async" fetchpriority="high" />
@@ -295,10 +302,14 @@ function buildGuides() {
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'Guides' }]);
 
   const body = `      ${crumbs.html}
-      <header class="page-hero wrap">
-        <p class="eyebrow">Guides</p>
-        <h1 class="page-hero__title">Comprendre avant de poser</h1>
-        <p class="page-hero__lead">Des guides pratiques sur le choix du parquet, la préparation du support, le sens de pose, les motifs et les finitions. Écrits pour être utiles sur le chantier, pas pour remplir une page.</p>
+      <header class="page-hero">
+        <div class="wrap-wide page-hero__grid">
+          <div>
+            <p class="eyebrow">Guides</p>
+            <h1 class="page-hero__title">Comprendre avant de poser</h1>
+          </div>
+          <p class="page-hero__lead">Des guides pratiques sur le choix du parquet, la préparation du support, le sens de pose, les motifs et les finitions. Écrits pour être utiles sur le chantier, pas pour remplir une page.</p>
+        </div>
       </header>
 
       <section class="section section--flush-top">
@@ -388,10 +399,14 @@ function buildMotifs() {
 
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'Motifs' }]);
   const body = `      ${crumbs.html}
-      <header class="page-hero wrap">
-        <p class="eyebrow">Motifs de pose</p>
-        <h1 class="page-hero__title">Six façons de dessiner un sol</h1>
-        <p class="page-hero__lead">Le motif décide du caractère de la pièce autant que l'essence du bois. Chaque fiche détaille le rendu, les contraintes de pose, les chutes attendues et les pièces adaptées.</p>
+      <header class="page-hero">
+        <div class="wrap-wide page-hero__grid">
+          <div>
+            <p class="eyebrow">Motifs de pose</p>
+            <h1 class="page-hero__title">Six façons de dessiner un sol</h1>
+          </div>
+          <p class="page-hero__lead">Le motif décide du caractère de la pièce autant que l'essence du bois. Chaque fiche détaille le rendu, les contraintes de pose, les chutes attendues et les pièces adaptées.</p>
+        </div>
       </header>
 
       <section class="section section--flush-top">
@@ -466,10 +481,14 @@ function buildTutos() {
 
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'Tutoriels' }]);
   const body = `      ${crumbs.html}
-      <header class="page-hero wrap">
-        <p class="eyebrow">Tutoriels</p>
-        <h1 class="page-hero__title">Le geste, étape par étape</h1>
-        <p class="page-hero__lead">Des déroulés de chantier détaillés, avec l'outillage nécessaire, les points de contrôle et les erreurs qui coûtent cher.</p>
+      <header class="page-hero">
+        <div class="wrap-wide page-hero__grid">
+          <div>
+            <p class="eyebrow">Tutoriels</p>
+            <h1 class="page-hero__title">Le geste, étape par étape</h1>
+          </div>
+          <p class="page-hero__lead">Des déroulés de chantier détaillés, avec l'outillage nécessaire, les points de contrôle et les erreurs qui coûtent cher.</p>
+        </div>
       </header>
 
       <section class="section section--flush-top">
@@ -507,10 +526,14 @@ function buildInspiration() {
   ).join('\n            ');
 
   const body = `      ${crumbs.html}
-      <header class="page-hero wrap">
-        <p class="eyebrow">Inspiration</p>
-        <h1 class="page-hero__title">Des sols, des directions, des ambiances</h1>
-        <p class="page-hero__lead">Une sélection de configurations réelles, classées par motif et par type de pièce. Chaque visuel indique le motif et le type de pose retenus.</p>
+      <header class="page-hero">
+        <div class="wrap-wide page-hero__grid">
+          <div>
+            <p class="eyebrow">Inspiration</p>
+            <h1 class="page-hero__title">Des sols, des directions, des ambiances</h1>
+          </div>
+          <p class="page-hero__lead">Une sélection de configurations réelles, classées par motif et par type de pièce. Chaque visuel indique le motif et le type de pose retenus.</p>
+        </div>
       </header>
 
       <section class="section section--flush-top">
@@ -558,10 +581,14 @@ function buildTools() {
   ];
 
   const bodyIndex = `      ${crumbsIndex.html}
-      <header class="page-hero wrap">
-        <p class="eyebrow">Outils</p>
-        <h1 class="page-hero__title">Une boîte à outils, pas une brochure</h1>
-        <p class="page-hero__lead">Des outils simples, utilisables depuis un téléphone sur le chantier comme depuis un bureau au moment de décider.</p>
+      <header class="page-hero">
+        <div class="wrap-wide page-hero__grid">
+          <div>
+            <p class="eyebrow">Outils</p>
+            <h1 class="page-hero__title">Une boîte à outils, pas une brochure</h1>
+          </div>
+          <p class="page-hero__lead">Des outils simples, utilisables depuis un téléphone sur le chantier comme depuis un bureau au moment de décider.</p>
+        </div>
       </header>
 
       <section class="section section--flush-top">
@@ -687,10 +714,14 @@ function buildProjet() {
   ];
 
   const body = `      ${crumbs.html}
-      <header class="page-hero wrap">
-        <p class="eyebrow">Mon projet</p>
-        <h1 class="page-hero__title">Décrivez votre projet de pose</h1>
-        <p class="page-hero__lead">Quelques informations suffisent à comprendre un chantier : la pièce, le support, le rendu recherché et le délai.</p>
+      <header class="page-hero">
+        <div class="wrap-wide page-hero__grid">
+          <div>
+            <p class="eyebrow">Mon projet</p>
+            <h1 class="page-hero__title">Décrivez votre projet de pose</h1>
+          </div>
+          <p class="page-hero__lead">Quelques informations suffisent à comprendre un chantier : la pièce, le support, le rendu recherché et le délai.</p>
+        </div>
       </header>
 
       <section class="section section--flush-top">
@@ -730,10 +761,14 @@ function buildProjet() {
 function buildContact() {
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'Contact' }]);
   const body = `      ${crumbs.html}
-      <header class="page-hero wrap">
-        <p class="eyebrow">Contact</p>
-        <h1 class="page-hero__title">Une question, une correction, une idée d'outil ?</h1>
-        <p class="page-hero__lead">Le site est écrit et maintenu par une petite équipe. Les retours de terrain sont particulièrement bienvenus.</p>
+      <header class="page-hero">
+        <div class="wrap-wide page-hero__grid">
+          <div>
+            <p class="eyebrow">Contact</p>
+            <h1 class="page-hero__title">Une question, une correction, une idée d'outil ?</h1>
+          </div>
+          <p class="page-hero__lead">Le site est écrit et maintenu par une petite équipe. Les retours de terrain sont particulièrement bienvenus.</p>
+        </div>
       </header>
 
       <section class="section section--flush-top">
@@ -778,10 +813,14 @@ function buildContact() {
 function buildApropos() {
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'À propos' }]);
   const body = `      ${crumbs.html}
-      <header class="page-hero wrap">
-        <p class="eyebrow">À propos</p>
-        <h1 class="page-hero__title">Un média pratique sur la pose du parquet</h1>
-        <p class="page-hero__lead">Pose Parquet documente ce qui se décide avant la première lame : le support, le sens, le motif, la méthode.</p>
+      <header class="page-hero">
+        <div class="wrap-wide page-hero__grid">
+          <div>
+            <p class="eyebrow">À propos</p>
+            <h1 class="page-hero__title">Un média pratique sur la pose du parquet</h1>
+          </div>
+          <p class="page-hero__lead">Pose Parquet documente ce qui se décide avant la première lame : le support, le sens, le motif, la méthode.</p>
+        </div>
       </header>
 
       <section class="section section--flush-top">
@@ -826,202 +865,7 @@ function buildApropos() {
 }
 
 function buildHome() {
-  const latest = GUIDES.slice(0, 6);
-  const stripItems = ['Pose droite', 'Point de Hongrie', 'Bâton rompu', 'Diagonale', 'Frise périphérique', 'Pose collée', 'Pose flottante', 'Calepinage'];
-  const chevron = '<svg viewBox="0 0 26 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 14 8 4l6 10 6-10"/></svg>';
-
-  const body = `      <section class="hero">
-        <div class="wrap-wide hero__grid">
-          <div>
-            <p class="eyebrow">Guides · Motifs · Outils</p>
-            <h1 class="hero__title">Un parquet bien posé commence <em>avant</em> la première lame.</h1>
-            <p class="hero__lead">Guides, techniques et outils pour comprendre et réussir votre projet parquet — du support au motif, du calepinage à la finition.</p>
-            <div class="hero__actions">
-              <a class="btn btn--lg" href="guides/">Explorer les guides</a>
-              <a class="btn btn--ghost btn--lg" href="outils/simulateur-pose.html">Visualiser ma pièce</a>
-            </div>
-            <div class="hero__stats">
-              <div class="hero__stat"><strong>5</strong><span>motifs simulés</span></div>
-              <div class="hero__stat"><strong>${GUIDES.length}</strong><span>guides pratiques</span></div>
-              <div class="hero__stat"><strong>0</strong><span>produit vendu</span></div>
-            </div>
-          </div>
-          <figure class="hero__media" data-hero-media>
-            <img src="assets/images/hero-poster.jpg" alt="Séjour vide au parquet clair, éclairé par une grande fenêtre" width="1000" height="1100" fetchpriority="high" decoding="async" />
-            <video muted loop playsinline preload="none" data-src="" aria-hidden="true"></video>
-            <figcaption class="hero__media-caption"><span>Séjour · 5,4 × 3,8 m</span><span class="mono">pose droite</span></figcaption>
-          </figure>
-        </div>
-        <div class="wrap-wide">
-          <div class="pattern-strip" aria-hidden="true">
-            <div class="pattern-strip__track">
-              ${[...stripItems, ...stripItems].map((item) => `<span class="pattern-strip__item">${chevron}${item}</span>`).join('')}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" aria-labelledby="parcours-title">
-        <div class="wrap">
-          <div class="section-head">
-            <p class="eyebrow">Vous en êtes où ?</p>
-            <h2 id="parcours-title">Quatre points d'entrée</h2>
-          </div>
-          <div class="grid home-steps">
-            ${PILLARS.map(
-              (pillar, index) => `<a class="step-card" href="${pillar.href}" data-reveal data-reveal-delay="${index * 70}">
-              <span class="step-card__num">${pillar.num}</span>
-              <h3 class="step-card__title">${pillar.title}</h3>
-              <p class="step-card__text">${pillar.text}</p>
-              <span class="step-card__more">Explorer ${ICON.arrow}</span>
-            </a>`
-            ).join('\n            ')}
-          </div>
-        </div>
-      </section>
-
-      <section class="section section--alt" aria-labelledby="sim-title">
-        <div class="wrap">
-          <div class="home-sim" data-reveal>
-            <div class="home-sim__head">
-              <div>
-                <p class="eyebrow">Studio de pose</p>
-                <h2 id="sim-title">Une pièce. Plusieurs directions.</h2>
-                <p class="lead">Changez de motif et voyez immédiatement ce que cela donne dans vos dimensions.</p>
-              </div>
-              <a class="btn" href="outils/simulateur-pose.html">Ouvrir le simulateur complet</a>
-            </div>
-            <div data-visualizer data-mode="compact" data-base=""></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" aria-labelledby="guides-title">
-        <div class="wrap">
-          <div class="section-head section-head__row">
-            <div>
-              <p class="eyebrow">Guides du moment</p>
-              <h2 id="guides-title">Ce qu'il faut savoir avant de commander</h2>
-            </div>
-            <div class="carousel__controls">
-              <button class="carousel__btn" type="button" data-carousel-prev aria-label="Guides précédents">${ICON.arrow.replace('M5 12h13', 'M19 12H6').replace('m12 5 7 7-7 7', 'm12 19-7-7 7-7')}</button>
-              <button class="carousel__btn" type="button" data-carousel-next aria-label="Guides suivants">${ICON.arrow}</button>
-            </div>
-          </div>
-          <div class="carousel" data-carousel>
-            <div class="carousel__viewport" data-carousel-viewport tabindex="0" role="region" aria-label="Carrousel de guides">
-              ${latest.map((guide) => articleCard(guide, '', 'guides/')).join('\n              ')}
-            </div>
-            <div class="carousel__progress"><span data-carousel-progress></span></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section section--dark" aria-labelledby="focus-title">
-        <div class="wrap">
-          <div class="split split--wide-left focus-pattern">
-            <div class="focus-pattern__viz" data-pattern-thumb="point-de-hongrie" data-reveal></div>
-            <div>
-              <p class="eyebrow">Focus motif</p>
-              <h2 id="focus-title">Le Point de Hongrie, une flèche au sol</h2>
-              <p class="lead">Des lames coupées à 45°, des pointes parfaitement alignées : le motif le plus exigeant, et le plus spectaculaire dans une pièce en longueur.</p>
-              <ul class="focus-pattern__list">
-                <li>${ICON.check}<span>Lames gauches et droites, à commander ensemble.</span></li>
-                <li>${ICON.check}<span>12 à 15 % de chutes à prévoir dès le premier lot.</span></li>
-                <li>${ICON.check}<span>Un axe tracé au cordeau, vérifié sur toute la longueur.</span></li>
-              </ul>
-              <p class="u-mt-6"><a class="btn btn--light" href="motifs/point-de-hongrie.html">Découvrir le motif</a></p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" aria-labelledby="tuto-title">
-        <div class="wrap">
-          <div class="section-head section-head__row">
-            <div>
-              <p class="eyebrow">Tutoriels</p>
-              <h2 id="tuto-title">Passer au geste</h2>
-            </div>
-            <a class="link-arrow" href="tutoriels/">Tous les tutoriels ${ICON.arrow}</a>
-          </div>
-          <div class="grid grid--3">
-            ${TUTOS.map(
-              (tuto, index) => `<article class="tuto-card" data-reveal data-reveal-delay="${index * 60}">
-              <div class="tuto-card__viz"><img src="assets/images/tile-${tuto.slug}.jpg" alt="" loading="lazy" decoding="async" width="300" height="300" /></div>
-              <div>
-                <h3><a href="tutoriels/${tuto.slug}.html">${tuto.h1}</a></h3>
-                <p>${tuto.level} · ${tuto.duration}</p>
-              </div>
-            </article>`
-            ).join('\n            ')}
-          </div>
-        </div>
-      </section>
-
-      <section class="section section--alt home-inspi" aria-labelledby="inspi-title">
-        <div class="wrap-wide">
-          <div class="section-head section-head__row">
-            <div>
-              <p class="eyebrow">Inspiration</p>
-              <h2 id="inspi-title">Voir avant de choisir</h2>
-            </div>
-            <a class="link-arrow" href="inspiration/">Toute la galerie ${ICON.arrow}</a>
-          </div>
-          <div class="gallery">
-            ${INSPIRATIONS.slice(0, 5)
-              .map(
-                (item, index) => `<figure class="gallery__item gallery__item--${item.size}">
-              <img src="assets/images/inspi-${index + 1}.jpg" alt="${item.alt}" loading="lazy" decoding="async" width="900" height="700" />
-              <figcaption class="gallery__caption"><span>${item.title}</span><span class="mono">${item.meta}</span></figcaption>
-            </figure>`
-              )
-              .join('\n            ')}
-          </div>
-        </div>
-      </section>
-
-      <section class="section" aria-labelledby="outils-title">
-        <div class="wrap">
-          <div class="section-head">
-            <p class="eyebrow">Outils</p>
-            <h2 id="outils-title">La boîte à outils</h2>
-          </div>
-          <div class="home-tools">
-            <div class="tool-card" data-reveal>
-              <div class="tool-card__head"><h3>Simulateur de pose</h3><span class="badge badge--sage">Disponible</span></div>
-              <p>Cinq motifs, vos dimensions, la lumière au bon endroit.</p>
-              <a class="link-arrow" href="outils/simulateur-pose.html">Ouvrir ${ICON.arrow}</a>
-            </div>
-            <div class="tool-card tool-card--soon" data-reveal data-reveal-delay="60">
-              <div class="tool-card__head"><h3>Calculateur de surface</h3><span class="badge badge--outline">Bientôt</span></div>
-              <p>Surfaces complexes, décrochés et chutes selon le motif.</p>
-            </div>
-            <div class="tool-card tool-card--soon" data-reveal data-reveal-delay="120">
-              <div class="tool-card__head"><h3>Checklist avant pose</h3><span class="badge badge--outline">Bientôt</span></div>
-              <p>Le point complet à faire la veille du chantier.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" aria-labelledby="cluster-title">
-        <div class="wrap">
-          <div class="section-head">
-            <p class="eyebrow">Derniers guides</p>
-            <h2 id="cluster-title">Le dossier sens de pose</h2>
-          </div>
-          <div class="cluster-list">
-            ${GUIDES.filter((guide) => guide.tags.includes('sens-de-pose'))
-              .map(
-                (guide) => `<a href="guides/${guide.slug}.html"><strong>${guide.h1}</strong><span>${guide.reading}</span></a>`
-              )
-              .join('\n            ')}
-            <a href="outils/simulateur-pose.html"><strong>Simulateur de sens de pose</strong><span>outil</span></a>
-          </div>
-        </div>
-      </section>
-      ${ctaBand('')}`;
+  const body = buildHomeBody({ GUIDES, TUTOS });
 
   write(
     'index.html',
@@ -1031,7 +875,8 @@ function buildHome() {
         "Média pratique et boîte à outils sur la pose du parquet : guides, motifs, tutoriels, inspiration et un simulateur de sens de pose gratuit.",
       path: 'index.html',
       depth: 0,
-      css: ['css/pages/home.css', 'css/pages/listing.css'],
+      ogImage: 'assets/images/hero-wide.jpg',
+      css: ['css/pages/home.css'],
       jsonld: [
         {
           '@context': 'https://schema.org',

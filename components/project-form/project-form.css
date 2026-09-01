@@ -1,8 +1,8 @@
 /* Styles du composant formulaire projet (isolés sous .project-form) */
 .project-form {
-  background: var(--bg-solid);
+  background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-block);
   padding: clamp(1.2rem, 1rem + 2vw, 2.4rem);
 }
 
@@ -30,19 +30,19 @@
 .pf__dot {
   width: 2.1rem;
   height: 4px;
-  border-radius: var(--r-full);
+  border-radius: var(--r-pill);
   background: var(--line);
   transition: background var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
 }
 .pf__dot:hover { transform: scaleY(1.6); }
 .pf__dot[data-state="done"] { background: var(--accent); }
-.pf__dot[data-state="current"] { background: var(--c-charcoal); }
+.pf__dot[data-state="current"] { background: var(--c-ink); }
 
 .pf__step { animation: pf-in var(--dur-3) var(--ease-out) both; }
 @keyframes pf-in { from { opacity: 0; transform: translateY(10px); } }
 @media (prefers-reduced-motion: reduce) { .pf__step { animation: none; } }
 
-.pf__title { font-size: var(--fs-lg); }
+.pf__title { font-size: var(--fs-h4); }
 .pf__title:focus-visible { outline-offset: 6px; }
 .pf__hint { margin: var(--sp-2) 0 0; color: var(--text-muted); font-size: var(--fs-sm); }
 
@@ -76,7 +76,7 @@
 .pf__status { margin: var(--sp-3) 0 0; font-size: var(--fs-sm); color: var(--text-muted); text-align: right; }
 
 .pf__success { display: grid; gap: var(--sp-3); justify-items: start; padding: var(--sp-5) 0; }
-.pf__success h3 { font-size: var(--fs-xl); }
+.pf__success h3 { font-size: var(--fs-h3); }
 .pf__success p { color: var(--text-soft); max-width: 46ch; margin: 0; }
 .pf__success:focus-visible { outline: none; }
 

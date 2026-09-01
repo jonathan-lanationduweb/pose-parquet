@@ -5,21 +5,21 @@
   gap: 0.3rem;
   padding: 0.3rem;
   border: 1px solid var(--line);
-  border-radius: var(--r-full);
-  background: var(--bg-solid);
+  border-radius: var(--r-pill);
+  background: var(--surface);
   width: fit-content;
   max-width: 100%;
 }
 .tabs__tab {
   padding: 0.5rem 1.05rem;
-  border-radius: var(--r-full);
+  border-radius: var(--r-pill);
   font-size: 0.9rem;
   color: var(--text-soft);
   white-space: nowrap;
   transition: background var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
 }
 .tabs__tab:hover { color: var(--text); }
-.tabs__tab[aria-selected="true"] { background: var(--c-charcoal); color: var(--text-invert); }
+.tabs__tab[aria-selected="true"] { background: var(--c-ink); color: var(--text-invert); }
 .tabs__panel { margin-top: var(--sp-5); }
 .tabs__panel[hidden] { display: none; }
 .tabs__panel > * { animation: tab-in var(--dur-3) var(--ease-out) both; }

@@ -1,30 +1,40 @@
 import { qs, qsa, on, trapFocus } from '../utils/dom.js';
 
 /**
- * En-tete : etat scrolle, drawer mobile, lien actif.
+ * En-tête : état scrollé, superposition au visuel de tête, menu plein écran.
  */
 export function initNav() {
   const header = qs('[data-header]');
   if (!header) return;
 
+  const hero = qs('[data-hero]');
   const toggle = qs('[data-nav-toggle]', header);
   const drawer = qs('[data-drawer]');
 
-  const setScrolled = () => {
-    header.dataset.scrolled = String(window.scrollY > 8);
+  const sync = () => {
+    header.dataset.scrolled = String(window.scrollY > 24);
+    if (hero) {
+      const limit = hero.offsetTop + hero.offsetHeight - 90;
+      header.dataset.over = String(window.scrollY < limit && window.scrollY <= 24);
+    }
   };
-  setScrolled();
-  on(window, 'scroll', setScrolled, { passive: true });
+  sync();
+  on(window, 'scroll', sync, { passive: true });
+  on(window, 'resize', sync);
 
   if (!toggle || !drawer) return;
 
   const setOpen = (open) => {
     toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
     drawer.dataset.open = String(open);
     document.body.dataset.drawerOpen = String(open);
     if (open) {
-      const firstLink = qs('a, button', drawer);
-      if (firstLink) firstLink.focus();
+      header.dataset.over = 'false';
+      const first = qs('a, button', drawer);
+      if (first) first.focus();
+    } else {
+      sync();
     }
   };
 
@@ -41,19 +51,16 @@ export function initNav() {
 
   qsa('a', drawer).forEach((link) => on(link, 'click', () => setOpen(false)));
 
-  const desktop = window.matchMedia('(min-width: 68rem)');
-  desktop.addEventListener('change', (event) => {
+  window.matchMedia('(min-width: 62rem)').addEventListener('change', (event) => {
     if (event.matches) setOpen(false);
   });
 }
 
-/** Marque le lien de navigation correspondant a la page courante. */
+/** Marque le lien de navigation correspondant à la page courante. */
 export function markCurrentNav() {
   const path = window.location.pathname.replace(/index\.html$/, '');
   qsa('[data-nav-section]').forEach((link) => {
     const section = link.dataset.navSection;
-    if (section && path.includes(`/${section}`)) {
-      link.setAttribute('aria-current', 'page');
-    }
+    if (section && path.includes(`/${section}`)) link.setAttribute('aria-current', 'page');
   });
 }

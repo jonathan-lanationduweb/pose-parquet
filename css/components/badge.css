@@ -4,8 +4,8 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.28rem 0.65rem;
-  border-radius: var(--r-full);
-  background: var(--c-paper-3);
+  border-radius: var(--r-pill);
+  background: var(--c-mineral);
   color: var(--text-soft);
   font-size: var(--fs-xs);
   font-weight: 600;
@@ -13,9 +13,9 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
-.badge--sage { background: var(--c-sage-wash); color: var(--c-sage-deep); }
-.badge--terracotta { background: var(--c-terracotta-wash); color: #91503a; }
-.badge--dark { background: var(--c-charcoal); color: var(--text-invert); }
+.badge--sage { background: var(--c-sage-pale); color: var(--c-sage-deep); }
+.badge--terracotta { background: var(--c-clay-pale); color: #91503a; }
+.badge--dark { background: var(--c-ink); color: var(--text-invert); }
 .badge--outline { background: transparent; border: 1px solid var(--line-strong); }
 
 .meta-list {
