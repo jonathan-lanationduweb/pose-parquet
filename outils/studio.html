@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Studio · Pose Parquet</title>
+    <meta name="description" content="Application de visualisation : choisissez une pièce, essayez des parquets, comparez jusqu’à trois rendus. Tout est calculé dans votre navigateur." />
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href="https://pose-parquet.com/outils/studio.html" />
+    <meta name="theme-color" content="#101214" />
+    <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="../assets/icons/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="../site.webmanifest" />
+    <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-400-1.woff2" crossorigin />
+    <link rel="preload" as="fetch" href="../data/parquets.json" crossorigin />
+    <link rel="stylesheet" href="../css/studio.css" />
+    <script type="module" src="../js/studio/main.js"></script>
+  </head>
+  <body class="app">
+    <div data-studio data-base="../">
+      <noscript>
+        <p class="studio__noscript">Le Studio a besoin de JavaScript pour calculer le rendu dans votre navigateur.
+        Vous pouvez lire la présentation de l’outil sur la page
+        <a href="../outils/visualiseur.html">Visualiser ma pièce</a>.</p>
+      </noscript>
+    </div>
+  </body>
+</html>

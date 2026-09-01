@@ -199,4 +199,48 @@ ${page.body}
 `;
 }
 
-module.exports = { SITE, NAV, layout, breadcrumb, header, footer, mark, arrow };
+/**
+ * Gabarit « application » : le Studio.
+ *
+ * Pas d'en-tête éditorial, pas de pied de page, pas de fil d'Ariane. La page
+ * ne contient qu'un point de montage : l'interface est construite par
+ * js/studio/main.js. Le référencement du sujet vit sur la landing
+ * /outils/visualiseur.html, à laquelle cette page renvoie — l'application
+ * elle-même n'a rien à indexer.
+ */
+function appLayout(page) {
+  const p = page.depth === 0 ? '' : '../';
+  const canonical = `${SITE.domain}/${page.path}`;
+  return `<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>${page.title}</title>
+    <meta name="description" content="${page.description}" />
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href="${canonical}" />
+    <meta name="theme-color" content="#101214" />
+    <link rel="icon" href="${p}assets/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="${p}assets/icons/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="${p}assets/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="${p}site.webmanifest" />
+    <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/inter-400-1.woff2" crossorigin />
+    <link rel="preload" as="fetch" href="${p}data/parquets.json" crossorigin />
+    <link rel="stylesheet" href="${p}css/studio.css" />
+    <script type="module" src="${p}js/studio/main.js"></script>
+  </head>
+  <body class="app">
+    <div data-studio data-base="${p}">
+      <noscript>
+        <p class="studio__noscript">Le Studio a besoin de JavaScript pour calculer le rendu dans votre navigateur.
+        Vous pouvez lire la présentation de l’outil sur la page
+        <a href="${p}outils/visualiseur.html">Visualiser ma pièce</a>.</p>
+      </noscript>
+    </div>
+  </body>
+</html>
+`;
+}
+
+module.exports = { SITE, NAV, layout, appLayout, breadcrumb, header, footer, mark, arrow };

@@ -1,9 +1,34 @@
-/* Page du visualiseur de parquet (photo) + mode plan. */
-const { SITE, layout, breadcrumb } = require('./layout');
-const { faq, faqJsonLd, tip, key } = require('./ui');
+/**
+ * Deux pages, deux rôles :
+ *
+ *  - outils/visualiseur.html : la landing. C'est elle qui porte le H1, les
+ *    explications, la FAQ et les données structurées. Elle se termine par un
+ *    seul appel à l'action.
+ *  - outils/studio.html      : l'application. Aucune prose, aucun pied de
+ *    page, aucun fil d'Ariane — juste l'outil.
+ */
+const { SITE, layout, appLayout, breadcrumb } = require('./layout');
+const { faq, faqJsonLd, tip } = require('./ui');
 const { ICON } = require('./home');
 
+const STUDIO_URL = 'studio.html';
+
+function buildStudioPage(write) {
+  write(
+    'outils/studio.html',
+    appLayout({
+      title: 'Studio · Pose Parquet',
+      description:
+        'Application de visualisation : choisissez une pièce, essayez des parquets, comparez jusqu’à trois rendus. Tout est calculé dans votre navigateur.',
+      path: 'outils/studio.html',
+      depth: 1,
+    })
+  );
+}
+
 function buildVisualiseurPage(write) {
+  buildStudioPage(write);
+
   const crumbs = breadcrumb('../', [
     { label: 'Accueil', href: 'index.html' },
     { label: 'Outils', href: 'outils/' },
@@ -12,20 +37,24 @@ function buildVisualiseurPage(write) {
 
   const questions = [
     {
-      q: 'Comment la zone du sol est-elle détectée ?',
-      a: "Elle ne l'est pas automatiquement : vous placez vous-même quatre points aux angles du sol. Ce choix est assumé — une détection automatique fiable demande un modèle de segmentation d'image, qui fera l'objet d'une prochaine version. La sélection manuelle donne un résultat plus juste qu'une fausse détection.",
+      q: 'Comment le sol est-il délimité ?',
+      a: "Les pièces d'exemple arrivent avec leur sol déjà détouré : vous n'avez rien à faire, le parquet se pose du premier coup. Sur votre propre photo, vous placez le cadre du sol, puis vous pouvez affiner le contour et effacer au pinceau ce qui doit rester devant : meubles, tapis, plinthes. Aucune détection automatique n'est utilisée ni simulée.",
     },
     {
       q: 'Ma photo est-elle envoyée quelque part ?',
       a: "Non. Elle est lue et traitée directement dans votre navigateur : aucun envoi vers un serveur, aucun stockage. Fermez l'onglet et il n'en reste rien.",
     },
     {
-      q: 'Le rendu correspond-il exactement au produit posé ?',
-      a: "Non. Les textures sont générées pour la démonstration : elles donnent la teinte, le motif, l'échelle et le sens de pose, pas l'aspect exact d'une référence commerciale. Le rendu sert à décider d'une direction, pas à valider une commande.",
+      q: 'Les parquets proposés existent-ils vraiment ?',
+      a: "Ce sont douze références de démonstration. Chacune a son propre veinage, ses nœuds, son contraste et sa largeur de lame, mais elles ne correspondent pas à un produit commercial précis. Le Studio sert à choisir une direction — une teinte, un motif, un sens de pose — pas à valider une commande.",
+    },
+    {
+      q: 'Puis-je comparer plusieurs parquets ?',
+      a: "Oui. Vous enregistrez jusqu'à trois versions, puis vous les comparez sur la même photo, au même cadrage : au curseur pour deux, en vues côte à côte pour trois. Un bouton permet de repartir de celle que vous préférez.",
     },
     {
       q: 'Pourquoi le parquet suit-il la perspective ?',
-      a: "Les quatre points définissent un quadrilatère : on en déduit la transformation projective qui envoie le plan du sol sur l'image. Les lames proches paraissent donc plus grandes que celles du fond, et les ombres de la photo d'origine sont reportées sur la texture.",
+      a: "Le cadre du sol définit un quadrilatère : on en déduit la transformation projective qui envoie le plan du sol sur l'image. Les lames proches paraissent donc plus grandes que celles du fond, et les ombres de la photo d'origine sont reportées sur la texture.",
     },
   ];
 
@@ -33,65 +62,42 @@ function buildVisualiseurPage(write) {
     {
       num: '(01)',
       title: 'Choisissez une pièce',
-      text: 'Six pièces d’exemple sont prêtes, ou importez une photo de votre propre pièce.',
+      text: 'Six pièces d’exemple prêtes à l’emploi, sol déjà détouré — ou la photo de votre propre pièce.',
     },
     {
       num: '(02)',
-      title: 'Délimitez le sol',
-      text: 'Quatre points, déplaçables à la souris, au doigt ou au clavier, encadrent la surface à couvrir.',
+      title: 'Essayez les parquets',
+      text: 'Douze références, chacune avec son veinage et sa largeur de lame. Un clic, tout le sol change.',
     },
     {
       num: '(03)',
-      title: 'Essayez les parquets',
-      text: 'Teinte, motif, sens de pose et largeur de lame : le rendu se recalcule immédiatement.',
+      title: 'Comparez',
+      text: 'Enregistrez jusqu’à trois versions et regardez-les côte à côte, sur la même photo.',
     },
   ];
 
   const body = `      ${crumbs.html}
-      <header class="page-hero">
-        <div class="wrap-wide page-hero__grid">
-          <div>
-            <p class="eyebrow">Visualiseur · outil</p>
-            <h1 class="page-hero__title">Essayez le parquet dans votre pièce.</h1>
-          </div>
-          <div>
-            <p class="page-hero__lead">Importez une photo ou choisissez une pièce d’exemple. Changez le parquet, le motif et le sens de pose en quelques secondes.</p>
-            <div class="cluster u-mt-5">
-              <button class="btn" type="button" data-vz-import><span>Importer ma pièce</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</button>
-              <a class="btn btn--ghost" href="#outil"><span>Essayer une pièce d’exemple</span></a>
+      <header class="landing-hero">
+        <div class="wrap-wide landing-hero__grid">
+          <div class="landing-hero__text">
+            <p class="eyebrow">Studio · outil gratuit</p>
+            <h1 class="landing-hero__title">Visualisez votre parquet dans votre pièce.</h1>
+            <p class="landing-hero__lead">Importez une photo, choisissez un parquet, comparez plusieurs rendus. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée, ni conservée.</p>
+            <div class="landing-hero__actions">
+              <a class="btn btn--lg" href="${STUDIO_URL}"><span>Lancer le Studio</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+              <a class="link-arrow" href="simulateur-pose.html">Étudier le sens de pose ${ICON.arrow}</a>
             </div>
+            <ul class="landing-hero__facts">
+              <li><b>12</b> parquets de démonstration</li>
+              <li><b>3</b> motifs</li>
+              <li><b>0</b> envoi de photo</li>
+            </ul>
+          </div>
+          <div class="landing-hero__demo">
+            <div data-vz-preview data-room="sejour" data-base="../"></div>
           </div>
         </div>
       </header>
-
-      <section class="section section--flush-top" id="outil" aria-label="Outil de visualisation">
-        <div class="wrap-wide">
-          <div class="tool-tabs" data-tabs>
-            <div class="tabs__list" role="tablist" aria-label="Mode de l’outil">
-              <button class="tabs__tab" type="button" role="tab" id="tab-photo" aria-controls="panel-photo" aria-selected="true">Visualiser ma pièce</button>
-              <button class="tabs__tab" type="button" role="tab" id="tab-plan" aria-controls="panel-plan" aria-selected="false">Mode plan</button>
-            </div>
-
-            <div class="tabs__panel" role="tabpanel" id="panel-photo" aria-labelledby="tab-photo">
-              <div data-visualiseur-shell>
-                <div data-visualiseur data-base="../"></div>
-              </div>
-              <p class="note-inline u-mt-5">${ICON.check.replace('<svg', '<svg width="18" height="18"')}<span>Photo traitée dans votre navigateur, sans aucun envoi. Textures de démonstration : elles donnent la teinte et le motif, pas l’aspect exact d’une référence.</span></p>
-            </div>
-
-            <div class="tabs__panel" role="tabpanel" id="panel-plan" aria-labelledby="tab-plan" hidden>
-              <div class="plan-mode__head">
-                <div>
-                  <p class="eyebrow">Mode plan</p>
-                  <h2>Étudiez le sens de pose, les dimensions et les chutes.</h2>
-                </div>
-                <p class="lead">Vue du dessus, à l’échelle : dimensions de la pièce, largeur de lame, fenêtre, entrée, teinte et motif. Les quantités affichées sont des estimations indicatives.</p>
-              </div>
-              <div data-visualizer data-base="../"></div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section class="section section--alt" aria-labelledby="how-title">
         <div class="wrap-wide">
@@ -100,7 +106,7 @@ function buildVisualiseurPage(write) {
               <p class="eyebrow">Comment ça marche</p>
               <h2 id="how-title">Trois gestes, aucun compte à créer.</h2>
             </div>
-            <p class="lead">L’outil fonctionne entièrement dans le navigateur : rien n’est téléversé, rien n’est conservé.</p>
+            <p class="lead">Le Studio s’ouvre dans une interface dédiée : la pièce occupe l’écran, le catalogue tient sur le côté, et le rendu change à chaque clic.</p>
           </div>
           <div class="grid grid--3">
             ${steps
@@ -113,19 +119,50 @@ function buildVisualiseurPage(write) {
               )
               .join('\n            ')}
           </div>
-          ${key(
-            '<ul><li>Sélection du sol manuelle et précise, pas de fausse détection automatique.</li><li>Perspective calculée à partir de vos quatre points.</li><li>Ombres et lumières de la photo reportées sur le parquet.</li></ul>'
-          )}
+          <p class="u-mt-6"><a class="btn btn--lg" href="${STUDIO_URL}"><span>Lancer le Studio</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a></p>
         </div>
       </section>
 
-      <section class="section" aria-labelledby="faq-title">
+      <section class="section" aria-labelledby="what-title">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Ce que fait l’outil</p>
+              <h2 id="what-title">Un sol, pas un filtre.</h2>
+            </div>
+            <p class="lead">Le parquet est projeté sur le plan du sol, comme une seule surface continue : le motif se poursuit derrière les meubles au lieu de repartir de zéro de chaque côté.</p>
+          </div>
+          <ul class="steps-grid">
+            <li><span class="steps-grid__num">01</span><strong>Perspective réelle</strong><span>Les lames du fond sont plus petites que celles du premier plan, comme sur une photo.</span></li>
+            <li><span class="steps-grid__num">02</span><strong>Lumière conservée</strong><span>Les ombres et les zones éclairées de votre photo sont reportées sur le parquet.</span></li>
+            <li><span class="steps-grid__num">03</span><strong>Objets devant le sol</strong><span>Meubles, tapis et plinthes restent visibles ; un pinceau permet de rattraper les bords.</span></li>
+            <li><span class="steps-grid__num">04</span><strong>Comparaison honnête</strong><span>Les versions comparées partagent la même photo, le même cadrage et le même détourage.</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section section--alt" aria-labelledby="faq-title">
         <div class="wrap-text">
           <h2 id="faq-title">Questions fréquentes</h2>
           ${faq(questions)}
           ${tip(
-            '<p>Pour préparer une commande, passez en <strong>mode plan</strong> : il donne la surface, les chutes estimées et le nombre de lames à partir des dimensions réelles de la pièce.</p>'
+            '<p>Pour préparer une commande, passez en <a href="simulateur-pose.html">mode plan</a> : il donne la surface, les chutes estimées et le nombre de lames à partir des dimensions réelles de la pièce.</p>'
           )}
+        </div>
+      </section>
+
+      <section class="section" aria-label="Lancer le Studio">
+        <div class="wrap">
+          <div class="cta-band" data-reveal>
+            <div>
+              <h2>Prêt à essayer ?</h2>
+              <p>Le Studio s’ouvre directement sur le choix de la pièce. Aucune inscription, aucune photo envoyée.</p>
+            </div>
+            <div class="cta-band__actions">
+              <a class="btn btn--light" href="${STUDIO_URL}">Lancer le Studio</a>
+              <a class="btn btn--outline-light" href="../projet/">Décrire mon projet</a>
+            </div>
+          </div>
         </div>
       </section>`;
 
@@ -134,7 +171,7 @@ function buildVisualiseurPage(write) {
     layout({
       title: 'Visualiser un parquet dans sa pièce | Pose Parquet',
       description:
-        'Testez un parquet dans votre pièce : importez une photo ou choisissez une pièce d’exemple, puis changez la teinte, le motif et le sens de pose. Rendu en perspective, gratuit et sans envoi de photo.',
+        'Essayez un parquet dans votre pièce : importez une photo ou choisissez une pièce d’exemple, testez douze parquets, trois motifs, et comparez jusqu’à trois rendus. Gratuit, sans envoi de photo.',
       path: 'outils/visualiseur.html',
       depth: 1,
       css: ['css/pages/tools.css'],
@@ -144,11 +181,11 @@ function buildVisualiseurPage(write) {
         {
           '@context': 'https://schema.org',
           '@type': 'WebApplication',
-          name: 'Visualiseur de parquet',
+          name: 'Pose Parquet Studio',
           applicationCategory: 'DesignApplication',
           operatingSystem: 'Navigateur web',
           offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
-          url: `${SITE.domain}/outils/visualiseur.html`,
+          url: `${SITE.domain}/outils/studio.html`,
         },
       ],
       body,
@@ -156,4 +193,4 @@ function buildVisualiseurPage(write) {
   );
 }
 
-module.exports = { buildVisualiseurPage };
+module.exports = { buildVisualiseurPage, buildStudioPage };
