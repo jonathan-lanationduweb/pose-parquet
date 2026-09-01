@@ -1,5 +1,6 @@
 /* Nouvelle page d'accueil — composition éditoriale plein cadre. */
 const { SITE } = require('./layout');
+const { picture } = require('./responsive');
 
 const ICON = {
   arrow:
@@ -70,8 +71,7 @@ const MARQUEE = [
 function heroSection() {
   return `      <section class="hero" data-hero>
         <div class="hero__media" data-hero-media>
-          <img src="assets/images/hero-wide.jpg" alt="Grande pièce vide au parquet clair traversée par la lumière"
-            width="2200" height="1300" fetchpriority="high" decoding="async" />
+          ${picture('hero-wide', { alt: 'Grande pièce vide au parquet clair traversée par la lumière', sizes: '100vw', priority: true })}
           <video muted loop playsinline preload="none" data-src="" aria-hidden="true"></video>
         </div>
         <div class="wrap-wide hero__inner">
@@ -82,13 +82,13 @@ function heroSection() {
               <p class="hero__lead">Guides, techniques et outils pour comprendre et réussir votre projet parquet — du support au motif, du calepinage à la finition.</p>
               <div class="hero__actions">
                 <a class="btn btn--light btn--lg" href="guides/"><span>Explorer les guides</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
-                <a class="btn btn--outline-light btn--lg" href="outils/simulateur-pose.html"><span>Visualiser ma pièce</span></a>
+                <a class="btn btn--outline-light btn--lg" href="outils/visualiseur.html"><span>Visualiser ma pièce</span></a>
               </div>
             </div>
             <ul class="hero__meta">
               <li><b>5</b> motifs simulés</li>
               <li><b>8</b> guides pratiques</li>
-              <li><b>0</b> produit vendu</li>
+              <li><b>6</b> pièces d’exemple</li>
             </ul>
           </div>
         </div>
@@ -115,7 +115,7 @@ function tilesSection() {
               <span class="tile__more">Explorer ${ICON.arrow}</span>
               ${
                 tile.media
-                  ? `<div class="tile__media"><img src="assets/images/${tile.media}.jpg" alt="" loading="lazy" decoding="async" width="1000" height="900" /></div>`
+                  ? `<div class="tile__media">${picture(tile.media, { alt: '', sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw' })}</div>`
                   : '<div class="tile__pattern" aria-hidden="true"><span></span><span></span><span></span></div>'
               }
             </a>`
@@ -142,15 +142,18 @@ function simulatorSection() {
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
-              <p class="eyebrow">Studio de pose · outil</p>
-              <h2 id="sim-title">Une pièce.<br />Plusieurs directions.</h2>
+              <p class="eyebrow">Visualiseur · outil</p>
+              <h2 id="sim-title">Votre pièce,<br />avant les travaux.</h2>
             </div>
             <div>
-              <p class="lead">Entrez vos dimensions, placez la fenêtre, comparez cinq motifs. Le rendu, la surface et les chutes se recalculent à chaque changement.</p>
-              <p class="u-mt-5"><a class="btn" href="outils/simulateur-pose.html"><span>Ouvrir le simulateur complet</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a></p>
+              <p class="lead">Importez une photo de votre pièce, délimitez le sol, posez le parquet dessus. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée ni conservée.</p>
+              <p class="u-mt-5 u-actions">
+                <a class="btn" href="outils/visualiseur.html"><span>Visualiser ma pièce</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+                <a class="link-arrow" href="outils/simulateur-pose.html">Ou passer en mode Plan ${ICON.arrow}</a>
+              </p>
             </div>
           </div>
-          <div data-visualizer data-mode="compact" data-base="" data-reveal></div>
+          <div data-vz-preview data-room="sejour" data-base="" data-reveal></div>
         </div>
       </section>`;
 }
@@ -161,7 +164,7 @@ function carouselEditorial(guides) {
       (guide) => `<article class="carousel__slide">
               <div class="slide-card">
                 <div class="slide-card__media">
-                  <img src="assets/images/cover-${guide.slug}.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+                  ${picture(`cover-${guide.slug}`, { alt: '', sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw' })}
                   <span class="slide-card__cat">${guide.category}</span>
                 </div>
                 <div class="slide-card__body">
@@ -234,8 +237,10 @@ function immersiveSection() {
 
   return `      <section class="immersive" aria-labelledby="focus-title">
         <div class="immersive__bg">
-          <img src="assets/images/immersive-hongrie.jpg" alt="Lumière rasante sur un parquet posé en Point de Hongrie"
-            loading="lazy" decoding="async" width="2000" height="1500" />
+          ${picture('immersive-hongrie', {
+            alt: 'Lumière rasante sur un parquet posé en Point de Hongrie',
+            sizes: '100vw',
+          })}
         </div>
         <div class="wrap-wide">
           <div class="immersive__head" data-reveal>
@@ -254,7 +259,7 @@ function carouselGallery() {
   const slides = GALLERY.map(
     (item) => `<div class="carousel__slide">
               <a class="shot" href="inspiration/">
-                <img src="assets/images/${item.img}.jpg" alt="${item.cat} — ${item.title}" loading="lazy" decoding="async" width="900" height="700" />
+                ${picture(item.img, { alt: `${item.cat} — ${item.title}`, sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw' })}
                 <span class="shot__caption">
                   <span class="shot__cat">${item.cat}</span>
                   <span class="shot__title">${item.title}</span>
@@ -365,7 +370,7 @@ function projectSection() {
               </div>
             </div>
             <div class="feature__media" data-reveal>
-              <img src="assets/images/projet-visuel.jpg" alt="Pièce lumineuse au parquet clair" loading="lazy" decoding="async" width="1400" height="1100" />
+              ${picture('projet-visuel', { alt: 'Pièce lumineuse au parquet clair', sizes: '(min-width: 60rem) 45rem, 94vw' })}
             </div>
           </div>
         </div>

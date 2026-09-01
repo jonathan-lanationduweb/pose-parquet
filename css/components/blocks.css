@@ -274,3 +274,68 @@
   .list-row { transition: none; }
   .tile:hover { transform: none; }
 }
+
+/* Blocs d'outil : média large + argumentaire */
+.tool-blocks { display: grid; gap: clamp(3rem, 2rem + 5vw, 6rem); }
+.tool-block { display: grid; gap: clamp(1.25rem, 1rem + 1.5vw, 2.5rem); align-items: center; }
+@media (min-width: 60rem) {
+  .tool-block { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+  .tool-block--reverse .tool-block__media { order: 2; }
+}
+.tool-block__num {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.5rem;
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  color: var(--text-muted);
+}
+.tool-block__title { margin: 0 0 0.6rem; }
+.tool-block__points {
+  display: grid;
+  gap: 0.5rem;
+  margin: var(--sp-4) 0 var(--sp-5);
+  padding: 0;
+  list-style: none;
+  font-size: 0.94rem;
+  color: var(--text-soft);
+}
+.tool-block__points li { position: relative; padding-left: 1.25rem; }
+.tool-block__points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: var(--r-pill);
+  background: var(--c-sage-deep);
+}
+
+
+/* Repères numérotés (ce que contient un tutoriel, une méthode) */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--sp-5) var(--sp-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+.steps-grid li {
+  display: grid;
+  gap: 0.25rem;
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--line);
+}
+.steps-grid__num {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--accent);
+  letter-spacing: 0.08em;
+}
+.steps-grid strong { font-size: 1.02rem; font-weight: 600; }
+.steps-grid li > span:last-child { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }

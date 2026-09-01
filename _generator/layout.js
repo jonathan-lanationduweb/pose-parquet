@@ -77,7 +77,7 @@ function footer(p) {
             <a class="link-arrow" href="${p}projet/">Décrire un projet${arrow.replace('class="btn__icon"', '')}</a>
           </div>
           <div class="footer__col">
-            <h3>Comprendre</h3>
+            <h2>Comprendre</h2>
             <ul>
               <li><a href="${p}guides/quel-sens-de-pose-choisir.html">Choisir le sens de pose</a></li>
               <li><a href="${p}guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a></li>
@@ -86,7 +86,7 @@ function footer(p) {
             </ul>
           </div>
           <div class="footer__col">
-            <h3>Motifs</h3>
+            <h2>Motifs</h2>
             <ul>
               <li><a href="${p}motifs/pose-droite.html">Pose droite</a></li>
               <li><a href="${p}motifs/pose-diagonale.html">Pose diagonale</a></li>
@@ -95,18 +95,19 @@ function footer(p) {
             </ul>
           </div>
           <div class="footer__col">
-            <h3>Le site</h3>
+            <h2>Le site</h2>
             <ul>
-              <li><a href="${p}outils/simulateur-pose.html">Simulateur de pose</a></li>
-              <li><a href="${p}tutoriels/">Tutoriels</a></li>
+              <li><a href="${p}outils/visualiseur.html">Visualiser ma pièce</a></li>
+              <li><a href="${p}outils/simulateur-pose.html">Mode plan</a></li>
               <li><a href="${p}a-propos/">À propos</a></li>
+              <li><a href="${p}a-propos/methode-editoriale.html">Méthode éditoriale</a></li>
               <li><a href="${p}contact/">Contact</a></li>
             </ul>
           </div>
         </div>
         <div class="footer__bottom">
           <p>&copy; 2026 Pose Parquet — site éditorial indépendant.</p>
-          <p>Photographies libres de droits · aucune vente en ligne</p>
+          <p>Photographies sous licence Pexels · aucune vente en ligne</p>
         </div>
       </div>
     </footer>`;

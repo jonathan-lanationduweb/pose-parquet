@@ -79,12 +79,17 @@
         </div>
       </header>
 
-      <section class="section section--flush-top">
+      <section class="section section--flush-top" aria-labelledby="tuto-liste">
         <div class="wrap">
+          <h2 class="visually-hidden" id="tuto-liste">Tous les tutoriels</h2>
           <div class="grid grid--3">
             <article class="card" data-tags="" data-reveal>
             <div class="card__media">
-              <img src="../assets/images/cover-poser-un-parquet-flottant.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+              <picture>
+              <source type="image/webp" srcset="../assets/images/cover-poser-un-parquet-flottant-560.webp 560w, ../assets/images/cover-poser-un-parquet-flottant-980.webp 980w, ../assets/images/cover-poser-un-parquet-flottant-1400.webp 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="../assets/images/cover-poser-un-parquet-flottant.jpg" srcset="../assets/images/cover-poser-un-parquet-flottant-560.jpg 560w, ../assets/images/cover-poser-un-parquet-flottant-980.jpg 980w, ../assets/images/cover-poser-un-parquet-flottant-1400.jpg 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt=""
+                width="1400" height="875" loading="lazy" decoding="async"  />
+            </picture>
               <span class="badge">Accessible</span>
             </div>
             <div class="card__body">
@@ -98,7 +103,11 @@
           </article>
             <article class="card" data-tags="" data-reveal>
             <div class="card__media">
-              <img src="../assets/images/cover-coller-un-parquet-contrecolle.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+              <picture>
+              <source type="image/webp" srcset="../assets/images/cover-coller-un-parquet-contrecolle-560.webp 560w, ../assets/images/cover-coller-un-parquet-contrecolle-980.webp 980w, ../assets/images/cover-coller-un-parquet-contrecolle-1400.webp 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="../assets/images/cover-coller-un-parquet-contrecolle.jpg" srcset="../assets/images/cover-coller-un-parquet-contrecolle-560.jpg 560w, ../assets/images/cover-coller-un-parquet-contrecolle-980.jpg 980w, ../assets/images/cover-coller-un-parquet-contrecolle-1400.jpg 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt=""
+                width="1400" height="875" loading="lazy" decoding="async"  />
+            </picture>
               <span class="badge">Confirmé</span>
             </div>
             <div class="card__body">
@@ -112,7 +121,11 @@
           </article>
             <article class="card" data-tags="" data-reveal>
             <div class="card__media">
-              <img src="../assets/images/cover-reussir-le-calepinage.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+              <picture>
+              <source type="image/webp" srcset="../assets/images/cover-reussir-le-calepinage-560.webp 560w, ../assets/images/cover-reussir-le-calepinage-980.webp 980w, ../assets/images/cover-reussir-le-calepinage-1400.webp 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="../assets/images/cover-reussir-le-calepinage.jpg" srcset="../assets/images/cover-reussir-le-calepinage-560.jpg 560w, ../assets/images/cover-reussir-le-calepinage-980.jpg 980w, ../assets/images/cover-reussir-le-calepinage-1400.jpg 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt=""
+                width="1400" height="875" loading="lazy" decoding="async"  />
+            </picture>
               <span class="badge">Accessible</span>
             </div>
             <div class="card__body">
@@ -124,6 +137,43 @@
               </div>
             </div>
           </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--alt" aria-labelledby="tuto-methode">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Ce que vous trouverez</p>
+              <h2 id="tuto-methode">Un tutoriel, quatre repères</h2>
+            </div>
+            <p class="lead">Tous suivent la même trame, pour que vous puissiez travailler avec la page ouverte à côté de vous.</p>
+          </div>
+          <ol class="steps-grid">
+            <li><span class="steps-grid__num">01</span><strong>L’outillage réellement nécessaire</strong><span>Ce qu’il faut sortir avant de commencer, et ce dont on peut se passer.</span></li>
+            <li><span class="steps-grid__num">02</span><strong>Le déroulé du chantier</strong><span>Les étapes dans l’ordre, avec ce qui se joue à chacune.</span></li>
+            <li><span class="steps-grid__num">03</span><strong>Les points de contrôle</strong><span>Ce qu’il faut vérifier avant de passer à la suite, tant que c’est rattrapable.</span></li>
+            <li><span class="steps-grid__num">04</span><strong>Les erreurs coûteuses</strong><span>Celles qui obligent à déposer, et comment les éviter.</span></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="tuto-outil">
+        <div class="wrap-wide">
+          <div class="tool-block">
+            <div class="tool-block__media">
+              <div data-vz-preview data-room="chambre" data-base="../"></div>
+            </div>
+            <div class="tool-block__body">
+              <p class="tool-block__num">Avant de commencer</p>
+              <h2 class="tool-block__title" id="tuto-outil">Voir le résultat avant de couper la première lame</h2>
+              <p class="lead">Le sens de pose et le motif se décident sur le papier, mais se jugent à l’œil. Essayez-les sur une photo de votre pièce.</p>
+              <div class="cluster">
+                <a class="btn" href="../outils/visualiseur.html">Visualiser ma pièce</a>
+                <a class="link-arrow" href="../guides/">Lire les guides</a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -151,7 +201,7 @@
             <a class="link-arrow" href="../projet/">Décrire un projet<svg  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
           </div>
           <div class="footer__col">
-            <h3>Comprendre</h3>
+            <h2>Comprendre</h2>
             <ul>
               <li><a href="../guides/quel-sens-de-pose-choisir.html">Choisir le sens de pose</a></li>
               <li><a href="../guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a></li>
@@ -160,7 +210,7 @@
             </ul>
           </div>
           <div class="footer__col">
-            <h3>Motifs</h3>
+            <h2>Motifs</h2>
             <ul>
               <li><a href="../motifs/pose-droite.html">Pose droite</a></li>
               <li><a href="../motifs/pose-diagonale.html">Pose diagonale</a></li>
@@ -169,18 +219,19 @@
             </ul>
           </div>
           <div class="footer__col">
-            <h3>Le site</h3>
+            <h2>Le site</h2>
             <ul>
-              <li><a href="../outils/simulateur-pose.html">Simulateur de pose</a></li>
-              <li><a href="../tutoriels/">Tutoriels</a></li>
+              <li><a href="../outils/visualiseur.html">Visualiser ma pièce</a></li>
+              <li><a href="../outils/simulateur-pose.html">Mode plan</a></li>
               <li><a href="../a-propos/">À propos</a></li>
+              <li><a href="../a-propos/methode-editoriale.html">Méthode éditoriale</a></li>
               <li><a href="../contact/">Contact</a></li>
             </ul>
           </div>
         </div>
         <div class="footer__bottom">
           <p>&copy; 2026 Pose Parquet — site éditorial indépendant.</p>
-          <p>Photographies libres de droits · aucune vente en ligne</p>
+          <p>Photographies sous licence Pexels · aucune vente en ligne</p>
         </div>
       </div>
     </footer>

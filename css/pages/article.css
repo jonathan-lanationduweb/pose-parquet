@@ -68,3 +68,42 @@
   transform: scaleX(var(--progress, 0));
   transform-origin: left;
 }
+
+/* Signature et méthode éditoriale */
+.article-byline {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+.article-byline strong { color: var(--text); font-weight: 600; }
+
+/* Sources et références */
+.article-sources {
+  margin-top: var(--sp-7);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--line);
+}
+.article-sources__intro { font-size: var(--fs-sm); color: var(--text-muted); }
+.article-sources__list { display: grid; gap: 0.85rem; margin: var(--sp-4) 0 0; padding: 0; list-style: none; }
+.article-sources__list li { display: grid; gap: 0.15rem; }
+.article-sources__list a { font-weight: 500; }
+.article-sources__list span { font-size: var(--fs-sm); color: var(--text-muted); }
+
+/* Passerelle article → outil */
+.tool-bridge {
+  margin-top: var(--sp-7);
+  padding: clamp(1.25rem, 1rem + 1vw, 1.85rem);
+  border-radius: var(--r-card);
+  background: var(--c-sage-pale);
+}
+.tool-bridge__eyebrow {
+  margin: 0 0 0.4rem;
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  color: var(--text-muted);
+}
+.tool-bridge__text { margin: 0 0 var(--sp-4); max-width: 52ch; }
+
+/* Les tableaux larges défilent, ils n’élargissent pas la page */
+.article-layout, .article-layout > *, .prose { min-width: 0; }

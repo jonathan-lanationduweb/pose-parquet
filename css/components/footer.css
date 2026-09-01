@@ -34,7 +34,7 @@
 
 .footer__intro p { color: var(--text-soft); max-width: 34ch; margin: 0 0 var(--sp-5); font-size: 0.95rem; }
 
-.footer__col h3 {
+.footer__col h2 {
   font-family: var(--font-sans);
   font-size: var(--fs-xs);
   text-transform: uppercase;

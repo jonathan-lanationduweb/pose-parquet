@@ -81,49 +81,137 @@
 
       <section class="section section--flush-top">
         <div class="wrap-wide">
-          <div class="gallery">
-            <button class="gallery__item gallery__item--wide" type="button"
-              data-lightbox-trigger="Séjour traversant — Pose droite · chêne clair" aria-label="Agrandir : Séjour traversant">
-              <img src="../assets/images/inspi-1.jpg" alt="Séjour contemporain au parquet clair posé dans la longueur" loading="lazy" decoding="async" width="900" height="700" />
-              <span class="gallery__caption"><span>Séjour traversant</span><span class="mono">Pose droite · chêne clair</span></span>
-            </button>
-            <button class="gallery__item gallery__item--md" type="button"
-              data-lightbox-trigger="Chambre parisienne — Point de Hongrie · chêne naturel" aria-label="Agrandir : Chambre parisienne">
-              <img src="../assets/images/inspi-2.jpg" alt="Pièce aux murs bleus et parquet en chevrons" loading="lazy" decoding="async" width="900" height="700" />
-              <span class="gallery__caption"><span>Chambre parisienne</span><span class="mono">Point de Hongrie · chêne naturel</span></span>
-            </button>
-            <button class="gallery__item gallery__item--sm" type="button"
-              data-lightbox-trigger="Cuisine ouverte — Pose collée · contrecollé" aria-label="Agrandir : Cuisine ouverte">
-              <img src="../assets/images/inspi-3.jpg" alt="Cuisine ouverte sur salle à manger, sol en parquet" loading="lazy" decoding="async" width="900" height="700" />
-              <span class="gallery__caption"><span>Cuisine ouverte</span><span class="mono">Pose collée · contrecollé</span></span>
-            </button>
-            <button class="gallery__item gallery__item--sm" type="button"
-              data-lightbox-trigger="Couloir en enfilade — Pose droite · lames étroites" aria-label="Agrandir : Couloir en enfilade">
-              <img src="../assets/images/inspi-4.jpg" alt="Couloir minimaliste aux portes en bois et parquet posé dans l’axe" loading="lazy" decoding="async" width="900" height="700" />
-              <span class="gallery__caption"><span>Couloir en enfilade</span><span class="mono">Pose droite · lames étroites</span></span>
-            </button>
-            <button class="gallery__item gallery__item--md" type="button"
-              data-lightbox-trigger="Bureau graphique — Bâton rompu · chêne fumé" aria-label="Agrandir : Bureau graphique">
-              <img src="../assets/images/inspi-5.jpg" alt="Bureau sous combles avec plancher bois et mobilier moderne" loading="lazy" decoding="async" width="900" height="700" />
-              <span class="gallery__caption"><span>Bureau graphique</span><span class="mono">Bâton rompu · chêne fumé</span></span>
-            </button>
-            <button class="gallery__item gallery__item--wide" type="button"
-              data-lightbox-trigger="Salon d’angle — Pose diagonale · chêne blond" aria-label="Agrandir : Salon d’angle">
-              <img src="../assets/images/inspi-6.jpg" alt="Salon classique meublé, parquet blond au sol" loading="lazy" decoding="async" width="900" height="700" />
-              <span class="gallery__caption"><span>Salon d’angle</span><span class="mono">Pose diagonale · chêne blond</span></span>
-            </button>
-            <button class="gallery__item gallery__item--sm" type="button"
-              data-lightbox-trigger="Sous les toits — Pose droite · lames larges" aria-label="Agrandir : Sous les toits">
-              <img src="../assets/images/inspi-7.jpg" alt="Pièce sous combles éclairée par des fenêtres de toit, parquet clair" loading="lazy" decoding="async" width="900" height="700" />
-              <span class="gallery__caption"><span>Sous les toits</span><span class="mono">Pose droite · lames larges</span></span>
-            </button>
-            <button class="gallery__item gallery__item--md" type="button"
-              data-lightbox-trigger="Entrée cadrée — Frise · Point de Hongrie" aria-label="Agrandir : Entrée cadrée">
-              <img src="../assets/images/inspi-8.jpg" alt="Entrée spacieuse au sol en bois et décoration soignée" loading="lazy" decoding="async" width="900" height="700" />
-              <span class="gallery__caption"><span>Entrée cadrée</span><span class="mono">Frise · Point de Hongrie</span></span>
-            </button>
+          <div class="filter-bar" data-filters="galerie" role="group" aria-label="Filtrer par motif">
+            <button class="filter-chip" type="button" data-filter-value="all" aria-pressed="true">Tout</button>
+            <button class="filter-chip" type="button" data-filter-value="droite" aria-pressed="false">Lames droites</button>
+            <button class="filter-chip" type="button" data-filter-value="hongrie" aria-pressed="false">Chevrons</button>
+            <button class="filter-chip" type="button" data-filter-value="sejour" aria-pressed="false">Séjours</button>
+            <button class="filter-chip" type="button" data-filter-value="chambre" aria-pressed="false">Chambres</button>
           </div>
-          <p class="note-inline u-mt-5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.2 17.5h5.6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z"/></svg><span>Photographies libres de droits (Pexels), listées dans <code>assets/images/CREDITS.md</code> et remplaçables par vos propres visuels.</span></p>
+          <div class="gallery" id="galerie">
+            <figure class="gallery__item gallery__item--wide" data-tags="hongrie sejour">
+              <button class="gallery__zoom" type="button"
+                data-lightbox-trigger="Séjour traversant — Chevrons · chêne fumé" aria-label="Agrandir : Séjour traversant">
+                <picture>
+              <source type="image/webp" srcset="../assets/images/inspi-1-360.webp 360w, ../assets/images/inspi-1-630.webp 630w, ../assets/images/inspi-1-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="../assets/images/inspi-1.jpg" srcset="../assets/images/inspi-1-360.jpg 360w, ../assets/images/inspi-1-630.jpg 630w, ../assets/images/inspi-1-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Séjour contemporain au parquet foncé posé en chevrons"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
+              </button>
+              <figcaption class="gallery__caption">
+                <span>Séjour traversant</span>
+                <span class="mono">Chevrons · chêne fumé</span>
+                <a class="gallery__try" href="../outils/visualiseur.html?motif=point-de-hongrie&teinte=fume">Essayer ce style <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+              </figcaption>
+            </figure>
+            <figure class="gallery__item gallery__item--md" data-tags="hongrie chambre">
+              <button class="gallery__zoom" type="button"
+                data-lightbox-trigger="Chambre parisienne — Point de Hongrie · chêne naturel" aria-label="Agrandir : Chambre parisienne">
+                <picture>
+              <source type="image/webp" srcset="../assets/images/inspi-2-360.webp 360w, ../assets/images/inspi-2-630.webp 630w, ../assets/images/inspi-2-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="../assets/images/inspi-2.jpg" srcset="../assets/images/inspi-2-360.jpg 360w, ../assets/images/inspi-2-630.jpg 630w, ../assets/images/inspi-2-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Pièce aux murs bleus et parquet en chevrons"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
+              </button>
+              <figcaption class="gallery__caption">
+                <span>Chambre parisienne</span>
+                <span class="mono">Point de Hongrie · chêne naturel</span>
+                <a class="gallery__try" href="../outils/visualiseur.html?motif=point-de-hongrie&teinte=naturel">Essayer ce style <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+              </figcaption>
+            </figure>
+            <figure class="gallery__item gallery__item--sm" data-tags="droite cuisine">
+              <button class="gallery__zoom" type="button"
+                data-lightbox-trigger="Cuisine ouverte — Lames larges · teinte fumée" aria-label="Agrandir : Cuisine ouverte">
+                <picture>
+              <source type="image/webp" srcset="../assets/images/inspi-3-360.webp 360w, ../assets/images/inspi-3-630.webp 630w, ../assets/images/inspi-3-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="../assets/images/inspi-3.jpg" srcset="../assets/images/inspi-3-360.jpg 360w, ../assets/images/inspi-3-630.jpg 630w, ../assets/images/inspi-3-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Cuisine ouverte sur salle à manger, parquet aux lames larges et grises"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
+              </button>
+              <figcaption class="gallery__caption">
+                <span>Cuisine ouverte</span>
+                <span class="mono">Lames larges · teinte fumée</span>
+                <a class="gallery__try" href="../outils/visualiseur.html?motif=lames&teinte=fume&piece=cuisine">Essayer ce style <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+              </figcaption>
+            </figure>
+            <figure class="gallery__item gallery__item--sm" data-tags="droite couloir">
+              <button class="gallery__zoom" type="button"
+                data-lightbox-trigger="Couloir en enfilade — Lames dans l’axe · chêne clair" aria-label="Agrandir : Couloir en enfilade">
+                <picture>
+              <source type="image/webp" srcset="../assets/images/inspi-4-360.webp 360w, ../assets/images/inspi-4-630.webp 630w, ../assets/images/inspi-4-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="../assets/images/inspi-4.jpg" srcset="../assets/images/inspi-4-360.jpg 360w, ../assets/images/inspi-4-630.jpg 630w, ../assets/images/inspi-4-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Couloir minimaliste aux portes en bois et parquet clair posé dans l’axe"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
+              </button>
+              <figcaption class="gallery__caption">
+                <span>Couloir en enfilade</span>
+                <span class="mono">Lames dans l’axe · chêne clair</span>
+                <a class="gallery__try" href="../outils/visualiseur.html?motif=lames&teinte=clair&sens=90">Essayer ce style <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+              </figcaption>
+            </figure>
+            <figure class="gallery__item gallery__item--md" data-tags="droite chambre">
+              <button class="gallery__zoom" type="button"
+                data-lightbox-trigger="Chambre sous combles — Lames droites · chêne brun" aria-label="Agrandir : Chambre sous combles">
+                <picture>
+              <source type="image/webp" srcset="../assets/images/inspi-5-360.webp 360w, ../assets/images/inspi-5-630.webp 630w, ../assets/images/inspi-5-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="../assets/images/inspi-5.jpg" srcset="../assets/images/inspi-5-360.jpg 360w, ../assets/images/inspi-5-630.jpg 630w, ../assets/images/inspi-5-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Chambre sous combles au plancher brun et mobilier clair"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
+              </button>
+              <figcaption class="gallery__caption">
+                <span>Chambre sous combles</span>
+                <span class="mono">Lames droites · chêne brun</span>
+                <a class="gallery__try" href="../outils/visualiseur.html?motif=lames&teinte=brun">Essayer ce style <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+              </figcaption>
+            </figure>
+            <figure class="gallery__item gallery__item--wide" data-tags="droite sejour">
+              <button class="gallery__zoom" type="button"
+                data-lightbox-trigger="Salon d’angle — Lames droites · chêne foncé" aria-label="Agrandir : Salon d’angle">
+                <picture>
+              <source type="image/webp" srcset="../assets/images/inspi-6-360.webp 360w, ../assets/images/inspi-6-630.webp 630w, ../assets/images/inspi-6-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="../assets/images/inspi-6.jpg" srcset="../assets/images/inspi-6-360.jpg 360w, ../assets/images/inspi-6-630.jpg 630w, ../assets/images/inspi-6-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Salon classique meublé, parquet foncé au sol"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
+              </button>
+              <figcaption class="gallery__caption">
+                <span>Salon d’angle</span>
+                <span class="mono">Lames droites · chêne foncé</span>
+                <a class="gallery__try" href="../outils/visualiseur.html?motif=lames&teinte=brun&piece=salon">Essayer ce style <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+              </figcaption>
+            </figure>
+            <figure class="gallery__item gallery__item--sm" data-tags="droite chambre">
+              <button class="gallery__zoom" type="button"
+                data-lightbox-trigger="Sous les toits — Lames larges · chêne clair" aria-label="Agrandir : Sous les toits">
+                <picture>
+              <source type="image/webp" srcset="../assets/images/inspi-7-360.webp 360w, ../assets/images/inspi-7-630.webp 630w, ../assets/images/inspi-7-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="../assets/images/inspi-7.jpg" srcset="../assets/images/inspi-7-360.jpg 360w, ../assets/images/inspi-7-630.jpg 630w, ../assets/images/inspi-7-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Pièce sous combles éclairée par des fenêtres de toit, parquet clair"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
+              </button>
+              <figcaption class="gallery__caption">
+                <span>Sous les toits</span>
+                <span class="mono">Lames larges · chêne clair</span>
+                <a class="gallery__try" href="../outils/visualiseur.html?motif=lames&teinte=clair&piece=piece-claire">Essayer ce style <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+              </figcaption>
+            </figure>
+            <figure class="gallery__item gallery__item--md" data-tags="droite couloir">
+              <button class="gallery__zoom" type="button"
+                data-lightbox-trigger="Entrée cadrée — Lames dans l’axe · chêne miel" aria-label="Agrandir : Entrée cadrée">
+                <picture>
+              <source type="image/webp" srcset="../assets/images/inspi-8-360.webp 360w, ../assets/images/inspi-8-630.webp 630w, ../assets/images/inspi-8-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="../assets/images/inspi-8.jpg" srcset="../assets/images/inspi-8-360.jpg 360w, ../assets/images/inspi-8-630.jpg 630w, ../assets/images/inspi-8-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Entrée spacieuse au sol en bois clair et décoration soignée"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
+              </button>
+              <figcaption class="gallery__caption">
+                <span>Entrée cadrée</span>
+                <span class="mono">Lames dans l’axe · chêne miel</span>
+                <a class="gallery__try" href="../outils/visualiseur.html?motif=lames&teinte=miel&piece=salon">Essayer ce style <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+              </figcaption>
+            </figure>
+          </div>
+          <p class="filter-empty" data-filters-empty="galerie" hidden>Aucune ambiance pour ce motif pour l’instant.</p>
+          <p class="note-inline u-mt-5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.2 17.5h5.6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z"/></svg><span>Photographies publiées sur Pexels sous <a href="https://www.pexels.com/license/" rel="noopener">licence Pexels</a>, qui autorise l’usage sur un site. Auteurs et liens sources dans <code>assets/images/CREDITS.md</code>.</span></p>
         </div>
       </section>
 
@@ -158,7 +246,7 @@
             <a class="link-arrow" href="../projet/">Décrire un projet<svg  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
           </div>
           <div class="footer__col">
-            <h3>Comprendre</h3>
+            <h2>Comprendre</h2>
             <ul>
               <li><a href="../guides/quel-sens-de-pose-choisir.html">Choisir le sens de pose</a></li>
               <li><a href="../guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a></li>
@@ -167,7 +255,7 @@
             </ul>
           </div>
           <div class="footer__col">
-            <h3>Motifs</h3>
+            <h2>Motifs</h2>
             <ul>
               <li><a href="../motifs/pose-droite.html">Pose droite</a></li>
               <li><a href="../motifs/pose-diagonale.html">Pose diagonale</a></li>
@@ -176,18 +264,19 @@
             </ul>
           </div>
           <div class="footer__col">
-            <h3>Le site</h3>
+            <h2>Le site</h2>
             <ul>
-              <li><a href="../outils/simulateur-pose.html">Simulateur de pose</a></li>
-              <li><a href="../tutoriels/">Tutoriels</a></li>
+              <li><a href="../outils/visualiseur.html">Visualiser ma pièce</a></li>
+              <li><a href="../outils/simulateur-pose.html">Mode plan</a></li>
               <li><a href="../a-propos/">À propos</a></li>
+              <li><a href="../a-propos/methode-editoriale.html">Méthode éditoriale</a></li>
               <li><a href="../contact/">Contact</a></li>
             </ul>
           </div>
         </div>
         <div class="footer__bottom">
           <p>&copy; 2026 Pose Parquet — site éditorial indépendant.</p>
-          <p>Photographies libres de droits · aucune vente en ligne</p>
+          <p>Photographies sous licence Pexels · aucune vente en ligne</p>
         </div>
       </div>
     </footer>
