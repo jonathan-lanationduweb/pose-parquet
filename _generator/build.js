@@ -11,6 +11,7 @@ const { PHOTOS, INSPIRATION_PHOTOS } = require('./photos');
 const { buildHomeBody } = require('./home');
 const { buildVisualiseurPage } = require('./visualiseur');
 const { resolveSources } = require('./sources');
+const { buildAssets } = require('./assets');
 const { picture } = require('./responsive');
 
 const ROOT = process.env.SITE_ROOT || path.join(process.env.USERPROFILE || '', 'Desktop', 'pose-parquet.com');
@@ -1194,6 +1195,20 @@ function buildDataIndex() {
   write('data/contenus.json', JSON.stringify(index, null, 2));
 }
 
+/* Les assets sont construits en premier : le HTML a besoin de leurs empreintes.
+   Toutes les feuilles de page entrent dans le bundle unique, dans l'ordre où
+   elles étaient chargées auparavant — la cascade est donc identique. */
+const build = buildAssets(ROOT, {
+  pageCss: [
+    'css/pages/listing.css',
+    'css/pages/article.css',
+    'css/pages/tools.css',
+    'css/pages/project.css',
+    'css/pages/home.css',
+    'components/project-form/project-form.css',
+  ],
+});
+
 buildDiagrams();
 buildDataIndex();
 buildHome();
@@ -1211,3 +1226,4 @@ build404();
 buildMeta();
 
 console.log('Site généré dans', ROOT);
+console.log(`Assets : ${build.css} (${Math.round(build.sizes.css / 1024)} Ko), ${build.js} (${build.sizes.js} modules)`);

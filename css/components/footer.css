@@ -72,3 +72,42 @@
   color: var(--text-muted);
 }
 .footer__bottom p { margin: 0; }
+
+/* ---------- Téléphone : trois lignes de liens, pas trois colonnes ----------
+   Empiler les colonnes du bureau donnait un pied de page de 505 px avec un
+   vide sous le dernier groupe. Ici, chaque groupe devient une ligne de liens
+   séparés par un point médian : même contenu, trois fois moins de hauteur.
+   Les intitulés restent dans le DOM pour les lecteurs d'écran. */
+@media (max-width: 40rem) {
+  .site-footer { padding-block: var(--sp-5) var(--sp-4); }
+  .footer__inner { gap: var(--sp-5); }
+  .footer__top { gap: var(--sp-4); }
+  .footer__baseline { margin-top: 0.35rem; max-width: 40ch; }
+
+  .footer__nav { grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
+  .footer__col h2 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .footer__col ul {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.2rem 0;
+    font-size: 0.95rem;
+  }
+  .footer__col li:not(:last-child)::after {
+    content: "·";
+    margin: 0 0.55rem;
+    color: var(--line-strong);
+  }
+  .footer__col a { padding-block: 0.15rem; }
+
+  .footer__bottom { gap: 0.2rem 1rem; padding-top: 0.8rem; }
+}
