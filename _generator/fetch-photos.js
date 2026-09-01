@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const { PHOTOS, INSPIRATION_PHOTOS, pexelsUrl, photoPage } = require('./photos');
+const { variantsFor } = require('./responsive');
 
 const ROOT = path.join(__dirname, '..');
 const DIR = path.join(ROOT, 'assets', 'images');
@@ -61,7 +62,21 @@ async function resolveUrl(photo) {
   const html = await fetchText(photoPage(photo.id));
   const match = html.match(/https:\/\/images\.pexels\.com\/photos\/\d+\/[^"?]+\.(?:jpeg|jpg|png)/);
   if (!match) throw new Error(`Image introuvable pour la photo ${photo.id}`);
-  return `${match[0]}?auto=compress&cs=tinysrgb&fit=crop&w=${photo.w}&h=${photo.h}`;
+  const fm = photo.fm ? `&fm=${photo.fm}` : '';
+  return `${match[0]}?auto=compress&cs=tinysrgb${fm}&fit=crop&w=${photo.w}&h=${photo.h}`;
+}
+
+/** Télécharge un fichier s'il manque ; renvoie sa taille. */
+async function ensure(photo, dest) {
+  if (!FORCE && fs.existsSync(dest)) return { size: fs.statSync(dest).size, fresh: false };
+  let size;
+  try {
+    size = await download(pexelsUrl(photo), dest);
+  } catch (error) {
+    void error;
+    size = await download(await resolveUrl(photo), dest);
+  }
+  return { size, fresh: true };
 }
 
 async function main() {
@@ -80,22 +95,26 @@ async function main() {
   let total = 0;
 
   for (const { name, photo } of jobs) {
-    const dest = path.join(DIR, `${name}.jpg`);
-    if (!FORCE && fs.existsSync(dest)) {
-      skipped += 1;
-      total += fs.statSync(dest).size;
-      continue;
+    // Fichier de référence (repli des navigateurs sans srcset)
+    const base = await ensure(photo, path.join(DIR, `${name}.jpg`));
+    total += base.size;
+    if (base.fresh) downloaded += 1;
+    else skipped += 1;
+
+    // Déclinaisons réactives : trois largeurs, en JPEG et en WebP
+    for (const variant of variantsFor(name, photo)) {
+      for (const [ext, fm] of [
+        ['jpg', null],
+        ['webp', 'webp'],
+      ]) {
+        const dest = path.join(DIR, `${name}-${variant.w}.${ext}`);
+        const result = await ensure({ ...photo, ...variant, fm }, dest);
+        total += result.size;
+        if (result.fresh) downloaded += 1;
+        else skipped += 1;
+      }
     }
-    let size;
-    try {
-      size = await download(pexelsUrl(photo), dest);
-    } catch (error) {
-      void error;
-      size = await download(await resolveUrl(photo), dest);
-    }
-    downloaded += 1;
-    total += size;
-    process.stdout.write(`${name}.jpg  ${(size / 1024).toFixed(0)} Ko\n`);
+    process.stdout.write(`${name}  ${(base.size / 1024).toFixed(0)} Ko + déclinaisons\n`);
   }
 
   const credits = [

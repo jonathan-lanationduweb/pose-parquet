@@ -80,32 +80,67 @@
       </header>
 
       <section class="section section--flush-top">
-        <div class="wrap">
-          <div class="grid grid--2">
-            <div class="tool-card" data-reveal>
-              <div class="tool-card__head"><h3>Visualiser ma pièce</h3><span class="badge badge--sage">Nouveau</span></div>
-              <p>Importez une photo de votre pièce ou choisissez une pièce d'exemple, puis essayez les teintes, les motifs et les sens de pose. Le parquet suit la perspective et récupère les ombres de la photo.</p>
+        <div class="wrap-wide tool-blocks">
+          <article class="tool-block" data-reveal>
+            <div class="tool-block__media">
+              <div data-vz-preview data-room="sejour" data-base="../"></div>
+            </div>
+            <div class="tool-block__body">
+              <p class="tool-block__num">Outil 01 <span class="badge badge--sage">Nouveau</span></p>
+              <h2 class="tool-block__title">Visualiser ma pièce</h2>
+              <p class="lead">Une photo de votre pièce, le sol délimité en quelques gestes, et le parquet posé dessus : teinte, motif, sens de pose et largeur de lame se changent en direct.</p>
+              <ul class="tool-block__points">
+                <li>Le parquet suit la perspective et reprend la lumière de la photo.</li>
+                <li>Le pinceau garde vos meubles, vos tapis et vos plinthes visibles.</li>
+                <li>Curseur avant / après, comparaison de deux versions, rendu à enregistrer.</li>
+                <li>Tout est calculé dans le navigateur : la photo n’est ni envoyée ni conservée.</li>
+              </ul>
               <div class="cluster">
                 <a class="btn" href="visualiseur.html">Ouvrir le visualiseur</a>
-                <a class="link-arrow" href="simulateur-pose.html">Passer en mode plan</a>
+                <a class="link-arrow" href="../inspiration/">Voir des ambiances à essayer</a>
               </div>
             </div>
-            <div class="tool-card" data-reveal data-reveal-delay="60">
-              <div class="tool-card__head"><h3>Mode plan</h3><span class="badge badge--sage">Disponible</span></div>
-              <p>Vue du dessus à l'échelle : dimensions de la pièce, largeur de lame, fenêtre et entrée. Surface, chutes estimées et nombre de lames sont recalculés à chaque changement — à titre indicatif.</p>
+          </article>
+
+          <article class="tool-block tool-block--reverse" data-reveal>
+            <div class="tool-block__media">
+              <div data-visualizer data-mode="compact" data-base="../"></div>
+            </div>
+            <div class="tool-block__body">
+              <p class="tool-block__num">Outil 02 <span class="badge badge--outline">Disponible</span></p>
+              <h2 class="tool-block__title">Mode plan</h2>
+              <p class="lead">Vue du dessus à l’échelle : dimensions de la pièce, largeur de lame, position de la fenêtre et de l’entrée. Utile pour trancher le sens de pose avant d’acheter.</p>
+              <ul class="tool-block__points">
+                <li>Cinq motifs, du droit au point de Hongrie.</li>
+                <li>Surface, nombre de lames et chutes estimées, recalculés à chaque changement.</li>
+                <li>Estimations indicatives : elles ne remplacent pas un calepinage de chantier.</li>
+              </ul>
               <div class="cluster">
                 <a class="btn btn--ghost" href="simulateur-pose.html">Ouvrir le mode plan</a>
                 <a class="link-arrow" href="../guides/quel-sens-de-pose-choisir.html">Comprendre le sens de pose</a>
               </div>
             </div>
-            <div class="tool-card tool-card--soon" data-reveal data-reveal-delay="80">
-              <div class="tool-card__head"><h3>Prochainement</h3><span class="badge badge--outline">En préparation</span></div>
-              <p>Les outils suivants viendront compléter le studio, avec la même logique : une question concrète, une réponse immédiate.</p>
-              <ul class="meta-list meta-list--stack">
-                <li><strong>Calculateur de surface</strong><span>Surfaces complexes, décrochés, chutes.</span></li><li><strong>Calculateur de calepinage</strong><span>Nombre de lames, coupes de rive, répartition.</span></li><li><strong>Checklist avant pose</strong><span>Support, acclimatation, outillage, calepinage.</span></li><li><strong>Diagnostic du support</strong><span>Planéité, humidité, cohésion, adhérence.</span></li><li><strong>Comparateur massif / contrecollé</strong><span>Selon pièce, support et budget.</span></li><li><strong>Questionnaire sens de pose</strong><span>Cinq questions, une recommandation.</span></li>
-              </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section section--alt" aria-labelledby="a-venir">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Feuille de route</p>
+              <h2 id="a-venir">Les outils qui suivront</h2>
             </div>
+            <p class="lead">Même logique à chaque fois : une question concrète, une réponse immédiate, aucune inscription.</p>
           </div>
+          <ul class="roadmap">
+            <li class="roadmap__item"><strong>Calculateur de surface</strong><span>Surfaces complexes, décrochés, chutes.</span></li>
+            <li class="roadmap__item"><strong>Calculateur de calepinage</strong><span>Nombre de lames, coupes de rive, répartition.</span></li>
+            <li class="roadmap__item"><strong>Checklist avant pose</strong><span>Support, acclimatation, outillage, calepinage.</span></li>
+            <li class="roadmap__item"><strong>Diagnostic du support</strong><span>Planéité, humidité, cohésion, adhérence.</span></li>
+            <li class="roadmap__item"><strong>Comparateur massif / contrecollé</strong><span>Selon pièce, support et budget.</span></li>
+            <li class="roadmap__item"><strong>Questionnaire sens de pose</strong><span>Cinq questions, une recommandation.</span></li>
+          </ul>
         </div>
       </section>
       <section class="section">
@@ -132,7 +167,7 @@
             <a class="link-arrow" href="../projet/">Décrire un projet<svg  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
           </div>
           <div class="footer__col">
-            <h3>Comprendre</h3>
+            <h2>Comprendre</h2>
             <ul>
               <li><a href="../guides/quel-sens-de-pose-choisir.html">Choisir le sens de pose</a></li>
               <li><a href="../guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a></li>
@@ -141,7 +176,7 @@
             </ul>
           </div>
           <div class="footer__col">
-            <h3>Motifs</h3>
+            <h2>Motifs</h2>
             <ul>
               <li><a href="../motifs/pose-droite.html">Pose droite</a></li>
               <li><a href="../motifs/pose-diagonale.html">Pose diagonale</a></li>
@@ -150,18 +185,19 @@
             </ul>
           </div>
           <div class="footer__col">
-            <h3>Le site</h3>
+            <h2>Le site</h2>
             <ul>
-              <li><a href="../outils/simulateur-pose.html">Simulateur de pose</a></li>
-              <li><a href="../tutoriels/">Tutoriels</a></li>
+              <li><a href="../outils/visualiseur.html">Visualiser ma pièce</a></li>
+              <li><a href="../outils/simulateur-pose.html">Mode plan</a></li>
               <li><a href="../a-propos/">À propos</a></li>
+              <li><a href="../a-propos/methode-editoriale.html">Méthode éditoriale</a></li>
               <li><a href="../contact/">Contact</a></li>
             </ul>
           </div>
         </div>
         <div class="footer__bottom">
           <p>&copy; 2026 Pose Parquet — site éditorial indépendant.</p>
-          <p>Photographies libres de droits · aucune vente en ligne</p>
+          <p>Photographies sous licence Pexels · aucune vente en ligne</p>
         </div>
       </div>
     </footer>

@@ -148,6 +148,8 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 .u-center { text-align: center; }
 .u-mt-5 { margin-top: var(--sp-5); }
 .u-mt-6 { margin-top: var(--sp-6); }
+.u-ml-4 { margin-left: var(--sp-4); }
+.u-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-4); }
 .lead--center { margin: var(--sp-5) auto var(--sp-6); }
 .aside-image { border-radius: var(--r-media); }
 

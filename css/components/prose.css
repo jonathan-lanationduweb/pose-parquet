@@ -125,7 +125,7 @@
 .steps li ul { padding-left: 0; margin-top: var(--sp-3); }
 
 /* Tableau comparatif */
-.table-wrap { overflow-x: auto; margin: var(--sp-6) 0; border: 1px solid var(--line); border-radius: var(--r-md); }
+.table-wrap { overflow-x: auto; max-width: 100%; margin: var(--sp-6) 0; border: 1px solid var(--line); border-radius: var(--r-md); }
 .table-compare { min-width: 34rem; font-size: 0.94rem; background: var(--surface); }
 .table-compare th, .table-compare td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
 .table-compare thead th { background: var(--c-paper); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }

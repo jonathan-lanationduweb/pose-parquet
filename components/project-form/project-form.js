@@ -113,7 +113,7 @@ export function mountProjectForm(root, options = {}) {
           (step, index) => `
         <section class="pf__step" data-step="${index}" ${index === 0 ? '' : 'hidden'}
           aria-labelledby="${prefix}-step-${index}">
-          <h3 class="pf__title" id="${prefix}-step-${index}">${step.title}</h3>
+          <h2 class="pf__title" id="${prefix}-step-${index}">${step.title}</h2>
           ${step.hint ? `<p class="pf__hint">${step.hint}</p>` : ''}
           <div class="pf__grid">
             ${step.fields.map((field) => fieldMarkup(field, `${prefix}-${field.name}`)).join('')}
@@ -132,8 +132,8 @@ export function mountProjectForm(root, options = {}) {
 
     <div class="pf__success" hidden tabindex="-1">
       <p class="eyebrow">Demande enregistrée</p>
-      <h3>Merci, votre projet est bien décrit.</h3>
-      <p>Nous revenons vers vous rapidement. En attendant, le simulateur de pose peut vous aider à visualiser les options retenues.</p>
+      <h2>Merci, votre projet est bien décrit.</h2>
+      <p>Nous revenons vers vous rapidement. En attendant, le visualiseur peut vous aider à essayer les options retenues sur une photo de votre pièce.</p>
       <button type="button" class="btn btn--ghost btn--sm" data-restart>Décrire un autre projet</button>
     </div>`;
 

@@ -52,6 +52,8 @@
 }
 .btn--accent { --btn-bg: var(--c-sage-deep); --btn-bd: var(--c-sage-deep); --btn-hover: var(--c-ink); }
 .btn--sm { padding: 0.6rem 1.1rem; font-size: 0.86rem; }
+.btn--xs { padding: 0.42rem 0.8rem; font-size: 0.78rem; }
+.btn[disabled] { opacity: 0.45; pointer-events: none; }
 .btn--lg { padding: 1.05rem 2rem; font-size: 1rem; }
 .btn--block { width: 100%; }
 

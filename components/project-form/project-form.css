@@ -76,7 +76,7 @@
 .pf__status { margin: var(--sp-3) 0 0; font-size: var(--fs-sm); color: var(--text-muted); text-align: right; }
 
 .pf__success { display: grid; gap: var(--sp-3); justify-items: start; padding: var(--sp-5) 0; }
-.pf__success h3 { font-size: var(--fs-h3); }
+.pf__success h2 { font-size: var(--fs-h3); }
 .pf__success p { color: var(--text-soft); max-width: 46ch; margin: 0; }
 .pf__success:focus-visible { outline: none; }
 

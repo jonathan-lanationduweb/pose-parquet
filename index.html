@@ -70,8 +70,11 @@
     <main id="contenu">
       <section class="hero" data-hero>
         <div class="hero__media" data-hero-media>
-          <img src="assets/images/hero-wide.jpg" alt="Grande pièce vide au parquet clair traversée par la lumière"
-            width="2200" height="1300" fetchpriority="high" decoding="async" />
+          <picture>
+              <source type="image/webp" srcset="assets/images/hero-wide-880.webp 880w, assets/images/hero-wide-1540.webp 1540w, assets/images/hero-wide-2200.webp 2200w" sizes="100vw" />
+              <img src="assets/images/hero-wide.jpg" srcset="assets/images/hero-wide-880.jpg 880w, assets/images/hero-wide-1540.jpg 1540w, assets/images/hero-wide-2200.jpg 2200w" sizes="100vw" alt="Grande pièce vide au parquet clair traversée par la lumière"
+                width="2200" height="1300" fetchpriority="high" decoding="async"  />
+            </picture>
           <video muted loop playsinline preload="none" data-src="" aria-hidden="true"></video>
         </div>
         <div class="wrap-wide hero__inner">
@@ -82,13 +85,13 @@
               <p class="hero__lead">Guides, techniques et outils pour comprendre et réussir votre projet parquet — du support au motif, du calepinage à la finition.</p>
               <div class="hero__actions">
                 <a class="btn btn--light btn--lg" href="guides/"><span>Explorer les guides</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
-                <a class="btn btn--outline-light btn--lg" href="outils/simulateur-pose.html"><span>Visualiser ma pièce</span></a>
+                <a class="btn btn--outline-light btn--lg" href="outils/visualiseur.html"><span>Visualiser ma pièce</span></a>
               </div>
             </div>
             <ul class="hero__meta">
               <li><b>5</b> motifs simulés</li>
               <li><b>8</b> guides pratiques</li>
-              <li><b>0</b> produit vendu</li>
+              <li><b>6</b> pièces d’exemple</li>
             </ul>
           </div>
         </div>
@@ -137,7 +140,11 @@
               </div>
               <p class="tile__text">Planéité, humidité, ragréage, sous-couche : ce qui se joue avant toute pose.</p>
               <span class="tile__more">Explorer <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
-              <div class="tile__media"><img src="assets/images/tile-preparer.jpg" alt="" loading="lazy" decoding="async" width="1000" height="900" /></div>
+              <div class="tile__media"><picture>
+              <source type="image/webp" srcset="assets/images/tile-preparer-400.webp 400w, assets/images/tile-preparer-700.webp 700w, assets/images/tile-preparer-1000.webp 1000w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/tile-preparer.jpg" srcset="assets/images/tile-preparer-400.jpg 400w, assets/images/tile-preparer-700.jpg 700w, assets/images/tile-preparer-1000.jpg 1000w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt=""
+                width="1000" height="900" loading="lazy" decoding="async"  />
+            </picture></div>
             </a>
             <a class="tile tile--sage" href="guides/parquet-massif-ou-contrecolle.html" data-reveal data-reveal-delay="70">
               <div class="tile__head">
@@ -155,7 +162,11 @@
               </div>
               <p class="tile__text">Droite, diagonale, Point de Hongrie, bâton rompu : six écritures au sol.</p>
               <span class="tile__more">Explorer <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
-              <div class="tile__media"><img src="assets/images/tile-motif.jpg" alt="" loading="lazy" decoding="async" width="1000" height="900" /></div>
+              <div class="tile__media"><picture>
+              <source type="image/webp" srcset="assets/images/tile-motif-400.webp 400w, assets/images/tile-motif-700.webp 700w, assets/images/tile-motif-1000.webp 1000w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/tile-motif.jpg" srcset="assets/images/tile-motif-400.jpg 400w, assets/images/tile-motif-700.jpg 700w, assets/images/tile-motif-1000.jpg 1000w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt=""
+                width="1000" height="900" loading="lazy" decoding="async"  />
+            </picture></div>
             </a>
             <a class="tile tile--clay" href="guides/erreurs-a-eviter-avant-de-poser.html" data-reveal data-reveal-delay="210">
               <div class="tile__head">
@@ -164,7 +175,11 @@
               </div>
               <p class="tile__text">Entretien, réparation, rénovation : prolonger plutôt que remplacer.</p>
               <span class="tile__more">Explorer <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
-              <div class="tile__media"><img src="assets/images/tile-renover.jpg" alt="" loading="lazy" decoding="async" width="1000" height="900" /></div>
+              <div class="tile__media"><picture>
+              <source type="image/webp" srcset="assets/images/tile-renover-400.webp 400w, assets/images/tile-renover-700.webp 700w, assets/images/tile-renover-1000.webp 1000w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/tile-renover.jpg" srcset="assets/images/tile-renover-400.jpg 400w, assets/images/tile-renover-700.jpg 700w, assets/images/tile-renover-1000.jpg 1000w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt=""
+                width="1000" height="900" loading="lazy" decoding="async"  />
+            </picture></div>
             </a>
           </div>
         </div>
@@ -174,15 +189,18 @@
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
-              <p class="eyebrow">Studio de pose · outil</p>
-              <h2 id="sim-title">Une pièce.<br />Plusieurs directions.</h2>
+              <p class="eyebrow">Visualiseur · outil</p>
+              <h2 id="sim-title">Votre pièce,<br />avant les travaux.</h2>
             </div>
             <div>
-              <p class="lead">Entrez vos dimensions, placez la fenêtre, comparez cinq motifs. Le rendu, la surface et les chutes se recalculent à chaque changement.</p>
-              <p class="u-mt-5"><a class="btn" href="outils/simulateur-pose.html"><span>Ouvrir le simulateur complet</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a></p>
+              <p class="lead">Importez une photo de votre pièce, délimitez le sol, posez le parquet dessus. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée ni conservée.</p>
+              <p class="u-mt-5 u-actions">
+                <a class="btn" href="outils/visualiseur.html"><span>Visualiser ma pièce</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+                <a class="link-arrow" href="outils/simulateur-pose.html">Ou passer en mode Plan <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+              </p>
             </div>
           </div>
-          <div data-visualizer data-mode="compact" data-base="" data-reveal></div>
+          <div data-vz-preview data-room="sejour" data-base="" data-reveal></div>
         </div>
       </section>
 
@@ -209,7 +227,11 @@
             <article class="carousel__slide">
               <div class="slide-card">
                 <div class="slide-card__media">
-                  <img src="assets/images/cover-quel-sens-de-pose-choisir.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+                  <picture>
+              <source type="image/webp" srcset="assets/images/cover-quel-sens-de-pose-choisir-560.webp 560w, assets/images/cover-quel-sens-de-pose-choisir-980.webp 980w, assets/images/cover-quel-sens-de-pose-choisir-1400.webp 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/cover-quel-sens-de-pose-choisir.jpg" srcset="assets/images/cover-quel-sens-de-pose-choisir-560.jpg 560w, assets/images/cover-quel-sens-de-pose-choisir-980.jpg 980w, assets/images/cover-quel-sens-de-pose-choisir-1400.jpg 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt=""
+                width="1400" height="875" loading="lazy" decoding="async"  />
+            </picture>
                   <span class="slide-card__cat">Sens de pose</span>
                 </div>
                 <div class="slide-card__body">
@@ -225,7 +247,11 @@
             <article class="carousel__slide">
               <div class="slide-card">
                 <div class="slide-card__media">
-                  <img src="assets/images/cover-poser-parquet-sens-de-la-lumiere.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+                  <picture>
+              <source type="image/webp" srcset="assets/images/cover-poser-parquet-sens-de-la-lumiere-560.webp 560w, assets/images/cover-poser-parquet-sens-de-la-lumiere-980.webp 980w, assets/images/cover-poser-parquet-sens-de-la-lumiere-1400.webp 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/cover-poser-parquet-sens-de-la-lumiere.jpg" srcset="assets/images/cover-poser-parquet-sens-de-la-lumiere-560.jpg 560w, assets/images/cover-poser-parquet-sens-de-la-lumiere-980.jpg 980w, assets/images/cover-poser-parquet-sens-de-la-lumiere-1400.jpg 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt=""
+                width="1400" height="875" loading="lazy" decoding="async"  />
+            </picture>
                   <span class="slide-card__cat">Sens de pose</span>
                 </div>
                 <div class="slide-card__body">
@@ -241,7 +267,11 @@
             <article class="carousel__slide">
               <div class="slide-card">
                 <div class="slide-card__media">
-                  <img src="assets/images/cover-preparer-son-sol-avant-la-pose.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+                  <picture>
+              <source type="image/webp" srcset="assets/images/cover-preparer-son-sol-avant-la-pose-560.webp 560w, assets/images/cover-preparer-son-sol-avant-la-pose-980.webp 980w, assets/images/cover-preparer-son-sol-avant-la-pose-1400.webp 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/cover-preparer-son-sol-avant-la-pose.jpg" srcset="assets/images/cover-preparer-son-sol-avant-la-pose-560.jpg 560w, assets/images/cover-preparer-son-sol-avant-la-pose-980.jpg 980w, assets/images/cover-preparer-son-sol-avant-la-pose-1400.jpg 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt=""
+                width="1400" height="875" loading="lazy" decoding="async"  />
+            </picture>
                   <span class="slide-card__cat">Préparation</span>
                 </div>
                 <div class="slide-card__body">
@@ -257,7 +287,11 @@
             <article class="carousel__slide">
               <div class="slide-card">
                 <div class="slide-card__media">
-                  <img src="assets/images/cover-point-de-hongrie-ou-baton-rompu.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+                  <picture>
+              <source type="image/webp" srcset="assets/images/cover-point-de-hongrie-ou-baton-rompu-560.webp 560w, assets/images/cover-point-de-hongrie-ou-baton-rompu-980.webp 980w, assets/images/cover-point-de-hongrie-ou-baton-rompu-1400.webp 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/cover-point-de-hongrie-ou-baton-rompu.jpg" srcset="assets/images/cover-point-de-hongrie-ou-baton-rompu-560.jpg 560w, assets/images/cover-point-de-hongrie-ou-baton-rompu-980.jpg 980w, assets/images/cover-point-de-hongrie-ou-baton-rompu-1400.jpg 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt=""
+                width="1400" height="875" loading="lazy" decoding="async"  />
+            </picture>
                   <span class="slide-card__cat">Motifs</span>
                 </div>
                 <div class="slide-card__body">
@@ -273,7 +307,11 @@
             <article class="carousel__slide">
               <div class="slide-card">
                 <div class="slide-card__media">
-                  <img src="assets/images/cover-erreurs-a-eviter-avant-de-poser.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+                  <picture>
+              <source type="image/webp" srcset="assets/images/cover-erreurs-a-eviter-avant-de-poser-560.webp 560w, assets/images/cover-erreurs-a-eviter-avant-de-poser-980.webp 980w, assets/images/cover-erreurs-a-eviter-avant-de-poser-1400.webp 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/cover-erreurs-a-eviter-avant-de-poser.jpg" srcset="assets/images/cover-erreurs-a-eviter-avant-de-poser-560.jpg 560w, assets/images/cover-erreurs-a-eviter-avant-de-poser-980.jpg 980w, assets/images/cover-erreurs-a-eviter-avant-de-poser-1400.jpg 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt=""
+                width="1400" height="875" loading="lazy" decoding="async"  />
+            </picture>
                   <span class="slide-card__cat">Préparation</span>
                 </div>
                 <div class="slide-card__body">
@@ -289,7 +327,11 @@
             <article class="carousel__slide">
               <div class="slide-card">
                 <div class="slide-card__media">
-                  <img src="assets/images/cover-parquet-massif-ou-contrecolle.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+                  <picture>
+              <source type="image/webp" srcset="assets/images/cover-parquet-massif-ou-contrecolle-560.webp 560w, assets/images/cover-parquet-massif-ou-contrecolle-980.webp 980w, assets/images/cover-parquet-massif-ou-contrecolle-1400.webp 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/cover-parquet-massif-ou-contrecolle.jpg" srcset="assets/images/cover-parquet-massif-ou-contrecolle-560.jpg 560w, assets/images/cover-parquet-massif-ou-contrecolle-980.jpg 980w, assets/images/cover-parquet-massif-ou-contrecolle-1400.jpg 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt=""
+                width="1400" height="875" loading="lazy" decoding="async"  />
+            </picture>
                   <span class="slide-card__cat">Comprendre</span>
                 </div>
                 <div class="slide-card__body">
@@ -310,8 +352,11 @@
 
       <section class="immersive" aria-labelledby="focus-title">
         <div class="immersive__bg">
-          <img src="assets/images/immersive-hongrie.jpg" alt="Lumière rasante sur un parquet posé en Point de Hongrie"
-            loading="lazy" decoding="async" width="2000" height="1500" />
+          <picture>
+              <source type="image/webp" srcset="assets/images/immersive-hongrie-800.webp 800w, assets/images/immersive-hongrie-1400.webp 1400w, assets/images/immersive-hongrie-2000.webp 2000w" sizes="100vw" />
+              <img src="assets/images/immersive-hongrie.jpg" srcset="assets/images/immersive-hongrie-800.jpg 800w, assets/images/immersive-hongrie-1400.jpg 1400w, assets/images/immersive-hongrie-2000.jpg 2000w" sizes="100vw" alt="Lumière rasante sur un parquet posé en Point de Hongrie"
+                width="2000" height="1500" loading="lazy" decoding="async"  />
+            </picture>
         </div>
         <div class="wrap-wide">
           <div class="immersive__head" data-reveal>
@@ -359,7 +404,11 @@
               aria-label="Galerie d’inspiration, utilisez les flèches du clavier">
             <div class="carousel__slide">
               <a class="shot" href="inspiration/">
-                <img src="assets/images/inspi-1.jpg" alt="Séjour — Traversant, pose droite" loading="lazy" decoding="async" width="900" height="700" />
+                <picture>
+              <source type="image/webp" srcset="assets/images/inspi-1-360.webp 360w, assets/images/inspi-1-630.webp 630w, assets/images/inspi-1-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/inspi-1.jpg" srcset="assets/images/inspi-1-360.jpg 360w, assets/images/inspi-1-630.jpg 630w, assets/images/inspi-1-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Séjour — Traversant, pose droite"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
                 <span class="shot__caption">
                   <span class="shot__cat">Séjour</span>
                   <span class="shot__title">Traversant, pose droite</span>
@@ -368,7 +417,11 @@
             </div>
             <div class="carousel__slide">
               <a class="shot" href="inspiration/">
-                <img src="assets/images/inspi-2.jpg" alt="Chambre — Point de Hongrie" loading="lazy" decoding="async" width="900" height="700" />
+                <picture>
+              <source type="image/webp" srcset="assets/images/inspi-2-360.webp 360w, assets/images/inspi-2-630.webp 630w, assets/images/inspi-2-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/inspi-2.jpg" srcset="assets/images/inspi-2-360.jpg 360w, assets/images/inspi-2-630.jpg 630w, assets/images/inspi-2-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Chambre — Point de Hongrie"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
                 <span class="shot__caption">
                   <span class="shot__cat">Chambre</span>
                   <span class="shot__title">Point de Hongrie</span>
@@ -377,7 +430,11 @@
             </div>
             <div class="carousel__slide">
               <a class="shot" href="inspiration/">
-                <img src="assets/images/inspi-6.jpg" alt="Salon — Diagonale, chêne blond" loading="lazy" decoding="async" width="900" height="700" />
+                <picture>
+              <source type="image/webp" srcset="assets/images/inspi-6-360.webp 360w, assets/images/inspi-6-630.webp 630w, assets/images/inspi-6-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/inspi-6.jpg" srcset="assets/images/inspi-6-360.jpg 360w, assets/images/inspi-6-630.jpg 630w, assets/images/inspi-6-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Salon — Diagonale, chêne blond"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
                 <span class="shot__caption">
                   <span class="shot__cat">Salon</span>
                   <span class="shot__title">Diagonale, chêne blond</span>
@@ -386,7 +443,11 @@
             </div>
             <div class="carousel__slide">
               <a class="shot" href="inspiration/">
-                <img src="assets/images/inspi-3.jpg" alt="Cuisine — Contrecollé collé" loading="lazy" decoding="async" width="900" height="700" />
+                <picture>
+              <source type="image/webp" srcset="assets/images/inspi-3-360.webp 360w, assets/images/inspi-3-630.webp 630w, assets/images/inspi-3-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/inspi-3.jpg" srcset="assets/images/inspi-3-360.jpg 360w, assets/images/inspi-3-630.jpg 630w, assets/images/inspi-3-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Cuisine — Contrecollé collé"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
                 <span class="shot__caption">
                   <span class="shot__cat">Cuisine</span>
                   <span class="shot__title">Contrecollé collé</span>
@@ -395,7 +456,11 @@
             </div>
             <div class="carousel__slide">
               <a class="shot" href="inspiration/">
-                <img src="assets/images/inspi-5.jpg" alt="Bureau — Bâton rompu fumé" loading="lazy" decoding="async" width="900" height="700" />
+                <picture>
+              <source type="image/webp" srcset="assets/images/inspi-5-360.webp 360w, assets/images/inspi-5-630.webp 630w, assets/images/inspi-5-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/inspi-5.jpg" srcset="assets/images/inspi-5-360.jpg 360w, assets/images/inspi-5-630.jpg 630w, assets/images/inspi-5-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Bureau — Bâton rompu fumé"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
                 <span class="shot__caption">
                   <span class="shot__cat">Bureau</span>
                   <span class="shot__title">Bâton rompu fumé</span>
@@ -404,7 +469,11 @@
             </div>
             <div class="carousel__slide">
               <a class="shot" href="inspiration/">
-                <img src="assets/images/inspi-4.jpg" alt="Couloir — Lames étroites dans l’axe" loading="lazy" decoding="async" width="900" height="700" />
+                <picture>
+              <source type="image/webp" srcset="assets/images/inspi-4-360.webp 360w, assets/images/inspi-4-630.webp 630w, assets/images/inspi-4-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/inspi-4.jpg" srcset="assets/images/inspi-4-360.jpg 360w, assets/images/inspi-4-630.jpg 630w, assets/images/inspi-4-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Couloir — Lames étroites dans l’axe"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
                 <span class="shot__caption">
                   <span class="shot__cat">Couloir</span>
                   <span class="shot__title">Lames étroites dans l’axe</span>
@@ -413,7 +482,11 @@
             </div>
             <div class="carousel__slide">
               <a class="shot" href="inspiration/">
-                <img src="assets/images/inspi-7.jpg" alt="Combles — Parquet clair, lames larges" loading="lazy" decoding="async" width="900" height="700" />
+                <picture>
+              <source type="image/webp" srcset="assets/images/inspi-7-360.webp 360w, assets/images/inspi-7-630.webp 630w, assets/images/inspi-7-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/inspi-7.jpg" srcset="assets/images/inspi-7-360.jpg 360w, assets/images/inspi-7-630.jpg 630w, assets/images/inspi-7-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Combles — Parquet clair, lames larges"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
                 <span class="shot__caption">
                   <span class="shot__cat">Combles</span>
                   <span class="shot__title">Parquet clair, lames larges</span>
@@ -422,7 +495,11 @@
             </div>
             <div class="carousel__slide">
               <a class="shot" href="inspiration/">
-                <img src="assets/images/inspi-8.jpg" alt="Entrée — Frise périphérique" loading="lazy" decoding="async" width="900" height="700" />
+                <picture>
+              <source type="image/webp" srcset="assets/images/inspi-8-360.webp 360w, assets/images/inspi-8-630.webp 630w, assets/images/inspi-8-900.webp 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
+              <img src="assets/images/inspi-8.jpg" srcset="assets/images/inspi-8-360.jpg 360w, assets/images/inspi-8-630.jpg 630w, assets/images/inspi-8-900.jpg 900w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt="Entrée — Frise périphérique"
+                width="900" height="700" loading="lazy" decoding="async"  />
+            </picture>
                 <span class="shot__caption">
                   <span class="shot__cat">Entrée</span>
                   <span class="shot__title">Frise périphérique</span>
@@ -512,7 +589,11 @@
               </div>
             </div>
             <div class="feature__media" data-reveal>
-              <img src="assets/images/projet-visuel.jpg" alt="Pièce lumineuse au parquet clair" loading="lazy" decoding="async" width="1400" height="1100" />
+              <picture>
+              <source type="image/webp" srcset="assets/images/projet-visuel-560.webp 560w, assets/images/projet-visuel-980.webp 980w, assets/images/projet-visuel-1400.webp 1400w" sizes="(min-width: 60rem) 45rem, 94vw" />
+              <img src="assets/images/projet-visuel.jpg" srcset="assets/images/projet-visuel-560.jpg 560w, assets/images/projet-visuel-980.jpg 980w, assets/images/projet-visuel-1400.jpg 1400w" sizes="(min-width: 60rem) 45rem, 94vw" alt="Pièce lumineuse au parquet clair"
+                width="1400" height="1100" loading="lazy" decoding="async"  />
+            </picture>
             </div>
           </div>
         </div>
@@ -565,7 +646,7 @@
             <a class="link-arrow" href="projet/">Décrire un projet<svg  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
           </div>
           <div class="footer__col">
-            <h3>Comprendre</h3>
+            <h2>Comprendre</h2>
             <ul>
               <li><a href="guides/quel-sens-de-pose-choisir.html">Choisir le sens de pose</a></li>
               <li><a href="guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a></li>
@@ -574,7 +655,7 @@
             </ul>
           </div>
           <div class="footer__col">
-            <h3>Motifs</h3>
+            <h2>Motifs</h2>
             <ul>
               <li><a href="motifs/pose-droite.html">Pose droite</a></li>
               <li><a href="motifs/pose-diagonale.html">Pose diagonale</a></li>
@@ -583,18 +664,19 @@
             </ul>
           </div>
           <div class="footer__col">
-            <h3>Le site</h3>
+            <h2>Le site</h2>
             <ul>
-              <li><a href="outils/simulateur-pose.html">Simulateur de pose</a></li>
-              <li><a href="tutoriels/">Tutoriels</a></li>
+              <li><a href="outils/visualiseur.html">Visualiser ma pièce</a></li>
+              <li><a href="outils/simulateur-pose.html">Mode plan</a></li>
               <li><a href="a-propos/">À propos</a></li>
+              <li><a href="a-propos/methode-editoriale.html">Méthode éditoriale</a></li>
               <li><a href="contact/">Contact</a></li>
             </ul>
           </div>
         </div>
         <div class="footer__bottom">
           <p>&copy; 2026 Pose Parquet — site éditorial indépendant.</p>
-          <p>Photographies libres de droits · aucune vente en ligne</p>
+          <p>Photographies sous licence Pexels · aucune vente en ligne</p>
         </div>
       </div>
     </footer>

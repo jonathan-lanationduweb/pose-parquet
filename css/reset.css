@@ -31,3 +31,4 @@ table { border-collapse: collapse; width: 100%; }
     scroll-behavior: auto !important;
   }
 }
+picture { display: contents; }

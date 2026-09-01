@@ -10,6 +10,8 @@ const images = require('./images');
 const { PHOTOS, INSPIRATION_PHOTOS } = require('./photos');
 const { buildHomeBody } = require('./home');
 const { buildVisualiseurPage } = require('./visualiseur');
+const { resolveSources } = require('./sources');
+const { picture } = require('./responsive');
 
 const ROOT = process.env.SITE_ROOT || path.join(process.env.USERPROFILE || '', 'Desktop', 'pose-parquet.com');
 
@@ -136,7 +138,7 @@ const guideBySlug = (slug) => GUIDES.find((guide) => guide.slug === slug);
 function articleCard(item, base, hrefDir, badge) {
   return `<article class="card" data-tags="${(item.tags || []).join(' ')}" data-reveal>
             <div class="card__media">
-              <img src="${base}assets/images/cover-${item.slug}.jpg" alt="" loading="lazy" decoding="async" width="1400" height="875" />
+              ${picture(`cover-${item.slug}`, { base, alt: '', sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw' })}
               <span class="badge">${badge || item.category}</span>
             </div>
             <div class="card__body">
@@ -198,6 +200,25 @@ function editorialPage(item, options) {
         </section>`
     : '';
 
+  const published = item.date || '2026-08-01';
+  const updated = item.updated || published;
+
+  const sources = resolveSources(item);
+  const sourcesBlock = sources.length
+    ? `<section class="article-sources" aria-labelledby="sources-title">
+              <h2 id="sources-title">Sources et références</h2>
+              <p class="article-sources__intro">Ces documents font autorité sur la mise en œuvre des parquets en France. Les normes NF DTU sont éditées par AFNOR et payantes : le lien mène à leur fiche.</p>
+              <ul class="article-sources__list">
+                ${sources
+                  .map(
+                    (source) =>
+                      `<li><a href="${source.url}" rel="noopener nofollow">${source.label}</a><span>${source.note}</span></li>`
+                  )
+                  .join('\n                ')}
+              </ul>
+            </section>`
+    : '';
+
   const jsonld = [
     crumbs.jsonld,
     {
@@ -206,8 +227,9 @@ function editorialPage(item, options) {
       headline: item.h1,
       description: item.description,
       inLanguage: 'fr-FR',
-      datePublished: item.date || '2026-08-01',
-      author: { '@type': 'Organization', name: SITE.name },
+      datePublished: published,
+      dateModified: updated,
+      author: { '@type': 'Organization', name: SITE.name, url: `${SITE.domain}/a-propos/` },
       publisher: { '@type': 'Organization', name: SITE.name },
       mainEntityOfPage: `${SITE.domain}/${dir}${item.slug}.html`,
     },
@@ -226,27 +248,37 @@ function editorialPage(item, options) {
             <p class="lead">${item.lead}</p>
             <ul class="meta-list article-header__meta">
               <li>${item.reading} de lecture</li>
-              ${item.date ? `<li>Mis à jour le ${frDate(item.date)}</li>` : ''}
+              <li>Publié le <time datetime="${published}">${frDate(published)}</time></li>
+              ${updated !== published ? `<li>Mis à jour le <time datetime="${updated}">${frDate(updated)}</time></li>` : ''}
               ${item.level ? `<li>Niveau ${item.level}</li>` : ''}
               ${item.duration ? `<li>${item.duration}</li>` : ''}
             </ul>
+            <p class="article-byline">Par <strong>la rédaction de ${SITE.name}</strong> — <a href="${base}a-propos/methode-editoriale.html">notre méthode éditoriale</a></p>
           </div>
         </div>
       </header>
 
       <div class="wrap-wide">
         <div class="article-cover" data-reveal>
-          <img src="${base}assets/images/cover-${item.slug}.jpg" alt="${photoAlt(`cover-${item.slug}`) || item.h1}"
-            width="1400" height="875" decoding="async" fetchpriority="high" />
+          ${picture(`cover-${item.slug}`, { base, alt: photoAlt(`cover-${item.slug}`) || item.h1, sizes: '(min-width: 75rem) 68rem, 94vw', priority: true })}
         </div>
 
         <div class="article-layout">
           <article class="prose" id="article-content">
 ${item.body}
             ${faqBlock}
+            ${sourcesBlock}
+            <aside class="tool-bridge" aria-label="Passer à l’outil">
+              <p class="tool-bridge__eyebrow">Passer à la pratique</p>
+              <p class="tool-bridge__text">Essayez ce que vous venez de lire sur une photo de votre pièce : teinte, motif et sens de pose se changent en direct, sans rien envoyer sur un serveur.</p>
+              <div class="cluster">
+                <a class="btn btn--sm" href="${base}outils/visualiseur.html">Visualiser ma pièce</a>
+                <a class="link-arrow" href="${base}outils/simulateur-pose.html">Ou passer en mode plan</a>
+              </div>
+            </aside>
             <nav class="article-nav" aria-label="Poursuivre la lecture">
               ${linkArrow(`${base}${dir}`, `Tous les ${sectionLabel.toLowerCase()}`)}
-              ${linkArrow(`${base}outils/simulateur-pose.html`, 'Ouvrir le simulateur de pose')}
+              ${linkArrow(`${base}inspiration/`, 'Voir des ambiances')}
             </nav>
           </article>
 
@@ -316,7 +348,7 @@ function buildGuides() {
         <div class="wrap">
           <div class="listing-featured">
             <article class="feature-card" data-reveal>
-              <img src="../assets/images/cover-${featured.slug}.jpg" alt="" width="1400" height="875" decoding="async" fetchpriority="high" />
+              ${picture(`cover-${featured.slug}`, { base: '../', alt: '', sizes: '(min-width: 60rem) 45rem, 94vw', priority: true })}
               <p class="eyebrow">${featured.category}</p>
               <h2><a href="${featured.slug}.html">${featured.h1}</a></h2>
               <p>${featured.excerpt}</p>
@@ -409,8 +441,9 @@ function buildMotifs() {
         </div>
       </header>
 
-      <section class="section section--flush-top">
+      <section class="section section--flush-top" aria-labelledby="motifs-liste">
         <div class="wrap">
+          <h2 class="visually-hidden" id="motifs-liste">Tous les motifs de pose</h2>
           <div class="grid grid--3">
             ${MOTIFS.map(
               (motif) => `<a class="pattern-card" href="${motif.slug}.html" data-reveal>
@@ -491,10 +524,48 @@ function buildTutos() {
         </div>
       </header>
 
-      <section class="section section--flush-top">
+      <section class="section section--flush-top" aria-labelledby="tuto-liste">
         <div class="wrap">
+          <h2 class="visually-hidden" id="tuto-liste">Tous les tutoriels</h2>
           <div class="grid grid--3">
             ${TUTOS.map((tuto) => articleCard(tuto, '../', 'tutoriels/', tuto.level)).join('\n            ')}
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--alt" aria-labelledby="tuto-methode">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Ce que vous trouverez</p>
+              <h2 id="tuto-methode">Un tutoriel, quatre repères</h2>
+            </div>
+            <p class="lead">Tous suivent la même trame, pour que vous puissiez travailler avec la page ouverte à côté de vous.</p>
+          </div>
+          <ol class="steps-grid">
+            <li><span class="steps-grid__num">01</span><strong>L’outillage réellement nécessaire</strong><span>Ce qu’il faut sortir avant de commencer, et ce dont on peut se passer.</span></li>
+            <li><span class="steps-grid__num">02</span><strong>Le déroulé du chantier</strong><span>Les étapes dans l’ordre, avec ce qui se joue à chacune.</span></li>
+            <li><span class="steps-grid__num">03</span><strong>Les points de contrôle</strong><span>Ce qu’il faut vérifier avant de passer à la suite, tant que c’est rattrapable.</span></li>
+            <li><span class="steps-grid__num">04</span><strong>Les erreurs coûteuses</strong><span>Celles qui obligent à déposer, et comment les éviter.</span></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="tuto-outil">
+        <div class="wrap-wide">
+          <div class="tool-block">
+            <div class="tool-block__media">
+              <div data-vz-preview data-room="chambre" data-base="../"></div>
+            </div>
+            <div class="tool-block__body">
+              <p class="tool-block__num">Avant de commencer</p>
+              <h2 class="tool-block__title" id="tuto-outil">Voir le résultat avant de couper la première lame</h2>
+              <p class="lead">Le sens de pose et le motif se décident sur le papier, mais se jugent à l’œil. Essayez-les sur une photo de votre pièce.</p>
+              <div class="cluster">
+                <a class="btn" href="../outils/visualiseur.html">Visualiser ma pièce</a>
+                <a class="link-arrow" href="../guides/">Lire les guides</a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -518,12 +589,27 @@ function buildTutos() {
 function buildInspiration() {
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'Inspiration' }]);
   const gallery = INSPIRATIONS.map(
-    (item, index) => `<button class="gallery__item gallery__item--${item.size}" type="button"
-              data-lightbox-trigger="${item.title} — ${item.meta}" aria-label="Agrandir : ${item.title}">
-              <img src="../assets/images/inspi-${index + 1}.jpg" alt="${item.alt}" loading="lazy" decoding="async" width="900" height="700" />
-              <span class="gallery__caption"><span>${item.title}</span><span class="mono">${item.meta}</span></span>
-            </button>`
+    (item, index) => `<figure class="gallery__item gallery__item--${item.size}" data-tags="${item.tags}">
+              <button class="gallery__zoom" type="button"
+                data-lightbox-trigger="${item.title} — ${item.meta}" aria-label="Agrandir : ${item.title}">
+                ${picture(`inspi-${index + 1}`, { base: '../', alt: item.alt, sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw' })}
+              </button>
+              <figcaption class="gallery__caption">
+                <span>${item.title}</span>
+                <span class="mono">${item.meta}</span>
+                <a class="gallery__try" href="../outils/visualiseur.html?${item.try}">Essayer ce style ${ICON.arrow}</a>
+              </figcaption>
+            </figure>`
   ).join('\n            ');
+
+  // Filtres limités aux motifs réellement visibles dans les photographies.
+  const filters = [
+    ['all', 'Tout'],
+    ['droite', 'Lames droites'],
+    ['hongrie', 'Chevrons'],
+    ['sejour', 'Séjours'],
+    ['chambre', 'Chambres'],
+  ];
 
   const body = `      ${crumbs.html}
       <header class="page-hero">
@@ -538,10 +624,19 @@ function buildInspiration() {
 
       <section class="section section--flush-top">
         <div class="wrap-wide">
-          <div class="gallery">
+          <div class="filter-bar" data-filters="galerie" role="group" aria-label="Filtrer par motif">
+            ${filters
+              .map(
+                ([value, label], index) =>
+                  `<button class="filter-chip" type="button" data-filter-value="${value}" aria-pressed="${index === 0}">${label}</button>`
+              )
+              .join('\n            ')}
+          </div>
+          <div class="gallery" id="galerie">
             ${gallery}
           </div>
-          <p class="note-inline u-mt-5">${ICON.bulb.replace('<svg', '<svg width="18" height="18"')}<span>Photographies libres de droits (Pexels), listées dans <code>assets/images/CREDITS.md</code> et remplaçables par vos propres visuels.</span></p>
+          <p class="filter-empty" data-filters-empty="galerie" hidden>Aucune ambiance pour ce motif pour l’instant.</p>
+          <p class="note-inline u-mt-5">${ICON.bulb.replace('<svg', '<svg width="18" height="18"')}<span>Photographies publiées sur Pexels sous <a href="https://www.pexels.com/license/" rel="noopener">licence Pexels</a>, qui autorise l’usage sur un site. Auteurs et liens sources dans <code>assets/images/CREDITS.md</code>.</span></p>
         </div>
       </section>
 
@@ -592,32 +687,64 @@ function buildTools() {
       </header>
 
       <section class="section section--flush-top">
-        <div class="wrap">
-          <div class="grid grid--2">
-            <div class="tool-card" data-reveal>
-              <div class="tool-card__head"><h3>Visualiser ma pièce</h3><span class="badge badge--sage">Nouveau</span></div>
-              <p>Importez une photo de votre pièce ou choisissez une pièce d'exemple, puis essayez les teintes, les motifs et les sens de pose. Le parquet suit la perspective et récupère les ombres de la photo.</p>
+        <div class="wrap-wide tool-blocks">
+          <article class="tool-block" data-reveal>
+            <div class="tool-block__media">
+              <div data-vz-preview data-room="sejour" data-base="../"></div>
+            </div>
+            <div class="tool-block__body">
+              <p class="tool-block__num">Outil 01 <span class="badge badge--sage">Nouveau</span></p>
+              <h2 class="tool-block__title">Visualiser ma pièce</h2>
+              <p class="lead">Une photo de votre pièce, le sol délimité en quelques gestes, et le parquet posé dessus : teinte, motif, sens de pose et largeur de lame se changent en direct.</p>
+              <ul class="tool-block__points">
+                <li>Le parquet suit la perspective et reprend la lumière de la photo.</li>
+                <li>Le pinceau garde vos meubles, vos tapis et vos plinthes visibles.</li>
+                <li>Curseur avant / après, comparaison de deux versions, rendu à enregistrer.</li>
+                <li>Tout est calculé dans le navigateur : la photo n’est ni envoyée ni conservée.</li>
+              </ul>
               <div class="cluster">
                 <a class="btn" href="visualiseur.html">Ouvrir le visualiseur</a>
-                <a class="link-arrow" href="simulateur-pose.html">Passer en mode plan</a>
+                <a class="link-arrow" href="../inspiration/">Voir des ambiances à essayer</a>
               </div>
             </div>
-            <div class="tool-card" data-reveal data-reveal-delay="60">
-              <div class="tool-card__head"><h3>Mode plan</h3><span class="badge badge--sage">Disponible</span></div>
-              <p>Vue du dessus à l'échelle : dimensions de la pièce, largeur de lame, fenêtre et entrée. Surface, chutes estimées et nombre de lames sont recalculés à chaque changement — à titre indicatif.</p>
+          </article>
+
+          <article class="tool-block tool-block--reverse" data-reveal>
+            <div class="tool-block__media">
+              <div data-visualizer data-mode="compact" data-base="../"></div>
+            </div>
+            <div class="tool-block__body">
+              <p class="tool-block__num">Outil 02 <span class="badge badge--outline">Disponible</span></p>
+              <h2 class="tool-block__title">Mode plan</h2>
+              <p class="lead">Vue du dessus à l’échelle : dimensions de la pièce, largeur de lame, position de la fenêtre et de l’entrée. Utile pour trancher le sens de pose avant d’acheter.</p>
+              <ul class="tool-block__points">
+                <li>Cinq motifs, du droit au point de Hongrie.</li>
+                <li>Surface, nombre de lames et chutes estimées, recalculés à chaque changement.</li>
+                <li>Estimations indicatives : elles ne remplacent pas un calepinage de chantier.</li>
+              </ul>
               <div class="cluster">
                 <a class="btn btn--ghost" href="simulateur-pose.html">Ouvrir le mode plan</a>
                 <a class="link-arrow" href="../guides/quel-sens-de-pose-choisir.html">Comprendre le sens de pose</a>
               </div>
             </div>
-            <div class="tool-card tool-card--soon" data-reveal data-reveal-delay="80">
-              <div class="tool-card__head"><h3>Prochainement</h3><span class="badge badge--outline">En préparation</span></div>
-              <p>Les outils suivants viendront compléter le studio, avec la même logique : une question concrète, une réponse immédiate.</p>
-              <ul class="meta-list meta-list--stack">
-                ${roadmap.map(([title, text]) => `<li><strong>${title}</strong><span>${text}</span></li>`).join('')}
-              </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section section--alt" aria-labelledby="a-venir">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Feuille de route</p>
+              <h2 id="a-venir">Les outils qui suivront</h2>
             </div>
+            <p class="lead">Même logique à chaque fois : une question concrète, une réponse immédiate, aucune inscription.</p>
           </div>
+          <ul class="roadmap">
+            ${roadmap
+              .map(([title, text]) => `<li class="roadmap__item"><strong>${title}</strong><span>${text}</span></li>`)
+              .join('\n            ')}
+          </ul>
         </div>
       </section>
       ${ctaBand('../')}`;
@@ -840,17 +967,18 @@ function buildApropos() {
               <p>La documentation sur le parquet se partage entre catalogues commerciaux et notices techniques. Entre les deux, il manquait un endroit pour comprendre les décisions : pourquoi ce sens plutôt qu'un autre, ce que change réellement un ragréage, ce qui distingue deux motifs à chevrons.</p>
               <h2 id="methode">Notre méthode</h2>
               <p>Chaque contenu part d'une question concrète et se termine par une décision possible. Les chiffres cités correspondent aux pratiques courantes du métier et aux seuils usuels des documents techniques. Lorsqu'un sujet dépend du produit, nous le disons plutôt que de généraliser.</p>
+              <p><a class="link-arrow" href="methode-editoriale.html">Lire notre méthode éditoriale en détail</a></p>
               <h2 id="outils">Des outils plutôt que des promesses</h2>
               <p>Le simulateur de pose est le premier d'une série. L'objectif est simple : transformer une hésitation en visualisation, puis en décision.</p>
               <h2 id="independance">Indépendance</h2>
               <p>Le site ne vend rien et n'héberge aucune publicité. Quelques liens sortants pointent vers des ressources externes lorsqu'elles complètent le propos, sans contrepartie éditoriale.</p>
             </div>
             <div class="stack stack--lg">
-              <img src="../assets/images/apropos-studio.jpg" alt="Comparaison d’échantillons de bois et de matières sur un plan de travail" width="1400" height="875" loading="lazy" decoding="async" class="aside-image" />
+              ${picture('apropos-studio', { base: '../', alt: 'Comparaison d’échantillons de bois et de matières sur un plan de travail', sizes: '(min-width: 60rem) 45rem, 94vw', attrs: 'class="aside-image"' })}
               <div class="figures">
                 <div class="figure-item"><strong>${GUIDES.length + MOTIFS.length + TUTOS.length}</strong><span>contenus publiés</span></div>
                 <div class="figure-item"><strong>5</strong><span>motifs simulés</span></div>
-                <div class="figure-item"><strong>0</strong><span>produit vendu</span></div>
+                <div class="figure-item"><strong>6</strong><span>pièces d’exemple</span></div>
               </div>
             </div>
           </div>
@@ -865,6 +993,81 @@ function buildApropos() {
       description:
         "Pose Parquet est un média indépendant consacré à la pose du parquet : guides, motifs, tutoriels et outils de visualisation. Aucune vente, aucune publicité.",
       path: 'a-propos/index.html',
+      depth: 1,
+      css: ['css/pages/listing.css'],
+      jsonld: [crumbs.jsonld],
+      body,
+    })
+  );
+}
+
+function buildMethode() {
+  const crumbs = breadcrumb('../', [
+    { label: 'Accueil', href: 'index.html' },
+    { label: 'À propos', href: 'a-propos/' },
+    { label: 'Méthode éditoriale' },
+  ]);
+
+  const body = `      ${crumbs.html}
+      <header class="page-hero">
+        <div class="wrap-wide page-hero__grid">
+          <div>
+            <p class="eyebrow">À propos</p>
+            <h1 class="page-hero__title">Notre méthode éditoriale</h1>
+          </div>
+          <p class="page-hero__lead">Comment les contenus de ce site sont écrits, vérifiés et corrigés — et ce que nous ne prétendons pas être.</p>
+        </div>
+      </header>
+
+      <section class="section section--flush-top">
+        <div class="wrap">
+          <div class="prose">
+            <h2 id="qui">Qui écrit</h2>
+            <p>Les contenus sont écrits par la rédaction de ${SITE.name}, un site éditorial indépendant. Nous ne mettons pas en avant de nom d'expert, de titre professionnel ou de certification : ce serait donner à nos textes une autorité que nous n'avons pas. Ce que nous pouvons revendiquer, c'est un travail de lecture des documents techniques de référence et un souci de dire ce que nous ne savons pas.</p>
+
+            <h2 id="construction">Comment un contenu est construit</h2>
+            <ol>
+              <li>Une question concrète, celle que l'on se pose réellement avant un chantier.</li>
+              <li>Les critères qui permettent de trancher, dans leur ordre d'importance.</li>
+              <li>Les cas où la réponse change : support, produit, configuration de la pièce.</li>
+              <li>Une décision possible à la fin, jamais une simple liste d'options.</li>
+            </ol>
+
+            <h2 id="verification">Ce que nous vérifions</h2>
+            <p>Les seuils chiffrés (planéité, humidité, taux de chutes, jeux périphériques) sont confrontés aux documents techniques de référence — les normes NF DTU de la série 51 pour la pose des parquets — et aux pratiques courantes du métier. Lorsqu'une valeur dépend du produit ou du support, nous l'écrivons plutôt que de donner un chiffre unique rassurant mais faux.</p>
+            <p>Les estimations produites par nos outils (surface, nombre de lames, chutes) sont des ordres de grandeur calculés à partir de règles simples. Elles sont présentées comme telles et ne remplacent pas un calepinage de chantier.</p>
+
+            <h2 id="limites">Ce que nous ne faisons pas</h2>
+            <ul>
+              <li>Nous ne testons pas de produits et ne publions pas de comparatifs de marques.</li>
+              <li>Nous n'inventons pas de témoignages, d'avis d'artisans ni de retours de chantier.</li>
+              <li>Nous ne reproduisons pas le texte des normes : elles sont payantes et protégées. Nous y renvoyons.</li>
+              <li>Nous n'annonçons pas une fonctionnalité automatique ou « intelligente » qui n'existe pas réellement dans nos outils.</li>
+            </ul>
+
+            <h2 id="sources">Nos sources</h2>
+            <p>Les références citées en bas d'article sont réelles et consultables. Elles renvoient principalement aux normes NF DTU éditées par AFNOR, au CSTB et à l'institut technologique FCBA. Nous ne citons pas une source que nous n'avons pas consultée.</p>
+
+            <h2 id="images">Photographies et illustrations</h2>
+            <p>Les photographies proviennent de Pexels et sont utilisées dans le cadre de la licence Pexels, qui en autorise l'usage sur un site. Auteurs et liens vers les originaux sont listés dans le fichier <code>assets/images/CREDITS.md</code> du site. Les schémas sont produits par nos soins. Les rendus du visualiseur sont des simulations, jamais des photographies de chantier.</p>
+
+            <h2 id="independance">Indépendance et liens sortants</h2>
+            <p>Le site ne vend rien et n'affiche aucune publicité. Quelques liens renvoient vers des sites professionnels du secteur, dont <a href="https://premibel.fr" rel="noopener">premibel.fr</a>, lorsqu'ils documentent un point précis mieux que nous. Ces liens sont visibles dans le texte et ne modifient pas nos recommandations.</p>
+
+            <h2 id="corrections">Corrections et mises à jour</h2>
+            <p>Chaque article affiche sa date de publication et, le cas échéant, sa date de mise à jour. Une erreur factuelle signalée est corrigée, et la date de mise à jour est modifiée en conséquence. Pour nous signaler une inexactitude, écrivez-nous depuis la <a href="../contact/">page contact</a>.</p>
+          </div>
+        </div>
+      </section>
+      ${ctaBand('../')}`;
+
+  write(
+    'a-propos/methode-editoriale.html',
+    layout({
+      title: 'Notre méthode éditoriale | Pose Parquet',
+      description:
+        "Comment les contenus de Pose Parquet sont écrits, vérifiés et corrigés : sources, limites assumées, indépendance et politique de mise à jour.",
+      path: 'a-propos/methode-editoriale.html',
       depth: 1,
       css: ['css/pages/listing.css'],
       jsonld: [crumbs.jsonld],
@@ -927,35 +1130,43 @@ function build404() {
 }
 
 function buildMeta() {
+  const today = new Date().toISOString().slice(0, 10);
+  const page = (url, priority, lastmod) => ({ url, priority, lastmod: lastmod || today });
+  const article = (dir) => (item) =>
+    page(`${dir}/${item.slug}.html`, '0.7', item.updated || item.date);
+
   const urls = [
-    'index.html',
-    'guides/index.html',
-    ...GUIDES.map((guide) => `guides/${guide.slug}.html`),
-    'motifs/index.html',
-    ...MOTIFS.map((motif) => `motifs/${motif.slug}.html`),
-    'tutoriels/index.html',
-    ...TUTOS.map((tuto) => `tutoriels/${tuto.slug}.html`),
-    'inspiration/index.html',
-    'outils/index.html',
-    'outils/simulateur-pose.html',
-    'projet/index.html',
-    'contact/index.html',
-    'a-propos/index.html',
+    page('index.html', '1.0'),
+    page('guides/index.html', '0.8'),
+    ...GUIDES.map(article('guides')),
+    page('motifs/index.html', '0.8'),
+    ...MOTIFS.map(article('motifs')),
+    page('tutoriels/index.html', '0.8'),
+    ...TUTOS.map(article('tutoriels')),
+    page('inspiration/index.html', '0.8'),
+    page('outils/index.html', '0.8'),
+    page('outils/visualiseur.html', '0.9'),
+    page('outils/simulateur-pose.html', '0.8'),
+    page('projet/index.html', '0.7'),
+    page('contact/index.html', '0.5'),
+    page('a-propos/index.html', '0.5'),
+    page('a-propos/methode-editoriale.html', '0.5'),
   ];
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemap.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls
   .map(
-    (url) => `  <url>
-    <loc>${SITE.domain}/${url.replace(/index\.html$/, '')}</loc>
+    (entry) => `  <url>
+    <loc>${SITE.domain}/${entry.url.replace(/index\.html$/, '')}</loc>
+    <lastmod>${entry.lastmod}</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>${url === 'index.html' ? '1.0' : url.endsWith('index.html') ? '0.8' : '0.7'}</priority>
+    <priority>${entry.priority}</priority>
   </url>`
   )
   .join('\n')}
 </urlset>
-`.replace('www.sitemap.org', 'www.sitemaps.org');
+`;
 
   write('sitemap.xml', sitemap);
   write(
@@ -966,6 +1177,7 @@ Allow: /
 Sitemap: ${SITE.domain}/sitemap.xml
 `
   );
+
 }
 
 /* ------------------------------------------------------------------ */
@@ -994,6 +1206,7 @@ buildVisualiseurPage(write);
 buildProjet();
 buildContact();
 buildApropos();
+buildMethode();
 build404();
 buildMeta();
 
