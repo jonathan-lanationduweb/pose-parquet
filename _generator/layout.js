@@ -1,4 +1,5 @@
 /* Gabarit HTML commun : head, header, footer. Génère des fichiers statiques. */
+const { assets } = require('./assets');
 const SITE = {
   name: 'Pose Parquet',
   domain: 'https://pose-parquet.com',
@@ -169,9 +170,9 @@ function breadcrumb(p, trail) {
 function layout(page) {
   const p = page.depth === 0 ? '' : '../';
   const canonical = `${SITE.domain}/${page.path}`.replace(/index\.html$/, '');
-  const extraCss = (page.css || [])
-    .map((href) => `\n    <link rel="stylesheet" href="${p}${href}" />`)
-    .join('');
+  // Les feuilles de page sont déjà dans le bundle : plus rien à charger ici.
+  // `page.css` reste accepté pour la lisibilité des appels, sans effet.
+  const build = assets();
   const jsonld = (page.jsonld || [])
     .map((data) => `\n    <script type="application/ld+json">${JSON.stringify(data)}</script>`)
     .join('');
@@ -196,14 +197,14 @@ function layout(page) {
     <meta property="og:url" content="${canonical}" />
     <meta property="og:image" content="${ogImage}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="icon" href="${p}assets/icons/favicon.svg" type="image/svg+xml" />
-    <link rel="icon" href="${p}assets/icons/favicon-32.png" sizes="32x32" type="image/png" />
-    <link rel="apple-touch-icon" href="${p}assets/icons/apple-touch-icon.png" />
-    <link rel="manifest" href="${p}site.webmanifest" />
+    <link rel="icon" href="${p}assets/icons/favicon.svg?v=${build.icons}" type="image/svg+xml" />
+    <link rel="icon" href="${p}assets/icons/favicon-32.png?v=${build.icons}" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="${p}assets/icons/apple-touch-icon.png?v=${build.icons}" />
+    <link rel="manifest" href="${p}site.webmanifest?v=${build.icons}" />
     <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/inter-400-1.woff2" crossorigin />
-    <link rel="stylesheet" href="${p}css/main.css" />${extraCss}
-    <script type="module" src="${p}js/main.js"></script>${jsonld}
+    <link rel="stylesheet" href="${p}${build.css}" />
+    <script type="module" src="${p}${build.js}"></script>${jsonld}
   </head>
   <body class="page">
     ${header(p)}
@@ -227,6 +228,7 @@ ${page.body}
  */
 function appLayout(page) {
   const p = page.depth === 0 ? '' : '../';
+  const build = assets();
   const canonical = `${SITE.domain}/${page.path}`;
   return `<!doctype html>
 <html lang="fr">
@@ -238,14 +240,14 @@ function appLayout(page) {
     <meta name="robots" content="noindex, follow" />
     <link rel="canonical" href="${canonical}" />
     <meta name="theme-color" content="#101214" />
-    <link rel="icon" href="${p}assets/icons/favicon.svg" type="image/svg+xml" />
-    <link rel="icon" href="${p}assets/icons/favicon-32.png" sizes="32x32" type="image/png" />
-    <link rel="apple-touch-icon" href="${p}assets/icons/apple-touch-icon.png" />
-    <link rel="manifest" href="${p}site.webmanifest" />
+    <link rel="icon" href="${p}assets/icons/favicon.svg?v=${build.icons}" type="image/svg+xml" />
+    <link rel="icon" href="${p}assets/icons/favicon-32.png?v=${build.icons}" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="${p}assets/icons/apple-touch-icon.png?v=${build.icons}" />
+    <link rel="manifest" href="${p}site.webmanifest?v=${build.icons}" />
     <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/inter-400-1.woff2" crossorigin />
     <link rel="preload" as="fetch" href="${p}data/parquets.json" crossorigin />
-    <link rel="stylesheet" href="${p}css/studio.css" />
-    <script type="module" src="${p}js/studio/main.js"></script>
+    <link rel="stylesheet" href="${p}${build.studioCss}" />
+    <script type="module" src="${p}${build.studioJs}"></script>
   </head>
   <body class="app">
     <div data-studio data-base="${p}">
