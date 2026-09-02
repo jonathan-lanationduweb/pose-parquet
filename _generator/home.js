@@ -153,7 +153,12 @@ function simulatorSection() {
               </p>
             </div>
           </div>
-          <div data-vz-preview data-room="sejour" data-base="" data-reveal></div>
+          <!-- Scène de l'avant/après : uniquement une scène VALIDÉE sur les cinq
+               critères de _calibrage/scene-review.html. « chambre » est la seule à
+               l'être — géométrie mesurée sur trois murs, recoupée par un contrôle
+               d'invariance. « sejour » reste à « correct » : la brillance du sol
+               d'origine n'est pas restituée. -->
+          <div data-vz-preview data-room="chambre" data-base="" data-reveal></div>
         </div>
       </section>`;
 }

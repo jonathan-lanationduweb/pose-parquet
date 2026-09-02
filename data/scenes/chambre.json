@@ -12,11 +12,23 @@
     "credit": "Max Vakhtbovych / Pexels"
   },
   "camera": {
-    "horizon": 0.45,
+    "horizon": 0.4955,
     "vanishingPoints": [
-      { "x": 0.56, "y": 0.45, "weight": 0.85 }
+      {
+        "x": 0.7703,
+        "y": 0.4955,
+        "weight": 1,
+        "role": "murs-lateraux"
+      },
+      {
+        "x": -0.069,
+        "y": 0.4955,
+        "weight": 0.85,
+        "role": "mur-du-fond"
+      }
     ],
-    "heightM": 1.5
+    "heightM": 1.5,
+    "focalPx": 627
   },
   "surfaces": [
     {
@@ -28,14 +40,33 @@
   "planes": {
     "sol": {
       "quad": [
-        { "x": 0.23, "y": 0.578 },
-        { "x": 0.79, "y": 0.578 },
-        { "x": 1.05, "y": 0.995 },
-        { "x": -0.03, "y": 0.995 }
+        {
+          "x": 0.5297,
+          "y": 0.6189
+        },
+        {
+          "x": 0.25,
+          "y": 0.7624
+        },
+        {
+          "x": 1.4469,
+          "y": 1.764
+        },
+        {
+          "x": 0.874,
+          "y": 0.6899
+        }
       ],
-      "meters": { "width": 4, "depth": 4 },
-      "origin": { "u": 0, "v": 0 },
-      "rotationDeg": 0
+      "meters": {
+        "width": 4.66,
+        "depth": 4.6
+      },
+      "origin": {
+        "u": 0,
+        "v": 0
+      },
+      "rotationDeg": 0,
+      "note": "Trois murs visibles, trois droites ajustees sur le contour de sol deja valide : mur gauche (4 points, ecart max 0,0034), mur du fond (4 points, 0,0040), mur droit (3 points, 0,0047). Les murs gauche et droit sont paralleles dans la piece, donc leur intersection EST le point de fuite : (0,7703 ; 0,4955), obtenu sans supposer d horizon. L horizon vaut donc 0,4955 et non 0,45 comme declare avant. Le mur du fond fuit vers (-0,069 ; 0,4955) : les deux fuites encadrent le centre de l image, la focale s en deduit (627 px, champ 104 degres). u suit les murs lateraux, donc la profondeur de la piece. Controle : les cotes opposes du quadrilatere se correspondent a 0 pres, et l etendue du sol deduite est invariante quel que soit le rectangle de reference choisi — 6,18 m sur u et 4,67 m sur v, soit 26,3 lames de 18 cm en travers."
     }
   },
   "floorZones": [
@@ -47,18 +78,54 @@
       "order": 0,
       "mask": {
         "polygon": [
-          { "x": 0, "y": 0.892 },
-          { "x": 0.31, "y": 0.783 },
-          { "x": 0.33, "y": 0.718 },
-          { "x": 0.42, "y": 0.675 },
-          { "x": 0.53, "y": 0.621 },
-          { "x": 0.7, "y": 0.65 },
-          { "x": 0.86, "y": 0.688 },
-          { "x": 0.874, "y": 0.691 },
-          { "x": 0.94, "y": 0.807 },
-          { "x": 1, "y": 0.926 },
-          { "x": 1, "y": 1 },
-          { "x": 0, "y": 1 }
+          {
+            "x": 0,
+            "y": 0.892
+          },
+          {
+            "x": 0.31,
+            "y": 0.783
+          },
+          {
+            "x": 0.33,
+            "y": 0.718
+          },
+          {
+            "x": 0.42,
+            "y": 0.675
+          },
+          {
+            "x": 0.53,
+            "y": 0.621
+          },
+          {
+            "x": 0.7,
+            "y": 0.65
+          },
+          {
+            "x": 0.86,
+            "y": 0.688
+          },
+          {
+            "x": 0.874,
+            "y": 0.691
+          },
+          {
+            "x": 0.94,
+            "y": 0.807
+          },
+          {
+            "x": 1,
+            "y": 0.926
+          },
+          {
+            "x": 1,
+            "y": 1
+          },
+          {
+            "x": 0,
+            "y": 1
+          }
         ],
         "holes": []
       }
@@ -70,11 +137,26 @@
       "label": "Grille de ventilation",
       "kind": "fixture",
       "polygon": [
-        { "x": 0, "y": 0.876 },
-        { "x": 0.315, "y": 0.779 },
-        { "x": 0.322, "y": 0.818 },
-        { "x": 0.026, "y": 0.913 },
-        { "x": 0, "y": 0.922 }
+        {
+          "x": 0,
+          "y": 0.876
+        },
+        {
+          "x": 0.315,
+          "y": 0.779
+        },
+        {
+          "x": 0.322,
+          "y": 0.818
+        },
+        {
+          "x": 0.026,
+          "y": 0.913
+        },
+        {
+          "x": 0,
+          "y": 0.922
+        }
       ],
       "depth": 0.62,
       "castsShadow": false,
@@ -83,8 +165,9 @@
   ],
   "light": {
     "kind": "photo-luma",
-    "strength": 1,
+    "strength": 0.85,
     "blurRadius": 0.028,
-    "tint": 0.45
+    "tint": 0.45,
+    "ambient": 0.24
   }
 }

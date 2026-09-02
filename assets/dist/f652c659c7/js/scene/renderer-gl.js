@@ -119,7 +119,12 @@ void main() {
     specular = texture(uGloss, texel).r * uGlossGain * (1.0 - relief.b) * near;
   }
 
-  vec3 color = albedo * gain * (bump * lit.a) + vec3(0.82, 0.80, 0.76) * specular;
+  // Le reflet emprunte sa couleur au bois plutôt qu'au blanc, et s'atténue sur
+  // les teintes sombres. Un ajout quasi blanc sur un albédo foncé ne fait pas
+  // briller la matière : il la délave, et la tache de soleil part au gris.
+  float aLum = dot(albedo, vec3(0.2126, 0.7152, 0.0722));
+  vec3 teinteReflet = mix(albedo, vec3(0.82, 0.80, 0.76), 0.55);
+  vec3 color = albedo * gain * (bump * lit.a) + teinteReflet * specular * (0.35 + 0.65 * aLum);
 
   // Genou doux sur les hautes lumières. Dans une tache de soleil, un simple
   // écrêtage à 1 efface le bois : la zone devient un aplat blanc. Ici les

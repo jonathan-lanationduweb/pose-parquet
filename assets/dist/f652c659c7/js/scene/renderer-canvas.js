@@ -267,9 +267,14 @@ export function createCanvasRenderer() {
             // Genou doux sur les hautes lumières : dans une tache de soleil,
             // un simple écrêtage à 255 efface le bois et laisse un aplat
             // blanc. Au-delà de 219, on comprime au lieu de couper.
-            const r = knee(acc[0] * gainR * factor + specular * 210);
-            const gg = knee(acc[1] * gainG * factor + specular * 205);
-            const bb = knee(acc[2] * gainB * factor + specular * 195);
+            // Le reflet emprunte sa couleur au bois et s'atténue sur les
+            // teintes sombres : même formule que le shader, cf. `teinteReflet`
+            // dans renderer-gl.js.
+            const aLum = (0.2126 * acc[0] + 0.7152 * acc[1] + 0.0722 * acc[2]) / 255;
+            const dose = specular * (0.35 + 0.65 * aLum);
+            const r = knee(acc[0] * gainR * factor + (acc[0] * 0.45 + 210 * 0.55) * dose);
+            const gg = knee(acc[1] * gainG * factor + (acc[1] * 0.45 + 205 * 0.55) * dose);
+            const bb = knee(acc[2] * gainB * factor + (acc[2] * 0.45 + 195 * 0.55) * dose);
 
             // Écriture : un bloc px × px en rendu allégé, chaque pixel gardant
             // sa propre couverture pour que les bords restent nets.

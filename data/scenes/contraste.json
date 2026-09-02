@@ -12,11 +12,23 @@
     "credit": "sanket mahind / Pexels"
   },
   "camera": {
-    "horizon": 0.5,
+    "horizon": 0.54,
     "vanishingPoints": [
-      { "x": 0.5, "y": 0.5, "weight": 0.6 }
+      {
+        "x": 0.5,
+        "y": 0.54,
+        "weight": 0.6,
+        "role": "profondeur"
+      },
+      {
+        "x": -16.67,
+        "y": 0.54,
+        "weight": 0.4,
+        "role": "le-long-du-mur"
+      }
     ],
-    "heightM": 1.4
+    "heightM": 1.4,
+    "focalPx": 640
   },
   "surfaces": [
     {
@@ -28,14 +40,33 @@
   "planes": {
     "sol": {
       "quad": [
-        { "x": 0.09, "y": 0.6 },
-        { "x": 0.91, "y": 0.6 },
-        { "x": 1.05, "y": 1.02 },
-        { "x": -0.05, "y": 1.02 }
+        {
+          "x": 0.15,
+          "y": 0.7418
+        },
+        {
+          "x": 0.85,
+          "y": 0.7502
+        },
+        {
+          "x": 1.3291,
+          "y": 1.0379
+        },
+        {
+          "x": -0.2861,
+          "y": 0.9932
+        }
       ],
-      "meters": { "width": 4, "depth": 3.8 },
-      "origin": { "u": 0, "v": 0 },
-      "rotationDeg": 0
+      "meters": {
+        "width": 7.14,
+        "depth": 2.31
+      },
+      "origin": {
+        "u": 0,
+        "v": 0
+      },
+      "rotationDeg": 0,
+      "note": "ATTENTION : c est la seule des quatre scenes dont la geometrie n est PAS mesurable dans la photo. Le mur est quasi frontal (pied du mur releve a pente 0,012) et la bande de sol est tres basse : aucune ligne du sol orthogonale au mur n est visible, donc rien ne contraint la hauteur de l horizon. Le quadrilatere est construit correctement — bord lointain sur le pied du mur releve, cotes vers la fuite de profondeur (0,5 ; 0,54), bord proche vers la fuite laterale (-16,67 ; 0,54) — et les cotes opposes se correspondent a 0 pres. Mais l horizon 0,54 et la focale 0,40xW sont une HYPOTHESE, choisie parce qu elle place le mur a 4,08 m, distance coherente avec le cadrage. u suit le mur, comme les lames du sol d origine. Scene secondaire : ne pas la mettre en avant."
     }
   },
   "floorZones": [
@@ -47,11 +78,26 @@
       "order": 0,
       "mask": {
         "polygon": [
-          { "x": 0, "y": 0.74 },
-          { "x": 0.5, "y": 0.748 },
-          { "x": 1, "y": 0.752 },
-          { "x": 1, "y": 1 },
-          { "x": 0, "y": 1 }
+          {
+            "x": 0,
+            "y": 0.74
+          },
+          {
+            "x": 0.5,
+            "y": 0.748
+          },
+          {
+            "x": 1,
+            "y": 0.752
+          },
+          {
+            "x": 1,
+            "y": 1
+          },
+          {
+            "x": 0,
+            "y": 1
+          }
         ],
         "holes": []
       }
@@ -60,9 +106,10 @@
   "occluders": [],
   "light": {
     "kind": "photo-luma",
-    "strength": 1,
+    "strength": 0.85,
     "blurRadius": 0.014,
     "tint": 0.4,
-    "contact": 0.3
+    "contact": 0.3,
+    "ambient": 0.22
   }
 }

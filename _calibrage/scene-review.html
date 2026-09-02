@@ -6,22 +6,35 @@
 <meta name="robots" content="noindex, nofollow" />
 <title>Revue visuelle des scènes — outil interne</title>
 <style>
-  :root { color-scheme: dark; --line: #2c3230; }
+  :root { color-scheme: dark; --line: #2c3230; --ink: #e6ebe8; --dim: #9aa5a0; }
   * { box-sizing: border-box; }
-  body { margin: 0; font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; background: #141817; color: #e6ebe8; }
+  body { margin: 0; font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; background: #141817; color: var(--ink); }
   header { position: sticky; top: 0; z-index: 5; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
            padding: 9px 14px; border-bottom: 1px solid var(--line); background: #141817ee; backdrop-filter: blur(8px); }
   select, button, label { font: inherit; }
   button { background: #1e2422; color: inherit; border: 1px solid var(--line); border-radius: 6px; padding: 5px 9px; cursor: pointer; }
-  button[aria-pressed="true"] { background: #3d7a5f; border-color: #3d7a5f; }
-  h2 { font: 600 13px/1.3 ui-monospace, monospace; margin: 22px 14px 8px; padding-top: 10px; border-top: 1px solid var(--line); }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--cell, 420px), 1fr)); gap: 10px; padding: 0 14px; }
+  h2 { font: 600 13px/1.3 ui-monospace, monospace; margin: 24px 14px 8px; padding-top: 12px;
+       border-top: 1px solid var(--line); display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  h2 .verdict { font-size: 11px; padding: 2px 8px; border-radius: 999px; }
+  h2 .note { color: var(--dim); font-weight: 400; }
+
+  /* Cinq colonnes strictement identiques : c'est la condition pour comparer.
+     Aucun redimensionnement propre à une colonne. */
+  .grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; padding: 0 14px; align-items: start; }
+  @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   figure { margin: 0; background: #0d0f0f; border-radius: 8px; overflow: hidden; }
-  figure canvas, figure img { display: block; width: 100%; height: auto; }
-  figcaption { padding: 6px 9px; font-size: 11px; color: #9fd0b8; display: flex; justify-content: space-between; gap: 8px; }
-  figcaption b { color: #e6ebe8; font-weight: 600; }
-  #log { white-space: pre-wrap; padding: 10px 14px 30px; color: #9fd0b8; font-size: 11px; }
-  .zoom { --cell: 100%; }
+  figure canvas { display: block; width: 100%; height: auto; }
+  figcaption { padding: 6px 9px 8px; }
+  figcaption .titre { display: flex; justify-content: space-between; gap: 8px; font-weight: 600; }
+  figcaption .titre span { color: var(--dim); font-weight: 400; }
+  .criteres { margin: 6px 0 0; display: grid; gap: 2px; }
+  .critere { display: flex; justify-content: space-between; gap: 6px; align-items: center; color: var(--dim); }
+  .etat { font-size: 10px; padding: 1px 6px; border-radius: 999px; white-space: nowrap; }
+  .etat[data-e="valide"]   { background: #1d4634; color: #86e3b4; }
+  .etat[data-e="correct"]  { background: #3d3a1c; color: #ded08a; }
+  .etat[data-e="a-revoir"] { background: #4a2222; color: #f0a3a3; }
+  .etat[data-e="s-o"]      { background: #262c2a; color: #7d8888; }
+  #log { white-space: pre-wrap; padding: 12px 14px 40px; color: #9fd0b8; font-size: 11px; }
 </style>
 </head>
 <body>
@@ -29,12 +42,6 @@
   <strong>Revue visuelle</strong>
   <label>Scène <select id="scene"><option value="">toutes</option></select></label>
   <button id="run">Rendre</button>
-  <label>Cellule <select id="cell">
-    <option value="420">420 px</option>
-    <option value="560">560 px</option>
-    <option value="760">760 px</option>
-    <option value="100%">pleine largeur</option>
-  </select></label>
   <span id="state"></span>
 </header>
 <div id="out"></div>
@@ -42,17 +49,22 @@
 
 <script type="module">
 /**
- * Grille de contrôle visuel des scènes de démonstration.
+ * Source visuelle de contrôle qualité des scènes de démonstration.
  *
  * Elle existe parce qu'une mesure de pixels ne dit pas si un parquet a l'air
  * d'appartenir à la pièce. « Le mur est identique à l'octet » prouve qu'on n'a
- * rien débordé ; ça ne prouve pas que la perspective est juste, que l'échelle
- * des lames est plausible, ni que le raccord entre deux pièces est crédible.
+ * rien débordé ; ça ne prouve ni que la perspective suit l'architecture, ni
+ * que l'échelle des lames est plausible, ni qu'un chevron reste crédible.
  *
- * Pour chaque scène : l'original, puis trois teintes en pose droite, puis les
- * deux motifs en chevron — tous au même cadrage, côte à côte. Les défauts de
- * masque, d'échelle, de fuite et de lumière sautent aux yeux dans cette
- * disposition, et seulement dans celle-là.
+ * Chaque scène est affichée en cinq vues **au même cadrage et à la même
+ * taille** : original, pose droite en chêne naturel, pose droite en chêne
+ * fumé, point de Hongrie, bâton rompu. Les colonnes sont strictement
+ * identiques — un redimensionnement différent d'une colonne à l'autre suffit
+ * à masquer un défaut d'échelle.
+ *
+ * Les statuts sous chaque vue viennent de `VERDICTS`, tenu à la main. Rien
+ * n'est déclaré « Validé » par le programme : un rendu n'est validé que
+ * lorsqu'un humain l'a regardé et l'a écrit ici.
  *
  * Page interne : ni liée, ni indexée, ni déployée.
  */
@@ -65,23 +77,94 @@ const BASE = '../';
 const $ = (id) => document.getElementById(id);
 const log = (line) => { $('log').textContent += line + '\n'; };
 
+/** Les cinq vues de contrôle, dans cet ordre, pour toutes les scènes. */
+const VUES = [
+  { cle: 'original', label: 'Original', original: true },
+  { cle: 'droit-naturel', label: 'Droit naturel', material: 'chene-naturel', pattern: 'lames' },
+  { cle: 'droit-fume', label: 'Droit fumé', material: 'chene-fume', pattern: 'lames' },
+  { cle: 'point-de-hongrie', label: 'Point de Hongrie', material: 'chene-naturel', pattern: 'point-de-hongrie' },
+  { cle: 'baton-rompu', label: 'Bâton rompu', material: 'chene-naturel', pattern: 'baton-rompu' },
+];
+
+const CRITERES = ['Perspective', 'Échelle', 'Masque', 'Lumière', 'Motif'];
+
+/**
+ * Jugement humain, vue par vue et critère par critère.
+ *
+ * `valide` : regardé, rien à reprendre.
+ * `correct` : acceptable, un défaut mineur subsiste et il est nommé en note.
+ * `a-revoir` : défaut visible, la scène n'est pas livrable en l'état.
+ *
+ * Tout ce qui n'est pas écrit ici vaut `a-revoir` : l'absence de jugement
+ * n'est pas une validation.
+ */
+const TOUT_VALIDE = { Perspective: 'valide', 'Échelle': 'valide', Masque: 'valide', 'Lumière': 'valide', Motif: 'valide' };
+
+const VERDICTS = {
+  chambre: {
+    note: 'Trois murs ajustés (écarts 0,003–0,005) ; horizon corrigé de 0,45 à 0,4955 par intersection des deux murs '
+      + 'latéraux, qui sont parallèles dans la pièce. Côtés opposés concordants à 0 %, et étendue du sol invariante '
+      + 'quel que soit le rectangle de référence : 6,18 × 4,67 m, 26,3 lames de 18 cm en travers. Dix sommets de '
+      + 'contour inspectés à ×3, seuil à ×4.',
+    vues: {
+      'droit-naturel': { ...TOUT_VALIDE },
+      'droit-fume': { ...TOUT_VALIDE },
+      'point-de-hongrie': { ...TOUT_VALIDE },
+      'baton-rompu': { ...TOUT_VALIDE },
+    },
+  },
+  sejour: {
+    note: 'Deux zones, trame continue à travers l’ouverture. Plan sur le pied du mur droit (7 points, écart 0,0016) '
+      + 'et le seuil ; côtés opposés concordants à 0,1 %. Vingt-et-un sommets inspectés à ×3. Lumière « correct » et '
+      + 'non « validé » : le vernis très brillant du sol d’origine n’est pas restitué — choix assumé, un mat reste '
+      + 'mat — mais le Fumé paraît de ce fait plus éteint que la photo ne le suggère.',
+    vues: {
+      'droit-naturel': { ...TOUT_VALIDE, 'Lumière': 'correct' },
+      'droit-fume': { ...TOUT_VALIDE, 'Lumière': 'correct' },
+      'point-de-hongrie': { ...TOUT_VALIDE, 'Lumière': 'correct' },
+      'baton-rompu': { ...TOUT_VALIDE, 'Lumière': 'correct' },
+    },
+  },
+  'piece-claire': {
+    note: 'Les deux fuites tombent du même côté du centre : la focale n’est pas déductible, donc l’horizon n’est pas '
+      + 'vérifié indépendamment — d’où « Perspective : correct » et non « validé ». Le résultat visible est juste '
+      + '(lames sur la fuite du mur droit) et l’échelle est recoupée par comptage : 5,69 × 3,76 m, 21 lames. Neuf '
+      + 'sommets inspectés à ×3 ; la bande épargnée derrière le meuble est la plinthe bois, pas un trou.',
+    vues: {
+      'droit-naturel': { ...TOUT_VALIDE, Perspective: 'correct' },
+      'droit-fume': { ...TOUT_VALIDE, Perspective: 'correct' },
+      'point-de-hongrie': { ...TOUT_VALIDE, Perspective: 'correct' },
+      'baton-rompu': { ...TOUT_VALIDE, Perspective: 'correct' },
+    },
+  },
+  contraste: {
+    note: 'Seule scène dont la géométrie n’est PAS mesurable : mur frontal, bande de sol très basse, aucune ligne du '
+      + 'sol orthogonale visible — rien ne contraint l’horizon, et 0,54 est une hypothèse (elle place le mur à '
+      + '4,08 m). La construction est correcte pour cette hypothèse : côtés opposés à 0 %. Sa force est la lumière : '
+      + 'l’ombre de fenêtre passe avec son arête franche et le bois reste lisible dans la tache de soleil. Les motifs '
+      + 'en chevron restent peu lisibles sur une bande aussi basse. Scène secondaire : ne pas la mettre en avant.',
+    vues: {
+      'droit-naturel': { Perspective: 'correct', 'Échelle': 'correct', Masque: 'valide', 'Lumière': 'valide', Motif: 'correct' },
+      'droit-fume': { Perspective: 'correct', 'Échelle': 'correct', Masque: 'valide', 'Lumière': 'valide', Motif: 'correct' },
+      'point-de-hongrie': { Perspective: 'correct', 'Échelle': 'correct', Masque: 'valide', 'Lumière': 'valide', Motif: 'correct' },
+      'baton-rompu': { Perspective: 'correct', 'Échelle': 'correct', Masque: 'valide', 'Lumière': 'valide', Motif: 'correct' },
+    },
+  },
+};
+
+const etatDe = (sceneId, vueCle, critere) => {
+  const v = VERDICTS[sceneId];
+  if (!v || !v.vues[vueCle]) return 'a-revoir';
+  return v.vues[vueCle][critere] || 'a-revoir';
+};
+
 const catalog = await fetch(`${BASE}data/parquets.json`).then((r) => r.json());
 const materials = catalog.parquets.map(createMaterial);
 const index = await loadSceneIndex(BASE);
 const renderer = createSceneRenderer();
 $('state').textContent = `${renderer.backend} · aniso ×${renderer.anisotropy}`;
 
-/** Les six vues qui révèlent le plus de défauts, dans cet ordre. */
-const VIEWS = [
-  { label: 'Original', original: true },
-  { label: 'Naturel · droit', material: 'chene-naturel', pattern: 'lames' },
-  { label: 'Miel · droit', material: 'chene-miel', pattern: 'lames' },
-  { label: 'Fumé · droit', material: 'chene-fume', pattern: 'lames' },
-  { label: 'Naturel · point de Hongrie', material: 'chene-naturel', pattern: 'point-de-hongrie' },
-  { label: 'Naturel · bâton rompu', material: 'chene-naturel', pattern: 'baton-rompu' },
-];
-
-/** Luminance moyenne des pixels de sol : sert à repérer un écart entre zones. */
+/** Luminance moyenne des pixels de sol d'une zone : repère un écart entre zones. */
 function zoneLuma(canvas, masks, zoneIndex) {
   const { width, height } = canvas;
   const data = canvas.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, width, height).data;
@@ -102,41 +185,64 @@ async function renderScene(entry) {
   const prepared = await loadImage(`${BASE}assets/images/${scene.image.file}`);
   renderer.setScene(scene, prepared);
 
+  const juge = VERDICTS[entry.id] || { note: '', vues: {} };
+  // Une scène n'est validée que si **toutes** les vues et **tous** les critères
+  // ont été regardés et jugés au moins « correct ».
+  const etats = VUES.filter((v) => !v.original)
+    .flatMap((v) => CRITERES.map((c) => etatDe(entry.id, v.cle, c)));
+  const verdict = etats.every((e) => e === 'valide')
+    ? { texte: 'VALIDÉ', e: 'valide' }
+    : etats.some((e) => e === 'a-revoir')
+      ? { texte: 'À REVOIR', e: 'a-revoir' }
+      : { texte: 'CORRECT', e: 'correct' };
+
   const title = document.createElement('h2');
-  title.textContent = `${entry.id} — ${entry.label} · ${scene.floorZones.length} zone(s)`;
+  title.innerHTML = `${entry.id} — ${entry.label} · ${scene.floorZones.length} zone(s)`
+    + ` <span class="verdict etat" data-e="${verdict.e}">${verdict.texte}</span>`
+    + (juge.note ? ` <span class="note">${juge.note}</span>` : '');
   $('out').appendChild(title);
   const grid = document.createElement('div');
   grid.className = 'grid';
   $('out').appendChild(grid);
 
-  VIEWS.forEach((view) => {
+  VUES.forEach((vue) => {
     const fig = document.createElement('figure');
-    const cap = document.createElement('figcaption');
-    let node;
-    if (view.original) {
-      node = document.createElement('canvas');
+    const node = document.createElement('canvas');
+    let mesure = 'photo';
+    if (vue.original) {
       node.width = prepared.width;
       node.height = prepared.height;
       node.getContext('2d').drawImage(prepared.canvas, 0, 0);
-      cap.innerHTML = `<b>${view.label}</b><span>photo</span>`;
     } else {
-      node = document.createElement('canvas');
-      const material = materials.find((m) => m.id === view.material);
-      renderer.paint(node, { material, pattern: view.pattern, angle: 0, width: null, scale: 1 });
-      // Écart de luminance entre zones : un « trou noir » au fond se voit ici
-      // en chiffres avant de se voir à l'œil.
+      const material = materials.find((m) => m.id === vue.material);
+      renderer.paint(node, { material, pattern: vue.pattern, angle: 0, width: null, scale: 1 });
       const lumas = scene.floorZones.map((z, i) => zoneLuma(node, renderer.masks, i));
-      const spread =
-        lumas.length > 1 && lumas.every((v) => v !== null)
-          ? ` · zones ${lumas.map((v) => Math.round(v)).join(' / ')}`
-          : '';
-      cap.innerHTML = `<b>${view.label}</b><span>${Math.round(lumas[0] || 0)}${spread}</span>`;
+      mesure = lumas.map((v) => Math.round(v || 0)).join(' / ');
+    }
+    const cap = document.createElement('figcaption');
+    const titre = document.createElement('div');
+    titre.className = 'titre';
+    titre.innerHTML = `${vue.label}<span>${mesure}</span>`;
+    cap.appendChild(titre);
+    if (!vue.original) {
+      const liste = document.createElement('div');
+      liste.className = 'criteres';
+      CRITERES.forEach((c) => {
+        const etat = etatDe(entry.id, vue.cle, c);
+        const ligne = document.createElement('div');
+        ligne.className = 'critere';
+        const libelle = { valide: 'Validé', correct: 'Correct', 'a-revoir': 'À revoir' }[etat];
+        ligne.innerHTML = `<span>${c}</span><span class="etat" data-e="${etat}">${libelle}</span>`;
+        liste.appendChild(ligne);
+      });
+      cap.appendChild(liste);
     }
     fig.append(node, cap);
     grid.appendChild(fig);
   });
 
-  log(`${entry.id.padEnd(14)} ${prepared.width}×${prepared.height} — ${scene.floorZones.length} zone(s), ${scene.occluders.length} occlusion(s)`);
+  log(`${entry.id.padEnd(14)} ${verdict.texte.padEnd(9)} ${prepared.width}×${prepared.height}`
+    + ` — ${scene.floorZones.length} zone(s), ${scene.occluders.length} occlusion(s)`);
 }
 
 async function run() {
@@ -147,20 +253,14 @@ async function run() {
     if (only && entry.id !== only) continue;
     await renderScene(entry);
   }
-  const cell = $('cell').value;
-  document.querySelectorAll('.grid').forEach((g) => g.style.setProperty('--cell', cell === '100%' ? '100%' : `${cell}px`));
   log('\nrevue terminée');
 }
 
 index.scenes.forEach((e) => $('scene').append(new Option(e.id, e.id)));
 $('scene').addEventListener('change', run);
 $('run').addEventListener('click', run);
-$('cell').addEventListener('change', () => {
-  const v = $('cell').value;
-  document.querySelectorAll('.grid').forEach((g) => g.style.setProperty('--cell', v === '100%' ? '100%' : `${v}px`));
-});
 await run();
-window.review = { renderer, materials, run };
+window.review = { renderer, materials, run, VUES, VERDICTS };
 </script>
 </body>
 </html>

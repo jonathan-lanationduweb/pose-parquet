@@ -119,10 +119,48 @@ function streak(ctx, x, y, w, h, horizontal, t, wobble, random) {
  * donne la *matière*. Sans elle, chaque lame reste un aplat dégradé — et une
  * fois projetée au sol, la surface se lit comme une image plaquée.
  */
+/**
+ * Les deux accents d'un veinage : un plus sombre que le fond, un plus clair.
+ *
+ * `tex.grain` est toujours plus sombre que `tex.base`. Sur un chêne clair ça
+ * suffit ; sur un chêne fumé, un accent sombre posé sur un fond déjà sombre ne
+ * se voit pas, et la lame redevient un aplat — c'est exactement ce qui faisait
+ * lire les teintes foncées comme « éteintes ».
+ *
+ * D'où un second accent, plus clair que le fond, dont la part augmente quand le
+ * bois s'assombrit. Comme les deux accents se répartissent de part et d'autre
+ * du fond, la teinte moyenne de la lame ne bouge pas : on gagne du
+ * microcontraste sans éclaircir le matériau.
+ */
+function accents(tex) {
+  const lum = (0.2126 * tex.base[0] + 0.7152 * tex.base[1] + 0.0722 * tex.base[2]) / 255;
+  const partClaire = Math.min(0.68, Math.max(0.16, 0.84 - lum * 0.94));
+  const ecart = 58 - lum * 30;
+  return {
+    deep: tex.grain,
+    // Le bleu monte un peu moins : une fibre éclairée reste chaude.
+    lift: [clampByte(tex.base[0] + ecart), clampByte(tex.base[1] + ecart * 0.95), clampByte(tex.base[2] + ecart * 0.8)],
+    partClaire,
+    // Un bois foncé demande un peu plus d'amplitude pour donner autant à voir.
+    vigueur: 1 + (1 - lum) * 0.55,
+  };
+}
+
 function grain(ctx, x, y, w, h, tex, random) {
   const long = Math.max(w, h);
   const across = Math.min(w, h);
   const horizontal = w >= h;
+  const acc = accents(tex);
+  // Vigueur propre à la lame : deux planches du même lot n'ont pas le même
+  // dessin. Faire varier la *force* du veinage, et pas seulement la teinte,
+  // distingue les lames sans créer le patchwork d'un décalage de couleur.
+  const vigueurLame = acc.vigueur * (0.72 + random() * 0.62);
+  /** Choisit l'accent sombre ou clair, et rend une couleur rgba(). */
+  const encre = (alpha, ecartTeinte) => {
+    const c = random() < acc.partClaire ? acc.lift : acc.deep;
+    const t = Math.round((random() - 0.5) * ecartTeinte);
+    return `rgba(${clampByte(c[0] + t)},${clampByte(c[1] + t)},${clampByte(c[2] + t)},${alpha.toFixed(3)})`;
+  };
 
   ctx.save();
   ctx.beginPath();
@@ -135,11 +173,7 @@ function grain(ctx, x, y, w, h, tex, random) {
   //    sont elles qui survivent à la réduction quand la lame s’éloigne.
   const bandes = 2 + Math.round(random() * 2);
   for (let i = 0; i < bandes; i += 1) {
-    const tint = Math.round((random() - 0.5) * 10);
-    const alpha = tex.grainAlpha * (0.55 + random() * 0.55);
-    ctx.strokeStyle = `rgba(${clampByte(tex.grain[0] + tint)},${clampByte(tex.grain[1] + tint)},${clampByte(
-      tex.grain[2] + tint
-    )},${alpha.toFixed(3)})`;
+    ctx.strokeStyle = encre(tex.grainAlpha * vigueurLame * (0.5 + random() * 0.5), 10);
     ctx.lineWidth = across * (0.14 + random() * 0.2);
     streak(ctx, x, y, w, h, horizontal, 0.1 + random() * 0.8, 0.3, random);
   }
@@ -148,23 +182,18 @@ function grain(ctx, x, y, w, h, tex, random) {
   //    une à une. C'est ce qui casse l'aplat.
   const fibres = Math.max(26, Math.round(across * 1.15));
   for (let i = 0; i < fibres; i += 1) {
-    const tint = Math.round((random() - 0.5) * 11);
-    const alpha = tex.grainAlpha * 0.5 * (0.3 + random());
-    ctx.strokeStyle = `rgba(${clampByte(tex.grain[0] + tint)},${clampByte(tex.grain[1] + tint)},${clampByte(
-      tex.grain[2] + tint
-    )},${alpha.toFixed(3)})`;
+    ctx.strokeStyle = encre(tex.grainAlpha * vigueurLame * 0.62 * (0.3 + random()), 11);
     ctx.lineWidth = Math.max(0.5, across * 0.0065 * (0.6 + random()));
     streak(ctx, x, y, w, h, horizontal, 0.015 + random() * 0.97, 0.05, random);
   }
 
   // 3. Cernes marqués : le dessin propre au matériau, peu nombreux.
+  //    La puissance 0,45 rend la distribution inégale — quelques traits francs
+  //    et beaucoup de faibles, comme sur une planche réelle. Des cernes tous
+  //    de la même force donnent une rayure régulière, donc une fausse texture.
   const lines = Math.max(2, Math.round(tex.grainLines * (0.7 + random() * 0.6)));
   for (let i = 0; i < lines; i += 1) {
-    const tint = Math.round((random() - 0.5) * 16);
-    const alpha = tex.grainAlpha * (0.45 + random() * 0.65);
-    ctx.strokeStyle = `rgba(${clampByte(tex.grain[0] + tint)},${clampByte(tex.grain[1] + tint)},${clampByte(
-      tex.grain[2] + tint
-    )},${alpha.toFixed(3)})`;
+    ctx.strokeStyle = encre(tex.grainAlpha * vigueurLame * (0.3 + Math.pow(random(), 0.45) * 0.95), 16);
     ctx.lineWidth = Math.max(0.6, across * tex.grainWidth * (0.5 + random()));
     streak(ctx, x, y, w, h, horizontal, 0.05 + random() * 0.9, 0.14, random);
   }
@@ -173,9 +202,11 @@ function grain(ctx, x, y, w, h, tex, random) {
   if (random() < tex.knots) {
     const kx = x + w * (0.15 + random() * 0.7);
     const ky = y + h * (0.2 + random() * 0.6);
-    const kr = across * tex.knotSize * (0.7 + random() * 0.7);
+    // Discrets : un nœud trop marqué se lit comme une tache posée sur la lame,
+    // et se répète visiblement d'une tuile à l'autre.
+    const kr = across * tex.knotSize * (0.58 + random() * 0.6);
     const halo = ctx.createRadialGradient(kx, ky, kr * 0.2, kx, ky, kr * 2.4);
-    halo.addColorStop(0, `rgba(${tex.grain[0]},${tex.grain[1]},${tex.grain[2]},0.45)`);
+    halo.addColorStop(0, `rgba(${tex.grain[0]},${tex.grain[1]},${tex.grain[2]},0.3)`);
     halo.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = halo;
     ctx.beginPath();
@@ -183,7 +214,7 @@ function grain(ctx, x, y, w, h, tex, random) {
     ctx.fill();
     ctx.fillStyle = `rgba(${clampByte(tex.grain[0] - 26)},${clampByte(tex.grain[1] - 24)},${clampByte(
       tex.grain[2] - 20
-    )},0.7)`;
+    )},0.5)`;
     ctx.beginPath();
     ctx.ellipse(kx, ky, kr, kr * 0.72, random() * Math.PI, 0, Math.PI * 2);
     ctx.fill();
@@ -413,11 +444,33 @@ function drawChevron(ctx, tex, profile, random) {
     ctx.clip();
     // Le veinage suit la lame : on l'étale le long de l'arête, pas de l'écran.
     grain(ctx, x0 - armX, y0, armX * 2.2, step, tex, random);
-    ctx.fillStyle = 'rgba(255,255,255,0.07)';
-    ctx.fillRect(x0 - armX, y0, armX * 2.2, Math.max(0.8, w * tex.bevel * 1.5));
+
+    // Chanfreins des deux longs côtés, en **aplats** et non en filet.
+    //
+    // C'est le point qui décidait de tout ici : le motif ne tenait que par un
+    // contour de moins d'un pixel, et un trait d'un pixel disparaît dès que la
+    // tuile est réduite — le chevron s'effaçait alors en un champ uni parcouru
+    // de quelques traits, exactement l'aspect « texture plate ». Une bande
+    // pleine, elle, survit à la moyenne des mipmaps.
+    const bev = Math.max(1.2, step * 0.17);
+    const bande = (dy0, dy1, couleur) => {
+      ctx.fillStyle = couleur;
+      ctx.beginPath();
+      ctx.moveTo(x0, y0 + dy0);
+      ctx.lineTo(x0 + dir * armX, y0 + armY + dy0);
+      ctx.lineTo(x0 + dir * armX, y0 + armY + dy1);
+      ctx.lineTo(x0, y0 + dy1);
+      ctx.closePath();
+      ctx.fill();
+    };
+    bande(0, bev, 'rgba(255,255,255,0.06)');
+    bande(step - bev, step, 'rgba(34,23,14,0.2)');
     ctx.restore();
-    ctx.strokeStyle = `rgba(38,26,16,${tex.joint})`;
-    ctx.lineWidth = Math.max(0.7, w * 0.022);
+
+    // Joint : même dosage que sur une pose droite, et une largeur qui ne
+    // tombe pas sous le pixel.
+    ctx.strokeStyle = `rgba(38,26,16,${(tex.joint * 0.6).toFixed(3)})`;
+    ctx.lineWidth = Math.max(1.1, w * 0.05);
     ctx.stroke();
     ctx.restore();
   };

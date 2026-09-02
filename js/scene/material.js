@@ -38,7 +38,9 @@ const FINISH = {
 function finishProfile(label = '', declared) {
   if (declared && FINISH[declared]) return { key: declared, ...FINISH[declared] };
   const text = label.toLowerCase();
-  const key = text.includes('brut')
+  // « brossé » : la brosse creuse le grain et mate la surface. Sans ce cas, un
+  // « Fumé brossé » retombait sur « mat » et recevait un reflet qu'il n'a pas.
+  const key = text.includes('brut') || text.includes('bross')
     ? 'brut'
     : text.includes('satin')
       ? 'satine'
