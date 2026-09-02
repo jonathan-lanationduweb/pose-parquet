@@ -19,7 +19,23 @@ const DRAWER_EXTRA = [
   { href: 'contact/', label: 'Contact', section: 'contact', num: '07' },
 ];
 
-const mark = `<svg class="brand__mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 7h20"/><path d="M2 13h13"/><path d="M2 19h18"/></svg>`;
+/**
+ * Le symbole d'identité — Concept C : trois lames verticales inégales,
+ * traversées par des ruptures diagonales décalées.
+ *
+ * La géométrie est **générée** par _generator/make-icons.js, qui la tient de
+ * mesures faites au pixel sur la planche validée. Une seule source pour le
+ * favicon, les icônes d'application et l'interface : le symbole ne peut donc
+ * pas diverger d'un support à l'autre.
+ *
+ * Il est employé avec parcimonie — en-tête, pied de page, favicon — et jamais
+ * en motif décoratif répété : c'est sa rareté qui lui donne sa force.
+ */
+const SYMBOL_PATH = 'M0 0H0.3396V0.5584L0 0.6396ZM0 0.6599L0.3396 0.5787V1H0ZM0.4057 0H0.7453V0.2437L0.4057 0.3249ZM0.4057 0.3452L0.7453 0.264V1H0.4057ZM0.8208 0H1V0.5584L0.8208 0.6012ZM0.8208 0.6215L1 0.5787V1H0.8208Z';
+const symbol = (className) =>
+  `<svg class="${className}" viewBox="0 0 106 197" fill="currentColor" aria-hidden="true"><g transform="scale(106 197)"><path d="${SYMBOL_PATH}"/></g></svg>`;
+
+const mark = symbol('brand__mark');
 
 const arrow = `<svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg>`;
 
@@ -62,8 +78,12 @@ function header(p) {
       </nav>
       <div class="drawer__footer">
         <a class="btn btn--light btn--block" href="${p}projet/"><span>Décrire mon projet</span>${arrow}</a>
-        <a class="btn btn--outline-light btn--block" href="${p}outils/studio.html"><span>Visualiser ma pièce</span></a>
-        <p class="drawer__meta">Média indépendant · aucune vente en ligne</p>
+        <a class="btn btn--outline-light btn--block" href="${p}outils/studio.html"><span>Visualiser mon parquet</span></a>
+        <!-- « Média indépendant · aucune vente en ligne » figurait aussi ici.
+             L'information est utile, mais répétée en tête de menu sur chaque
+             page elle prend un ton défensif. Elle reste dans le pied de page et
+             développée sur la page À propos, c'est-à-dire là où on la cherche. -->
+        <p class="drawer__meta">Guides, motifs et outils</p>
       </div>
     </div>`;
 }
@@ -107,6 +127,7 @@ function footer(p) {
       <div class="wrap-wide footer__inner">
         <div class="footer__top">
           <div class="footer__brand">
+            ${symbol('footer__mark')}
             <p class="footer__wordmark">Pose <span>Parquet</span></p>
             <p class="footer__baseline">Guides et outils pour réussir la pose de son parquet.</p>
           </div>
@@ -187,6 +208,13 @@ function layout(page) {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>${page.title}</title>
     <meta name="description" content="${page.description}" />
+    <!-- Balise robots toujours explicite, et toujours en « index, follow » :
+         les fichiers du dépôt décrivent la production. C'est le déploiement qui
+         la remplace par « noindex, nofollow » tant que le site est servi sur une
+         adresse de préproduction — voir .github/workflows/deploy-pages.yml et
+         docs/seo-environnements.md. Un noindex écrit ici finirait tôt ou tard
+         copié en production. -->
+    <meta name="robots" content="index, follow" />
     <link rel="canonical" href="${canonical}" />
     <meta name="theme-color" content="#f2efe8" />
     <meta property="og:type" content="${page.ogType || 'website'}" />
@@ -199,6 +227,7 @@ function layout(page) {
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="${p}assets/icons/favicon.svg?v=${build.icons}" type="image/svg+xml" />
     <link rel="icon" href="${p}assets/icons/favicon-32.png?v=${build.icons}" sizes="32x32" type="image/png" />
+    <link rel="icon" href="${p}assets/icons/favicon-16.png?v=${build.icons}" sizes="16x16" type="image/png" />
     <link rel="apple-touch-icon" href="${p}assets/icons/apple-touch-icon.png?v=${build.icons}" />
     <link rel="manifest" href="${p}site.webmanifest?v=${build.icons}" />
     <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/instrument-serif-400-3.woff2" crossorigin />
@@ -242,6 +271,7 @@ function appLayout(page) {
     <meta name="theme-color" content="#101214" />
     <link rel="icon" href="${p}assets/icons/favicon.svg?v=${build.icons}" type="image/svg+xml" />
     <link rel="icon" href="${p}assets/icons/favicon-32.png?v=${build.icons}" sizes="32x32" type="image/png" />
+    <link rel="icon" href="${p}assets/icons/favicon-16.png?v=${build.icons}" sizes="16x16" type="image/png" />
     <link rel="apple-touch-icon" href="${p}assets/icons/apple-touch-icon.png?v=${build.icons}" />
     <link rel="manifest" href="${p}site.webmanifest?v=${build.icons}" />
     <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/inter-400-1.woff2" crossorigin />
@@ -262,4 +292,4 @@ function appLayout(page) {
 `;
 }
 
-module.exports = { SITE, NAV, layout, appLayout, breadcrumb, header, footer, mark, arrow };
+module.exports = { SITE, NAV, layout, appLayout, breadcrumb, header, footer, mark, symbol, arrow };

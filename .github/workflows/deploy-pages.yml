@@ -35,10 +35,43 @@ jobs:
         run: |
           rm -rf _site
           mkdir _site
-          # On copie le site sans les sources du générateur ni le dossier git
+          # On copie le site sans les sources du générateur, l'outillage interne
+          # ni le dossier git
           rsync -a --exclude '.git' --exclude '_generator' --exclude '.github' \
-                --exclude 'serve.js' --exclude '_site' ./ _site/
+                --exclude '_calibrage' --exclude 'serve.js' --exclude '_site' ./ _site/
           touch _site/.nojekyll
+
+      # Les fichiers du dépôt décrivent toujours la PRODUCTION : canoniques en
+      # pose-parquet.com, robots en « index, follow », sitemap complet. C'est
+      # volontaire — un noindex écrit dans les sources finirait tôt ou tard
+      # copié en production le jour de la mise en ligne.
+      #
+      # Tant que le site est servi sur une adresse de préproduction, c'est donc
+      # le déploiement qui le marque. Le signal utilisé est la présence d'un
+      # fichier CNAME : sans CNAME, GitHub Pages sert sur *.github.io, ce n'est
+      # pas l'adresse définitive et il n'y a aucune raison de l'indexer. Le jour
+      # où les DNS sont repointés et le CNAME ajouté, cette étape ne fait plus
+      # rien et l'indexation reprend d'elle-même.
+      #
+      # Voir docs/seo-environnements.md.
+      - name: Marquer la préproduction (noindex)
+        if: ${{ hashFiles('CNAME') == '' }}
+        run: |
+          echo "Aucun CNAME : déploiement traité comme une préproduction."
+          printf 'User-agent: *\nDisallow: /\n' > _site/robots.txt
+          rm -f _site/sitemap.xml
+          find _site -name '*.html' -print0 | xargs -0 --no-run-if-empty sed -i \
+            -e 's#<meta name="robots" content="index, follow" />#<meta name="robots" content="noindex, nofollow" />#' \
+            -e 's#<meta name="robots" content="noindex, follow" />#<meta name="robots" content="noindex, nofollow" />#'
+          echo "Pages marquées : $(grep -rl 'noindex, nofollow' _site --include='*.html' | wc -l)"
+
+      - name: Confirmer la production (index)
+        if: ${{ hashFiles('CNAME') != '' }}
+        run: |
+          echo "CNAME présent : déploiement traité comme la production."
+          grep -q 'content="index, follow"' _site/index.html \
+            && echo "Accueil indexable : OK" \
+            || (echo "L'accueil n'est pas indexable — vérifier _generator/layout.js" && exit 1)
 
       - name: Téléverser l'artefact
         uses: actions/upload-pages-artifact@v3

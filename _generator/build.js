@@ -273,7 +273,7 @@ ${item.body}
               <p class="tool-bridge__eyebrow">Passer à la pratique</p>
               <p class="tool-bridge__text">Essayez ce que vous venez de lire sur une photo de votre pièce : teinte, motif et sens de pose se changent en direct, sans rien envoyer sur un serveur.</p>
               <div class="cluster">
-                <a class="btn btn--sm" href="${base}outils/visualiseur.html">Visualiser ma pièce</a>
+                <a class="btn btn--sm" href="${base}outils/visualiseur.html">Visualiser mon parquet</a>
                 <a class="link-arrow" href="${base}outils/simulateur-pose.html">Ou passer en mode plan</a>
               </div>
             </aside>
@@ -438,7 +438,7 @@ function buildMotifs() {
             <p class="eyebrow">Motifs de pose</p>
             <h1 class="page-hero__title">Six façons de dessiner un sol</h1>
           </div>
-          <p class="page-hero__lead">Le motif décide du caractère de la pièce autant que l'essence du bois. Chaque fiche détaille le rendu, les contraintes de pose, les chutes attendues et les pièces adaptées.</p>
+          <p class="page-hero__lead">Le motif décide du caractère de la pièce autant que l'essence du bois. Chaque fiche détaille le rendu, les contraintes de pose, le niveau de chutes attendu — un ordre de grandeur, jamais un calcul — et les pièces adaptées.</p>
         </div>
       </header>
 
@@ -451,7 +451,7 @@ function buildMotifs() {
               <div class="pattern-card__viz" data-pattern-thumb="${motif.pattern}"></div>
               <h3>${motifName(motif)}</h3>
               <p>${motif.excerpt}</p>
-              <span class="mono">${motif.stats[0][1]} de chutes</span>
+              <span class="mono">Chutes ${motif.stats[0][1].split(' (')[0]}</span>
             </a>`
             ).join('\n            ')}
           </div>
@@ -563,7 +563,7 @@ function buildTutos() {
               <h2 class="tool-block__title" id="tuto-outil">Voir le résultat avant de couper la première lame</h2>
               <p class="lead">Le sens de pose et le motif se décident sur le papier, mais se jugent à l’œil. Essayez-les sur une photo de votre pièce.</p>
               <div class="cluster">
-                <a class="btn" href="../outils/visualiseur.html">Visualiser ma pièce</a>
+                <a class="btn" href="../outils/visualiseur.html">Visualiser mon parquet</a>
                 <a class="link-arrow" href="../guides/">Lire les guides</a>
               </div>
             </div>
@@ -590,7 +590,7 @@ function buildTutos() {
 function buildInspiration() {
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'Inspiration' }]);
   const gallery = INSPIRATIONS.map(
-    (item, index) => `<figure class="gallery__item gallery__item--${item.size}" data-tags="${item.tags}">
+    (item, index) => `<figure class="gallery__item" data-tags="${item.tags}">
               <button class="gallery__zoom" type="button"
                 data-lightbox-trigger="${item.title} — ${item.meta}" aria-label="Agrandir : ${item.title}">
                 ${picture(`inspi-${index + 1}`, { base: '../', alt: item.alt, sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw' })}
@@ -689,14 +689,14 @@ function buildTools() {
 
       <section class="section section--flush-top">
         <div class="wrap-wide tool-blocks">
-          <article class="tool-block" data-reveal>
+          <article class="tool-block tool-block--lead" data-reveal>
             <div class="tool-block__media">
               <div data-vz-preview data-room="sejour" data-base="../"></div>
             </div>
             <div class="tool-block__body">
               <p class="tool-block__num">Outil 01 <span class="badge badge--sage">Visualiseur</span></p>
-              <h2 class="tool-block__title">Visualiser ma pièce</h2>
-              <p class="lead">Une application dédiée : votre pièce en grand, un catalogue de douze parquets sur le côté, et le sol qui change à chaque clic.</p>
+              <h2 class="tool-block__title">Visualiseur Parquet</h2>
+              <p class="lead">Une application dédiée : votre pièce occupe l’écran, le catalogue se range sur le côté, et le sol change à chaque clic. Une photo peut contenir plusieurs sols visibles — le parquet choisi les change tous.</p>
               <ul class="tool-block__points">
                 <li>Douze parquets de démonstration, chacun avec son veinage et sa largeur de lame.</li>
                 <li>Le pinceau garde vos meubles, vos tapis et vos plinthes visibles.</li>
@@ -715,8 +715,8 @@ function buildTools() {
               <div data-visualizer data-mode="compact" data-base="../"></div>
             </div>
             <div class="tool-block__body">
-              <p class="tool-block__num">Outil 02 <span class="badge badge--outline">Disponible</span></p>
-              <h2 class="tool-block__title">Mode plan</h2>
+              <p class="tool-block__num">Outil 02 <span class="badge badge--outline">Mode Plan</span></p>
+              <h2 class="tool-block__title">Mode Plan</h2>
               <p class="lead">Vue du dessus à l’échelle : dimensions de la pièce, largeur de lame, position de la fenêtre et de l’entrée. Utile pour trancher le sens de pose avant d’acheter.</p>
               <ul class="tool-block__points">
                 <li>Cinq motifs, du droit au point de Hongrie.</li>
@@ -732,7 +732,7 @@ function buildTools() {
         </div>
       </section>
 
-      <section class="section section--alt" aria-labelledby="a-venir">
+      <section class="section section--alt section--compact" aria-labelledby="a-venir">
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
@@ -864,7 +864,7 @@ function buildProjet() {
       <section class="section section--flush-top">
         <div class="wrap">
           <div class="project-intro">
-            <div data-project-form>
+            <div data-project-form data-base="../">
               <noscript>
                 <p>Le formulaire nécessite JavaScript. Vous pouvez décrire votre projet par email : <a href="mailto:projet@pose-parquet.com">projet@pose-parquet.com</a>.</p>
               </noscript>

@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Pose Parquet">
-  <rect width="64" height="64" rx="15" fill="#16181a" />
-  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="7.5">
-    <path d="M14 33 L32 15 L50 33" stroke="#8ba088" />
-    <path d="M14 51 L32 33 L50 51" stroke="#f2efe8" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Pose Parquet">
+  <title>Pose Parquet</title>
+  <rect width="32" height="32" rx="6.4" fill="#f2efe8"/>
+  <g transform="translate(8.0906 4.16) scale(15.8187 23.68)" fill="#16181a">
+    <path d="M0 0H0.3396V0.5584L0 0.6396ZM0 0.6599L0.3396 0.5787V1H0ZM0.4057 0H0.7453V0.2437L0.4057 0.3249ZM0.4057 0.3452L0.7453 0.264V1H0.4057ZM0.8208 0H1V0.5584L0.8208 0.6012ZM0.8208 0.6215L1 0.5787V1H0.8208Z"/>
   </g>
 </svg>

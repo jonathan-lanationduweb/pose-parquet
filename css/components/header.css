@@ -39,13 +39,14 @@
   line-height: 1;
   justify-self: start;
 }
+/* Symbole d'identité : proportions réelles (106 × 197), pas un carré — un
+   symbole étiré n'est plus le symbole. Pas d'animation au survol : le repère
+   de marque n'a pas à bouger. */
 .brand__mark {
-  width: 22px; height: 22px;
+  width: 13px; height: 24px;
   align-self: center;
   flex: none;
-  transition: transform var(--dur-3) var(--ease-out);
 }
-.brand:hover .brand__mark { transform: rotate(-8deg); }
 .brand strong { font-weight: 400; }
 .brand span { opacity: 0.55; }
 

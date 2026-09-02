@@ -92,16 +92,31 @@
   --wrap-text: 42rem;
   --gutter: clamp(1.25rem, 0.5rem + 2.6vw, 3.5rem);
 
-  /* ---- Formes ---- */
-  --r-xs: 4px;
-  --r-sm: 10px;
-  --r-md: 16px;
-  --r-media: 22px;
-  --r-card: 28px;
-  --r-block: 34px;
-  --r-pill: 100px;
+  /* ---- Formes ----
+     Trois rayons, pas sept. L'échelle précédente comptait 4, 10, 16, 22, 28 et
+     34 px : à l'usage, personne ne distingue 28 de 34, et l'écart finit par se
+     lire comme une négligence plutôt que comme une intention. Les anciens noms
+     survivent en alias pour ne pas réécrire toutes les feuilles, mais ils ne
+     désignent plus que trois valeurs réelles.
 
-  /* ---- Ombres ---- */
+       sm  détails : puces, champs, petits médias
+       md  cartes, images, panneaux
+       lg  grands blocs, sections immersives                                */
+  --r-sm: 8px;
+  --r-md: 16px;
+  --r-lg: 28px;
+  --r-pill: 100px;
+  /* Alias historiques → une des trois valeurs ci-dessus */
+  --r-xs: var(--r-sm);
+  --r-media: var(--r-md);
+  --r-card: var(--r-lg);
+  --r-block: var(--r-lg);
+
+  /* ---- Ombres ----
+     Très peu d'ombres, et jamais sur une carte posée dans le flux : elles sont
+     réservées à ce qui flotte réellement au-dessus du contenu — menu déroulant,
+     panneau coulissant, feuille modale. Une ombre douce sur chaque bloc est la
+     signature la plus sûre d'une interface générée sans intention.           */
   --shadow-1: 0 1px 2px rgba(22, 24, 26, 0.05);
   --shadow-2: 0 18px 40px -26px rgba(22, 24, 26, 0.5);
   --shadow-3: 0 40px 80px -40px rgba(22, 24, 26, 0.55);

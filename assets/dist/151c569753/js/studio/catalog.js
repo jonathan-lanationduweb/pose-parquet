@@ -33,8 +33,6 @@ export function swatchFor(material, options) {
   return swatches.get(material.id);
 }
 
-const cm = (m) => `${Math.round(m * 100)} cm`;
-
 export function createCatalog(host, catalog, { onSelect, onVisible }) {
   const wrap = document.createElement('div');
   wrap.className = 'cat';
@@ -118,12 +116,11 @@ export function createCatalog(host, catalog, { onSelect, onVisible }) {
     card.dataset.material = material.id;
     card.dataset.tone = material.tone;
     card.setAttribute('aria-pressed', 'false');
+    // Une carte = une matière. Le nom, rien de plus : la finition et la largeur
+    // de lame sont dans l'en-tête du contexte, pas répétées douze fois.
     card.innerHTML = `
       <span class="cat__media"></span>
-      <span class="cat__label">
-        <strong>${material.name}</strong>
-        <span>${material.finish} · lames ${cm(material.boardWidth)}</span>
-      </span>`;
+      <span class="cat__label">${material.name}</span>`;
     card.addEventListener('click', () => onSelect(material));
     grid.appendChild(card);
     if (observer) observer.observe(card);

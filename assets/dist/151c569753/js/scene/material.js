@@ -77,11 +77,20 @@ export function createMaterial(entry) {
       finishKind: finish.key,
     },
     variation: Number.isFinite(entry.variation) ? entry.variation : entry.texture.spread / 30,
+    /**
+     * Cartes physiques. Vides aujourd'hui : voir assets/materials/README.md.
+     * `hasMaps` dit si le moteur peut s'en servir ; sinon il retombe sur le
+     * dessin procédural, qui reste la source de vérité par défaut.
+     */
     maps: {
       albedo: (entry.maps && entry.maps.albedo) || null,
       normal: (entry.maps && entry.maps.normal) || null,
       roughness: (entry.maps && entry.maps.roughness) || null,
     },
+    hasMaps: Boolean(entry.maps && entry.maps.albedo),
+    proceduralFallback: entry.proceduralFallback !== false,
+    /** Dimensions et angle propres à chaque motif. Voir js/scene/texture.js. */
+    patternProfiles: entry.patternProfiles || null,
   };
 }
 

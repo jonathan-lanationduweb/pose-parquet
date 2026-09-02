@@ -209,6 +209,22 @@ export function createSceneMasks(scene, width, height) {
       return zoneId ? boxes.get(zoneId) || null : unionBox;
     },
 
+    /**
+     * Déclare une zone apparue après coup — l'utilisateur qui ajoute un second
+     * sol sur sa photo, ou un service d'analyse qui en renvoie un de plus.
+     * Sans cela la zone existerait dans la scène mais n'aurait aucun contour.
+     */
+    registerZone(zone) {
+      if (polygons.has(zone.id)) return;
+      polygons.set(zone.id, zonePolygon(zone).map((p) => ({ ...p })));
+      dirty = true;
+    },
+    removeZone(zoneId) {
+      polygons.delete(zoneId);
+      strokes = strokes.filter((stroke) => stroke.zoneId !== zoneId);
+      dirty = true;
+    },
+
     getPolygon(zoneId) {
       const polygon = polygons.get(zoneId);
       return polygon ? polygon.map((p) => ({ ...p })) : [];

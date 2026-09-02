@@ -105,7 +105,7 @@ function buildAssets(root, { pageCss = [] } = {}) {
   });
   const siteCss = writeHashed(root, 'site', 'css', site);
 
-  /* ---- CSS du Studio ---- */
+  /* ---- CSS du Visualiseur Parquet (fichier interne : css/studio.css) ---- */
   const studioCss = writeHashed(root, 'studio', 'css', inlineCss(root, 'css/studio.css'));
 
   /* ---- JS : l'arbre est copié tel quel dans un dossier daté par son contenu ----

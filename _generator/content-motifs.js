@@ -13,7 +13,7 @@ const MOTIFS = [
     lead:
       "Lames parallèles à un mur, joints décalés d'une rangée à l'autre : la pose droite est le motif le plus répandu, et le plus économique en matière et en temps.",
     stats: [
-      ['Chutes estimées', '7 à 8 %'],
+      ['Chutes', 'faibles (ordre de 7 à 8 %)'],
       ['Difficulté', 'Accessible'],
       ['Poses compatibles', 'Flottante, collée, clouée'],
     ],
@@ -57,7 +57,7 @@ const MOTIFS = [
     lead:
       "Poser dans la longueur consiste à aligner les lames sur le grand côté de la pièce. C'est l'orientation la plus fréquente, et souvent la plus économe en coupes.",
     stats: [
-      ['Chutes estimées', '≈ 7 %'],
+      ['Chutes', 'faibles (ordre de 7 %)'],
       ['Effet visuel', 'Allonge la pièce'],
       ['Cas favorable', 'Séjour large et lumineux'],
     ],
@@ -98,7 +98,7 @@ const MOTIFS = [
     lead:
       "Poser dans la largeur revient à traverser la pièce. Le regard bute sur les lignes de joints, ce qui raccourcit visuellement l'espace.",
     stats: [
-      ['Chutes estimées', '≈ 8 %'],
+      ['Chutes', 'faibles (ordre de 8 %)'],
       ['Effet visuel', 'Élargit la pièce'],
       ['Cas favorable', 'Pièce très allongée'],
     ],
@@ -128,11 +128,11 @@ const MOTIFS = [
     description:
       "Lames à 45° des murs : un motif dynamique qui agrandit les petits volumes et rattrape les murs non parallèles. Chutes, traçage et précautions.",
     reading: '5 min',
-    excerpt: "Un motif qui agrandit et rattrape les murs faux — au prix de 14 % de chutes.",
+    excerpt: "Un motif qui agrandit et rattrape les murs faux — au prix de chutes sensiblement plus élevées.",
     lead:
       "La pose en diagonale reprend le principe de la pose droite, mais à 45° des murs. Le regard n'a plus de ligne de référence : la pièce paraît plus large et les murs non parallèles se font oublier.",
     stats: [
-      ['Chutes estimées', '12 à 15 %'],
+      ['Chutes', 'élevées (ordre de 12 à 15 %)'],
       ['Difficulté', 'Intermédiaire'],
       ['Effet visuel', 'Agrandit, dynamise'],
     ],
@@ -150,7 +150,7 @@ const MOTIFS = [
         { title: 'Poser la rangée maîtresse au centre', text: 'On travaille ensuite de part et d’autre de cette rangée, ce qui répartit les écarts.' },
         { title: 'Préparer les coupes de rive', text: 'Toutes les rives sont coupées à 45° : préparez-les par lots et vérifiez chaque angle contre le mur réel.' },
       ])}
-      ${warn('<p>Prévoyez la matière : 12 à 15 % de chutes, et davantage dans une pièce comportant de nombreux décrochés ou une cheminée.</p>')}
+      ${warn('<p>Prévoyez la matière : de l’ordre de 12 à 15 % de chutes selon les sources, et davantage dans une pièce comportant de nombreux décrochés ou une cheminée. Ce chiffre est un ordre de grandeur, pas un calcul : seul un calepinage donne la quantité à commander.</p>')}
       ${tip("<p>Dans une pièce carrée, orientez la diagonale de manière à ce qu'elle parte de l'entrée : le motif accompagne alors le regard dès le seuil.</p>")}
     `,
     faq: [
@@ -169,9 +169,9 @@ const MOTIFS = [
     reading: '6 min',
     excerpt: "Des pointes continues, un axe impitoyable : le motif le plus exigeant.",
     lead:
-      "Le Point de Hongrie assemble des lames coupées à 45° à leurs extrémités. Les pointes se rejoignent en colonnes parfaitement alignées : c'est ce qui le distingue du bâton rompu.",
+      "Le Point de Hongrie assemble des lames coupées en biais à leurs extrémités — le plus souvent à 45°, parfois à 30° ou 60°. Les pointes se rejoignent en colonnes parfaitement alignées : c'est ce qui le distingue du bâton rompu.",
     stats: [
-      ['Chutes estimées', '12 à 15 %'],
+      ['Chutes', 'élevées (ordre de 12 à 15 %)'],
       ['Difficulté', 'Élevée'],
       ["Coupe des lames", "Onglet, gauches et droites"],
     ],
@@ -194,7 +194,7 @@ const MOTIFS = [
       ${steps([
         { title: "Définir l'axe principal", text: "Tracé au cordeau, vérifié à l'équerre sur toute la longueur de la pièce." },
         { title: 'Monter la première colonne à blanc', text: 'Sans colle, pour valider l’angle et le positionnement des pointes.' },
-        { title: 'Coller en progressant par colonnes', text: "Chaque pointe est contrôlée : une dérive d'un demi-degré se cumule et devient visible." },
+        { title: 'Coller en progressant par colonnes', text: "Chaque pointe est contrôlée : une dérive, même faible, se cumule d'une colonne à l'autre et finit par se voir." },
         { title: 'Traiter les rives', text: 'Coupes en pointe le long des murs, ou frise périphérique pour rattraper les murs faux.' },
       ])}
       ${warn("<p>Ne posez jamais un Point de Hongrie sur un support non ragréé. Le motif multiplie les joints : le moindre creux se traduit par un point souple sous le pied.</p>")}
@@ -218,7 +218,7 @@ const MOTIFS = [
     lead:
       "Le bâton rompu assemble des lames droites, bout contre chant, à angle droit. Le dessin forme des décrochés en escalier, très reconnaissables.",
     stats: [
-      ['Chutes estimées', '10 à 12 %'],
+      ['Chutes', 'modérées (ordre de 10 à 12 %)'],
       ['Difficulté', 'Élevée'],
       ['Coupe des lames', 'Lames droites standard'],
     ],
@@ -250,7 +250,7 @@ const MOTIFS = [
       ${key("<ul><li>Lames droites : approvisionnement simple.</li><li>Construction depuis le centre, jamais depuis un mur.</li><li>Le format des lames détermine le caractère du motif.</li></ul>")}
     `,
     faq: [
-      { q: 'Bâton rompu et point de Hongrie, est-ce la même chose ?', a: "Non. Le bâton rompu utilise des lames droites assemblées à angle droit ; le Point de Hongrie des lames coupées à 45° formant une pointe continue." },
+      { q: 'Bâton rompu et point de Hongrie, est-ce la même chose ?', a: "Non. Le bâton rompu utilise des lames droites assemblées à angle droit ; le Point de Hongrie des lames coupées en biais, formant une pointe continue. L'angle du biais varie selon la référence : 45° est le plus courant." },
       { q: 'Peut-on le poser en flottant ?', a: "C'est déconseillé : le motif multiplie les joints et supporte mal les mouvements d'un plancher flottant. La pose collée est la règle." },
     ],
   },

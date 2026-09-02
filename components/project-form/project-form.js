@@ -182,9 +182,9 @@ export function mountProjectForm(root, options = {}) {
     </form>
 
     <div class="pf__success" hidden tabindex="-1">
-      <p class="eyebrow">Demande enregistrée</p>
-      <h2>Merci, votre projet est bien décrit.</h2>
-      <p>Nous revenons vers vous rapidement. En attendant, le visualiseur peut vous aider à essayer les options retenues sur une photo de votre pièce.</p>
+      <p class="eyebrow" data-success-eyebrow>Demande enregistrée</p>
+      <h2 data-success-title>Merci, votre projet est bien décrit.</h2>
+      <p data-success-text>Nous revenons vers vous rapidement. En attendant, le visualiseur peut vous aider à essayer les options retenues sur une photo de votre pièce.</p>
       <button type="button" class="btn btn--ghost btn--sm" data-restart>Décrire un autre projet</button>
     </div>`;
 
@@ -305,7 +305,26 @@ export function mountProjectForm(root, options = {}) {
     payload.source = window.location.pathname;
 
     try {
-      await onSubmit(payload);
+      const result = await onSubmit(payload);
+      /**
+       * Mode démonstration : sans point d'envoi configuré, la demande est
+       * seulement conservée dans ce navigateur. Le dire, et le dire nettement.
+       *
+       * Un écran « Merci, nous revenons vers vous » alors que personne ne
+       * reçoit rien n'est pas une imprécision d'interface : c'est une promesse
+       * fausse faite à quelqu'un qui vient de saisir son adresse et son projet.
+       * Tant qu'aucun backend n'est branché, l'écran de fin doit être explicite.
+       * Voir docs/formulaire-production.md.
+       */
+      if (result && (result.mode === 'local' || result.mode === 'noop')) {
+        root.querySelector('[data-success-eyebrow]').textContent = 'Mode démonstration';
+        root.querySelector('[data-success-title]').textContent = 'Votre demande n’a pas été envoyée.';
+        root.querySelector('[data-success-text]').innerHTML =
+          'Ce formulaire fonctionne, mais aucun destinataire n’est encore branché : votre demande est restée dans ce navigateur et personne ne l’a reçue. ' +
+          'Pour nous joindre dès maintenant, passez par la <a href="' +
+          (root.dataset.base || '') +
+          'contact/">page contact</a>.';
+      }
       form.hidden = true;
       success.hidden = false;
       success.focus();

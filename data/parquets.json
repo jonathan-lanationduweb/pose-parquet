@@ -1,16 +1,40 @@
 {
   "version": 1,
-  "note": "Catalogue de démonstration. Les références sont fictives : elles servent à essayer un rendu, pas à commander un produit. Les paramètres de texture pilotent le moteur de rendu (js/studio/texture.js) : chaque parquet a son propre veinage, ses nœuds, son contraste et sa largeur de lame.",
+  "note": "Catalogue de démonstration. Ce sont des **matériaux procéduraux** : leur apparence est calculée par le moteur (js/scene/texture.js) à partir des paramètres ci-dessous — veinage, nœuds, fentes, contraste, largeur de lame, finition. Ce ne sont donc ni des photographies de produits, ni des textures sous licence, et ils ne correspondent à aucune référence commerciale. Ils servent à choisir une direction — une teinte, un motif, un sens de pose — pas à valider une commande. Le champ `maps` est prévu pour de vraies cartes photographiques (albedo, normale, rugosité) : voir assets/materials/README.md. Tant qu'il est vide, le moteur procédural sert de repli.",
   "tones": [
-    { "id": "clair", "label": "Clair" },
-    { "id": "naturel", "label": "Naturel" },
-    { "id": "chaud", "label": "Chaud" },
-    { "id": "fonce", "label": "Foncé" }
+    {
+      "id": "clair",
+      "label": "Clair"
+    },
+    {
+      "id": "naturel",
+      "label": "Naturel"
+    },
+    {
+      "id": "chaud",
+      "label": "Chaud"
+    },
+    {
+      "id": "fonce",
+      "label": "Foncé"
+    }
   ],
   "patterns": [
-    { "id": "lames", "label": "Lames droites", "waste": "7 à 8 %" },
-    { "id": "point-de-hongrie", "label": "Point de Hongrie", "waste": "12 à 15 %" },
-    { "id": "baton-rompu", "label": "Bâton rompu", "waste": "10 à 12 %" }
+    {
+      "id": "lames",
+      "label": "Lames droites",
+      "waste": "faibles"
+    },
+    {
+      "id": "point-de-hongrie",
+      "label": "Point de Hongrie",
+      "waste": "élevées"
+    },
+    {
+      "id": "baton-rompu",
+      "label": "Bâton rompu",
+      "waste": "modérées à élevées"
+    }
   ],
   "parquets": [
     {
@@ -23,10 +47,22 @@
       "boardWidth": 0.19,
       "boardLength": 1.9,
       "defaultPattern": "lames",
-      "compatiblePatterns": ["lames", "point-de-hongrie", "baton-rompu"],
+      "compatiblePatterns": [
+        "lames",
+        "point-de-hongrie",
+        "baton-rompu"
+      ],
       "texture": {
-        "base": [232, 223, 208],
-        "grain": [206, 195, 178],
+        "base": [
+          232,
+          223,
+          208
+        ],
+        "grain": [
+          206,
+          195,
+          178
+        ],
         "warm": 2,
         "spread": 9,
         "grainLines": 6,
@@ -39,6 +75,14 @@
         "joint": 0.3,
         "sheen": 0.05,
         "cracks": 0
+      },
+      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "proceduralFallback": true,
+      "dimensions": { "width": 0.19, "length": 1.9 },
+      "patternProfiles": {
+        "lames": { "width": 0.19, "length": 1.9 },
+        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
+        "baton-rompu": { "width": 0.09, "length": 0.45 }
       }
     },
     {
@@ -51,10 +95,22 @@
       "boardWidth": 0.16,
       "boardLength": 1.6,
       "defaultPattern": "lames",
-      "compatiblePatterns": ["lames", "point-de-hongrie", "baton-rompu"],
+      "compatiblePatterns": [
+        "lames",
+        "point-de-hongrie",
+        "baton-rompu"
+      ],
       "texture": {
-        "base": [221, 203, 175],
-        "grain": [193, 172, 141],
+        "base": [
+          221,
+          203,
+          175
+        ],
+        "grain": [
+          193,
+          172,
+          141
+        ],
         "warm": 4,
         "spread": 14,
         "grainLines": 9,
@@ -67,6 +123,14 @@
         "joint": 0.4,
         "sheen": 0.04,
         "cracks": 0
+      },
+      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "proceduralFallback": true,
+      "dimensions": { "width": 0.16, "length": 1.6 },
+      "patternProfiles": {
+        "lames": { "width": 0.16, "length": 1.6 },
+        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
+        "baton-rompu": { "width": 0.09, "length": 0.45 }
       }
     },
     {
@@ -79,10 +143,22 @@
       "boardWidth": 0.18,
       "boardLength": 1.8,
       "defaultPattern": "lames",
-      "compatiblePatterns": ["lames", "point-de-hongrie", "baton-rompu"],
+      "compatiblePatterns": [
+        "lames",
+        "point-de-hongrie",
+        "baton-rompu"
+      ],
       "texture": {
-        "base": [226, 204, 186],
-        "grain": [199, 172, 153],
+        "base": [
+          226,
+          204,
+          186
+        ],
+        "grain": [
+          199,
+          172,
+          153
+        ],
         "warm": 7,
         "spread": 11,
         "grainLines": 7,
@@ -95,6 +171,14 @@
         "joint": 0.34,
         "sheen": 0.06,
         "cracks": 0
+      },
+      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "proceduralFallback": true,
+      "dimensions": { "width": 0.18, "length": 1.8 },
+      "patternProfiles": {
+        "lames": { "width": 0.18, "length": 1.8 },
+        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
+        "baton-rompu": { "width": 0.09, "length": 0.45 }
       }
     },
     {
@@ -107,10 +191,22 @@
       "boardWidth": 0.18,
       "boardLength": 1.8,
       "defaultPattern": "lames",
-      "compatiblePatterns": ["lames", "point-de-hongrie", "baton-rompu"],
+      "compatiblePatterns": [
+        "lames",
+        "point-de-hongrie",
+        "baton-rompu"
+      ],
       "texture": {
-        "base": [205, 178, 143],
-        "grain": [173, 143, 107],
+        "base": [
+          205,
+          178,
+          143
+        ],
+        "grain": [
+          173,
+          143,
+          107
+        ],
         "warm": 6,
         "spread": 19,
         "grainLines": 11,
@@ -123,6 +219,14 @@
         "joint": 0.46,
         "sheen": 0.05,
         "cracks": 0.05
+      },
+      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "proceduralFallback": true,
+      "dimensions": { "width": 0.18, "length": 1.8 },
+      "patternProfiles": {
+        "lames": { "width": 0.18, "length": 1.8 },
+        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
+        "baton-rompu": { "width": 0.09, "length": 0.45 }
       }
     },
     {
@@ -135,10 +239,22 @@
       "boardWidth": 0.2,
       "boardLength": 2.2,
       "defaultPattern": "lames",
-      "compatiblePatterns": ["lames", "point-de-hongrie", "baton-rompu"],
+      "compatiblePatterns": [
+        "lames",
+        "point-de-hongrie",
+        "baton-rompu"
+      ],
       "texture": {
-        "base": [206, 169, 118],
-        "grain": [172, 132, 82],
+        "base": [
+          206,
+          169,
+          118
+        ],
+        "grain": [
+          172,
+          132,
+          82
+        ],
         "warm": 10,
         "spread": 16,
         "grainLines": 8,
@@ -151,6 +267,14 @@
         "joint": 0.42,
         "sheen": 0.12,
         "cracks": 0
+      },
+      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "proceduralFallback": true,
+      "dimensions": { "width": 0.2, "length": 2.2 },
+      "patternProfiles": {
+        "lames": { "width": 0.2, "length": 2.2 },
+        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
+        "baton-rompu": { "width": 0.09, "length": 0.45 }
       }
     },
     {
@@ -163,10 +287,21 @@
       "boardWidth": 0.22,
       "boardLength": 2,
       "defaultPattern": "lames",
-      "compatiblePatterns": ["lames", "baton-rompu"],
+      "compatiblePatterns": [
+        "lames",
+        "baton-rompu"
+      ],
       "texture": {
-        "base": [166, 161, 152],
-        "grain": [131, 127, 120],
+        "base": [
+          166,
+          161,
+          152
+        ],
+        "grain": [
+          131,
+          127,
+          120
+        ],
         "warm": 0,
         "spread": 15,
         "grainLines": 13,
@@ -179,6 +314,14 @@
         "joint": 0.5,
         "sheen": 0.02,
         "cracks": 0.08
+      },
+      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "proceduralFallback": true,
+      "dimensions": { "width": 0.22, "length": 2 },
+      "patternProfiles": {
+        "lames": { "width": 0.22, "length": 2 },
+        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
+        "baton-rompu": { "width": 0.09, "length": 0.45 }
       }
     },
     {
@@ -191,10 +334,22 @@
       "boardWidth": 0.15,
       "boardLength": 1.5,
       "defaultPattern": "lames",
-      "compatiblePatterns": ["lames", "point-de-hongrie", "baton-rompu"],
+      "compatiblePatterns": [
+        "lames",
+        "point-de-hongrie",
+        "baton-rompu"
+      ],
       "texture": {
-        "base": [191, 146, 92],
-        "grain": [159, 113, 63],
+        "base": [
+          191,
+          146,
+          92
+        ],
+        "grain": [
+          159,
+          113,
+          63
+        ],
         "warm": 9,
         "spread": 22,
         "grainLines": 12,
@@ -207,6 +362,14 @@
         "joint": 0.48,
         "sheen": 0.09,
         "cracks": 0.06
+      },
+      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "proceduralFallback": true,
+      "dimensions": { "width": 0.15, "length": 1.5 },
+      "patternProfiles": {
+        "lames": { "width": 0.15, "length": 1.5 },
+        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
+        "baton-rompu": { "width": 0.09, "length": 0.45 }
       }
     },
     {
@@ -219,10 +382,22 @@
       "boardWidth": 0.16,
       "boardLength": 1.7,
       "defaultPattern": "point-de-hongrie",
-      "compatiblePatterns": ["lames", "point-de-hongrie", "baton-rompu"],
+      "compatiblePatterns": [
+        "lames",
+        "point-de-hongrie",
+        "baton-rompu"
+      ],
       "texture": {
-        "base": [169, 118, 71],
-        "grain": [136, 88, 48],
+        "base": [
+          169,
+          118,
+          71
+        ],
+        "grain": [
+          136,
+          88,
+          48
+        ],
         "warm": 11,
         "spread": 18,
         "grainLines": 10,
@@ -235,6 +410,14 @@
         "joint": 0.5,
         "sheen": 0.1,
         "cracks": 0.04
+      },
+      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "proceduralFallback": true,
+      "dimensions": { "width": 0.16, "length": 1.7 },
+      "patternProfiles": {
+        "lames": { "width": 0.16, "length": 1.7 },
+        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
+        "baton-rompu": { "width": 0.09, "length": 0.45 }
       }
     },
     {
@@ -247,10 +430,21 @@
       "boardWidth": 0.22,
       "boardLength": 2.4,
       "defaultPattern": "lames",
-      "compatiblePatterns": ["lames", "baton-rompu"],
+      "compatiblePatterns": [
+        "lames",
+        "baton-rompu"
+      ],
       "texture": {
-        "base": [180, 138, 96],
-        "grain": [132, 92, 55],
+        "base": [
+          180,
+          138,
+          96
+        ],
+        "grain": [
+          132,
+          92,
+          55
+        ],
         "warm": 8,
         "spread": 34,
         "grainLines": 16,
@@ -263,6 +457,14 @@
         "joint": 0.56,
         "sheen": 0.03,
         "cracks": 0.35
+      },
+      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "proceduralFallback": true,
+      "dimensions": { "width": 0.22, "length": 2.4 },
+      "patternProfiles": {
+        "lames": { "width": 0.22, "length": 2.4 },
+        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
+        "baton-rompu": { "width": 0.09, "length": 0.45 }
       }
     },
     {
@@ -275,10 +477,22 @@
       "boardWidth": 0.14,
       "boardLength": 1.4,
       "defaultPattern": "lames",
-      "compatiblePatterns": ["lames", "point-de-hongrie", "baton-rompu"],
+      "compatiblePatterns": [
+        "lames",
+        "point-de-hongrie",
+        "baton-rompu"
+      ],
       "texture": {
-        "base": [131, 92, 60],
-        "grain": [99, 65, 39],
+        "base": [
+          131,
+          92,
+          60
+        ],
+        "grain": [
+          99,
+          65,
+          39
+        ],
         "warm": 7,
         "spread": 17,
         "grainLines": 12,
@@ -291,6 +505,14 @@
         "joint": 0.5,
         "sheen": 0.07,
         "cracks": 0.05
+      },
+      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "proceduralFallback": true,
+      "dimensions": { "width": 0.14, "length": 1.4 },
+      "patternProfiles": {
+        "lames": { "width": 0.14, "length": 1.4 },
+        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
+        "baton-rompu": { "width": 0.09, "length": 0.45 }
       }
     },
     {
@@ -303,10 +525,22 @@
       "boardWidth": 0.18,
       "boardLength": 1.8,
       "defaultPattern": "lames",
-      "compatiblePatterns": ["lames", "point-de-hongrie", "baton-rompu"],
+      "compatiblePatterns": [
+        "lames",
+        "point-de-hongrie",
+        "baton-rompu"
+      ],
       "texture": {
-        "base": [110, 80, 58],
-        "grain": [80, 55, 38],
+        "base": [
+          110,
+          80,
+          58
+        ],
+        "grain": [
+          80,
+          55,
+          38
+        ],
         "warm": 5,
         "spread": 14,
         "grainLines": 9,
@@ -319,6 +553,14 @@
         "joint": 0.48,
         "sheen": 0.06,
         "cracks": 0.03
+      },
+      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "proceduralFallback": true,
+      "dimensions": { "width": 0.18, "length": 1.8 },
+      "patternProfiles": {
+        "lames": { "width": 0.18, "length": 1.8 },
+        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
+        "baton-rompu": { "width": 0.09, "length": 0.45 }
       }
     },
     {
@@ -331,10 +573,22 @@
       "boardWidth": 0.2,
       "boardLength": 2.1,
       "defaultPattern": "point-de-hongrie",
-      "compatiblePatterns": ["lames", "point-de-hongrie", "baton-rompu"],
+      "compatiblePatterns": [
+        "lames",
+        "point-de-hongrie",
+        "baton-rompu"
+      ],
       "texture": {
-        "base": [86, 69, 58],
-        "grain": [58, 45, 37],
+        "base": [
+          86,
+          69,
+          58
+        ],
+        "grain": [
+          58,
+          45,
+          37
+        ],
         "warm": 3,
         "spread": 16,
         "grainLines": 14,
@@ -347,7 +601,16 @@
         "joint": 0.55,
         "sheen": 0.04,
         "cracks": 0.12
+      },
+      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "proceduralFallback": true,
+      "dimensions": { "width": 0.2, "length": 2.1 },
+      "patternProfiles": {
+        "lames": { "width": 0.2, "length": 2.1 },
+        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
+        "baton-rompu": { "width": 0.09, "length": 0.45 }
       }
     }
-  ]
+  ],
+  "patternNote": "Le niveau de chutes est qualitatif (faibles, modérées, élevées), pas un pourcentage : le taux réel dépend de la pièce, du calepinage et des longueurs livrées."
 }

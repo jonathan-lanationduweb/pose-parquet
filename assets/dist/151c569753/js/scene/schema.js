@@ -233,6 +233,50 @@ export function createBlankScene({ width, height, quad = DEFAULT_QUAD, meters, l
   });
 }
 
+/**
+ * Ajoute une zone de sol à une scène existante.
+ *
+ * Sert quand l'utilisateur déclare un second sol sur sa photo — une pièce
+ * aperçue derrière une porte, un couloir. Par défaut la nouvelle zone rejoint
+ * la **même surface** que la première : c'est le cas courant, un seul parquet
+ * pour tout l'étage, et cela évite de demander à l'utilisateur de comprendre la
+ * notion de surface pour obtenir le résultat attendu.
+ *
+ * @returns {object} la zone créée, déjà présente dans scene.floorZones
+ */
+export function addZone(scene, { label, quad, surfaceId, meters } = {}) {
+  const index = scene.floorZones.length;
+  const zone = normalizeZone(
+    {
+      id: `zone-${index + 1}-${Date.now().toString(36)}`,
+      label: label || `Sol ${index + 1}`,
+      surfaceId: surfaceId || scene.surfaces[0].id,
+      order: index,
+      plane: {
+        quad: quad || DEFAULT_QUAD,
+        meters: meters || scene.floorZones[0].plane.meters,
+      },
+      mask: { polygon: quad || DEFAULT_QUAD },
+    },
+    index,
+    {}
+  );
+  scene.floorZones.push(zone);
+  return zone;
+}
+
+/** Retire une zone. La scène doit toujours en garder au moins une. */
+export function removeZone(scene, zoneId) {
+  if (scene.floorZones.length <= 1) return false;
+  const index = scene.floorZones.findIndex((zone) => zone.id === zoneId);
+  if (index < 0) return false;
+  scene.floorZones.splice(index, 1);
+  scene.floorZones.forEach((zone, i) => {
+    zone.order = i;
+  });
+  return true;
+}
+
 /** Zones d'une même surface, de la plus lointaine à la plus proche. */
 export const zonesOfSurface = (scene, surfaceId) =>
   scene.floorZones.filter((zone) => zone.surfaceId === surfaceId);
