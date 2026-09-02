@@ -165,9 +165,10 @@
   ],
   "light": {
     "kind": "photo-luma",
-    "strength": 0.85,
+    "strength": 1,
     "blurRadius": 0.028,
-    "tint": 0.45,
-    "ambient": 0.24
+    "tint": 0.5,
+    "ambient": 0.22,
+    "contact": 0.5
   }
 }

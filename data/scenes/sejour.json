@@ -190,8 +190,9 @@
   "occluders": [],
   "light": {
     "kind": "photo-luma",
-    "strength": 0.85,
+    "strength": 1,
     "blurRadius": 0.032,
-    "ambient": 0.26
+    "ambient": 0.26,
+    "contact": 0.45
   }
 }

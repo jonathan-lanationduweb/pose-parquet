@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "note": "EXEMPLE, non chargé par le site. Montre la forme qu'un export Premibel peut avoir : noms en snake_case, largeurs en millimètres, motifs en chaîne séparée par des virgules, famille de rendu parfois absente. js/scene/product.js ramène tout cela à la fiche canonique. Pour brancher un vrai catalogue, renommer ce fichier en data/products.json — chargerProduits() lui donne alors la priorité sur data/parquets.json, sans aucune autre modification.",
+  "produits": [
+    {
+      "reference": "PB-CHN-180-HM",
+      "nom": "Chêne Tradition Naturel",
+      "essence": "Chêne",
+      "gamme": "Tradition",
+      "teinte": "naturel",
+      "finition": "Huilé mat",
+      "largeur_lame": 180,
+      "longueur_lame": 1800,
+      "type_parquet": "contrecollé",
+      "motifs_autorises": "lames, point-de-hongrie, baton-rompu",
+      "motif_par_defaut": "lames",
+      "famille_rendu": "chene-naturel",
+      "ordre_affichage": 10,
+      "actif": true
+    },
+    {
+      "reference": "PB-CHN-090-PH",
+      "nom": "Chêne Tradition Point de Hongrie",
+      "essence": "Chêne",
+      "gamme": "Tradition",
+      "teinte": "miel",
+      "finition": "Vernis satiné",
+      "largeur_lame": 90,
+      "longueur_lame": 600,
+      "type_parquet": "massif",
+      "motifs_autorises": "point-de-hongrie, baton-rompu",
+      "ordre_affichage": 20,
+      "actif": true
+    },
+    {
+      "reference": "PB-CHN-220-FB",
+      "nom": "Chêne Atelier Fumé",
+      "essence": "Chêne",
+      "gamme": "Atelier",
+      "teinte": "fonce",
+      "finition": "Fumé brossé",
+      "largeur_lame": 220,
+      "longueur_lame": 2200,
+      "type_parquet": "contrecollé",
+      "motifs_autorises": "lames",
+      "ordre_affichage": 30,
+      "actif": true
+    },
+    {
+      "reference": "PB-CHN-160-XX",
+      "nom": "Chêne fiche incomplète (test)",
+      "essence": "Chêne",
+      "gamme": "Atelier",
+      "largeur_lame": 160,
+      "ordre_affichage": 40,
+      "actif": true
+    },
+    {
+      "reference": "PB-RETIRE-001",
+      "nom": "Référence retirée du catalogue",
+      "essence": "Chêne",
+      "teinte": "clair",
+      "largeur_lame": 140,
+      "ordre_affichage": 50,
+      "actif": false
+    }
+  ]
+}

@@ -186,7 +186,7 @@ export function normalizeScene(raw) {
      */
     light: {
       kind: light.kind || 'photo-luma',
-      strength: num(light.strength, 0.85),
+      strength: num(light.strength, 1),
       blurRadius: num(light.blurRadius, 0.035),
       // Lumière d'ambiance : la part de l'éclairement qui ne vient pas
       // directement de la fenêtre mais du rebond sur les murs et le plafond.

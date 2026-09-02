@@ -235,8 +235,12 @@ export function createCanvasRenderer() {
             shading.sample(x, y, lit);
             const lum = 0.2126 * lit[0] + 0.7152 * lit[1] + 0.0722 * lit[2];
             const raw = 1 + strength * (Math.pow(Math.max(0.02, lum), 0.88) - 1);
-            // Même formule que le shader : voir `uAmbient` dans renderer-gl.js.
-            const shade = clamp(ambient + (1 - ambient) * raw, 0.42, 1.9);
+            // Même formule que le shader : le relèvement ne touche que les
+            // ombres, et seulement à proportion du manque de marge du
+            // matériau. Voir `uAmbient` dans renderer-gl.js.
+            const aLum = (0.2126 * acc[0] + 0.7152 * acc[1] + 0.0722 * acc[2]) / 255;
+            const lift = ambient * (1 - aLum);
+            const shade = clamp(raw < 1 ? lift + (1 - lift) * raw : raw, 0.42, 1.9);
             const gainR = shade + tint * (lit[0] - lum) * strength;
             const gainG = shade + tint * (lit[1] - lum) * strength;
             const gainB = shade + tint * (lit[2] - lum) * strength;
@@ -270,7 +274,6 @@ export function createCanvasRenderer() {
             // Le reflet emprunte sa couleur au bois et s'atténue sur les
             // teintes sombres : même formule que le shader, cf. `teinteReflet`
             // dans renderer-gl.js.
-            const aLum = (0.2126 * acc[0] + 0.7152 * acc[1] + 0.0722 * acc[2]) / 255;
             const dose = specular * (0.35 + 0.65 * aLum);
             const r = knee(acc[0] * gainR * factor + (acc[0] * 0.45 + 210 * 0.55) * dose);
             const gg = knee(acc[1] * gainG * factor + (acc[1] * 0.45 + 205 * 0.55) * dose);

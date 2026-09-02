@@ -106,10 +106,10 @@
   "occluders": [],
   "light": {
     "kind": "photo-luma",
-    "strength": 0.85,
+    "strength": 1,
     "blurRadius": 0.014,
-    "tint": 0.4,
-    "contact": 0.3,
-    "ambient": 0.22
+    "tint": 0.45,
+    "contact": 0.35,
+    "ambient": 0.2
   }
 }
