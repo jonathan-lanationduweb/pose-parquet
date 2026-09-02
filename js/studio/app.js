@@ -475,6 +475,7 @@ export async function mountStudio(root) {
 
   function syncVariants() {
     variantsHost.innerHTML = '';
+    variantsHost.dataset.label = variants.length ? `Mes variantes ${variants.length}/3` : '';
     variants.forEach((variant, index) => {
       const item = catalog.get(variant.config.materialId);
       const chip = document.createElement('span');
