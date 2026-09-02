@@ -47,7 +47,7 @@ body.app.is-comparing { overflow: hidden; }
   align-items: center;
   gap: var(--sp-4);
   padding: 0 clamp(0.6rem, 1.5vw, 1.1rem);
-  height: 3.25rem;
+  height: 2.9rem;
   background: #101214;
   color: #f4f2ec;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -192,8 +192,9 @@ body.app.is-comparing { overflow: hidden; }
 /* ---------- Plan de travail ---------- */
 .studio__main {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(19rem, 23vw, 24rem);
-  grid-template-rows: minmax(0, 1fr) auto;
+  position: relative;
+  grid-template-columns: minmax(0, 1fr) clamp(17.5rem, 21vw, 22rem);
+  grid-template-rows: minmax(0, 1fr);
   min-height: 0;
   background: #17191b;
 }
@@ -222,7 +223,7 @@ body.app.is-comparing { overflow: hidden; }
   z-index: 1;
   display: block;
   max-width: 100%;
-  max-height: calc(100svh - 12rem);
+  max-height: calc(100svh - 9rem);
   width: auto;
   height: auto;
 }
@@ -326,7 +327,7 @@ body.app.is-comparing { overflow: hidden; }
 /* ---------- Panneau ---------- */
 .studio__panel {
   grid-column: 2;
-  grid-row: 1 / span 2;
+  grid-row: 1;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
   min-height: 0;
@@ -513,18 +514,29 @@ body.app.is-comparing { overflow: hidden; }
 .orient__item[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); }
 
 /* ---------- Barre d'actions ---------- */
+/* Les actions flottent au-dessus de la pièce : elles ne lui volent aucune
+   bande, exactement comme la barre d'outils d'un configurateur. */
 .studio__actions {
-  grid-column: 1;
-  grid-row: 2;
+  position: absolute;
+  left: 50%;
+  bottom: clamp(0.6rem, 1.4vw, 1.1rem);
+  transform: translateX(-50%);
+  z-index: 12;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem 1rem;
-  padding: 0.6rem clamp(0.6rem, 1.4vw, 1.25rem);
-  background: #101214;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  justify-content: center;
+  gap: 0.4rem 0.75rem;
+  max-width: calc(100% - 2rem);
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--r-pill);
+  background: rgba(16, 18, 19, 0.86);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
-.actions__variants { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-right: auto; }
+/* Le panneau occupe la colonne de droite sur toute la hauteur */
+.studio__panel { grid-column: 2; grid-row: 1; }
+.actions__variants { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
 .variant {
   display: inline-flex;
   align-items: center;
@@ -587,7 +599,7 @@ body.app.is-comparing { overflow: hidden; }
   position: fixed;
   right: 0;
   bottom: 0;
-  top: 3.25rem;
+  top: 2.9rem;
   z-index: 60;
   width: min(24rem, 100%);
   display: grid;
@@ -789,46 +801,80 @@ body.app.is-comparing { overflow: hidden; }
 @media (max-width: 64rem) and (orientation: portrait) and (min-width: 48rem) {
   .studio__main {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto auto;
+    grid-template-rows: auto auto minmax(0, 1fr);
   }
   .studio__stage { grid-column: 1; grid-row: 1; }
-  .studio__actions { grid-column: 1; grid-row: 2; }
+  /* En portrait, la pièce ne tient plus toute la hauteur : la barre revient
+     dans le flux, sinon elle flotterait au-dessus du catalogue. */
+  .studio__actions {
+    position: static;
+    transform: none;
+    grid-column: 1;
+    grid-row: 2;
+    width: auto;
+    max-width: none;
+    justify-content: space-between;
+    border-radius: 0;
+    background: #101214;
+    backdrop-filter: none;
+    box-shadow: none;
+    padding: 0.5rem clamp(0.6rem, 1.4vw, 1.25rem);
+  }
   .studio__panel {
     grid-column: 1;
     grid-row: 3;
+    align-content: start;
     border-left: 0;
     border-top: 1px solid var(--line);
-    max-height: 42svh;
   }
   .cat__grid { grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr)); }
 }
 
 /* ================================================================== */
-/* Téléphone : photo en haut, actions, puis catalogue — tout au pouce    */
+/* Téléphone : la pièce en haut, les actions, puis les matières au pouce */
 /* ================================================================== */
 @media (max-width: 47.99rem) {
   .studio__bar { height: 3rem; padding-inline: 0.5rem; }
   .studio__back span { font-size: 0.85rem; }
   .studio__project { display: none; }
 
-  /* Trois zones empilées : la photo prend sa hauteur naturelle, le
-     catalogue occupe tout ce qui reste. Aucun espace noir perdu. */
+  /* Trois bandes : la photo prend ce qui reste, les actions et le catalogue
+     se dimensionnent sur leur contenu. */
+  /* La photo prend sa hauteur naturelle et se cale sous la barre ; le
+     catalogue occupe le reste. Aucune bande noire perdue. */
   .studio__main {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto minmax(0, 1fr);
   }
-  .studio__stage { grid-row: 1; padding: 0.4rem; align-content: start; }
-  .stage__canvas { max-height: 58svh; }
+  .studio__stage { grid-row: 1; grid-column: 1; padding: 0.4rem; }
+  .stage__canvas { max-height: 46svh; }
   .stage__room { top: 0.6rem; left: 0.6rem; font-size: 0.78rem; }
 
+  /* Les actions reviennent dans le flux : sur un téléphone, une pilule
+     flottante mangerait le bas de la photo. */
   .studio__actions {
+    position: static;
+    transform: none;
     grid-row: 2;
+    grid-column: 1;
+    width: auto;
+    max-width: none;
     flex-direction: column;
     align-items: stretch;
-    gap: 0.4rem;
-    padding: 0.5rem 0.5rem 0.55rem;
+    gap: 0.35rem;
+    padding: 0.45rem 0.5rem;
+    border-radius: 0;
+    backdrop-filter: none;
+    background: #101214;
+    box-shadow: none;
   }
-  .actions__variants { margin: 0; justify-content: center; }
+  .actions__variants:not(:empty) {
+    justify-content: center;
+    padding: 0 0 0.3rem;
+    margin: 0;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  }
   .actions__buttons { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.3rem; }
   .action { flex-direction: column; gap: 0.2rem; padding: 0.5rem 0.2rem; text-align: center; font-size: 0.66rem; line-height: 1.2; }
   .action svg { width: 1.25rem; height: 1.25rem; }
@@ -837,6 +883,7 @@ body.app.is-comparing { overflow: hidden; }
     grid-row: 3;
     grid-column: 1;
     grid-template-rows: auto auto auto minmax(0, 1fr);
+    align-content: start;
     border-left: 0;
     border-top: 1px solid var(--line);
     border-radius: var(--r-card) var(--r-card) 0 0;
@@ -847,6 +894,7 @@ body.app.is-comparing { overflow: hidden; }
     position: fixed;
     inset: 3rem 0 0 0;
     z-index: 50;
+    max-height: none;
     box-shadow: 0 -14px 40px rgba(0, 0, 0, 0.35);
   }
   .panel__grab { display: block; width: 100%; height: 1.35rem; border: 0; background: none; cursor: pointer; }
@@ -891,3 +939,89 @@ body.app.is-comparing { overflow: hidden; }
 
 .studio__noscript { padding: var(--gutter); color: #f4f2ec; max-width: 40rem; }
 .studio__noscript a { color: #fff; }
+
+/* ---------- Cartes de matière : l'action est nommée sur la carte ----------
+   Repris du principe observé chez IKEA : au survol, la vignette annonce ce
+   qui va se passer, et l'état actif se voit sans avoir à comparer les bords. */
+.cat__media { position: relative; }
+.cat__card .cat__media::after {
+  content: "Poser ce parquet";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 0.5rem;
+  background: rgba(16, 18, 19, 0.55);
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 500;
+  text-align: center;
+  opacity: 0;
+  transition: opacity var(--dur-2) var(--ease-out);
+}
+.cat__card:hover .cat__media::after,
+.cat__card:focus-visible .cat__media::after { opacity: 1; }
+.cat__card[aria-pressed="true"] .cat__media::after { content: none; }
+
+.cat__card[aria-pressed="true"] { position: relative; }
+.cat__card[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: var(--r-pill);
+  background: var(--c-sage-deep)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 12.5 5 5L20 6'/%3E%3C/svg%3E")
+    center / 0.85rem no-repeat;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28);
+}
+
+/* La matière doit se lire : vignette plus haute, deux colonnes franches */
+.cat__grid { grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); }
+.cat__media { aspect-ratio: 1 / 1; }
+
+/* ---------- Zone de comparaison identifiée ---------- */
+.actions__variants:not(:empty) {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding-right: 0.6rem;
+  margin-right: 0.15rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.18);
+}
+.actions__variants::before {
+  content: attr(data-label);
+  margin-right: 0.15rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(244, 242, 236, 0.55);
+  white-space: nowrap;
+}
+.actions__variants:empty { display: none; }
+
+/* ---------- Téléphone : essayer les matières au pouce ----------
+   Panneau replié = un défileur horizontal de matières juste sous la pièce :
+   on essaie six parquets sans rien ouvrir. Panneau déplié = le catalogue
+   complet, en feuille par-dessus la photo. */
+@media (max-width: 47.99rem) {
+  .studio__panel[data-sheet="closed"] .cat__head { display: none; }
+  .studio__panel[data-sheet="closed"] .panel__body { padding-block: 0.5rem 0.65rem; }
+  .studio__panel[data-sheet="closed"] .cat__grid {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 6.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+    padding-bottom: 0.25rem;
+  }
+  .studio__panel[data-sheet="closed"] .cat__card { scroll-snap-align: start; }
+  .studio__panel[data-sheet="closed"] .cat__label { padding: 0.35rem 0.45rem 0.45rem; }
+  .studio__panel[data-sheet="closed"] .cat__label span { display: none; }
+  .studio__panel[data-sheet="closed"] .cat__empty { display: none; }
+  /* Motifs et orientation restent lisibles en replié */
+  .studio__panel[data-sheet="closed"] .tile-card { margin-bottom: 0.4rem; }
+}
