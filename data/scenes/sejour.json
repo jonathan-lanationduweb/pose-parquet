@@ -1,0 +1,96 @@
+{
+  "schema": "pose-parquet/scene@1",
+  "id": "sejour",
+  "label": "Séjour et salle à manger",
+  "source": "precalibrated",
+  "note": "Calibrée à la main avec _calibrage/. Deux sols visibles — le séjour au premier plan, la salle à manger derrière l'ouverture — mais une seule dalle : les deux zones partagent le plan « rez » (planeRef), ce qui rend la trame exactement continue à travers l'ouverture. Deux plans calibrés séparément auraient laissé un décalage au raccord. Le chambranle de l'ouverture, la porte ouverte à gauche et les plinthes ne sont pas du sol : le contour passe sous eux.",
+  "image": {
+    "file": "room-sejour.jpg",
+    "width": 1600,
+    "height": 1067,
+    "alt": "Séjour vide et lumineux ouvert sur une salle à manger",
+    "credit": "Curtis Adams / Pexels"
+  },
+  "camera": {
+    "horizon": 0.44,
+    "vanishingPoints": [
+      { "x": 0.408, "y": 0.44, "weight": 0.8 }
+    ],
+    "heightM": 1.5
+  },
+  "surfaces": [
+    {
+      "id": "rez",
+      "label": "Parquet du rez-de-chaussée",
+      "continuous": true
+    }
+  ],
+  "planes": {
+    "rez": {
+      "quad": [
+        { "x": 0.2, "y": 0.585 },
+        { "x": 0.83, "y": 0.585 },
+        { "x": 1.04, "y": 0.995 },
+        { "x": -0.04, "y": 0.995 }
+      ],
+      "meters": { "width": 4.6, "depth": 4.2 },
+      "origin": { "u": 0, "v": 0 },
+      "rotationDeg": 0
+    }
+  },
+  "floorZones": [
+    {
+      "id": "salle-a-manger",
+      "label": "Salle à manger",
+      "surfaceId": "rez",
+      "planeRef": "rez",
+      "order": 0,
+      "mask": {
+        "polygon": [
+          { "x": 0.098, "y": 0.552 },
+          { "x": 0.14, "y": 0.547 },
+          { "x": 0.2, "y": 0.536 },
+          { "x": 0.25, "y": 0.53 },
+          { "x": 0.31, "y": 0.544 },
+          { "x": 0.335, "y": 0.553 },
+          { "x": 0.352, "y": 0.575 },
+          { "x": 0.362, "y": 0.594 },
+          { "x": 0.098, "y": 0.676 }
+        ],
+        "holes": []
+      }
+    },
+    {
+      "id": "sejour",
+      "label": "Séjour",
+      "surfaceId": "rez",
+      "planeRef": "rez",
+      "order": 1,
+      "mask": {
+        "polygon": [
+          { "x": 0, "y": 0.694 },
+          { "x": 0.055, "y": 0.683 },
+          { "x": 0.098, "y": 0.676 },
+          { "x": 0.362, "y": 0.594 },
+          { "x": 0.372, "y": 0.583 },
+          { "x": 0.42, "y": 0.586 },
+          { "x": 0.5, "y": 0.616 },
+          { "x": 0.6, "y": 0.652 },
+          { "x": 0.7, "y": 0.691 },
+          { "x": 0.8, "y": 0.727 },
+          { "x": 0.9, "y": 0.762 },
+          { "x": 1, "y": 0.799 },
+          { "x": 1, "y": 1 },
+          { "x": 0, "y": 1 }
+        ],
+        "holes": []
+      }
+    }
+  ],
+  "occluders": [],
+  "light": {
+    "kind": "photo-luma",
+    "strength": 0.95,
+    "blurRadius": 0.032
+  }
+}

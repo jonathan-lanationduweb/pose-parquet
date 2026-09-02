@@ -1,0 +1,90 @@
+{
+  "schema": "pose-parquet/scene@1",
+  "id": "chambre",
+  "label": "Chambre ouverte au jardin",
+  "source": "precalibrated",
+  "note": "Perspective profonde et lumière très franche : c'est la scène qui met à l'épreuve la convergence du motif et le report de l'ombre portée. Les trois murs visibles donnent trois segments rectilignes, obtenus par ajustement de droites sur le relevé plutôt que point par point — le bas d'un mur est une droite dans l'image, autant s'en servir. La grille de ventilation au pied de la porte-fenêtre reste devant le parquet.",
+  "image": {
+    "file": "room-chambre.jpg",
+    "width": 1600,
+    "height": 1067,
+    "alt": "Chambre aux murs bleus ouverte sur le jardin",
+    "credit": "Max Vakhtbovych / Pexels"
+  },
+  "camera": {
+    "horizon": 0.45,
+    "vanishingPoints": [
+      { "x": 0.56, "y": 0.45, "weight": 0.85 }
+    ],
+    "heightM": 1.5
+  },
+  "surfaces": [
+    {
+      "id": "sol",
+      "label": "Sol de la chambre",
+      "continuous": true
+    }
+  ],
+  "planes": {
+    "sol": {
+      "quad": [
+        { "x": 0.23, "y": 0.578 },
+        { "x": 0.79, "y": 0.578 },
+        { "x": 1.05, "y": 0.995 },
+        { "x": -0.03, "y": 0.995 }
+      ],
+      "meters": { "width": 4, "depth": 4 },
+      "origin": { "u": 0, "v": 0 },
+      "rotationDeg": 0
+    }
+  },
+  "floorZones": [
+    {
+      "id": "chambre",
+      "label": "Chambre",
+      "surfaceId": "sol",
+      "planeRef": "sol",
+      "order": 0,
+      "mask": {
+        "polygon": [
+          { "x": 0, "y": 0.892 },
+          { "x": 0.31, "y": 0.783 },
+          { "x": 0.33, "y": 0.718 },
+          { "x": 0.42, "y": 0.675 },
+          { "x": 0.53, "y": 0.621 },
+          { "x": 0.7, "y": 0.65 },
+          { "x": 0.86, "y": 0.688 },
+          { "x": 0.874, "y": 0.691 },
+          { "x": 0.94, "y": 0.807 },
+          { "x": 1, "y": 0.926 },
+          { "x": 1, "y": 1 },
+          { "x": 0, "y": 1 }
+        ],
+        "holes": []
+      }
+    }
+  ],
+  "occluders": [
+    {
+      "id": "grille",
+      "label": "Grille de ventilation",
+      "kind": "fixture",
+      "polygon": [
+        { "x": 0, "y": 0.876 },
+        { "x": 0.315, "y": 0.779 },
+        { "x": 0.322, "y": 0.818 },
+        { "x": 0.026, "y": 0.913 },
+        { "x": 0, "y": 0.922 }
+      ],
+      "depth": 0.62,
+      "castsShadow": false,
+      "feather": 0.0012
+    }
+  ],
+  "light": {
+    "kind": "photo-luma",
+    "strength": 1,
+    "blurRadius": 0.028,
+    "tint": 0.45
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "schema": "pose-parquet/scene@1",
+  "id": "piece-claire",
+  "label": "Pièce claire",
+  "source": "precalibrated",
+  "note": "Un seul sol, mais deux objets posés dessus : le meuble bas et le radiateur. Ils sont déclarés en occlusions et non en trous du contour — un objet vaut pour toute la scène et survit à une correction du sol. Le mur blanc du premier plan, à droite, borne le sol à x = 0,841.",
+  "image": {
+    "file": "room-piece-claire.jpg",
+    "width": 1600,
+    "height": 1067,
+    "alt": "Pièce vide et moderne à la lumière douce",
+    "credit": "Max Vakhtbovych / Pexels"
+  },
+  "camera": {
+    "horizon": 0.47,
+    "vanishingPoints": [
+      { "x": 0.47, "y": 0.47, "weight": 0.8 }
+    ],
+    "heightM": 1.55
+  },
+  "surfaces": [
+    {
+      "id": "sol",
+      "label": "Sol de la pièce",
+      "continuous": true
+    }
+  ],
+  "planes": {
+    "sol": {
+      "quad": [
+        { "x": 0.16, "y": 0.59 },
+        { "x": 0.87, "y": 0.59 },
+        { "x": 1.05, "y": 0.995 },
+        { "x": -0.05, "y": 0.995 }
+      ],
+      "meters": { "width": 4.2, "depth": 4 },
+      "origin": { "u": 0, "v": 0 },
+      "rotationDeg": 0
+    }
+  },
+  "floorZones": [
+    {
+      "id": "piece",
+      "label": "Pièce",
+      "surfaceId": "sol",
+      "planeRef": "sol",
+      "order": 0,
+      "mask": {
+        "polygon": [
+          { "x": 0.038, "y": 0.7 },
+          { "x": 0.075, "y": 0.665 },
+          { "x": 0.2, "y": 0.671 },
+          { "x": 0.36, "y": 0.679 },
+          { "x": 0.56, "y": 0.69 },
+          { "x": 0.64, "y": 0.731 },
+          { "x": 0.72, "y": 0.782 },
+          { "x": 0.8, "y": 0.815 },
+          { "x": 0.841, "y": 0.834 },
+          { "x": 0.841, "y": 1 },
+          { "x": 0.038, "y": 1 }
+        ],
+        "holes": []
+      }
+    }
+  ],
+  "occluders": [
+    {
+      "id": "radiateur",
+      "label": "Radiateur",
+      "kind": "fixture",
+      "polygon": [
+        { "x": 0.255, "y": 0.554 },
+        { "x": 0.349, "y": 0.551 },
+        { "x": 0.349, "y": 0.617 },
+        { "x": 0.255, "y": 0.627 }
+      ],
+      "contact": [
+        { "x": 0.255, "y": 0.627 },
+        { "x": 0.349, "y": 0.617 }
+      ],
+      "depth": 0.72
+    },
+    {
+      "id": "meuble",
+      "label": "Meuble bas",
+      "kind": "furniture",
+      "polygon": [
+        { "x": 0.361, "y": 0.569 },
+        { "x": 0.502, "y": 0.585 },
+        { "x": 0.502, "y": 0.699 },
+        { "x": 0.361, "y": 0.668 }
+      ],
+      "contact": [
+        { "x": 0.361, "y": 0.668 },
+        { "x": 0.502, "y": 0.699 }
+      ],
+      "depth": 0.6
+    }
+  ],
+  "light": {
+    "kind": "photo-luma",
+    "strength": 0.95,
+    "blurRadius": 0.036,
+    "tint": 0.4
+  }
+}

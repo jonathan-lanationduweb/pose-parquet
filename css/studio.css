@@ -1,6 +1,7 @@
-/* Feuille de style du Studio : base du design system + interface applicative */
+/* Feuille de style du Visualiseur Parquet : socle du design system + interface applicative */
 @import url("./fonts.css");
 @import url("./tokens.css");
 @import url("./reset.css");
 @import url("./components/button.css");
+@import url("./components/floor-editor.css");
 @import url("./studio-app.css");

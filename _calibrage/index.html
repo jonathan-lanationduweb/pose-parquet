@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Calibrage des scènes — outil interne</title>
+<style>
+  :root { color-scheme: dark; --line: #2c3230; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; background: #141817; color: #e6ebe8; }
+  header { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: #14181799; backdrop-filter: blur(8px); z-index: 5; }
+  select, button, input { font: inherit; background: #1e2422; color: inherit; border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; }
+  button { cursor: pointer; }
+  button[aria-pressed="true"] { background: #3d7a5f; border-color: #3d7a5f; }
+  main { padding: 14px; }
+  .wrap { position: relative; display: block; width: min(1600px, calc((100vh - 190px) * 1.4995)); margin: 0 auto; }
+  .wrap canvas, .wrap svg { display: block; width: 100%; height: auto; }
+  .wrap svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .grid line { stroke: #ffffff22; stroke-width: 0.5; vector-effect: non-scaling-stroke; }
+  .grid line.major { stroke: #ffffff55; }
+  .grid text { fill: #ffffffaa; font-size: 9px; font-family: ui-monospace, monospace; }
+  .zone { fill: #3ad19a18; stroke: #3ad19a; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+  .hole { fill: #ff9d4d22; stroke: #ff9d4d; stroke-dasharray: 4 3; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+  .quadline { fill: none; stroke: #6aa8ff; stroke-width: 1.2; stroke-dasharray: 6 4; vector-effect: non-scaling-stroke; }
+  .occ { fill: #ff5d7a22; stroke: #ff5d7a; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+  .horizon { stroke: #ffd84d; stroke-width: 1; stroke-dasharray: 8 5; vector-effect: non-scaling-stroke; }
+  .pt { fill: #fff; stroke: #141817; stroke-width: 1; }
+  .lbl { fill: #fff; font-size: 10px; paint-order: stroke; stroke: #000a; stroke-width: 2.5px; }
+  #log { white-space: pre-wrap; font-size: 11px; padding: 10px 14px; border-top: 1px solid var(--line); color: #9fd0b8; max-height: 40vh; overflow: auto; }
+  .cursor { position: fixed; bottom: 8px; right: 12px; background: #000c; padding: 4px 8px; border-radius: 6px; }
+</style>
+</head>
+<body>
+<header>
+  <label>Scène <select id="scene"></select></label>
+  <label>Parquet <select id="material"></select></label>
+  <label>Motif <select id="pattern"></select></label>
+  <label>Angle <input id="angle" type="number" value="0" step="15" style="width:5.5em" /></label>
+  <button id="toggle-overlay" aria-pressed="true">Repères</button>
+  <button id="toggle-engine" aria-pressed="false">Moteur Canvas</button>
+  <button id="loupe-btn" aria-pressed="false">Loupe</button>
+  <label>×<input id="loupe-zoom" type="number" value="2" step="0.5" min="1" max="8" style="width:4.5em" /></label>
+  <button id="bench">Banc d'essai</button>
+  <button id="dump">Copier la scène</button>
+  <span id="backend"></span>
+</header>
+<main>
+  <div class="wrap" id="wrap">
+    <canvas id="out"></canvas>
+    <svg id="overlay" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true"></svg>
+  </div>
+</main>
+  <canvas id="loupe" width="1560" height="900" hidden style="display:none;width:100%;max-width:1600px;margin:14px auto 0;border:1px solid var(--line);border-radius:8px"></canvas>
+<pre id="log"></pre>
+<div class="cursor" id="cursor">—</div>
+<script type="module" src="calibrage.js"></script>
+</body>
+</html>
