@@ -979,7 +979,9 @@ body.app.is-comparing { overflow: hidden; }
 }
 
 /* La matière doit se lire : vignette plus haute, deux colonnes franches */
-.cat__grid { grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); }
+/* Deux colonnes dans un panneau de 300 px : on voit six matieres d'un coup,
+   sans que la vignette devienne trop petite pour lire le veinage. */
+.cat__grid { grid-template-columns: repeat(auto-fill, minmax(6.75rem, 1fr)); }
 .cat__media { aspect-ratio: 1 / 1; }
 
 /* ---------- Zone de comparaison identifiée ---------- */
