@@ -176,21 +176,21 @@ const PHOTOS = {
 
 /** Galerie inspiration : ordre = inspi-1.jpg, inspi-2.jpg, … */
 const INSPIRATION_PHOTOS = [
-  { id: 7587865, tags: 'hongrie sejour', try: 'motif=point-de-hongrie&teinte=fume', credit: 'Max Vakhtbovych', title: 'Séjour traversant', meta: 'Chevrons · chêne fumé', size: 'wide',
+  { id: 7587865, tags: 'hongrie sejour', try: 'piece=sejour&parquet=chene-fume&motif=point-de-hongrie&orientation=0', credit: 'Max Vakhtbovych', title: 'Séjour traversant', meta: 'Chevrons · chêne fumé', size: 'wide',
     alt: 'Séjour contemporain au parquet foncé posé en chevrons' },
-  { id: 7587872, tags: 'hongrie chambre', try: 'motif=point-de-hongrie&teinte=naturel', credit: 'Max Vakhtbovych', title: 'Chambre parisienne', meta: 'Point de Hongrie · chêne naturel', size: 'md',
+  { id: 7587872, tags: 'hongrie chambre', try: 'piece=chambre&parquet=chene-naturel&motif=point-de-hongrie&orientation=0', credit: 'Max Vakhtbovych', title: 'Chambre parisienne', meta: 'Point de Hongrie · chêne naturel', size: 'md',
     alt: 'Pièce aux murs bleus et parquet en chevrons' },
-  { id: 7060823, tags: 'droite cuisine', try: 'motif=lames&teinte=fume&piece=cuisine', credit: 'Max Vakhtbovych', title: 'Cuisine ouverte', meta: 'Lames larges · teinte fumée', size: 'sm',
+  { id: 7060823, tags: 'droite cuisine', try: 'piece=sejour&parquet=chene-gris&motif=lames&orientation=0', credit: 'Max Vakhtbovych', title: 'Cuisine ouverte', meta: 'Lames larges · chêne gris', size: 'sm',
     alt: 'Cuisine ouverte sur salle à manger, parquet aux lames larges et grises' },
-  { id: 7587374, tags: 'droite couloir', try: 'motif=lames&teinte=clair&sens=90', credit: 'Max Vakhtbovych', title: 'Couloir en enfilade', meta: 'Lames dans l’axe · chêne clair', size: 'sm',
+  { id: 7587374, tags: 'droite couloir', try: 'piece=piece-claire&parquet=chene-craie&motif=lames&orientation=90', credit: 'Max Vakhtbovych', title: 'Couloir en enfilade', meta: 'Lames dans l’axe · chêne clair', size: 'sm',
     alt: 'Couloir minimaliste aux portes en bois et parquet clair posé dans l’axe' },
-  { id: 20771870, tags: 'droite chambre', try: 'motif=lames&teinte=brun', credit: 'Алан Албегов', title: 'Chambre sous combles', meta: 'Lames droites · chêne brun', size: 'md',
+  { id: 20771870, tags: 'droite chambre', try: 'piece=chambre&parquet=chene-brun&motif=lames&orientation=0', credit: 'Алан Албегов', title: 'Chambre sous combles', meta: 'Lames droites · chêne brun', size: 'md',
     alt: 'Chambre sous combles au plancher brun et mobilier clair' },
-  { id: 7045700, tags: 'droite sejour', try: 'motif=lames&teinte=brun&piece=salon', credit: 'Max Vakhtbovych', title: 'Salon d’angle', meta: 'Lames droites · chêne foncé', size: 'wide',
+  { id: 7045700, tags: 'droite sejour', try: 'piece=sejour&parquet=chene-tabac&motif=lames&orientation=0', credit: 'Max Vakhtbovych', title: 'Salon d’angle', meta: 'Lames droites · chêne foncé', size: 'wide',
     alt: 'Salon classique meublé, parquet foncé au sol' },
-  { id: 8082327, tags: 'droite chambre', try: 'motif=lames&teinte=clair&piece=piece-claire', credit: 'Max Vakhtbovych', title: 'Sous les toits', meta: 'Lames larges · chêne clair', size: 'sm',
+  { id: 8082327, tags: 'droite chambre', try: 'piece=piece-claire&parquet=chene-sable&motif=lames&orientation=0', credit: 'Max Vakhtbovych', title: 'Sous les toits', meta: 'Lames larges · chêne clair', size: 'sm',
     alt: 'Pièce sous combles éclairée par des fenêtres de toit, parquet clair' },
-  { id: 8583672, tags: 'droite couloir', try: 'motif=lames&teinte=miel&piece=salon', credit: 'Curtis Adams', title: 'Entrée cadrée', meta: 'Lames dans l’axe · chêne miel', size: 'md',
+  { id: 8583672, tags: 'droite couloir', try: 'piece=contraste&parquet=chene-miel&motif=lames&orientation=90', credit: 'Curtis Adams', title: 'Entrée cadrée', meta: 'Lames dans l’axe · chêne miel', size: 'md',
     alt: 'Entrée spacieuse au sol en bois clair et décoration soignée' },
 ];
 

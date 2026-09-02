@@ -93,39 +93,80 @@ const seedOf = (id) => {
 /* Éléments de bois                                                    */
 /* ------------------------------------------------------------------ */
 
-/** Veinage : stries longitudinales, nœuds, fentes — densité propre au matériau. */
+/** Trace une strie dans la longueur de la lame, avec une légère ondulation. */
+function streak(ctx, x, y, w, h, horizontal, t, wobble, random) {
+  const long = horizontal ? w : h;
+  const across = horizontal ? h : w;
+  const a = across * t;
+  const w1 = across * wobble * (random() - 0.5);
+  const w2 = across * wobble * (random() - 0.5);
+  ctx.beginPath();
+  if (horizontal) {
+    ctx.moveTo(x - 4, y + a);
+    ctx.bezierCurveTo(x + long * 0.28, y + a + w1, x + long * 0.66, y + a + w2, x + long + 4, y + a);
+  } else {
+    ctx.moveTo(x + a, y - 4);
+    ctx.bezierCurveTo(x + a + w1, y + long * 0.28, x + a + w2, y + long * 0.66, x + a, y + long + 4);
+  }
+  ctx.stroke();
+}
+
+/**
+ * Veinage : fibre de fond, cernes marqués, nœuds, fentes.
+ *
+ * Le fond fibreux compte autant que les cernes. Une dizaine de traits nets
+ * donne le *dessin* d'un bois ; c'est la densité de stries très pâles qui en
+ * donne la *matière*. Sans elle, chaque lame reste un aplat dégradé — et une
+ * fois projetée au sol, la surface se lit comme une image plaquée.
+ */
 function grain(ctx, x, y, w, h, tex, random) {
   const long = Math.max(w, h);
   const across = Math.min(w, h);
   const horizontal = w >= h;
-  const lines = Math.max(2, Math.round(tex.grainLines * (0.7 + random() * 0.6)));
 
   ctx.save();
   ctx.beginPath();
   ctx.rect(x, y, w, h);
   ctx.clip();
 
-  for (let i = 0; i < lines; i += 1) {
-    const t = 0.05 + random() * 0.9;
-    const alpha = tex.grainAlpha * (0.35 + random());
-    ctx.lineWidth = Math.max(0.5, across * tex.grainWidth * (0.5 + random()));
-    const tint = Math.round((random() - 0.5) * 16);
+  // 1. Figure : quelques bandes larges et floues. C’est l’échelle qui manque
+  //    le plus à un veinage synthétique — un chêne montre des zones sombres
+  //    de plusieurs centimètres, pas seulement des cheveux d’un pixel, et ce
+  //    sont elles qui survivent à la réduction quand la lame s’éloigne.
+  const bandes = 2 + Math.round(random() * 2);
+  for (let i = 0; i < bandes; i += 1) {
+    const tint = Math.round((random() - 0.5) * 10);
+    const alpha = tex.grainAlpha * (0.55 + random() * 0.55);
     ctx.strokeStyle = `rgba(${clampByte(tex.grain[0] + tint)},${clampByte(tex.grain[1] + tint)},${clampByte(
       tex.grain[2] + tint
     )},${alpha.toFixed(3)})`;
-    ctx.beginPath();
-    if (horizontal) {
-      const gy = y + across * t;
-      const wobble = across * 0.12 * (random() - 0.5);
-      ctx.moveTo(x - 4, gy);
-      ctx.bezierCurveTo(x + long * 0.3, gy + wobble, x + long * 0.7, gy - wobble, x + long + 4, gy);
-    } else {
-      const gx = x + across * t;
-      const wobble = across * 0.12 * (random() - 0.5);
-      ctx.moveTo(gx, y - 4);
-      ctx.bezierCurveTo(gx + wobble, y + long * 0.3, gx - wobble, y + long * 0.7, gx, y + long + 4);
-    }
-    ctx.stroke();
+    ctx.lineWidth = across * (0.14 + random() * 0.2);
+    streak(ctx, x, y, w, h, horizontal, 0.1 + random() * 0.8, 0.3, random);
+  }
+
+  // 2. Fibre de fond : une strie tous les pixels environ, presque invisible
+  //    une à une. C'est ce qui casse l'aplat.
+  const fibres = Math.max(26, Math.round(across * 1.15));
+  for (let i = 0; i < fibres; i += 1) {
+    const tint = Math.round((random() - 0.5) * 11);
+    const alpha = tex.grainAlpha * 0.5 * (0.3 + random());
+    ctx.strokeStyle = `rgba(${clampByte(tex.grain[0] + tint)},${clampByte(tex.grain[1] + tint)},${clampByte(
+      tex.grain[2] + tint
+    )},${alpha.toFixed(3)})`;
+    ctx.lineWidth = Math.max(0.5, across * 0.0065 * (0.6 + random()));
+    streak(ctx, x, y, w, h, horizontal, 0.015 + random() * 0.97, 0.05, random);
+  }
+
+  // 3. Cernes marqués : le dessin propre au matériau, peu nombreux.
+  const lines = Math.max(2, Math.round(tex.grainLines * (0.7 + random() * 0.6)));
+  for (let i = 0; i < lines; i += 1) {
+    const tint = Math.round((random() - 0.5) * 16);
+    const alpha = tex.grainAlpha * (0.45 + random() * 0.65);
+    ctx.strokeStyle = `rgba(${clampByte(tex.grain[0] + tint)},${clampByte(tex.grain[1] + tint)},${clampByte(
+      tex.grain[2] + tint
+    )},${alpha.toFixed(3)})`;
+    ctx.lineWidth = Math.max(0.6, across * tex.grainWidth * (0.5 + random()));
+    streak(ctx, x, y, w, h, horizontal, 0.05 + random() * 0.9, 0.14, random);
   }
 
   // Nœuds : cercles sombres cernés d'un halo, fréquence propre au matériau
@@ -134,7 +175,7 @@ function grain(ctx, x, y, w, h, tex, random) {
     const ky = y + h * (0.2 + random() * 0.6);
     const kr = across * tex.knotSize * (0.7 + random() * 0.7);
     const halo = ctx.createRadialGradient(kx, ky, kr * 0.2, kx, ky, kr * 2.4);
-    halo.addColorStop(0, `rgba(${tex.grain[0]},${tex.grain[1]},${tex.grain[2]},0.5)`);
+    halo.addColorStop(0, `rgba(${tex.grain[0]},${tex.grain[1]},${tex.grain[2]},0.45)`);
     halo.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = halo;
     ctx.beginPath();
@@ -142,7 +183,7 @@ function grain(ctx, x, y, w, h, tex, random) {
     ctx.fill();
     ctx.fillStyle = `rgba(${clampByte(tex.grain[0] - 26)},${clampByte(tex.grain[1] - 24)},${clampByte(
       tex.grain[2] - 20
-    )},0.85)`;
+    )},0.7)`;
     ctx.beginPath();
     ctx.ellipse(kx, ky, kr, kr * 0.72, random() * Math.PI, 0, Math.PI * 2);
     ctx.fill();
@@ -155,7 +196,7 @@ function grain(ctx, x, y, w, h, tex, random) {
     const len = long * (0.08 + random() * 0.22);
     ctx.strokeStyle = `rgba(${clampByte(tex.grain[0] - 40)},${clampByte(tex.grain[1] - 38)},${clampByte(
       tex.grain[2] - 34
-    )},0.55)`;
+    )},0.5)`;
     ctx.lineWidth = Math.max(0.6, across * 0.012);
     ctx.beginPath();
     if (horizontal) {
@@ -171,9 +212,21 @@ function grain(ctx, x, y, w, h, tex, random) {
   ctx.restore();
 }
 
-/** Une lame : teinte propre, dégradé longitudinal, veinage, chanfrein, joint. */
+/**
+ * Une lame : teinte propre, dégradé longitudinal, veinage, chanfrein, joints.
+ *
+ * Deux réglages comptent plus que les autres pour l'aspect final :
+ *
+ * - la **dispersion de teinte** entre lames voisines. Trop forte, le sol se
+ *   lit en patchwork : on voit des cases claires et sombres avant de voir un
+ *   parquet. Un vrai lot de pose est bien plus homogène que ça.
+ * - la **différence entre joint latéral et joint de bout**. Les traiter à
+ *   égalité dessine une grille régulière, et c'est le défaut qui trahit le
+ *   plus sûrement une texture synthétique : sur un parquet posé, les joints
+ *   de bout se remarquent à peine.
+ */
 function board(ctx, x, y, w, h, tex, random) {
-  const shift = Math.round((random() - 0.5) * tex.spread * 2);
+  const shift = Math.round((random() - 0.5) * tex.spread);
   const warm = Math.round((random() - 0.5) * tex.warm);
   const horizontal = w >= h;
 
@@ -181,7 +234,7 @@ function board(ctx, x, y, w, h, tex, random) {
   const gradient = horizontal
     ? ctx.createLinearGradient(x, y, x + w, y)
     : ctx.createLinearGradient(x, y, x, y + h);
-  const amp = 9 * tex.contrast;
+  const amp = 5 * tex.contrast;
   gradient.addColorStop(0, rgb(tex.base, shift - amp, warm));
   gradient.addColorStop(0.45, rgb(tex.base, shift + amp * 0.55, warm));
   gradient.addColorStop(1, rgb(tex.base, shift - amp * 0.7, warm));
@@ -202,19 +255,46 @@ function board(ctx, x, y, w, h, tex, random) {
     ctx.fillRect(x, y, w, h);
   }
 
-  // Chanfrein : arête claire en haut/gauche, ombre en bas/droite
+  // Chanfrein : seulement sur les longs côtés, là où il existe vraiment
   const bevel = Math.max(0.7, Math.min(w, h) * tex.bevel);
-  ctx.fillStyle = 'rgba(255,255,255,0.055)';
-  ctx.fillRect(x, y, w, bevel);
-  ctx.fillRect(x, y, bevel, h);
-  ctx.fillStyle = 'rgba(34,23,14,0.2)';
-  ctx.fillRect(x, y + h - bevel, w, bevel);
-  ctx.fillRect(x + w - bevel, y, bevel, h);
+  ctx.fillStyle = 'rgba(255,255,255,0.05)';
+  if (horizontal) ctx.fillRect(x, y, w, bevel);
+  else ctx.fillRect(x, y, bevel, h);
+  ctx.fillStyle = 'rgba(34,23,14,0.17)';
+  if (horizontal) ctx.fillRect(x, y + h - bevel, w, bevel);
+  else ctx.fillRect(x + w - bevel, y, bevel, h);
 
-  // Joint : micro-ombre entre deux lames
-  ctx.strokeStyle = `rgba(38,26,16,${tex.joint})`;
-  ctx.lineWidth = Math.max(0.8, Math.min(w, h) * 0.026);
-  ctx.strokeRect(x + 0.4, y + 0.4, w - 0.8, h - 0.8);
+  // Joints : les longs côtés se voient, les joints de bout beaucoup moins.
+  // Le facteur 0,6 vient de la comparaison avec les photos : un joint de
+  // parquet posé est une ombre fine, pas un trait dessiné.
+  const lw = Math.max(0.7, Math.min(w, h) * 0.016);
+  ctx.lineWidth = lw;
+  const longSides = () => {
+    ctx.beginPath();
+    if (horizontal) {
+      ctx.moveTo(x, y + 0.4); ctx.lineTo(x + w, y + 0.4);
+      ctx.moveTo(x, y + h - 0.4); ctx.lineTo(x + w, y + h - 0.4);
+    } else {
+      ctx.moveTo(x + 0.4, y); ctx.lineTo(x + 0.4, y + h);
+      ctx.moveTo(x + w - 0.4, y); ctx.lineTo(x + w - 0.4, y + h);
+    }
+    ctx.stroke();
+  };
+  const buttSides = () => {
+    ctx.beginPath();
+    if (horizontal) {
+      ctx.moveTo(x + 0.4, y); ctx.lineTo(x + 0.4, y + h);
+      ctx.moveTo(x + w - 0.4, y); ctx.lineTo(x + w - 0.4, y + h);
+    } else {
+      ctx.moveTo(x, y + 0.4); ctx.lineTo(x + w, y + 0.4);
+      ctx.moveTo(x, y + h - 0.4); ctx.lineTo(x + w, y + h - 0.4);
+    }
+    ctx.stroke();
+  };
+  ctx.strokeStyle = `rgba(38,26,16,${(tex.joint * 0.6).toFixed(3)})`;
+  longSides();
+  ctx.strokeStyle = `rgba(38,26,16,${(tex.joint * 0.17).toFixed(3)})`;
+  buttSides();
   ctx.restore();
 }
 
@@ -313,7 +393,7 @@ function drawChevron(ctx, tex, profile, random) {
 
   /** Une lame, en parallélogramme : le biais est porté par armX / armY. */
   const plank = (x0, y0, dir) => {
-    const shift = Math.round((random() - 0.5) * tex.spread * 2);
+    const shift = Math.round((random() - 0.5) * tex.spread);
     const warm = Math.round((random() - 0.5) * tex.warm);
     ctx.save();
     ctx.beginPath();
@@ -323,7 +403,7 @@ function drawChevron(ctx, tex, profile, random) {
     ctx.lineTo(x0, y0 + step);
     ctx.closePath();
     const gradient = ctx.createLinearGradient(x0, y0, x0 + dir * armX, y0 + armY);
-    const amp = 8 * tex.contrast;
+    const amp = 5 * tex.contrast;
     gradient.addColorStop(0, rgb(tex.base, shift - amp, warm));
     gradient.addColorStop(0.5, rgb(tex.base, shift + amp * 0.5, warm));
     gradient.addColorStop(1, rgb(tex.base, shift - amp * 0.6, warm));

@@ -132,6 +132,7 @@ export function createCanvasRenderer() {
         const reliefGain = surf.relief * 0.9;
         const glossGain = gloss ? surf.clearcoat * 1.15 : 0;
         const strength = light.strength;
+        const ambient = light.ambient;
         const tint = light.tint;
 
         for (let y = box.y0; y < box.y1; y += px) {
@@ -233,7 +234,9 @@ export function createCanvasRenderer() {
             // remarque tout de suite.
             shading.sample(x, y, lit);
             const lum = 0.2126 * lit[0] + 0.7152 * lit[1] + 0.0722 * lit[2];
-            const shade = clamp(1 + strength * (Math.pow(Math.max(0.02, lum), 0.88) - 1), 0.22, 2.1);
+            const raw = 1 + strength * (Math.pow(Math.max(0.02, lum), 0.88) - 1);
+            // Même formule que le shader : voir `uAmbient` dans renderer-gl.js.
+            const shade = clamp(ambient + (1 - ambient) * raw, 0.42, 1.9);
             const gainR = shade + tint * (lit[0] - lum) * strength;
             const gainG = shade + tint * (lit[1] - lum) * strength;
             const gainB = shade + tint * (lit[2] - lum) * strength;

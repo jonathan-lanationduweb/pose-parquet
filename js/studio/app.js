@@ -74,7 +74,7 @@ export async function mountStudio(root) {
   root.dataset.sheet = 'peek';
   root.innerHTML = `
     <header class="studio__bar">
-      <a class="studio__back" href="${base}index.html">
+      <a class="studio__back" href="${base}index.html" data-back>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
         <span><strong>Pose</strong> Parquet</span>
       </a>
@@ -971,6 +971,24 @@ export async function mountStudio(root) {
     if (sceneId) openRoom(sceneId);
     else root.dataset.state = 'start';
   });
+  /**
+   * Retour.
+   *
+   * Le lien pointe vers l'accueil, ce qui est le bon repli quand on arrive
+   * directement sur l'application. Mais quand on vient d'Inspiration — le
+   * parcours « Essayer ce style » — revenir à l'accueil fait perdre la galerie
+   * et la position de lecture. On rend donc la main à l'historique du
+   * navigateur dès qu'on vient d'une page du site.
+   */
+  on(qs('[data-back]', root), 'click', (event) => {
+    const from = document.referrer;
+    const sameSite = from && new URL(from, window.location.href).origin === window.location.origin;
+    if (sameSite && window.history.length > 1) {
+      event.preventDefault();
+      window.history.back();
+    }
+  });
+
   on(qs('[data-help]', root), 'click', async () => {
     const { openHelp } = await import('./help.js');
     openHelp(root);
@@ -997,10 +1015,36 @@ export async function mountStudio(root) {
   /* ---------------- Démarrage ---------------- */
 
   restore();
+
+  /**
+   * Lien profond.
+   *
+   * Depuis la page Inspiration, « Essayer ce style » ouvre **directement** le
+   * visualiseur avec la scène, le parquet, le motif et l'orientation déjà
+   * appliqués. L'utilisateur a déjà choisi : il n'y a ni écran de choix de
+   * pièce, ni landing, ni confirmation à traverser.
+   *
+   *   /outils/studio.html?piece=sejour&parquet=chene-fume
+   *                      &motif=point-de-hongrie&orientation=0
+   *
+   * L'orientation est en degrés, cohérente avec le panneau Orientation :
+   * 0 = lames dans la largeur, 90 = dans la profondeur, ±45 = diagonale.
+   */
   const params = new URLSearchParams(window.location.search);
   const wanted = params.get('parquet');
   if (wanted && catalog.get(wanted)) config.materialId = wanted;
-  if (params.get('motif')) config.pattern = params.get('motif');
+  const motif = params.get('motif');
+  if (motif && catalog.patterns.some((p) => p.id === motif)) config.pattern = motif;
+  const orientation = Number(params.get('orientation'));
+  if (Number.isFinite(orientation) && params.get('orientation') !== null) {
+    config.angle = Math.max(-90, Math.min(90, orientation));
+  }
+  // Un motif incompatible avec la référence demandée serait ignoré en silence :
+  // on retombe alors sur le motif par défaut du parquet.
+  const chosen = catalog.get(config.materialId);
+  if (chosen && !chosen.compatiblePatterns.includes(config.pattern)) {
+    config.pattern = chosen.defaultPattern;
+  }
 
   catalogUi.setActive(config.materialId);
   syncSelected();

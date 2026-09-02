@@ -12,9 +12,20 @@
     "credit": "Max Vakhtbovych / Pexels"
   },
   "camera": {
-    "horizon": 0.47,
+    "horizon": 0.4517,
     "vanishingPoints": [
-      { "x": 0.47, "y": 0.47, "weight": 0.8 }
+      {
+        "x": 0.096,
+        "y": 0.4517,
+        "weight": 1,
+        "role": "lames"
+      },
+      {
+        "x": -4.057,
+        "y": 0.4517,
+        "weight": 0.6,
+        "role": "plinthe"
+      }
     ],
     "heightM": 1.55
   },
@@ -28,14 +39,33 @@
   "planes": {
     "sol": {
       "quad": [
-        { "x": 0.16, "y": 0.59 },
-        { "x": 0.87, "y": 0.59 },
-        { "x": 1.05, "y": 0.995 },
-        { "x": -0.05, "y": 0.995 }
+        {
+          "x": 0.5558,
+          "y": 0.6895
+        },
+        {
+          "x": 1.1,
+          "y": 0.971
+        },
+        {
+          "x": 0.0551,
+          "y": 0.8658
+        },
+        {
+          "x": 0.075,
+          "y": 0.6647
+        }
       ],
-      "meters": { "width": 4.2, "depth": 4 },
-      "origin": { "u": 0, "v": 0 },
-      "rotationDeg": 0
+      "meters": {
+        "width": 4.5,
+        "depth": 3.5
+      },
+      "origin": {
+        "u": 0,
+        "v": 0
+      },
+      "rotationDeg": 0,
+      "note": "Quadrilatere construit sur deux droites du sol relevees dans la photo : la plinthe du fond (4 points, ecart max 0,0004) et le pied du mur droit (5 points, ecart max 0,0076). u suit le mur droit, donc la direction des lames, et fuit vers (0,096 ; 0,452) ; v suit la plinthe du fond. Ce n est donc plus un trapeze symetrique pose sur le sol, mais l image d un rectangle du sol. Controle d echelle : le contour de sol couvre 5,69 m sur u et 3,76 m sur v, soit 21 lames de 18 cm en travers — dimensions plausibles pour cette piece. Les deux fuites tombent du meme cote du centre, donc la focale n est pas deductible ici et l echelle a ete validee a l oeil puis recoupee par ce comptage."
     }
   },
   "floorZones": [
@@ -47,17 +77,50 @@
       "order": 0,
       "mask": {
         "polygon": [
-          { "x": 0.038, "y": 0.7 },
-          { "x": 0.075, "y": 0.665 },
-          { "x": 0.2, "y": 0.671 },
-          { "x": 0.36, "y": 0.679 },
-          { "x": 0.56, "y": 0.69 },
-          { "x": 0.64, "y": 0.731 },
-          { "x": 0.72, "y": 0.782 },
-          { "x": 0.8, "y": 0.815 },
-          { "x": 0.841, "y": 0.834 },
-          { "x": 0.841, "y": 1 },
-          { "x": 0.038, "y": 1 }
+          {
+            "x": 0.038,
+            "y": 0.7
+          },
+          {
+            "x": 0.075,
+            "y": 0.665
+          },
+          {
+            "x": 0.2,
+            "y": 0.671
+          },
+          {
+            "x": 0.36,
+            "y": 0.679
+          },
+          {
+            "x": 0.56,
+            "y": 0.69
+          },
+          {
+            "x": 0.64,
+            "y": 0.731
+          },
+          {
+            "x": 0.72,
+            "y": 0.782
+          },
+          {
+            "x": 0.8,
+            "y": 0.815
+          },
+          {
+            "x": 0.841,
+            "y": 0.834
+          },
+          {
+            "x": 0.841,
+            "y": 1
+          },
+          {
+            "x": 0.038,
+            "y": 1
+          }
         ],
         "holes": []
       }
@@ -69,14 +132,32 @@
       "label": "Radiateur",
       "kind": "fixture",
       "polygon": [
-        { "x": 0.255, "y": 0.554 },
-        { "x": 0.349, "y": 0.551 },
-        { "x": 0.349, "y": 0.617 },
-        { "x": 0.255, "y": 0.627 }
+        {
+          "x": 0.255,
+          "y": 0.554
+        },
+        {
+          "x": 0.349,
+          "y": 0.551
+        },
+        {
+          "x": 0.349,
+          "y": 0.617
+        },
+        {
+          "x": 0.255,
+          "y": 0.627
+        }
       ],
       "contact": [
-        { "x": 0.255, "y": 0.627 },
-        { "x": 0.349, "y": 0.617 }
+        {
+          "x": 0.255,
+          "y": 0.627
+        },
+        {
+          "x": 0.349,
+          "y": 0.617
+        }
       ],
       "depth": 0.72
     },
@@ -85,14 +166,32 @@
       "label": "Meuble bas",
       "kind": "furniture",
       "polygon": [
-        { "x": 0.361, "y": 0.569 },
-        { "x": 0.502, "y": 0.585 },
-        { "x": 0.502, "y": 0.699 },
-        { "x": 0.361, "y": 0.668 }
+        {
+          "x": 0.361,
+          "y": 0.569
+        },
+        {
+          "x": 0.502,
+          "y": 0.585
+        },
+        {
+          "x": 0.502,
+          "y": 0.699
+        },
+        {
+          "x": 0.361,
+          "y": 0.668
+        }
       ],
       "contact": [
-        { "x": 0.361, "y": 0.668 },
-        { "x": 0.502, "y": 0.699 }
+        {
+          "x": 0.361,
+          "y": 0.668
+        },
+        {
+          "x": 0.502,
+          "y": 0.699
+        }
       ],
       "depth": 0.6
     }

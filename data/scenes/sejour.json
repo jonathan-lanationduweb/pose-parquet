@@ -14,9 +14,21 @@
   "camera": {
     "horizon": 0.44,
     "vanishingPoints": [
-      { "x": 0.408, "y": 0.44, "weight": 0.8 }
+      {
+        "x": 0.022,
+        "y": 0.44,
+        "weight": 1,
+        "role": "lames"
+      },
+      {
+        "x": 0.858,
+        "y": 0.44,
+        "weight": 0.7,
+        "role": "seuil"
+      }
     ],
-    "heightM": 1.5
+    "heightM": 1.5,
+    "focalPx": 659
   },
   "surfaces": [
     {
@@ -28,14 +40,33 @@
   "planes": {
     "rez": {
       "quad": [
-        { "x": 0.2, "y": 0.585 },
-        { "x": 0.83, "y": 0.585 },
-        { "x": 1.04, "y": 0.995 },
-        { "x": -0.04, "y": 0.995 }
+        {
+          "x": 0.4052,
+          "y": 0.5806
+        },
+        {
+          "x": 1,
+          "y": 0.7989
+        },
+        {
+          "x": 1.132,
+          "y": 1.132
+        },
+        {
+          "x": 0.3,
+          "y": 0.6133
+        }
       ],
-      "meters": { "width": 4.6, "depth": 4.2 },
-      "origin": { "u": 0, "v": 0 },
-      "rotationDeg": 0
+      "meters": {
+        "width": 6.14,
+        "depth": 1.65
+      },
+      "origin": {
+        "u": 0,
+        "v": 0
+      },
+      "rotationDeg": 0,
+      "note": "Construit sur deux droites du sol relevees dans la photo : le pied du mur droit (7 points du contour, ecart max 0,0016) et le seuil entre les deux pieces. u suit le mur droit et fuit vers (0,022 ; 0,44) ; v suit le seuil et fuit vers (0,858 ; 0,44) — les deux fuites encadrent le centre de l image, signature de deux directions perpendiculaires. Focale deduite : 659 px, champ 101 degres. Les metres ne sont pas devines : avec l horizon a 0,44 et une hauteur d oeil de 1,50 m, les cotes opposes du quadrilatere se correspondent a 0,1 pres (6,14 m et 1,65 m contre 6,14 et 1,648), ce qui confirme que c est bien l image d un rectangle. Le rectangle de reference est plus etroit que la piece : le sol visible couvre 6,14 m sur u et 4,02 m sur v, soit 22,6 lames de 18 cm en travers."
     }
   },
   "floorZones": [
@@ -47,15 +78,42 @@
       "order": 0,
       "mask": {
         "polygon": [
-          { "x": 0.098, "y": 0.552 },
-          { "x": 0.14, "y": 0.547 },
-          { "x": 0.2, "y": 0.536 },
-          { "x": 0.25, "y": 0.53 },
-          { "x": 0.31, "y": 0.544 },
-          { "x": 0.335, "y": 0.553 },
-          { "x": 0.352, "y": 0.575 },
-          { "x": 0.362, "y": 0.594 },
-          { "x": 0.098, "y": 0.676 }
+          {
+            "x": 0.098,
+            "y": 0.552
+          },
+          {
+            "x": 0.14,
+            "y": 0.547
+          },
+          {
+            "x": 0.2,
+            "y": 0.536
+          },
+          {
+            "x": 0.25,
+            "y": 0.53
+          },
+          {
+            "x": 0.31,
+            "y": 0.544
+          },
+          {
+            "x": 0.335,
+            "y": 0.553
+          },
+          {
+            "x": 0.352,
+            "y": 0.575
+          },
+          {
+            "x": 0.362,
+            "y": 0.594
+          },
+          {
+            "x": 0.098,
+            "y": 0.676
+          }
         ],
         "holes": []
       }
@@ -68,20 +126,62 @@
       "order": 1,
       "mask": {
         "polygon": [
-          { "x": 0, "y": 0.694 },
-          { "x": 0.055, "y": 0.683 },
-          { "x": 0.098, "y": 0.676 },
-          { "x": 0.362, "y": 0.594 },
-          { "x": 0.372, "y": 0.583 },
-          { "x": 0.42, "y": 0.586 },
-          { "x": 0.5, "y": 0.616 },
-          { "x": 0.6, "y": 0.652 },
-          { "x": 0.7, "y": 0.691 },
-          { "x": 0.8, "y": 0.727 },
-          { "x": 0.9, "y": 0.762 },
-          { "x": 1, "y": 0.799 },
-          { "x": 1, "y": 1 },
-          { "x": 0, "y": 1 }
+          {
+            "x": 0,
+            "y": 0.694
+          },
+          {
+            "x": 0.055,
+            "y": 0.683
+          },
+          {
+            "x": 0.098,
+            "y": 0.676
+          },
+          {
+            "x": 0.362,
+            "y": 0.594
+          },
+          {
+            "x": 0.372,
+            "y": 0.583
+          },
+          {
+            "x": 0.42,
+            "y": 0.586
+          },
+          {
+            "x": 0.5,
+            "y": 0.616
+          },
+          {
+            "x": 0.6,
+            "y": 0.652
+          },
+          {
+            "x": 0.7,
+            "y": 0.691
+          },
+          {
+            "x": 0.8,
+            "y": 0.727
+          },
+          {
+            "x": 0.9,
+            "y": 0.762
+          },
+          {
+            "x": 1,
+            "y": 0.799
+          },
+          {
+            "x": 1,
+            "y": 1
+          },
+          {
+            "x": 0,
+            "y": 1
+          }
         ],
         "holes": []
       }
@@ -90,7 +190,8 @@
   "occluders": [],
   "light": {
     "kind": "photo-luma",
-    "strength": 0.95,
-    "blurRadius": 0.032
+    "strength": 0.85,
+    "blurRadius": 0.032,
+    "ambient": 0.26
   }
 }

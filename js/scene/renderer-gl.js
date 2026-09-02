@@ -57,6 +57,7 @@ uniform float uTileMeters;  // mètres couverts par une tuile
 uniform float uLabel;       // numéro de la zone, 1..255
 uniform vec2  uLight;       // direction de la lumière, repère de la tuile
 uniform float uStrength;    // report de l'éclairement
+uniform float uAmbient;     // plancher de lumière indirecte
 uniform float uTint;        // part de la couleur de la lumière
 uniform float uReliefGain;  // amplitude du relief
 uniform float uGlossGain;   // dose de reflet
@@ -99,7 +100,13 @@ void main() {
 
   vec4 lit = texture(uShading, texel);
   float lum = max(0.02, dot(lit.rgb, vec3(0.2126, 0.7152, 0.0722)));
-  float shade = clamp(1.0 + uStrength * (pow(lum, 0.88) - 1.0), 0.22, 2.1);
+  float raw = 1.0 + uStrength * (pow(lum, 0.88) - 1.0);
+  // Lumière indirecte. Sans ce plancher, le gain suit la photo jusqu'en bas
+  // et un bois foncé dans une zone peu éclairée s'effondre vers le noir : on
+  // ne lit plus un sol sombre, on lit un trou. Un vrai sol foncé reçoit
+  // toujours du rebond, et c'est ce rebond qui le rattache à la pièce. La
+  // forme retenue relève les ombres sans déplacer les tons moyens.
+  float shade = clamp(uAmbient + (1.0 - uAmbient) * raw, 0.42, 1.9);
   // La couleur de la lumière, pas seulement son intensité : un bois neutre au
   // milieu d'une pièce dorée se remarque tout de suite.
   vec3 gain = vec3(shade) + uTint * (lit.rgb - vec3(lum)) * uStrength;
@@ -236,7 +243,7 @@ export function createGlRenderer() {
   };
   const u = uniforms(prog, [
     'uQuad', 'uViewport', 'uInverse', 'uMeters', 'uOrigin', 'uRot', 'uTileMeters',
-    'uLabel', 'uLight', 'uStrength', 'uTint', 'uReliefGain', 'uGlossGain',
+    'uLabel', 'uLight', 'uStrength', 'uAmbient', 'uTint', 'uReliefGain', 'uGlossGain',
     'uMask', 'uAlbedo', 'uReliefMap', 'uShading', 'uGloss',
   ]);
   const uBlit = uniforms(blit, ['uTex']);
@@ -374,6 +381,7 @@ export function createGlRenderer() {
       gl.uniform1i(u.uShading, tex.shading.unit);
       gl.uniform1i(u.uGloss, tex.gloss.unit);
       gl.uniform1f(u.uStrength, scene.light.strength);
+      gl.uniform1f(u.uAmbient, scene.light.ambient);
       gl.uniform1f(u.uTint, scene.light.tint);
 
       scene.floorZones.forEach((zone, index) => {
