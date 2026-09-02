@@ -12,18 +12,47 @@
  */
 import { buildSwatch } from '../scene/texture.js';
 import { createMaterial } from '../scene/material.js';
+import { chargerProduits, versMateriau } from '../scene/product.js';
 
+/**
+ * Charge le catalogue en passant par la **couche produit**.
+ *
+ * Les références traversent désormais `js/scene/product.js`, qui les ramène à
+ * une fiche canonique — essence, gamme, teinte, finition, largeur de lame,
+ * motifs autorisés, famille de rendu — avant que le moteur n'en fasse un
+ * matériau. C'est ce qui permettra de substituer un export Premibel à
+ * `data/parquets.json` sans toucher ni l'interface ni le rendu : seule la
+ * source change.
+ *
+ * La forme rendue reste celle qu'attendait le reste de l'outil (`parquets`,
+ * `byId`, `get(id)`, `patterns`), augmentée de `fiches` et `familles` pour ce
+ * qui a besoin des données commerciales.
+ */
 export async function loadCatalog(base = '') {
-  const response = await fetch(`${base}data/parquets.json`, { cache: 'force-cache' });
-  if (!response.ok) throw new Error('Catalogue indisponible');
-  const data = await response.json();
-  // Les entrées brutes deviennent des matériaux complets dès le chargement :
-  // largeur et longueur de lame, rugosité et brillance déduites de la
-  // finition, emplacements prévus pour de vraies cartes photographiques.
-  // Tout le reste de l'outil ne manipule donc que des matériaux.
-  const parquets = data.parquets.map(createMaterial);
+  const { fiches, familles, source } = await chargerProduits(base);
+  if (!fiches.length) throw new Error('Catalogue indisponible');
+
+  // Les motifs de pose ne sont pas une donnée de produit : ils décrivent des
+  // façons de poser et restent décrits une seule fois.
+  const meta = await fetch(`${base}data/parquets.json`, { cache: 'force-cache' })
+    .then((r) => (r.ok ? r.json() : {}))
+    .catch(() => ({}));
+
+  const parquets = fiches.map((fiche) => createMaterial(versMateriau(fiche)));
   const byId = new Map(parquets.map((item) => [item.id, item]));
-  return { ...data, parquets, byId, get: (id) => byId.get(id) };
+
+  const incomplets = fiches.filter((f) => f.avertissements.length);
+  if (incomplets.length) {
+    // Une fiche incomplète ne doit pas faire tomber la page, mais elle ne doit
+    // pas passer inaperçue non plus : le jour où le catalogue vient d'un ERP,
+    // c'est ici qu'on verra les trous.
+    console.warn(
+      '[catalogue] fiches incomplètes :',
+      incomplets.map((f) => `${f.id} (${f.avertissements.join(', ')})`).join(' · ')
+    );
+  }
+
+  return { ...meta, parquets, byId, get: (id) => byId.get(id), fiches, familles, source };
 }
 
 /** Vignette de matériau, fabriquée une seule fois puis réutilisée. */

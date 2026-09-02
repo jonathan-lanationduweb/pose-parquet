@@ -98,15 +98,26 @@ void main() {
   float footprint = max(length(dFdx(rotated)), length(dFdy(rotated)));
   float near = clamp(0.006 / (footprint + 0.003), 0.0, 1.0);
 
+  float aLum = dot(albedo, vec3(0.2126, 0.7152, 0.0722));
+
   vec4 lit = texture(uShading, texel);
   float lum = max(0.02, dot(lit.rgb, vec3(0.2126, 0.7152, 0.0722)));
   float raw = 1.0 + uStrength * (pow(lum, 0.88) - 1.0);
-  // Lumière indirecte. Sans ce plancher, le gain suit la photo jusqu'en bas
-  // et un bois foncé dans une zone peu éclairée s'effondre vers le noir : on
-  // ne lit plus un sol sombre, on lit un trou. Un vrai sol foncé reçoit
-  // toujours du rebond, et c'est ce rebond qui le rattache à la pièce. La
-  // forme retenue relève les ombres sans déplacer les tons moyens.
-  float shade = clamp(uAmbient + (1.0 - uAmbient) * raw, 0.42, 1.9);
+
+  // Relèvement des ombres, sur deux conditions.
+  //
+  // 1. **Seulement sous la moyenne du sol.** Relever toute la plage coûtait un
+  //    tiers à la moitié du relief lumineux (mesuré : 21 → 12 sur le séjour),
+  //    et un sol sans modelé se lit comme une plaque posée sur la photo.
+  // 2. **Seulement autant que le matériau en a besoin.** Un albédo foncé
+  //    multiplié par un gain faible atterrit près de zéro, là où la
+  //    quantification 8 bits et le noir de l'écran effacent toute matière : on
+  //    ne lit plus un sol sombre, on lit un trou. Un albédo clair a de la
+  //    marge et n'a donc rien à protéger — lui appliquer la même correction ne
+  //    faisait qu'aplatir son éclairement. Le garde-fou est proportionnel au
+  //    manque de marge, pas constant.
+  float lift = uAmbient * (1.0 - aLum);
+  float shade = clamp(raw < 1.0 ? lift + (1.0 - lift) * raw : raw, 0.42, 1.9);
   // La couleur de la lumière, pas seulement son intensité : un bois neutre au
   // milieu d'une pièce dorée se remarque tout de suite.
   vec3 gain = vec3(shade) + uTint * (lit.rgb - vec3(lum)) * uStrength;
@@ -122,7 +133,6 @@ void main() {
   // Le reflet emprunte sa couleur au bois plutôt qu'au blanc, et s'atténue sur
   // les teintes sombres. Un ajout quasi blanc sur un albédo foncé ne fait pas
   // briller la matière : il la délave, et la tache de soleil part au gris.
-  float aLum = dot(albedo, vec3(0.2126, 0.7152, 0.0722));
   vec3 teinteReflet = mix(albedo, vec3(0.82, 0.80, 0.76), 0.55);
   vec3 color = albedo * gain * (bump * lit.a) + teinteReflet * specular * (0.35 + 0.65 * aLum);
 

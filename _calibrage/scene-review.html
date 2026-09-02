@@ -34,6 +34,11 @@
   .etat[data-e="correct"]  { background: #3d3a1c; color: #ded08a; }
   .etat[data-e="a-revoir"] { background: #4a2222; color: #f0a3a3; }
   .etat[data-e="s-o"]      { background: #262c2a; color: #7d8888; }
+  .grid.produits { grid-template-columns: repeat(6, minmax(0, 1fr)); margin-top: 8px; }
+  @media (max-width: 1100px) { .grid.produits { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  #passe { margin: 10px 14px 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px;
+           color: var(--dim); max-width: 130ch; line-height: 1.5; }
+  #passe b { color: var(--ink); }
   #log { white-space: pre-wrap; padding: 12px 14px 40px; color: #9fd0b8; font-size: 11px; }
 </style>
 </head>
@@ -44,6 +49,13 @@
   <button id="run">Rendre</button>
   <span id="state"></span>
 </header>
+<p id="passe">
+  <b>Etat du moteur.</b> Relevement des ombres limite aux ombres <em>et</em> proportionne au manque de
+  marge du materiau : le relief lumineux du sol conserve 0,96 a 0,97 de celui de la photo sur les bois
+  clairs (contre 0,57 a 0,76 avant). Figure en cathedrale ajoutee au veinage. Joints de bout remontes a
+  0,32 du joint lateral. Dispersion de teinte indexee sur la taille de l element. Reflet colore par le
+  bois. Catalogue charge par la couche produit (js/scene/product.js).
+</p>
 <div id="out"></div>
 <pre id="log"></pre>
 
@@ -70,8 +82,8 @@
  */
 import { analyzeScene, loadSceneIndex } from '../js/scene/analyzer.js';
 import { createSceneRenderer } from '../js/scene/renderer.js';
-import { createMaterial } from '../js/scene/material.js';
 import { loadImage } from '../js/scene/image-loader.js';
+import { loadCatalog } from '../js/studio/catalog.js';
 
 const BASE = '../';
 const $ = (id) => document.getElementById(id);
@@ -87,6 +99,15 @@ const VUES = [
 ];
 
 const CRITERES = ['Perspective', 'Échelle', 'Masque', 'Lumière', 'Motif'];
+
+/**
+ * Produits de contrôle, du plus clair au plus foncé.
+ *
+ * Le rendu doit tenir sur toute la plage de teintes : un clair qui part au
+ * délavé et un foncé qui part au gris sont deux façons de rater la même
+ * chose — l'intégration à la lumière de la pièce.
+ */
+const PRODUITS_TEST = ['chene-craie', 'chene-sable', 'chene-naturel', 'chene-miel', 'chene-tabac', 'chene-fume'];
 
 /**
  * Jugement humain, vue par vue et critère par critère.
@@ -158,8 +179,11 @@ const etatDe = (sceneId, vueCle, critere) => {
   return v.vues[vueCle][critere] || 'a-revoir';
 };
 
-const catalog = await fetch(`${BASE}data/parquets.json`).then((r) => r.json());
-const materials = catalog.parquets.map(createMaterial);
+// Le catalogue passe par la **couche produit** (js/scene/product.js), donc par
+// exactement le même chemin que l'application. Une fiche mal formée se verrait
+// ici avant de se voir en production.
+const catalog = await loadCatalog(BASE);
+const materials = catalog.parquets;
 const index = await loadSceneIndex(BASE);
 const renderer = createSceneRenderer();
 $('state').textContent = `${renderer.backend} · aniso ×${renderer.anisotropy}`;
@@ -239,6 +263,28 @@ async function renderScene(entry) {
     }
     fig.append(node, cap);
     grid.appendChild(fig);
+  });
+
+  // Deuxième rangée : la même scène en pose droite avec plusieurs produits.
+  // Elle sert à autre chose que la première : on y vérifie que la teinte ne
+  // décide pas de la crédibilité — un rendu qui ne tient que sur le chêne
+  // naturel n'est pas un rendu, c'est un réglage heureux.
+  const bande = document.createElement('div');
+  bande.className = 'grid produits';
+  $('out').appendChild(bande);
+  PRODUITS_TEST.forEach((id) => {
+    const material = materials.find((m) => m.id === id);
+    if (!material) return;
+    const fig = document.createElement('figure');
+    const node = document.createElement('canvas');
+    renderer.paint(node, { material, pattern: 'lames', angle: 0, width: null, scale: 1 });
+    const cap = document.createElement('figcaption');
+    const fiche = material.produit || {};
+    cap.innerHTML = `<div class="titre">${material.name}<span>${Math.round(zoneLuma(node, renderer.masks, 0) || 0)}</span></div>`
+      + `<div class="critere"><span>${[fiche.teinte, fiche.finition].filter(Boolean).join(' · ') || '—'}</span>`
+      + `<span>${fiche.largeurLame ? Math.round(fiche.largeurLame * 100) + ' cm' : '—'}</span></div>`;
+    fig.append(node, cap);
+    bande.appendChild(fig);
   });
 
   log(`${entry.id.padEnd(14)} ${verdict.texte.padEnd(9)} ${prepared.width}×${prepared.height}`

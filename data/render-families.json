@@ -1,0 +1,391 @@
+{
+  "version": 1,
+  "catalogue": "data/parquets.json",
+  "note": "Familles de rendu : les parametres VISUELS qui dessinent la tuile de parquet. Une fiche produit (data/products.json ou un futur export Premibel) ne cite qu un identifiant de famille — personne ne saisit un grainAlpha dans un ERP. Le rapprochement d une fiche sans famille declaree se fait sur essence + teinte + finition, puis sur la luminance ; voir js/scene/product.js et docs/premibel-integration.md.",
+  "familles": {
+    "chene-craie": {
+      "id": "chene-craie",
+      "label": "Chêne Craie",
+      "essence": "Chêne",
+      "teinte": "clair",
+      "finition": "Huilé blanchi",
+      "luminance": 0.878,
+      "texture": {
+        "base": [
+          232,
+          223,
+          208
+        ],
+        "grain": [
+          206,
+          195,
+          178
+        ],
+        "warm": 2,
+        "spread": 9,
+        "grainLines": 6,
+        "grainAlpha": 0.13,
+        "grainWidth": 0.016,
+        "knots": 0.1,
+        "knotSize": 0.05,
+        "contrast": 0.82,
+        "bevel": 0.024,
+        "joint": 0.3,
+        "sheen": 0.05,
+        "cracks": 0
+      }
+    },
+    "chene-sable": {
+      "id": "chene-sable",
+      "label": "Chêne Sable",
+      "essence": "Chêne",
+      "teinte": "clair",
+      "finition": "Vernis mat",
+      "luminance": 0.803,
+      "texture": {
+        "base": [
+          221,
+          203,
+          175
+        ],
+        "grain": [
+          193,
+          172,
+          141
+        ],
+        "warm": 4,
+        "spread": 14,
+        "grainLines": 9,
+        "grainAlpha": 0.18,
+        "grainWidth": 0.014,
+        "knots": 0.22,
+        "knotSize": 0.06,
+        "contrast": 0.95,
+        "bevel": 0.028,
+        "joint": 0.4,
+        "sheen": 0.04,
+        "cracks": 0
+      }
+    },
+    "chene-nude": {
+      "id": "chene-nude",
+      "label": "Chêne Nude",
+      "essence": "Chêne",
+      "teinte": "clair",
+      "finition": "Huilé naturel",
+      "luminance": 0.813,
+      "texture": {
+        "base": [
+          226,
+          204,
+          186
+        ],
+        "grain": [
+          199,
+          172,
+          153
+        ],
+        "warm": 7,
+        "spread": 11,
+        "grainLines": 7,
+        "grainAlpha": 0.15,
+        "grainWidth": 0.02,
+        "knots": 0.14,
+        "knotSize": 0.05,
+        "contrast": 0.88,
+        "bevel": 0.026,
+        "joint": 0.34,
+        "sheen": 0.06,
+        "cracks": 0
+      }
+    },
+    "chene-naturel": {
+      "id": "chene-naturel",
+      "label": "Chêne Naturel",
+      "essence": "Chêne",
+      "teinte": "naturel",
+      "finition": "Huilé mat",
+      "luminance": 0.711,
+      "texture": {
+        "base": [
+          205,
+          178,
+          143
+        ],
+        "grain": [
+          173,
+          143,
+          107
+        ],
+        "warm": 6,
+        "spread": 19,
+        "grainLines": 11,
+        "grainAlpha": 0.2,
+        "grainWidth": 0.018,
+        "knots": 0.3,
+        "knotSize": 0.07,
+        "contrast": 1,
+        "bevel": 0.03,
+        "joint": 0.46,
+        "sheen": 0.05,
+        "cracks": 0.05
+      }
+    },
+    "chene-dore": {
+      "id": "chene-dore",
+      "label": "Chêne Doré",
+      "essence": "Chêne",
+      "teinte": "naturel",
+      "finition": "Vernis satiné",
+      "luminance": 0.679,
+      "texture": {
+        "base": [
+          206,
+          169,
+          118
+        ],
+        "grain": [
+          172,
+          132,
+          82
+        ],
+        "warm": 10,
+        "spread": 16,
+        "grainLines": 8,
+        "grainAlpha": 0.17,
+        "grainWidth": 0.022,
+        "knots": 0.2,
+        "knotSize": 0.06,
+        "contrast": 1.02,
+        "bevel": 0.026,
+        "joint": 0.42,
+        "sheen": 0.12,
+        "cracks": 0
+      }
+    },
+    "chene-gris": {
+      "id": "chene-gris",
+      "label": "Chêne Gris",
+      "essence": "Chêne",
+      "teinte": "naturel",
+      "finition": "Brossé teinté",
+      "luminance": 0.633,
+      "texture": {
+        "base": [
+          166,
+          161,
+          152
+        ],
+        "grain": [
+          131,
+          127,
+          120
+        ],
+        "warm": 0,
+        "spread": 15,
+        "grainLines": 13,
+        "grainAlpha": 0.22,
+        "grainWidth": 0.012,
+        "knots": 0.18,
+        "knotSize": 0.05,
+        "contrast": 1.05,
+        "bevel": 0.032,
+        "joint": 0.5,
+        "sheen": 0.02,
+        "cracks": 0.08
+      }
+    },
+    "chene-miel": {
+      "id": "chene-miel",
+      "label": "Chêne Miel",
+      "essence": "Chêne",
+      "teinte": "chaud",
+      "finition": "Huilé miel",
+      "luminance": 0.595,
+      "texture": {
+        "base": [
+          191,
+          146,
+          92
+        ],
+        "grain": [
+          159,
+          113,
+          63
+        ],
+        "warm": 9,
+        "spread": 22,
+        "grainLines": 12,
+        "grainAlpha": 0.24,
+        "grainWidth": 0.017,
+        "knots": 0.34,
+        "knotSize": 0.07,
+        "contrast": 1.08,
+        "bevel": 0.03,
+        "joint": 0.48,
+        "sheen": 0.09,
+        "cracks": 0.06
+      }
+    },
+    "chene-caramel": {
+      "id": "chene-caramel",
+      "label": "Chêne Caramel",
+      "essence": "Chêne",
+      "teinte": "chaud",
+      "finition": "Vernis satiné",
+      "luminance": 0.492,
+      "texture": {
+        "base": [
+          169,
+          118,
+          71
+        ],
+        "grain": [
+          136,
+          88,
+          48
+        ],
+        "warm": 11,
+        "spread": 18,
+        "grainLines": 10,
+        "grainAlpha": 0.21,
+        "grainWidth": 0.019,
+        "knots": 0.26,
+        "knotSize": 0.065,
+        "contrast": 1.06,
+        "bevel": 0.028,
+        "joint": 0.5,
+        "sheen": 0.1,
+        "cracks": 0.04
+      }
+    },
+    "chene-rustique": {
+      "id": "chene-rustique",
+      "label": "Chêne Rustique",
+      "essence": "Chêne",
+      "teinte": "chaud",
+      "finition": "Brossé huilé",
+      "luminance": 0.564,
+      "texture": {
+        "base": [
+          180,
+          138,
+          96
+        ],
+        "grain": [
+          132,
+          92,
+          55
+        ],
+        "warm": 8,
+        "spread": 34,
+        "grainLines": 16,
+        "grainAlpha": 0.3,
+        "grainWidth": 0.024,
+        "knots": 0.85,
+        "knotSize": 0.11,
+        "contrast": 1.18,
+        "bevel": 0.034,
+        "joint": 0.56,
+        "sheen": 0.03,
+        "cracks": 0.35
+      }
+    },
+    "chene-tabac": {
+      "id": "chene-tabac",
+      "label": "Chêne Tabac",
+      "essence": "Chêne",
+      "teinte": "fonce",
+      "finition": "Huilé teinté",
+      "luminance": 0.384,
+      "texture": {
+        "base": [
+          131,
+          92,
+          60
+        ],
+        "grain": [
+          99,
+          65,
+          39
+        ],
+        "warm": 7,
+        "spread": 17,
+        "grainLines": 12,
+        "grainAlpha": 0.23,
+        "grainWidth": 0.016,
+        "knots": 0.28,
+        "knotSize": 0.06,
+        "contrast": 1.05,
+        "bevel": 0.028,
+        "joint": 0.5,
+        "sheen": 0.07,
+        "cracks": 0.05
+      }
+    },
+    "chene-brun": {
+      "id": "chene-brun",
+      "label": "Chêne Brun",
+      "essence": "Chêne",
+      "teinte": "fonce",
+      "finition": "Vernis mat",
+      "luminance": 0.333,
+      "texture": {
+        "base": [
+          110,
+          80,
+          58
+        ],
+        "grain": [
+          80,
+          55,
+          38
+        ],
+        "warm": 5,
+        "spread": 14,
+        "grainLines": 9,
+        "grainAlpha": 0.19,
+        "grainWidth": 0.018,
+        "knots": 0.2,
+        "knotSize": 0.055,
+        "contrast": 1,
+        "bevel": 0.028,
+        "joint": 0.48,
+        "sheen": 0.06,
+        "cracks": 0.03
+      }
+    },
+    "chene-fume": {
+      "id": "chene-fume",
+      "label": "Chêne Fumé",
+      "essence": "Chêne",
+      "teinte": "fonce",
+      "finition": "Fumé brossé",
+      "luminance": 0.282,
+      "texture": {
+        "base": [
+          86,
+          69,
+          58
+        ],
+        "grain": [
+          58,
+          45,
+          37
+        ],
+        "warm": 3,
+        "spread": 16,
+        "grainLines": 14,
+        "grainAlpha": 0.26,
+        "grainWidth": 0.014,
+        "knots": 0.24,
+        "knotSize": 0.06,
+        "contrast": 1.12,
+        "bevel": 0.032,
+        "joint": 0.55,
+        "sheen": 0.04,
+        "cracks": 0.12
+      }
+    }
+  }
+}

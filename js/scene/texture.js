@@ -112,14 +112,6 @@ function streak(ctx, x, y, w, h, horizontal, t, wobble, random) {
 }
 
 /**
- * Veinage : fibre de fond, cernes marqués, nœuds, fentes.
- *
- * Le fond fibreux compte autant que les cernes. Une dizaine de traits nets
- * donne le *dessin* d'un bois ; c'est la densité de stries très pâles qui en
- * donne la *matière*. Sans elle, chaque lame reste un aplat dégradé — et une
- * fois projetée au sol, la surface se lit comme une image plaquée.
- */
-/**
  * Les deux accents d'un veinage : un plus sombre que le fond, un plus clair.
  *
  * `tex.grain` est toujours plus sombre que `tex.base`. Sur un chêne clair ça
@@ -146,6 +138,62 @@ function accents(tex) {
   };
 }
 
+/**
+ * Figure en cathédrale : les arcs emboîtés d'un débit sur dosse.
+ *
+ * C'est le dessin le plus reconnaissable d'un chêne, et il ne s'obtient pas
+ * avec des stries longitudinales. Quand la lame est sciée à travers les
+ * cernes, ceux-ci affleurent en arcs emboîtés, en ogive, qui se resserrent
+ * vers l'axe de la lame. Sans eux, on peut empiler autant de stries qu'on veut
+ * dans la longueur : la surface garde l'aspect régulier d'un placage.
+ *
+ * Une cathédrale = quelques arcs concentriques, tracés en courbes quadratiques
+ * dans le repère de la lame, de plus en plus étroits et de plus en plus
+ * marqués vers le centre.
+ */
+function cathedral(ctx, x, y, w, h, horizontal, random, encre, tex, vigueur) {
+  const long = horizontal ? w : h;
+  const across = horizontal ? h : w;
+  // Une à trois cathédrales par lame, jamais alignées d'une lame à l'autre.
+  const combien = 1 + Math.round(random() * 1.6);
+  for (let k = 0; k < combien; k += 1) {
+    const centre = long * (0.12 + random() * 0.76);
+    const cote = random() < 0.5 ? 0.34 : 0.66;   // vers un bord ou l'autre
+    const base = across * cote;
+    const sens = cote < 0.5 ? 1 : -1;
+    const arcs = 3 + Math.round(random() * 3);
+    const etendue = long * (0.1 + random() * 0.16);
+    for (let a = 0; a < arcs; a += 1) {
+      const t = (a + 1) / (arcs + 1);
+      const demi = etendue * (1 - t * 0.62);
+      const fleche = across * (0.1 + 0.3 * t) * sens;
+      // Largeur et contraste calés sur le bois réel : une cathédrale de chêne
+      // est une bande d'un à deux centimètres, pas un cheveu. Un arc d'un
+      // pixel à 6 % d'opacité, comme au premier essai, ne survit pas à la
+      // réduction — le sol reprend aussitôt son aspect de placage strié.
+      ctx.strokeStyle = encre(tex.grainAlpha * vigueur * (0.7 + t * 1.1), 12);
+      ctx.lineWidth = Math.max(1.2, across * (0.05 + 0.09 * t));
+      ctx.beginPath();
+      if (horizontal) {
+        ctx.moveTo(x + centre - demi, y + base);
+        ctx.quadraticCurveTo(x + centre, y + base + fleche, x + centre + demi, y + base);
+      } else {
+        ctx.moveTo(x + base, y + centre - demi);
+        ctx.quadraticCurveTo(x + base + fleche, y + centre, x + base, y + centre + demi);
+      }
+      ctx.stroke();
+    }
+  }
+}
+
+/**
+ * Veinage : figure large, cathédrales, fibre de fond, cernes marqués, nœuds.
+ *
+ * Le fond fibreux compte autant que les cernes. Une dizaine de traits nets
+ * donne le *dessin* d'un bois ; c'est la densité de stries très pâles qui en
+ * donne la *matière*. Sans elle, chaque lame reste un aplat dégradé — et une
+ * fois projetée au sol, la surface se lit comme une image plaquée.
+ */
 function grain(ctx, x, y, w, h, tex, random) {
   const long = Math.max(w, h);
   const across = Math.min(w, h);
@@ -178,7 +226,11 @@ function grain(ctx, x, y, w, h, tex, random) {
     streak(ctx, x, y, w, h, horizontal, 0.1 + random() * 0.8, 0.3, random);
   }
 
-  // 2. Fibre de fond : une strie tous les pixels environ, presque invisible
+  // 2. Cathédrales : le dessin propre au chêne débité sur dosse. Posées avant
+  //    la fibre, pour que celle-ci les traverse comme sur une planche réelle.
+  cathedral(ctx, x, y, w, h, horizontal, random, encre, tex, vigueurLame);
+
+  // 3. Fibre de fond : une strie tous les pixels environ, presque invisible
   //    une à une. C'est ce qui casse l'aplat.
   const fibres = Math.max(26, Math.round(across * 1.15));
   for (let i = 0; i < fibres; i += 1) {
@@ -187,7 +239,7 @@ function grain(ctx, x, y, w, h, tex, random) {
     streak(ctx, x, y, w, h, horizontal, 0.015 + random() * 0.97, 0.05, random);
   }
 
-  // 3. Cernes marqués : le dessin propre au matériau, peu nombreux.
+  // 4. Cernes marqués : le dessin propre au matériau, peu nombreux.
   //    La puissance 0,45 rend la distribution inégale — quelques traits francs
   //    et beaucoup de faibles, comme sur une planche réelle. Des cernes tous
   //    de la même force donnent une rayure régulière, donc une fausse texture.
@@ -257,9 +309,19 @@ function grain(ctx, x, y, w, h, tex, random) {
  *   de bout se remarquent à peine.
  */
 function board(ctx, x, y, w, h, tex, random) {
-  const shift = Math.round((random() - 0.5) * tex.spread);
-  const warm = Math.round((random() - 0.5) * tex.warm);
   const horizontal = w >= h;
+
+  // Dispersion de teinte proportionnée à la taille de l'élément.
+  //
+  // Une lame de 1,80 m peut varier franchement d'une voisine : c'est ce qu'on
+  // voit sur un vrai lot, et sans cette variation le sol se lit comme un
+  // placage. Un tasseau de bâton rompu de 45 cm, non : à cette taille la même
+  // amplitude donne une mosaïque de cases claires et sombres. On indexe donc
+  // l'amplitude sur la longueur de l'élément plutôt que d'imposer un compromis
+  // unique qui trahit l'un ou l'autre.
+  const varLame = Math.min(1.5, 0.6 + (Math.max(w, h) / TILE) * 4);
+  const shift = Math.round((random() - 0.5) * tex.spread * varLame);
+  const warm = Math.round((random() - 0.5) * tex.warm * varLame);
 
   ctx.save();
   const gradient = horizontal
@@ -324,7 +386,11 @@ function board(ctx, x, y, w, h, tex, random) {
   };
   ctx.strokeStyle = `rgba(38,26,16,${(tex.joint * 0.6).toFixed(3)})`;
   longSides();
-  ctx.strokeStyle = `rgba(38,26,16,${(tex.joint * 0.17).toFixed(3)})`;
+  // Les joints de bout restent nettement plus discrets que les joints
+  // lateraux — sinon on dessine une grille — mais les effacer donne des lames
+  // infinies, ce qui est un aussi mauvais signal. 0,32 est le dosage ou ils se
+  // devinent sans structurer l image.
+  ctx.strokeStyle = `rgba(38,26,16,${(tex.joint * 0.32).toFixed(3)})`;
   buttSides();
   ctx.restore();
 }
