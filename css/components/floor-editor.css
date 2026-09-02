@@ -1,0 +1,83 @@
+/**
+ * Calque de correction du sol : cadre, contour, pinceau.
+ *
+ * Ces règles vivent dans leur propre composant parce que **deux bundles** en
+ * ont besoin : la feuille du site (css/main.css) et celle de l'application
+ * (css/studio.css). Elles étaient auparavant noyées dans
+ * components/visualizer-photo.css, que seule la première importait : dans
+ * l'application, le calque se retrouvait sans positionnement, tombait dans le
+ * flux sous la photo, et les poignées devenaient inatteignables. « Corriger le
+ * sol » ne fonctionnait donc pas là où il sert le plus.
+ */
+
+.floor-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+.floor-mask__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.floor-mask__handles {
+  position: absolute;
+  inset: 0;
+}
+.floor-mask__shape {
+  fill: rgba(139, 160, 136, 0.28);
+  stroke: #f2efe8;
+  stroke-width: 0.4;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 2 2;
+}
+.floor-mask__handle {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border-radius: var(--r-pill);
+  border: 2px solid #16181a;
+  background: #f2efe8;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  cursor: grab;
+  touch-action: none;
+}
+.floor-mask__handle::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: var(--r-pill);
+  background: var(--c-sage-deep);
+}
+.floor-mask__handle[data-active="true"] {
+  cursor: grabbing;
+  transform: scale(1.12);
+}
+.floor-mask__handle:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+.floor-mask[data-mode="brush"] .floor-mask__shape {
+  fill: rgba(139, 160, 136, 0.12);
+  stroke-opacity: 0.35;
+}
+.floor-mask[data-mode="brush"] { cursor: none; }
+.floor-mask[data-mode="polygon"] { cursor: copy; }
+
+.floor-mask__cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--brush, 80px);
+  height: var(--brush, 80px);
+  margin: calc(var(--brush, 80px) / -2) 0 0 calc(var(--brush, 80px) / -2);
+  border-radius: var(--r-pill);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+.floor-mask__cursor[data-mode="remove"] { border-style: dashed; }
+.floor-mask__cursor[data-mode="add"] { background: rgba(139, 160, 136, 0.25); }

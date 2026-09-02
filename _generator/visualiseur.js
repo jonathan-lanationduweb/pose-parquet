@@ -6,6 +6,11 @@
  *    seul appel à l'action.
  *  - outils/studio.html      : l'application. Aucune prose, aucun pied de
  *    page, aucun fil d'Ariane — juste l'outil.
+ *
+ * Le nom public est **Visualiseur Parquet**. « Studio » ne subsiste que comme
+ * nom technique — le fichier de l'application et les classes CSS — parce que
+ * l'URL est déjà indexée et qu'un identifiant interne n'a pas à porter le
+ * nom commercial.
  */
 const { SITE, layout, appLayout, breadcrumb } = require('./layout');
 const { faq, faqJsonLd, tip } = require('./ui');
@@ -17,9 +22,9 @@ function buildStudioPage(write) {
   write(
     'outils/studio.html',
     appLayout({
-      title: 'Studio · Pose Parquet',
+      title: 'Visualiseur Parquet · Pose Parquet',
       description:
-        'Application de visualisation : choisissez une pièce, essayez des parquets, comparez jusqu’à trois rendus. Tout est calculé dans votre navigateur.',
+        'Visualiseur Parquet : choisissez une pièce, essayez des parquets, comparez jusqu’à trois rendus. Tout est calculé dans votre navigateur.',
       path: 'outils/studio.html',
       depth: 1,
     })
@@ -38,7 +43,7 @@ function buildVisualiseurPage(write) {
   const questions = [
     {
       q: 'Comment le sol est-il délimité ?',
-      a: "Les pièces d'exemple arrivent avec leur sol déjà détouré : vous n'avez rien à faire, le parquet se pose du premier coup. Sur votre propre photo, vous placez le cadre du sol, puis vous pouvez affiner le contour et effacer au pinceau ce qui doit rester devant : meubles, tapis, plinthes. Aucune détection automatique n'est utilisée ni simulée.",
+      a: "Les pièces d'exemple arrivent avec leur sol déjà détouré, y compris les pièces que l'on aperçoit derrière une ouverture : vous n'avez rien à faire, le parquet se pose du premier coup. Sur votre propre photo, vous placez le cadre du sol, puis vous pouvez affiner le contour et effacer au pinceau ce qui doit rester devant : meubles, tapis, plinthes. Aucune détection automatique n'est utilisée ni simulée, et rien dans l'interface ne le laisse croire.",
     },
     {
       q: 'Ma photo est-elle envoyée quelque part ?',
@@ -46,7 +51,7 @@ function buildVisualiseurPage(write) {
     },
     {
       q: 'Les parquets proposés existent-ils vraiment ?',
-      a: "Ce sont douze références de démonstration. Chacune a son propre veinage, ses nœuds, son contraste et sa largeur de lame, mais elles ne correspondent pas à un produit commercial précis. Le Studio sert à choisir une direction — une teinte, un motif, un sens de pose — pas à valider une commande.",
+      a: "Ce sont douze références de démonstration. Chacune a son propre veinage, ses nœuds, son contraste et sa largeur de lame, mais elles ne correspondent pas à un produit commercial précis. Le visualiseur sert à choisir une direction — une teinte, un motif, un sens de pose — pas à valider une commande.",
     },
     {
       q: 'Puis-je comparer plusieurs parquets ?',
@@ -54,7 +59,7 @@ function buildVisualiseurPage(write) {
     },
     {
       q: 'Pourquoi le parquet suit-il la perspective ?',
-      a: "Le cadre du sol définit un quadrilatère : on en déduit la transformation projective qui envoie le plan du sol sur l'image. Les lames proches paraissent donc plus grandes que celles du fond, et les ombres de la photo d'origine sont reportées sur la texture.",
+      a: "Parce que le motif n'est pas calculé sur l'image, mais dans le plan du sol, en mètres, avant d'être projeté. Une lame de 18 cm mesure 18 cm au premier plan comme au fond : elle rétrécit et converge d'elle-même. C'est vrai aussi du point de Hongrie, dont les chevrons appartiennent au sol au lieu d'être plaqués par-dessus. Une pièce peut d'ailleurs contenir plusieurs sols visibles — le parquet choisi les change tous, chacun avec sa propre fuite.",
     },
   ];
 
@@ -62,7 +67,7 @@ function buildVisualiseurPage(write) {
     {
       num: '(01)',
       title: 'Choisissez une pièce',
-      text: 'Six pièces d’exemple prêtes à l’emploi, sol déjà détouré — ou la photo de votre propre pièce.',
+      text: 'Quatre pièces d’exemple calibrées à la main, sol déjà détouré — ou la photo de votre propre pièce.',
     },
     {
       num: '(02)',
@@ -80,11 +85,11 @@ function buildVisualiseurPage(write) {
       <header class="landing-hero">
         <div class="wrap-wide landing-hero__grid">
           <div class="landing-hero__text">
-            <p class="eyebrow">Studio · outil gratuit</p>
+            <p class="eyebrow">Visualiseur Parquet · outil gratuit</p>
             <h1 class="landing-hero__title">Visualisez votre parquet dans votre pièce.</h1>
             <p class="landing-hero__lead">Importez une photo, choisissez un parquet, comparez plusieurs rendus. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée, ni conservée.</p>
             <div class="landing-hero__actions">
-              <a class="btn btn--lg" href="${STUDIO_URL}"><span>Lancer le Studio</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+              <a class="btn btn--lg" href="${STUDIO_URL}"><span>Visualiser mon parquet</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
               <a class="link-arrow" href="simulateur-pose.html">Étudier le sens de pose ${ICON.arrow}</a>
             </div>
             <ul class="landing-hero__facts">
@@ -106,7 +111,7 @@ function buildVisualiseurPage(write) {
               <p class="eyebrow">Comment ça marche</p>
               <h2 id="how-title">Trois gestes, aucun compte à créer.</h2>
             </div>
-            <p class="lead">Le Studio s’ouvre dans une interface dédiée : la pièce occupe l’écran, le catalogue tient sur le côté, et le rendu change à chaque clic.</p>
+            <p class="lead">Le visualiseur s’ouvre dans une interface dédiée : la pièce occupe l’écran, le catalogue tient sur le côté, et le rendu change à chaque clic.</p>
           </div>
           <div class="grid grid--3">
             ${steps
@@ -119,7 +124,7 @@ function buildVisualiseurPage(write) {
               )
               .join('\n            ')}
           </div>
-          <p class="u-mt-6"><a class="btn btn--lg" href="${STUDIO_URL}"><span>Lancer le Studio</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a></p>
+          <p class="u-mt-6"><a class="btn btn--lg" href="${STUDIO_URL}"><span>Visualiser mon parquet</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a></p>
         </div>
       </section>
 
@@ -151,15 +156,15 @@ function buildVisualiseurPage(write) {
         </div>
       </section>
 
-      <section class="section" aria-label="Lancer le Studio">
+      <section class="section" aria-label="Lancer le visualiseur">
         <div class="wrap">
           <div class="cta-band" data-reveal>
             <div>
               <h2>Prêt à essayer ?</h2>
-              <p>Le Studio s’ouvre directement sur le choix de la pièce. Aucune inscription, aucune photo envoyée.</p>
+              <p>Le visualiseur s’ouvre directement sur le choix de la pièce. Aucune inscription, aucune photo envoyée.</p>
             </div>
             <div class="cta-band__actions">
-              <a class="btn btn--light" href="${STUDIO_URL}">Lancer le Studio</a>
+              <a class="btn btn--light" href="${STUDIO_URL}">Visualiser mon parquet</a>
               <a class="btn btn--outline-light" href="../projet/">Décrire mon projet</a>
             </div>
           </div>
@@ -181,7 +186,7 @@ function buildVisualiseurPage(write) {
         {
           '@context': 'https://schema.org',
           '@type': 'WebApplication',
-          name: 'Pose Parquet Studio',
+          name: 'Visualiseur Parquet — Pose Parquet',
           applicationCategory: 'DesignApplication',
           operatingSystem: 'Navigateur web',
           offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },

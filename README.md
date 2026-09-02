@@ -54,7 +54,9 @@ pose-parquet.com/
 │   ├── components/         nav (menu plein écran), carousel (drag/swipe/clavier),
 │   │                       accordion, tabs, modal/lightbox, tooltip, toc,
 │   │                       before-after, filters, hero-media
-│   ├── tools/              patterns.js (registre des motifs) + floor-visualizer.js (simulateur)
+│   ├── scene/              Le moteur du Visualiseur Parquet (voir plus bas)
+│   ├── studio/             L'interface du Visualiseur Parquet (app, catalogue, comparaison)
+│   ├── tools/              patterns.js (registre des motifs) + floor-visualizer.js (mode plan)
 │   └── forms/              submit-adapter.js (abstraction d'envoi)
 │
 ├── components/
@@ -66,7 +68,13 @@ pose-parquet.com/
 │   ├── icons/favicon.svg
 │   └── videos/             Emplacement de la vidéo du hero (voir README dédié)
 │
-├── data/contenus.json      Index machine des contenus (guides, motifs, tutoriels, outils)
+├── data/
+│   ├── contenus.json       Index machine des contenus (guides, motifs, tutoriels, outils)
+│   ├── parquets.json       Catalogue des parquets de démonstration
+│   └── scenes/             Pièces d'exemple calibrées à la main (index.json + une par pièce)
+│
+├── docs/                   Notes d'ingénierie et contrats à venir
+├── _calibrage/             Outil interne de calibrage des scènes et banc d'essai des moteurs
 ├── robots.txt  sitemap.xml
 ├── serve.js                Serveur statique de développement
 └── _generator/             Générateur Node optionnel des pages HTML (voir son README)
@@ -86,7 +94,7 @@ communes sur les 29 pages d'un coup (`node _generator/build.js`).
 
 ---
 
-## Simulateur de pose (Studio de pose)
+## Simulateur de pose (mode plan)
 
 Point de montage :
 
@@ -195,40 +203,112 @@ partenaire dans le conteneur `[data-project-form]`.
 
 ---
 
-## Visualiseur de parquet (`js/visualizer/`)
+## Visualiseur Parquet (`js/scene/` + `js/studio/`)
 
-Page : `outils/visualiseur.html`. Deux modes en onglets — **Visualiser ma pièce**
-(photo) et **Mode plan** (l'ancien simulateur vu du dessus).
+Pages : `outils/visualiseur.html` (la landing) et `outils/studio.html`
+(l'application). Le nom public est **Visualiseur Parquet** ; « studio » ne
+subsiste que comme nom technique — fichiers, classes CSS, stockage local — parce
+que l'URL est indexée et qu'un identifiant interne n'a pas à porter le nom
+commercial.
+
+### Le principe : une SCÈNE, puis un rendu
+
+```
+IMAGE  →  analyzeScene()  →  SceneData  →  moteur de rendu  →  canevas
+```
+
+Le moteur de rendu **ne sait pas d'où viennent les données**. Elles arrivent
+aujourd'hui de deux endroits, et un troisième est déjà prévu :
+
+| stratégie | source | statut |
+| --- | --- | --- |
+| `precalibrated` | `data/scenes/<id>.json`, calibré à la main | en service |
+| `manual` | plan de départ que l'utilisateur ajuste | en service |
+| `remote` | service d'analyse d'image | **non implémenté**, contrat écrit |
+
+Une **scène** décrit tout ce qu'il faut savoir d'une photo pour y poser un
+parquet : plusieurs zones de sol, chacune avec son plan de perspective et son
+contour, les objets qui doivent rester devant, l'éclairement, la caméra.
+Deux zones qui partagent une `surfaceId` sont le même sol : elles reçoivent
+forcément le même bois. Deux zones qui partagent un `planeRef` sont sur le même
+plan : la trame se prolonge exactement d'une pièce à l'autre.
+
+Le schéma complet est commenté dans `js/scene/schema.js`. Le contrat de la
+future API est dans [docs/future-ai-api-contract.md](docs/future-ai-api-contract.md).
+
+### Les fichiers
 
 | Fichier | Rôle |
 | --- | --- |
-| `image-loader.js` | Chargement et redimensionnement (max 1600 × 1200) des pièces d'exemple et des photos importées |
-| `rooms.js` | Catalogue des pièces d'exemple : fichier, crédit, dimensions supposées, quadrilatère du sol |
-| `floor-mask.js` | Sélection manuelle du sol + interface `detectFloor(strategy, ctx)` |
-| `perspective.js` | Homographie 4 points (carré unité → quadrilatère) et son inverse |
-| `patterns.js` | Textures procédurales répétables : lames droites, Point de Hongrie, bâton rompu, 6 teintes |
-| `texture-renderer.js` | Rendu pixel par pixel : projection, choix du niveau de réduction, report des ombres |
-| `controls.js` | Panneau de réglages (natif, accessible au clavier) |
-| `compare.js` | Avant / après piloté par un `input[type=range]` |
-| `state.js` | État partagé avec le mode plan (localStorage) |
-| `index.js` | Orchestration |
+| `scene/schema.js` | Le format `SceneData` : zones, plans, surfaces, occlusions, lumière |
+| `scene/analyzer.js` | `analyzeScene()` et le registre des stratégies — le seul point de branchement |
+| `scene/texture.js` | Albedo du bois : tuile procédurale répétable, **mesurée en mètres** (4,80 m / 1280 px) |
+| `scene/material.js` | Le matériau : lame, finition, rugosité, relief ; emplacements prévus pour de vraies cartes |
+| `scene/mask.js` | Étiquettes de zones + couverture + occlusions, en deux cartes quel que soit le nombre de zones |
+| `scene/shading.js` | Éclairement basse fréquence **en couleur**, reflets, ombre de contact |
+| `scene/geometry.js` | Homographies de zone et direction de la lumière — partagé par les deux moteurs |
+| `scene/renderer.js` | Choisit le moteur, calcule une fois ce qui ne dépend que de la photo |
+| `scene/renderer-gl.js` | WebGL 2 sans bibliothèque : un quadrilatère par zone, filtrage anisotrope matériel |
+| `scene/renderer-canvas.js` | Canvas 2D : même chaîne, en tableaux typés. Recours et référence |
+| `scene/editor.js` | Correction du sol : cadre, contour, pinceau |
+| `scene/preview.js` | La démonstration avant / après de l'accueil, sur le vrai moteur |
+| `scene/export.js` | Composition et téléchargement du rendu |
+| `studio/app.js` | L'application : trois écrans, un panneau, un tiroir |
+| `studio/catalog.js` | Catalogue de parquets, échantillons dessinés à la demande |
+| `studio/compare.js` | Comparaison de deux ou trois variantes sur la même scène |
 
-**Ce que fait réellement la V1** : la zone de sol est délimitée **à la main**
-(quatre poignées souris / tactile / clavier). Aucune détection automatique
-n'est utilisée ni simulée. La texture est ensuite projetée dans le
-quadrilatère par homographie — d'où la perspective — et modulée par la
-luminance de la photo d'origine, ce qui reporte ombres et reflets.
+### Ce que fait réellement la version en service
 
-**Brancher une détection automatique plus tard** :
+- Les quatre pièces d'exemple sont **calibrées à la main** avec `_calibrage/`.
+  Aucune analyse d'image, aucune détection, aucune IA — et l'interface ne
+  prononce aucun de ces mots, parce que ce serait faux.
+- Sur une photo importée, l'utilisateur place le cadre du sol, affine le contour
+  et efface au pinceau ce qui doit rester devant.
+- Le motif est calculé **dans le plan du sol, en mètres**, puis projeté. Une
+  lame de 18 cm mesure 18 cm au premier plan comme au fond : elle rétrécit et
+  converge d'elle-même. Idem pour le point de Hongrie et le bâton rompu, dont
+  les chevrons appartiennent au sol.
+- L'éclairement est repris de la photo, séparé en basse et haute fréquence : on
+  garde le soleil et les ombres, on jette la trame de l'ancien revêtement.
+- La profondeur est dérivée analytiquement du plan (exacte pour les pixels de
+  sol) ; le champ `scene.depth` prévoit une carte d'image pour la suite.
+
+### Brancher une analyse automatique, plus tard
+
+Un seul point à toucher :
 
 ```js
-import { registerDetector, detectFloor } from './floor-mask.js';
-registerDetector('auto', async ({ canvas }) => quadNormalise); // modèle ou service
-await detectFloor('auto', { canvas });
+import { registerAnalyzer } from './js/scene/analyzer.js';
+
+registerAnalyzer('remote', async ({ file }) => {
+  const body = new FormData();
+  body.append('image', file);
+  const response = await fetch(`${API}/analyze-room`, { method: 'POST', body });
+  return response.json(); // même schéma que data/scenes/*.json
+});
 ```
 
-Les photos importées ne quittent jamais le navigateur : lecture via
-`URL.createObjectURL`, traitement en Canvas, aucun envoi réseau.
+Rien d'autre ne change : ni le schéma, ni les moteurs, ni les masques, ni les
+matériaux, ni la comparaison, ni l'export. L'écran de correction ne disparaît
+pas non plus — il devient facultatif. Voir
+[docs/future-python-architecture.md](docs/future-python-architecture.md).
+
+**Contrainte tenue aujourd'hui** : les photos importées ne quittent jamais le
+navigateur — lecture par `URL.createObjectURL`, traitement en Canvas, aucun
+envoi réseau. Un service distant changerait cela : ce devra être un choix
+explicite, jamais le comportement par défaut.
+
+### Calibrer une pièce
+
+```bash
+node serve.js
+```
+
+puis `http://localhost:5180/_calibrage/` — page interne, ni liée ni indexée.
+Elle affiche les contours sur la photo, propose une loupe cotée pour relever un
+point au centième, aide au relevé du bas des murs, et sert de banc d'essai entre
+les deux moteurs (temps de rendu et écart pixel à pixel). Voir
+[docs/renderer-canvas-vs-webgl.md](docs/renderer-canvas-vs-webgl.md).
 
 ---
 

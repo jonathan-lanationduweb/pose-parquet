@@ -191,8 +191,14 @@
   ],
   "outils": [
     {
+      "slug": "visualiseur",
+      "titre": "Visualiseur Parquet",
+      "url": "outils/visualiseur.html",
+      "etat": "disponible"
+    },
+    {
       "slug": "simulateur-pose",
-      "titre": "Studio de pose",
+      "titre": "Simulateur de pose",
       "url": "outils/simulateur-pose.html",
       "etat": "disponible"
     }

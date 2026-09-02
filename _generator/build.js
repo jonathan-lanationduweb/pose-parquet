@@ -174,7 +174,7 @@ function ctaBand(base) {
           </div>
           <div class="cta-band__actions">
             <a class="btn btn--light" href="${base}projet/">Décrire mon projet</a>
-            <a class="btn btn--outline-light" href="${base}outils/studio.html">Lancer le Studio</a>
+            <a class="btn btn--outline-light" href="${base}outils/studio.html">Visualiser mon parquet</a>
           </div>
         </div>
       </div>
@@ -694,7 +694,7 @@ function buildTools() {
               <div data-vz-preview data-room="sejour" data-base="../"></div>
             </div>
             <div class="tool-block__body">
-              <p class="tool-block__num">Outil 01 <span class="badge badge--sage">Studio</span></p>
+              <p class="tool-block__num">Outil 01 <span class="badge badge--sage">Visualiseur</span></p>
               <h2 class="tool-block__title">Visualiser ma pièce</h2>
               <p class="lead">Une application dédiée : votre pièce en grand, un catalogue de douze parquets sur le côté, et le sol qui change à chaque clic.</p>
               <ul class="tool-block__points">
@@ -704,7 +704,7 @@ function buildTools() {
                 <li>Tout est calculé dans le navigateur : la photo n’est ni envoyée ni conservée.</li>
               </ul>
               <div class="cluster">
-                <a class="btn" href="studio.html">Lancer le Studio</a>
+                <a class="btn" href="studio.html">Visualiser mon parquet</a>
                 <a class="link-arrow" href="../inspiration/">Voir des ambiances à essayer</a>
               </div>
             </div>
@@ -829,7 +829,7 @@ function buildTools() {
         {
           '@context': 'https://schema.org',
           '@type': 'WebApplication',
-          name: 'Studio de pose',
+          name: 'Simulateur de pose',
           applicationCategory: 'DesignApplication',
           operatingSystem: 'Navigateur web',
           offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
@@ -979,7 +979,7 @@ function buildApropos() {
               <div class="figures">
                 <div class="figure-item"><strong>${GUIDES.length + MOTIFS.length + TUTOS.length}</strong><span>contenus publiés</span></div>
                 <div class="figure-item"><strong>5</strong><span>motifs simulés</span></div>
-                <div class="figure-item"><strong>6</strong><span>pièces d’exemple</span></div>
+                <div class="figure-item"><strong>4</strong><span>pièces d’exemple</span></div>
               </div>
             </div>
           </div>
@@ -1190,7 +1190,10 @@ function buildDataIndex() {
     guides: GUIDES.map((g) => ({ slug: g.slug, titre: g.h1, url: 'guides/' + g.slug + '.html', categorie: g.category, tags: g.tags, lecture: g.reading, resume: g.excerpt })),
     motifs: MOTIFS.map((m) => ({ slug: m.slug, titre: m.h1, url: 'motifs/' + m.slug + '.html', motif: m.pattern, stats: Object.fromEntries(m.stats) })),
     tutoriels: TUTOS.map((t) => ({ slug: t.slug, titre: t.h1, url: 'tutoriels/' + t.slug + '.html', niveau: t.level, duree: t.duration })),
-    outils: [{ slug: 'simulateur-pose', titre: 'Studio de pose', url: 'outils/simulateur-pose.html', etat: 'disponible' }],
+    outils: [
+      { slug: 'visualiseur', titre: 'Visualiseur Parquet', url: 'outils/visualiseur.html', etat: 'disponible' },
+      { slug: 'simulateur-pose', titre: 'Simulateur de pose', url: 'outils/simulateur-pose.html', etat: 'disponible' },
+    ],
   };
   write('data/contenus.json', JSON.stringify(index, null, 2));
 }

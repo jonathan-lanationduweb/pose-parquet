@@ -11,7 +11,7 @@
 import { PATTERNS, getPattern, patternThumb } from './patterns.js';
 import { clamp } from '../utils/dom.js';
 import icons from '../utils/icons.js';
-import { getState, setState, PLAN_TO_PATTERN, PATTERN_TO_PLAN } from '../visualizer/state.js';
+import { getState, setState, PLAN_TO_PATTERN, PATTERN_TO_PLAN } from './plan-state.js';
 
 /** Passerelle de teintes entre le visualiseur photo et le mode plan. */
 const TONE_TO_PLAN = { clair: 'clair', naturel: 'naturel', miel: 'naturel', brun: 'fume', fume: 'fume', graphite: 'fume' };

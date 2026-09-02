@@ -77,7 +77,7 @@ async function boot() {
   }
 
   if (has('[data-vz-preview]')) {
-    const { mountPreview } = await import('./visualizer/preview.js');
+    const { mountPreview } = await import('./scene/preview.js');
     mountAll('[data-vz-preview]', mountPreview);
   }
 

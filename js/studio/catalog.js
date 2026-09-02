@@ -10,14 +10,20 @@
  * moteur que le sol : ce que l'on voit dans la vignette est ce que l'on
  * obtient dans la pièce.
  */
-import { buildSwatch } from './texture.js';
+import { buildSwatch } from '../scene/texture.js';
+import { createMaterial } from '../scene/material.js';
 
 export async function loadCatalog(base = '') {
   const response = await fetch(`${base}data/parquets.json`, { cache: 'force-cache' });
   if (!response.ok) throw new Error('Catalogue indisponible');
   const data = await response.json();
-  const byId = new Map(data.parquets.map((item) => [item.id, item]));
-  return { ...data, byId, get: (id) => byId.get(id) };
+  // Les entrées brutes deviennent des matériaux complets dès le chargement :
+  // largeur et longueur de lame, rugosité et brillance déduites de la
+  // finition, emplacements prévus pour de vraies cartes photographiques.
+  // Tout le reste de l'outil ne manipule donc que des matériaux.
+  const parquets = data.parquets.map(createMaterial);
+  const byId = new Map(parquets.map((item) => [item.id, item]));
+  return { ...data, parquets, byId, get: (id) => byId.get(id) };
 }
 
 /** Vignette de matériau, fabriquée une seule fois puis réutilisée. */

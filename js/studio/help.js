@@ -1,5 +1,5 @@
 /**
- * Aide du Studio : trois phrases, pas un manuel.
+ * Aide du visualiseur : trois phrases, pas un manuel.
  * Chargée à la demande — elle ne pèse rien tant qu'on ne l'ouvre pas.
  */
 const STEPS = [

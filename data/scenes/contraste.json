@@ -1,0 +1,68 @@
+{
+  "schema": "pose-parquet/scene@1",
+  "id": "contraste",
+  "label": "Lumière contrastée",
+  "source": "precalibrated",
+  "note": "Géométrie simple, lumière difficile : une ombre de fenêtre franchement découpée traverse le sol. C'est la scène qui vérifie que l'éclairement est bien repris de la photo, et surtout qu'il est repris en basse fréquence — l'ancien plancher, très marqué, ne doit pas réapparaître en filigrane sous le nouveau. Rayon de flou volontairement court pour ne pas adoucir l'arête de l'ombre.",
+  "image": {
+    "file": "room-contraste.jpg",
+    "width": 1600,
+    "height": 1067,
+    "alt": "Pièce traversée par l’ombre découpée d’une fenêtre",
+    "credit": "sanket mahind / Pexels"
+  },
+  "camera": {
+    "horizon": 0.5,
+    "vanishingPoints": [
+      { "x": 0.5, "y": 0.5, "weight": 0.6 }
+    ],
+    "heightM": 1.4
+  },
+  "surfaces": [
+    {
+      "id": "sol",
+      "label": "Sol de la pièce",
+      "continuous": true
+    }
+  ],
+  "planes": {
+    "sol": {
+      "quad": [
+        { "x": 0.09, "y": 0.6 },
+        { "x": 0.91, "y": 0.6 },
+        { "x": 1.05, "y": 1.02 },
+        { "x": -0.05, "y": 1.02 }
+      ],
+      "meters": { "width": 4, "depth": 3.8 },
+      "origin": { "u": 0, "v": 0 },
+      "rotationDeg": 0
+    }
+  },
+  "floorZones": [
+    {
+      "id": "piece",
+      "label": "Pièce",
+      "surfaceId": "sol",
+      "planeRef": "sol",
+      "order": 0,
+      "mask": {
+        "polygon": [
+          { "x": 0, "y": 0.74 },
+          { "x": 0.5, "y": 0.748 },
+          { "x": 1, "y": 0.752 },
+          { "x": 1, "y": 1 },
+          { "x": 0, "y": 1 }
+        ],
+        "holes": []
+      }
+    }
+  ],
+  "occluders": [],
+  "light": {
+    "kind": "photo-luma",
+    "strength": 1,
+    "blurRadius": 0.014,
+    "tint": 0.4,
+    "contact": 0.3
+  }
+}

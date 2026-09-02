@@ -218,7 +218,7 @@ ${page.body}
 }
 
 /**
- * Gabarit « application » : le Studio.
+ * Gabarit « application » : le Visualiseur Parquet.
  *
  * Pas d'en-tête éditorial, pas de pied de page, pas de fil d'Ariane. La page
  * ne contient qu'un point de montage : l'interface est construite par
@@ -252,7 +252,7 @@ function appLayout(page) {
   <body class="app">
     <div data-studio data-base="${p}">
       <noscript>
-        <p class="studio__noscript">Le Studio a besoin de JavaScript pour calculer le rendu dans votre navigateur.
+        <p class="studio__noscript">Le visualiseur a besoin de JavaScript pour calculer le rendu dans votre navigateur.
         Vous pouvez lire la présentation de l’outil sur la page
         <a href="${p}outils/visualiseur.html">Visualiser ma pièce</a>.</p>
       </noscript>

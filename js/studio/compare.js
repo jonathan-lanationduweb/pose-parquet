@@ -6,7 +6,7 @@
  * horizontal sur téléphone — jamais trois vignettes minuscules.
  *
  * À ne pas confondre avec « Avant / après », qui oppose la photo d'origine au
- * parquet posé. Ici, on compare des parquets entre eux.
+ * parquet posé. Ici, on compare des parquets entre eux — sur la même scène.
  */
 const PATTERN_LABELS = {
   lames: 'Lames droites',
@@ -14,7 +14,7 @@ const PATTERN_LABELS = {
   'baton-rompu': 'Bâton rompu',
 };
 
-export function createCompare(host, { renderer, catalog, onUse, projectLink }) {
+export function createCompare(host, { renderer, catalog, paintConfig, onUse, projectLink }) {
   const root = document.createElement('div');
   root.className = 'cmp';
   root.hidden = true;
@@ -36,7 +36,7 @@ export function createCompare(host, { renderer, catalog, onUse, projectLink }) {
     <p class="cmp__count" data-count hidden aria-live="polite"></p>
     <footer class="cmp__foot">
       <p>Vous avez trouvé votre rendu ?</p>
-      <a class="btn btn--sm btn--ghost" data-project href="#">Décrire mon projet</a>
+      <a class="btn btn--sm btn--light" data-project href="#">Décrire mon projet</a>
     </footer>`;
 
   const body = root.querySelector('[data-body]');
@@ -51,10 +51,16 @@ export function createCompare(host, { renderer, catalog, onUse, projectLink }) {
     return { name: material ? material.name : '—', pattern: PATTERN_LABELS[variant.config.pattern] || '' };
   };
 
+  /**
+   * Chaque variante est peinte à partir de la **même scène** : même géométrie,
+   * mêmes masques, même éclairement, même caméra. Seul le matériau change.
+   * C'est ce qui rend la comparaison honnête — et c'est gratuit, puisque tout
+   * ce qui ne dépend que de la photo est calculé une fois pour toutes.
+   */
   const canvasFor = (variant) => {
     const canvas = document.createElement('canvas');
     canvas.className = 'cmp__canvas';
-    renderer.paint(canvas, catalog.get(variant.config.materialId), variant.config, 1);
+    renderer.paint(canvas, paintConfig(variant.config), null, 1);
     return canvas;
   };
 

@@ -1,0 +1,38 @@
+{
+  "schema": "pose-parquet/scene-index@1",
+  "note": "Pièces d'exemple du Visualiseur Parquet. Chaque scène est calibrée à la main : zones de sol, plans de perspective, trous et occlusions. Aucune analyse d'image n'intervient. Quatre pièces soignées valent mieux que douze approximatives ; l'outil de calibrage est dans _calibrage/.",
+  "scenes": [
+    {
+      "id": "sejour",
+      "label": "Séjour et salle à manger",
+      "file": "room-sejour.jpg",
+      "thumb": "room-sejour-640.jpg",
+      "zones": 2,
+      "highlight": "Deux pièces en enfilade, un seul parquet"
+    },
+    {
+      "id": "piece-claire",
+      "label": "Pièce claire",
+      "file": "room-piece-claire.jpg",
+      "thumb": "room-piece-claire-640.jpg",
+      "zones": 1,
+      "highlight": "Meuble et radiateur devant le sol"
+    },
+    {
+      "id": "chambre",
+      "label": "Chambre ouverte au jardin",
+      "file": "room-chambre.jpg",
+      "thumb": "room-chambre-640.jpg",
+      "zones": 1,
+      "highlight": "Lumière franche, perspective profonde"
+    },
+    {
+      "id": "contraste",
+      "label": "Lumière contrastée",
+      "file": "room-contraste.jpg",
+      "thumb": "room-contraste-640.jpg",
+      "zones": 1,
+      "highlight": "Ombre découpée reportée sur le parquet"
+    }
+  ]
+}

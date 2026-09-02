@@ -1,22 +1,36 @@
 /**
- * Pose Parquet Studio — application de visualisation.
+ * Visualiseur Parquet — l'application.
  *
  * Trois écrans seulement : choisir une pièce, essayer des parquets, comparer.
- * Tout le reste (correction du masque, largeur exacte, échelle, angle libre)
- * vit dans « Réglages avancés » et ne s'affiche que si on le demande.
+ * Tout le reste — correction du sol, largeur exacte, échelle, angle libre —
+ * vit derrière un bouton et ne s'affiche que si on le demande. L'utilisateur
+ * n'a jamais à connaître un plan de perspective ni un masque : la photo est
+ * l'application, les commandes se rangent autour d'elle.
+ *
+ * Le nom interne reste « studio » — classes CSS, fichiers, stockage local.
+ * Le nom affiché est Visualiseur Parquet.
+ *
+ * Le parcours est déjà celui d'après :
+ *
+ *   aujourd'hui   importer → délimiter le sol → visualiser
+ *   demain        importer → [analyse] → corriger si besoin → visualiser
+ *
+ * Une seule étape change de statut, aucune ne change de place. Voir
+ * js/scene/analyzer.js et docs/future-ai-api-contract.md.
  *
  * Rien ne quitte le navigateur : la photo est lue localement, le rendu est
  * calculé localement, aucun envoi vers un serveur.
  */
 import { qs, on } from '../utils/dom.js';
-import { ROOMS, getRoom } from '../visualizer/rooms.js';
-import { loadImage, loadFile } from '../visualizer/image-loader.js';
-import { createFloorEditor, detectFloor } from '../visualizer/floor-mask.js';
-import { composeRender, downloadCanvas } from '../visualizer/export.js';
-import { createRenderer } from './render.js';
+import { analyzeScene, loadSceneIndex } from '../scene/analyzer.js';
+import { loadImage, loadFile } from '../scene/image-loader.js';
+import { createFloorEditor } from '../scene/editor.js';
+import { composeRender, downloadCanvas } from '../scene/export.js';
+import { createSceneRenderer } from '../scene/renderer.js';
+import { warmMaterial } from '../scene/material.js';
 import { loadCatalog, createCatalog, swatchFor } from './catalog.js';
 import { createCompare } from './compare.js';
-import { buildTexture } from './texture.js';
+import { buildTexture } from '../scene/texture.js';
 
 const ORIENTATIONS = [
   { angle: 0, label: 'Lames dans la largeur', icon: 'M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4' },
@@ -51,7 +65,7 @@ export async function mountStudio(root) {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
         <span><strong>Pose</strong> Parquet</span>
       </a>
-      <p class="studio__project" data-project>Studio</p>
+      <p class="studio__project" data-project>Visualiseur Parquet</p>
       <div class="studio__tools">
         <button class="studio__tool" type="button" data-help aria-label="Aide">${icon(ICONS.help)}</button>
         <button class="studio__tool" type="button" data-restart aria-label="Réinitialiser">${icon(ICONS.reset)}</button>
@@ -61,7 +75,7 @@ export async function mountStudio(root) {
             <button type="button" data-advanced>Réglages avancés</button>
             <button type="button" data-fix>Corriger le sol</button>
             <a href="${base}outils/simulateur-pose.html">Passer au mode Plan</a>
-            <a href="${base}outils/visualiseur.html">À propos du Studio</a>
+            <a href="${base}outils/visualiseur.html">À propos du visualiseur</a>
           </div>
         </div>
       </div>
@@ -72,7 +86,7 @@ export async function mountStudio(root) {
         <h1 class="start__title">Visualisez votre parquet</h1>
         <p class="start__lead">Choisissez une pièce, essayez les parquets, comparez. Votre photo reste dans votre navigateur.</p>
         <div class="start__actions">
-          <button class="btn btn--solid btn--lg" type="button" data-import>Importer ma pièce</button>
+          <button class="btn btn--solid btn--lg" type="button" data-import>Essayer dans ma pièce</button>
           <span class="start__or">ou choisissez une pièce d’exemple</span>
         </div>
         <div class="start__rooms" data-rooms></div>
@@ -155,8 +169,9 @@ export async function mountStudio(root) {
   const drawerTitle = qs('[data-drawer-title]', root);
   const dropdown = qs('[data-dropdown]', root);
 
-  const renderer = createRenderer();
+  const renderer = createSceneRenderer();
   const catalog = await loadCatalog(base);
+  const sceneIndex = await loadSceneIndex(base);
 
   let config = {
     materialId: catalog.parquets[0].id,
@@ -166,14 +181,20 @@ export async function mountStudio(root) {
     scale: 1,
   };
   let variants = [];
-  let roomId = null;
-  let userPhoto = false;
+  let sceneId = null;
   let pending = false;
   let refine = 0;
   let quality = 1;
   let editor = null;
+  /** Zone visée par la correction du sol : la plus proche par défaut. */
+  let activeZone = null;
 
   const material = () => catalog.get(config.materialId);
+  /** Configuration telle que le moteur l'attend : le matériau, pas son id. */
+  const paintConfig = (source) => {
+    const from = source || config;
+    return { ...from, material: catalog.get(from.materialId) };
+  };
   const setStatus = (message) => {
     status.textContent = message || '';
     status.hidden = !message;
@@ -184,7 +205,7 @@ export async function mountStudio(root) {
   function paint() {
     pending = false;
     if (!renderer.ready) return;
-    const ok = renderer.paint(canvas, material(), config, quality);
+    const ok = renderer.paint(canvas, paintConfig(), null, quality);
     if (!ok) {
       setStatus('Zone de sol invalide : corrigez-la dans « Corriger le sol ».');
       return;
@@ -200,7 +221,9 @@ export async function mountStudio(root) {
   }
 
   function schedule(draft) {
-    if (draft) {
+    // Le rendu allégé ne concerne que le moteur logiciel : sur GPU, un rendu
+    // plein format coûte moins de temps qu'il n'en ferait perdre en réglages.
+    if (draft && renderer.backend !== 'webgl2') {
       quality = 2;
       window.clearTimeout(refine);
     }
@@ -217,19 +240,19 @@ export async function mountStudio(root) {
 
   /* ---------------- Écran de départ ---------------- */
 
-  ROOMS.forEach((room) => {
+  sceneIndex.scenes.forEach((entry) => {
     const card = document.createElement('button');
     card.type = 'button';
     card.className = 'room-card';
-    card.dataset.room = room.id;
-    const stem = room.file.replace(/\.jpg$/, '');
+    card.dataset.room = entry.id;
+    const stem = entry.file.replace(/\.jpg$/, '');
     card.innerHTML = `
       <picture>
         <source type="image/webp" srcset="${base}assets/images/${stem}-640.webp" />
-        <img src="${base}assets/images/${stem}-640.jpg" alt="${room.alt}" decoding="async" width="640" height="427" />
+        <img src="${base}assets/images/${stem}-640.jpg" alt="${entry.label}" decoding="async" width="640" height="427" />
       </picture>
-      <span class="room-card__label">${room.label}</span>`;
-    card.addEventListener('click', () => openRoom(room.id));
+      <span class="room-card__label">${entry.label}</span>`;
+    card.addEventListener('click', () => openRoom(entry.id));
     roomsHost.appendChild(card);
   });
 
@@ -241,34 +264,36 @@ export async function mountStudio(root) {
 
   /* ---------------- Chargement d'une pièce ---------------- */
 
-  function afterSource(name) {
+  function afterScene(name) {
     root.dataset.state = 'edit';
     qs('[data-project]', root).textContent = name;
     photo.src = renderer.photo.toDataURL('image/jpeg', 0.9);
+    // La zone la plus proche est celle qu'on corrige le plus souvent.
+    const zones = renderer.scene.floorZones;
+    activeZone = zones[zones.length - 1].id;
     if (editor) editor.setMode('off');
     quality = 1;
     schedule();
-    renderer.warm(material(), config);
+    warmMaterial(material(), config);
   }
 
   async function openRoom(id) {
-    const room = getRoom(id);
+    const entry = sceneIndex.scenes.find((item) => item.id === id) || sceneIndex.scenes[0];
     setStatus('Chargement…');
     try {
-      const prepared = await loadImage(`${base}assets/images/${room.file}`);
-      renderer.setSource(prepared, room.room);
-      renderer.setZone(await detectFloor('manual', { canvas: prepared.canvas, suggestion: room.quad }), room.mask);
-      roomId = room.id;
-      userPhoto = false;
-      photo.alt = room.alt;
-      const stem = room.file.replace(/\.jpg$/, '');
+      const scene = await analyzeScene({ sceneId: entry.id, base });
+      const prepared = await loadImage(`${base}assets/images/${scene.image.file}`);
+      renderer.setScene(scene, prepared);
+      sceneId = entry.id;
+      photo.alt = scene.image.alt;
+      const stem = entry.file.replace(/\.jpg$/, '');
       qs('[data-room-thumb]', root).style.backgroundImage = `url(${base}assets/images/${stem}-640.jpg)`;
-      afterSource(room.label);
+      afterScene(scene.label);
       setStatus('');
       mountEditor();
     } catch (error) {
       setStatus('La pièce n’a pas pu être chargée.');
-      void error;
+      console.error('[visualiseur]', error);
     }
   }
 
@@ -276,13 +301,15 @@ export async function mountStudio(root) {
     setStatus('Lecture de la photo…');
     try {
       const prepared = await loadFile(file);
-      renderer.setSource(prepared, { width: 4.2, depth: 4 });
-      renderer.setZone(await detectFloor('manual', { canvas: prepared.canvas }));
-      roomId = null;
-      userPhoto = true;
+      // Aucune analyse : la scène de départ est un plan plausible, que
+      // l'utilisateur ajuste. Le jour où un service d'analyse existe, seule
+      // la stratégie demandée ici change.
+      const scene = await analyzeScene({ width: prepared.width, height: prepared.height, label: 'Ma photo' });
+      renderer.setScene(scene, prepared);
+      sceneId = null;
       photo.alt = 'Votre pièce';
       qs('[data-room-thumb]', root).style.backgroundImage = 'none';
-      afterSource('Ma photo');
+      afterScene('Ma photo');
       mountEditor();
       openDrawer('zone');
       setStatus('Placez les quatre coins du sol, puis fermez le panneau.');
@@ -296,7 +323,7 @@ export async function mountStudio(root) {
   const catalogView = qs('[data-view="parquets"]', root);
   const catalogUi = createCatalog(catalogView, catalog, {
     onSelect: (item) => selectMaterial(item.id),
-    onVisible: (item) => renderer.warm(item, { ...config, materialId: item.id }),
+    onVisible: (item) => warmMaterial(item, config),
   });
 
   function selectMaterial(id) {
@@ -310,7 +337,7 @@ export async function mountStudio(root) {
     schedule(true);
     save();
     // Les références voisines sont préparées pendant que l'on regarde le rendu
-    catalogUi.neighbours(id).forEach((item) => renderer.warm(item, { ...config, materialId: item.id }));
+    catalogUi.neighbours(id).forEach((item) => warmMaterial(item, config));
   }
 
   function syncSelected() {
@@ -321,7 +348,7 @@ export async function mountStudio(root) {
       <span class="selected__swatch"></span>
       <span class="selected__text">
         <strong>${item.name}</strong>
-        <span>${item.finish} · lames ${Math.round(item.boardWidth * 100)} cm</span>
+        <span>${item.finish} · lames ${Math.round(item.plank.width * 100)} cm</span>
       </span>`;
     const slot = selected.querySelector('.selected__swatch');
     const mini = document.createElement('canvas');
@@ -363,16 +390,16 @@ export async function mountStudio(root) {
   }
 
   /**
-   * Aperçu de motif : la tuile réelle, dessinée en 256 px au lieu de 1024.
-   * Seize fois moins de pixels pour la même image : indispensable, sinon
+   * Aperçu de motif : la tuile réelle, dessinée en 256 px au lieu de 1280.
+   * Vingt-cinq fois moins de pixels pour la même image — indispensable, sinon
    * chaque changement de parquet reconstruirait trois tuiles pleines.
    */
   function drawPatternPreview(target, item, pattern) {
     const draw = () => {
-      const tile = buildTexture(item, { pattern, width: item.boardWidth, size: 256 });
+      const tile = buildTexture(item, { pattern, size: 256 });
       const ctx = target.getContext('2d');
       ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(tile, 20, 30, 180, 124, 0, 0, target.width, target.height);
+      ctx.drawImage(tile, 24, 34, 168, 116, 0, 0, target.width, target.height);
     };
     if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(draw, { timeout: 700 });
     else window.setTimeout(draw, 40);
@@ -460,6 +487,7 @@ export async function mountStudio(root) {
   const compareUi = createCompare(root, {
     renderer,
     catalog,
+    paintConfig,
     projectLink,
     onUse: (variant) => {
       config = { ...variant.config };
@@ -548,48 +576,74 @@ export async function mountStudio(root) {
     }
   });
 
+  const zone = () => renderer.scene.floorZones.find((item) => item.id === activeZone);
+
   function mountEditor() {
-    if (editor) return;
+    if (editor) {
+      loadZoneIntoEditor();
+      return;
+    }
     editor = createFloorEditor(media, {
+      // Le cadre définit la perspective de la zone : on écrit directement dans
+      // son plan, et le contour suit tant qu'il n'a pas été retouché.
       onFrameChange(next) {
-        renderer.setFrame(next);
-        renderer.mask.setPolygon(next);
-        editor.setPolygon(next);
+        const target = zone();
+        target.plane.quad = next.map((p) => ({ ...p }));
+        if (!renderer.masks.hasStrokes()) {
+          renderer.masks.setPolygon(target.id, next);
+          editor.setPolygon(next);
+        }
+        renderer.invalidateMasks();
         schedule(true);
       },
       onPolygonChange(next) {
-        renderer.mask.setPolygon(next);
+        renderer.masks.setPolygon(activeZone, next);
+        renderer.invalidateMasks();
         schedule(true);
       },
       onInsertPoint(point) {
-        renderer.mask.insertPointNear(point);
-        editor.setPolygon(renderer.mask.getPolygon());
+        renderer.masks.insertPointNear(activeZone, point);
+        editor.setPolygon(renderer.masks.getPolygon(activeZone));
+        renderer.invalidateMasks();
         schedule(true);
       },
       onRemovePoint(index) {
-        const removed = renderer.mask.removePoint(index);
+        const removed = renderer.masks.removePoint(activeZone, index);
         if (removed) {
-          editor.setPolygon(renderer.mask.getPolygon());
+          editor.setPolygon(renderer.masks.getPolygon(activeZone));
+          renderer.invalidateMasks();
           schedule(true);
         }
         return removed;
       },
       onStrokeStart(mode, radius, point) {
         const ratio = renderer.size.width / (media.clientWidth || renderer.size.width);
-        renderer.mask.beginStroke(mode, Math.max(2, radius * ratio), point);
+        renderer.masks.beginStroke(activeZone, mode, Math.max(2, radius * ratio), point);
+        renderer.invalidateMasks();
         schedule(true);
       },
       onStrokeMove(point) {
-        renderer.mask.extendStroke(point);
+        renderer.masks.extendStroke(point);
+        renderer.invalidateMasks();
         schedule(true);
       },
+      // L'éclairement ne se relit qu'à la fin du geste : sa moyenne de
+      // référence dépend du masque, et la recalculer à chaque pixel du
+      // pinceau ferait ramer pour rien.
       onStrokeEnd() {
+        renderer.refreshLighting();
         quality = 1;
         schedule();
       },
     });
-    editor.setFrame(renderer.frame);
-    editor.setPolygon(renderer.mask.getPolygon());
+    loadZoneIntoEditor();
+  }
+
+  function loadZoneIntoEditor() {
+    const target = zone();
+    if (!editor || !target) return;
+    editor.setFrame(target.plane.quad);
+    editor.setPolygon(renderer.masks.getPolygon(target.id));
   }
 
   function openDrawer(kind) {
@@ -603,10 +657,15 @@ export async function mountStudio(root) {
   }
 
   function closeDrawer() {
+    const wasEditing = stage.dataset.editing === 'true';
     drawer.hidden = true;
     delete root.dataset.drawer;
     if (editor) editor.setMode('off');
     stage.dataset.editing = 'false';
+    if (wasEditing && renderer.ready) {
+      renderer.refreshLighting();
+      schedule();
+    }
   }
   on(qs('[data-drawer-close]', root), 'click', closeDrawer);
   on(qs('[data-advanced]', root), 'click', () => openDrawer('advanced'));
@@ -620,7 +679,7 @@ export async function mountStudio(root) {
       ['polygon', 'Contour', 'Ajoutez des points pour suivre un mur.'],
       ['brush', 'Pinceau', 'Effacez ce qui doit rester devant le parquet.'],
     ];
-    const zone = { mode: 'frame', brush: 'remove', radius: 42 };
+    const tool = { mode: 'frame', brush: 'remove', radius: 42 };
     const seg = document.createElement('div');
     seg.className = 'seg-tabs';
     const hint = document.createElement('p');
@@ -637,15 +696,43 @@ export async function mountStudio(root) {
         <input type="range" min="10" max="140" step="2" value="42" data-radius /><output>42 px</output></label>`;
 
     const applyMode = () => {
-      editor.setMode(zone.mode);
-      editor.setBrush({ mode: zone.brush, radius: zone.radius });
-      brushBox.hidden = zone.mode !== 'brush';
+      editor.setMode(tool.mode);
+      editor.setBrush({ mode: tool.brush, radius: tool.radius });
+      brushBox.hidden = tool.mode !== 'brush';
       seg.querySelectorAll('[data-mode]').forEach((el) =>
-        el.setAttribute('aria-pressed', String(el.dataset.mode === zone.mode))
+        el.setAttribute('aria-pressed', String(el.dataset.mode === tool.mode))
       );
-      const found = modes.find((entry) => entry[0] === zone.mode);
+      const found = modes.find((entry) => entry[0] === tool.mode);
       hint.textContent = found ? found[2] : '';
     };
+
+    // Sélecteur de sol : une photo peut en contenir plusieurs. Il n'apparaît
+    // que s'il y a réellement un choix à faire.
+    const zones = renderer.scene.floorZones;
+    if (zones.length > 1) {
+      const label = document.createElement('p');
+      label.className = 'drawer__hint';
+      label.textContent = 'Sol à corriger :';
+      const picker = document.createElement('div');
+      picker.className = 'seg-tabs';
+      zones.forEach((item) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.zone = item.id;
+        button.textContent = item.label;
+        button.setAttribute('aria-pressed', String(item.id === activeZone));
+        button.addEventListener('click', () => {
+          activeZone = item.id;
+          picker.querySelectorAll('[data-zone]').forEach((el) =>
+            el.setAttribute('aria-pressed', String(el.dataset.zone === activeZone))
+          );
+          loadZoneIntoEditor();
+          applyMode();
+        });
+        picker.appendChild(button);
+      });
+      drawerBody.append(label, picker);
+    }
 
     modes.forEach(([id, label]) => {
       const button = document.createElement('button');
@@ -653,7 +740,7 @@ export async function mountStudio(root) {
       button.dataset.mode = id;
       button.textContent = label;
       button.addEventListener('click', () => {
-        zone.mode = id;
+        tool.mode = id;
         applyMode();
       });
       seg.appendChild(button);
@@ -661,18 +748,18 @@ export async function mountStudio(root) {
 
     brushBox.querySelectorAll('[data-brush]').forEach((button) =>
       button.addEventListener('click', () => {
-        zone.brush = button.dataset.brush;
+        tool.brush = button.dataset.brush;
         brushBox
           .querySelectorAll('[data-brush]')
-          .forEach((el) => el.setAttribute('aria-pressed', String(el.dataset.brush === zone.brush)));
+          .forEach((el) => el.setAttribute('aria-pressed', String(el.dataset.brush === tool.brush)));
         applyMode();
       })
     );
     const radius = brushBox.querySelector('[data-radius]');
     radius.addEventListener('input', () => {
-      zone.radius = Number(radius.value);
-      brushBox.querySelector('output').textContent = `${zone.radius} px`;
-      editor.setBrush({ radius: zone.radius });
+      tool.radius = Number(radius.value);
+      brushBox.querySelector('output').textContent = `${tool.radius} px`;
+      editor.setBrush({ radius: tool.radius });
     });
 
     const undo = document.createElement('div');
@@ -681,11 +768,15 @@ export async function mountStudio(root) {
       <button class="btn btn--ghost btn--xs" type="button" data-undo>Annuler</button>
       <button class="btn btn--ghost btn--xs" type="button" data-redo>Rétablir</button>
       <button class="btn btn--ghost btn--xs" type="button" data-clear>Effacer les retouches</button>`;
-    undo.querySelector('[data-undo]').addEventListener('click', () => renderer.mask.undo() && schedule());
-    undo.querySelector('[data-redo]').addEventListener('click', () => renderer.mask.redo() && schedule());
-    undo.querySelector('[data-clear]').addEventListener('click', () => {
-      renderer.mask.clearStrokes();
+    const afterEdit = () => {
+      renderer.refreshLighting();
       schedule();
+    };
+    undo.querySelector('[data-undo]').addEventListener('click', () => renderer.masks.undo() && afterEdit());
+    undo.querySelector('[data-redo]').addEventListener('click', () => renderer.masks.redo() && afterEdit());
+    undo.querySelector('[data-clear]').addEventListener('click', () => {
+      renderer.masks.clearStrokes();
+      afterEdit();
     });
 
     const done = document.createElement('button');
@@ -702,7 +793,7 @@ export async function mountStudio(root) {
     const item = material();
     const wrap = document.createElement('div');
     wrap.className = 'drawer__stack';
-    const widthValue = config.width || item.boardWidth;
+    const widthValue = config.width || item.plank.width;
     wrap.innerHTML = `
       <label class="drawer__range"><span>Largeur des lames</span>
         <input type="range" min="9" max="26" step="1" value="${Math.round(widthValue * 100)}" data-width />
@@ -765,7 +856,7 @@ export async function mountStudio(root) {
     syncPatterns();
     syncOrientation();
     save();
-    if (roomId) openRoom(roomId);
+    if (sceneId) openRoom(sceneId);
     else root.dataset.state = 'start';
   });
   on(qs('[data-help]', root), 'click', async () => {
@@ -775,7 +866,7 @@ export async function mountStudio(root) {
 
   function save() {
     try {
-      window.localStorage.setItem(STORAGE, JSON.stringify({ config, variants, roomId }));
+      window.localStorage.setItem(STORAGE, JSON.stringify({ config, variants, sceneId }));
     } catch (error) {
       void error;
     }
@@ -806,8 +897,8 @@ export async function mountStudio(root) {
   syncVariants();
 
   const requested = params.get('piece');
-  if (requested && ROOMS.some((room) => room.id === requested)) openRoom(requested);
-  else if (params.get('demarrer') === '1') openRoom(ROOMS[0].id);
+  if (requested && sceneIndex.scenes.some((entry) => entry.id === requested)) openRoom(requested);
+  else if (params.get('demarrer') === '1') openRoom(sceneIndex.scenes[0].id);
 
   on(window, 'resize', () => {
     if (renderer.ready) schedule();
@@ -816,6 +907,7 @@ export async function mountStudio(root) {
   return {
     element: root,
     openRoom,
+    backend: renderer.backend,
     get config() {
       return { ...config };
     },
