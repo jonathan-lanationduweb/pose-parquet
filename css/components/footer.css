@@ -26,6 +26,15 @@
 }
 
 /* Signature : fluide mais bornée, interligne serré, aucune marge superflue */
+/* Le symbole revient une fois en pied de page, discrètement : deux apparitions
+   par page suffisent à installer une identité, dix la banalisent. */
+.footer__mark {
+  width: 14px; height: 26px;
+  display: block;
+  margin-bottom: 0.7rem;
+  color: var(--line-strong, currentColor);
+  opacity: 0.85;
+}
 .footer__wordmark {
   margin: 0;
   font-family: var(--font-display);

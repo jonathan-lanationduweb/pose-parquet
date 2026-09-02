@@ -33,22 +33,46 @@ export const TILE = 1280;
 export const TILE_METERS = 4.8;
 
 /**
- * Largeur de lame effective, selon le motif.
+ * Profil d'un motif : largeur de lame, longueur, et angle pour les motifs en
+ * chevron.
  *
- * Une lame de 18 cm se pose droite ; on ne pose pas un point de Hongrie ni un
- * bâton rompu avec des lames de cette largeur — la pose traditionnelle emploie
- * des éléments bien plus étroits, de l'ordre de 9 cm, ce qui donne au motif sa
- * finesse. Utiliser la largeur des lames droites produisait des chevrons de
- * 60 cm : géométriquement juste, mais ce n'est pas ce motif-là.
+ * Une seule largeur de lame pour les trois motifs n'a pas de sens. On ne pose
+ * pas un point de Hongrie ni un bâton rompu avec des lames de 18 ou 22 cm : la
+ * pose traditionnelle emploie des éléments bien plus étroits, de l'ordre de
+ * 9 cm, et c'est cette finesse qui fait le motif. Utiliser la largeur des lames
+ * droites produisait des chevrons de 60 cm — géométriquement corrects, mais ce
+ * n'était plus ce motif-là.
  *
- * Un matériau peut imposer sa propre valeur (`chevronWidth` dans le
- * catalogue) ; sinon on prend la plus étroite des deux.
+ * **L'angle du point de Hongrie n'est pas figé à 45°.** C'est le plus répandu,
+ * mais 30° et 60° existent et changent nettement le rendu : la pointe s'allonge
+ * ou s'écrase. L'angle est donc un paramètre du motif, pas une constante du
+ * moteur.
+ *
+ * Un matériau peut décrire ses propres profils dans data/parquets.json
+ * (`patternProfiles`) ; sinon on dérive des valeurs par défaut raisonnables de
+ * ses dimensions de lame droite.
  */
-export const CHEVRON_WIDTH = 0.09;
-export function patternWidth(material, pattern, override) {
-  if (override) return override;
-  if (pattern === 'lames') return material.boardWidth;
-  return material.chevronWidth || Math.min(material.boardWidth, CHEVRON_WIDTH);
+export const DEFAULT_PROFILES = {
+  lames: { width: null, length: null },
+  'point-de-hongrie': { width: 0.09, length: 0.6, angleDeg: 45 },
+  'baton-rompu': { width: 0.09, length: 0.45 },
+};
+
+export function patternProfile(material, pattern, widthOverride) {
+  const declared = (material.patternProfiles && material.patternProfiles[pattern]) || {};
+  const fallback = DEFAULT_PROFILES[pattern] || DEFAULT_PROFILES.lames;
+  const width =
+    widthOverride ||
+    declared.width ||
+    (pattern === 'lames' ? material.boardWidth : Math.min(material.boardWidth, fallback.width));
+  const length =
+    declared.length ||
+    (pattern === 'lames' ? material.boardLength || width * 9 : fallback.length || width * 5);
+  return {
+    width,
+    length,
+    angleDeg: declared.angleDeg || fallback.angleDeg || 45,
+  };
 }
 
 const clampByte = (v) => Math.max(0, Math.min(255, Math.round(v)));
@@ -219,9 +243,9 @@ function wrapped(ctx, draw, box) {
 /* Motifs                                                              */
 /* ------------------------------------------------------------------ */
 
-function drawStraight(ctx, tex, widthM, lengthM, random) {
-  const h = fit((widthM / TILE_METERS) * TILE);
-  const w = fit(Math.min(TILE, (lengthM / TILE_METERS) * TILE));
+function drawStraight(ctx, tex, profile, random) {
+  const h = fit((profile.width / TILE_METERS) * TILE);
+  const w = fit(Math.min(TILE, (profile.length / TILE_METERS) * TILE));
   const rows = Math.round(TILE / h);
   const cols = Math.round(TILE / w);
 
@@ -236,9 +260,11 @@ function drawStraight(ctx, tex, widthM, lengthM, random) {
   }
 }
 
-function drawHerringbone(ctx, tex, widthM, random) {
-  const w = fit((widthM / TILE_METERS) * TILE);
-  const l = w * 4;
+function drawHerringbone(ctx, tex, profile, random) {
+  const w = fit((profile.width / TILE_METERS) * TILE);
+  // Longueur réelle de l'élément, arrondie à un multiple de la largeur : c'est
+  // la condition pour que le motif se referme sur lui-même.
+  const l = w * Math.max(2, Math.round(profile.length / profile.width));
   const steps = Math.ceil((TILE * 1.6) / w) + 2;
 
   ctx.save();
@@ -258,24 +284,45 @@ function drawHerringbone(ctx, tex, widthM, random) {
   ctx.restore();
 }
 
-function drawChevron(ctx, tex, widthM, random) {
-  const w = fit((widthM / TILE_METERS) * TILE);
-  const run = w * 3.4;
-  const step = w * Math.SQRT2;
-  const cols = Math.ceil(TILE / (run * 2)) + 2;
-  const rows = Math.ceil((TILE + run) / step) + 2;
+/**
+ * Point de Hongrie : deux arêtes de lames coupées en biais qui se rejoignent en
+ * pointe, colonne après colonne.
+ *
+ * L'angle est un **paramètre**, pas une constante. Il se mesure entre la lame
+ * et l'axe de la pose : 45° donne la pointe droite classique, 30° une pointe
+ * allongée et nervurée, 60° une pointe écrasée et large. Les trois existent
+ * dans le commerce, et le rendu n'a rien à voir.
+ *
+ * Géométrie : pour une lame de longueur L inclinée de θ par rapport à l'axe
+ * vertical, son emprise vaut L·sin θ en largeur et L·cos θ en hauteur ; deux
+ * lames voisines d'une même arête sont décalées de w / sin θ le long de l'axe.
+ * On arrondit ensuite le pas à un diviseur entier de la tuile, sans quoi le
+ * motif ne se refermerait pas sur lui-même.
+ */
+function drawChevron(ctx, tex, profile, random) {
+  const w = fit((profile.width / TILE_METERS) * TILE);
+  const rad = (Math.min(75, Math.max(15, profile.angleDeg)) * Math.PI) / 180;
+  const length = (profile.length / TILE_METERS) * TILE;
+  const armX = length * Math.sin(rad);
+  const armY = length * Math.cos(rad);
+  // Décalage vertical entre deux lames d'une même arête, ajusté pour que la
+  // tuile se referme.
+  const step = fit(w / Math.sin(rad));
+  const cols = Math.ceil(TILE / (armX * 2)) + 2;
+  const rows = Math.ceil((TILE + armY) / step) + 2;
 
-  const para = (x0, y0, dir) => {
+  /** Une lame, en parallélogramme : le biais est porté par armX / armY. */
+  const plank = (x0, y0, dir) => {
     const shift = Math.round((random() - 0.5) * tex.spread * 2);
     const warm = Math.round((random() - 0.5) * tex.warm);
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(x0, y0);
-    ctx.lineTo(x0 + dir * run, y0 + run);
-    ctx.lineTo(x0 + dir * run, y0 + run + step);
+    ctx.lineTo(x0 + dir * armX, y0 + armY);
+    ctx.lineTo(x0 + dir * armX, y0 + armY + step);
     ctx.lineTo(x0, y0 + step);
     ctx.closePath();
-    const gradient = ctx.createLinearGradient(x0, y0, x0 + dir * run, y0 + run);
+    const gradient = ctx.createLinearGradient(x0, y0, x0 + dir * armX, y0 + armY);
     const amp = 8 * tex.contrast;
     gradient.addColorStop(0, rgb(tex.base, shift - amp, warm));
     gradient.addColorStop(0.5, rgb(tex.base, shift + amp * 0.5, warm));
@@ -284,9 +331,10 @@ function drawChevron(ctx, tex, widthM, random) {
     ctx.fill();
     ctx.save();
     ctx.clip();
-    grain(ctx, x0 - run, y0, run * 2.2, step, tex, random);
+    // Le veinage suit la lame : on l'étale le long de l'arête, pas de l'écran.
+    grain(ctx, x0 - armX, y0, armX * 2.2, step, tex, random);
     ctx.fillStyle = 'rgba(255,255,255,0.07)';
-    ctx.fillRect(x0 - run, y0, run * 2.2, Math.max(0.8, w * tex.bevel * 1.5));
+    ctx.fillRect(x0 - armX, y0, armX * 2.2, Math.max(0.8, w * tex.bevel * 1.5));
     ctx.restore();
     ctx.strokeStyle = `rgba(38,26,16,${tex.joint})`;
     ctx.lineWidth = Math.max(0.7, w * 0.022);
@@ -296,15 +344,15 @@ function drawChevron(ctx, tex, widthM, random) {
 
   for (let c = -1; c <= cols; c += 1) {
     for (let r = -2; r <= rows; r += 1) {
-      const x0 = c * run * 2;
-      const y0 = r * step - run;
+      const x0 = c * armX * 2;
+      const y0 = r * step - armY;
       wrapped(
         ctx,
         () => {
-          para(x0, y0, 1);
-          para(x0 + run * 2, y0, -1);
+          plank(x0, y0, 1);
+          plank(x0 + armX * 2, y0, -1);
         },
-        { x: x0 - run, y: y0, w: run * 3, h: run + step }
+        { x: x0 - armX, y: y0, w: armX * 3, h: armY + step }
       );
     }
   }
@@ -363,13 +411,12 @@ function filmGrain(ctx, w, h, amount) {
  */
 export function buildTexture(material, { pattern = 'lames', width, size = TILE } = {}) {
   const tex = material.texture;
-  const widthM = patternWidth(material, pattern, width);
-  const lengthM = material.boardLength || widthM * 9;
+  const profile = patternProfile(material, pattern, width);
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  const random = seeded(seedOf(material.id) + Math.round(widthM * 1000));
+  const random = seeded(seedOf(material.id) + Math.round(profile.width * 1000));
 
   // Tout est dessiné dans le repère de la tuile pleine : une taille réduite
   // sert aux aperçus (16 fois moins de pixels, même dessin).
@@ -377,9 +424,9 @@ export function buildTexture(material, { pattern = 'lames', width, size = TILE }
   ctx.fillStyle = rgb(tex.grain, -14);
   ctx.fillRect(0, 0, TILE, TILE);
 
-  if (pattern === 'point-de-hongrie') drawChevron(ctx, tex, widthM, random);
-  else if (pattern === 'baton-rompu') drawHerringbone(ctx, tex, widthM, random);
-  else drawStraight(ctx, tex, widthM, lengthM, random);
+  if (pattern === 'point-de-hongrie') drawChevron(ctx, tex, profile, random);
+  else if (pattern === 'baton-rompu') drawHerringbone(ctx, tex, profile, random);
+  else drawStraight(ctx, tex, profile, random);
 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   filmGrain(ctx, size, size, 6);

@@ -29,7 +29,7 @@ const GUIDES = [
       },
       {
         q: 'Le sens de pose change-t-il la quantité de parquet à acheter ?',
-        a: "Oui. Une pose droite génère environ 7 à 8 % de chutes, une pose diagonale ou un Point de Hongrie 12 à 15 %. Ce surplus doit être commandé dès le départ, dans le même lot.",
+        a: "Oui. Une pose droite est la plus économe en matière ; une pose diagonale ou un Point de Hongrie multiplient les coupes de rive et consomment sensiblement plus. Les ordres de grandeur souvent cités vont de 7 à 8 % pour une pose droite à 12 à 15 % pour un motif orienté, mais ils dépendent de la pièce, du calepinage et des longueurs livrées : à confirmer par un calepinage avant de commander. Dans tous les cas, le surplus se commande dès le départ, dans le même lot.",
       },
     ],
     related: ['poser-parquet-sens-de-la-lumiere', 'sens-de-pose-piece-etroite', 'sens-de-pose-couloir'],
@@ -92,7 +92,7 @@ const GUIDES = [
           text: "Le simulateur de pose permet de comparer les orientations sur vos dimensions réelles, avec la fenêtre au bon endroit.",
         },
       ])}
-      ${key('<ul><li>La lumière décide dans huit cas sur dix.</li><li>Les proportions tranchent lorsque la lumière est neutre.</li><li>Le support peut imposer un sens, quel que soit le rendu souhaité.</li><li>Le motif se décide avant le sens, jamais après.</li></ul>')}
+      ${key('<ul><li>La lumière tranche le plus souvent.</li><li>Les proportions tranchent lorsque la lumière est neutre.</li><li>Le support peut imposer un sens, quel que soit le rendu souhaité.</li><li>Le motif se décide avant le sens, jamais après.</li></ul>')}
 
       <h2 id="visualiser">Visualiser plutôt qu'imaginer</h2>
       <p>Les descriptions ont leurs limites : deux orientations décrites de la même façon peuvent donner deux ambiances très différentes une fois posées. Le simulateur reproduit votre pièce, place la fenêtre et l'entrée, puis applique le motif choisi.</p>
@@ -197,7 +197,7 @@ const GUIDES = [
     date: '2026-08-18',
     reading: '10 min',
     excerpt:
-      "Neuf désordres sur dix viennent du support, pas du parquet. Voici les contrôles à mener avant la première lame.",
+      "La plupart des désordres viennent du support, pas du parquet. Voici les contrôles à mener avant la première lame.",
     cover: { seed: 31, variant: 3 },
     lead:
       "Un parquet ne corrige jamais les défauts du sol sur lequel il est posé : il les révèle. La préparation du support représente l'essentiel du travail invisible d'un chantier réussi.",
@@ -296,10 +296,10 @@ const GUIDES = [
     ],
     related: ['quel-sens-de-pose-choisir', 'parquet-massif-ou-contrecolle', 'preparer-son-sol-avant-la-pose'],
     body: `
-      <p>Les deux motifs assemblent des lames à 45° et produisent un sol très graphique. La différence tient à la coupe : le bâton rompu utilise des lames droites, le Point de Hongrie des lames coupées à l'onglet.</p>
+      <p>Les deux motifs assemblent des lames en biais et produisent un sol très graphique. La différence tient à la coupe : le bâton rompu utilise des lames droites, le Point de Hongrie des lames coupées à l'onglet. L'angle du Point de Hongrie n'est pas figé — 45° est le plus répandu, mais on rencontre aussi 30° et 60°, qui allongent la pointe et changent nettement le rendu.</p>
 
       <h2 id="difference">La différence en une phrase</h2>
-      <p>Dans le <strong>bâton rompu</strong>, le bout d'une lame vient buter contre le chant de la suivante : le dessin forme des marches d'escalier. Dans le <strong>Point de Hongrie</strong>, les extrémités coupées à 45° se rejoignent : le dessin forme des pointes continues, alignées en colonnes.</p>
+      <p>Dans le <strong>bâton rompu</strong>, le bout d'une lame vient buter contre le chant de la suivante : le dessin forme des marches d'escalier. Dans le <strong>Point de Hongrie</strong>, les extrémités coupées en biais se rejoignent : le dessin forme des pointes continues, alignées en colonnes.</p>
       <div class="grid grid--2">
         <div class="pattern-card"><div class="pattern-card__viz" data-pattern-thumb="point-de-hongrie"></div><h3>Point de Hongrie</h3><p>Pointe continue, joints alignés, coupe d'onglet.</p></div>
         <div class="pattern-card"><div class="pattern-card__viz" data-pattern-thumb="baton-rompu"></div><h3>Bâton rompu</h3><p>Lames droites, décrochés en escalier, aucune coupe spéciale.</p></div>
@@ -309,7 +309,7 @@ const GUIDES = [
       ${table(
         ['Critère', 'Point de Hongrie', 'Bâton rompu'],
         [
-          ['Coupe des lames', "Onglet à 45°, lames gauches et droites", 'Lames droites standard'],
+          ['Coupe des lames', "Onglet, le plus souvent à 45° ; lames gauches et droites", 'Lames droites standard'],
           ['Rendu au sol', 'Pointes continues, effet flèche', 'Décrochés en escalier, effet tressé'],
           ['Chutes estimées', '12 à 15 %', '10 à 12 %'],
           ['Approvisionnement', 'Lots dédiés, délais plus longs', 'Lames courantes'],
@@ -325,7 +325,7 @@ const GUIDES = [
         <li><strong>Budget contraint</strong> : le bâton rompu, en lames courantes.</li>
         <li><strong>Rénovation d'un appartement ancien</strong> : les deux se justifient, mais le Point de Hongrie s'accorde mieux aux moulures et aux parquets d'origine.</li>
       </ul>
-      ${tip("<p>Quel que soit le motif, tracez l'axe principal au cordeau et vérifiez-le à l'équerre avant de coller la première lame. Un axe faux d'un demi-degré devient visible sur toute la longueur de la pièce.</p>")}
+      ${tip("<p>Quel que soit le motif, tracez l'axe principal au cordeau et vérifiez-le à l'équerre avant de coller la première lame. Un axe légèrement faux ne se corrige pas en cours de pose : l'écart se cumule rangée après rangée.</p>")}
       ${warn("<p>N'improvisez pas la rive. Une frise périphérique, même simple, rattrape les murs non parallèles et évite des coupes en pointe très fines, fragiles et disgracieuses.</p>")}
 
       <h2 id="simulateur">Voir les deux motifs dans votre pièce</h2>

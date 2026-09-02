@@ -187,16 +187,31 @@
   --wrap-text: 42rem;
   --gutter: clamp(1.25rem, 0.5rem + 2.6vw, 3.5rem);
 
-  /* ---- Formes ---- */
-  --r-xs: 4px;
-  --r-sm: 10px;
-  --r-md: 16px;
-  --r-media: 22px;
-  --r-card: 28px;
-  --r-block: 34px;
-  --r-pill: 100px;
+  /* ---- Formes ----
+     Trois rayons, pas sept. L'échelle précédente comptait 4, 10, 16, 22, 28 et
+     34 px : à l'usage, personne ne distingue 28 de 34, et l'écart finit par se
+     lire comme une négligence plutôt que comme une intention. Les anciens noms
+     survivent en alias pour ne pas réécrire toutes les feuilles, mais ils ne
+     désignent plus que trois valeurs réelles.
 
-  /* ---- Ombres ---- */
+       sm  détails : puces, champs, petits médias
+       md  cartes, images, panneaux
+       lg  grands blocs, sections immersives                                */
+  --r-sm: 8px;
+  --r-md: 16px;
+  --r-lg: 28px;
+  --r-pill: 100px;
+  /* Alias historiques → une des trois valeurs ci-dessus */
+  --r-xs: var(--r-sm);
+  --r-media: var(--r-md);
+  --r-card: var(--r-lg);
+  --r-block: var(--r-lg);
+
+  /* ---- Ombres ----
+     Très peu d'ombres, et jamais sur une carte posée dans le flux : elles sont
+     réservées à ce qui flotte réellement au-dessus du contenu — menu déroulant,
+     panneau coulissant, feuille modale. Une ombre douce sur chaque bloc est la
+     signature la plus sûre d'une interface générée sans intention.           */
   --shadow-1: 0 1px 2px rgba(22, 24, 26, 0.05);
   --shadow-2: 0 18px 40px -26px rgba(22, 24, 26, 0.5);
   --shadow-3: 0 40px 80px -40px rgba(22, 24, 26, 0.55);
@@ -334,6 +349,24 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 .section { padding-block: var(--section-y); position: relative; }
 .section--flush-top { padding-top: 0; }
 .section--tight { padding-block: clamp(3rem, 1.5rem + 5vw, 6rem); }
+/**
+ * Trois poids de section, pas un seul.
+ *
+ * Toutes les sections avaient le même rythme vertical et le même en-tête : la
+ * page d'accueil donnait treize écrans de blocs premium, tous d'égale
+ * importance, et la hiérarchie éditoriale disparaissait.
+ *
+ *   signature   hero, Visualiseur, dossier plein cadre — pleine respiration
+ *   (défaut)    contenu : guides, inspiration
+ *   --compact   navigation éditoriale : tutoriels, outils, dossier
+ *
+ * « compact » ne veut pas dire serré : la page garde sa respiration. Cela veut
+ * dire que ces sections ne réclament pas la même attention qu'un dossier.
+ */
+.section--compact { padding-block: clamp(2.25rem, 1.25rem + 3vw, 3.75rem); }
+.section--compact .section-head { margin-bottom: clamp(1.25rem, 0.9rem + 1.4vw, 2rem); }
+.section--compact h2 { font-size: var(--fs-h3); }
+.section--compact .lead { font-size: var(--fs-base); }
 .section--alt { background: var(--bg-alt); }
 .section--mineral { background: var(--tint-mineral); }
 .section--sage { background: var(--tint-sage); }
@@ -505,13 +538,14 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
   line-height: 1;
   justify-self: start;
 }
+/* Symbole d'identité : proportions réelles (106 × 197), pas un carré — un
+   symbole étiré n'est plus le symbole. Pas d'animation au survol : le repère
+   de marque n'a pas à bouger. */
 .brand__mark {
-  width: 22px; height: 22px;
+  width: 13px; height: 24px;
   align-self: center;
   flex: none;
-  transition: transform var(--dur-3) var(--ease-out);
 }
-.brand:hover .brand__mark { transform: rotate(-8deg); }
 .brand strong { font-weight: 400; }
 .brand span { opacity: 0.55; }
 
@@ -696,6 +730,15 @@ body[data-drawer-open="true"] { overflow: hidden; }
 }
 
 /* Signature : fluide mais bornée, interligne serré, aucune marge superflue */
+/* Le symbole revient une fois en pied de page, discrètement : deux apparitions
+   par page suffisent à installer une identité, dix la banalisent. */
+.footer__mark {
+  width: 14px; height: 26px;
+  display: block;
+  margin-bottom: 0.7rem;
+  color: var(--line-strong, currentColor);
+  opacity: 0.85;
+}
 .footer__wordmark {
   margin: 0;
   font-family: var(--font-display);
@@ -1000,54 +1043,64 @@ body[data-drawer-open="true"] { overflow: hidden; }
 .tile:hover .tile__pattern span:nth-child(2) { transform: skewX(-14deg) translateX(-4px); }
 .tile:hover .tile__pattern span:nth-child(3) { transform: skewX(-14deg) translateX(10px); }
 
-/* ---------- Section immersive : image plein cadre + blocs numérotés ---------- */
-.immersive {
+/* ---------- Dossier plein cadre : image + bas de page éditorial ----------
+   Le texte ne flotte pas au milieu de la photo : il se range en bas, titre à
+   gauche puis trois points en rangée séparés par un filet. Le regard entre par
+   l'image, descend vers le titre, balaie les points. */
+.dossier {
   position: relative;
-  min-height: min(128svh, 1180px);
-  color: #fff;
   isolation: isolate;
   display: grid;
-  align-content: start;
-  padding-block: calc(var(--header-h) + clamp(3rem, 2rem + 4vw, 6rem)) clamp(3.5rem, 2rem + 5vw, 7rem);
+  align-content: end;
+  min-height: min(96svh, 900px);
+  padding-block: calc(var(--header-h) + clamp(2rem, 1rem + 3vw, 4rem)) clamp(2rem, 1.2rem + 3vw, 4rem);
+  color: #fff;
 }
-.immersive__bg { position: absolute; inset: 0; z-index: -2; overflow: hidden; }
-.immersive__bg img { width: 100%; height: 100%; object-fit: cover; }
-.immersive::after {
+.dossier__bg { position: absolute; inset: 0; z-index: -2; overflow: hidden; }
+.dossier__bg img { width: 100%; height: 100%; object-fit: cover; }
+/* Voile plus dense en bas, là où le texte se pose ; presque nul en haut, pour
+   ne pas éteindre la photo. */
+.dossier::after {
   content: "";
   position: absolute; inset: 0; z-index: -1;
-  background: linear-gradient(to bottom, rgba(12,14,15,0.58), rgba(12,14,15,0.22) 38%, rgba(12,14,15,0.86));
+  background: linear-gradient(to bottom, rgba(12,14,15,0.34) 0%, rgba(12,14,15,0.12) 34%, rgba(12,14,15,0.9) 100%);
 }
-.immersive__head { text-align: center; max-width: min(92%, 46rem); margin-inline: auto; }
-.immersive__head h2 { max-width: 14ch; margin-inline: auto; }
-.immersive__head h2 { color: #fff; }
-.immersive__head .eyebrow { justify-content: center; color: rgba(255,255,255,0.7); }
+.dossier__inner { display: grid; gap: clamp(1.5rem, 1rem + 2.5vw, 3rem); }
+.dossier__head { display: grid; justify-items: start; gap: var(--sp-4); max-width: 30ch; }
+.dossier__head h2 { margin: 0; color: #fff; }
+.dossier__head .eyebrow { color: rgba(255,255,255,0.72); }
 
-.immersive__steps {
-  margin-top: clamp(2.5rem, 1.5rem + 5vw, 6rem);
+.dossier__notes {
   display: grid;
-  gap: clamp(2rem, 1rem + 4vw, 4.5rem);
-  max-width: 40rem;
+  gap: clamp(1.25rem, 0.8rem + 1.6vw, 2.5rem);
+  margin: 0;
+  padding: clamp(1.25rem, 0.8rem + 1.6vw, 2.25rem) 0 0;
+  list-style: none;
+  border-top: 1px solid rgba(255,255,255,0.28);
 }
-.immersive__steps--right { margin-left: auto; }
-.step-block { display: grid; gap: 0.6rem; }
-/* Sur petit écran, les textes passent sur une photo chargée : on pose un voile local */
-@media (max-width: 62rem) {
-  .step-block {
+.dossier__note { display: grid; gap: 0.35rem; }
+.dossier__note h3 { margin: 0; font-size: var(--fs-h4); color: #fff; }
+.dossier__note p { margin: 0; color: rgba(255,255,255,0.78); max-width: 38ch; }
+.dossier__num {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.6);
+}
+
+@media (min-width: 62rem) {
+  .dossier__notes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+/* Sur petit écran les textes passent sur une photo chargée : voile local. */
+@media (max-width: 61.99rem) {
+  .dossier__notes {
     padding: clamp(1rem, 0.8rem + 1vw, 1.5rem);
+    border-top: 0;
     border-radius: var(--r-md);
-    background: rgba(12, 14, 15, 0.42);
+    background: rgba(12, 14, 15, 0.46);
     backdrop-filter: blur(3px);
   }
-  .immersive__steps { gap: 1.25rem; }
 }
-.step-block__num {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
-  color: rgba(255,255,255,0.62);
-}
-.step-block h3 { color: #fff; font-size: clamp(1.7rem, 1.2rem + 2.2vw, 3rem); }
-.step-block p { margin: 0; color: rgba(255,255,255,0.8); max-width: 40ch; }
 
 /* ---------- Alternance texte / image ---------- */
 .feature {
@@ -1258,6 +1311,17 @@ body[data-drawer-open="true"] { overflow: hidden; }
 }
 .steps-grid strong { font-size: 1.02rem; font-weight: 600; }
 .steps-grid li > span:last-child { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+/* ---------- Page Outils : le Visualiseur domine ----------
+   Trois blocs de poids égal se concurrencent et personne ne sait par où
+   commencer. Le premier outil prend donc plus de place et plus de contraste ;
+   le second reste un bloc normal ; la feuille de route passe en section
+   compacte. La hiérarchie se voit avant d'être lue. */
+.tool-block--lead .tool-block__title { font-size: var(--fs-h1); }
+.tool-block--lead .tool-block__media { border-radius: var(--r-lg); }
+@media (min-width: 62rem) {
+  .tool-block--lead { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: center; }
+}
 
 
 /* Hero immersif : photographie plein cadre, titre monumental */
@@ -1608,25 +1672,32 @@ body[data-drawer-open="true"] { overflow: hidden; }
 .slide-card:hover .slide-card__link svg { transform: translateX(5px); }
 .slide-card__meta { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); }
 
-/* ---------- Slide galerie (très visuelle) ---------- */
+/* ---------- Slide galerie (très visuelle) ----------
+   Un seul gabarit : même largeur, même ratio, même alignement.
+
+   La version précédente combinait un décalage vertical un rang sur deux avec
+   trois ratios alternés tous les trois rangs. Deux rythmes premiers entre eux
+   se superposaient, et le résultat sur huit visuels ne se lisait pas comme une
+   intention mais comme une irrégularité : des cartes plus petites, plus
+   serrées, décalées sans logique apparente.
+
+   Un rail se lit calme quand il est régulier. La variété éditoriale a sa place,
+   mais sur la page Inspiration, où elle peut être structurée et respirer —
+   pas dans un défileur de huit vignettes. */
 .carousel--gallery .carousel__slide { width: clamp(15rem, 76vw, 20rem); }
 @media (min-width: 48rem) { .carousel--gallery .carousel__slide { width: clamp(19rem, 34vw, 24rem); } }
 @media (min-width: 75rem) { .carousel--gallery .carousel__slide { width: 25rem; } }
-.carousel--gallery .carousel__slide:nth-child(odd) { align-self: flex-start; }
-.carousel--gallery .carousel__slide:nth-child(even) { align-self: flex-end; }
 
 .shot {
   position: relative;
   display: block;
-  border-radius: var(--r-card);
+  border-radius: var(--r-md);
   overflow: hidden;
   background: var(--c-mineral);
   aspect-ratio: 4 / 5;
   text-decoration: none;
   color: #fff;
 }
-.carousel--gallery .carousel__slide:nth-child(3n) .shot { aspect-ratio: 1; }
-.carousel--gallery .carousel__slide:nth-child(3n + 2) .shot { aspect-ratio: 3 / 4; }
 .shot img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-4) var(--ease-out); }
 .shot:hover img { transform: scale(1.05); }
 .shot::after {
@@ -1650,7 +1721,7 @@ body[data-drawer-open="true"] { overflow: hidden; }
   text-transform: uppercase;
   color: rgba(255,255,255,0.8);
 }
-.shot__title { font-family: var(--font-display); font-size: 1.5rem; line-height: 1.05; letter-spacing: var(--tracking-display); }
+.shot__title { font-family: var(--font-display); font-size: 1.4rem; line-height: 1.05; letter-spacing: var(--tracking-display); }
 
 @media (prefers-reduced-motion: reduce) {
   .carousel__viewport { scroll-behavior: auto; }
@@ -1788,11 +1859,45 @@ body[data-drawer-open="true"] { overflow: hidden; }
 @keyframes tab-in { from { opacity: 0; transform: translateY(6px); } }
 
 
-/* Galerie d'inspiration : grille de grandes photographies + lightbox */
+/**
+ * Galerie d'inspiration.
+ *
+ * **Une alternance stricte, pas quatre ratios qui tournent.**
+ *
+ * La version précédente faisait cycler quatre formats — 3/4, 1/1, 4/5, 5/6 —
+ * dans une grille dont le nombre de colonnes variait avec la largeur. Le cycle
+ * de quatre et la grille de deux ou trois colonnes ne retombaient jamais au
+ * même endroit : selon la fenêtre, une carte se retrouvait seule et minuscule,
+ * les hauteurs de rangée sautaient, et les boutons « Essayer ce style » ne
+ * s'alignaient plus. L'intention était là, le résultat se lisait comme un
+ * accident.
+ *
+ * Ici, la variété est assumée mais **régulière** : une grille de douze colonnes,
+ * une rangée = deux photos, la large occupe sept colonnes et l'étroite cinq, en
+ * alternance stricte. Toutes les rangées ont exactement la même hauteur, donc
+ * les légendes et les appels à l'action sont alignés d'une rangée à l'autre ;
+ * l'asymétrie, elle, est dans la largeur. Ce n'est ni une grille plate ni un
+ * masonry approximatif : c'est un rythme qu'on peut nommer.
+ */
 .gallery {
   display: grid;
   gap: clamp(1rem, 0.6rem + 1.2vw, 1.75rem);
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 48rem) {
+  .gallery {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    /* Hauteur de rangée commune : c'est elle qui garantit l'alignement. */
+    grid-auto-rows: clamp(16rem, 26vw, 24rem);
+  }
+  .gallery__item { grid-column: span 6; }
+}
+
+@media (min-width: 62rem) {
+  .gallery__item:nth-child(odd) { grid-column: span 7; }
+  .gallery__item:nth-child(even) { grid-column: span 5; }
+  .gallery { grid-auto-rows: clamp(19rem, 27vw, 27rem); }
 }
 
 .gallery__zoom {
@@ -1813,19 +1918,18 @@ body[data-drawer-open="true"] { overflow: hidden; }
   padding: 0;
   margin: 0;
   border: 0;
-  border-radius: var(--r-card);
+  border-radius: var(--r-md);
   overflow: hidden;
   background: var(--c-mineral);
-  aspect-ratio: 4 / 5;
   cursor: zoom-in;
   color: #fff;
   text-align: left;
 }
-/* Rythme : on alterne les formats pour éviter la grille trop régulière */
-.gallery__item:nth-child(4n + 1) { aspect-ratio: 3 / 4; }
-.gallery__item:nth-child(4n + 2) { aspect-ratio: 1; }
-.gallery__item:nth-child(4n + 3) { aspect-ratio: 4 / 5; }
-.gallery__item:nth-child(4n) { aspect-ratio: 5 / 6; }
+/* Sur une colonne, la hauteur de rangée ne s'applique pas : on redonne un
+   ratio, unique, pour que le défilement reste régulier. */
+@media (max-width: 47.99rem) {
+  .gallery__item { aspect-ratio: 4 / 5; }
+}
 
 .gallery__item img {
   width: 100%;
@@ -1833,7 +1937,7 @@ body[data-drawer-open="true"] { overflow: hidden; }
   object-fit: cover;
   transition: transform var(--dur-4) var(--ease-out);
 }
-.gallery__item:hover img { transform: scale(1.05); }
+.gallery__item:hover img { transform: scale(1.04); }
 
 .gallery__caption {
   position: absolute;
@@ -1852,6 +1956,7 @@ body[data-drawer-open="true"] { overflow: hidden; }
 .gallery__caption span:first-child {
   font-family: var(--font-display);
   font-size: 1.35rem;
+  line-height: 1.1;
   letter-spacing: var(--tracking-display);
 }
 .gallery__caption .mono { color: rgba(255,255,255,0.78); }
@@ -1861,12 +1966,13 @@ body[data-drawer-open="true"] { overflow: hidden; }
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  margin-top: 0.35rem;
-  padding: 0.4rem 0.85rem;
+  margin-top: 0.5rem;
+  min-height: 2.4rem;
+  padding: 0 0.95rem;
   border-radius: var(--r-pill);
   background: rgba(255, 255, 255, 0.92);
   color: var(--c-ink);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 500;
   text-decoration: none;
 }

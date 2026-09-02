@@ -1,13 +1,12 @@
 /**
  * Visualiseur Parquet — l'application.
  *
- * Trois écrans seulement : choisir une pièce, essayer des parquets, comparer.
- * Tout le reste — correction du sol, largeur exacte, échelle, angle libre —
- * vit derrière un bouton et ne s'affiche que si on le demande. L'utilisateur
- * n'a jamais à connaître un plan de perspective ni un masque : la photo est
- * l'application, les commandes se rangent autour d'elle.
+ * Composition : **la pièce est le sujet**, tout le reste s'efface. Un seul
+ * contexte est ouvert à la fois — Parquet, Motif ou Orientation — et quand on
+ * le referme la photo reprend toute la largeur. L'utilisateur n'a jamais à
+ * connaître un plan de perspective, une surface ni un masque.
  *
- * Le nom interne reste « studio » — classes CSS, fichiers, stockage local.
+ * Le nom interne reste « studio » : fichiers, classes CSS, clé de stockage.
  * Le nom affiché est Visualiseur Parquet.
  *
  * Le parcours est déjà celui d'après :
@@ -28,6 +27,7 @@ import { createFloorEditor } from '../scene/editor.js';
 import { composeRender, downloadCanvas } from '../scene/export.js';
 import { createSceneRenderer } from '../scene/renderer.js';
 import { warmMaterial } from '../scene/material.js';
+import { addZone, removeZone } from '../scene/schema.js';
 import { loadCatalog, createCatalog, swatchFor } from './catalog.js';
 import { createCompare } from './compare.js';
 import { buildTexture } from '../scene/texture.js';
@@ -38,6 +38,16 @@ const ORIENTATIONS = [
   { angle: 45, label: 'Diagonale vers la droite', icon: 'M6 18 18 6M18 12V6h-6' },
   { angle: -45, label: 'Diagonale vers la gauche', icon: 'M18 18 6 6M6 12V6h6' },
 ];
+
+/** Un contexte = un panneau. Jamais deux ouverts, jamais trois empilés. */
+const CONTEXTS = [
+  { id: 'parquets', label: 'Parquet', title: 'Choisir un parquet' },
+  { id: 'motifs', label: 'Motif', title: 'Choisir un motif' },
+  { id: 'orientation', label: 'Orientation', title: 'Sens de pose' },
+];
+
+/** Niveaux de la feuille basse, sur téléphone. On ne cache jamais la pièce. */
+const SHEET_LEVELS = ['peek', 'half', 'full'];
 
 const icon = (path) =>
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${path}"/></svg>`;
@@ -50,6 +60,7 @@ const ICONS = {
   help: 'M9.5 9a2.5 2.5 0 1 1 3 2.5V13M12 17h.01',
   reset: 'M4 10a8 8 0 1 1 1.6 6M4 4v6h6',
   more: 'M6 12h.01M12 12h.01M18 12h.01',
+  close: 'm6 6 12 12M18 6 6 18',
 };
 
 const STORAGE = 'pose-parquet:studio';
@@ -59,6 +70,8 @@ export async function mountStudio(root) {
 
   root.className = 'studio';
   root.dataset.state = 'start';
+  root.dataset.panel = 'closed';
+  root.dataset.sheet = 'peek';
   root.innerHTML = `
     <header class="studio__bar">
       <a class="studio__back" href="${base}index.html">
@@ -72,9 +85,9 @@ export async function mountStudio(root) {
         <div class="studio__menu">
           <button class="studio__tool" type="button" data-menu aria-expanded="false" aria-label="Autres options">${icon(ICONS.more)}</button>
           <div class="studio__dropdown" data-dropdown hidden>
+            <button type="button" data-fix>Délimiter le sol</button>
             <button type="button" data-advanced>Réglages avancés</button>
-            <button type="button" data-fix>Corriger le sol</button>
-            <a href="${base}outils/simulateur-pose.html">Passer au mode Plan</a>
+            <a href="${base}outils/simulateur-pose.html">Passer au Mode Plan</a>
             <a href="${base}outils/visualiseur.html">À propos du visualiseur</a>
           </div>
         </div>
@@ -113,14 +126,12 @@ export async function mountStudio(root) {
         </button>
       </div>
 
-      <aside class="studio__panel" data-panel data-sheet="closed">
-        <button class="panel__grab" type="button" data-sheet-toggle aria-label="Ouvrir ou fermer le panneau"></button>
-        <div class="panel__selected" data-selected></div>
-        <nav class="panel__tabs" role="tablist" data-tabs>
-          <button class="panel__tab" type="button" role="tab" data-tab="parquets" aria-selected="true">Parquet</button>
-          <button class="panel__tab" type="button" role="tab" data-tab="motifs" aria-selected="false">Motif</button>
-          <button class="panel__tab" type="button" role="tab" data-tab="orientation" aria-selected="false">Orientation</button>
-        </nav>
+      <aside class="studio__panel">
+        <button class="panel__grab" type="button" data-sheet-toggle aria-label="Agrandir ou réduire le panneau"></button>
+        <div class="panel__head">
+          <p class="panel__title" data-panel-title>Choisir un parquet</p>
+          <button class="panel__close" type="button" data-panel-close aria-label="Fermer le panneau">${icon(ICONS.close)}</button>
+        </div>
         <div class="panel__body">
           <div class="panel__view" data-view="parquets"></div>
           <div class="panel__view" data-view="motifs" hidden></div>
@@ -129,11 +140,12 @@ export async function mountStudio(root) {
       </aside>
 
       <footer class="studio__actions">
+        <div class="actions__contexts" role="group" aria-label="Que voulez-vous changer ?" data-contexts></div>
         <div class="actions__variants" data-variants></div>
+        <button class="variant-add" type="button" data-add aria-label="Ajouter cette version à la comparaison">${icon(ICONS.plus)}</button>
         <div class="actions__buttons">
-          <button class="action" type="button" data-toggle-ba aria-pressed="false">${icon(ICONS.before)}<span>Avant / après</span></button>
-          <button class="action" type="button" data-add>${icon(ICONS.plus)}<span>Ajouter à comparer</span></button>
-          <button class="action" type="button" data-compare disabled>${icon(ICONS.layers)}<span data-compare-label>Comparer</span></button>
+          <button class="action" type="button" data-toggle-ba aria-pressed="false" aria-label="Avant / après">${icon(ICONS.before)}<span>Avant / après</span></button>
+          <button class="action" type="button" data-compare disabled aria-label="Comparer">${icon(ICONS.layers)}<span data-compare-label>Comparer</span></button>
           <button class="action action--primary" type="button" data-save>${icon(ICONS.save)}<span>Enregistrer</span></button>
         </div>
       </footer>
@@ -142,9 +154,7 @@ export async function mountStudio(root) {
     <div class="studio__drawer" data-drawer hidden>
       <div class="drawer__head">
         <p data-drawer-title>Réglages avancés</p>
-        <button class="studio__tool" type="button" data-drawer-close aria-label="Fermer">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12"/><path d="m18 6-12 12"/></svg>
-        </button>
+        <button class="studio__tool" type="button" data-drawer-close aria-label="Fermer">${icon(ICONS.close)}</button>
       </div>
       <div class="drawer__body" data-drawer-body></div>
     </div>`;
@@ -155,13 +165,14 @@ export async function mountStudio(root) {
   const photo = qs('[data-photo]', root);
   const canvas = qs('[data-canvas]', root);
   const status = qs('[data-status]', root);
-  const panel = qs('[data-panel]', root);
-  const selected = qs('[data-selected]', root);
   const roomsHost = qs('[data-rooms]', root);
   const fileInput = qs('[data-file]', root);
+  const contextsHost = qs('[data-contexts]', root);
   const variantsHost = qs('[data-variants]', root);
+  const addBtn = qs('[data-add]', root);
   const compareBtn = qs('[data-compare]', root);
   const compareLabel = qs('[data-compare-label]', root);
+  const panelTitle = qs('[data-panel-title]', root);
   const ba = qs('[data-ba]', root);
   const baRange = qs('[data-ba-range]', root);
   const drawer = qs('[data-drawer]', root);
@@ -207,7 +218,7 @@ export async function mountStudio(root) {
     if (!renderer.ready) return;
     const ok = renderer.paint(canvas, paintConfig(), null, quality);
     if (!ok) {
-      setStatus('Zone de sol invalide : corrigez-la dans « Corriger le sol ».');
+      setStatus('Zone de sol invalide : reprenez-la dans « Délimiter le sol ».');
       return;
     }
     setStatus('');
@@ -238,6 +249,49 @@ export async function mountStudio(root) {
     }, 0);
   }
 
+  /* ---------------- Contextes ---------------- */
+
+  /**
+   * Ouvre un contexte, ou le referme s'il est déjà actif.
+   *
+   * Refermer n'est pas un détail : c'est ce qui donne l'écran calme, photo
+   * plein cadre, sans un pixel de chrome à droite.
+   */
+  function setContext(id) {
+    const next = root.dataset.panel === id ? 'closed' : id;
+    root.dataset.panel = next;
+    contextsHost.querySelectorAll('[data-context]').forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.context === next));
+    });
+    root.querySelectorAll('[data-view]').forEach((view) => {
+      view.hidden = view.dataset.view !== next;
+    });
+    const found = CONTEXTS.find((entry) => entry.id === next);
+    if (found) panelTitle.textContent = found.title;
+    if (next === 'motifs') syncPatterns();
+    if (next === 'orientation') syncOrientation();
+    // La pièce change de largeur : le canevas doit se remesurer.
+    window.setTimeout(() => schedule(), 300);
+  }
+
+  CONTEXTS.forEach((entry) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'context-btn';
+    button.dataset.context = entry.id;
+    button.setAttribute('aria-pressed', 'false');
+    button.textContent = entry.label;
+    button.addEventListener('click', () => setContext(entry.id));
+    contextsHost.appendChild(button);
+  });
+  on(qs('[data-panel-close]', root), 'click', () => setContext(root.dataset.panel));
+
+  /** Poignée de la feuille : elle fait défiler les trois niveaux. */
+  on(qs('[data-sheet-toggle]', root), 'click', () => {
+    const index = SHEET_LEVELS.indexOf(root.dataset.sheet);
+    root.dataset.sheet = SHEET_LEVELS[(index + 1) % SHEET_LEVELS.length];
+  });
+
   /* ---------------- Écran de départ ---------------- */
 
   sceneIndex.scenes.forEach((entry) => {
@@ -246,12 +300,13 @@ export async function mountStudio(root) {
     card.className = 'room-card';
     card.dataset.room = entry.id;
     const stem = entry.file.replace(/\.jpg$/, '');
+    const zones = entry.zones > 1 ? `<span class="room-card__zones">${entry.zones} sols visibles</span>` : '';
     card.innerHTML = `
       <picture>
         <source type="image/webp" srcset="${base}assets/images/${stem}-640.webp" />
         <img src="${base}assets/images/${stem}-640.jpg" alt="${entry.label}" decoding="async" width="640" height="427" />
       </picture>
-      <span class="room-card__label">${entry.label}</span>`;
+      <span class="room-card__label">${entry.label}${zones}</span>`;
     card.addEventListener('click', () => openRoom(entry.id));
     roomsHost.appendChild(card);
   });
@@ -291,6 +346,9 @@ export async function mountStudio(root) {
       afterScene(scene.label);
       setStatus('');
       mountEditor();
+      // Une pièce calibrée est prête : on ouvre directement le catalogue, qui
+      // est la seule chose à faire ensuite.
+      setContext('parquets');
     } catch (error) {
       setStatus('La pièce n’a pas pu être chargée.');
       console.error('[visualiseur]', error);
@@ -311,17 +369,24 @@ export async function mountStudio(root) {
       qs('[data-room-thumb]', root).style.backgroundImage = 'none';
       afterScene('Ma photo');
       mountEditor();
+      root.dataset.panel = 'closed';
       openDrawer('zone');
-      setStatus('Placez les quatre coins du sol, puis fermez le panneau.');
+      setStatus('Délimitez le sol : déplacez les quatre poignées jusqu’aux angles.');
     } catch (error) {
       setStatus(error.message || 'Photo illisible.');
     }
   }
 
-  /* ---------------- Sélections ---------------- */
+  /* ---------------- Contexte : parquets ---------------- */
 
   const catalogView = qs('[data-view="parquets"]', root);
-  const catalogUi = createCatalog(catalogView, catalog, {
+  const selectedHost = document.createElement('div');
+  selectedHost.className = 'selected';
+  catalogView.appendChild(selectedHost);
+  const catalogSlot = document.createElement('div');
+  catalogView.appendChild(catalogSlot);
+
+  const catalogUi = createCatalog(catalogSlot, catalog, {
     onSelect: (item) => selectMaterial(item.id),
     onVisible: (item) => warmMaterial(item, config),
   });
@@ -333,7 +398,6 @@ export async function mountStudio(root) {
     if (!next.compatiblePatterns.includes(config.pattern)) config.pattern = next.defaultPattern;
     catalogUi.setActive(id);
     syncSelected();
-    syncPatterns();
     schedule(true);
     save();
     // Les références voisines sont préparées pendant que l'on regarde le rendu
@@ -344,13 +408,13 @@ export async function mountStudio(root) {
     const item = material();
     if (!item) return;
     const swatch = swatchFor(item);
-    selected.innerHTML = `
+    selectedHost.innerHTML = `
       <span class="selected__swatch"></span>
       <span class="selected__text">
         <strong>${item.name}</strong>
         <span>${item.finish} · lames ${Math.round(item.plank.width * 100)} cm</span>
       </span>`;
-    const slot = selected.querySelector('.selected__swatch');
+    const slot = selectedHost.querySelector('.selected__swatch');
     const mini = document.createElement('canvas');
     mini.width = swatch.width;
     mini.height = swatch.height;
@@ -358,11 +422,14 @@ export async function mountStudio(root) {
     slot.appendChild(mini);
   }
 
-  /* Motifs */
+  /* ---------------- Contexte : motifs ---------------- */
+
   const patternsView = qs('[data-view="motifs"]', root);
   function syncPatterns() {
     const item = material();
     patternsView.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.className = 'tile-grid';
     catalog.patterns.forEach((pattern) => {
       const allowed = !item || item.compatiblePatterns.includes(pattern.id);
       const card = document.createElement('button');
@@ -371,11 +438,11 @@ export async function mountStudio(root) {
       card.dataset.pattern = pattern.id;
       card.disabled = !allowed;
       card.setAttribute('aria-pressed', String(config.pattern === pattern.id));
-      card.innerHTML = `<span class="tile-card__media"></span><span class="tile-card__label"><strong>${pattern.label}</strong><span>${pattern.waste} de chutes</span></span>`;
-      if (item && !patternsView.hidden) {
+      card.innerHTML = `<span class="tile-card__media"></span><span class="tile-card__label">${pattern.label}</span>`;
+      if (item) {
         const preview = document.createElement('canvas');
-        preview.width = 220;
-        preview.height = 150;
+        preview.width = 288;
+        preview.height = 162;
         card.querySelector('.tile-card__media').appendChild(preview);
         drawPatternPreview(preview, item, pattern.id);
       }
@@ -385,27 +452,42 @@ export async function mountStudio(root) {
         schedule(true);
         save();
       });
-      patternsView.appendChild(card);
+      grid.appendChild(card);
     });
+    patternsView.appendChild(grid);
+
+    // La donnée de chutes est utile mais c'est un ordre de grandeur, pas un
+    // devis : une ligne suffit, sous la grille, pour le motif retenu.
+    const current = catalog.patterns.find((entry) => entry.id === config.pattern);
+    if (current) {
+      const note = document.createElement('p');
+      note.className = 'drawer__hint';
+      note.style.marginTop = '0.6rem';
+      note.textContent = `Chutes ${current.waste} selon la pièce et le calepinage.`;
+      patternsView.appendChild(note);
+    }
   }
 
   /**
-   * Aperçu de motif : la tuile réelle, dessinée en 256 px au lieu de 1280.
-   * Vingt-cinq fois moins de pixels pour la même image — indispensable, sinon
+   * Aperçu de motif : la tuile réelle, dessinée en 320 px au lieu de 1280.
+   * Seize fois moins de pixels pour la même image — indispensable, sinon
    * chaque changement de parquet reconstruirait trois tuiles pleines.
    */
   function drawPatternPreview(target, item, pattern) {
     const draw = () => {
-      const tile = buildTexture(item, { pattern, size: 256 });
+      const tile = buildTexture(item, { pattern, size: 320 });
       const ctx = target.getContext('2d');
       ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(tile, 24, 34, 168, 116, 0, 0, target.width, target.height);
+      // Cadrage identique pour les trois motifs : c'est ce qui permet de les
+      // comparer d'un coup d'œil.
+      ctx.drawImage(tile, 40, 60, 240, 135, 0, 0, target.width, target.height);
     };
     if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(draw, { timeout: 700 });
     else window.setTimeout(draw, 40);
   }
 
-  /* Orientation */
+  /* ---------------- Contexte : orientation ---------------- */
+
   const orientationView = qs('[data-view="orientation"]', root);
   function syncOrientation() {
     orientationView.innerHTML = '';
@@ -431,28 +513,10 @@ export async function mountStudio(root) {
     const more = document.createElement('button');
     more.type = 'button';
     more.className = 'panel__link';
-    more.textContent = 'Angle libre et échelle · réglages avancés';
+    more.textContent = 'Angle libre et échelle';
     more.addEventListener('click', () => openDrawer('advanced'));
     orientationView.appendChild(more);
   }
-
-  /* Onglets du panneau */
-  qs('[data-tabs]', root)
-    .querySelectorAll('[data-tab]')
-    .forEach((tab) =>
-      tab.addEventListener('click', () => {
-        const name = tab.dataset.tab;
-        root.querySelectorAll('[data-tab]').forEach((el) => el.setAttribute('aria-selected', String(el === tab)));
-        root.querySelectorAll('[data-view]').forEach((view) => {
-          view.hidden = view.dataset.view !== name;
-        });
-        if (name === 'motifs') syncPatterns();
-        panel.dataset.sheet = 'open';
-      })
-    );
-  on(qs('[data-sheet-toggle]', root), 'click', () => {
-    panel.dataset.sheet = panel.dataset.sheet === 'open' ? 'closed' : 'open';
-  });
 
   /* ---------------- Avant / après ---------------- */
 
@@ -493,8 +557,6 @@ export async function mountStudio(root) {
       config = { ...variant.config };
       catalogUi.setActive(config.materialId);
       syncSelected();
-      syncPatterns();
-      syncOrientation();
       schedule();
       compareUi.close();
       save();
@@ -503,17 +565,17 @@ export async function mountStudio(root) {
 
   function syncVariants() {
     variantsHost.innerHTML = '';
-    variantsHost.dataset.label = variants.length ? `Mes variantes ${variants.length}/3` : '';
     variants.forEach((variant, index) => {
       const item = catalog.get(variant.config.materialId);
       const chip = document.createElement('span');
       chip.className = 'variant';
-      chip.innerHTML = `<span class="variant__dot" data-index="${index + 1}"></span><span>${item.name}</span>`;
+      chip.title = item.name;
+      chip.innerHTML = `<span class="variant__dot" data-index="${index + 1}"></span><span class="variant__name">${item.name}</span>`;
       const remove = document.createElement('button');
       remove.type = 'button';
       remove.className = 'variant__remove';
       remove.setAttribute('aria-label', `Retirer ${item.name} de la comparaison`);
-      remove.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12"/><path d="m18 6-12 12"/></svg>';
+      remove.innerHTML = icon('m6 6 12 12M18 6 6 18');
       remove.addEventListener('click', () => {
         variants = variants.filter((entry) => entry.id !== variant.id);
         syncVariants();
@@ -524,17 +586,17 @@ export async function mountStudio(root) {
     });
     compareBtn.disabled = variants.length < 2;
     compareLabel.textContent = variants.length ? `Comparer (${variants.length})` : 'Comparer';
-    qs('[data-add]', root).disabled = variants.length >= 3;
+    addBtn.disabled = variants.length >= 3;
   }
 
-  on(qs('[data-add]', root), 'click', () => {
+  on(addBtn, 'click', () => {
     if (variants.length >= 3) return;
     variants = [...variants, { id: `v${Date.now()}`, config: { ...config } }];
     syncVariants();
     save();
     setStatus(
       variants.length < 2
-        ? 'Version enregistrée. Essayez-en une autre, puis comparez.'
+        ? 'Version retenue. Essayez-en une autre, puis comparez.'
         : `Comparez vos ${variants.length} versions.`
     );
     window.setTimeout(() => setStatus(''), 2600);
@@ -562,7 +624,7 @@ export async function mountStudio(root) {
     }
   });
 
-  /* ---------------- Menu, tiroir, réglages avancés ---------------- */
+  /* ---------------- Menu et tiroir ---------------- */
 
   on(qs('[data-menu]', root), 'click', (event) => {
     const open = dropdown.hidden;
@@ -648,7 +710,7 @@ export async function mountStudio(root) {
 
   function openDrawer(kind) {
     dropdown.hidden = true;
-    drawerTitle.textContent = kind === 'zone' ? 'Corriger le sol' : 'Réglages avancés';
+    drawerTitle.textContent = kind === 'zone' ? 'Délimiter le sol' : 'Réglages avancés';
     drawerBody.innerHTML = '';
     drawer.hidden = false;
     root.dataset.drawer = kind;
@@ -671,13 +733,20 @@ export async function mountStudio(root) {
   on(qs('[data-advanced]', root), 'click', () => openDrawer('advanced'));
   on(qs('[data-fix]', root), 'click', () => openDrawer('zone'));
 
+  /**
+   * Outils de délimitation.
+   *
+   * Le vocabulaire reste celui de l'utilisateur : « le sol », « le contour »,
+   * « les objets ». Nulle part il n'est question de plan de perspective, de
+   * masque ni d'homographie — ce sont nos affaires, pas les siennes.
+   */
   function buildZoneTools() {
     if (!editor) mountEditor();
     stage.dataset.editing = 'true';
     const modes = [
-      ['frame', 'Cadre', 'Quatre coins : donne la perspective.'],
-      ['polygon', 'Contour', 'Ajoutez des points pour suivre un mur.'],
-      ['brush', 'Pinceau', 'Effacez ce qui doit rester devant le parquet.'],
+      ['frame', 'Le sol', 'Placez les quatre poignées aux angles du sol.'],
+      ['polygon', 'Le contour', 'Ajoutez des points pour suivre un mur ou une plinthe.'],
+      ['brush', 'Les objets', 'Effacez ce qui doit rester devant : meubles, tapis, plinthes.'],
     ];
     const tool = { mode: 'frame', brush: 'remove', radius: 42 };
     const seg = document.createElement('div');
@@ -706,15 +775,22 @@ export async function mountStudio(root) {
       hint.textContent = found ? found[2] : '';
     };
 
-    // Sélecteur de sol : une photo peut en contenir plusieurs. Il n'apparaît
-    // que s'il y a réellement un choix à faire.
-    const zones = renderer.scene.floorZones;
-    if (zones.length > 1) {
+    /**
+     * Sélecteur de sol : une photo peut en contenir plusieurs — la pièce du
+     * premier plan et celle qu'on aperçoit derrière une ouverture. On peut en
+     * ajouter, et tous reçoivent par défaut le même parquet.
+     */
+    const zonesBox = document.createElement('div');
+    zonesBox.className = 'drawer__stack';
+    const renderZones = () => {
+      zonesBox.innerHTML = '';
+      const zones = renderer.scene.floorZones;
       const label = document.createElement('p');
       label.className = 'drawer__hint';
-      label.textContent = 'Sol à corriger :';
+      label.textContent = zones.length > 1 ? 'Sol en cours de réglage :' : 'Un seul sol pour l’instant.';
       const picker = document.createElement('div');
       picker.className = 'seg-tabs';
+      picker.style.gridTemplateColumns = `repeat(${Math.min(3, zones.length)}, minmax(0, 1fr))`;
       zones.forEach((item) => {
         const button = document.createElement('button');
         button.type = 'button';
@@ -723,16 +799,53 @@ export async function mountStudio(root) {
         button.setAttribute('aria-pressed', String(item.id === activeZone));
         button.addEventListener('click', () => {
           activeZone = item.id;
-          picker.querySelectorAll('[data-zone]').forEach((el) =>
-            el.setAttribute('aria-pressed', String(el.dataset.zone === activeZone))
-          );
+          renderZones();
           loadZoneIntoEditor();
           applyMode();
         });
         picker.appendChild(button);
       });
-      drawerBody.append(label, picker);
-    }
+
+      const row = document.createElement('div');
+      row.className = 'drawer__row';
+      const add = document.createElement('button');
+      add.className = 'btn btn--ghost btn--xs';
+      add.type = 'button';
+      add.textContent = 'Ajouter un sol';
+      add.addEventListener('click', () => {
+        const created = addZone(renderer.scene, { label: `Sol ${renderer.scene.floorZones.length + 1}` });
+        renderer.masks.registerZone(created);
+        activeZone = created.id;
+        renderZones();
+        loadZoneIntoEditor();
+        applyMode();
+        renderer.refreshLighting();
+        schedule();
+        setStatus('Nouveau sol ajouté : placez ses quatre poignées.');
+        window.setTimeout(() => setStatus(''), 3200);
+      });
+      row.appendChild(add);
+      if (renderer.scene.floorZones.length > 1) {
+        const drop = document.createElement('button');
+        drop.className = 'btn btn--ghost btn--xs';
+        drop.type = 'button';
+        drop.textContent = 'Retirer ce sol';
+        drop.addEventListener('click', () => {
+          const target = activeZone;
+          if (!removeZone(renderer.scene, target)) return;
+          renderer.masks.removeZone(target);
+          activeZone = renderer.scene.floorZones[renderer.scene.floorZones.length - 1].id;
+          renderZones();
+          loadZoneIntoEditor();
+          applyMode();
+          renderer.refreshLighting();
+          schedule();
+        });
+        row.appendChild(drop);
+      }
+      zonesBox.append(label, picker, row);
+    };
+    renderZones();
 
     modes.forEach(([id, label]) => {
       const button = document.createElement('button');
@@ -767,7 +880,7 @@ export async function mountStudio(root) {
     undo.innerHTML = `
       <button class="btn btn--ghost btn--xs" type="button" data-undo>Annuler</button>
       <button class="btn btn--ghost btn--xs" type="button" data-redo>Rétablir</button>
-      <button class="btn btn--ghost btn--xs" type="button" data-clear>Effacer les retouches</button>`;
+      <button class="btn btn--ghost btn--xs" type="button" data-clear>Tout effacer</button>`;
     const afterEdit = () => {
       renderer.refreshLighting();
       schedule();
@@ -785,7 +898,7 @@ export async function mountStudio(root) {
     done.textContent = 'Terminer';
     done.addEventListener('click', closeDrawer);
 
-    drawerBody.append(seg, hint, brushBox, undo, done);
+    drawerBody.append(zonesBox, seg, hint, brushBox, undo, done);
     applyMode();
   }
 
@@ -839,6 +952,7 @@ export async function mountStudio(root) {
 
   on(qs('[data-change-room]', root), 'click', () => {
     root.dataset.state = 'start';
+    root.dataset.panel = 'closed';
     closeDrawer();
   });
   on(qs('[data-restart]', root), 'click', () => {
@@ -853,8 +967,6 @@ export async function mountStudio(root) {
     syncVariants();
     catalogUi.setActive(config.materialId);
     syncSelected();
-    syncPatterns();
-    syncOrientation();
     save();
     if (sceneId) openRoom(sceneId);
     else root.dataset.state = 'start';
@@ -892,8 +1004,6 @@ export async function mountStudio(root) {
 
   catalogUi.setActive(config.materialId);
   syncSelected();
-  syncPatterns();
-  syncOrientation();
   syncVariants();
 
   const requested = params.get('piece');
@@ -907,6 +1017,7 @@ export async function mountStudio(root) {
   return {
     element: root,
     openRoom,
+    setContext,
     backend: renderer.backend,
     get config() {
       return { ...config };

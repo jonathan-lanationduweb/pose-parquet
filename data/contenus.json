@@ -35,7 +35,7 @@
         "poser"
       ],
       "lecture": "10 min",
-      "resume": "Neuf désordres sur dix viennent du support, pas du parquet. Voici les contrôles à mener avant la première lame."
+      "resume": "La plupart des désordres viennent du support, pas du parquet. Voici les contrôles à mener avant la première lame."
     },
     {
       "slug": "point-de-hongrie-ou-baton-rompu",
@@ -105,7 +105,7 @@
       "url": "motifs/pose-droite.html",
       "motif": "longueur",
       "stats": {
-        "Chutes estimées": "7 à 8 %",
+        "Chutes": "faibles (ordre de 7 à 8 %)",
         "Difficulté": "Accessible",
         "Poses compatibles": "Flottante, collée, clouée"
       }
@@ -116,7 +116,7 @@
       "url": "motifs/pose-longueur.html",
       "motif": "longueur",
       "stats": {
-        "Chutes estimées": "≈ 7 %",
+        "Chutes": "faibles (ordre de 7 %)",
         "Effet visuel": "Allonge la pièce",
         "Cas favorable": "Séjour large et lumineux"
       }
@@ -127,7 +127,7 @@
       "url": "motifs/pose-largeur.html",
       "motif": "largeur",
       "stats": {
-        "Chutes estimées": "≈ 8 %",
+        "Chutes": "faibles (ordre de 8 %)",
         "Effet visuel": "Élargit la pièce",
         "Cas favorable": "Pièce très allongée"
       }
@@ -138,7 +138,7 @@
       "url": "motifs/pose-diagonale.html",
       "motif": "diagonale",
       "stats": {
-        "Chutes estimées": "12 à 15 %",
+        "Chutes": "élevées (ordre de 12 à 15 %)",
         "Difficulté": "Intermédiaire",
         "Effet visuel": "Agrandit, dynamise"
       }
@@ -149,7 +149,7 @@
       "url": "motifs/point-de-hongrie.html",
       "motif": "point-de-hongrie",
       "stats": {
-        "Chutes estimées": "12 à 15 %",
+        "Chutes": "élevées (ordre de 12 à 15 %)",
         "Difficulté": "Élevée",
         "Coupe des lames": "Onglet, gauches et droites"
       }
@@ -160,7 +160,7 @@
       "url": "motifs/baton-rompu.html",
       "motif": "baton-rompu",
       "stats": {
-        "Chutes estimées": "10 à 12 %",
+        "Chutes": "modérées (ordre de 10 à 12 %)",
         "Difficulté": "Élevée",
         "Coupe des lames": "Lames droites standard"
       }

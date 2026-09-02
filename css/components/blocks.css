@@ -81,54 +81,64 @@
 .tile:hover .tile__pattern span:nth-child(2) { transform: skewX(-14deg) translateX(-4px); }
 .tile:hover .tile__pattern span:nth-child(3) { transform: skewX(-14deg) translateX(10px); }
 
-/* ---------- Section immersive : image plein cadre + blocs numérotés ---------- */
-.immersive {
+/* ---------- Dossier plein cadre : image + bas de page éditorial ----------
+   Le texte ne flotte pas au milieu de la photo : il se range en bas, titre à
+   gauche puis trois points en rangée séparés par un filet. Le regard entre par
+   l'image, descend vers le titre, balaie les points. */
+.dossier {
   position: relative;
-  min-height: min(128svh, 1180px);
-  color: #fff;
   isolation: isolate;
   display: grid;
-  align-content: start;
-  padding-block: calc(var(--header-h) + clamp(3rem, 2rem + 4vw, 6rem)) clamp(3.5rem, 2rem + 5vw, 7rem);
+  align-content: end;
+  min-height: min(96svh, 900px);
+  padding-block: calc(var(--header-h) + clamp(2rem, 1rem + 3vw, 4rem)) clamp(2rem, 1.2rem + 3vw, 4rem);
+  color: #fff;
 }
-.immersive__bg { position: absolute; inset: 0; z-index: -2; overflow: hidden; }
-.immersive__bg img { width: 100%; height: 100%; object-fit: cover; }
-.immersive::after {
+.dossier__bg { position: absolute; inset: 0; z-index: -2; overflow: hidden; }
+.dossier__bg img { width: 100%; height: 100%; object-fit: cover; }
+/* Voile plus dense en bas, là où le texte se pose ; presque nul en haut, pour
+   ne pas éteindre la photo. */
+.dossier::after {
   content: "";
   position: absolute; inset: 0; z-index: -1;
-  background: linear-gradient(to bottom, rgba(12,14,15,0.58), rgba(12,14,15,0.22) 38%, rgba(12,14,15,0.86));
+  background: linear-gradient(to bottom, rgba(12,14,15,0.34) 0%, rgba(12,14,15,0.12) 34%, rgba(12,14,15,0.9) 100%);
 }
-.immersive__head { text-align: center; max-width: min(92%, 46rem); margin-inline: auto; }
-.immersive__head h2 { max-width: 14ch; margin-inline: auto; }
-.immersive__head h2 { color: #fff; }
-.immersive__head .eyebrow { justify-content: center; color: rgba(255,255,255,0.7); }
+.dossier__inner { display: grid; gap: clamp(1.5rem, 1rem + 2.5vw, 3rem); }
+.dossier__head { display: grid; justify-items: start; gap: var(--sp-4); max-width: 30ch; }
+.dossier__head h2 { margin: 0; color: #fff; }
+.dossier__head .eyebrow { color: rgba(255,255,255,0.72); }
 
-.immersive__steps {
-  margin-top: clamp(2.5rem, 1.5rem + 5vw, 6rem);
+.dossier__notes {
   display: grid;
-  gap: clamp(2rem, 1rem + 4vw, 4.5rem);
-  max-width: 40rem;
+  gap: clamp(1.25rem, 0.8rem + 1.6vw, 2.5rem);
+  margin: 0;
+  padding: clamp(1.25rem, 0.8rem + 1.6vw, 2.25rem) 0 0;
+  list-style: none;
+  border-top: 1px solid rgba(255,255,255,0.28);
 }
-.immersive__steps--right { margin-left: auto; }
-.step-block { display: grid; gap: 0.6rem; }
-/* Sur petit écran, les textes passent sur une photo chargée : on pose un voile local */
-@media (max-width: 62rem) {
-  .step-block {
+.dossier__note { display: grid; gap: 0.35rem; }
+.dossier__note h3 { margin: 0; font-size: var(--fs-h4); color: #fff; }
+.dossier__note p { margin: 0; color: rgba(255,255,255,0.78); max-width: 38ch; }
+.dossier__num {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.6);
+}
+
+@media (min-width: 62rem) {
+  .dossier__notes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+/* Sur petit écran les textes passent sur une photo chargée : voile local. */
+@media (max-width: 61.99rem) {
+  .dossier__notes {
     padding: clamp(1rem, 0.8rem + 1vw, 1.5rem);
+    border-top: 0;
     border-radius: var(--r-md);
-    background: rgba(12, 14, 15, 0.42);
+    background: rgba(12, 14, 15, 0.46);
     backdrop-filter: blur(3px);
   }
-  .immersive__steps { gap: 1.25rem; }
 }
-.step-block__num {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
-  color: rgba(255,255,255,0.62);
-}
-.step-block h3 { color: #fff; font-size: clamp(1.7rem, 1.2rem + 2.2vw, 3rem); }
-.step-block p { margin: 0; color: rgba(255,255,255,0.8); max-width: 40ch; }
 
 /* ---------- Alternance texte / image ---------- */
 .feature {
@@ -339,3 +349,14 @@
 }
 .steps-grid strong { font-size: 1.02rem; font-weight: 600; }
 .steps-grid li > span:last-child { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+/* ---------- Page Outils : le Visualiseur domine ----------
+   Trois blocs de poids égal se concurrencent et personne ne sait par où
+   commencer. Le premier outil prend donc plus de place et plus de contraste ;
+   le second reste un bloc normal ; la feuille de route passe en section
+   compacte. La hiérarchie se voit avant d'être lue. */
+.tool-block--lead .tool-block__title { font-size: var(--fs-h1); }
+.tool-block--lead .tool-block__media { border-radius: var(--r-lg); }
+@media (min-width: 62rem) {
+  .tool-block--lead { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: center; }
+}

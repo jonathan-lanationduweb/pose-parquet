@@ -1,16 +1,41 @@
 /**
- * Interface du Studio.
+ * Interface du Visualiseur Parquet.
  *
- * Règle de composition : la pièce est le sujet, tout le reste s'efface.
- * Le chrome (barre, panneau, actions) est compact, sombre ou neutre, et ne
- * concurrence jamais la photo. Aucune marge éditoriale, aucun héros, aucun
- * pied de page : on est dans une application, pas dans un article.
+ * Une seule règle de composition, et tout en découle : **la pièce est le
+ * sujet.** Le chrome — barre, panneau, actions — est mince, sombre, et ne
+ * concurrence jamais la photo. Aucune marge éditoriale, aucun héros, aucun pied
+ * de page : on est dans une application, pas dans un article.
+ *
+ * Trois décisions structurent cette feuille.
+ *
+ * 1. **La photo n'est pas dans une carte.** Pas de grande boîte arrondie posée
+ *    sur un fond beige avec des contrôles dessous : la photo *est* la surface de
+ *    travail, à fleur du cadre. Les rayons et les bordures ne servent que
+ *    lorsqu'ils structurent réellement quelque chose.
+ *
+ * 2. **Une action = un contexte.** Parquet, Motif et Orientation ne cohabitent
+ *    jamais empilés dans une colonne. Le panneau n'affiche qu'un contexte à la
+ *    fois, et quand aucun n'est demandé il se referme entièrement : la pièce
+ *    reprend toute la largeur et l'écran devient très calme.
+ *
+ * 3. **Le pourtour est charbon, pas crème.** Une photo d'intérieur se juge sur
+ *    fond sombre ; le blanc cassé du site lui vole sa clarté et fausse la
+ *    lecture des teintes de bois. Le site éditorial reste crème, l'application
+ *    passe au charbon — et le catalogue, lui, reste clair pour que les matières
+ *    se lisent. Aucun réglage n'est proposé : ce n'est pas une préférence, c'est
+ *    une condition de lecture.
  */
 
-/* ---------- Base ---------- */
+/* ================================================================== */
+/* Base                                                               */
+/* ================================================================== */
+
 body.app {
   margin: 0;
   height: 100svh;
+  /* L'application ne défile pas… sauf quand la hauteur devient critique : voir
+     la requête @media (max-height) en fin de feuille, qui libère le défilement
+     plutôt que de rendre un contrôle inatteignable. */
   overflow: hidden;
   background: var(--c-ink);
   color: var(--text);
@@ -19,7 +44,6 @@ body.app {
   line-height: var(--lh-body);
   -webkit-font-smoothing: antialiased;
 }
-body.app.is-comparing { overflow: hidden; }
 
 .visually-hidden {
   position: absolute !important;
@@ -35,19 +59,29 @@ body.app.is-comparing { overflow: hidden; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 .studio {
+  --bar-h: 3rem;
+  /* Cible tactile de référence. Les icônes restent petites ; c'est la zone
+     sensible qui grandit. */
+  --touch: 2.75rem;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
+  /* Hauteur définie, et non min-height : sans cela la rangée du plan de
+     travail se dimensionnerait sur le contenu du catalogue — plusieurs
+     milliers de pixels — et la photo se retrouverait centrée dans le vide. */
   height: 100svh;
   background: var(--c-ink);
 }
 
-/* ---------- Barre d'application ---------- */
+/* ================================================================== */
+/* Barre d'application                                                */
+/* ================================================================== */
+
 .studio__bar {
   display: flex;
   align-items: center;
-  gap: var(--sp-4);
-  padding: 0 clamp(0.6rem, 1.5vw, 1.1rem);
-  height: 2.9rem;
+  gap: clamp(0.5rem, 1.5vw, 1rem);
+  padding: 0 clamp(0.35rem, 1vw, 0.75rem);
+  min-height: var(--bar-h);
   background: #101214;
   color: #f4f2ec;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -56,70 +90,78 @@ body.app.is-comparing { overflow: hidden; }
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+  min-height: var(--touch);
+  padding: 0 0.6rem;
   color: inherit;
   text-decoration: none;
-  font-size: 0.9rem;
-  padding: 0.35rem 0.5rem;
+  font-size: 0.95rem;
   border-radius: var(--r-sm);
 }
-.studio__back svg { width: 1.1em; height: 1.1em; opacity: 0.65; }
+.studio__back svg { width: 1.1em; height: 1.1em; opacity: 0.6; }
 .studio__back strong { font-family: var(--font-display); font-weight: 400; font-size: 1.1em; }
 .studio__back span { white-space: nowrap; }
 .studio__back:hover { background: rgba(255, 255, 255, 0.08); }
 
 .studio__project {
   margin: 0 auto 0 0;
-  padding-left: var(--sp-4);
-  font-size: 0.86rem;
+  padding-left: clamp(0.5rem, 1.5vw, 1rem);
+  font-size: 0.9rem;
   color: rgba(244, 242, 236, 0.62);
   border-left: 1px solid rgba(255, 255, 255, 0.14);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.studio__tools { display: flex; align-items: center; gap: 0.25rem; }
+.studio__tools { display: flex; align-items: center; gap: 0.1rem; }
 .studio__tool {
   display: grid;
   place-items: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: var(--touch);
+  height: var(--touch);
   border: 0;
   border-radius: var(--r-sm);
   background: transparent;
   color: inherit;
   cursor: pointer;
 }
-.studio__tool svg { width: 1.15rem; height: 1.15rem; }
+.studio__tool svg { width: 1.2rem; height: 1.2rem; }
 .studio__tool:hover { background: rgba(255, 255, 255, 0.1); }
 
 .studio__menu { position: relative; }
 .studio__dropdown {
   position: absolute;
   right: 0;
-  top: calc(100% + 0.4rem);
+  top: calc(100% + 0.3rem);
   z-index: 40;
   display: grid;
-  min-width: 13rem;
-  padding: 0.35rem;
+  min-width: 14rem;
+  padding: 0.3rem;
   border-radius: var(--r-md);
   background: #1c1f21;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  /* Une des rares ombres justifiées : cet élément flotte réellement. */
+  box-shadow: var(--shadow-3);
 }
 .studio__dropdown > * {
-  padding: 0.6rem 0.75rem;
+  display: flex;
+  align-items: center;
+  min-height: var(--touch);
+  padding: 0 0.75rem;
   border: 0;
   border-radius: var(--r-sm);
   background: none;
   color: #eceae4;
   font: inherit;
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   text-align: left;
   text-decoration: none;
   cursor: pointer;
 }
 .studio__dropdown > *:hover { background: rgba(255, 255, 255, 0.09); }
 
-/* ---------- Écran de départ ---------- */
+/* ================================================================== */
+/* Écran de départ                                                    */
+/* ================================================================== */
+
 .studio__start { display: none; overflow: auto; background: var(--bg); }
 .studio[data-state="start"] .studio__start { display: block; }
 .studio[data-state="start"] .studio__main { display: none; }
@@ -148,9 +190,9 @@ body.app.is-comparing { overflow: hidden; }
   flex-wrap: wrap;
   align-items: center;
   gap: var(--sp-4);
-  margin: clamp(1.25rem, 3vw, 2rem) 0 clamp(1.25rem, 3vw, 2rem);
+  margin: clamp(1.25rem, 3vw, 2rem) 0;
 }
-.start__or { color: var(--text-muted); font-size: 0.92rem; }
+.start__or { color: var(--text-muted); font-size: 0.95rem; }
 
 .start__rooms {
   display: grid;
@@ -162,42 +204,55 @@ body.app.is-comparing { overflow: hidden; }
   display: block;
   padding: 0;
   border: 0;
-  border-radius: var(--r-card);
+  border-radius: var(--r-md);
   overflow: hidden;
   background: var(--c-mineral);
   cursor: pointer;
   aspect-ratio: 3 / 2;
 }
 .room-card img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-4) var(--ease-out); }
-.room-card:hover img { transform: scale(1.04); }
+.room-card:hover img { transform: scale(1.03); }
 .room-card__label {
   position: absolute;
   inset: auto 0 0 0;
-  padding: 2.5rem 1rem 0.85rem;
-  background: linear-gradient(to top, rgba(12, 14, 15, 0.82), transparent);
+  padding: 2.5rem 1rem 0.9rem;
+  background: linear-gradient(to top, rgba(12, 14, 15, 0.85), transparent);
   color: #fff;
   font-size: 1rem;
   font-weight: 500;
   text-align: left;
 }
-.room-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+.room-card__zones {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.75);
 }
 .room-card:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 
-/* ---------- Plan de travail ---------- */
+/* ================================================================== */
+/* Plan de travail                                                    */
+/* ================================================================== */
+
+/**
+ * Deux colonnes, dont la seconde vaut zéro quand aucun contexte n'est ouvert.
+ * C'est le mécanisme qui rend la pièce plein cadre : le panneau ne réserve pas
+ * sa place « au cas où ».
+ */
 .studio__main {
-  display: grid;
   position: relative;
-  grid-template-columns: minmax(0, 1fr) clamp(17.5rem, 21vw, 22rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 0;
   grid-template-rows: minmax(0, 1fr);
   min-height: 0;
-  background: #17191b;
+  background: #121415;
+  transition: grid-template-columns var(--dur-2) var(--ease-out);
 }
+.studio:not([data-panel="closed"]) .studio__main {
+  grid-template-columns: minmax(0, 1fr) clamp(17rem, 22vw, 21rem);
+}
+
 .studio__stage {
   position: relative;
   grid-column: 1;
@@ -205,7 +260,8 @@ body.app.is-comparing { overflow: hidden; }
   display: grid;
   place-items: center;
   min-height: 0;
-  padding: clamp(0.5rem, 1.4vw, 1.25rem);
+  /* Pas de marge décorative : la photo va au bord du cadre. */
+  padding: 0;
   overflow: hidden;
 }
 .stage__media {
@@ -214,7 +270,7 @@ body.app.is-comparing { overflow: hidden; }
   display: block;
   max-width: 100%;
   max-height: 100%;
-  border-radius: var(--r-md);
+  /* Aucun rayon, aucun cadre : la photo n'est pas une carte. */
   overflow: hidden;
   touch-action: pan-y;
 }
@@ -223,7 +279,7 @@ body.app.is-comparing { overflow: hidden; }
   z-index: 1;
   display: block;
   max-width: 100%;
-  max-height: calc(100svh - 9rem);
+  max-height: calc(100svh - var(--bar-h));
   width: auto;
   height: auto;
 }
@@ -237,6 +293,7 @@ body.app.is-comparing { overflow: hidden; }
 .stage__media[data-ba="true"] .stage__canvas { clip-path: inset(0 0 0 var(--ba)); }
 .studio__stage[data-editing="true"] { cursor: crosshair; }
 
+/* ---- Avant / après ---- */
 .stage__ba { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
 .stage__range {
   position: absolute;
@@ -254,156 +311,170 @@ body.app.is-comparing { overflow: hidden; }
   bottom: 0;
   left: var(--ba);
   width: 2px;
-  background: #fff;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.9);
 }
+/* Poignée franche mais pas énorme : 40 px, assez pour le pouce, assez discrète
+   pour ne pas masquer la zone que l'on compare. */
 .stage__handle::after {
   content: "";
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   transform: translate(-50%, -50%);
   border-radius: var(--r-pill);
-  background: #fff;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 .stage__tag {
   position: absolute;
-  top: 0.75rem;
-  padding: 0.28rem 0.65rem;
+  top: 0.8rem;
+  padding: 0.3rem 0.7rem;
   border-radius: var(--r-pill);
-  background: rgba(16, 18, 19, 0.72);
+  background: rgba(16, 18, 19, 0.7);
   color: #fff;
-  font-size: 0.66rem;
-  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
-.stage__tag--a { left: 0.75rem; }
-.stage__tag--b { right: 0.75rem; }
+.stage__tag--a { left: 0.8rem; }
+.stage__tag--b { right: 0.8rem; }
 
 .stage__status {
   position: absolute;
   left: 50%;
-  bottom: 1rem;
+  bottom: 5.5rem;
   transform: translateX(-50%);
   z-index: 8;
   margin: 0;
-  padding: 0.5rem 0.95rem;
+  padding: 0.55rem 1rem;
   border-radius: var(--r-pill);
-  background: rgba(16, 18, 19, 0.88);
+  background: rgba(16, 18, 19, 0.9);
   color: #fff;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   max-width: calc(100% - 2rem);
   text-align: center;
 }
 
 .stage__room {
   position: absolute;
-  top: 0.85rem;
-  left: 0.85rem;
+  top: 0.75rem;
+  left: 0.75rem;
   z-index: 8;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.35rem 0.75rem 0.35rem 0.35rem;
+  min-height: var(--touch);
+  padding: 0.3rem 0.85rem 0.3rem 0.3rem;
   border: 0;
   border-radius: var(--r-pill);
-  background: rgba(16, 18, 19, 0.72);
+  background: rgba(16, 18, 19, 0.66);
   color: #fff;
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   cursor: pointer;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
 }
 .stage__room:hover { background: rgba(16, 18, 19, 0.9); }
 .stage__room-thumb {
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 2rem;
+  height: 2rem;
   border-radius: var(--r-pill);
   background: var(--c-mineral) center / cover no-repeat;
 }
 
-/* ---------- Panneau ---------- */
+/* ================================================================== */
+/* Panneau contextuel                                                 */
+/* ================================================================== */
+
 .studio__panel {
   grid-column: 2;
   grid-row: 1;
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   min-height: 0;
+  overflow: hidden;
   background: var(--bg);
-  border-left: 1px solid var(--line);
+  border-left: 1px solid rgba(0, 0, 0, 0.12);
 }
+.studio[data-panel="closed"] .studio__panel { visibility: hidden; }
 .panel__grab { display: none; }
 
-.panel__selected {
+.panel__head {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.8rem clamp(0.75rem, 1.2vw, 1.1rem);
+  gap: 0.5rem;
+  padding: 0 0.35rem 0 clamp(0.75rem, 1.2vw, 1.1rem);
+  min-height: 3.1rem;
   border-bottom: 1px solid var(--line);
 }
+.panel__title { margin: 0 auto 0 0; font-size: 0.95rem; font-weight: 600; }
+.panel__close {
+  display: grid;
+  place-items: center;
+  width: var(--touch);
+  height: var(--touch);
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+.panel__close svg { width: 1.1rem; height: 1.1rem; }
+.panel__close:hover { background: var(--c-mineral); color: var(--text); }
+
+.panel__body { min-height: 0; overflow-y: auto; padding: clamp(0.75rem, 1.2vw, 1.1rem); }
+.panel__view[hidden] { display: none; }
+
+.panel__link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--touch);
+  margin-top: var(--sp-4);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: none;
+  font: inherit;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.panel__link:hover { color: var(--text); border-color: var(--line-strong); }
+
+/* ---- Matière sélectionnée, en tête du contexte Parquet ---- */
+.selected {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.85rem;
+}
 .selected__swatch {
-  width: 3rem;
-  height: 3rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: var(--r-sm);
   overflow: hidden;
   flex: none;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
 }
-.selected__swatch canvas { width: 100%; height: 100%; object-fit: cover; }
-.selected__text { display: grid; gap: 0.1rem; min-width: 0; }
-.selected__text strong { font-size: 0.98rem; }
-.selected__text span { font-size: 0.78rem; color: var(--text-muted); }
+.selected__swatch canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
+.selected__text { display: grid; gap: 0.05rem; min-width: 0; }
+.selected__text strong { font-size: 1rem; }
+.selected__text span { font-size: 0.82rem; color: var(--text-muted); }
 
-.panel__tabs {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 2px;
-  margin: 0.75rem clamp(0.75rem, 1.2vw, 1.1rem) 0;
-  padding: 2px;
-  border-radius: var(--r-pill);
-  background: var(--c-mineral);
-}
-.panel__tab {
-  padding: 0.5rem 0.4rem;
-  border: 0;
-  border-radius: var(--r-pill);
-  background: transparent;
-  font: inherit;
-  font-size: 0.84rem;
-  color: var(--text-muted);
-  cursor: pointer;
-}
-.panel__tab[aria-selected="true"] {
-  background: var(--surface);
-  color: var(--text);
-  font-weight: 600;
-  box-shadow: var(--shadow-1);
-}
-.panel__body { min-height: 0; overflow-y: auto; padding: clamp(0.75rem, 1.2vw, 1.1rem); }
-.panel__link {
-  display: block;
-  width: 100%;
-  margin-top: var(--sp-4);
-  padding: 0.6rem;
-  border: 1px dashed var(--line-strong);
-  border-radius: var(--r-sm);
-  background: none;
-  font: inherit;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  cursor: pointer;
-}
-.panel__link:hover { color: var(--text); border-color: var(--text-muted); }
+/* ================================================================== */
+/* Catalogue de matières                                              */
+/* ================================================================== */
 
-/* ---------- Catalogue ---------- */
-.cat__head { display: grid; gap: 0.5rem; margin-bottom: 0.75rem; }
+.cat__head { display: grid; gap: 0.5rem; margin-bottom: 0.8rem; }
 .cat__search {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.45rem 0.7rem;
+  min-height: var(--touch);
+  padding: 0 0.8rem;
   border: 1px solid var(--line);
   border-radius: var(--r-pill);
   background: var(--surface);
@@ -412,180 +483,291 @@ body.app.is-comparing { overflow: hidden; }
 .cat__search input {
   flex: 1;
   min-width: 0;
+  /* L'input remplit la pilule : sans cela la zone sensible ne fait que la
+     hauteur du texte, et le tour de la pilule ne déclenche rien. */
+  align-self: stretch;
   border: 0;
   background: none;
   font: inherit;
-  font-size: 0.88rem;
+  font-size: 0.95rem;
 }
 .cat__search input:focus { outline: none; }
 .cat__filters { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 .cat__filter {
-  padding: 0.3rem 0.7rem;
+  min-height: 2.15rem;
+  padding: 0 0.8rem;
   border: 1px solid var(--line);
   border-radius: var(--r-pill);
   background: transparent;
   font: inherit;
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
   cursor: pointer;
 }
 .cat__filter[aria-pressed="true"] { background: var(--c-ink); border-color: var(--c-ink); color: #fff; }
 
+/**
+ * Une carte de parquet est d'abord **une matière**.
+ *
+ * Grande vignette, nom court dessous, rien d'autre : la finition et la largeur
+ * de lame vivent dans l'en-tête du contexte, pas répétées douze fois. Toutes
+ * les cartes ont exactement le même gabarit — même ratio, même hauteur de
+ * libellé — pour que la grille se lise comme un nuancier et non comme un
+ * formulaire.
+ */
 .cat__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
-  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  gap: 0.5rem;
 }
 .cat__card {
+  position: relative;
   display: grid;
-  gap: 0;
+  grid-template-rows: 1fr auto;
   padding: 0;
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface);
-  overflow: hidden;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
   text-align: left;
   cursor: pointer;
-  transition: border-color var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
 }
-.cat__card:hover { border-color: var(--line-strong); transform: translateY(-1px); }
-.cat__card[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-.cat__media { display: block; aspect-ratio: 4 / 5; background: var(--c-mineral); }
+.cat__media {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--c-mineral);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+  transition: box-shadow var(--dur-2) var(--ease-out);
+}
 .cat__swatch { width: 100%; height: 100%; object-fit: cover; display: block; }
-/* Bloc de libellé de hauteur constante : un nom long ne décale pas la carte
-   voisine, et la ligne secondaire est toujours au même endroit. */
-.cat__label { display: grid; gap: 0.1rem; padding: 0.45rem 0.55rem 0.55rem; align-content: start; }
-.cat__label strong {
+.cat__label {
+  padding: 0.4rem 0.1rem 0;
   font-size: 0.85rem;
-  font-weight: 600;
-  line-height: 1.2;
-  min-height: 1.2em;
+  font-weight: 500;
+  line-height: 1.25;
+  /* Hauteur fixe : un nom sur deux lignes ne décale pas la carte voisine. */
+  min-height: 2.5em;
+  color: var(--text);
 }
-.cat__label span {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  font-size: 0.7rem;
-  line-height: 1.3;
-  min-height: 2.6em;
-  color: var(--text-muted);
-}
-.cat__empty { color: var(--text-muted); font-size: 0.88rem; }
+.cat__card:hover .cat__media { box-shadow: inset 0 0 0 1px var(--line-strong); }
 
-/* ---------- Motifs et orientation ---------- */
+/**
+ * État actif : un filet charbon franc et une petite coche.
+ *
+ * Pas de grosse bordure colorée — le nuancier doit rester un nuancier, et
+ * l'accent sauge entrerait en concurrence avec les teintes de bois qu'il est
+ * censé mettre en valeur.
+ */
+.cat__card[aria-pressed="true"] .cat__media { box-shadow: inset 0 0 0 2px var(--c-ink); }
+.cat__card[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: var(--r-pill);
+  background: var(--c-ink)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 12.5 5 5L20 6'/%3E%3C/svg%3E")
+    center / 0.8rem no-repeat;
+}
+.cat__card[aria-pressed="true"] .cat__label { font-weight: 700; }
+.cat__empty { color: var(--text-muted); font-size: 0.9rem; }
+
+/* ================================================================== */
+/* Motifs et orientation                                              */
+/* ================================================================== */
+
+/* Les trois motifs doivent être identifiables sans lire : vignette large,
+   même gabarit, libellé court. */
+.tile-grid { display: grid; gap: 0.5rem; }
 .tile-card {
+  position: relative;
   display: grid;
-  grid-template-columns: 5.5rem minmax(0, 1fr);
-  align-items: center;
-  gap: 0.75rem;
   width: 100%;
-  margin-bottom: 0.6rem;
   padding: 0;
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface);
-  overflow: hidden;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
   text-align: left;
   cursor: pointer;
 }
-.tile-card:hover { border-color: var(--line-strong); }
-.tile-card[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-.tile-card[disabled] { opacity: 0.45; cursor: not-allowed; }
-.tile-card__media { display: block; aspect-ratio: 11 / 8; background: var(--c-mineral); }
+.tile-card__media {
+  display: block;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--c-mineral);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+  transition: box-shadow var(--dur-2) var(--ease-out);
+}
 .tile-card__media canvas { width: 100%; height: 100%; display: block; object-fit: cover; }
-.tile-card__label { display: grid; gap: 0.1rem; padding-right: 0.6rem; }
-.tile-card__label strong { font-size: 0.92rem; }
-.tile-card__label span { font-size: 0.74rem; color: var(--text-muted); }
+.tile-card__label { padding: 0.4rem 0.1rem 0; font-size: 0.9rem; font-weight: 500; }
+.tile-card:hover .tile-card__media { box-shadow: inset 0 0 0 1px var(--line-strong); }
+.tile-card[aria-pressed="true"] .tile-card__media { box-shadow: inset 0 0 0 2px var(--c-ink); }
+.tile-card[aria-pressed="true"] .tile-card__label { font-weight: 700; }
+.tile-card[disabled] { opacity: 0.4; cursor: not-allowed; }
 
 .orient { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; }
 .orient__item {
   display: grid;
   place-items: center;
   aspect-ratio: 1;
+  min-height: var(--touch);
   border: 1px solid var(--line);
-  border-radius: var(--r-md);
+  border-radius: var(--r-sm);
   background: var(--surface);
   color: var(--text-soft);
   cursor: pointer;
 }
 .orient__item svg { width: 1.5rem; height: 1.5rem; }
 .orient__item:hover { border-color: var(--line-strong); }
-.orient__item[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); }
+.orient__item[aria-pressed="true"] { border-color: var(--c-ink); box-shadow: inset 0 0 0 1px var(--c-ink); color: var(--text); }
 
-/* ---------- Barre d'actions ---------- */
-/* Les actions flottent au-dessus de la pièce : elles ne lui volent aucune
-   bande, exactement comme la barre d'outils d'un configurateur. */
+/* ================================================================== */
+/* Barre d'actions                                                    */
+/* ================================================================== */
+
+/**
+ * Deux groupes, six commandes, pas dix.
+ *
+ *   [ Parquet | Motif | Orientation ]   ← contextes, un seul à la fois
+ *   [ Avant/après ] [ Comparer ] [ Enregistrer ]
+ *
+ * Elle flotte au-dessus de la pièce : elle ne lui prend aucune bande.
+ */
 .studio__actions {
   position: absolute;
-  left: 50%;
+  /* left: 0 / right: 0 et non left: 50 % : avec left: 50 %, la largeur
+     disponible d'un élément absolu se réduit à la moitié droite du cadre, et la
+     barre s'enroulait sur deux ou trois rangées en mangeant le bas de la
+     pièce. Ici elle prend sa largeur naturelle et se centre. */
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin-inline: auto;
   bottom: clamp(0.6rem, 1.4vw, 1.1rem);
-  transform: translateX(-50%);
   z-index: 12;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem 0.75rem;
-  max-width: calc(100% - 2rem);
-  padding: 0.45rem 0.6rem;
+  gap: 0.35rem 0.5rem;
+  max-width: calc(100% - 1.5rem);
+  padding: 0.35rem;
   border-radius: var(--r-pill);
-  background: rgba(16, 18, 19, 0.86);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  background: rgba(16, 18, 19, 0.84);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-2);
 }
-/* Le panneau occupe la colonne de droite sur toute la hauteur */
-.studio__panel { grid-column: 2; grid-row: 1; }
-.actions__variants { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
-.variant {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.25rem 0.3rem 0.25rem 0.55rem;
+
+.actions__contexts {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
   border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+}
+.context-btn {
+  min-height: 2.35rem;
+  padding: 0 0.95rem;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: rgba(244, 242, 236, 0.82);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.context-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+.context-btn[aria-pressed="true"] { background: #f4f2ec; color: #16181a; font-weight: 600; }
+
+/**
+ * Les variantes retenues sont des pastilles numérotées, pas des étiquettes.
+ *
+ * Trois chips portant « Chêne Naturel », « Chêne Miel », « Chêne Fumé »
+ * faisaient déborder la barre sur trois rangées et mangeaient le bas de la
+ * pièce. Le nom reste accessible — title et aria-label — et il est de toute
+ * façon affiché en grand dans la vue de comparaison, qui est le seul moment où
+ * on en a besoin.
+ */
+.actions__variants { display: flex; align-items: center; gap: 0.25rem; }
+.variant {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.14);
   color: #f4f2ec;
-  font-size: 0.78rem;
 }
 .variant__dot {
   display: grid;
   place-items: center;
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 1.4rem;
+  height: 1.4rem;
   border-radius: var(--r-pill);
-  background: var(--c-sage);
-  color: #12140f;
-  font-size: 0.62rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #16181a;
+  font-size: 0.78rem;
   font-weight: 700;
 }
 .variant__dot::before { content: attr(data-index); }
+.variant__name { display: none; }
+/* La croix n'apparaît qu'au survol ou au clavier : on ne propose pas de
+   supprimer en permanence quelque chose qu'on vient d'ajouter. */
 .variant__remove {
+  position: absolute;
+  inset: 0;
   display: grid;
   place-items: center;
-  width: 1.3rem;
-  height: 1.3rem;
   border: 0;
   border-radius: var(--r-pill);
+  background: rgba(16, 18, 19, 0.86);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--dur-1) var(--ease-out);
+}
+.variant__remove svg { width: 0.95rem; height: 0.95rem; }
+.variant:hover .variant__remove,
+.variant__remove:focus-visible { opacity: 1; }
+
+/* « Ajouter à comparer » n'est pas une commande de premier plan : c'est un
+   geste attaché aux variantes. */
+.variant-add {
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border: 1px dashed rgba(255, 255, 255, 0.32);
+  border-radius: var(--r-pill);
   background: none;
-  color: rgba(244, 242, 236, 0.7);
+  color: #f4f2ec;
   cursor: pointer;
 }
-.variant__remove svg { width: 0.85rem; height: 0.85rem; }
-.variant__remove:hover { background: rgba(255, 255, 255, 0.16); color: #fff; }
+.variant-add svg { width: 1rem; height: 1rem; }
+.variant-add:hover:not([disabled]) { background: rgba(255, 255, 255, 0.12); border-style: solid; }
+.variant-add[disabled] { opacity: 0.35; cursor: not-allowed; }
 
-.actions__buttons { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.actions__buttons { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 .action {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.5rem 0.85rem;
+  min-height: 2.35rem;
+  padding: 0 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: var(--r-pill);
   background: transparent;
   color: #f4f2ec;
   font: inherit;
-  font-size: 0.84rem;
+  font-size: 0.9rem;
   cursor: pointer;
+  white-space: nowrap;
 }
 .action svg { width: 1.05rem; height: 1.05rem; opacity: 0.8; }
 .action:hover:not([disabled]) { background: rgba(255, 255, 255, 0.1); }
@@ -594,40 +776,44 @@ body.app.is-comparing { overflow: hidden; }
 .action--primary { background: var(--c-sage); border-color: var(--c-sage); color: #12140f; font-weight: 600; }
 .action--primary:hover:not([disabled]) { background: #9cb098; }
 
-/* ---------- Tiroir (réglages, correction) ---------- */
+/* ================================================================== */
+/* Tiroir : correction du sol, réglages avancés                        */
+/* ================================================================== */
+
 .studio__drawer {
   position: fixed;
   right: 0;
   bottom: 0;
-  top: 2.9rem;
+  top: var(--bar-h);
   z-index: 60;
   width: min(24rem, 100%);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   background: var(--bg);
   border-left: 1px solid var(--line);
-  box-shadow: -20px 0 50px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--shadow-3);
 }
 .drawer__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.6rem 0.6rem 0.6rem 1rem;
+  padding: 0.4rem 0.4rem 0.4rem 1rem;
+  min-height: 3.1rem;
   border-bottom: 1px solid var(--line);
 }
 .drawer__head p { margin: 0; font-weight: 600; }
 .drawer__head .studio__tool { color: var(--text); }
 .drawer__head .studio__tool:hover { background: var(--c-mineral); }
-.drawer__body { overflow-y: auto; padding: 1rem; display: grid; gap: 0.75rem; align-content: start; }
-.drawer__hint { margin: 0; font-size: 0.82rem; color: var(--text-muted); }
+.drawer__body { overflow-y: auto; padding: 1rem; display: grid; gap: 0.8rem; align-content: start; }
+.drawer__hint { margin: 0; font-size: 0.88rem; color: var(--text-muted); }
 .drawer__row { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-.drawer__stack { display: grid; gap: 0.9rem; }
+.drawer__stack { display: grid; gap: 1rem; }
 .drawer__brush { display: grid; gap: 0.6rem; }
-.drawer__range { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0.35rem 0.6rem; font-size: 0.85rem; }
+.drawer__range { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0.35rem 0.6rem; font-size: 0.9rem; }
 .drawer__range span { grid-column: 1 / -1; color: var(--text-soft); }
-.drawer__range input[type="range"] { width: 100%; accent-color: var(--c-sage-deep); }
-.drawer__range output { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--text-muted); }
+.drawer__range input[type="range"] { width: 100%; height: var(--touch); accent-color: var(--c-sage-deep); }
+.drawer__range output { font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-muted); }
 
 .seg-tabs {
   display: grid;
@@ -639,18 +825,22 @@ body.app.is-comparing { overflow: hidden; }
 }
 .seg-tabs--pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .seg-tabs button {
-  padding: 0.45rem 0.3rem;
+  min-height: 2.5rem;
+  padding: 0 0.4rem;
   border: 0;
   border-radius: var(--r-pill);
   background: transparent;
   font: inherit;
-  font-size: 0.8rem;
+  font-size: 0.86rem;
   color: var(--text-muted);
   cursor: pointer;
 }
 .seg-tabs button[aria-pressed="true"] { background: var(--surface); color: var(--text); font-weight: 600; }
 
-/* ---------- Aide ---------- */
+/* ================================================================== */
+/* Aide                                                               */
+/* ================================================================== */
+
 .studio__help {
   position: fixed;
   inset: 0;
@@ -658,25 +848,31 @@ body.app.is-comparing { overflow: hidden; }
   display: grid;
   place-items: center;
   padding: var(--gutter);
-  background: rgba(16, 18, 19, 0.55);
+  background: rgba(16, 18, 19, 0.6);
+  overflow: auto;
 }
 .help__card {
   width: min(28rem, 100%);
   padding: clamp(1.1rem, 2vw, 1.6rem);
-  border-radius: var(--r-card);
+  border-radius: var(--r-lg);
   background: var(--bg);
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-3);
 }
 .help__title { margin: 0 0 0.75rem; font-family: var(--font-display); font-size: 1.4rem; }
 .help__list { display: grid; gap: 0.7rem; margin: 0; padding: 0 0 0 1.1rem; }
 .help__list li { display: grid; gap: 0.1rem; }
-.help__list strong { font-size: 0.95rem; }
-.help__list span { font-size: 0.86rem; color: var(--text-soft); }
-.help__note { margin: 0.9rem 0 1rem; font-size: 0.78rem; color: var(--text-muted); }
+.help__list strong { font-size: 0.98rem; }
+.help__list span { font-size: 0.9rem; color: var(--text-soft); }
+.help__note { margin: 0.9rem 0 1rem; font-size: 0.84rem; color: var(--text-muted); }
 
 .studio__error { padding: var(--gutter); color: #f4f2ec; }
+.studio__noscript { padding: var(--gutter); color: #f4f2ec; max-width: 40rem; }
+.studio__noscript a { color: #fff; }
 
-/* ---------- Comparaison ---------- */
+/* ================================================================== */
+/* Comparaison — elle devient le contenu principal                    */
+/* ================================================================== */
+
 .cmp {
   position: fixed;
   inset: 0;
@@ -689,36 +885,54 @@ body.app.is-comparing { overflow: hidden; }
 .cmp__bar {
   display: flex;
   align-items: center;
-  gap: var(--sp-4);
-  padding: 0.6rem clamp(0.6rem, 1.5vw, 1.25rem);
+  gap: clamp(0.5rem, 1.5vw, 1rem);
+  padding: 0.35rem clamp(0.5rem, 1.5vw, 1.25rem);
+  min-height: 3.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
-.cmp__title { margin: 0 auto 0 0; font-size: 0.95rem; font-weight: 600; }
+.cmp__title { margin: 0 auto 0 0; font-size: 1rem; font-weight: 600; }
 .cmp__modes { display: flex; gap: 2px; padding: 2px; border-radius: var(--r-pill); background: rgba(255, 255, 255, 0.1); }
 .cmp__mode {
-  padding: 0.35rem 0.85rem;
+  min-height: 2.35rem;
+  padding: 0 0.95rem;
   border: 0;
   border-radius: var(--r-pill);
   background: transparent;
-  color: rgba(244, 242, 236, 0.7);
+  color: rgba(244, 242, 236, 0.8);
   font: inherit;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   cursor: pointer;
 }
 .cmp__mode[aria-pressed="true"] { background: #f4f2ec; color: #16181a; font-weight: 600; }
-.cmp__close { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border: 0; border-radius: var(--r-sm); background: transparent; color: inherit; cursor: pointer; }
+.cmp__close {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
 .cmp__close svg { width: 1.15rem; height: 1.15rem; }
 .cmp__close:hover { background: rgba(255, 255, 255, 0.12); }
 
-.cmp__body { min-height: 0; overflow: auto; display: grid; align-content: center; gap: 0.75rem; padding: clamp(0.6rem, 1.5vw, 1.25rem); }
+.cmp__body {
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  align-content: center;
+  gap: 0.85rem;
+  padding: clamp(0.6rem, 1.5vw, 1.25rem);
+}
 .cmp__canvas {
   display: block;
   max-width: 100%;
-  /* Bornée par la fenêtre : la barre, les actions et le pied restent visibles */
-  max-height: calc(100svh - 15rem);
+  /* Bornée par la fenêtre : la barre, les légendes et le pied restent visibles */
+  max-height: calc(100svh - 14rem);
   width: auto;
   margin-inline: auto;
-  border-radius: var(--r-md);
 }
 
 .cmp__slider { position: relative; --split: 50%; justify-self: center; }
@@ -732,35 +946,36 @@ body.app.is-comparing { overflow: hidden; }
   clip-path: inset(0 0 0 var(--split));
 }
 .cmp__range { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; z-index: 4; }
-.cmp__handle { position: absolute; top: 0; bottom: 0; left: var(--split); width: 2px; background: #fff; z-index: 3; }
+.cmp__handle { position: absolute; top: 0; bottom: 0; left: var(--split); width: 2px; background: rgba(255, 255, 255, 0.9); z-index: 3; }
 .cmp__handle::after {
   content: "";
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   transform: translate(-50%, -50%);
   border-radius: var(--r-pill);
-  background: #fff;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
+/* Les noms restent très discrets : c'est l'image qu'on regarde. */
 .cmp__tag {
   position: absolute;
-  top: 0.75rem;
+  top: 0.8rem;
   z-index: 3;
   padding: 0.28rem 0.7rem;
   border-radius: var(--r-pill);
-  background: rgba(16, 18, 19, 0.75);
-  font-size: 0.72rem;
+  background: rgba(16, 18, 19, 0.66);
+  font-size: 0.78rem;
 }
-.cmp__tag--a { left: 0.75rem; }
-.cmp__tag--b { right: 0.75rem; }
+.cmp__tag--a { left: 0.8rem; }
+.cmp__tag--b { right: 0.8rem; }
 
 .cmp__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem 2rem; }
 .cmp__action { display: grid; gap: 0.15rem; justify-items: center; text-align: center; }
-.cmp__action strong { font-size: 0.92rem; }
-.cmp__action span { font-size: 0.78rem; color: rgba(244, 242, 236, 0.62); }
+.cmp__action strong { font-size: 0.95rem; }
+.cmp__action span { font-size: 0.82rem; color: rgba(244, 242, 236, 0.62); }
 .cmp__action .btn { margin-top: 0.35rem; }
 
 .cmp__grid {
@@ -770,12 +985,12 @@ body.app.is-comparing { overflow: hidden; }
   align-items: start;
 }
 .cmp__grid[data-items="3"] { --cols: 3; }
-.cmp__cell { margin: 0; display: grid; gap: 0.5rem; }
+.cmp__cell { margin: 0; display: grid; gap: 0.5rem; min-width: 0; }
 .cmp__caption { display: grid; gap: 0.1rem; justify-items: center; text-align: center; }
 .cmp__caption strong { font-size: 0.95rem; }
-.cmp__caption span { font-size: 0.8rem; color: rgba(244, 242, 236, 0.62); }
+.cmp__caption span { font-size: 0.82rem; color: rgba(244, 242, 236, 0.62); }
 .cmp__caption .btn { margin-top: 0.3rem; }
-.cmp__count { margin: 0; padding-bottom: 0.4rem; text-align: center; font-size: 0.8rem; color: rgba(244, 242, 236, 0.7); }
+.cmp__count { margin: 0; padding-bottom: 0.4rem; text-align: center; font-size: 0.85rem; color: rgba(244, 242, 236, 0.7); }
 
 .cmp__foot {
   display: flex;
@@ -783,137 +998,172 @@ body.app.is-comparing { overflow: hidden; }
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  padding: 0.75rem;
+  padding: 0.6rem 0.75rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
-.cmp__foot p { margin: 0; font-size: 0.88rem; color: rgba(244, 242, 236, 0.72); }
-.cmp .btn--ghost { --btn-fg: #f4f2ec; --btn-bd: rgba(255, 255, 255, 0.45); --btn-hover: #fff; --btn-hover-fg: #16181a; }
+.cmp__foot p { margin: 0; font-size: 0.9rem; color: rgba(244, 242, 236, 0.72); }
 
 /* ================================================================== */
-/* Tablette paysage et petits portables                               */
+/* Tablette                                                           */
 /* ================================================================== */
-@media (max-width: 74rem) and (min-width: 48rem) {
-  .studio__main { grid-template-columns: minmax(0, 1fr) clamp(17rem, 30vw, 20rem); }
-  .cat__grid { grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); }
+
+/* Paysage : petit panneau latéral, grande pièce — pas un desktop compressé. */
+@media (max-width: 74rem) and (min-width: 48rem) and (orientation: landscape) {
+  .studio:not([data-panel="closed"]) .studio__main {
+    grid-template-columns: minmax(0, 1fr) clamp(15.5rem, 28vw, 18rem);
+  }
+  .cat__grid { grid-template-columns: repeat(auto-fill, minmax(5.75rem, 1fr)); }
 }
 
-/* Tablette portrait : la pièce en haut, le panneau dessous */
-@media (max-width: 64rem) and (orientation: portrait) and (min-width: 48rem) {
-  .studio__main {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto minmax(0, 1fr);
-  }
-  .studio__stage { grid-column: 1; grid-row: 1; }
-  /* En portrait, la pièce ne tient plus toute la hauteur : la barre revient
-     dans le flux, sinon elle flotterait au-dessus du catalogue. */
-  .studio__actions {
-    position: static;
-    transform: none;
-    grid-column: 1;
-    grid-row: 2;
-    width: auto;
-    max-width: none;
-    justify-content: space-between;
-    border-radius: 0;
-    background: #101214;
-    backdrop-filter: none;
-    box-shadow: none;
-    padding: 0.5rem clamp(0.6rem, 1.4vw, 1.25rem);
-  }
+/* Portrait : la pièce en haut, le panneau en feuille basse. */
+@media (max-width: 64rem) and (min-width: 48rem) and (orientation: portrait) {
+  .studio:not([data-panel="closed"]) .studio__main { grid-template-columns: minmax(0, 1fr); }
   .studio__panel {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 50;
     grid-column: 1;
-    grid-row: 3;
-    align-content: start;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    height: 46svh;
     border-left: 0;
-    border-top: 1px solid var(--line);
+    border-radius: var(--r-md) var(--r-md) 0 0;
+    box-shadow: var(--shadow-3);
   }
-  .cat__grid { grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr)); }
+  .studio[data-panel="closed"] .studio__panel { display: none; }
+  .studio:not([data-panel="closed"]) .studio__actions { bottom: calc(46svh + 0.8rem); }
+  /* Même principe qu'au téléphone : la photo se centre dans ce qui reste
+     visible au-dessus de la feuille. */
+  .studio:not([data-panel="closed"]) .studio__stage { padding-bottom: 46svh; }
+  .studio:not([data-panel="closed"]) .stage__canvas { max-height: calc(54svh - var(--bar-h)); }
+  .cat__grid { grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); }
 }
 
 /* ================================================================== */
-/* Téléphone : la pièce en haut, les actions, puis les matières au pouce */
+/* Téléphone : la pièce reste visible, toujours                       */
 /* ================================================================== */
+
+/**
+ * Feuille basse à trois niveaux. La règle qui commande tout : **on ne cache
+ * jamais la pièce.** Même au niveau le plus haut, une bande de photo reste
+ * visible ; le plein écran n'existe que si l'utilisateur le demande.
+ *
+ *   peek  32 svh  — le rail de matières : on essaie six parquets au pouce
+ *   half  58 svh  — le catalogue complet
+ *   full  86 svh  — sur demande explicite seulement
+ */
 @media (max-width: 47.99rem) {
-  .studio__bar { height: 3rem; padding-inline: 0.5rem; }
-  .studio__back span { font-size: 0.85rem; }
+  .studio__bar { padding-inline: 0.25rem; }
+  .studio__back span { font-size: 0.92rem; }
   .studio__project { display: none; }
 
-  /* Trois bandes : la photo prend ce qui reste, les actions et le catalogue
-     se dimensionnent sur leur contenu. */
-  /* La photo prend sa hauteur naturelle et se cale sous la barre ; le
-     catalogue occupe le reste. Aucune bande noire perdue. */
-  .studio__main {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto minmax(0, 1fr);
-  }
-  .studio__stage { grid-row: 1; grid-column: 1; padding: 0.4rem; }
-  .stage__canvas { max-height: 46svh; }
-  .stage__room { top: 0.6rem; left: 0.6rem; font-size: 0.78rem; }
-
-  /* Les actions reviennent dans le flux : sur un téléphone, une pilule
-     flottante mangerait le bas de la photo. */
-  .studio__actions {
-    position: static;
-    transform: none;
-    grid-row: 2;
+  .studio__main,
+  .studio:not([data-panel="closed"]) .studio__main { grid-template-columns: minmax(0, 1fr); }
+  /* La feuille recouvre le bas de la scène : on centre la photo dans ce qui
+     reste réellement visible, pas dans toute la hauteur. Sans cela, la photo se
+     retrouve à moitié cachée derrière le catalogue alors qu'il y a de la place
+     au-dessus. */
+  .studio__stage {
     grid-column: 1;
+    grid-row: 1;
+    padding-bottom: var(--sheet-h, 0px);
+    transition: padding-bottom var(--dur-2) var(--ease-out);
+  }
+  .studio[data-panel="closed"] .studio__stage { padding-bottom: 0; }
+  .stage__canvas { max-height: calc(100svh - var(--bar-h) - var(--sheet-h, 0px)); }
+  .stage__room { top: 0.6rem; left: 0.6rem; font-size: 0.85rem; }
+  .stage__status { bottom: 5rem; font-size: 0.88rem; }
+
+  /* La barre d'actions reste flottante et se cale au-dessus de la feuille. */
+  .studio__actions {
+    left: 0.5rem;
+    right: 0.5rem;
     width: auto;
     max-width: none;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.35rem;
-    padding: 0.45rem 0.5rem;
-    border-radius: 0;
-    backdrop-filter: none;
-    background: #101214;
-    box-shadow: none;
-  }
-  .actions__variants:not(:empty) {
     justify-content: center;
-    padding: 0 0 0.3rem;
-    margin: 0;
-    border-right: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    gap: 0.3rem 0.4rem;
+    bottom: calc(var(--sheet-h, 0px) + 0.6rem + env(safe-area-inset-bottom));
+    transition: bottom var(--dur-2) var(--ease-out);
   }
-  .actions__buttons { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.3rem; }
-  .action { flex-direction: column; gap: 0.2rem; padding: 0.5rem 0.2rem; text-align: center; font-size: 0.66rem; line-height: 1.2; }
-  .action svg { width: 1.25rem; height: 1.25rem; }
+  /* Deux rangées, pas trois : les contextes en pleine largeur, puis les
+     commandes. Une barre de trois rangées mangeait un tiers de la photo. */
+  .actions__contexts { flex: 1 0 100%; justify-content: center; }
+  .context-btn { flex: 1; font-size: 0.9rem; padding: 0 0.5rem; }
+  /* Les pastilles de variantes disparaissent : le nombre de versions retenues
+     est déjà porté par le bouton « Comparer (3) », et sur 390 px chaque
+     commande doit gagner sa place. */
+  .actions__variants { display: none; }
+  /* Les icônes suffisent pour les trois actions de droite, sauf la principale :
+     « Enregistrer » sans mot n'est pas devinable, et une disquette encore
+     moins. Aucun libellé ne descend sous une taille lisible. */
+  .action span { display: none; }
+  .action { padding: 0 0.75rem; }
+  .action--primary span { display: inline; }
 
   .studio__panel {
-    grid-row: 3;
-    grid-column: 1;
-    grid-template-rows: auto auto auto minmax(0, 1fr);
-    align-content: start;
-    border-left: 0;
-    border-top: 1px solid var(--line);
-    border-radius: var(--r-card) var(--r-card) 0 0;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  /* Déplié : le catalogue passe au-dessus de la photo, comme une feuille */
-  .studio__panel[data-sheet="open"] {
     position: fixed;
-    inset: 3rem 0 0 0;
+    inset: auto 0 0 0;
     z-index: 50;
-    max-height: none;
-    box-shadow: 0 -14px 40px rgba(0, 0, 0, 0.35);
+    grid-column: 1;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    height: var(--sheet-h, 32svh);
+    border-left: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: var(--r-md) var(--r-md) 0 0;
+    box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.32);
+    padding-bottom: env(safe-area-inset-bottom);
+    transition: height var(--dur-2) var(--ease-out);
   }
-  .panel__grab { display: block; width: 100%; height: 1.35rem; border: 0; background: none; cursor: pointer; }
+  .studio[data-panel="closed"] .studio__panel { display: none; }
+
+  .studio[data-sheet="peek"] { --sheet-h: 32svh; }
+  .studio[data-sheet="half"] { --sheet-h: 58svh; }
+  .studio[data-sheet="full"] { --sheet-h: 86svh; }
+
+  /* Poignée : elle fait défiler les trois niveaux, et c'est une vraie cible. */
+  .panel__grab {
+    display: block;
+    width: 100%;
+    /* Cible réelle : c'est le geste le plus fréquent de l'écran mobile. */
+    height: 2.75rem;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
   .panel__grab::before {
     content: "";
     display: block;
-    width: 2.5rem;
+    width: 2.75rem;
     height: 4px;
-    margin: 0.45rem auto 0;
+    margin: 1.1rem auto 0;
     border-radius: var(--r-pill);
     background: var(--line-strong);
   }
-  .panel__selected { padding-block: 0.45rem; }
-  .selected__swatch { width: 2.4rem; height: 2.4rem; }
-  .panel__tabs { margin-top: 0.5rem; }
-  .cat__grid { grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); }
-  .tile-card { grid-template-columns: 4.5rem minmax(0, 1fr); }
+  .panel__head { min-height: 2.7rem; }
+  .panel__body { padding: 0.6rem 0.75rem 0.9rem; }
 
-  .studio__drawer { top: 3rem; width: 100%; }
+  /**
+   * Niveau replié : un rail horizontal de matières.
+   * Une grille de deux colonnes remplirait l'écran ; un rail laisse la pièce
+   * respirer et se parcourt au pouce, ce qui est le geste réel.
+   */
+  .studio[data-sheet="peek"] .cat__head,
+  .studio[data-sheet="peek"] .selected { display: none; }
+  .studio[data-sheet="peek"] .cat__grid {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 5.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+    padding-bottom: 0.25rem;
+  }
+  .studio[data-sheet="peek"] .cat__card { scroll-snap-align: start; }
+  .studio[data-sheet="peek"] .cat__label { min-height: 0; }
+  .studio[data-sheet="peek"] .cat__empty { display: none; }
+  .studio[data-sheet="peek"] .tile-grid { grid-auto-flow: column; grid-auto-columns: 9rem; overflow-x: auto; }
+
+  .cat__grid { grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr)); }
+  .studio__drawer { top: var(--bar-h); width: 100%; }
 
   /* Comparaison : une vue par écran, balayage horizontal */
   .cmp__grid {
@@ -925,105 +1175,89 @@ body.app.is-comparing { overflow: hidden; }
     gap: 0.5rem;
   }
   .cmp__cell { scroll-snap-align: center; }
-  .cmp__actions { gap: 0.5rem 1rem; }
   .cmp__body { align-content: start; }
-  .cmp__canvas { max-height: calc(100svh - 19rem); }
-  .cmp__bar { padding: 0.5rem; }
-  .cmp__title { font-size: 0.85rem; }
+  .cmp__canvas { max-height: calc(100svh - 17rem); }
+  .cmp__bar { padding-inline: 0.35rem; }
+  .cmp__title { font-size: 0.9rem; }
+}
+
+/* ================================================================== */
+/* Hauteur disponible critique                                        */
+/* ================================================================== */
+
+/**
+ * Paysage téléphone et zoom fort : la hauteur est la ressource rare.
+ * On laisse l'application défiler plutôt que d'écraser des contrôles jusqu'à
+ * les rendre inatteignables — un bouton qu'on ne peut plus atteindre est un
+ * défaut plus grave qu'un écran qui défile.
+ */
+@media (max-height: 34rem) {
+  body.app { height: auto; min-height: 100svh; overflow: auto; }
+  .studio { height: auto; min-height: 100svh; }
+  .studio__main { grid-template-rows: auto; }
+  .studio__stage { min-height: 56svh; }
+  .stage__canvas { max-height: 56svh; }
+  .studio__panel {
+    position: static;
+    height: auto;
+    max-height: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .studio__actions { position: static; margin: 0.5rem auto; left: auto; right: auto; }
+}
+
+/* En paysage téléphone, le panneau passe à droite plutôt qu'en bas : une
+   feuille basse ne laisserait rien voir de la pièce. */
+@media (max-width: 47.99rem) and (orientation: landscape) and (min-height: 20rem) {
+  .studio:not([data-panel="closed"]) .studio__main { grid-template-columns: minmax(0, 1fr) 45vw; }
+  .studio__panel {
+    position: static;
+    grid-column: 2;
+    height: auto;
+    border-radius: 0;
+    border-left: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: none;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .panel__grab { display: none; }
+  .studio__actions { bottom: clamp(0.4rem, 1vw, 0.8rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .studio__panel { transition: none; }
+  .studio__main,
+  .studio__panel,
+  .studio__actions,
   .room-card img { transition: none; }
 }
 
-.studio__noscript { padding: var(--gutter); color: #f4f2ec; max-width: 40rem; }
-.studio__noscript a { color: #fff; }
+/* ================================================================== */
+/* Cibles tactiles                                                    */
+/* ================================================================== */
 
-/* ---------- Cartes de matière : l'action est nommée sur la carte ----------
-   Repris du principe observé chez IKEA : au survol, la vignette annonce ce
-   qui va se passer, et l'état actif se voit sans avoir à comparer les bords. */
-.cat__media { position: relative; }
-.cat__card .cat__media::after {
-  content: "Poser ce parquet";
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 0.5rem;
-  background: rgba(16, 18, 19, 0.55);
-  color: #fff;
-  font-size: 0.74rem;
-  font-weight: 500;
-  text-align: center;
-  opacity: 0;
-  transition: opacity var(--dur-2) var(--ease-out);
-}
-.cat__card:hover .cat__media::after,
-.cat__card:focus-visible .cat__media::after { opacity: 1; }
-.cat__card[aria-pressed="true"] .cat__media::after { content: none; }
-
-.cat__card[aria-pressed="true"] { position: relative; }
-.cat__card[aria-pressed="true"]::after {
-  content: "";
-  position: absolute;
-  top: 0.4rem;
-  right: 0.4rem;
-  width: 1.35rem;
-  height: 1.35rem;
-  border-radius: var(--r-pill);
-  background: var(--c-sage-deep)
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 12.5 5 5L20 6'/%3E%3C/svg%3E")
-    center / 0.85rem no-repeat;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28);
-}
-
-/* La matière doit se lire : vignette plus haute, deux colonnes franches */
-/* Deux colonnes dans un panneau de 300 px : on voit six matieres d'un coup,
-   sans que la vignette devienne trop petite pour lire le veinage. */
-.cat__grid { grid-template-columns: repeat(auto-fill, minmax(6.75rem, 1fr)); }
-.cat__media { aspect-ratio: 1 / 1; }
-
-/* ---------- Zone de comparaison identifiée ---------- */
-.actions__variants:not(:empty) {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding-right: 0.6rem;
-  margin-right: 0.15rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.18);
-}
-.actions__variants::before {
-  content: attr(data-label);
-  margin-right: 0.15rem;
-  font-size: 0.68rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba(244, 242, 236, 0.55);
-  white-space: nowrap;
-}
-.actions__variants:empty { display: none; }
-
-/* ---------- Téléphone : essayer les matières au pouce ----------
-   Panneau replié = un défileur horizontal de matières juste sous la pièce :
-   on essaie six parquets sans rien ouvrir. Panneau déplié = le catalogue
-   complet, en feuille par-dessus la photo. */
-@media (max-width: 47.99rem) {
-  .studio__panel[data-sheet="closed"] .cat__head { display: none; }
-  .studio__panel[data-sheet="closed"] .panel__body { padding-block: 0.5rem 0.65rem; }
-  .studio__panel[data-sheet="closed"] .cat__grid {
-    grid-template-columns: none;
-    grid-auto-flow: column;
-    grid-auto-columns: 6.25rem;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    overscroll-behavior-x: contain;
-    padding-bottom: 0.25rem;
-  }
-  .studio__panel[data-sheet="closed"] .cat__card { scroll-snap-align: start; }
-  .studio__panel[data-sheet="closed"] .cat__label { padding: 0.35rem 0.45rem 0.45rem; }
-  .studio__panel[data-sheet="closed"] .cat__label span { display: none; }
-  .studio__panel[data-sheet="closed"] .cat__empty { display: none; }
-  /* Motifs et orientation restent lisibles en replié */
-  .studio__panel[data-sheet="closed"] .tile-card { margin-bottom: 0.4rem; }
+/**
+ * Sur pointeur grossier — doigt, stylet — toute commande fait au moins 44 px.
+ *
+ * Les pilules de la barre mesurent 2,35 rem à la souris : c'est net et compact,
+ * et une barre de 54 px de haut mangerait le bas de la pièce pour rien. Mais
+ * 38 px au doigt, c'est une cible qu'on rate. On distingue donc les deux cas au
+ * lieu d'imposer le pire des deux à tout le monde : les icônes gardent leur
+ * taille, seule la zone sensible grandit.
+ */
+@media (pointer: coarse) {
+  .studio { --touch: 2.75rem; }
+  .context-btn,
+  .action,
+  .cmp__mode,
+  .seg-tabs button,
+  .cat__filter,
+  .panel__link { min-height: 2.75rem; }
+  .variant,
+  .variant-add { width: 2.75rem; height: 2.75rem; }
+  .variant__remove { width: 2.75rem; height: 2.75rem; }
+  .stage__room { min-height: 2.75rem; }
+  /* Les vignettes du catalogue sont déjà de grandes cibles ; on garantit
+     seulement que la plus petite reste confortable. */
+  .cat__card { min-height: 2.75rem; }
+  .orient__item { min-height: 3rem; }
 }

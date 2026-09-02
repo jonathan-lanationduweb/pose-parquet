@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Contrôle des icônes — outil interne</title>
+<style>
+  body { margin: 0; font: 13px/1.5 ui-monospace, Menlo, monospace; background: #f2efe8; color: #16181a; }
+  h1 { font: 600 15px/1.4 ui-monospace, monospace; padding: 14px 18px; margin: 0; border-bottom: 1px solid #d8d3c8; }
+  section { padding: 18px; border-bottom: 1px solid #d8d3c8; }
+  section.dark { background: #16181a; color: #f2efe8; border-color: #333; }
+  section.tab { background: #dee1e6; }
+  .row { display: flex; gap: 26px; align-items: flex-end; flex-wrap: wrap; margin-top: 12px; }
+  figure { margin: 0; text-align: center; }
+  figcaption { margin-top: 6px; font-size: 11px; opacity: 0.65; }
+  /* image-rendering: pixelated pour juger la grille de pixels réelle */
+  img.zoom { image-rendering: pixelated; }
+  .tabbar { display: flex; align-items: center; gap: 8px; background: #fff; border-radius: 8px 8px 0 0; padding: 7px 12px; width: 260px; box-shadow: 0 1px 3px #0002; }
+  .tabbar span { font: 12px/1 system-ui, sans-serif; color: #202124; }
+  .tabbar--dark { background: #292a2d; }
+  .tabbar--dark span { color: #e8eaed; }
+  code { background: #0001; padding: 1px 4px; border-radius: 3px; }
+</style>
+</head>
+<body>
+<h1>Contrôle des icônes — symbole Concept C</h1>
+
+<section>
+  <strong>Taille réelle, fond clair</strong>
+  <div class="row" id="real-light"></div>
+</section>
+
+<section class="dark">
+  <strong>Taille réelle, fond sombre</strong>
+  <div class="row" id="real-dark"></div>
+</section>
+
+<section>
+  <strong>Grille de pixels (×10, sans lissage)</strong>
+  <div class="row" id="zoom"></div>
+</section>
+
+<section class="tab">
+  <strong>Simulation d'onglet Chrome</strong>
+  <div class="row">
+    <div class="tabbar"><img src="../assets/icons/favicon-16.png" width="16" height="16" alt="" /><span>Pose Parquet</span></div>
+    <div class="tabbar tabbar--dark"><img src="../assets/icons/favicon-16.png" width="16" height="16" alt="" /><span>Pose Parquet</span></div>
+  </div>
+</section>
+
+<section>
+  <strong>SVG (favicon vectoriel) et grandes tailles</strong>
+  <div class="row">
+    <figure><img src="../assets/icons/favicon.svg" width="16" height="16" alt="" /><figcaption>svg 16</figcaption></figure>
+    <figure><img src="../assets/icons/favicon.svg" width="32" height="32" alt="" /><figcaption>svg 32</figcaption></figure>
+    <figure><img src="../assets/icons/favicon.svg" width="64" height="64" alt="" /><figcaption>svg 64</figcaption></figure>
+    <figure><img src="../assets/icons/apple-touch-icon.png" width="90" height="90" alt="" /><figcaption>apple 180 → 90</figcaption></figure>
+    <figure><img src="../assets/icons/icon-512.png" width="120" height="120" alt="" /><figcaption>icon 512 → 120</figcaption></figure>
+    <figure><img src="../assets/icons/icon-512-dark.png" width="120" height="120" alt="" /><figcaption>512 sombre</figcaption></figure>
+    <figure><img src="../assets/icons/maskable-512.png" width="120" height="120" alt="" /><figcaption>maskable</figcaption></figure>
+    <figure><img src="../assets/icons/symbol.svg" height="120" alt="" style="color:#16181a" /><figcaption>symbole seul</figcaption></figure>
+  </div>
+</section>
+
+<script>
+  const sizes = [16, 24, 32, 48];
+  const build = (host, zoom) => {
+    host.innerHTML = sizes.map((s) => `
+      <figure>
+        <img class="${zoom ? 'zoom' : ''}" src="../assets/icons/favicon-${s}.png"
+             width="${s * (zoom ? 10 : 1)}" height="${s * (zoom ? 10 : 1)}" alt="" />
+        <figcaption>${s} px</figcaption>
+      </figure>`).join('');
+  };
+  build(document.getElementById('real-light'), false);
+  build(document.getElementById('real-dark'), false);
+  build(document.getElementById('zoom'), true);
+</script>
+</body>
+</html>

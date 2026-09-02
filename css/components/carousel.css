@@ -107,25 +107,32 @@
 .slide-card:hover .slide-card__link svg { transform: translateX(5px); }
 .slide-card__meta { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); }
 
-/* ---------- Slide galerie (très visuelle) ---------- */
+/* ---------- Slide galerie (très visuelle) ----------
+   Un seul gabarit : même largeur, même ratio, même alignement.
+
+   La version précédente combinait un décalage vertical un rang sur deux avec
+   trois ratios alternés tous les trois rangs. Deux rythmes premiers entre eux
+   se superposaient, et le résultat sur huit visuels ne se lisait pas comme une
+   intention mais comme une irrégularité : des cartes plus petites, plus
+   serrées, décalées sans logique apparente.
+
+   Un rail se lit calme quand il est régulier. La variété éditoriale a sa place,
+   mais sur la page Inspiration, où elle peut être structurée et respirer —
+   pas dans un défileur de huit vignettes. */
 .carousel--gallery .carousel__slide { width: clamp(15rem, 76vw, 20rem); }
 @media (min-width: 48rem) { .carousel--gallery .carousel__slide { width: clamp(19rem, 34vw, 24rem); } }
 @media (min-width: 75rem) { .carousel--gallery .carousel__slide { width: 25rem; } }
-.carousel--gallery .carousel__slide:nth-child(odd) { align-self: flex-start; }
-.carousel--gallery .carousel__slide:nth-child(even) { align-self: flex-end; }
 
 .shot {
   position: relative;
   display: block;
-  border-radius: var(--r-card);
+  border-radius: var(--r-md);
   overflow: hidden;
   background: var(--c-mineral);
   aspect-ratio: 4 / 5;
   text-decoration: none;
   color: #fff;
 }
-.carousel--gallery .carousel__slide:nth-child(3n) .shot { aspect-ratio: 1; }
-.carousel--gallery .carousel__slide:nth-child(3n + 2) .shot { aspect-ratio: 3 / 4; }
 .shot img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-4) var(--ease-out); }
 .shot:hover img { transform: scale(1.05); }
 .shot::after {
@@ -149,7 +156,7 @@
   text-transform: uppercase;
   color: rgba(255,255,255,0.8);
 }
-.shot__title { font-family: var(--font-display); font-size: 1.5rem; line-height: 1.05; letter-spacing: var(--tracking-display); }
+.shot__title { font-family: var(--font-display); font-size: 1.4rem; line-height: 1.05; letter-spacing: var(--tracking-display); }
 
 @media (prefers-reduced-motion: reduce) {
   .carousel__viewport { scroll-behavior: auto; }

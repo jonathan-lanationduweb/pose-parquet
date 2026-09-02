@@ -185,6 +185,14 @@ Le formulaire est un **composant indépendant** monté sur un conteneur neutre :
 - `components/project-form/project-form.css` : styles isolés sous `.project-form`.
 - `components/project-form/project-form.html` : bloc de montage à copier dans une page.
 
+> **État réel : le formulaire n'envoie rien.** Sans `endpoint` configuré, la
+> demande est conservée dans le `localStorage` du visiteur et personne ne la
+> reçoit. L'écran de fin le dit explicitement (« Mode démonstration — votre
+> demande n'a pas été envoyée »), et redevient un remerciement normal dès qu'un
+> point de réception existe. Ce qu'il reste à faire avant le lancement, y
+> compris la vérification des adresses email affichées :
+> [docs/formulaire-production.md](docs/formulaire-production.md).
+
 ### Brancher un backend
 
 `js/forms/submit-adapter.js` isole l'envoi. Sans `endpoint`, la demande est
@@ -298,6 +306,56 @@ navigateur — lecture par `URL.createObjectURL`, traitement en Canvas, aucun
 envoi réseau. Un service distant changerait cela : ce devra être un choix
 explicite, jamais le comportement par défaut.
 
+### Le matériau
+
+Un parquet n'est pas une teinte. `js/scene/material.js` en fait un objet complet :
+dimensions de lame, finition, rugosité et brillance déduites du libellé de
+finition, amplitude du relief — et **trois emplacements de cartes physiques**
+(`albedo`, `normal`, `roughness`).
+
+Ces cartes sont **vides aujourd'hui**, à dessein : nous n'avons pas de ressource
+photographique dont la licence autorise cet usage, et fabriquer de fausses
+normal maps n'apporterait rien. Les douze références sont donc **procédurales** —
+calculées, pas photographiées — et le relief est dérivé de la luminance de
+l'albedo : faux physiquement, mais visuellement juste sur du bois. Le modèle de
+données est prêt à recevoir de vraies cartes ; les formats attendus et les
+pièges sont dans [assets/materials/README.md](assets/materials/README.md).
+
+**Dimensions par motif.** Une largeur de lame unique pour les trois motifs n'a
+pas de sens : on ne pose pas un point de Hongrie avec des lames de 22 cm. Chaque
+référence déclare donc un profil par motif (`patternProfiles`) :
+
+```json
+"patternProfiles": {
+  "lames":            { "width": 0.18, "length": 1.8 },
+  "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
+  "baton-rompu":      { "width": 0.09, "length": 0.45 }
+}
+```
+
+**L'angle du point de Hongrie est un paramètre, pas une constante.** 45° est le
+plus répandu, mais 30° et 60° existent et changent nettement le rendu. Le moteur
+prend l'angle en entrée ; les contenus éditoriaux ne présentent plus 45° comme
+une règle.
+
+### L'interface
+
+Une seule règle de composition : **la pièce est le sujet.**
+
+- La photo n'est pas dans une carte : elle va au bord du cadre, sans rayon ni
+  marge décorative. Le pourtour est charbon — une photo d'intérieur se juge sur
+  fond sombre, et le blanc cassé du site lui vole sa clarté.
+- **Une action = un contexte.** Parquet, Motif et Orientation ne cohabitent
+  jamais empilés. Le panneau n'affiche qu'un contexte, et quand on le referme la
+  colonne passe à zéro : la pièce reprend toute la largeur.
+- Sur téléphone, une **feuille basse à trois niveaux** (32 / 58 / 86 svh) et un
+  rail horizontal de matières au niveau replié. La photo se recentre dans la
+  partie visible : on ne cache jamais la pièce.
+- Cibles tactiles à 44 px **sur pointeur grossier seulement** — les pilules
+  restent compactes à la souris.
+- En hauteur critique (paysage téléphone, zoom 200 %), l'application libère le
+  défilement au lieu d'écraser des contrôles jusqu'à les rendre inatteignables.
+
 ### Calibrer une pièce
 
 ```bash
@@ -326,13 +384,53 @@ flèches et glisser.
 
 ---
 
-## Icônes
+## Identité visuelle et icônes
 
-`node _generator/make-icons.js` produit `favicon-16/32/48.png`,
-`apple-touch-icon.png` (180) et `icon-192/512.png` (maskable) à partir du
-monogramme double chevron, via un rasteriseur maison (aucune dépendance).
-Les sources vectorielles sont `assets/icons/favicon.svg` et `maskable.svg` ;
-`site.webmanifest` référence l'ensemble en chemins relatifs.
+Le symbole de marque est le **Concept C** : trois lames verticales de largeurs
+inégales — 36, 36 et 19 unités — séparées par des joints et traversées par des
+ruptures diagonales décalées à deux hauteurs. Le rythme d'un parquet réduit à sa
+structure. Pas de lettre, pas de chevron, pas de maison, pas d'outil.
+
+Sa géométrie n'est pas redessinée à l'estime : elle est **relevée au pixel** sur
+la planche d'identité validée, et vit dans un seul endroit,
+`_generator/make-icons.js`. Ce fichier alimente à la fois les icônes et le SVG
+inséré dans l'interface : le symbole ne peut donc pas diverger d'un support à
+l'autre.
+
+```bash
+node _generator/make-icons.js
+```
+
+produit dans `assets/icons/` :
+
+| fichier | usage |
+| --- | --- |
+| `favicon.svg` | favicon vectoriel — fond crème, symbole charbon |
+| `favicon-16/24/32/48.png` | favicon matriciel, géométrie **accrochée à la grille de pixels** |
+| `apple-touch-icon.png` (180) | iOS |
+| `icon-192.png`, `icon-512.png` | manifeste web |
+| `maskable-512.png` | Android, fond plein, symbole dans la zone de sécurité |
+| `icon-512-dark.png` | variante dorée sur charbon, pour les surfaces sombres |
+| `symbol.svg` | symbole seul, sans fond |
+
+Deux décisions à connaître avant d'y toucher :
+
+- **Aspect optiquement corrigé aux petites tailles.** L'aspect réel du symbole
+  est 0,538 (nettement vertical). À 16 px cela donnerait un dessin large de 6 px
+  pour trois lames et deux joints : de la bouillie. On interpole donc vers un
+  aspect plus trapu en dessous de 72 px, sans jamais toucher au nombre de lames,
+  à leur inégalité ni aux ruptures.
+- **Pas de bascule en mode sombre pour le favicon.** Un carré crème se détache
+  aussi bien sur une barre d'onglets claire que sombre ; un symbole doré sur
+  charbon perd sa lisibilité à 16 px. La variante dorée existe, mais pour les
+  surfaces sombres de l'interface.
+
+Contrôle visuel : `node serve.js` puis
+`http://localhost:5180/_calibrage/icones.html` — tailles réelles sur fond clair
+et sombre, grille de pixels au ×10, simulation d'onglet Chrome.
+
+Le symbole apparaît **deux fois par page** : en-tête et pied de page. Jamais en
+motif décoratif répété — c'est sa rareté qui lui donne sa force.
 
 ---
 
@@ -364,6 +462,17 @@ Vidéo du hero : déposer `assets/videos/hero.mp4` puis renseigner l'attribut
 
 ---
 
+## Indexation : préproduction et production
+
+Les fichiers du dépôt décrivent **toujours la production** (canoniques en
+`pose-parquet.com`, `robots` en `index, follow`, sitemap complet). C'est le
+déploiement qui marque la préproduction `github.io` en `noindex, nofollow`,
+selon la présence d'un fichier `CNAME`. Aucun `noindex` n'existe donc dans le
+dépôt et aucun ne peut fuiter en production. Détail et procédure de mise en
+ligne : [docs/seo-environnements.md](docs/seo-environnements.md).
+
+---
+
 ## SEO
 
 - `title`, `meta description`, `canonical`, Open Graph et Twitter Card sur chaque page.
@@ -371,6 +480,21 @@ Vidéo du hero : déposer `assets/videos/hero.mp4` puis renseigner l'attribut
 - Fil d'Ariane visible et balisé.
 - `sitemap.xml` et `robots.txt` à la racine (domaine à ajuster avant mise en ligne).
 - Cluster « sens de pose » : guide pilier + guides satellites + simulateur, reliés entre eux.
+
+---
+
+## Notes d'ingénierie
+
+| document | sujet |
+| --- | --- |
+| [docs/renderer-canvas-vs-webgl.md](docs/renderer-canvas-vs-webgl.md) | pourquoi WebGL 2 écrit à la main, pourquoi pas Three.js, avec les mesures |
+| [docs/future-ai-api-contract.md](docs/future-ai-api-contract.md) | contrat de l'API d'analyse d'image — spécifié, non implémenté |
+| [docs/future-python-architecture.md](docs/future-python-architecture.md) | architecture Python prévue — aucune ligne écrite |
+| [docs/seo-environnements.md](docs/seo-environnements.md) | indexation préproduction / production |
+| [docs/formulaire-production.md](docs/formulaire-production.md) | état réel du formulaire, ce qu'il manque avant le lancement |
+| [docs/benchmark-ikea-home-design.md](docs/benchmark-ikea-home-design.md) | observation d'IKEA Home Design et écarts |
+| [docs/hebergement.md](docs/hebergement.md) | hébergement et DNS |
+| [assets/materials/README.md](assets/materials/README.md) | formats attendus pour de vraies cartes de matière |
 
 ---
 

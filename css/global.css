@@ -55,6 +55,24 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 .section { padding-block: var(--section-y); position: relative; }
 .section--flush-top { padding-top: 0; }
 .section--tight { padding-block: clamp(3rem, 1.5rem + 5vw, 6rem); }
+/**
+ * Trois poids de section, pas un seul.
+ *
+ * Toutes les sections avaient le même rythme vertical et le même en-tête : la
+ * page d'accueil donnait treize écrans de blocs premium, tous d'égale
+ * importance, et la hiérarchie éditoriale disparaissait.
+ *
+ *   signature   hero, Visualiseur, dossier plein cadre — pleine respiration
+ *   (défaut)    contenu : guides, inspiration
+ *   --compact   navigation éditoriale : tutoriels, outils, dossier
+ *
+ * « compact » ne veut pas dire serré : la page garde sa respiration. Cela veut
+ * dire que ces sections ne réclament pas la même attention qu'un dossier.
+ */
+.section--compact { padding-block: clamp(2.25rem, 1.25rem + 3vw, 3.75rem); }
+.section--compact .section-head { margin-bottom: clamp(1.25rem, 0.9rem + 1.4vw, 2rem); }
+.section--compact h2 { font-size: var(--fs-h3); }
+.section--compact .lead { font-size: var(--fs-base); }
 .section--alt { background: var(--bg-alt); }
 .section--mineral { background: var(--tint-mineral); }
 .section--sage { background: var(--tint-sage); }

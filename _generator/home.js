@@ -82,7 +82,7 @@ function heroSection() {
               <p class="hero__lead">Guides, techniques et outils pour comprendre et réussir votre projet parquet — du support au motif, du calepinage à la finition.</p>
               <div class="hero__actions">
                 <a class="btn btn--light btn--lg" href="guides/"><span>Explorer les guides</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
-                <a class="btn btn--outline-light btn--lg" href="outils/studio.html"><span>Visualiser ma pièce</span></a>
+                <a class="btn btn--outline-light btn--lg" href="outils/studio.html"><span>Visualiser mon parquet</span></a>
               </div>
             </div>
             <ul class="hero__meta">
@@ -148,7 +148,7 @@ function simulatorSection() {
             <div>
               <p class="lead">Importez une photo, choisissez un parquet et comparez plusieurs rendus. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée ni conservée.</p>
               <p class="u-mt-5 u-actions">
-                <a class="btn" href="outils/studio.html"><span>Visualiser ma pièce</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+                <a class="btn" href="outils/studio.html"><span>Visualiser mon parquet</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
                 <a class="link-arrow" href="outils/simulateur-pose.html">Étudier le sens de pose ${ICON.arrow}</a>
               </p>
             </div>
@@ -208,49 +208,61 @@ function carouselEditorial(guides) {
       </section>`;
 }
 
+/**
+ * Focus motif — composition éditoriale asymétrique.
+ *
+ * L'ancienne version posait un titre centré au milieu de la photo, puis une
+ * colonne de trois blocs alignée à droite : lisible, mais statique, et les
+ * textes tombaient en plein dans la zone la plus chargée de l'image.
+ *
+ * Ici, la photo occupe tout le cadre et le texte se range en bas : le titre à
+ * gauche, ancré, puis les trois points en une rangée séparée par un filet, à la
+ * manière d'un bas de page de dossier. Le regard entre par l'image, descend
+ * vers le titre, puis balaie les trois points. Rien ne flotte au centre.
+ */
 function immersiveSection() {
-  const steps = [
+  const notes = [
     {
-      num: '(01)',
+      num: '01',
       title: 'Une flèche continue',
-      text: 'Les lames coupées à 45° forment une pointe qui file vers le fond de la pièce et guide le regard.',
+      text: 'Les lames, coupées en biais à leurs extrémités, forment une pointe qui file vers le fond de la pièce et guide le regard.',
     },
     {
-      num: '(02)',
+      num: '02',
       title: 'Un axe sans pardon',
-      text: 'Tout se joue au traçage : un demi-degré d’écart devient visible sur toute la longueur du sol.',
+      text: 'Tout se joue au traçage : un écart minime en début de pose se cumule et finit par se voir sur toute la longueur.',
     },
     {
-      num: '(03)',
-      title: 'Des lames gauches et droites',
-      text: 'Elles se commandent ensemble, en quantités égales, avec 12 à 15 % de chutes prévues dès le premier lot.',
+      num: '03',
+      title: 'Lames gauches et droites',
+      text: 'Elles se commandent ensemble, en quantités égales, avec une marge de chutes plus large qu’une pose droite.',
     },
   ]
     .map(
-      (step, index) => `<div class="step-block" data-reveal data-reveal-delay="${index * 90}">
-                <span class="step-block__num">${step.num}</span>
-                <h3>${step.title}</h3>
-                <p>${step.text}</p>
-              </div>`
+      (note) => `<li class="dossier__note">
+                <span class="dossier__num">${note.num}</span>
+                <h3>${note.title}</h3>
+                <p>${note.text}</p>
+              </li>`
     )
     .join('\n              ');
 
-  return `      <section class="immersive" aria-labelledby="focus-title">
-        <div class="immersive__bg">
+  return `      <section class="dossier" aria-labelledby="focus-title">
+        <div class="dossier__bg">
           ${picture('immersive-hongrie', {
             alt: 'Lumière rasante sur un parquet posé en Point de Hongrie',
             sizes: '100vw',
           })}
         </div>
-        <div class="wrap-wide">
-          <div class="immersive__head" data-reveal>
+        <div class="wrap-wide dossier__inner">
+          <div class="dossier__head" data-reveal>
             <p class="eyebrow eyebrow--plain">Focus motif · 04</p>
-            <h2 id="focus-title">Le Point de Hongrie, une flèche au sol.</h2>
+            <h2 id="focus-title">Le Point de Hongrie,<br />une flèche au sol.</h2>
+            <a class="btn btn--light" href="motifs/point-de-hongrie.html"><span>Découvrir le motif</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
           </div>
-          <div class="immersive__steps immersive__steps--right">
-            ${steps}
-            <p data-reveal><a class="btn btn--light" href="motifs/point-de-hongrie.html"><span>Découvrir le motif</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a></p>
-          </div>
+          <ol class="dossier__notes" data-reveal data-reveal-delay="90">
+              ${notes}
+          </ol>
         </div>
       </section>`;
 }
@@ -306,7 +318,7 @@ function tutorialsSection(tutos) {
     )
     .join('\n            ');
 
-  return `      <section class="section" aria-labelledby="tuto-title">
+  return `      <section class="section section--compact" aria-labelledby="tuto-title">
         <div class="wrap-wide">
           <div class="section-head section-head__row section-head__row--tight">
             <div>
@@ -323,7 +335,7 @@ function tutorialsSection(tutos) {
 }
 
 function toolsSection() {
-  return `      <section class="section section--alt" aria-labelledby="outils-title">
+  return `      <section class="section section--alt section--compact" aria-labelledby="outils-title">
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
@@ -390,7 +402,7 @@ function clusterSection(guides) {
     )
     .join('\n            ');
 
-  return `      <section class="section section--flush-top" aria-labelledby="cluster-title">
+  return `      <section class="section section--flush-top section--compact" aria-labelledby="cluster-title">
         <div class="wrap-wide">
           <div class="section-head section-head__row section-head__row--tight">
             <div>
