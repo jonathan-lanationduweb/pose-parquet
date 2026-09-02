@@ -598,7 +598,7 @@ function buildInspiration() {
               <figcaption class="gallery__caption">
                 <span>${item.title}</span>
                 <span class="mono">${item.meta}</span>
-                <a class="gallery__try" href="../outils/visualiseur.html?${item.try}">Essayer ce style ${ICON.arrow}</a>
+                <a class="gallery__try" href="../outils/studio.html?${item.try}">Essayer ce style ${ICON.arrow}</a>
               </figcaption>
             </figure>`
   ).join('\n            ');

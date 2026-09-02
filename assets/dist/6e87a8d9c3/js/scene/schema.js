@@ -186,8 +186,20 @@ export function normalizeScene(raw) {
      */
     light: {
       kind: light.kind || 'photo-luma',
-      strength: num(light.strength, 0.95),
+      strength: num(light.strength, 0.85),
       blurRadius: num(light.blurRadius, 0.035),
+      // Lumière d'ambiance : la part de l'éclairement qui ne vient pas
+      // directement de la fenêtre mais du rebond sur les murs et le plafond.
+      //
+      // Sans elle, le gain appliqué au bois descend aussi bas que la photo,
+      // et un parquet foncé dans une zone peu éclairée s'effondre vers le
+      // noir : on ne lit plus un sol sombre, on lit un trou. Aucune pièce
+      // réelle ne se comporte comme ça — un sol foncé reçoit toujours de la
+      // lumière indirecte, et c'est elle qui le rattache à la pièce.
+      //
+      // Le gain devient `ambient + (1 - ambient) · gain` : les ombres se
+      // relèvent, les tons moyens et les hautes lumières ne bougent pas.
+      ambient: num(light.ambient, 0.22),
       // Part de la **couleur** de la lumière reportée sur le parquet, en plus
       // de son intensité. 0 : éclairement en niveaux de gris, le bois garde
       // une teinte neutre au milieu d'une pièce dorée — et ça se voit.
