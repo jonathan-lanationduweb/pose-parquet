@@ -13,6 +13,9 @@
  * nom commercial.
  */
 const { SITE, layout, appLayout, breadcrumb } = require('./layout');
+const { NB_PIECES_LETTRES } = require('./scenes');
+/** « cinq » devient « Cinq » : ce nombre ouvre une phrase. */
+const MAJ_PIECES = NB_PIECES_LETTRES.charAt(0).toUpperCase() + NB_PIECES_LETTRES.slice(1);
 const { faq, faqJsonLd, tip } = require('./ui');
 const { ICON } = require('./home');
 
@@ -67,7 +70,7 @@ function buildVisualiseurPage(write) {
     {
       num: '(01)',
       title: 'Choisissez une pièce',
-      text: 'Quatre pièces d’exemple calibrées à la main, sol déjà détouré — ou la photo de votre propre pièce.',
+      text: `${MAJ_PIECES} pièces d’exemple calibrées à la main, sol déjà détouré — ou la photo de votre propre pièce.`,
     },
     {
       num: '(02)',

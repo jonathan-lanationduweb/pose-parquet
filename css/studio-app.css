@@ -211,7 +211,19 @@ body.app {
   grid-template-columns: 1fr;
   gap: clamp(0.75rem, 1.5vw, 1.25rem);
 }
-@media (min-width: 40rem) {
+/**
+ * Deux cartes par ligne dès 24rem, et non 40rem.
+ *
+ * À une carte par ligne, six à huit pièces demandent deux à trois écrans de
+ * défilement pour être vues : l'écran de choix devient un couloir. À deux
+ * cartes, la vignette fait encore 169 px de large à 390 px de fenêtre — assez
+ * pour reconnaître une pièce — et tout le lot tient en un écran et demi.
+ *
+ * En dessous de 24rem (320 et 360 px), on reste à une colonne : deux vignettes
+ * de 130 px ne se distinguent plus l'une de l'autre, et l'écran de choix perd
+ * sa raison d'être.
+ */
+@media (min-width: 24rem) {
   .start__rooms { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (min-width: 64rem) {
@@ -257,6 +269,20 @@ body.app {
   color: rgba(255, 255, 255, 0.75);
 }
 .room-card:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+/**
+ * Carte a deux colonnes : le nom seul.
+ *
+ * Entre 24 et 40rem la carte fait 169 x 113 px. Le bandeau de titre, avec sa
+ * phrase secondaire et son compte de zones, mesurait 186 px : il debordait de
+ * 73 px et rognait le titre par le haut. Le nom suffit a choisir une piece a
+ * cette taille ; la phrase revient des qu il y a la place.
+ */
+@media (min-width: 24rem) and (max-width: 39.99rem) {
+  .room-card__quoi,
+  .room-card__zones { display: none; }
+  .room-card__label { padding: 1.6rem 0.7rem 0.55rem; font-size: 0.95rem; line-height: 1.15; }
+}
 
 /* ================================================================== */
 /* Plan de travail                                                    */
@@ -1088,20 +1114,51 @@ body.app {
   .studio__back span { font-size: 0.92rem; }
   .studio__project { display: none; }
 
+  /**
+   * Colonne : la pièce en haut, les commandes juste dessous.
+   *
+   * La scène occupait toute la hauteur du cadre et y centrait la photo. Une
+   * photo en 3/2 dans un écran en portrait ne peut pas remplir cette hauteur :
+   * mesuré à 390 × 844, le canvas faisait 260 px dans une scène de 796, soit
+   * **268 px de noir au-dessus et 268 px en dessous**. La barre d'actions, elle,
+   * flottait au bas de l'écran, séparée de la photo par tout ce vide.
+   *
+   * Le remède n'est pas d'agrandir la photo — son rapport est ce qu'il est, et
+   * le déformer ou la rogner serait pire. C'est de **ne plus étirer la scène** :
+   * en colonne flexible, `flex: 0 0 auto` lui donne exactement la hauteur de la
+   * photo, et les commandes reviennent en flux immédiatement dessous. Le vide
+   * ne disparaît pas par magie, il est reporté en bas, sous les commandes, là
+   * où la feuille du catalogue vient l'occuper.
+   */
   .studio__main,
-  .studio:not([data-panel="closed"]) .studio__main { grid-template-columns: minmax(0, 1fr); }
-  /* La feuille recouvre le bas de la scène : on centre la photo dans ce qui
-     reste réellement visible, pas dans toute la hauteur. Sans cela, la photo se
-     retrouve à moitié cachée derrière le catalogue alors qu'il y a de la place
-     au-dessus. */
-  .studio__stage {
-    grid-column: 1;
-    grid-row: 1;
-    padding-bottom: var(--sheet-h, 0px);
-    transition: padding-bottom var(--dur-2) var(--ease-out);
+  .studio:not([data-panel="closed"]) .studio__main {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    grid-template-columns: none;
   }
-  .studio[data-panel="closed"] .studio__stage { padding-bottom: 0; }
-  .stage__canvas { max-height: calc(100svh - var(--bar-h) - var(--sheet-h, 0px)); }
+  /* L'ordre à l'écran est imposé, pas hérité du DOM : dans le balisage la
+     feuille précède les commandes, et en colonne elle serait passée avant. */
+  .studio__stage { order: 1; }
+  .studio__actions { order: 2; }
+  .studio__panel { order: 3; }
+
+  .studio__stage {
+    flex: 0 0 auto;
+    padding-bottom: 0;
+  }
+  /* Les commandes ne flottent plus : elles suivent la photo. */
+  .studio__actions {
+    position: static;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    bottom: auto;
+    padding: 0.5rem 0.5rem calc(0.5rem + env(safe-area-inset-bottom));
+    background: #121415;
+  }
+  .stage__canvas { max-height: calc(100svh - var(--bar-h)); }
   .stage__room { top: 0.6rem; left: 0.6rem; font-size: 0.85rem; }
   .stage__status { bottom: 5rem; font-size: 0.88rem; }
 
@@ -1113,8 +1170,6 @@ body.app {
     max-width: none;
     justify-content: center;
     gap: 0.3rem 0.4rem;
-    bottom: calc(var(--sheet-h, 0px) + 0.6rem + env(safe-area-inset-bottom));
-    transition: bottom var(--dur-2) var(--ease-out);
   }
   /* Deux rangées, pas trois : les contextes en pleine largeur, puis les
      commandes. Une barre de trois rangées mangeait un tiers de la photo. */
@@ -1124,12 +1179,24 @@ body.app {
      est déjà porté par le bouton « Comparer (3) », et sur 390 px chaque
      commande doit gagner sa place. */
   .actions__variants { display: none; }
-  /* Les icônes suffisent pour les trois actions de droite, sauf la principale :
-     « Enregistrer » sans mot n'est pas devinable, et une disquette encore
-     moins. Aucun libellé ne descend sous une taille lisible. */
-  .action span { display: none; }
-  .action { padding: 0 0.75rem; }
-  .action--primary span { display: inline; }
+  /**
+   * Les libellés reviennent.
+   *
+   * Ils étaient masqués parce que la barre flottait au-dessus de la photo et
+   * que chaque pixel lui était pris. Maintenant qu'elle est en flux sous la
+   * pièce, la contrainte a disparu — et trois icônes muettes ne sont pas
+   * devinables : une glissière, un empilement de calques et une disquette ne
+   * disent ni « avant / après », ni « comparer », ni « enregistrer ».
+   *
+   * La barre passe volontiers sur deux rangées : mieux vaut deux rangées
+   * comprises qu'une rangée d'énigmes.
+   */
+  .action span { display: inline; }
+  .action { padding: 0 0.7rem; gap: 0.35rem; }
+  /* `display: contents` : les trois actions deviennent des enfants directs de
+     la barre et s'enroulent donc avec le bouton « + », au lieu de le laisser
+     seul sur une rangée. Trois rangées de commandes tombent à deux. */
+  .actions__buttons { display: contents; }
 
   .studio__panel {
     position: fixed;
@@ -1150,6 +1217,29 @@ body.app {
   .studio[data-sheet="peek"] { --sheet-h: 32svh; }
   .studio[data-sheet="half"] { --sheet-h: 58svh; }
   .studio[data-sheet="full"] { --sheet-h: 86svh; }
+
+  /**
+   * Au niveau « peek », la feuille n'est pas flottante : elle occupe ce qui
+   * reste.
+   *
+   * Remonter la photo en haut du cadre a déplacé le vide, pas supprimé : il
+   * restait 154 px de noir entre les commandes et le catalogue, parce que la
+   * feuille se dimensionnait sur 32svh au lieu de la place disponible. En flux,
+   * troisième élément de la colonne, elle prend exactement le reste — et
+   * l'ordre à l'écran devient celui qu'on veut lire : pièce, commandes,
+   * catalogue.
+   *
+   * Aux niveaux « half » et « full », elle redevient flottante et recouvre la
+   * photo : c'est un geste demandé, pas un état par défaut.
+   */
+  .studio[data-sheet="peek"]:not([data-panel="closed"]) .studio__panel {
+    position: relative;
+    inset: auto;
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    box-shadow: none;
+  }
 
   /* Poignée : elle fait défiler les trois niveaux, et c'est une vraie cible. */
   .panel__grab {
@@ -1189,7 +1279,15 @@ body.app {
     overscroll-behavior-x: contain;
     padding-bottom: 0.25rem;
   }
-  .studio[data-sheet="peek"] .cat__card { scroll-snap-align: start; }
+  /* La carte ne s'étire plus : `grid-template-rows: 1fr auto` faisait grandir
+     la rangée de l'échantillon jusqu'à la hauteur du rail, alors que son
+     rapport 4/5 en plafonne l'image — d'où plus de cent pixels de vide entre
+     la matière et son nom. */
+  .studio[data-sheet="peek"] .cat__card {
+    scroll-snap-align: start;
+    grid-template-rows: auto auto;
+    align-content: start;
+  }
   .studio[data-sheet="peek"] .cat__label { min-height: 0; }
   .studio[data-sheet="peek"] .cat__empty { display: none; }
   .studio[data-sheet="peek"] .tile-grid { grid-auto-flow: column; grid-auto-columns: 9rem; overflow-x: auto; }
@@ -1227,12 +1325,25 @@ body.app {
   body.app { height: auto; min-height: 100svh; overflow: auto; }
   .studio { height: auto; min-height: 100svh; }
   .studio__main { grid-template-rows: auto; }
-  .studio__stage { min-height: 56svh; }
+  /**
+   * La scène ne s'étire pas sur la rangée, et le catalogue ne l'étire pas.
+   *
+   * Mesuré à 844 × 390 : le panneau devenu statique rendait tout le catalogue
+   * en flux, la rangée montait à 3082 px, et la photo — toujours centrée dans
+   * sa case — se retrouvait à y = 1400. Il fallait défiler un écran et demi
+   * pour voir la pièce qu'on est venu regarder. C'est le même défaut que le
+   * vide noir du téléphone, dans l'autre branche de la feuille.
+   */
+  .studio__stage { min-height: 56svh; align-self: start; align-content: start; }
   .stage__canvas { max-height: 56svh; }
   .studio__panel {
     position: static;
     height: auto;
-    max-height: none;
+    /* Le catalogue défile chez lui : sans plafond il commande la hauteur de
+       toute la page. */
+    max-height: 100svh;
+    overflow: auto;
+    align-self: start;
     border-radius: 0;
     box-shadow: none;
   }

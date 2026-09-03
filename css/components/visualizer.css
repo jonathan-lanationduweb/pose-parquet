@@ -168,10 +168,58 @@
   .visualizer__dims { gap: 0.75rem; }
   .visualizer__num input { min-height: 44px; }
   .seg { gap: 0.4rem; }
-  .seg button { min-height: 40px; padding-inline: 0.9rem; }
+  /* 44 et non 40 : c'est la cible de référence, et rien ici ne justifiait une
+     exception — la contrainte de largeur est réglée par la grille. */
+  .seg button { min-height: 44px; padding-inline: 0.75rem; }
+  .visualizer__actions .btn { min-height: 44px; }
   .visualizer__group > legend,
   .visualizer__group-title { font-size: 0.82rem; }
   /* La scène du plan est un SVG : sans cela, un glissement vertical dessus
      pouvait être capté au lieu de faire défiler la page. */
   .visualizer__canvas { touch-action: pan-y; }
+}
+
+/**
+ * Densité des contrôles sur téléphone, à cibles tactiles constantes.
+ *
+ * Les réglages mesuraient 1544 px de haut à 390 px : cinq motifs empilés un par
+ * rangée en occupaient 300, et chaque groupe de pastilles 129 parce que la
+ * cinquième — « Aucune » — passait seule à la ligne en laissant un vide.
+ * Beaucoup de défilement pour peu de réglages.
+ *
+ * Deux changements, aucun sur la taille des cibles, qui restent à 44 px :
+ *
+ *   - les motifs passent en deux colonnes, soit trois rangées au lieu de cinq ;
+ *   - les pastilles deviennent une grille qui accueille les cinq de front là où
+ *     la place existe, et se replie proprement en dessous — plutôt qu'un
+ *     `flex-wrap` qui laisse une orpheline centrée.
+ */
+@media (max-width: 47.99rem) {
+  .pattern-switch { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Le motif actif garde toute la largeur : c'est l'état, il se lit d'abord. */
+  .pattern-switch button[aria-pressed="true"] { grid-column: 1 / -1; }
+  /* 4,6rem et non 3,4 : à cinq colonnes sur 390 px, une cellule tombe à 58 px
+     et « Gauche » comme « Aucune » débordent. Quatre de front puis un repli
+     propre valent mieux qu'une rangée de mots rognés. */
+  .seg {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(4.6rem, 1fr));
+    border-radius: var(--r-md);
+  }
+  .seg button { width: 100%; white-space: nowrap; }
+}
+
+/**
+ * Actions finales : en colonne quand deux boutons ne tiennent plus côte à côte.
+ *
+ * « Réinitialiser » et « Utiliser dans mon projet » font ensemble plus de
+ * 300 px de libellé : sur 320 px ils se serrent jusqu'à l'illisible ou
+ * s'enroulent en laissant le principal en second. En colonne, l'ordre visuel
+ * est renversé pour que le CTA domine — il passe au-dessus, pleine largeur, et
+ * « Réinitialiser » reste dessous, secondaire comme il doit l'être.
+ */
+@media (max-width: 26rem) {
+  .visualizer__actions { flex-direction: column; align-items: stretch; }
+  .visualizer__actions .btn { width: 100%; }
+  .visualizer__actions .btn--ghost { order: 2; }
 }

@@ -11,6 +11,7 @@ const { PHOTOS, INSPIRATION_PHOTOS } = require('./photos');
 const { buildHomeBody } = require('./home');
 const { buildVisualiseurPage } = require('./visualiseur');
 const { resolveSources } = require('./sources');
+const { NB_PIECES } = require('./scenes');
 const { buildAssets } = require('./assets');
 const { picture } = require('./responsive');
 
@@ -989,7 +990,7 @@ function buildApropos() {
               <div class="figures">
                 <div class="figure-item"><strong>${GUIDES.length + MOTIFS.length + TUTOS.length}</strong><span>contenus publiés</span></div>
                 <div class="figure-item"><strong>5</strong><span>motifs simulés</span></div>
-                <div class="figure-item"><strong>4</strong><span>pièces d’exemple</span></div>
+                <div class="figure-item"><strong>${NB_PIECES}</strong><span>pièces d’exemple</span></div>
               </div>
             </div>
           </div>
