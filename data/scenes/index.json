@@ -1,6 +1,6 @@
 {
   "schema": "pose-parquet/scene-index@1",
-  "note": "Pièces d'exemple du Visualiseur Parquet. Chaque scène est calibrée à la main : zones de sol, plans de perspective, trous et occlusions. Aucune analyse d'image n'intervient. Quatre pièces soignées valent mieux que douze approximatives ; l'outil de calibrage est dans _calibrage/.",
+  "note": "Pièces d'exemple du Visualiseur Parquet. Chaque scène est calibrée à la main : zones de sol, plans de perspective, trous et occlusions. Aucune analyse d'image n'intervient. L'outil de calibrage est dans _calibrage/ — calibrage.html au clic, calibrer.html en script. `status` décide de ce qui est proposé aux visiteurs : seules les scènes `validated` apparaissent, et le défaut, en cas d'oubli, est `experimental`. Une scène difficile se garde : elle montre où le moteur plie.",
   "scenes": [
     {
       "id": "sejour",
@@ -8,6 +8,7 @@
       "file": "room-sejour.jpg",
       "thumb": "room-sejour-640.jpg",
       "zones": 2,
+      "status": "validated",
       "highlight": "Deux pièces en enfilade, un seul parquet"
     },
     {
@@ -16,6 +17,7 @@
       "file": "room-piece-claire.jpg",
       "thumb": "room-piece-claire-640.jpg",
       "zones": 1,
+      "status": "validated",
       "highlight": "Meuble et radiateur devant le sol"
     },
     {
@@ -24,7 +26,17 @@
       "file": "room-chambre.jpg",
       "thumb": "room-chambre-640.jpg",
       "zones": 1,
+      "status": "validated",
       "highlight": "Lumière franche, perspective profonde"
+    },
+    {
+      "id": "appartement-ancien",
+      "label": "Appartement ancien",
+      "file": "room-appartement-ancien.jpg",
+      "thumb": "room-appartement-ancien-640.jpg",
+      "zones": 1,
+      "status": "experimental",
+      "highlight": "Couloir profond ; occultations a reprendre"
     },
     {
       "id": "contraste",
@@ -32,7 +44,17 @@
       "file": "room-contraste.jpg",
       "thumb": "room-contraste-640.jpg",
       "zones": 1,
+      "status": "validated",
       "highlight": "Ombre découpée reportée sur le parquet"
+    },
+    {
+      "id": "couloir",
+      "label": "Couloir",
+      "file": "room-couloir.jpg",
+      "thumb": "room-couloir-640.jpg",
+      "zones": 1,
+      "status": "experimental",
+      "highlight": "Distorsion en barillet : le modèle sténopé n'y suffit pas"
     }
   ]
 }

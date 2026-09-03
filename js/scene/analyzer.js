@@ -68,6 +68,39 @@ export async function loadSceneIndex(base = '') {
   return cache.get('__index__');
 }
 
+/**
+ * Statut d'une pièce d'exemple.
+ *
+ *   validated     calibrée, relue, proposée aux visiteurs ;
+ *   experimental  gardée pour le contrôle qualité, pas proposée ;
+ *   disabled      conservée dans le dépôt mais hors service.
+ *
+ * Une scène difficile a de la valeur : elle montre où le moteur plie. La
+ * supprimer pour faire propre, c'est perdre le seul cas qui apprenait quelque
+ * chose. Le statut permet de la garder sans l'imposer à un visiteur.
+ *
+ * **Le défaut est `experimental`, pas `validated`.** Une scène dont le statut
+ * a été oublié n'apparaît donc pas publiquement : l'oubli fait rater une
+ * scène, il ne publie pas un rendu que personne n'a regardé.
+ */
+export const STATUTS = ['validated', 'experimental', 'disabled'];
+export const statutDe = (entry) =>
+  (STATUTS.includes(entry && entry.status) ? entry.status : 'experimental');
+
+/** Les pièces proposées au visiteur : les validées, dans l'ordre du manifeste. */
+export const scenesPubliques = (index) =>
+  (index && Array.isArray(index.scenes) ? index.scenes : []).filter((e) => statutDe(e) === 'validated');
+
+/**
+ * Les pièces qu'on accepte d'ouvrir sur demande explicite (lien direct).
+ * Une scène expérimentale reste atteignable pour la relecture ; une scène
+ * `disabled` ne s'ouvre pas.
+ */
+export const sceneOuvrable = (index, id) => {
+  const entry = (index && Array.isArray(index.scenes) ? index.scenes : []).find((e) => e.id === id);
+  return entry && statutDe(entry) !== 'disabled' ? entry : null;
+};
+
 registerAnalyzer('precalibrated', async ({ sceneId, base = '' }) => {
   const key = `${base}|${sceneId}`;
   if (!cache.has(key)) {

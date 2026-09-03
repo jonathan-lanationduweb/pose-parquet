@@ -21,7 +21,7 @@
  * calculé localement, aucun envoi vers un serveur.
  */
 import { qs, on } from '../utils/dom.js';
-import { analyzeScene, loadSceneIndex } from '../scene/analyzer.js';
+import { analyzeScene, loadSceneIndex, scenesPubliques, sceneOuvrable } from '../scene/analyzer.js';
 import { loadImage, loadFile } from '../scene/image-loader.js';
 import { createFloorEditor } from '../scene/editor.js';
 import { composeRender, downloadCanvas } from '../scene/export.js';
@@ -183,6 +183,14 @@ export async function mountStudio(root) {
   const renderer = createSceneRenderer();
   const catalog = await loadCatalog(base);
   const sceneIndex = await loadSceneIndex(base);
+  /**
+   * La bibliothèque proposée au visiteur : les scènes `validated` seulement.
+   *
+   * Une scène expérimentale reste dans le dépôt et reste ouvrable par lien
+   * direct — c'est ce qui permet de garder une pièce difficile pour la
+   * relecture sans l'imposer à quelqu'un qui découvre l'outil.
+   */
+  const bibliotheque = scenesPubliques(sceneIndex);
 
   let config = {
     materialId: catalog.parquets[0].id,
@@ -294,19 +302,26 @@ export async function mountStudio(root) {
 
   /* ---------------- Écran de départ ---------------- */
 
-  sceneIndex.scenes.forEach((entry) => {
+  bibliotheque.forEach((entry) => {
     const card = document.createElement('button');
     card.type = 'button';
     card.className = 'room-card';
     card.dataset.room = entry.id;
     const stem = entry.file.replace(/\.jpg$/, '');
+    /**
+     * Une carte porte un nom simple et une phrase qui dit ce que la pièce
+     * met à l'épreuve. `highlight` existait déjà dans le manifeste et ne
+     * s'affichait nulle part : c'est pourtant la seule information qui aide
+     * à choisir entre cinq pièces qui se ressemblent en vignette.
+     */
     const zones = entry.zones > 1 ? `<span class="room-card__zones">${entry.zones} sols visibles</span>` : '';
+    const quoi = entry.highlight ? `<span class="room-card__quoi">${entry.highlight}</span>` : '';
     card.innerHTML = `
       <picture>
         <source type="image/webp" srcset="${base}assets/images/${stem}-640.webp" />
         <img src="${base}assets/images/${stem}-640.jpg" alt="${entry.label}" decoding="async" width="640" height="427" />
       </picture>
-      <span class="room-card__label">${entry.label}${zones}</span>`;
+      <span class="room-card__label">${entry.label}${quoi}${zones}</span>`;
     card.addEventListener('click', () => openRoom(entry.id));
     roomsHost.appendChild(card);
   });
@@ -357,7 +372,7 @@ export async function mountStudio(root) {
   }
 
   async function openRoom(id) {
-    const entry = sceneIndex.scenes.find((item) => item.id === id) || sceneIndex.scenes[0];
+    const entry = sceneOuvrable(sceneIndex, id) || bibliotheque[0];
     setStatus('Chargement…');
     try {
       const scene = await analyzeScene({ sceneId: entry.id, base });
@@ -1104,8 +1119,10 @@ export async function mountStudio(root) {
   syncVariants();
 
   const requested = params.get('piece');
-  if (requested && sceneIndex.scenes.some((entry) => entry.id === requested)) openRoom(requested);
-  else if (params.get('demarrer') === '1') openRoom(sceneIndex.scenes[0].id);
+  // Un lien direct ouvre aussi une scène expérimentale : c'est ce qui permet de
+  // la relire sans la proposer. Une scène `disabled` ne s'ouvre pas.
+  if (requested && sceneOuvrable(sceneIndex, requested)) openRoom(requested);
+  else if (params.get('demarrer') === '1') openRoom(bibliotheque[0].id);
 
   on(window, 'resize', () => {
     if (renderer.ready) schedule();
