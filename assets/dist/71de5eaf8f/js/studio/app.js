@@ -408,11 +408,33 @@ export async function mountStudio(root) {
     const item = material();
     if (!item) return;
     const swatch = swatchFor(item);
+    const fiche = item.product || {};
+    const dims = fiche.dimensions || {};
+
+    // Dimensions en millimètres, comme sur une fiche technique. Arrondies au
+    // centimètre, elles effaçaient la différence entre un 92 et un 90 — or
+    // c'est exactement ce que le visualiseur doit rendre visible.
+    const cotes = dims.widthMm
+      ? `${dims.widthMm} × ${dims.lengthMm || '?'} mm`
+      : `lames ${Math.round(item.plank.width * 1000)} mm`;
+    const surface = [fiche.finish, fiche.surfaceTreatment].filter(Boolean).join(' · ') || item.finish;
+
+    // Lien vers la fiche du fabricant : **seulement** pour une vraie référence.
+    // Une matière de démonstration n'a pas de fiche, et prétendre le contraire
+    // renverrait vers un produit qui n'est pas celui affiché.
+    const lien =
+      fiche.source === 'premibel' && fiche.productUrl
+        ? `<a class="selected__ref" href="${fiche.productUrl}" target="_blank" rel="noopener">Voir la référence${
+            fiche.sku ? ` <span>${fiche.sku}</span>` : ''
+          }</a>`
+        : '';
+
     selectedHost.innerHTML = `
       <span class="selected__swatch"></span>
       <span class="selected__text">
         <strong>${item.name}</strong>
-        <span>${item.finish} · lames ${Math.round(item.plank.width * 100)} cm</span>
+        <span>${surface} · ${cotes}</span>
+        ${lien}
       </span>`;
     const slot = selectedHost.querySelector('.selected__swatch');
     const mini = document.createElement('canvas');
