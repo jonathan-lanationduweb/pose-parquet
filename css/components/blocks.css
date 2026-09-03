@@ -129,15 +129,66 @@
 @media (min-width: 62rem) {
   .dossier__notes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-/* Sur petit écran les textes passent sur une photo chargée : voile local. */
+/**
+ * Sur téléphone, la photo redevient une photo.
+ *
+ * La version précédente posait les trois points sur l'image dans un seul
+ * panneau sombre voilé. Mesuré à 390 px : 429 px de panneau pour 810 px de
+ * section, soit 53 % — le parquet, qui est le sujet, passait sous un rectangle
+ * gris sur plus de la moitié de la hauteur. Une section « focus motif » qui
+ * cache le motif ne remplit pas son office.
+ *
+ * La composition mobile est donc franchement différente, pas rétrécie : une
+ * bande photographique nette porte l'accroche et le bouton, puis les trois
+ * points descendent sur le fond de la page, en liste éditoriale séparée par
+ * des filets — numéro discret en marge, titre, texte court. Pas de cartes :
+ * cette section est un bas de page de dossier, pas un tableau de bord.
+ */
 @media (max-width: 61.99rem) {
-  .dossier__notes {
-    padding: clamp(1rem, 0.8rem + 1vw, 1.5rem);
-    border-top: 0;
-    border-radius: var(--r-md);
-    background: rgba(12, 14, 15, 0.46);
-    backdrop-filter: blur(3px);
+  .dossier {
+    --bande: min(62svh, 500px);
+    min-height: 0;
+    align-content: start;
+    padding-block: 0 clamp(1.5rem, 1rem + 3vw, 2.5rem);
+    color: var(--text);
   }
+  /* Pas de `background` sur la section : elle porte `isolation: isolate` et la
+     photo vit en `z-index: -2`, donc sous le fond de son propre élément. Lui
+     donner un fond la masquerait. Sous la bande, le fond de la page suffit. */
+  /* L'image et son voile s'arrêtent au bas de la bande, pas au bas de la
+     section : c'est ce qui libère le fond de page pour les trois points. */
+  .dossier__bg,
+  .dossier::after { bottom: auto; height: var(--bande); }
+  .dossier::after {
+    background: linear-gradient(to bottom, rgba(12, 14, 15, 0.3) 0%, rgba(12, 14, 15, 0.1) 40%, rgba(12, 14, 15, 0.82) 100%);
+  }
+  .dossier__inner { gap: 0; }
+  .dossier__head {
+    min-height: var(--bande);
+    align-content: end;
+    max-width: none;
+    padding-block: calc(var(--header-h) + 1rem) clamp(1.4rem, 4vw, 2.2rem);
+  }
+  .dossier__notes {
+    padding: 0;
+    gap: 0;
+    border-top: 0;
+    color: var(--text);
+  }
+  /* Même composition que `.list-row` : numéro discret, titre, texte, tout au
+     même bord gauche. Deux listes éditoriales sur la même page ne doivent pas
+     s'indenter différemment — mesuré, l'une commençait à 20 px et l'autre à
+     65. */
+  .dossier__note {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.1rem;
+    padding-block: clamp(0.9rem, 0.6rem + 1.6vw, 1.4rem);
+    border-bottom: 1px solid var(--line);
+  }
+  .dossier__note:first-child { border-top: 1px solid var(--line); }
+  .dossier__num { color: var(--text-muted); }
+  .dossier__note h3 { color: var(--text); font-size: 1.08rem; line-height: 1.2; }
+  .dossier__note p { color: var(--text-soft); max-width: none; font-size: 0.94rem; margin-top: 0.25rem; }
 }
 
 /* ---------- Alternance texte / image ---------- */
@@ -238,25 +289,58 @@
 }
 
 /* ---------- Liste éditoriale (tutoriels, clusters) ---------- */
+
+/**
+ * Une seule colonne sur téléphone, quatre à partir de 55rem.
+ *
+ * La version précédente n'avait pas de composition mobile : elle gardait une
+ * grille `3.2rem minmax(0, 1fr)` et laissait les quatre enfants se placer
+ * automatiquement. Le numéro et le titre remplissaient la première ligne, puis
+ * **le résumé retombait en deuxième ligne, première colonne** — soit une
+ * colonne de 51 px. Mesuré à 390 px : un résumé de 51 px de large pour 390 px
+ * de haut, coupé en plein mot (« référen / ce »). La section entière faisait
+ * 1436 px pour trois entrées, ce qui repoussait le pied de page très loin.
+ *
+ * Ce n'était donc ni une affaire de taille de police ni une affaire de césure :
+ * c'était une grille desktop restée active, et un placement automatique qui
+ * envoyait le texte le plus long dans la colonne la plus étroite.
+ *
+ * Sur téléphone la composition suit l'ordre de lecture — numéro discret,
+ * titre, méta, résumé pleine largeur — et l'ordre du DOM a été aligné dessus,
+ * ce qui sert aussi la lecture d'écran. Sur grand écran chaque enfant reçoit sa
+ * colonne **explicitement** : c'est ce qui permet de garder la disposition
+ * d'origine (numéro | titre | résumé | méta) malgré le nouvel ordre du DOM.
+ */
 .list-rows { display: grid; border-top: 1px solid var(--line); }
 .list-row {
   display: grid;
-  gap: 0.4rem var(--sp-5);
-  grid-template-columns: 3.2rem minmax(0, 1fr);
-  align-items: baseline;
-  padding: clamp(1.2rem, 0.8rem + 1.4vw, 2rem) 0;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.3rem;
+  padding: clamp(1.1rem, 0.8rem + 1vw, 2rem) 0;
   border-bottom: 1px solid var(--line);
   text-decoration: none;
   transition: padding-left var(--dur-3) var(--ease-out), background var(--dur-3) var(--ease-out);
 }
+.list-row__num { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); }
+.list-row__title { font-family: var(--font-display); font-size: clamp(1.35rem, 1.1rem + 1.2vw, 2rem); line-height: 1.08; letter-spacing: var(--tracking-display); }
+.list-row__meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); }
+/* Le résumé respire un peu plus que la méta, qui appartient encore au titre. */
+.list-row__text { color: var(--text-soft); font-size: 0.94rem; margin: 0.35rem 0 0; }
+
 @media (min-width: 55rem) {
-  .list-row { grid-template-columns: 3.5rem minmax(0, 1.1fr) minmax(0, 1fr) auto; align-items: center; }
+  .list-row {
+    grid-template-columns: 3.5rem minmax(0, 1.1fr) minmax(0, 1fr) auto;
+    gap: 0.4rem var(--sp-5);
+    align-items: center;
+  }
+  /* La ligne est imposée aux quatre : sans elle, placer la méta en colonne 4
+     avant le résumé en colonne 3 renverrait ce dernier à la ligne suivante. */
+  .list-row__num   { grid-area: 1 / 1; }
+  .list-row__title { grid-area: 1 / 2; }
+  .list-row__text  { grid-area: 1 / 3; margin-top: 0; }
+  .list-row__meta  { grid-area: 1 / 4; white-space: nowrap; }
 }
 .list-row:hover { padding-left: 0.9rem; }
-.list-row__num { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); }
-.list-row__title { font-family: var(--font-display); font-size: clamp(1.35rem, 1.1rem + 1.2vw, 2rem); line-height: 1.05; letter-spacing: var(--tracking-display); }
-.list-row__text { color: var(--text-soft); font-size: 0.94rem; margin: 0; }
-.list-row__meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); white-space: nowrap; }
 .list-row svg { width: 1.1rem; height: 1.1rem; transition: transform var(--dur-2) var(--ease-out); }
 .list-row:hover svg { transform: translateX(5px); }
 

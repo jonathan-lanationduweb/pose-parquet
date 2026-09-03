@@ -11,8 +11,23 @@
 .prose h3 { margin-top: var(--sp-6); scroll-margin-top: calc(var(--header-h) + 2rem); }
 .prose p { color: var(--text-soft); }
 .prose strong { color: var(--text); font-weight: 600; }
-.prose a { color: var(--text); text-decoration: underline; text-decoration-color: var(--accent); }
-.prose a:hover { color: var(--accent); }
+/**
+ * Le style de lien de l'article ne s'applique qu'aux liens **du corps de
+ * texte**, c'est-à-dire à ceux qui ne portent pas de classe.
+ *
+ * Sans le `:not([class])`, `.prose a` (spécificité 0,1,1) écrasait le `color`
+ * de `.btn` (0,1,0) : tout bouton placé dans un article recevait le texte
+ * sombre de l'article sur le fond sombre du bouton. Mesuré sur le bloc
+ * « Passer à la pratique » : `color` et `background-color` valaient tous deux
+ * rgb(22, 24, 26). Le libellé était bien dans le DOM — il était noir sur noir.
+ *
+ * Un composant porte son propre contrat de couleurs ; un style de contexte ne
+ * doit pas passer par-dessus. C'est la même faute que le survol qui masquait
+ * les libellés, corrigée dans button.css : là aussi, le texte disparaissait
+ * sans qu'aucune règle ne le dise.
+ */
+.prose a:not([class]) { color: var(--text); text-decoration: underline; text-decoration-color: var(--accent); }
+.prose a:not([class]):hover { color: var(--accent); }
 .prose ul, .prose ol { padding-left: 1.2rem; color: var(--text-soft); display: grid; gap: 0.5rem; }
 .prose ul { list-style: none; padding-left: 0; }
 .prose ul li { position: relative; padding-left: 1.35rem; }

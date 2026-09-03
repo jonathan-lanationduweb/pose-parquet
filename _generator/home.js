@@ -1,6 +1,7 @@
 /* Nouvelle page d'accueil — composition éditoriale plein cadre. */
 const { SITE } = require('./layout');
 const { picture } = require('./responsive');
+const { NB_PIECES } = require('./scenes');
 
 const ICON = {
   arrow:
@@ -101,7 +102,7 @@ function heroSection() {
             <ul class="hero__meta">
               <li><b>5</b> motifs simulés</li>
               <li><b>8</b> guides pratiques</li>
-              <li><b>4</b> pièces d’exemple</li>
+              <li><b>${NB_PIECES}</b> pièces d’exemple</li>
             </ul>
           </div>
         </div>
@@ -329,8 +330,8 @@ function tutorialsSection(tutos) {
       (tuto, index) => `<a class="list-row" href="tutoriels/${tuto.slug}.html">
               <span class="list-row__num">(0${index + 1})</span>
               <span class="list-row__title">${tuto.h1}</span>
-              <p class="list-row__text">${tuto.excerpt}</p>
               <span class="list-row__meta">${tuto.level} · ${tuto.duration}</span>
+              <p class="list-row__text">${tuto.excerpt}</p>
             </a>`
     )
     .join('\n            ');
@@ -413,8 +414,8 @@ function clusterSection(guides) {
       (guide, index) => `<a class="list-row" href="guides/${guide.slug}.html">
               <span class="list-row__num">(0${index + 1})</span>
               <span class="list-row__title">${guide.h1}</span>
-              <p class="list-row__text">${guide.excerpt}</p>
               <span class="list-row__meta">${guide.reading}</span>
+              <p class="list-row__text">${guide.excerpt}</p>
             </a>`
     )
     .join('\n            ');
