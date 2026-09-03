@@ -2,9 +2,9 @@
   "schema": "pose-parquet/scene@1",
   "id": "appartement-ancien",
   "label": "Appartement ancien",
-  "status": "experimental",
+  "status": "validated",
   "source": "precalibrated",
-  "note": "Couloir d'appartement ancien, vue dans l'axe. Géométrie mesurée, échelle déclarée — et la distinction compte.\n\nMESURÉ. Les deux plinthes ont été ajustées sur le contour affiné (12 et 14 points, résidu max 8,9 et 7,1 px) ; elles se croisent en (0,4908 ; 0,5454), qui est donc le point de fuite de l'axe du couloir, et l'horizon passe par lui. La direction transversale est prise horizontale : dans une vue axiale sa fuite part à l'infini et n'est pas mesurable.\n\nPREUVE. La direction des joints du parquet, relevée par tenseur de structure en 12 points du sol (66 intersections deux à deux), fuit vers (0,5058 ; 0,5513). Les angles balaient 134,6 degrés à gauche jusqu'à 53,3 degrés à droite : la convergence est réelle, pas un artefact. Cette mesure ne partage rien avec la précédente — l'architecture d'un côté, la texture du sol de l'autre — et elle tombe à 24 px en x et 6 px en y de la fuite des plinthes. C'est ce qui établit que les lames de ce sol suivent bien l'axe du couloir et que la fuite est au bon endroit.\n\nCe qui NE serait PAS une preuve, et qu'il ne faut pas y lire : le quatrième coin du quadrilatère tombe sur la plinthe droite, mais c'est une tautologie. Il est construit comme l'intersection de (bord du fond vers la fuite de l'axe) avec la transversale, et la fuite de l'axe est elle-même l'intersection des deux plinthes : le coin est donc sur la plinthe droite par construction. Le vérifier ne vérifie rien.\n\nDÉCLARÉ. Ni la focale ni la hauteur d'œil ne sont déductibles ici : une vue dans l'axe ne contraint pas la profondeur, et les deux fuites tombent du même côté du centre de l'image (le contrôle d'orthogonalité refuse de rendre une focale plutôt que d'en inventer une). Les mètres sont donc posés — 2,20 m de large, 7,00 m de sol visible — et non déduits ; ils fixent l'échelle des lames, rien d'autre. Le comptage des joints, qui aurait recoupé la largeur, échoue sur ce sol : le vernis de ce vieux parquet crée des reflets plus contrastés que les joints eux-mêmes, et le pas médian mesuré est incohérent d'une profondeur à l'autre (62, puis 84, puis 39 px, alors qu'il devrait décroître). Même cause que le brouillon salon.json.\n\nContour affiné : gradient médian 20,1 → 27,5 (×1,37). Faible en valeur absolue — une plinthe blanche sur parquet ciré donne une arête molle — à comparer aux 272 du séjour.\n\nPAS ENCORE LIVRABLE — deux defauts de precision, mesures en comparant le rendu a l original au meme cadrage.\n\n(1) Occultations trop larges. Les trois pieds de la console et les deux poteaux du porte-manteau sont bien preserves, mais mes polygones depassent la largeur reelle des pieds d environ 5 px : a cote de chaque pied apparait une echarde de l ancien parquet, orange, tres visible sur un parquet clair. Un pied fin demande un polygone au pixel, pas une boite englobante.\n\n(2) Le contour monte sur la plinthe dans la zone de la console. L affineur y a accroche l arete HAUTE de la plinthe au lieu de son pied. Le parquet couvre donc quelques centimetres de plinthe blanche, et comme l eclairement est relu dans la photo (photo-luma), ces pixels ressortent en bande pale delavee au lieu de bois. C est exactement le defaut que le contour affine est censé eviter, et il rappelle que le gradient median (27,5 ici) ne dit pas SUR QUELLE arete le contour s est pose.\n\nLa geometrie, elle, tient : c est la partie mesuree et prouvee. Ce qui reste a faire est du relevé, pas du calcul.",
+  "note": "Couloir d'appartement ancien, vue dans l'axe. Géométrie mesurée, échelle déclarée — et la distinction compte.\n\nMESURÉ. Les deux plinthes ont été ajustées sur le contour affiné (12 et 14 points, résidu max 8,9 et 7,1 px) ; elles se croisent en (0,4908 ; 0,5454), qui est donc le point de fuite de l'axe du couloir, et l'horizon passe par lui. La direction transversale est prise horizontale : dans une vue axiale sa fuite part à l'infini et n'est pas mesurable.\n\nPREUVE. La direction des joints du parquet, relevée par tenseur de structure en 12 points du sol (66 intersections deux à deux), fuit vers (0,5058 ; 0,5513). Les angles balaient 134,6 degrés à gauche jusqu'à 53,3 degrés à droite : la convergence est réelle, pas un artefact. Cette mesure ne partage rien avec la précédente — l'architecture d'un côté, la texture du sol de l'autre — et elle tombe à 24 px en x et 6 px en y de la fuite des plinthes. C'est ce qui établit que les lames de ce sol suivent bien l'axe du couloir et que la fuite est au bon endroit.\n\nCe qui NE serait PAS une preuve, et qu'il ne faut pas y lire : le quatrième coin du quadrilatère tombe sur la plinthe droite, mais c'est une tautologie. Il est construit comme l'intersection de (bord du fond vers la fuite de l'axe) avec la transversale, et la fuite de l'axe est elle-même l'intersection des deux plinthes : le coin est donc sur la plinthe droite par construction. Le vérifier ne vérifie rien.\n\nDÉCLARÉ. Ni la focale ni la hauteur d'œil ne sont déductibles ici : une vue dans l'axe ne contraint pas la profondeur, et les deux fuites tombent du même côté du centre de l'image (le contrôle d'orthogonalité refuse de rendre une focale plutôt que d'en inventer une). Les mètres sont donc posés — 2,20 m de large, 7,00 m de sol visible — et non déduits ; ils fixent l'échelle des lames, rien d'autre. Le comptage des joints, qui aurait recoupé la largeur, échoue sur ce sol : le vernis de ce vieux parquet crée des reflets plus contrastés que les joints eux-mêmes, et le pas médian mesuré est incohérent d'une profondeur à l'autre (62, puis 84, puis 39 px, alors qu'il devrait décroître). Même cause que le brouillon salon.json.\n\nContour affiné : gradient médian 20,1 → 27,5 (×1,37). Faible en valeur absolue — une plinthe blanche sur parquet ciré donne une arête molle — à comparer aux 272 du séjour.\n\nOCCULTATIONS. Six objets touchent le sol : les quatre pieds de la console et les deux poteaux du porte-manteau. Leurs contours ne sont pas des boites englobantes mais des SILHOUETTES, relevees par seuil de luminance ligne par ligne — mediane de la ligne moins 1,9 fois l ecart absolu median — puis filtrees en mediane sur chaque flanc pour ecarter un pixel de segmentation aberrant. Un pied fin ne tolere pas mieux : la premiere version, posee a l oeil sur une capture, depassait de 5 px et laissait a cote de chaque pied une echarde d ancien parquet orange, tres visible sur un parquet clair. Le releve par seuil a aussi montre que la console a QUATRE pieds et non trois, et que deux de mes polygones etaient decales de 20 px.\n\nRELUE ET VALIDEE. Les quatre motifs de controle ont ete regardes en vue entiere : masque propre sur les deux plinthes et les deux huisseries, perspective qui suit l architecture, six occultations credibles, chevrons qui retrecissent correctement vers le fond. Reserve nommee, la meme qu au-dessus : les metres sont declares et non mesures, une vue axiale ne contraignant pas la profondeur. Cela fixe l echelle des lames, pas la justesse geometrique — celle-la est prouvee par la concordance des deux fuites.",
   "image": {
     "file": "room-appartement-ancien.jpg",
     "width": 1600,
@@ -221,130 +221,372 @@
   ],
   "occluders": [
     {
-      "id": "console-pied-1",
+      "id": "console-pied-avant-gauche",
       "label": "Console, pied avant gauche",
       "kind": "furniture",
       "polygon": [
         {
-          "x": 0.331,
-          "y": 0.596
+          "x": 0.3516,
+          "y": 0.6092
         },
         {
-          "x": 0.347,
-          "y": 0.596
+          "x": 0.3498,
+          "y": 0.6232
         },
         {
-          "x": 0.358,
-          "y": 0.706
+          "x": 0.3504,
+          "y": 0.6373
+        },
+        {
+          "x": 0.3516,
+          "y": 0.6514
+        },
+        {
+          "x": 0.3541,
+          "y": 0.6654
+        },
+        {
+          "x": 0.356,
+          "y": 0.6795
+        },
+        {
+          "x": 0.3573,
+          "y": 0.6935
+        },
+        {
+          "x": 0.3573,
+          "y": 0.7076
+        },
+        {
+          "x": 0.3554,
+          "y": 0.7216
+        },
+        {
+          "x": 0.3523,
+          "y": 0.7451
+        },
+        {
+          "x": 0.3596,
+          "y": 0.7451
+        },
+        {
+          "x": 0.3628,
+          "y": 0.717
+        },
+        {
+          "x": 0.3634,
+          "y": 0.7029
         },
         {
           "x": 0.364,
-          "y": 0.746
+          "y": 0.6888
         },
         {
-          "x": 0.348,
-          "y": 0.746
+          "x": 0.3634,
+          "y": 0.6748
         },
         {
-          "x": 0.342,
-          "y": 0.7
+          "x": 0.3628,
+          "y": 0.6607
+        },
+        {
+          "x": 0.3615,
+          "y": 0.6467
+        },
+        {
+          "x": 0.3615,
+          "y": 0.6326
+        },
+        {
+          "x": 0.374,
+          "y": 0.6186
+        },
+        {
+          "x": 0.364,
+          "y": 0.6092
         }
       ],
       "contact": [
         {
-          "x": 0.348,
-          "y": 0.746
+          "x": 0.3523,
+          "y": 0.7451
         },
         {
-          "x": 0.364,
-          "y": 0.746
+          "x": 0.3596,
+          "y": 0.7451
         }
       ],
-      "depth": 0.55
+      "depth": 0.52
     },
     {
-      "id": "console-pied-2",
-      "label": "Console, pied arrière",
-      "kind": "furniture",
-      "polygon": [
-        {
-          "x": 0.388,
-          "y": 0.592
-        },
-        {
-          "x": 0.401,
-          "y": 0.592
-        },
-        {
-          "x": 0.416,
-          "y": 0.673
-        },
-        {
-          "x": 0.422,
-          "y": 0.697
-        },
-        {
-          "x": 0.409,
-          "y": 0.697
-        },
-        {
-          "x": 0.4,
-          "y": 0.66
-        }
-      ],
-      "contact": [
-        {
-          "x": 0.409,
-          "y": 0.697
-        },
-        {
-          "x": 0.422,
-          "y": 0.697
-        }
-      ],
-      "depth": 0.62
-    },
-    {
-      "id": "console-pied-3",
+      "id": "console-pied-avant-droit",
       "label": "Console, pied avant droit",
       "kind": "furniture",
       "polygon": [
         {
-          "x": 0.424,
-          "y": 0.593
+          "x": 0.4298,
+          "y": 0.6092
         },
         {
-          "x": 0.438,
-          "y": 0.593
+          "x": 0.4323,
+          "y": 0.6186
         },
         {
-          "x": 0.446,
-          "y": 0.7
+          "x": 0.4329,
+          "y": 0.6326
         },
         {
-          "x": 0.452,
-          "y": 0.74
+          "x": 0.4329,
+          "y": 0.6467
         },
         {
-          "x": 0.437,
-          "y": 0.74
+          "x": 0.4323,
+          "y": 0.6607
         },
         {
-          "x": 0.433,
-          "y": 0.7
+          "x": 0.4316,
+          "y": 0.6748
+        },
+        {
+          "x": 0.431,
+          "y": 0.6888
+        },
+        {
+          "x": 0.431,
+          "y": 0.7029
+        },
+        {
+          "x": 0.4316,
+          "y": 0.717
+        },
+        {
+          "x": 0.4335,
+          "y": 0.731
+        },
+        {
+          "x": 0.4329,
+          "y": 0.7451
+        },
+        {
+          "x": 0.4335,
+          "y": 0.7498
+        },
+        {
+          "x": 0.4384,
+          "y": 0.7498
+        },
+        {
+          "x": 0.4384,
+          "y": 0.7357
+        },
+        {
+          "x": 0.4371,
+          "y": 0.7216
+        },
+        {
+          "x": 0.4378,
+          "y": 0.7076
+        },
+        {
+          "x": 0.4384,
+          "y": 0.6935
+        },
+        {
+          "x": 0.4396,
+          "y": 0.6795
+        },
+        {
+          "x": 0.4409,
+          "y": 0.6654
+        },
+        {
+          "x": 0.4427,
+          "y": 0.6514
+        },
+        {
+          "x": 0.444,
+          "y": 0.6373
+        },
+        {
+          "x": 0.4446,
+          "y": 0.6232
+        },
+        {
+          "x": 0.444,
+          "y": 0.6092
+        },
+        {
+          "x": 0.4371,
+          "y": 0.6092
         }
       ],
       "contact": [
         {
-          "x": 0.437,
-          "y": 0.74
+          "x": 0.4335,
+          "y": 0.7498
         },
         {
-          "x": 0.452,
-          "y": 0.74
+          "x": 0.4384,
+          "y": 0.7498
         }
       ],
-      "depth": 0.56
+      "depth": 0.52
+    },
+    {
+      "id": "console-pied-arriere-droit",
+      "label": "Console, pied arrière droit",
+      "kind": "furniture",
+      "polygon": [
+        {
+          "x": 0.4497,
+          "y": 0.6092
+        },
+        {
+          "x": 0.4491,
+          "y": 0.6232
+        },
+        {
+          "x": 0.4485,
+          "y": 0.6326
+        },
+        {
+          "x": 0.4479,
+          "y": 0.6467
+        },
+        {
+          "x": 0.4472,
+          "y": 0.6607
+        },
+        {
+          "x": 0.4479,
+          "y": 0.6748
+        },
+        {
+          "x": 0.4497,
+          "y": 0.6888
+        },
+        {
+          "x": 0.4497,
+          "y": 0.6935
+        },
+        {
+          "x": 0.4565,
+          "y": 0.6935
+        },
+        {
+          "x": 0.4552,
+          "y": 0.6795
+        },
+        {
+          "x": 0.4534,
+          "y": 0.6654
+        },
+        {
+          "x": 0.4534,
+          "y": 0.6514
+        },
+        {
+          "x": 0.4552,
+          "y": 0.6373
+        },
+        {
+          "x": 0.4565,
+          "y": 0.6279
+        },
+        {
+          "x": 0.4571,
+          "y": 0.6139
+        },
+        {
+          "x": 0.4571,
+          "y": 0.6092
+        }
+      ],
+      "contact": [
+        {
+          "x": 0.4497,
+          "y": 0.6935
+        },
+        {
+          "x": 0.4565,
+          "y": 0.6935
+        }
+      ],
+      "depth": 0.6
+    },
+    {
+      "id": "console-pied-arriere-gauche",
+      "label": "Console, pied arrière gauche",
+      "kind": "furniture",
+      "polygon": [
+        {
+          "x": 0.3841,
+          "y": 0.6139
+        },
+        {
+          "x": 0.3854,
+          "y": 0.6279
+        },
+        {
+          "x": 0.3872,
+          "y": 0.642
+        },
+        {
+          "x": 0.3879,
+          "y": 0.656
+        },
+        {
+          "x": 0.3879,
+          "y": 0.6701
+        },
+        {
+          "x": 0.3866,
+          "y": 0.6842
+        },
+        {
+          "x": 0.3854,
+          "y": 0.6935
+        },
+        {
+          "x": 0.3927,
+          "y": 0.6935
+        },
+        {
+          "x": 0.394,
+          "y": 0.6795
+        },
+        {
+          "x": 0.394,
+          "y": 0.6654
+        },
+        {
+          "x": 0.394,
+          "y": 0.6514
+        },
+        {
+          "x": 0.394,
+          "y": 0.6373
+        },
+        {
+          "x": 0.3934,
+          "y": 0.6232
+        },
+        {
+          "x": 0.3934,
+          "y": 0.6139
+        }
+      ],
+      "contact": [
+        {
+          "x": 0.3854,
+          "y": 0.6935
+        },
+        {
+          "x": 0.3927,
+          "y": 0.6935
+        }
+      ],
+      "depth": 0.6
     },
     {
       "id": "portemanteau-poteau-gauche",
@@ -352,37 +594,129 @@
       "kind": "furniture",
       "polygon": [
         {
-          "x": 0.603,
-          "y": 0.53
+          "x": 0.6511,
+          "y": 0.6054
         },
         {
-          "x": 0.625,
-          "y": 0.53
+          "x": 0.6511,
+          "y": 0.6195
         },
         {
-          "x": 0.627,
-          "y": 0.84
+          "x": 0.6505,
+          "y": 0.6336
         },
         {
-          "x": 0.618,
-          "y": 0.849
+          "x": 0.6505,
+          "y": 0.6476
         },
         {
-          "x": 0.605,
-          "y": 0.845
+          "x": 0.6505,
+          "y": 0.6617
+        },
+        {
+          "x": 0.6505,
+          "y": 0.6757
+        },
+        {
+          "x": 0.6511,
+          "y": 0.6898
+        },
+        {
+          "x": 0.6505,
+          "y": 0.7038
+        },
+        {
+          "x": 0.6543,
+          "y": 0.7179
+        },
+        {
+          "x": 0.6505,
+          "y": 0.7413
+        },
+        {
+          "x": 0.6499,
+          "y": 0.7507
+        },
+        {
+          "x": 0.6486,
+          "y": 0.7694
+        },
+        {
+          "x": 0.6505,
+          "y": 0.7788
+        },
+        {
+          "x": 0.6486,
+          "y": 0.7882
+        },
+        {
+          "x": 0.6614,
+          "y": 0.7882
+        },
+        {
+          "x": 0.6633,
+          "y": 0.7788
+        },
+        {
+          "x": 0.6614,
+          "y": 0.7601
+        },
+        {
+          "x": 0.6601,
+          "y": 0.7507
+        },
+        {
+          "x": 0.6601,
+          "y": 0.7366
+        },
+        {
+          "x": 0.6607,
+          "y": 0.7132
+        },
+        {
+          "x": 0.6607,
+          "y": 0.6992
+        },
+        {
+          "x": 0.6607,
+          "y": 0.6851
+        },
+        {
+          "x": 0.6607,
+          "y": 0.671
+        },
+        {
+          "x": 0.6607,
+          "y": 0.657
+        },
+        {
+          "x": 0.6607,
+          "y": 0.6429
+        },
+        {
+          "x": 0.6614,
+          "y": 0.6289
+        },
+        {
+          "x": 0.6607,
+          "y": 0.6148
+        },
+        {
+          "x": 0.6607,
+          "y": 0.6054
         }
       ],
       "contact": [
         {
-          "x": 0.605,
-          "y": 0.845
+          "x": 0.6486,
+          "y": 0.7882
         },
         {
-          "x": 0.627,
-          "y": 0.845
+          "x": 0.6614,
+          "y": 0.7882
         }
       ],
-      "depth": 0.5
+      "depth": 0.42
     },
     {
       "id": "portemanteau-poteau-droit",
@@ -390,33 +724,113 @@
       "kind": "furniture",
       "polygon": [
         {
-          "x": 0.732,
-          "y": 0.53
+          "x": 0.7505,
+          "y": 0.6336
         },
         {
-          "x": 0.762,
-          "y": 0.53
+          "x": 0.7555,
+          "y": 0.6476
         },
         {
-          "x": 0.766,
-          "y": 1
+          "x": 0.7574,
+          "y": 0.6617
         },
         {
-          "x": 0.734,
-          "y": 1
+          "x": 0.7574,
+          "y": 0.6757
+        },
+        {
+          "x": 0.7574,
+          "y": 0.6898
+        },
+        {
+          "x": 0.7574,
+          "y": 0.7038
+        },
+        {
+          "x": 0.7661,
+          "y": 0.7179
+        },
+        {
+          "x": 0.7574,
+          "y": 0.7366
+        },
+        {
+          "x": 0.758,
+          "y": 0.7507
+        },
+        {
+          "x": 0.7642,
+          "y": 0.7601
+        },
+        {
+          "x": 0.758,
+          "y": 0.7788
+        },
+        {
+          "x": 0.7636,
+          "y": 0.7882
+        },
+        {
+          "x": 0.7726,
+          "y": 0.7882
+        },
+        {
+          "x": 0.7732,
+          "y": 0.7788
+        },
+        {
+          "x": 0.7732,
+          "y": 0.7601
+        },
+        {
+          "x": 0.7651,
+          "y": 0.7507
+        },
+        {
+          "x": 0.7739,
+          "y": 0.7366
+        },
+        {
+          "x": 0.7732,
+          "y": 0.7179
+        },
+        {
+          "x": 0.7745,
+          "y": 0.7038
+        },
+        {
+          "x": 0.7739,
+          "y": 0.6898
+        },
+        {
+          "x": 0.7751,
+          "y": 0.6757
+        },
+        {
+          "x": 0.7745,
+          "y": 0.6617
+        },
+        {
+          "x": 0.7782,
+          "y": 0.6476
+        },
+        {
+          "x": 0.7739,
+          "y": 0.6336
         }
       ],
       "contact": [
         {
-          "x": 0.734,
-          "y": 1
+          "x": 0.7636,
+          "y": 0.7882
         },
         {
-          "x": 0.766,
-          "y": 1
+          "x": 0.7726,
+          "y": 0.7882
         }
       ],
-      "depth": 0.3
+      "depth": 0.42
     }
   ],
   "light": {

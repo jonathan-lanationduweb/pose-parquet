@@ -199,20 +199,28 @@ const VERDICTS = {
     },
   },
   'appartement-ancien': {
-    note: 'Couloir profond, vue dans l’axe. Fuite de l’axe mesurée deux fois, indépendamment : par les deux '
-      + 'plinthes (0,4908 ; 0,5454) et par la direction des joints du parquet relevée au tenseur de structure '
-      + '(0,5058 ; 0,5513). Les deux concordent à 24 px en x et 6 px en y — c’est la preuve que les lames de ce sol '
-      + 'suivent bien l’axe. Réserve nommée, et elle est importante : la focale et la hauteur d’œil ne sont PAS '
-      + 'déductibles d’une vue axiale, les mètres sont donc déclarés (2,20 × 7,00 m) et non mesurés. Le comptage de '
-      + 'lames, qui aurait recoupé la largeur, échoue sur ce vernis. Sept occultations, dont six pieds fins.',
-    vues: {},
+    note: 'Couloir profond, vue dans l’axe. Fuite de l’axe mesuree deux fois, independamment : par les deux '
+      + 'plinthes (0,4908 ; 0,5454) et par la direction des joints du parquet relevee au tenseur de structure '
+      + '(0,5058 ; 0,5513). Les deux concordent a 24 px en x et 6 px en y. Occultations refaites en SILHOUETTE, '
+      + 'relevees par seuil de luminance ligne par ligne : la premiere version, posee a l’oeil sur une capture, '
+      + 'depassait de 5 px et laissait une echarde d’ancien parquet orange a cote de chaque pied. Le seuil a aussi '
+      + 'montre que la console a QUATRE pieds et non trois. Reserve nommee : les metres sont declares (2,20 x 7,00 m) '
+      + 'et non mesures, une vue axiale ne contraignant pas la profondeur.',
+    vues: {
+      'droit-naturel': { ...TOUT_VALIDE },
+      'droit-fume': { ...TOUT_VALIDE },
+      'point-de-hongrie': { ...TOUT_VALIDE },
+      'baton-rompu': { ...TOUT_VALIDE },
+    },
   },
   couloir: {
-    note: 'EXPÉRIMENTALE. Distorsion en barillet mesurée : le jambage de la porte du fond, droite réelle, dessine un '
-      + 'arc de +3,1 / −4,0 / +4,0 px sur 79 points, au centre du cadre. Deux arêtes horizontales du mur de droite '
-      + 'fuient vers (0,407 ; 0,501) quand celles du panneau de gauche fuient vers (0,504 ; 0,622) : aucun horizon '
-      + 'n’est compatible avec les deux, le modèle sténopé ne peut pas décrire cette image. Gardée pour ça — les '
-      + 'photos de téléphone en ultra grand-angle poseront le même problème à « importer ma pièce ».',
+    note: 'EXPERIMENTALE, raison : low-contrast-boundaries. Le diagnostic precedent — distorsion en barillet — '
+      + 'etait FAUX : remesure par suivi de gradient, le jambage de la porte du fond donne une fleche de 0,13 px '
+      + 'pour un ecart-type de 0,21 px sur 99 points. C’est une droite ; l’ancien traqueur, qui suivait un minimum '
+      + 'de luminance, derivait sur le bois sombre de la porte et mesurait sa propre derive. La vraie raison est '
+      + 'ailleurs : bois clair sur bois clair, la jonction mur/sol n’offre aucun gradient exploitable (forces 1,7 a '
+      + '15,6 ; residus 46 a 61 px), donc pas de seconde direction et pas de quadrilatere prouve. Gardee comme cas '
+      + 'de test pour « importer ma piece ». Voir docs/photo-lens-distortion.md.',
     vues: {},
   },
 };

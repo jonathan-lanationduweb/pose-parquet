@@ -45,14 +45,40 @@ import {
   orientationLocale, fuiteDesLames, piedDeMur, releveColonnes,
 } from './geometrie.js';
 import { affineurDeContour, qualiteContour, surLeCadre } from './mask-refine.js';
-import { loadImage } from '../js/scene/image-loader.js';
 
 const BASE = '../';
 const $ = (id) => document.getElementById(id);
 const log = (...parts) => { $('log').textContent += parts.join(' ') + '\n'; };
 
+/**
+ * Chargement à la résolution **native**, sans passer par `image-loader.js`.
+ *
+ * Le chargeur du visualiseur réduit l'image à 1100 px de large quand la
+ * fenêtre en fait moins de 600 : c'est le bon comportement pour le rendu, et
+ * le pire possible pour un outil de mesure. Un résidu de 8 px ne veut pas dire
+ * la même chose à 1100 px qu'à 1600 px, et la résolution de travail se serait
+ * mise à dépendre de la largeur de la fenêtre — donc les mesures d'une session
+ * à l'autre ne seraient plus comparables. Ici la taille de l'image est la
+ * taille du fichier, toujours.
+ */
+function chargeNative(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.decoding = 'async';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      canvas.getContext('2d', { willReadFrequently: true }).drawImage(img, 0, 0);
+      resolve({ canvas, width: canvas.width, height: canvas.height });
+    };
+    img.onerror = () => reject(new Error('Image illisible'));
+    img.src = src;
+  });
+}
+
 const fichier = new URLSearchParams(location.search).get('img') || 'room-couloir.jpg';
-const prepared = await loadImage(`${BASE}assets/images/${fichier}`);
+const prepared = await chargeNative(`${BASE}assets/images/${fichier}`);
 const photo = prepared.canvas;
 const W = photo.width;
 const H = photo.height;
@@ -336,9 +362,412 @@ function courbure(points) {
   return { n, residuMax: fit.residuMax, residuMoyen: fit.residuMoyen, arc: [a(0), a((n / 4) | 0), a((n / 2) | 0), a(((3 * n) / 4) | 0), a(n - 1)] };
 }
 
+/**
+ * Traque une arête verticale par le **gradient**, pas par la luminance.
+ *
+ * `traqueVerticale` suit un minimum de luminance : parfait pour un joint de
+ * parquet ou un jambage sombre, inutilisable pour une **marche** de clarté —
+ * un placard blanc contre un mur crème, l'arête d'un marbre, un angle de mur.
+ * Sur ces bords, elle part en promenade et donne un écart-type d'ajustement de
+ * 4 à 10 px, ce qui rendait toute mesure de flèche muette sur quatre photos
+ * candidates.
+ *
+ * Ici on suit le maximum de |dI/dx|, et on **conserve le signe** du saut
+ * relevé au départ : sans cela le suivi traverse volontiers une bande claire
+ * pour s'accrocher à son autre bord, ce qui fabrique une fausse courbure.
+ */
+function traqueGradient(xd, yd, yf, fenetre = 6, pas = 4) {
+  const d = photo.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, W, H).data;
+  const lum = (x, y) => {
+    const p = ((y | 0) * W + (x | 0)) * 4;
+    return 0.2126 * d[p] + 0.7152 * d[p + 1] + 0.0722 * d[p + 2];
+  };
+  // Dérivée horizontale, moyennée sur trois lignes pour amortir le bruit.
+  const grad = (x, y) => (lum(x + 2, y - 1) - lum(x - 2, y - 1)
+    + lum(x + 2, y) - lum(x - 2, y)
+    + lum(x + 2, y + 1) - lum(x - 2, y + 1)) / 3;
+  let x = xd * W;
+  // Signe du saut, relevé une fois au point de départ.
+  let signe = 0;
+  for (let dx = -fenetre; dx <= fenetre; dx += 0.5) {
+    const gg = grad(x + dx, yd * H);
+    if (Math.abs(gg) > Math.abs(signe)) signe = gg;
+  }
+  signe = signe >= 0 ? 1 : -1;
+  const out = [];
+  // Même prédiction de pente que pour le suivi horizontal : une arête verticale
+  // vue en perspective n'est pas verticale dans l'image.
+  let pente = 0;
+  for (let y = yd * H; y <= yf * H; y += pas) {
+    const prediction = x + pente * pas;
+    let best = prediction;
+    let bv = -Infinity;
+    for (let dx = -fenetre; dx <= fenetre; dx += 0.5) {
+      const v = signe * grad(prediction + dx, y);
+      if (v > bv) { bv = v; best = prediction + dx; }
+    }
+    out.push({ x: best / W, y: y / H, force: +bv.toFixed(1) });
+    x = best;
+    if (out.length >= 6) {
+      const a = out[out.length - 6];
+      const b = out[out.length - 1];
+      pente = ((b.x - a.x) * W) / ((b.y - a.y) * H);
+    }
+  }
+  return out;
+}
+
+/**
+ * Même suivi, mais horizontal : on avance en x et on cherche le maximum de
+ * |dI/dy|. Sert aux pieds de murs, seuils, plinthes, arêtes de plafond — les
+ * lignes horizontales du monde, dont l'intersection donne un point de fuite.
+ */
+function traqueGradientH(yd, xd, xf, fenetre = 6, pas = 4) {
+  const d = photo.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, W, H).data;
+  const lum = (x, y) => {
+    const p = ((y | 0) * W + (x | 0)) * 4;
+    return 0.2126 * d[p] + 0.7152 * d[p + 1] + 0.0722 * d[p + 2];
+  };
+  const grad = (x, y) => (lum(x - 1, y + 2) - lum(x - 1, y - 2)
+    + lum(x, y + 2) - lum(x, y - 2)
+    + lum(x + 1, y + 2) - lum(x + 1, y - 2)) / 3;
+  let y = yd * H;
+  let signe = 0;
+  for (let dy = -fenetre; dy <= fenetre; dy += 0.5) {
+    const gg = grad(xd * W, y + dy);
+    if (Math.abs(gg) > Math.abs(signe)) signe = gg;
+  }
+  signe = signe >= 0 ? 1 : -1;
+  const out = [];
+  const sens = xf > xd ? 1 : -1;
+  /**
+   * Le suivi **prédit** la pente au lieu de chercher autour du point précédent.
+   *
+   * Une plinthe qui fuit vers l'horizon a une pente de 1,8 dans l'image : elle
+   * se déplace de 5,4 px en y pour 3 px en x, presque la limite d'une fenêtre
+   * de ±7 px. Sans prédiction, la recherche est décentrée à chaque pas,
+   * l'erreur s'accumule et le suivi finit sur le mur — mesuré : 36 et 48 px de
+   * résidu sur les deux plinthes de l'appartement ancien.
+   *
+   * La pente est estimée sur les derniers points acceptés, jamais sur un seul :
+   * un point aberrant décalerait la prédiction de tout le reste du suivi.
+   */
+  let pente = 0;
+  for (let x = xd * W; sens > 0 ? x <= xf * W : x >= xf * W; x += pas * sens) {
+    const prediction = y + pente * pas * sens;
+    let best = prediction;
+    let bv = -Infinity;
+    for (let dy = -fenetre; dy <= fenetre; dy += 0.5) {
+      const v = signe * grad(x, prediction + dy);
+      if (v > bv) { bv = v; best = prediction + dy; }
+    }
+    out.push({ x: x / W, y: best / H, force: +bv.toFixed(1) });
+    y = best;
+    if (out.length >= 6) {
+      const a = out[out.length - 6];
+      const b = out[out.length - 1];
+      pente = ((b.y - a.y) * H) / ((b.x - a.x) * W);
+    }
+  }
+  return out;
+}
+
+/**
+ * Flèche d'une arête verticale **choisie** — le test décisif de distorsion.
+ *
+ * On traque l'arête, on lui ajuste une parabole, et on renvoie l'écart de
+ * cette parabole à sa corde au milieu. Une droite du monde réel doit donner
+ * une flèche de l'ordre du pixel ; au-delà de 3 px sur une arête bien décrite
+ * (écart-type d'ajustement faible), l'objectif déforme.
+ *
+ * À choisir **loin du centre de l'image** — la distorsion radiale ne déplace
+ * rien sur l'axe optique — et **la plus longue possible**.
+ */
+function flecheDe(x, y0, y1, fenetre = 6, pas = 4) {
+  const pts = traqueGradient(x, y0, y1, fenetre, pas);
+  const n = pts.length;
+  if (n < 16) return { erreur: 'trace trop courte' };
+  const T = pts.map((_, i) => i / (n - 1));
+  const X = pts.map((p) => p.x * W);
+  let s0 = n; let s1 = 0; let s2 = 0; let s3 = 0; let s4 = 0;
+  let y0s = 0; let y1s = 0; let y2s = 0;
+  for (let i = 0; i < n; i += 1) {
+    const t = T[i];
+    const t2 = t * t;
+    s1 += t; s2 += t2; s3 += t2 * t; s4 += t2 * t2;
+    y0s += X[i]; y1s += X[i] * t; y2s += X[i] * t2;
+  }
+  const M = [[s4, s3, s2], [s3, s2, s1], [s2, s1, s0]];
+  const V = [y2s, y1s, y0s];
+  const det3 = (m) => m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
+    - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
+    + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+  const D = det3(M);
+  if (Math.abs(D) < 1e-9) return { erreur: 'systeme degenere' };
+  const rep = (c) => M.map((row, i) => row.map((v, j) => (j === c ? V[i] : v)));
+  const a = det3(rep(0)) / D;
+  const b = det3(rep(1)) / D;
+  const cc = det3(rep(2)) / D;
+  let sse = 0;
+  for (let i = 0; i < n; i += 1) sse += (X[i] - (a * T[i] * T[i] + b * T[i] + cc)) ** 2;
+  const ecartType = Math.sqrt(sse / n);
+  return {
+    points: n,
+    fleche: +(Math.abs(a) / 4).toFixed(2),
+    sens: a > 0 ? 'convexe vers la droite' : 'convexe vers la gauche',
+    ecartType: +ecartType.toFixed(2),
+    fiable: ecartType < 3,
+    xMoyen: +(X.reduce((s, v) => s + v, 0) / n / W).toFixed(3),
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Diagnostic préalable : cette photo vaut-elle la peine ?             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Qualifie une photo **avant** de la calibrer.
+ *
+ * Ce n'est pas une analyse d'image intelligente, et ça ne prétend pas l'être.
+ * Ce sont cinq mesures, chacune avec un seuil, et un verdict qui n'engage
+ * qu'un ordre de priorité. La décision reste humaine : une photo « bon
+ * candidat » peut donner un rendu laid, et le contraire arrive aussi.
+ *
+ * Il existe parce qu'une photo a coûté une demi-journée de calibrage avant de
+ * révéler une distorsion en barillet qui rendait l'exercice impossible. La
+ * mesure qui l'aurait écartée en trente secondes est la **flèche d'arc** : on
+ * traque des arêtes verticales franches — jambages de porte, angles de murs —
+ * et on regarde de combien elles s'écartent de leur propre droite. Une droite
+ * du monde réel doit être droite dans l'image ; si elle bombe, l'objectif
+ * déforme et le modèle sténopé de SceneData ne peut pas décrire la scène.
+ *
+ * Les seuils ne sont pas inventés : ils sont calés sur les scènes déjà
+ * validées d'un côté, sur la scène rejetée de l'autre. Voir
+ * docs/photo-lens-distortion.md.
+ */
+function diagnostic({ verbeux = false } = {}) {
+  const ctx = photo.getContext('2d', { willReadFrequently: true });
+  const data = ctx.getImageData(0, 0, W, H).data;
+  const lum = (x, y) => {
+    const p = ((y | 0) * W + (x | 0)) * 4;
+    return 0.2126 * data[p] + 0.7152 * data[p + 1] + 0.0722 * data[p + 2];
+  };
+
+  /* 1. Résolution ---------------------------------------------------- */
+  const resolution = { largeur: W, hauteur: H, suffisante: W >= 1200 && H >= 800 };
+
+  /* 2. Arêtes verticales : semis automatique par énergie de gradient -- */
+  // On somme |dI/dx| sur la moitié haute de chaque colonne : les jambages et
+  // les angles de murs y ressortent, le sol n'y est pas.
+  const energie = new Float32Array(W);
+  for (let x = 2; x < W - 2; x += 1) {
+    let s = 0;
+    for (let y = Math.round(H * 0.12); y < Math.round(H * 0.58); y += 3) {
+      s += Math.abs(lum(x + 2, y) - lum(x - 2, y));
+    }
+    energie[x] = s;
+  }
+  const candidates = [];
+  for (let x = 30; x < W - 30; x += 1) {
+    if (energie[x] > energie[x - 1] && energie[x] >= energie[x + 1]) candidates.push({ x, e: energie[x] });
+  }
+  /**
+   * Les arêtes loin du centre passent d'abord.
+   *
+   * La distorsion radiale déplace les points le long du rayon depuis le centre
+   * optique : une verticale qui passe près de l'axe reste droite, quelle que
+   * soit la force de la distorsion. Trier sur la seule énergie de gradient
+   * revient donc à échantillonner là où il n'y a rien à voir — c'est ainsi que
+   * le couloir, dont un jambage bombe de 7,4 px, a d'abord été mesuré à 1 px.
+   */
+  candidates.forEach((c) => { c.poids = c.e * (0.35 + Math.abs(c.x / W - 0.5) * 1.6); });
+  candidates.sort((a, b) => b.poids - a.poids);
+  const retenues = [];
+  for (const c of candidates) {
+    if (retenues.length >= 6) break;
+    if (retenues.every((r) => Math.abs(r.x - c.x) > 60)) retenues.push(c);
+  }
+
+  /**
+   * Toutes les arêtes traquées ne valent pas mesure.
+   *
+   * Le traqueur suit le minimum de luminance de ligne en ligne : sur un pli de
+   * rideau ou un bord de meuble, il part en promenade et produit un résidu
+   * énorme. Compter ce résidu comme de la distorsion serait faux, et c'est
+   * exactement ce qui a d'abord fait déclarer le séjour — scène de référence —
+   * « mauvais candidat ».
+   *
+   * Deux critères séparent l'arc optique de la dérive :
+   *
+   *   - **rugosité** : la moyenne quadratique des différences secondes du
+   *     tracé. Un arc de distorsion est lisse, sa rugosité est inférieure au
+   *     pixel ; une dérive zigzague et la fait exploser ;
+   *   - **régularité** : un arc de distorsion reste du même côté de la corde
+   *     sur toute sa longueur. Une dérive change de côté.
+   *
+   * Seules les arêtes lisses ET régulières entrent dans le verdict. Les autres
+   * sont conservées dans le détail, marquées « écartée », pour qu'on voie ce
+   * qui a été ignoré plutôt que de le deviner.
+   */
+  const verticales = retenues.map((c) => {
+    const pts = traqueGradient(c.x / W, 0.12, 0.66, 6, 4);
+    if (pts.length < 16) return null;
+    const n = pts.length;
+    // t normalisé sur la longueur suivie, x en pixels : on ajuste x = a·t² + b·t + c.
+    const T = pts.map((_, i) => i / (n - 1));
+    const X = pts.map((p) => p.x * W);
+    // Moindres carrés à trois inconnues, résolus par les équations normales.
+    let s0 = n; let s1 = 0; let s2 = 0; let s3 = 0; let s4 = 0;
+    let y0 = 0; let y1 = 0; let y2 = 0;
+    for (let i = 0; i < n; i += 1) {
+      const t = T[i];
+      const t2 = t * t;
+      s1 += t; s2 += t2; s3 += t2 * t; s4 += t2 * t2;
+      y0 += X[i]; y1 += X[i] * t; y2 += X[i] * t2;
+    }
+    const M = [[s4, s3, s2], [s3, s2, s1], [s2, s1, s0]];
+    const V = [y2, y1, y0];
+    const det3 = (m) => m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
+      - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
+      + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+    const D = det3(M);
+    if (Math.abs(D) < 1e-9) return null;
+    const remplace = (col) => M.map((row, i) => row.map((v, j) => (j === col ? V[i] : v)));
+    const a = det3(remplace(0)) / D;
+    const b = det3(remplace(1)) / D;
+    const cc = det3(remplace(2)) / D;
+    // Résidus de la parabole et de la droite : la part expliquée par la
+    // courbure dit si le bombement est réel ou si le suivi a dérivé.
+    let sseQuad = 0;
+    for (let i = 0; i < n; i += 1) sseQuad += (X[i] - (a * T[i] * T[i] + b * T[i] + cc)) ** 2;
+    const mt = s1 / n;
+    const mx = y0 / n;
+    let stt = 0; let stx = 0;
+    for (let i = 0; i < n; i += 1) { stt += (T[i] - mt) ** 2; stx += (T[i] - mt) * (X[i] - mx); }
+    const pente = stt > 1e-9 ? stx / stt : 0;
+    let sseLin = 0;
+    for (let i = 0; i < n; i += 1) sseLin += (X[i] - (mx + pente * (T[i] - mt))) ** 2;
+    const partCourbure = sseLin > 1e-6 ? 1 - sseQuad / sseLin : 0;
+    // Flèche : écart de la parabole à sa corde, au milieu. |a| / 4.
+    const fleche = Math.abs(a) / 4;
+    const ecartTypeQuad = Math.sqrt(sseQuad / n);
+    /**
+     * Une arête est exploitable quand la parabole **décrit bien** le tracé.
+     *
+     * Rien de plus. Exiger en plus que la courbure explique l'essentiel de
+     * l'écart à la droite serait à l'envers : sur une photo sans distorsion la
+     * ligne est droite, la parabole n'ajoute donc rien au modèle linéaire et
+     * cette part tombe à 0,13. C'est le signe d'une bonne photo, pas d'une
+     * mauvaise mesure — le séjour, scène de référence, était rejeté par ce
+     * critère.
+     *
+     * `partCourbure` reste affichée, à titre d'information.
+     */
+    const retenue = ecartTypeQuad < 1.5;
+    return {
+      x: +(c.x / W).toFixed(3),
+      energie: Math.round(c.e),
+      points: n,
+      fleche: +fleche.toFixed(2),
+      partCourbure: +partCourbure.toFixed(2),
+      ecartTypeQuad: +ecartTypeQuad.toFixed(2),
+      retenue,
+    };
+  }).filter(Boolean);
+
+  const utiles = verticales.filter((v) => v.retenue);
+  const fleches = utiles.map((v) => v.fleche).sort((a, b) => a - b);
+  const flecheMediane = fleches.length ? fleches[Math.floor(fleches.length / 2)] : null;
+  const flecheMax = fleches.length ? fleches[fleches.length - 1] : null;
+
+  /* 3. Champ d'orientation du sol : une fuite est-elle identifiable ? - */
+  // Si une famille de lignes du sol converge, son angle balaie l'image de
+  // façon monotone. On mesure ce balayage et sa régularité.
+  const echantillons = [];
+  for (let ny = 0.7; ny <= 0.95; ny += 0.06) {
+    for (let nx = 0.15; nx <= 0.85; nx += 0.07) {
+      const o = orientationLocale(photo, nx, ny, 45);
+      if (o.coherence > 0.5) echantillons.push({ nx, ny, angle: o.angle, coherence: o.coherence });
+    }
+  }
+  let balayage = null;
+  if (echantillons.length >= 8) {
+    // Régression de l'angle sur x, en repliant les angles pour éviter le saut 0/180.
+    const base = echantillons[0].angle;
+    const plie = echantillons.map((e) => {
+      let a = e.angle;
+      while (a - base > 90) a -= 180;
+      while (base - a > 90) a += 180;
+      return { x: e.nx, a };
+    });
+    const n = plie.length;
+    const mx = plie.reduce((s, p) => s + p.x, 0) / n;
+    const ma = plie.reduce((s, p) => s + p.a, 0) / n;
+    let sxa = 0;
+    let sxx = 0;
+    let saa = 0;
+    for (const p of plie) { sxa += (p.x - mx) * (p.a - ma); sxx += (p.x - mx) ** 2; saa += (p.a - ma) ** 2; }
+    const pente = sxx > 1e-9 ? sxa / sxx : 0;
+    const r = sxx > 1e-9 && saa > 1e-9 ? sxa / Math.sqrt(sxx * saa) : 0;
+    balayage = { points: n, penteDegParLargeur: +pente.toFixed(1), correlation: +r.toFixed(3) };
+  }
+
+  /* 4. Surface de sol : quelle part de la moitié basse est continue ? - */
+  // Blocs de 24 px comparés à la couleur médiane des blocs du bas. C'est une
+  // indication, pas une segmentation : un tapis ou un meuble comptent contre.
+  const pas = 24;
+  const blocs = [];
+  for (let y = Math.round(H * 0.55); y < H - pas; y += pas) {
+    for (let x = 0; x < W - pas; x += pas) {
+      let r = 0;
+      let g2 = 0;
+      let b = 0;
+      let k = 0;
+      for (let dy = 0; dy < pas; dy += 6) {
+        for (let dx = 0; dx < pas; dx += 6) {
+          const p = ((y + dy) * W + x + dx) * 4;
+          r += data[p]; g2 += data[p + 1]; b += data[p + 2]; k += 1;
+        }
+      }
+      blocs.push({ x, y, r: r / k, g: g2 / k, b: b / k });
+    }
+  }
+  const bas = blocs.filter((bl) => bl.y > H * 0.85);
+  const med = (arr) => { const s = [...arr].sort((a, b) => a - b); return s.length ? s[Math.floor(s.length / 2)] : 0; };
+  const ref = { r: med(bas.map((b) => b.r)), g: med(bas.map((b) => b.g)), b: med(bas.map((b) => b.b)) };
+  const proches = blocs.filter((bl) => Math.hypot(bl.r - ref.r, bl.g - ref.g, bl.b - ref.b) < 48);
+  const surface = {
+    partMoitieBasse: blocs.length ? +(proches.length / blocs.length).toFixed(3) : 0,
+    couleurReference: [Math.round(ref.r), Math.round(ref.g), Math.round(ref.b)],
+  };
+
+  /* 5. Verdict ------------------------------------------------------- */
+  const griefs = [];
+  const reserves = [];
+  if (!resolution.suffisante) griefs.push(`résolution ${W}×${H} insuffisante`);
+  if (flecheMediane === null) reserves.push(`aucune arête verticale exploitable sur ${verticales.length} traquées : distorsion non contrôlable`);
+  else if (flecheMediane > 3) griefs.push(`flèche d'arc médiane ${flecheMediane} px — distorsion optique`);
+  else if (flecheMediane > 1.6) reserves.push(`flèche d'arc médiane ${flecheMediane} px — distorsion légère`);
+  if (surface.partMoitieBasse < 0.22) griefs.push(`sol continu sur ${Math.round(surface.partMoitieBasse * 100)} % de la moitié basse`);
+  else if (surface.partMoitieBasse < 0.35) reserves.push(`sol continu sur ${Math.round(surface.partMoitieBasse * 100)} % seulement`);
+  if (!balayage) reserves.push('champ d’orientation du sol trop faible pour lire une fuite');
+  else if (Math.abs(balayage.penteDegParLargeur) < 12 || Math.abs(balayage.correlation) < 0.5) {
+    reserves.push(`balayage angulaire faible (${balayage.penteDegParLargeur}°, r=${balayage.correlation}) — fuite mal contrainte`);
+  }
+
+  // Un « BON CANDIDAT » est un resultat de DEPISTAGE, pas une garantie : le
+  // semis automatique peut tomber sur des aretes qui ne bombent pas. Le test
+  // decisif reste flecheDe() sur une arete franche choisie a l oeil, loin du
+  // centre de l image et la plus longue possible.
+  const verdict = griefs.length ? 'MAUVAIS CANDIDAT' : reserves.length ? 'À VÉRIFIER' : 'BON CANDIDAT';
+  const bilan = { fichier, verdict, griefs, reserves, resolution, aretes: { traquees: verticales.length, retenues: utiles.length }, flecheMediane, flecheMax, balayage, surface };
+  if (verbeux) bilan.verticales = verticales;
+  return bilan;
+}
+
 window.C = {
   photo, W, H, fichier, log, trace, apercu, fermer,
-  loupe, grille, traqueVerticale, courbure,
+  loupe, grille, traqueVerticale, traqueGradient, traqueGradientH, courbure, diagnostic, flecheDe,
   ligneDuSol, ligneDepuisPoints, fuite, calibre, affine,
   intersecte, ajusteDroite, focaleParOrthogonalite, quadDepuisPiece,
   pointAuSol, mesureQuad, etendueVisible,

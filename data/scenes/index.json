@@ -35,8 +35,8 @@
       "file": "room-appartement-ancien.jpg",
       "thumb": "room-appartement-ancien-640.jpg",
       "zones": 1,
-      "status": "experimental",
-      "highlight": "Couloir profond ; occultations a reprendre"
+      "status": "validated",
+      "highlight": "Couloir profond, meubles à pieds fins"
     },
     {
       "id": "contraste",
@@ -54,7 +54,8 @@
       "thumb": "room-couloir-640.jpg",
       "zones": 1,
       "status": "experimental",
-      "highlight": "Distorsion en barillet : le modèle sténopé n'y suffit pas"
+      "highlight": "Jonction mur/sol sans contraste : frontière non mesurable",
+      "reason": "low-contrast-boundaries"
     }
   ]
 }
