@@ -198,6 +198,23 @@ const VERDICTS = {
       'baton-rompu': { Perspective: 'correct', 'Échelle': 'correct', Masque: 'valide', 'Lumière': 'valide', Motif: 'correct' },
     },
   },
+  'bureau-vide': {
+    note: 'Bureau vide, vue d angle. Les deux directions du sol viennent de deux longues plinthes '
+      + '(120 et 235 points, residus 0,45 et 0,46 px moyens), chacune recoupee par une seconde '
+      + 'parallele du meme mur ; les deux fuites encadrent le centre, focale 776 px. Preuve : les deux '
+      + 'directions font 90,03 degres entre elles sans que cela ait ete impose. La fuite des joints du '
+      + 'sol existant tombe a 32 px de celle du mur gauche. Le carre de 3 m se mesure 3,000 x 2,999. '
+      + 'Echelle : hauteur d oeil 0,95 m, deduite de l ouverture d une porte (2,03 m) ; la plinthe vaut '
+      + 'alors 14,2 cm et le plafond suspendu 2,56 m. Les trois largeurs pilotes se mesurent DANS le rendu '
+      + 'a 119, 150 et 191 mm pour 120, 150 et 193 demandes. Aucune occultation : la piece est vide, '
+      + 'c est la premiere scene du depot dans ce cas. Repetition de la tuile de 4,80 m : mesuree absente.',
+    vues: {
+      'droit-naturel': TOUT_VALIDE,
+      'droit-fume': TOUT_VALIDE,
+      'point-de-hongrie': TOUT_VALIDE,
+      'baton-rompu': TOUT_VALIDE,
+    },
+  },
   'petite-piece': {
     note: 'Petit bureau. Deux directions mesurees et la focale avec : mur gauche (75 points sur 75, residu max '
       + '1,36 px) croise avec le bord bas d un cadre accroche au meme mur, et appui de fenetre (109 points sur '

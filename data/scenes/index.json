@@ -39,6 +39,15 @@
       "highlight": "Couloir profond, meubles à pieds fins"
     },
     {
+      "id": "bureau-vide",
+      "label": "Bureau vide, vue d’angle",
+      "file": "room-bureau-vide.jpg",
+      "thumb": "room-bureau-vide-640.jpg",
+      "zones": 1,
+      "status": "validated",
+      "highlight": "Vue d’angle, deux plinthes mesurées, sol dégagé"
+    },
+    {
       "id": "petite-piece",
       "label": "Petit bureau",
       "file": "room-petite-piece.jpg",

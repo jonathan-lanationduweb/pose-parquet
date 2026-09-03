@@ -205,6 +205,10 @@ const PHOTOS = {
     id: 26747989, w: 1600, h: 1067, credit: 'Image Hunter',
     alt: 'Petit bureau d angle, secretaire en bois clair devant une fenetre a rideaux',
   },
+  'room-bureau-vide': {
+    id: 7028110, w: 1600, h: 1067, credit: 'Curtis Adams',
+    alt: 'Bureau vide vu d angle, sol en lames claires et plinthes blanches sur deux murs',
+  },
   'room-appartement-ancien': {
     id: 8583672, w: 1600, h: 1067, credit: 'Curtis Adams',
     alt: 'Couloir d appartement ancien au parquet patiné, console et portes à double battant',
