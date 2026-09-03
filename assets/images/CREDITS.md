@@ -43,6 +43,10 @@ Elles sont créditées ici par respect du travail des auteurs.
 | `room-salon.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
 | `room-contraste.jpg` | sanket mahind | [Pexels #18707513](https://www.pexels.com/photo/18707513/) |
 | `room-cuisine.jpg` | Max Vakhtbovych | [Pexels #7060823](https://www.pexels.com/photo/7060823/) |
+| `room-couloir.jpg` | Max Vakhtbovych | [Pexels #7587374](https://www.pexels.com/photo/7587374/) |
+| `room-petit-bureau.jpg` | Алан Албегов | [Pexels #20771870](https://www.pexels.com/photo/20771870/) |
+| `room-grande-piece.jpg` | Max Vakhtbovych | [Pexels #7045700](https://www.pexels.com/photo/7045700/) |
+| `room-appartement-ancien.jpg` | Curtis Adams | [Pexels #8583672](https://www.pexels.com/photo/8583672/) |
 | `hero-poster.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
 | `og-default.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
 | `inspi-1.jpg` | Max Vakhtbovych | [Pexels #7587865](https://www.pexels.com/photo/7587865/) |

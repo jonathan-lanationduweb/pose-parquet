@@ -179,6 +179,32 @@ const PHOTOS = {
     id: 7060823, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
     alt: 'Cuisine ouverte sur la salle à manger',
   },
+  /**
+   * Les pièces suivantes ne sont pas choisies pour leur beauté.
+   *
+   * Chacune couvre un cas que le moteur ne savait pas éprouver : une
+   * profondeur de couloir où les lames rapetissent en quelques mètres, une
+   * petite pièce où une lame de 19 cm doit peser lourd dans le cadre, un grand
+   * sol où la tuile de 4,80 m a la place de se répéter, des pieds de chaise
+   * fins qui mettent l'occlusion à l'épreuve. Une jolie photo au sol vide et
+   * plat n'apprend rien.
+   */
+  'room-couloir': {
+    id: 7587374, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
+    alt: 'Couloir clair aux portes en bois, ouvert sur une pièce au fond',
+  },
+  'room-petit-bureau': {
+    id: 20771870, w: 1600, h: 1067, credit: 'Алан Албегов',
+    alt: 'Petit bureau sous combles, banquette capitonnée et chaise devant un secrétaire',
+  },
+  'room-grande-piece': {
+    id: 7045700, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
+    alt: 'Grand salon classique meublé au parquet foncé, canapé et tapis',
+  },
+  'room-appartement-ancien': {
+    id: 8583672, w: 1600, h: 1067, credit: 'Curtis Adams',
+    alt: 'Couloir d appartement ancien au parquet patiné, console et portes à double battant',
+  },
   // --- Hero et partage ----------------------------------------------------
   'hero-poster': {
     id: 7027842, w: 1000, h: 1100, credit: 'Curtis Adams',
