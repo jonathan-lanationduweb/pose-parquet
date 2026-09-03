@@ -6,16 +6,6 @@
 .tools-roadmap ol { display: grid; gap: var(--sp-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); list-style: none; padding: 0; }
 
 /* Feuille de route des outils : lisible, sans effet machine à écrire */
-.tool-card .meta-list--stack {
-  font-family: var(--font-sans);
-  font-size: 0.94rem;
-  letter-spacing: 0;
-  color: var(--text-soft);
-  gap: 0.75rem;
-}
-.tool-card .meta-list--stack li { display: grid; gap: 0.15rem; }
-.tool-card .meta-list--stack strong { color: var(--text); font-weight: 600; }
-.tool-card .meta-list--stack li::before { content: none; }
 
 /* Onglets de l'outil (visualiseur / mode plan) */
 .tool-tabs .tabs__list { margin-bottom: clamp(1.25rem, 1rem + 1vw, 2rem); }

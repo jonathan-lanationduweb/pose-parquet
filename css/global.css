@@ -195,7 +195,22 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 /* Gabarit article */
 .article-layout { display: grid; gap: clamp(2rem, 4vw, 4rem); align-items: start; }
 @media (min-width: 64rem) {
-  .article-layout { grid-template-columns: minmax(0, 1fr) 17rem; }
+  /**
+   * La colonne d'article épouse la mesure de lecture au lieu de prendre tout
+   * l'espace restant.
+   *
+   * Avec `minmax(0, 1fr)` elle valait 844 px à 1920, alors que `.prose` est
+   * plafonné à 68ch (≈ 700 px) : 144 px de vide s'installaient entre la fin du
+   * texte et la gouttière, ce qui éloignait la colonne latérale du texte
+   * qu'elle accompagne — sans rien apporter.
+   *
+   * Le bloc reste centré : l'ensemble se lit comme un tout, et non comme deux
+   * colonnes séparées par un couloir.
+   */
+  .article-layout {
+    grid-template-columns: minmax(0, var(--measure)) 17rem;
+    justify-content: center;
+  }
 }
 
 /* Média plein cadre */

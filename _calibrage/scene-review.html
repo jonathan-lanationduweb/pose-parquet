@@ -56,6 +56,30 @@
   0,32 du joint lateral. Dispersion de teinte indexee sur la taille de l element. Reflet colore par le
   bois. Catalogue charge par la couche produit (js/scene/product.js).
 </p>
+<p id="passe">
+  <b>Passe matiere du 3 septembre 2026.</b> Deux defauts objectifs corriges.
+  (1) L accent clair du veinage etait <em>additif</em> : il rapprochait la couleur du gris. Mesure sur
+  les dix chenes du catalogue, il perdait de 0,05 a 0,09 de saturation et decalait la teinte de 2 a
+  5,6 degres sur les teintes foncees — d ou les trainees grisatres du Fume — et jusqu a +17 degres sur
+  le Craie par ecretage du bleu. Il est desormais un <em>gain</em>, qui conserve les rapports entre
+  canaux donc la teinte. A microcontraste egal : luminance identique sur les douze rendus, saturation
+  en hausse partout, aucun indicateur en recul.
+  (2) Le point de Hongrie passait par un chemin de dessin appauvri : le veinage etait etale dans une
+  boite horizontale de 2,2 longueurs d arete, donc il <em>traversait</em> la lame en biais au lieu de
+  la suivre, et la lame n avait ni dispersion de teinte indexee sur sa taille, ni reflet, ni chanfrein
+  proportionne. Le motif ressortait presque lisse la ou la pose droite et le baton rompu gardaient leur
+  figure a la meme distance. La lame de chevron est maintenant peinte dans son propre repere et passe
+  par <code>board()</code>, comme les autres motifs. <code>drawChevron</code> ne sert qu au point de
+  Hongrie : aucun rendu droit ni baton rompu deja valide n a change, ce que les mesures confirment au
+  chiffre pres.
+  <br><b>Verifie et non modifie.</b> La chambre paraissait plus plate que le sejour ; mesure, son
+  microcontraste est en fait legerement superieur (2,32 contre 2,29) — l impression venait des lames de
+  18 cm, qui donnent moins de joints par surface. Aucune correction. Les limites de masque des trois
+  scenes suivent la grille, le seuil, les plinthes et le pied du meuble, sans halo ni decoupe oblique.
+  <br><b>Limite connue.</b> La tuile se repete tous les 4,80 m. Aucun bloc repete n est visible ici :
+  le plus grand sol du lot mesure 6,18 m, soit 1,29 periode. La limite reste entiere pour de plus
+  grandes pieces.
+</p>
 <div id="out"></div>
 <pre id="log"></pre>
 
