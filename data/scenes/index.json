@@ -39,6 +39,16 @@
       "highlight": "Couloir profond, meubles à pieds fins"
     },
     {
+      "id": "petite-piece",
+      "label": "Petit bureau",
+      "file": "room-petite-piece.jpg",
+      "thumb": "room-petite-piece-640.jpg",
+      "zones": 1,
+      "status": "experimental",
+      "highlight": "Petite pièce ; contour et occultations à reprendre",
+      "reason": "boundary-not-verifiable"
+    },
+    {
       "id": "contraste",
       "label": "Lumière contrastée",
       "file": "room-contraste.jpg",
