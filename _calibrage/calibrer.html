@@ -77,8 +77,20 @@ function chargeNative(src) {
   });
 }
 
-const fichier = new URLSearchParams(location.search).get('img') || 'room-couloir.jpg';
-const prepared = await chargeNative(`${BASE}assets/images/${fichier}`);
+/**
+ * `?img=` accepte un nom de fichier d'`assets/images/`, ou un chemin absolu.
+ *
+ * Le chemin absolu sert à qualifier une photo **avant** de l'importer : une
+ * candidate vit dans `_calibrage/_candidates/`, non versionné et non déployé,
+ * et ne rejoint `assets/images/` que si le pré-filtre la retient et que sa
+ * licence a été vérifiée sur sa page source. Sans cela il faudrait importer
+ * pour évaluer, puis nettoyer les rejets — et un fichier oublié finirait
+ * crédité nulle part.
+ */
+const demande = new URLSearchParams(location.search).get('img') || 'room-couloir.jpg';
+const fichier = demande.split('/').pop();
+const chemin = demande.startsWith('/') ? demande : `${BASE}assets/images/${demande}`;
+const prepared = await chargeNative(chemin);
 const photo = prepared.canvas;
 const W = photo.width;
 const H = photo.height;

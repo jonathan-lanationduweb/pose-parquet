@@ -201,6 +201,10 @@ const PHOTOS = {
     id: 7045700, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
     alt: 'Grand salon classique meublé au parquet foncé, canapé et tapis',
   },
+  'room-petite-piece': {
+    id: 26747989, w: 1600, h: 1067, credit: 'Image Hunter',
+    alt: 'Petit bureau d angle, secretaire en bois clair devant une fenetre a rideaux',
+  },
   'room-appartement-ancien': {
     id: 8583672, w: 1600, h: 1067, credit: 'Curtis Adams',
     alt: 'Couloir d appartement ancien au parquet patiné, console et portes à double battant',
