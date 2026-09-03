@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Revue des matières — outil interne</title>
+<style>
+  :root { color-scheme: dark; --line: #2c3230; --ink: #e6ebe8; --dim: #9aa5a0; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; background: #141817; color: var(--ink); }
+  header { position: sticky; top: 0; z-index: 5; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+           padding: 9px 14px; border-bottom: 1px solid var(--line); background: #141817ee; backdrop-filter: blur(8px); }
+  select, button, label { font: inherit; }
+  button { background: #1e2422; color: inherit; border: 1px solid var(--line); border-radius: 6px; padding: 5px 9px; cursor: pointer; }
+  .intro { margin: 10px 14px 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px;
+           color: var(--dim); max-width: 130ch; line-height: 1.5; }
+  .intro b { color: var(--ink); }
+  h2 { font: 600 13px/1.3 ui-monospace, monospace; margin: 22px 14px 6px; padding-top: 12px;
+       border-top: 1px solid var(--line); display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  h2 .dim { color: var(--dim); font-weight: 400; }
+  .etat { font-size: 10px; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+  .etat[data-e="ready"]       { background: #1d4634; color: #86e3b4; }
+  .etat[data-e="approximate"] { background: #3d3a1c; color: #ded08a; }
+  .etat[data-e="unavailable"] { background: #4a2222; color: #f0a3a3; }
+  .etat[data-g="bloquant"]    { background: #4a2222; color: #f0a3a3; }
+  .etat[data-g="signalement"] { background: #3d3a1c; color: #ded08a; }
+
+  /* Trois vues par matière, à largeur strictement égale. */
+  .lignes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0 14px; align-items: start; }
+  @media (max-width: 900px) { .lignes { grid-template-columns: 1fr; } }
+  figure { margin: 0; background: #0d0f0f; border-radius: 8px; overflow: hidden; }
+  figure canvas { display: block; width: 100%; height: auto; }
+  figcaption { padding: 5px 9px 7px; color: var(--dim); display: flex; justify-content: space-between; gap: 8px; }
+  table { border-collapse: collapse; margin: 6px 14px 0; font-size: 11px; }
+  td, th { border: 1px solid var(--line); padding: 3px 8px; text-align: left; vertical-align: top; }
+  th { color: var(--dim); font-weight: 400; }
+  #log { white-space: pre-wrap; padding: 12px 14px 40px; color: #9fd0b8; font-size: 11px; }
+</style>
+</head>
+<body>
+<header>
+  <strong>Revue des matières</strong>
+  <label>Scène <select id="scene"></select></label>
+  <label>Motif <select id="motif">
+    <option value="lames">lames droites</option>
+    <option value="point-de-hongrie">point de Hongrie</option>
+    <option value="baton-rompu">bâton rompu</option>
+  </select></label>
+  <button id="run">Rendre</button>
+  <span id="state"></span>
+</header>
+<p class="intro">
+  <b>Une matière, une scène de référence.</b> Chaque produit est rendu dans la
+  <em>même</em> pièce, sous la <em>même</em> lumière, avec la <em>même</em>
+  perspective et le <em>même</em> motif. Ce qui diffère d'une ligne à l'autre
+  est donc le produit, et rien d'autre — c'est la condition pour comparer
+  honnêtement deux références, et ce sera la page de contrôle à l'import des
+  vraies références Premibel. Le <b>statut visuel</b> dit ce qu'on regarde :
+  <span class="etat" data-e="ready">ready</span> une vraie matière,
+  <span class="etat" data-e="approximate">approximate</span> une famille de
+  démonstration qui en tient lieu. Un rendu approché ne représente pas
+  fidèlement une référence réelle, et ne doit jamais être présenté comme telle.
+</p>
+<div id="validation"></div>
+<div id="out"></div>
+<pre id="log"></pre>
+
+<script type="module">
+/**
+ * Revue des matières — et contrôle du catalogue.
+ *
+ * Deux besoins, une page :
+ *
+ * 1. **Comparer des produits à scène constante.** `scene-review.html` répond à
+ *    la question « cette pièce est-elle crédible ? ». Celle-ci répond à
+ *    « cette matière est-elle crédible, et se distingue-t-elle de sa voisine ? ».
+ *    Trois vues par produit : un gros plan au premier plan, la pièce entière,
+ *    et le fond de pièce — parce qu'une matière peut très bien tenir de près et
+ *    se dissoudre au loin, ou l'inverse.
+ *
+ * 2. **Valider le catalogue.** Le rapport en tête liste ce qui manque fiche par
+ *    fiche. Un produit invalide ne casse pas le visualiseur : il est écarté au
+ *    chargement, et il apparaît ici. Le jour où le catalogue vient d'un ERP,
+ *    c'est le premier endroit à regarder.
+ *
+ * Page interne : ni liée, ni indexée, ni déployée.
+ */
+import { analyzeScene, loadSceneIndex } from '../js/scene/analyzer.js';
+import { createSceneRenderer } from '../js/scene/renderer.js';
+import { loadImage } from '../js/scene/image-loader.js';
+import { loadCatalog } from '../js/studio/catalog.js';
+import { validateCatalog, KNOWN_PATTERNS } from '../js/scene/product.js';
+
+const BASE = '../';
+const $ = (id) => document.getElementById(id);
+const log = (line) => { $('log').textContent += line + '\n'; };
+
+/**
+ * Trois cadrages, choisis pour ce qu'ils révèlent.
+ * Le gros plan montre le veinage et les joints ; la pièce montre l'intégration ;
+ * le fond montre ce qui survit à la réduction — c'est là que les matières
+ * faibles deviennent un aplat.
+ */
+const CADRAGES = [
+  { cle: 'pres', label: 'Gros plan', box: [0.18, 0.80, 0.34, 0.19], zoom: 2 },
+  { cle: 'piece', label: 'La pièce', box: [0, 0, 1, 1], zoom: 1 },
+  { cle: 'fond', label: 'Fond de pièce', box: [0.34, 0.64, 0.34, 0.12], zoom: 3 },
+];
+
+const catalog = await loadCatalog(BASE);
+const index = await loadSceneIndex(BASE);
+const renderer = createSceneRenderer();
+$('state').textContent = `${renderer.backend} · aniso ×${renderer.anisotropy} · ${catalog.products.length} produits · ${catalog.source}`;
+
+index.scenes.forEach((e) => $('scene').append(new Option(e.id, e.id)));
+// La chambre est la scène validée sur les cinq critères : c'est la référence.
+$('scene').value = index.scenes.some((e) => e.id === 'chambre') ? 'chambre' : index.scenes[0].id;
+
+/* ---------------- Contrôle du catalogue ---------------- */
+
+function afficherValidation() {
+  const toutes = [...catalog.products, ...catalog.rejected];
+  const rapport = validateCatalog(toutes, catalog.families);
+  const bloquants = rapport.problemes.filter((p) => p.gravite === 'bloquant');
+  const signalements = rapport.problemes.filter((p) => p.gravite === 'signalement');
+
+  const par = {};
+  rapport.problemes.forEach((p) => {
+    par[p.id] = par[p.id] || [];
+    par[p.id].push(p);
+  });
+
+  $('validation').innerHTML =
+    `<h2>Catalogue — ${rapport.total} fiche(s)`
+    + ` <span class="etat" data-e="${rapport.ok ? 'ready' : 'unavailable'}">${rapport.ok ? 'valide' : bloquants.length + ' bloquant(s)'}</span>`
+    + ` <span class="dim">ready ${rapport.parStatut.ready || 0} · approximate ${rapport.parStatut.approximate || 0}`
+    + ` · unavailable ${rapport.parStatut.unavailable || 0} · ${signalements.length} signalement(s)</span></h2>`
+    + (Object.keys(par).length
+      ? '<table><tr><th>produit</th><th>gravité</th><th>ce qui manque</th></tr>'
+        + Object.entries(par).map(([id, liste]) =>
+          liste.map((p, i) =>
+            `<tr><td>${i === 0 ? id : ''}</td>`
+            + `<td><span class="etat" data-g="${p.gravite}">${p.gravite}</span></td>`
+            + `<td>${p.quoi}</td></tr>`).join('')).join('')
+        + '</table>'
+      : '<p class="intro">Aucun manque relevé.</p>');
+
+  log(`catalogue : ${rapport.total} fiches, ${bloquants.length} bloquant(s), ${signalements.length} signalement(s)`);
+  log(`motifs connus du moteur : ${KNOWN_PATTERNS.join(', ')}`);
+}
+
+/* ---------------- Rendu des matières ---------------- */
+
+const crop = (src, box, zoom) => {
+  const sw = box[2] * src.width;
+  const sh = box[3] * src.height;
+  const out = document.createElement('canvas');
+  out.width = Math.round(sw * zoom);
+  out.height = Math.round(sh * zoom);
+  const g = out.getContext('2d');
+  g.imageSmoothingEnabled = false;
+  g.drawImage(src, box[0] * src.width, box[1] * src.height, sw, sh, 0, 0, out.width, out.height);
+  return out;
+};
+
+async function run() {
+  $('out').innerHTML = '';
+  $('log').textContent = '';
+  afficherValidation();
+
+  const sceneId = $('scene').value;
+  const motif = $('motif').value;
+  const scene = await analyzeScene({ sceneId, base: BASE });
+  const prepared = await loadImage(`${BASE}assets/images/${scene.image.file}`);
+  renderer.setScene(scene, prepared);
+
+  // L'original, une fois, comme repère.
+  const ref = document.createElement('canvas');
+  ref.width = prepared.width;
+  ref.height = prepared.height;
+  ref.getContext('2d').drawImage(prepared.canvas, 0, 0);
+  const titreRef = document.createElement('h2');
+  titreRef.innerHTML = `${sceneId} — photo d’origine <span class="dim">repère</span>`;
+  $('out').appendChild(titreRef);
+  const ligneRef = document.createElement('div');
+  ligneRef.className = 'lignes';
+  CADRAGES.forEach((c) => {
+    const fig = document.createElement('figure');
+    const cap = document.createElement('figcaption');
+    cap.innerHTML = `<span>${c.label}</span><span>×${c.zoom}</span>`;
+    fig.append(crop(ref, c.box, c.zoom), cap);
+    ligneRef.appendChild(fig);
+  });
+  $('out').appendChild(ligneRef);
+
+  for (const material of catalog.parquets) {
+    const fiche = material.product || {};
+    const dispo = (fiche.compatiblePatterns || ['lames']).includes(motif);
+
+    const titre = document.createElement('h2');
+    titre.innerHTML = `${material.name}`
+      + ` <span class="etat" data-e="${fiche.visualStatus || 'approximate'}">${fiche.visualStatus || 'approximate'}</span>`
+      + ` <span class="dim">${[fiche.woodSpecies, fiche.tone, fiche.finish].filter(Boolean).join(' · ')}`
+      + ` — ${fiche.dimensions && fiche.dimensions.widthMm ? fiche.dimensions.widthMm + ' × ' + (fiche.dimensions.lengthMm || '?') + ' mm' : 'dimensions inconnues'}`
+      + ` — famille « ${fiche.visual ? fiche.visual.familyId : '?'} » (${fiche.visual ? fiche.visual.familyReason : '?'})`
+      + `${dispo ? '' : ' — <b>ce motif n’existe pas pour cette référence</b>'}</span>`;
+    $('out').appendChild(titre);
+
+    if (!dispo) {
+      // On ne dessine pas un motif que la référence ne propose pas : ce serait
+      // exactement la promesse fausse que la couche produit sert à éviter.
+      log(`${material.id.padEnd(16)} ${motif} indisponible — non rendu`);
+      continue;
+    }
+
+    const plein = document.createElement('canvas');
+    renderer.paint(plein, { material, pattern: motif, angle: 0, width: null, scale: 1 });
+    const ligne = document.createElement('div');
+    ligne.className = 'lignes';
+    CADRAGES.forEach((c) => {
+      const fig = document.createElement('figure');
+      const cap = document.createElement('figcaption');
+      cap.innerHTML = `<span>${c.label}</span><span>×${c.zoom}</span>`;
+      fig.append(crop(plein, c.box, c.zoom), cap);
+      ligne.appendChild(fig);
+    });
+    $('out').appendChild(ligne);
+    log(`${material.id.padEnd(16)} ${String(fiche.visualStatus).padEnd(12)} rendu`);
+  }
+  log('\nrevue terminée');
+}
+
+$('scene').addEventListener('change', run);
+$('motif').addEventListener('change', run);
+$('run').addEventListener('click', run);
+await run();
+window.review = { renderer, catalog, run };
+</script>
+</body>
+</html>

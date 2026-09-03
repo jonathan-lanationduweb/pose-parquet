@@ -26,7 +26,7 @@
  * disponible ; voir docs/renderer-canvas-vs-webgl.md.
  */
 import { zoneTransform, lightDirection, tileLight } from './geometry.js';
-import { TILE, TILE_METERS } from './texture.js';
+import { TILE, TILE_METERS, patternProfile } from './texture.js';
 
 const clamp = (v, min, max) => (v < min ? min : v > max ? max : v);
 
@@ -129,6 +129,18 @@ export function createCanvasRenderer() {
         // relief est éclairé du bon côté même quand la zone est vue de biais.
         const { u: lightU, v: lightV } = tileLight(jac, dir, angle);
 
+        // Rupture de périodicité : réservée à la pose droite, dont les rangées
+        // de lames sont indépendantes. Un chevron traverse les rangées.
+        const profil = patternProfile(surface.material, config.pattern, config.width || null);
+        const rangees = config.pattern === 'lames' ? Math.max(1, Math.round(TILE_METERS / profil.width)) : 0;
+        const hauteurRangee = rangees ? TILE / rangees : 0;
+        const decalageRangee = rangees
+          ? (ty) => {
+              const r = Math.floor(ty / hauteurRangee);
+              return (((r * 0.6180339887) % 1) + 1) % 1 * TILE;
+            }
+          : () => 0;
+
         const reliefGain = surf.relief * 0.9;
         const glossGain = gloss ? surf.clearcoat * 1.15 : 0;
         const strength = light.strength;
@@ -168,8 +180,12 @@ export function createCanvasRenderer() {
             // Coordonnées dans le plan du sol, en mètres, motif compris.
             const fu = u * meters.width + origin.u;
             const fv = v * meters.depth + origin.v;
-            const tx = (fu * cos - fv * sin) * perMeter;
             const ty = (fu * sin + fv * cos) * perMeter;
+            // Rupture de périodicité, rangée par rangée : même formule que le
+            // shader, voir 'uJitter' dans renderer-gl.js. Le décalage est
+            // calculé une fois pour le pixel, avant l'étalement anisotrope,
+            // pour que tous ses échantillons restent dans la même rangée.
+            const tx = (fu * cos - fv * sin) * perMeter + decalageRangee(ty);
 
             // Empreinte du pixel dans la tuile : deux axes, souvent très
             // inégaux en perspective rasante. Filtrer sur le plus grand rend

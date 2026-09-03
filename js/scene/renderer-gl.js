@@ -26,7 +26,7 @@
  * de référence — les deux doivent donner la même image.
  */
 import { zoneTransform, tileLight } from './geometry.js';
-import { TILE_METERS } from './texture.js';
+import { TILE_METERS, patternProfile } from './texture.js';
 
 const VERTEX = `#version 300 es
 in vec2 aUnit;
@@ -54,6 +54,8 @@ uniform vec2  uMeters;      // largeur, profondeur réelles du plan
 uniform vec2  uOrigin;      // décalage de la trame, en mètres
 uniform vec2  uRot;         // cos, sin de l'orientation du motif
 uniform float uTileMeters;  // mètres couverts par une tuile
+uniform float uRowsPerTile; // rangées de lames dans une tuile
+uniform float uJitter;      // amplitude du décalage par rangée, 0 = aucun
 uniform float uLabel;       // numéro de la zone, 1..255
 uniform vec2  uLight;       // direction de la lumière, repère de la tuile
 uniform float uStrength;    // report de l'éclairement
@@ -88,10 +90,38 @@ void main() {
   );
   vec2 uv = rotated / uTileMeters;
 
-  // Les dérivées de uv sont continues (aucun repli) : le GPU choisit seul le
-  // niveau de mipmap et l'étalement anisotrope.
-  vec3 albedo = texture(uAlbedo, uv).rgb;
-  vec3 relief = texture(uReliefMap, uv).rgb;
+  // Rupture de périodicité, rangée par rangée.
+  //
+  // La tuile couvre 4,80 m et une pièce en fait 6 à 8 : la même séquence de
+  // lames revient donc, avec ses nœuds et ses cathédrales au même endroit, et
+  // l'œil repère aussitôt un motif qui se répète. Un atlas plus grand coûterait
+  // des dizaines de mégaoctets pour le seul plaisir de repousser le problème.
+  //
+  // On décale plutôt la lecture le long de 'u' d'une valeur propre à chaque
+  // rangée de lames. Les rangées gardent leur alignement — le décalage se fait
+  // dans la longueur, pas en travers — la tuile se raccorde en 'u', donc rien
+  // ne se voit au joint. Et comme l'indice de rangée croît sans borne, deux
+  // répétitions de la tuile en profondeur reçoivent des décalages différents :
+  // la périodicité tombe sur les deux axes à la fois.
+  //
+  // Inapplicable aux chevrons, dont les lames traversent les rangées : le
+  // moteur y met 'uJitter' à zéro.
+  vec2 uvLu = uv;
+  if (uJitter > 0.0) {
+    float rangee = floor(uv.y * uRowsPerTile);
+    // Recurrence doree plutot que fract(sin(x)) : la seconde depend de la
+    // precision de sin, qui differe entre le float32 du shader et le float64
+    // du moteur Canvas — les deux moteurs n arrangeraient pas les lames de la
+    // meme facon, et ils doivent rester comparables.
+    uvLu.x += fract(rangee * 0.6180339887) * uJitter;
+  }
+
+  // Les dérivées viennent de 'uv', jamais de 'uvLu' : le décalage est constant
+  // par rangée, mais il saute d'une rangée à l'autre. Laisser le GPU dériver
+  // 'uvLu' lui ferait lire un saut à chaque changement de rangée et choisir un
+  // mipmap absurde — une ligne floue apparaîtrait à chaque joint de lame.
+  vec3 albedo = textureGrad(uAlbedo, uvLu, dFdx(uv), dFdy(uv)).rgb;
+  vec3 relief = textureGrad(uReliefMap, uvLu, dFdx(uv), dFdy(uv)).rgb;
 
   // Taille du pixel au sol, en mètres : sert à estomper le relief au loin,
   // où un chanfrein de 2 mm ne peut plus être qu'un bruit.
@@ -258,6 +288,7 @@ export function createGlRenderer() {
   };
   const u = uniforms(prog, [
     'uQuad', 'uViewport', 'uInverse', 'uMeters', 'uOrigin', 'uRot', 'uTileMeters',
+    'uRowsPerTile', 'uJitter',
     'uLabel', 'uLight', 'uStrength', 'uAmbient', 'uTint', 'uReliefGain', 'uGlossGain',
     'uMask', 'uAlbedo', 'uReliefMap', 'uShading', 'uGloss',
   ]);
@@ -425,6 +456,13 @@ export function createGlRenderer() {
         gl.uniform2f(u.uOrigin, zone.plane.origin.u, zone.plane.origin.v);
         gl.uniform2f(u.uRot, Math.cos(angle), Math.sin(angle));
         gl.uniform1f(u.uTileMeters, TILE_METERS * (config.scale || 1));
+        // Rupture de périodicité : réservée à la pose droite, dont les rangées
+        // de lames sont indépendantes. Un chevron traverse les rangées, un
+        // décalage les briserait.
+        const profil = patternProfile(surface.material, config.pattern, config.width || null);
+        const droit = config.pattern === 'lames';
+        gl.uniform1f(u.uRowsPerTile, droit ? Math.max(1, Math.round(TILE_METERS / profil.width)) : 1);
+        gl.uniform1f(u.uJitter, droit ? 1 : 0);
         gl.uniform1f(u.uLabel, index + 1);
         gl.uniform2f(u.uLight, light.u, light.v);
         gl.uniform1f(u.uReliefGain, surf.relief * 0.9);
