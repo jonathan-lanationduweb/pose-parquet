@@ -194,10 +194,28 @@ body.app {
 }
 .start__or { color: var(--text-muted); font-size: 0.95rem; }
 
+/**
+ * Bibliothèque de pièces : une colonne, puis deux, puis trois.
+ *
+ * `auto-fill` en `minmax(17rem, 1fr)` donnait quatre cartes par ligne au-delà
+ * de 1100 px, et les vignettes devenaient trop petites pour distinguer une
+ * pièce d'une autre — ce qui est précisément à quoi sert cet écran. Les
+ * paliers sont donc explicites : la largeur d'une carte est un choix, pas le
+ * reste d'une division.
+ *
+ * Toutes les cartes partagent le même gabarit — même ratio 3/2, donc même
+ * hauteur, même dégradé, même position de titre. Rien n'est laissé au contenu.
+ */
 .start__rooms {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  grid-template-columns: 1fr;
   gap: clamp(0.75rem, 1.5vw, 1.25rem);
+}
+@media (min-width: 40rem) {
+  .start__rooms { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 64rem) {
+  .start__rooms { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 .room-card {
   position: relative;
@@ -221,6 +239,15 @@ body.app {
   font-size: 1rem;
   font-weight: 500;
   text-align: left;
+}
+/* Ce que la pièce met à l'épreuve : la seule ligne qui aide à choisir. */
+.room-card__quoi {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.83rem;
+  font-weight: 400;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.82);
 }
 .room-card__zones {
   display: block;

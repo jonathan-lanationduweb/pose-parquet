@@ -13,6 +13,17 @@ import { createSceneRenderer } from '../js/scene/renderer.js';
 import { createMaterial } from '../js/scene/material.js';
 import { loadImage } from '../js/scene/image-loader.js';
 import { zoneTransform } from '../js/scene/geometry.js';
+/**
+ * Les mesures de calibrage vivent dans geometrie.js : elles servent aussi à
+ * calibrer une scène en script, sans passer par cette interface. C'était
+ * nécessaire — à la main, six nouvelles pièces représentaient des centaines
+ * de relevés.
+ */
+import {
+  intersecte, ajusteDroite, focaleParOrthogonalite, quadDepuisPiece,
+  pointAuSol, mesureQuad, etendueVisible,
+  orientationLocale, fuiteDesLames, piedDeMur, releveColonnes,
+} from './geometrie.js';
 
 const BASE = '../';
 const $ = (id) => document.getElementById(id);
@@ -135,137 +146,20 @@ function paintOverlay() {
 
 /* ---------------- Orientation réelle du plancher ---------------- */
 
-/**
- * Direction des lames du sol **d'origine**, mesurée par tenseur de structure.
- *
- * C'est la mesure qui manquait, et l'absence de laquelle tout le reste était
- * faux. Un quadrilatère de perspective n'a de sens que s'il est **l'image d'un
- * rectangle réel du sol** : son axe u doit suivre une direction réelle de la
- * pièce. En posant à la place un trapèze symétrique « qui couvre le sol », on
- * force l'axe des lames à l'horizontale de l'écran — et le rendu donne une
- * plaque qui remonte, avec sa propre perspective, indépendante de la pièce.
- *
- * Le plancher photographié porte déjà l'information : ses joints sont des
- * droites parallèles à un axe de la pièce. On lit donc l'orientation locale
- * du motif, en plusieurs points, et on en déduit le point de fuite.
- *
- * Méthode : dans une fenêtre autour du point, on somme le tenseur des
- * gradients J = Σ [[gx², gxgy], [gxgy, gy²]]. Le vecteur propre dominant donne
- * la direction du **gradient** ; les joints sont perpendiculaires. La cohérence
- * (rapport des valeurs propres) dit si la mesure vaut quelque chose : sur une
- * zone lisse ou bruitée, elle tombe à zéro et il faut choisir un autre point.
- *
- * @returns {{angle:number, coherence:number, dir:{x,y}}} angle en degrés,
- *          mesuré depuis l'horizontale de l'image, dans le sens des y croissants
- */
-function plankOrientation(nx, ny, radiusPx = 60) {
-  const photo = renderer.photo;
-  const w = photo.width;
-  const h = photo.height;
-  const ctx = photo.getContext('2d', { willReadFrequently: true });
-  const cx = Math.round(nx * w);
-  const cy = Math.round(ny * h);
-  const r = radiusPx;
-  const x0 = Math.max(1, cx - r);
-  const y0 = Math.max(1, cy - r);
-  const x1 = Math.min(w - 1, cx + r);
-  const y1 = Math.min(h - 1, cy + r);
-  const img = ctx.getImageData(x0 - 1, y0 - 1, x1 - x0 + 2, y1 - y0 + 2).data;
-  const stride = x1 - x0 + 2;
-  const lum = (x, y) => {
-    const p = ((y + 1) * stride + (x + 1)) * 4;
-    return 0.2126 * img[p] + 0.7152 * img[p + 1] + 0.0722 * img[p + 2];
-  };
-
-  let jxx = 0;
-  let jxy = 0;
-  let jyy = 0;
-  for (let y = 0; y < y1 - y0; y += 1) {
-    for (let x = 0; x < x1 - x0; x += 1) {
-      const gx = lum(x + 1, y) - lum(x - 1, y);
-      const gy = lum(x, y + 1) - lum(x, y - 1);
-      jxx += gx * gx;
-      jxy += gx * gy;
-      jyy += gy * gy;
-    }
-  }
-  // Valeurs propres du tenseur 2×2
-  const tr = jxx + jyy;
-  const det = jxx * jyy - jxy * jxy;
-  const disc = Math.sqrt(Math.max(0, (tr / 2) * (tr / 2) - det));
-  const l1 = tr / 2 + disc;
-  const l2 = tr / 2 - disc;
-  const coherence = l1 > 1e-6 ? (l1 - l2) / (l1 + l2) : 0;
-  // Vecteur propre dominant = direction du gradient ; les joints sont à 90°
-  const gAngle = 0.5 * Math.atan2(2 * jxy, jxx - jyy);
-  const angle = ((gAngle * 180) / Math.PI + 90 + 180) % 180;
-  const rad = (angle * Math.PI) / 180;
-  return { angle: +angle.toFixed(2), coherence: +coherence.toFixed(3), dir: { x: Math.cos(rad), y: Math.sin(rad) } };
+/** Relevé d'une série de colonnes, journalisé et prêt à coller dans une scène. */
+function releve(colonnes, y0, y1) {
+  const rows = releveColonnes(renderer.photo, colonnes, y0, y1);
+  const pixels = rows.map((r) => ({ x: r.x * renderer.size.width, y: r.y * renderer.size.height }));
+  const fit = ajusteDroite(pixels);
+  log("\n  relevé " + y0 + "–" + y1 + " :");
+  log("  [" + rows.map((r) => JSON.stringify({ x: r.x, y: r.y })).join(", ") + "]");
+  if (fit) log("  droite ajustée : résidu max " + fit.residuMax + " px sur " + fit.points + " points");
+  return { rows, fit };
 }
 
-/** Intersection de deux droites données par un point et une direction. */
-function intersect(p1, d1, p2, d2) {
-  const den = d1.x * d2.y - d1.y * d2.x;
-  if (Math.abs(den) < 1e-9) return null; // parallèles à l'écran : fuite à l'infini
-  const t = ((p2.x - p1.x) * d2.y - (p2.y - p1.y) * d2.x) / den;
-  return { x: p1.x + t * d1.x, y: p1.y + t * d1.y };
-}
 
-/**
- * Point de fuite de la direction des lames, en coordonnées normalisées.
- * Trois points ou plus : on prend la médiane des intersections deux à deux,
- * bien plus robuste qu'une seule paire.
- */
-function plankVanishingPoint(points, radiusPx = 60) {
-  const w = renderer.size.width;
-  const h = renderer.size.height;
-  const samples = points.map(([nx, ny]) => {
-    const o = plankOrientation(nx, ny, radiusPx);
-    return { p: { x: nx * w, y: ny * h }, d: o.dir, angle: o.angle, coherence: o.coherence, at: [nx, ny] };
-  });
-  const hits = [];
-  for (let i = 0; i < samples.length; i += 1) {
-    for (let j = i + 1; j < samples.length; j += 1) {
-      const q = intersect(samples[i].p, samples[i].d, samples[j].p, samples[j].d);
-      if (q) hits.push(q);
-    }
-  }
-  const median = (arr) => {
-    const s = [...arr].sort((a, b) => a - b);
-    return s.length ? s[Math.floor(s.length / 2)] : null;
-  };
-  const vp = hits.length ? { x: median(hits.map((q) => q.x)), y: median(hits.map((q) => q.y)) } : null;
-  return {
-    samples: samples.map((s) => ({ at: s.at, angle: s.angle, coherence: s.coherence })),
-    vp: vp ? { x: +(vp.x / w).toFixed(4), y: +(vp.y / h).toFixed(4) } : null,
-    intersections: hits.length,
-  };
-}
 
-/**
- * Quadrilatère de plan construit à partir de la géométrie de la pièce.
- *
- * @param {object} o
- * @param {{x,y}} o.vpU  point de fuite de l'axe u (le long des lames), normalisé
- * @param {{x,y}} o.vpV  point de fuite de l'axe v (perpendiculaire)
- * @param {{x,y}} o.corner  un coin du rectangle, sur le sol
- * @param {{x,y}} o.alongU  second point du rectangle, dans la direction u
- * @param {{x,y}} o.alongV  second point, dans la direction v
- * @returns {{x,y}[]} quatre points, dans l'ordre attendu par le moteur
- *
- * Le quatrième coin n'est pas choisi : il est **imposé** par la perspective —
- * intersection de la droite (alongU → vpV) et de (alongV → vpU). C'est ce qui
- * garantit que le quadrilatère est bien l'image d'un rectangle, et donc que
- * l'homographie a un sens.
- */
-function quadFromRoom({ vpU, vpV, corner, alongU, alongV }) {
-  const dir = (a, b) => ({ x: b.x - a.x, y: b.y - a.y });
-  const fourth = intersect(alongU, dir(alongU, vpV), alongV, dir(alongV, vpU));
-  if (!fourth) throw new Error('quatrième coin indéterminé');
-  const round = (p) => ({ x: +p.x.toFixed(4), y: +p.y.toFixed(4) });
-  // ordre du moteur : fond-gauche, fond-droite, proche-droite, proche-gauche
-  return [round(corner), round(alongU), round(fourth), round(alongV)];
-}
+
 
 /* ---------------- Loupe ---------------- */
 
@@ -385,60 +279,7 @@ function showPhoto() {
 
 /* ---------------- Relevé du bas des murs ---------------- */
 
-/**
- * Aide au relevé, pas une détection.
- *
- * Le bas d'un mur est, dans une photo d'intérieur, la plus forte montée de
- * « chaleur » (R − B) quand on descend : la plinthe est claire et neutre, le
- * sol est chaud. On renvoie le **début** de cette montée et non son sommet :
- * la transition s'étale sur quelques pixels, et prendre le sommet place la
- * limite deux ou trois pixels trop bas — assez pour laisser une bande de
- * l'ancien sol visible sous la plinthe, ce qui saute aux yeux.
- *
- * Chaque valeur produite ici est ensuite vérifiée à la loupe, contour affiché,
- * avant d'entrer dans data/scenes/. C'est un outil de développement : rien de
- * tout cela ne tourne dans le visualiseur.
- */
-function wallFoot(photo, nx, y0n, y1n) {
-  const width = photo.width;
-  const height = photo.height;
-  const data = photo.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, width, height).data;
-  const x = Math.round(nx * width);
-  const rows = [];
-  for (let y = Math.round(y0n * height); y < Math.round(y1n * height); y += 1) {
-    let warm = 0;
-    let luma = 0;
-    for (let dx = -4; dx <= 4; dx += 1) {
-      const p = (y * width + Math.min(width - 1, Math.max(0, x + dx))) * 4;
-      warm += data[p] - data[p + 2];
-      luma += 0.2126 * data[p] + 0.7152 * data[p + 1] + 0.0722 * data[p + 2];
-    }
-    rows.push({ y, warm: warm / 9, luma: luma / 9 });
-  }
-  const score = rows.map((r, i) => {
-    const a = rows[Math.max(0, i - 2)];
-    const b = rows[Math.min(rows.length - 1, i + 2)];
-    return (b.warm - a.warm) + (b.luma - a.luma) * 0.3;
-  });
-  let peak = 0;
-  for (let i = 2; i < score.length - 2; i += 1) if (score[i] > score[peak]) peak = i;
-  // Remontée jusqu'au pied de la pente : là commence réellement le sol.
-  const floorLevel = score[peak] * 0.22;
-  let start = peak;
-  while (start > 1 && score[start - 1] > floorLevel) start -= 1;
-  return { ny: +(rows[start].y / height).toFixed(4), force: +score[peak].toFixed(1) };
-}
 
-/** Relevé d'une série de colonnes, prêt à coller dans une scène. */
-function survey(columns, y0, y1) {
-  const rows = columns.map((nx) => {
-    const found = wallFoot(renderer.photo, nx, y0, y1);
-    return { nx, ...found };
-  });
-  log(`\n  relevé ${y0}–${y1} :`);
-  log(`  [${rows.map((r) => `{ "x": ${r.nx}, "y": ${r.ny} }`).join(', ')}]`);
-  return rows;
-}
 
 /* ---------------- Banc d'essai ---------------- */
 
@@ -523,4 +364,4 @@ $('wrap').addEventListener('mousemove', (event) => {
 });
 
 await load($('scene').value);
-window.calibrage = { renderer, get scene() { return scene; }, load, draw, bench, materials, showPhoto, wallFoot, survey, plankOrientation, plankVanishingPoint, quadFromRoom, intersect, setFocus(x, y, zoom) { focus = { x, y }; if (zoom) $('loupe-zoom').value = String(zoom); if (!loupeOn) $('loupe-btn').click(); else paintLoupe(); } };
+window.calibrage = { renderer, get scene() { return scene; }, load, draw, bench, materials, showPhoto, releve, intersecte, ajusteDroite, focaleParOrthogonalite, quadDepuisPiece, pointAuSol, mesureQuad, etendueVisible, orientationLocale, fuiteDesLames, piedDeMur, releveColonnes, setFocus(x, y, zoom) { focus = { x, y }; if (zoom) $('loupe-zoom').value = String(zoom); if (!loupeOn) $('loupe-btn').click(); else paintLoupe(); } };

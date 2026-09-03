@@ -36,9 +36,9 @@
   .etat[data-e="s-o"]      { background: #262c2a; color: #7d8888; }
   .grid.produits { grid-template-columns: repeat(6, minmax(0, 1fr)); margin-top: 8px; }
   @media (max-width: 1100px) { .grid.produits { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  #passe { margin: 10px 14px 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px;
+  .passe { margin: 10px 14px 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px;
            color: var(--dim); max-width: 130ch; line-height: 1.5; }
-  #passe b { color: var(--ink); }
+  .passe b { color: var(--ink); }
   #log { white-space: pre-wrap; padding: 12px 14px 40px; color: #9fd0b8; font-size: 11px; }
 </style>
 </head>
@@ -49,14 +49,14 @@
   <button id="run">Rendre</button>
   <span id="state"></span>
 </header>
-<p id="passe">
+<p class="passe">
   <b>Etat du moteur.</b> Relevement des ombres limite aux ombres <em>et</em> proportionne au manque de
   marge du materiau : le relief lumineux du sol conserve 0,96 a 0,97 de celui de la photo sur les bois
   clairs (contre 0,57 a 0,76 avant). Figure en cathedrale ajoutee au veinage. Joints de bout remontes a
   0,32 du joint lateral. Dispersion de teinte indexee sur la taille de l element. Reflet colore par le
   bois. Catalogue charge par la couche produit (js/scene/product.js).
 </p>
-<p id="passe">
+<p class="passe">
   <b>Passe matiere du 3 septembre 2026.</b> Deux defauts objectifs corriges.
   (1) L accent clair du veinage etait <em>additif</em> : il rapprochait la couleur du gris. Mesure sur
   les dix chenes du catalogue, il perdait de 0,05 a 0,09 de saturation et decalait la teinte de 2 a
@@ -104,7 +104,7 @@
  *
  * Page interne : ni liée, ni indexée, ni déployée.
  */
-import { analyzeScene, loadSceneIndex } from '../js/scene/analyzer.js';
+import { analyzeScene, loadSceneIndex, statutDe } from '../js/scene/analyzer.js';
 import { createSceneRenderer } from '../js/scene/renderer.js';
 import { loadImage } from '../js/scene/image-loader.js';
 import { loadCatalog } from '../js/studio/catalog.js';
@@ -198,6 +198,23 @@ const VERDICTS = {
       'baton-rompu': { Perspective: 'correct', 'Échelle': 'correct', Masque: 'valide', 'Lumière': 'valide', Motif: 'correct' },
     },
   },
+  'appartement-ancien': {
+    note: 'Couloir profond, vue dans l’axe. Fuite de l’axe mesurée deux fois, indépendamment : par les deux '
+      + 'plinthes (0,4908 ; 0,5454) et par la direction des joints du parquet relevée au tenseur de structure '
+      + '(0,5058 ; 0,5513). Les deux concordent à 24 px en x et 6 px en y — c’est la preuve que les lames de ce sol '
+      + 'suivent bien l’axe. Réserve nommée, et elle est importante : la focale et la hauteur d’œil ne sont PAS '
+      + 'déductibles d’une vue axiale, les mètres sont donc déclarés (2,20 × 7,00 m) et non mesurés. Le comptage de '
+      + 'lames, qui aurait recoupé la largeur, échoue sur ce vernis. Sept occultations, dont six pieds fins.',
+    vues: {},
+  },
+  couloir: {
+    note: 'EXPÉRIMENTALE. Distorsion en barillet mesurée : le jambage de la porte du fond, droite réelle, dessine un '
+      + 'arc de +3,1 / −4,0 / +4,0 px sur 79 points, au centre du cadre. Deux arêtes horizontales du mur de droite '
+      + 'fuient vers (0,407 ; 0,501) quand celles du panneau de gauche fuient vers (0,504 ; 0,622) : aucun horizon '
+      + 'n’est compatible avec les deux, le modèle sténopé ne peut pas décrire cette image. Gardée pour ça — les '
+      + 'photos de téléphone en ultra grand-angle poseront le même problème à « importer ma pièce ».',
+    vues: {},
+  },
 };
 
 const etatDe = (sceneId, vueCle, critere) => {
@@ -248,7 +265,7 @@ async function renderScene(entry) {
       : { texte: 'CORRECT', e: 'correct' };
 
   const title = document.createElement('h2');
-  title.innerHTML = `${entry.id} — ${entry.label} · ${scene.floorZones.length} zone(s)`
+  title.innerHTML = `${entry.id} — ${entry.label} · ${scene.floorZones.length} zone(s) · ${statutDe(entry)}`
     + ` <span class="verdict etat" data-e="${verdict.e}">${verdict.texte}</span>`
     + (juge.note ? ` <span class="note">${juge.note}</span>` : '');
   $('out').appendChild(title);

@@ -1,0 +1,90 @@
+{
+  "schema": "pose-parquet/scene@1",
+  "id": "couloir",
+  "label": "Couloir",
+  "status": "experimental",
+  "source": "precalibrated",
+  "note": "EXPÉRIMENTALE — conservée pour ce qu'elle apprend, pas proposée aux visiteurs.\n\nCette photo met en défaut le modèle de caméra du moteur, et c'est la raison de la garder.\n\nLE DÉFAUT. Le jambage de la porte du fond est une droite dans le monde réel. Traqué sur 79 points dans l'image, il s'écarte de sa propre droite ajustée de +3,1 px, puis −4,0 px au milieu, puis +4,0 px à l'autre bout : un arc systématique, pas du bruit. C'est la signature d'une DISTORSION EN BARILLET, et ce mesuré au centre du cadre, là où elle est la plus faible. Aux bords elle est plusieurs fois plus forte.\n\nCE QUE ÇA CASSE. SceneData décrit une caméra sténopé : pas de coefficient de distorsion. Deux droites horizontales du même mur de droite (son pied et son arête haute) fuient vers (0,407 ; 0,501), alors que le pied et le haut du panneau de gauche fuient vers (0,504 ; 0,622). Deux directions horizontales doivent avoir leurs fuites sur un même horizon ; la droite qui joindrait ces deux points serait inclinée de 40 degrés, ce qui supposerait un appareil tourné de 40 degrés — or les verticales de la photo sont verticales. Il n'existe donc aucun horizon compatible avec les deux relevés : le modèle ne peut pas décrire cette image.\n\nCE QU'ON EN TIRE. Le cas n'est pas anecdotique. Les téléphones photographient en ultra grand-angle, et la fonction « importer ma pièce » recevra exactement ce genre d'image. Ajouter un coefficient de distorsion radial à SceneData, et le corriger avant tout relevé, est la vraie réponse. Ce n'est pas fait, et cette scène est ici pour le rappeler.\n\nEN ATTENDANT. Le quadrilatère est construit sur les deux pieds de murs du premier plan (5 et 7 points du contour affiné, résidus max 1,9 et 3,1 px) et sur la fuite du panneau de gauche, mesurée sur une base de 640 px. Il est cohérent LOCALEMENT, dans la moitié basse de l'image où la distorsion reste modérée. Les mètres sont déclarés, pas déduits. Le rendu est utilisable pour éprouver la profondeur et la réduction des lames ; il ne faut pas s'en servir pour juger la justesse géométrique du moteur.\n\nContour affiné : gradient médian 28,1 → 51,8 (×1,84). Faible en absolu : ce couloir est bois clair sur bois clair, la jonction mur/sol n'offre presque aucune marche de teinte — le relevé automatique de pied de mur y échoue complètement (forces 1,7 à 15,6, résidus 46 à 61 px), d'où un contour relevé à l'œil puis affiné.",
+  "image": {
+    "file": "room-couloir.jpg",
+    "width": 1600,
+    "height": 1067,
+    "alt": "Couloir clair aux portes en bois, ouvert sur une pièce au fond",
+    "credit": "Max Vakhtbovych / Pexels"
+  },
+  "camera": {
+    "horizon": 0.6223,
+    "vanishingPoints": [
+      { "x": 0.504, "y": 0.6223, "weight": 1, "role": "axe-couloir" },
+      { "x": 0.407, "y": 0.5007, "weight": 0.3, "role": "mur-droit-incompatible" },
+      { "x": 40, "y": 0.6223, "weight": 0.2, "role": "transversale-a-l-infini" }
+    ],
+    "heightM": null,
+    "focalPx": null
+  },
+  "surfaces": [
+    { "id": "couloir", "label": "Parquet du couloir", "continuous": true }
+  ],
+  "planes": {
+    "couloir": {
+      "quad": [
+        { "x": 0.2521, "y": 0.88 },
+        { "x": 0.6354, "y": 0.88 },
+        { "x": 0.7039, "y": 1.0143 },
+        { "x": 0.1302, "y": 1.02 }
+      ],
+      "meters": { "width": 2.6, "depth": 3.2 },
+      "origin": { "u": 0, "v": 0 },
+      "rotationDeg": 0,
+      "note": "Rectangle de référence pris volontairement dans le premier plan (y de 0,880 à 1,020), là où la distorsion reste modérée. Le prendre sur toute la hauteur du sol donnerait une fuite fausse."
+    }
+  },
+  "floorZones": [
+    {
+      "id": "couloir",
+      "label": "Couloir",
+      "surfaceId": "couloir",
+      "planeRef": "couloir",
+      "order": 0,
+      "mask": {
+        "polygon": [
+          { "x": 0.157, "y": 1 },
+          { "x": 0.1886, "y": 0.9545 },
+          { "x": 0.212, "y": 0.9238 },
+          { "x": 0.232, "y": 0.902 },
+          { "x": 0.2427, "y": 0.8923 },
+          { "x": 0.2533, "y": 0.8791 },
+          { "x": 0.2539, "y": 0.76 },
+          { "x": 0.2528, "y": 0.7288 },
+          { "x": 0.2717, "y": 0.7196 },
+          { "x": 0.3002, "y": 0.7098 },
+          { "x": 0.34, "y": 0.7025 },
+          { "x": 0.5729, "y": 0.6998 },
+          { "x": 0.5761, "y": 0.6999 },
+          { "x": 0.5765, "y": 0.7092 },
+          { "x": 0.5768, "y": 0.737 },
+          { "x": 0.5756, "y": 0.7611 },
+          { "x": 0.5836, "y": 0.787 },
+          { "x": 0.5884, "y": 0.7987 },
+          { "x": 0.5978, "y": 0.8173 },
+          { "x": 0.6131, "y": 0.8427 },
+          { "x": 0.6748, "y": 0.9522 },
+          { "x": 0.6864, "y": 0.9685 },
+          { "x": 0.69, "y": 0.97 },
+          { "x": 0.709, "y": 1 }
+        ],
+        "holes": [],
+        "note": "Relevé à l'œil sur la loupe graduée, puis affiné sur les arêtes de l'image. Le pas vertical entre y = 0,879 et 0,729 est l'arête verticale du panneau coulissant, vue de champ : ce n'est pas une erreur de relevé."
+      }
+    }
+  ],
+  "occluders": [],
+  "light": {
+    "kind": "photo-luma",
+    "strength": 1,
+    "blurRadius": 0.032,
+    "tint": 0.4,
+    "ambient": 0.26,
+    "contact": 0.42
+  }
+}
