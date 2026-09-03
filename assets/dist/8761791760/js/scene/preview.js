@@ -48,7 +48,10 @@ export function mountPreview(root) {
         <canvas class="vzp__canvas" data-canvas></canvas>
         <span class="vzp__tag vzp__tag--before">Avant</span>
         <span class="vzp__tag vzp__tag--after">Après</span>
-        <input class="vzp__range" type="range" min="0" max="100" value="52"
+        <!-- Course bornée à 3–97 % : le bouton de la poignée est centré sur le
+             trait, donc à moitié hors cadre à 0 et à 100 %, où l'overflow de la
+             scène le coupait net. Le trait et le découpage restent identiques. -->
+        <input class="vzp__range" type="range" min="3" max="97" value="52"
           aria-label="Curseur de comparaison entre la pièce d’origine et le parquet simulé" data-range />
         <span class="vzp__handle" aria-hidden="true"></span>
       </div>

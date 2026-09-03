@@ -17,6 +17,15 @@ const ICON = {
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 12h16"/><path d="m8 8-4 4 4 4"/><path d="m16 8 4 4-4 4"/></svg>',
 };
 
+/**
+ * Les quatre entrées du parcours.
+ *
+ * `media` est **obligatoire** sur chacune. Il existait auparavant un repli
+ * `tile__pattern` pour les cartes sans visuel — trois `<span>` sans une seule
+ * règle CSS, qui s'affichaient donc en barres nues et donnaient l'impression
+ * d'un squelette de chargement resté bloqué. Le repli est supprimé : quatre
+ * cartes, quatre photographies, même gabarit.
+ */
 const TILES = [
   {
     num: '(01)',
@@ -32,7 +41,11 @@ const TILES = [
     text: 'Flottante, collée, clouée : le support et le produit décident plus que le goût.',
     href: 'guides/parquet-massif-ou-contrecolle.html',
     tone: 'sage',
-    pattern: true,
+    // Cette carte portait `pattern: true` et rendait trois barres décoratives
+    // là où les trois autres rendent une photographie : elle avait l'air d'un
+    // squelette de chargement resté affiché. Le visuel `tile-poser` existait
+    // déjà en 400/700/1000 (jpg + webp) et n'était utilisé nulle part.
+    media: 'tile-poser',
   },
   {
     num: '(03)',
@@ -113,11 +126,10 @@ function tilesSection() {
               </div>
               <p class="tile__text">${tile.text}</p>
               <span class="tile__more">Explorer ${ICON.arrow}</span>
-              ${
-                tile.media
-                  ? `<div class="tile__media">${picture(tile.media, { alt: '', sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw' })}</div>`
-                  : '<div class="tile__pattern" aria-hidden="true"><span></span><span></span><span></span></div>'
-              }
+              <div class="tile__media">${picture(tile.media, {
+                alt: '',
+                sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw',
+              })}</div>
             </a>`
   ).join('\n            ');
 

@@ -95,6 +95,16 @@ async function main() {
   let total = 0;
 
   for (const { name, photo } of jobs) {
+    // Visuel produit pour le site, pas téléchargé : un rendu du moteur, par
+    // exemple, qu un --force ne doit surtout pas écraser.
+    if (photo.local) {
+      const manquants = [`${name}.jpg`, ...variantsFor(name, photo).flatMap((v) => [`${name}-${v.w}.jpg`, `${name}-${v.w}.webp`])]
+        .filter((f) => !fs.existsSync(path.join(DIR, f)));
+      if (manquants.length) console.log(`! ${name} : local, mais absent — ${manquants.join(", ")}`);
+      else console.log(`= ${name} : local, conservé`);
+      skipped += 1;
+      continue;
+    }
     // Fichier de référence (repli des navigateurs sans srcset)
     const base = await ensure(photo, path.join(DIR, `${name}.jpg`));
     total += base.size;
@@ -120,15 +130,23 @@ async function main() {
   const credits = [
     '# Crédits photographiques',
     '',
-    'Toutes les photographies proviennent de [Pexels](https://www.pexels.com)',
+    'La plupart des photographies proviennent de [Pexels](https://www.pexels.com)',
     '(licence gratuite, usage commercial autorisé, attribution non obligatoire).',
     'Elles sont créditées ici par respect du travail des auteurs.',
     '',
     '| Fichier | Auteur | Source |',
     '| --- | --- | --- |',
     ...jobs.map(
-      ({ name, photo }) => `| \`${name}.jpg\` | ${photo.credit} | [Pexels #${photo.id}](${photoPage(photo.id)}) |`
+      ({ name, photo }) =>
+        `| \`${name}.jpg\` | ${photo.credit} | ${
+          photo.local ? 'produit pour le site' : `[Pexels #${photo.id}](${photoPage(photo.id)})`
+        } |`
     ),
+    '',
+    'Les visuels marqués « produit pour le site » ne sont pas des photographies :',
+    'ils sont calculés par le moteur du visualiseur sur une scène calibrée, quand',
+    'aucune photographie disponible n’illustre réellement le sujet de la page.',
+    'Voir `_generator/photos.js` pour le détail de chacun.',
     '',
     'Les schémas (`guide-sens-proportions.svg`, `lumiere-avant.svg`,',
     '`lumiere-apres.svg`) sont des illustrations vectorielles produites pour le site.',

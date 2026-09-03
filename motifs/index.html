@@ -29,8 +29,8 @@
     <link rel="manifest" href="../site.webmanifest?v=4910986db7" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-400-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../assets/dist/site.cacd29303e.css" />
-    <script type="module" src="../assets/dist/71de5eaf8f/js/main.js"></script>
+    <link rel="stylesheet" href="../assets/dist/site.dc7c5beb1f.css" />
+    <script type="module" src="../assets/dist/8761791760/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/index.html"},{"@type":"ListItem","position":2,"name":"Motifs","item":"https://pose-parquet.com/"}]}</script>
   </head>
   <body class="page">
@@ -136,20 +136,30 @@
 
       <section class="section section--alt">
         <div class="wrap">
+          <!--
+            Comparatif horizontal, pleine largeur.
+
+            La version précédente plaçait le texte dans la colonne gauche d'un
+            bloc « split » et les deux cartes dans la droite, avec une grille
+            « grid--2 » imbriquée. Cette grille n'avait que la moitié de la
+            largeur : elle retombait donc à une seule colonne, les deux cartes
+            s'empilaient, et il restait à gauche du texte un vide de la hauteur
+            des deux cartes.
+
+            Les deux motifs se comparent côte à côte — c'est le sujet même de
+            la section. Ils ont maintenant la même largeur et la même hauteur,
+            sur toute la largeur du bloc.
+          -->
           <div class="section-head">
             <p class="eyebrow">Comparer</p>
             <h2>Deux motifs souvent confondus</h2>
+            <p class="lead">Point de Hongrie et bâton rompu produisent tous deux un effet de chevrons, mais ne se posent ni ne se commandent de la même façon.</p>
           </div>
-          <div class="split">
-            <div class="stack">
-              <p class="lead">Point de Hongrie et bâton rompu produisent tous deux un effet de chevrons, mais ne se posent ni ne se commandent de la même façon.</p>
-              <a class="link-arrow" href="../guides/point-de-hongrie-ou-baton-rompu.html">Lire le comparatif complet<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
-            </div>
-            <div class="grid grid--2">
-              <div class="pattern-card"><div class="pattern-card__viz" data-pattern-thumb="point-de-hongrie"></div><h3>Point de Hongrie</h3><p>Coupe d'onglet, pointe continue.</p></div>
-              <div class="pattern-card"><div class="pattern-card__viz" data-pattern-thumb="baton-rompu"></div><h3>Bâton rompu</h3><p>Lames droites, décrochés en escalier.</p></div>
-            </div>
+          <div class="grid grid--2">
+            <div class="pattern-card"><div class="pattern-card__viz" data-pattern-thumb="point-de-hongrie"></div><h3>Point de Hongrie</h3><p>Coupe d'onglet, pointe continue.</p></div>
+            <div class="pattern-card"><div class="pattern-card__viz" data-pattern-thumb="baton-rompu"></div><h3>Bâton rompu</h3><p>Lames droites, décrochés en escalier.</p></div>
           </div>
+          <p class="u-mt-5"><a class="link-arrow" href="../guides/point-de-hongrie-ou-baton-rompu.html">Lire le comparatif complet<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a></p>
         </div>
       </section>
       <section class="section">

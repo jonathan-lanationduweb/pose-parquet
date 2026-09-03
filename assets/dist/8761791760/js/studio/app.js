@@ -332,11 +332,38 @@ export async function mountStudio(root) {
     warmMaterial(material(), config);
   }
 
+  /**
+   * Réserve la place de la scène **avant** de calculer quoi que ce soit.
+   *
+   * Un `<canvas>` sans attributs mesure 300 × 150, et c'est lui qui dimensionne
+   * `.stage__media`. Tant que le rendu n'avait pas fixé `canvas.width`, la
+   * pièce s'affichait donc en vignette minuscule au centre d'un cadre noir,
+   * puis sautait à sa taille réelle : le défaut visible à l'ouverture.
+   *
+   * On donne donc au canvas ses dimensions définitives dès que la scène est
+   * connue — le fichier JSON les déclare, aucun décodage d'image n'est
+   * nécessaire — et on affiche tout de suite la photo d'origine à sa place
+   * finale. Le rendu vient ensuite la remplacer sans que rien ne bouge.
+   */
+  function reserverScene({ width, height, file, alt }) {
+    canvas.width = width;
+    canvas.height = height;
+    // Filet : si le moteur peint plus tard à une autre résolution, la boîte
+    // garde le même rapport de forme et la scène ne bouge pas pour autant.
+    media.style.setProperty('--ratio', `${width} / ${height}`);
+    if (file) photo.src = `${base}assets/images/${file}`;
+    if (alt) photo.alt = alt;
+    root.dataset.state = 'edit';
+  }
+
   async function openRoom(id) {
     const entry = sceneIndex.scenes.find((item) => item.id === id) || sceneIndex.scenes[0];
     setStatus('Chargement…');
     try {
       const scene = await analyzeScene({ sceneId: entry.id, base });
+      // Dès ici la scène a sa taille finale et montre la photo d'origine.
+      reserverScene({ width: scene.image.width, height: scene.image.height, file: scene.image.file, alt: scene.image.alt });
+      setStatus('Préparation du rendu…');
       const prepared = await loadImage(`${base}assets/images/${scene.image.file}`);
       renderer.setScene(scene, prepared);
       sceneId = entry.id;
@@ -363,6 +390,10 @@ export async function mountStudio(root) {
       // l'utilisateur ajuste. Le jour où un service d'analyse existe, seule
       // la stratégie demandée ici change.
       const scene = await analyzeScene({ width: prepared.width, height: prepared.height, label: 'Ma photo' });
+      // Même réservation que pour une pièce d'exemple : la photo de
+      // l'utilisateur est déjà décodée, on connaît donc ses dimensions.
+      reserverScene({ width: prepared.width, height: prepared.height, alt: 'Votre pièce' });
+      setStatus('Préparation du rendu…');
       renderer.setScene(scene, prepared);
       sceneId = null;
       photo.alt = 'Votre pièce';

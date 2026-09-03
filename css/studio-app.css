@@ -282,6 +282,11 @@ body.app {
   max-height: calc(100svh - var(--bar-h));
   width: auto;
   height: auto;
+  /* `--ratio` est posé par `reserverScene()` dès que la scène est connue.
+     Sans lui, un canvas encore vierge mesure 300 × 150 et la pièce
+     s'affichait en vignette avant de sauter à sa taille réelle. Il sert aussi
+     de filet si le moteur peint à une autre résolution que celle déclarée. */
+  aspect-ratio: var(--ratio, 3 / 2);
 }
 .stage__photo {
   position: absolute;

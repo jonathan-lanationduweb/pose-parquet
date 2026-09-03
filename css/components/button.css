@@ -1,8 +1,29 @@
-/* Boutons pilule et liens d'action */
+/**
+ * Boutons pilule et liens d'action.
+ *
+ * Le remplissage du survol est un **dégradé de fond**, pas un pseudo-élément
+ * posé par-dessus.
+ *
+ * La version précédente utilisait `::before { position: absolute; z-index: 0 }`
+ * qui montait depuis le bas. Or un pseudo-élément positionné se peint APRÈS le
+ * texte en flux du parent : seuls les libellés enveloppés dans une balise
+ * (remontés par `.btn > * { z-index: 1 }`) y échappaient. Sur les 175 boutons
+ * du site, **102 portaient un texte nu** et leur libellé disparaissait donc
+ * sous le remplissage au survol.
+ *
+ * Un fond animé ne peut rien recouvrir : le défaut n'est plus possible, quelle
+ * que soit la façon dont un gabarit écrit son libellé.
+ *
+ * Chaque variante déclare ses deux couleurs de survol — fond ET texte. Le
+ * repli `#fff` de `--btn-hover-fg` reste, mais aucune variante ne s'y fie :
+ * c'est ce genre de valeur par défaut qui produit du blanc sur clair.
+ */
 .btn {
   --btn-bg: var(--c-ink);
   --btn-fg: var(--text-invert);
   --btn-bd: var(--c-ink);
+  --btn-hover: var(--c-sage-deep);
+  --btn-hover-fg: #fff;
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -11,32 +32,34 @@
   padding: 0.92rem 1.6rem;
   border: 1px solid var(--btn-bd);
   border-radius: var(--r-pill);
-  background: var(--btn-bg);
+  background-color: var(--btn-bg);
+  background-image: linear-gradient(var(--btn-hover), var(--btn-hover));
+  background-repeat: no-repeat;
+  background-position: 50% 100%;
+  background-size: 100% 0%;
   color: var(--btn-fg);
   font-size: 0.94rem;
   font-weight: 500;
   line-height: 1.15;
   text-decoration: none;
   cursor: pointer;
-  overflow: hidden;
-  transition: color var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out),
-              transform var(--dur-2) var(--ease-out);
+  transition: background-size var(--dur-3) var(--ease-out), color var(--dur-2) var(--ease-out),
+              border-color var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
 }
-/* Remplissage animé au survol */
-.btn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--btn-hover, var(--c-sage-deep));
-  transform: translateY(101%);
-  transition: transform var(--dur-3) var(--ease-out);
-  z-index: 0;
+.btn:hover,
+.btn:focus-visible {
+  background-size: 100% 100%;
+  color: var(--btn-hover-fg);
+  border-color: var(--btn-hover);
 }
-.btn:hover::before { transform: translateY(0); }
-.btn > * { position: relative; z-index: 1; }
-.btn:hover { color: var(--btn-hover-fg, #fff); border-color: var(--btn-hover, var(--c-sage-deep)); }
 .btn:active { transform: scale(0.985); }
 .btn:disabled, .btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
+/* Un bouton désactivé ne se remplit pas : le survol ne doit rien promettre. */
+.btn:disabled:hover, .btn[aria-disabled="true"]:hover {
+  background-size: 100% 0%;
+  color: var(--btn-fg);
+  border-color: var(--btn-bd);
+}
 
 .btn--light {
   --btn-bg: #fff; --btn-fg: var(--c-ink); --btn-bd: #fff;
@@ -50,7 +73,10 @@
   --btn-bg: transparent; --btn-fg: #fff; --btn-bd: rgba(255, 255, 255, 0.5);
   --btn-hover: #fff; --btn-hover-fg: var(--c-ink);
 }
-.btn--accent { --btn-bg: var(--c-sage-deep); --btn-bd: var(--c-sage-deep); --btn-hover: var(--c-ink); }
+.btn--accent {
+  --btn-bg: var(--c-sage-deep); --btn-bd: var(--c-sage-deep);
+  --btn-hover: var(--c-ink); --btn-hover-fg: #fff;
+}
 .btn--sm { padding: 0.6rem 1.1rem; font-size: 0.86rem; }
 .btn--xs { padding: 0.42rem 0.8rem; font-size: 0.78rem; }
 .btn[disabled] { opacity: 0.45; pointer-events: none; }
@@ -59,6 +85,27 @@
 
 .btn__icon { width: 1em; height: 1em; flex: none; transition: transform var(--dur-2) var(--ease-out); }
 .btn:hover .btn__icon { transform: translateX(4px); }
+
+/**
+ * Anneau de focus clavier, lisible sur n'importe quel fond.
+ *
+ * Un seul anneau ne peut pas convenir partout : sombre, il disparaît sur une
+ * image sombre ; clair, il disparaît sur un fond clair. On en pose donc deux,
+ * un blanc au contact et un sombre autour. Le focus n'est jamais retiré.
+ */
+.btn:focus-visible,
+.icon-btn:focus-visible,
+.link-arrow:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--c-ink);
+}
+/* Sur fond sombre, on inverse l'ordre des deux anneaux. */
+.btn--outline-light:focus-visible,
+.icon-btn--light:focus-visible {
+  outline-color: var(--c-ink);
+  box-shadow: 0 0 0 5px #fff;
+}
 
 /* Lien fléché éditorial */
 .link-arrow {
