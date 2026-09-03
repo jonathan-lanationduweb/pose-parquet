@@ -47,6 +47,7 @@ Elles sont créditées ici par respect du travail des auteurs.
 | `room-petit-bureau.jpg` | Алан Албегов | [Pexels #20771870](https://www.pexels.com/photo/20771870/) |
 | `room-grande-piece.jpg` | Max Vakhtbovych | [Pexels #7045700](https://www.pexels.com/photo/7045700/) |
 | `room-petite-piece.jpg` | Image Hunter | [Pexels #26747989](https://www.pexels.com/photo/26747989/) |
+| `room-bureau-vide.jpg` | Curtis Adams | [Pexels #7028110](https://www.pexels.com/photo/7028110/) |
 | `room-appartement-ancien.jpg` | Curtis Adams | [Pexels #8583672](https://www.pexels.com/photo/8583672/) |
 | `hero-poster.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
 | `og-default.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
