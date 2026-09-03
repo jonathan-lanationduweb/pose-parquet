@@ -489,7 +489,22 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 /* Gabarit article */
 .article-layout { display: grid; gap: clamp(2rem, 4vw, 4rem); align-items: start; }
 @media (min-width: 64rem) {
-  .article-layout { grid-template-columns: minmax(0, 1fr) 17rem; }
+  /**
+   * La colonne d'article épouse la mesure de lecture au lieu de prendre tout
+   * l'espace restant.
+   *
+   * Avec `minmax(0, 1fr)` elle valait 844 px à 1920, alors que `.prose` est
+   * plafonné à 68ch (≈ 700 px) : 144 px de vide s'installaient entre la fin du
+   * texte et la gouttière, ce qui éloignait la colonne latérale du texte
+   * qu'elle accompagne — sans rien apporter.
+   *
+   * Le bloc reste centré : l'ensemble se lit comme un tout, et non comme deux
+   * colonnes séparées par un couloir.
+   */
+  .article-layout {
+    grid-template-columns: minmax(0, var(--measure)) 17rem;
+    justify-content: center;
+  }
 }
 
 /* Média plein cadre */
@@ -1005,6 +1020,26 @@ body[data-drawer-open="true"] { overflow: hidden; }
 }
 .meta-list li { display: flex; align-items: center; gap: 0.4rem; }
 .meta-list li + li::before { content: "\2014"; color: var(--line-strong); }
+
+/**
+ * Variante empilée : une ligne par entrée, terme au-dessus de sa valeur.
+ *
+ * Ces règles vivaient dans `css/pages/tools.css`, préfixées par `.tool-card`.
+ * Le même modificateur employé ailleurs — la colonne latérale des articles, où
+ * l'encadré ne fait que 272 px — ne recevait donc rien, et retombait sur le
+ * `flex` en ligne de la liste de base : le terme et sa valeur se disputaient la
+ * largeur, les deux-points partaient seuls à la ligne et les tirets de
+ * séparation s'invitaient entre les entrées.
+ *
+ * Le modificateur appartient au composant : il est défini ici, sans contexte.
+ */
+.meta-list--stack {
+  display: grid;
+  gap: 0.7rem;
+}
+.meta-list--stack li { display: grid; gap: 0.15rem; }
+.meta-list--stack strong { color: var(--text); font-weight: 600; }
+.meta-list--stack li + li::before { content: none; }
 
 
 /* Blocs de composition : cartes en aplat, sections immersives, citations */
@@ -2629,6 +2664,34 @@ body[data-drawer-open="true"] { overflow: hidden; }
   .pattern-switch button { font-size: 0.86rem; gap: 0.5rem; }
 }
 
+/**
+ * Mode Plan sur écran tactile.
+ *
+ * Mesuré à 390 px avec émulation tactile : les cinq boutons de motif faisaient
+ * 42 px de haut, les deux champs de dimensions 43 px, et les boutons empilés
+ * n'étaient séparés que de 6 à 7 px. Sous le pouce, c'est trop juste — la
+ * recommandation usuelle est 44 px de cible et au moins 8 px entre deux.
+ *
+ * Les titres de groupe passent de 12 à 13 px : ce sont des libellés de
+ * contrôle, pas de la métadonnée décorative, et ils doivent rester lisibles
+ * sur un téléphone.
+ *
+ * Tout est sous `pointer: coarse` : la densité du bureau ne change pas.
+ */
+@media (pointer: coarse) {
+  .pattern-switch { gap: 0.75rem; }
+  .pattern-switch button { min-height: 44px; }
+  .visualizer__dims { gap: 0.75rem; }
+  .visualizer__num input { min-height: 44px; }
+  .seg { gap: 0.4rem; }
+  .seg button { min-height: 40px; padding-inline: 0.9rem; }
+  .visualizer__group > legend,
+  .visualizer__group-title { font-size: 0.82rem; }
+  /* La scène du plan est un SVG : sans cela, un glissement vertical dessus
+     pouvait être capté au lieu de faire défiler la page. */
+  .visualizer__canvas { touch-action: pan-y; }
+}
+
 
 /**
  * Calque de correction du sol : cadre, contour, pinceau.
@@ -3424,16 +3487,6 @@ body[data-drawer-open="true"] { overflow: hidden; }
 .tools-roadmap ol { display: grid; gap: var(--sp-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); list-style: none; padding: 0; }
 
 /* Feuille de route des outils : lisible, sans effet machine à écrire */
-.tool-card .meta-list--stack {
-  font-family: var(--font-sans);
-  font-size: 0.94rem;
-  letter-spacing: 0;
-  color: var(--text-soft);
-  gap: 0.75rem;
-}
-.tool-card .meta-list--stack li { display: grid; gap: 0.15rem; }
-.tool-card .meta-list--stack strong { color: var(--text); font-weight: 600; }
-.tool-card .meta-list--stack li::before { content: none; }
 
 /* Onglets de l'outil (visualiseur / mode plan) */
 .tool-tabs .tabs__list { margin-bottom: clamp(1.25rem, 1rem + 1vw, 2rem); }

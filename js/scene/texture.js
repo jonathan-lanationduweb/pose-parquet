@@ -128,10 +128,35 @@ function accents(tex) {
   const lum = (0.2126 * tex.base[0] + 0.7152 * tex.base[1] + 0.0722 * tex.base[2]) / 255;
   const partClaire = Math.min(0.68, Math.max(0.16, 0.84 - lum * 0.94));
   const ecart = 58 - lum * 30;
+  /**
+   * L'accent clair est un **gain**, pas une somme.
+   *
+   * Ajouter la même quantité aux trois canaux rapproche la couleur du gris :
+   * mesuré sur les dix chênes du catalogue, l'accent additif perdait de 0,05 à
+   * 0,09 de saturation et décalait la teinte de 2 à 5,6° sur les teintes
+   * foncées — d'où les traînées grisâtres visibles sur le Fumé, là où un chêne
+   * fumé n'a que des fibres plus claires ET toujours brunes. Sur le Craie,
+   * l'écrêtage du bleu poussait même la teinte de +17°.
+   *
+   * Multiplier conserve les rapports entre canaux, donc la teinte et la
+   * saturation exactement. Le gain est calé sur la luminance que visait la
+   * version additive : à microcontraste égal (dLum identique sur les huit
+   * teintes non écrêtées), on ne perd rien de ce que la passe précédente avait
+   * gagné.
+   *
+   * Le plafond est le seul compromis : sur un chêne presque blanc le gain bute
+   * sur 255 et l'accent devient plus discret qu'avant. C'est le bon sens
+   * physique — une fibre éclairée sur un bois déjà crème ne peut pas être
+   * beaucoup plus claire — alors que l'ancienne amplitude n'était atteinte
+   * qu'en écrêtant vers un blanc bleuté.
+   */
+  const viseeLum = (0.2126 * (tex.base[0] + ecart)
+    + 0.7152 * (tex.base[1] + ecart * 0.95)
+    + 0.0722 * (tex.base[2] + ecart * 0.8)) / 255;
+  const gain = Math.min(viseeLum / Math.max(lum, 0.02), 255 / Math.max(tex.base[0], tex.base[1], tex.base[2], 1));
   return {
     deep: tex.grain,
-    // Le bleu monte un peu moins : une fibre éclairée reste chaude.
-    lift: [clampByte(tex.base[0] + ecart), clampByte(tex.base[1] + ecart * 0.95), clampByte(tex.base[2] + ecart * 0.8)],
+    lift: [clampByte(tex.base[0] * gain), clampByte(tex.base[1] * gain), clampByte(tex.base[2] * gain)],
     partClaire,
     // Un bois foncé demande un peu plus d'amplitude pour donner autant à voir.
     vigueur: 1 + (1 - lum) * 0.55,
@@ -488,53 +513,63 @@ function drawChevron(ctx, tex, profile, random) {
   const cols = Math.ceil(TILE / (armX * 2)) + 2;
   const rows = Math.ceil((TILE + armY) / step) + 2;
 
-  /** Une lame, en parallélogramme : le biais est porté par armX / armY. */
+  /**
+   * Une lame, en parallélogramme : le biais est porté par armX / armY, les deux
+   * bouts restent verticaux — c'est la coupe d'onglet qui fait la couture entre
+   * deux colonnes, donc la bonne forme pour un point de Hongrie.
+   *
+   * Le bois est peint **dans le repère de la lame**, pas dans celui de l'écran.
+   *
+   * Le chemin précédent étalait le veinage dans une boîte horizontale de
+   * `armX * 2,2` : les stries et les cathédrales traversaient donc la lame en
+   * biais au lieu de la suivre, et leur densité était calée sur 2,2 longueurs
+   * d'arête au lieu d'une. Le point de Hongrie ressortait presque lisse — figure
+   * absente, nœuds absents — quand la pose droite et le bâton rompu gardaient
+   * la leur à la même distance. C'était le défaut le plus visible de cette
+   * passe.
+   *
+   * La matrice ci-dessous envoie (s, t) — s le long de la lame, t en travers —
+   * sur l'écran. `u` et `n` étant orthonormés, la lame n'est ni étirée ni
+   * cisaillée dans ce repère : on peut y appeler `board()`, exactement comme
+   * pour une lame droite. Le point de Hongrie hérite alors de tout ce dont il
+   * était privé — veinage dans le fil, dispersion de teinte indexée sur la
+   * taille de l'élément, reflet de finition, chanfrein proportionné.
+   *
+   * `drawChevron` ne sert qu'au point de Hongrie : aucune pose droite ni aucun
+   * bâton rompu déjà validé ne passe par ici.
+   */
   const plank = (x0, y0, dir) => {
-    const shift = Math.round((random() - 0.5) * tex.spread);
-    const warm = Math.round((random() - 0.5) * tex.warm);
     ctx.save();
+    // Contour du parallélogramme : il sert de découpe, puis de joint.
     ctx.beginPath();
     ctx.moveTo(x0, y0);
     ctx.lineTo(x0 + dir * armX, y0 + armY);
     ctx.lineTo(x0 + dir * armX, y0 + armY + step);
     ctx.lineTo(x0, y0 + step);
     ctx.closePath();
-    const gradient = ctx.createLinearGradient(x0, y0, x0 + dir * armX, y0 + armY);
-    const amp = 5 * tex.contrast;
-    gradient.addColorStop(0, rgb(tex.base, shift - amp, warm));
-    gradient.addColorStop(0.5, rgb(tex.base, shift + amp * 0.5, warm));
-    gradient.addColorStop(1, rgb(tex.base, shift - amp * 0.6, warm));
-    ctx.fillStyle = gradient;
-    ctx.fill();
+
     ctx.save();
     ctx.clip();
-    // Le veinage suit la lame : on l'étale le long de l'arête, pas de l'écran.
-    grain(ctx, x0 - armX, y0, armX * 2.2, step, tex, random);
-
-    // Chanfreins des deux longs côtés, en **aplats** et non en filet.
-    //
-    // C'est le point qui décidait de tout ici : le motif ne tenait que par un
-    // contour de moins d'un pixel, et un trait d'un pixel disparaît dès que la
-    // tuile est réduite — le chevron s'effaçait alors en un champ uni parcouru
-    // de quelques traits, exactement l'aspect « texture plate ». Une bande
-    // pleine, elle, survit à la moyenne des mipmaps.
-    const bev = Math.max(1.2, step * 0.17);
-    const bande = (dy0, dy1, couleur) => {
-      ctx.fillStyle = couleur;
-      ctx.beginPath();
-      ctx.moveTo(x0, y0 + dy0);
-      ctx.lineTo(x0 + dir * armX, y0 + armY + dy0);
-      ctx.lineTo(x0 + dir * armX, y0 + armY + dy1);
-      ctx.lineTo(x0, y0 + dy1);
-      ctx.closePath();
-      ctx.fill();
-    };
-    bande(0, bev, 'rgba(255,255,255,0.06)');
-    bande(step - bev, step, 'rgba(34,23,14,0.2)');
+    const ux = (dir * armX) / length;
+    const uy = armY / length;
+    // Normale unitaire orientée du long côté A→B vers le long côté D→C.
+    const nx = -uy * dir;
+    const ny = ux * dir;
+    ctx.transform(ux, uy, nx, ny, x0, y0);
+    // Dans ce repère le parallélogramme va de s = 0 à length + step·cos θ ;
+    // on couvre un peu plus large, la découpe fait le reste.
+    const debord = step * Math.cos(rad);
+    board(ctx, -1, 0, length + debord + 2, w, tex, random);
     ctx.restore();
 
-    // Joint : même dosage que sur une pose droite, et une largeur qui ne
-    // tombe pas sous le pixel.
+    /**
+     * Joint appuyé, par-dessus celui de `board()`.
+     *
+     * Le joint d'une lame droite fait 0,7 px de large, et un trait de moins
+     * d'un pixel disparaît dès que la tuile est réduite : le chevron s'effaçait
+     * alors en un champ uni parcouru de quelques traits. On repasse donc le
+     * contour avec une largeur plancher, qui survit à la moyenne des mipmaps.
+     */
     ctx.strokeStyle = `rgba(38,26,16,${(tex.joint * 0.6).toFixed(3)})`;
     ctx.lineWidth = Math.max(1.1, w * 0.05);
     ctx.stroke();

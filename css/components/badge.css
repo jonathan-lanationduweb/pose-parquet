@@ -29,3 +29,23 @@
 }
 .meta-list li { display: flex; align-items: center; gap: 0.4rem; }
 .meta-list li + li::before { content: "\2014"; color: var(--line-strong); }
+
+/**
+ * Variante empilée : une ligne par entrée, terme au-dessus de sa valeur.
+ *
+ * Ces règles vivaient dans `css/pages/tools.css`, préfixées par `.tool-card`.
+ * Le même modificateur employé ailleurs — la colonne latérale des articles, où
+ * l'encadré ne fait que 272 px — ne recevait donc rien, et retombait sur le
+ * `flex` en ligne de la liste de base : le terme et sa valeur se disputaient la
+ * largeur, les deux-points partaient seuls à la ligne et les tirets de
+ * séparation s'invitaient entre les entrées.
+ *
+ * Le modificateur appartient au composant : il est défini ici, sans contexte.
+ */
+.meta-list--stack {
+  display: grid;
+  gap: 0.7rem;
+}
+.meta-list--stack li { display: grid; gap: 0.15rem; }
+.meta-list--stack strong { color: var(--text); font-weight: 600; }
+.meta-list--stack li + li::before { content: none; }

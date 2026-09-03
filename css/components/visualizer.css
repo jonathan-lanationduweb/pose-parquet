@@ -147,3 +147,31 @@
   .seg button { flex: 1 0 auto; }
   .pattern-switch button { font-size: 0.86rem; gap: 0.5rem; }
 }
+
+/**
+ * Mode Plan sur écran tactile.
+ *
+ * Mesuré à 390 px avec émulation tactile : les cinq boutons de motif faisaient
+ * 42 px de haut, les deux champs de dimensions 43 px, et les boutons empilés
+ * n'étaient séparés que de 6 à 7 px. Sous le pouce, c'est trop juste — la
+ * recommandation usuelle est 44 px de cible et au moins 8 px entre deux.
+ *
+ * Les titres de groupe passent de 12 à 13 px : ce sont des libellés de
+ * contrôle, pas de la métadonnée décorative, et ils doivent rester lisibles
+ * sur un téléphone.
+ *
+ * Tout est sous `pointer: coarse` : la densité du bureau ne change pas.
+ */
+@media (pointer: coarse) {
+  .pattern-switch { gap: 0.75rem; }
+  .pattern-switch button { min-height: 44px; }
+  .visualizer__dims { gap: 0.75rem; }
+  .visualizer__num input { min-height: 44px; }
+  .seg { gap: 0.4rem; }
+  .seg button { min-height: 40px; padding-inline: 0.9rem; }
+  .visualizer__group > legend,
+  .visualizer__group-title { font-size: 0.82rem; }
+  /* La scène du plan est un SVG : sans cela, un glissement vertical dessus
+     pouvait être capté au lieu de faire défiler la page. */
+  .visualizer__canvas { touch-action: pan-y; }
+}
