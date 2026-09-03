@@ -1,6 +1,15 @@
 {
   "version": 1,
-  "catalogue": "data/parquets.json",
+  "catalogues": [
+    {
+      "fichier": "data/parquets.json",
+      "source": "demonstration"
+    },
+    {
+      "fichier": "data/products.premibel-pilot.json",
+      "source": "premibel"
+    }
+  ],
   "note": "Familles de rendu : les parametres VISUELS qui dessinent la tuile de parquet. Une fiche produit (data/products.json ou un futur export Premibel) ne cite qu un identifiant de famille — personne ne saisit un grainAlpha dans un ERP. Le rapprochement d une fiche sans famille declaree se fait sur essence + teinte + finition, puis sur la luminance ; voir js/scene/product.js et docs/premibel-integration.md.",
   "familles": {
     "chene-craie": {

@@ -76,14 +76,32 @@
         "sheen": 0.05,
         "cracks": 0
       },
-      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "maps": {
+        "albedo": null,
+        "normal": null,
+        "roughness": null
+      },
       "proceduralFallback": true,
-      "dimensions": { "width": 0.19, "length": 1.9 },
+      "dimensions": {
+        "width": 0.19,
+        "length": 1.9
+      },
       "patternProfiles": {
-        "lames": { "width": 0.19, "length": 1.9 },
-        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
-        "baton-rompu": { "width": 0.09, "length": 0.45 }
-      }
+        "lames": {
+          "width": 0.19,
+          "length": 1.9
+        },
+        "point-de-hongrie": {
+          "width": 0.09,
+          "length": 0.6,
+          "angleDeg": 45
+        },
+        "baton-rompu": {
+          "width": 0.09,
+          "length": 0.45
+        }
+      },
+      "dimensionUnit": "m"
     },
     {
       "id": "chene-sable",
@@ -124,14 +142,32 @@
         "sheen": 0.04,
         "cracks": 0
       },
-      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "maps": {
+        "albedo": null,
+        "normal": null,
+        "roughness": null
+      },
       "proceduralFallback": true,
-      "dimensions": { "width": 0.16, "length": 1.6 },
+      "dimensions": {
+        "width": 0.16,
+        "length": 1.6
+      },
       "patternProfiles": {
-        "lames": { "width": 0.16, "length": 1.6 },
-        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
-        "baton-rompu": { "width": 0.09, "length": 0.45 }
-      }
+        "lames": {
+          "width": 0.16,
+          "length": 1.6
+        },
+        "point-de-hongrie": {
+          "width": 0.09,
+          "length": 0.6,
+          "angleDeg": 45
+        },
+        "baton-rompu": {
+          "width": 0.09,
+          "length": 0.45
+        }
+      },
+      "dimensionUnit": "m"
     },
     {
       "id": "chene-nude",
@@ -172,14 +208,32 @@
         "sheen": 0.06,
         "cracks": 0
       },
-      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "maps": {
+        "albedo": null,
+        "normal": null,
+        "roughness": null
+      },
       "proceduralFallback": true,
-      "dimensions": { "width": 0.18, "length": 1.8 },
+      "dimensions": {
+        "width": 0.18,
+        "length": 1.8
+      },
       "patternProfiles": {
-        "lames": { "width": 0.18, "length": 1.8 },
-        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
-        "baton-rompu": { "width": 0.09, "length": 0.45 }
-      }
+        "lames": {
+          "width": 0.18,
+          "length": 1.8
+        },
+        "point-de-hongrie": {
+          "width": 0.09,
+          "length": 0.6,
+          "angleDeg": 45
+        },
+        "baton-rompu": {
+          "width": 0.09,
+          "length": 0.45
+        }
+      },
+      "dimensionUnit": "m"
     },
     {
       "id": "chene-naturel",
@@ -220,14 +274,32 @@
         "sheen": 0.05,
         "cracks": 0.05
       },
-      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "maps": {
+        "albedo": null,
+        "normal": null,
+        "roughness": null
+      },
       "proceduralFallback": true,
-      "dimensions": { "width": 0.18, "length": 1.8 },
+      "dimensions": {
+        "width": 0.18,
+        "length": 1.8
+      },
       "patternProfiles": {
-        "lames": { "width": 0.18, "length": 1.8 },
-        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
-        "baton-rompu": { "width": 0.09, "length": 0.45 }
-      }
+        "lames": {
+          "width": 0.18,
+          "length": 1.8
+        },
+        "point-de-hongrie": {
+          "width": 0.09,
+          "length": 0.6,
+          "angleDeg": 45
+        },
+        "baton-rompu": {
+          "width": 0.09,
+          "length": 0.45
+        }
+      },
+      "dimensionUnit": "m"
     },
     {
       "id": "chene-dore",
@@ -268,14 +340,32 @@
         "sheen": 0.12,
         "cracks": 0
       },
-      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "maps": {
+        "albedo": null,
+        "normal": null,
+        "roughness": null
+      },
       "proceduralFallback": true,
-      "dimensions": { "width": 0.2, "length": 2.2 },
+      "dimensions": {
+        "width": 0.2,
+        "length": 2.2
+      },
       "patternProfiles": {
-        "lames": { "width": 0.2, "length": 2.2 },
-        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
-        "baton-rompu": { "width": 0.09, "length": 0.45 }
-      }
+        "lames": {
+          "width": 0.2,
+          "length": 2.2
+        },
+        "point-de-hongrie": {
+          "width": 0.09,
+          "length": 0.6,
+          "angleDeg": 45
+        },
+        "baton-rompu": {
+          "width": 0.09,
+          "length": 0.45
+        }
+      },
+      "dimensionUnit": "m"
     },
     {
       "id": "chene-gris",
@@ -315,14 +405,32 @@
         "sheen": 0.02,
         "cracks": 0.08
       },
-      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "maps": {
+        "albedo": null,
+        "normal": null,
+        "roughness": null
+      },
       "proceduralFallback": true,
-      "dimensions": { "width": 0.22, "length": 2 },
+      "dimensions": {
+        "width": 0.22,
+        "length": 2
+      },
       "patternProfiles": {
-        "lames": { "width": 0.22, "length": 2 },
-        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
-        "baton-rompu": { "width": 0.09, "length": 0.45 }
-      }
+        "lames": {
+          "width": 0.22,
+          "length": 2
+        },
+        "point-de-hongrie": {
+          "width": 0.09,
+          "length": 0.6,
+          "angleDeg": 45
+        },
+        "baton-rompu": {
+          "width": 0.09,
+          "length": 0.45
+        }
+      },
+      "dimensionUnit": "m"
     },
     {
       "id": "chene-miel",
@@ -363,14 +471,32 @@
         "sheen": 0.09,
         "cracks": 0.06
       },
-      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "maps": {
+        "albedo": null,
+        "normal": null,
+        "roughness": null
+      },
       "proceduralFallback": true,
-      "dimensions": { "width": 0.15, "length": 1.5 },
+      "dimensions": {
+        "width": 0.15,
+        "length": 1.5
+      },
       "patternProfiles": {
-        "lames": { "width": 0.15, "length": 1.5 },
-        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
-        "baton-rompu": { "width": 0.09, "length": 0.45 }
-      }
+        "lames": {
+          "width": 0.15,
+          "length": 1.5
+        },
+        "point-de-hongrie": {
+          "width": 0.09,
+          "length": 0.6,
+          "angleDeg": 45
+        },
+        "baton-rompu": {
+          "width": 0.09,
+          "length": 0.45
+        }
+      },
+      "dimensionUnit": "m"
     },
     {
       "id": "chene-caramel",
@@ -411,14 +537,32 @@
         "sheen": 0.1,
         "cracks": 0.04
       },
-      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "maps": {
+        "albedo": null,
+        "normal": null,
+        "roughness": null
+      },
       "proceduralFallback": true,
-      "dimensions": { "width": 0.16, "length": 1.7 },
+      "dimensions": {
+        "width": 0.16,
+        "length": 1.7
+      },
       "patternProfiles": {
-        "lames": { "width": 0.16, "length": 1.7 },
-        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
-        "baton-rompu": { "width": 0.09, "length": 0.45 }
-      }
+        "lames": {
+          "width": 0.16,
+          "length": 1.7
+        },
+        "point-de-hongrie": {
+          "width": 0.09,
+          "length": 0.6,
+          "angleDeg": 45
+        },
+        "baton-rompu": {
+          "width": 0.09,
+          "length": 0.45
+        }
+      },
+      "dimensionUnit": "m"
     },
     {
       "id": "chene-rustique",
@@ -458,14 +602,32 @@
         "sheen": 0.03,
         "cracks": 0.35
       },
-      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "maps": {
+        "albedo": null,
+        "normal": null,
+        "roughness": null
+      },
       "proceduralFallback": true,
-      "dimensions": { "width": 0.22, "length": 2.4 },
+      "dimensions": {
+        "width": 0.22,
+        "length": 2.4
+      },
       "patternProfiles": {
-        "lames": { "width": 0.22, "length": 2.4 },
-        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
-        "baton-rompu": { "width": 0.09, "length": 0.45 }
-      }
+        "lames": {
+          "width": 0.22,
+          "length": 2.4
+        },
+        "point-de-hongrie": {
+          "width": 0.09,
+          "length": 0.6,
+          "angleDeg": 45
+        },
+        "baton-rompu": {
+          "width": 0.09,
+          "length": 0.45
+        }
+      },
+      "dimensionUnit": "m"
     },
     {
       "id": "chene-tabac",
@@ -506,14 +668,32 @@
         "sheen": 0.07,
         "cracks": 0.05
       },
-      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "maps": {
+        "albedo": null,
+        "normal": null,
+        "roughness": null
+      },
       "proceduralFallback": true,
-      "dimensions": { "width": 0.14, "length": 1.4 },
+      "dimensions": {
+        "width": 0.14,
+        "length": 1.4
+      },
       "patternProfiles": {
-        "lames": { "width": 0.14, "length": 1.4 },
-        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
-        "baton-rompu": { "width": 0.09, "length": 0.45 }
-      }
+        "lames": {
+          "width": 0.14,
+          "length": 1.4
+        },
+        "point-de-hongrie": {
+          "width": 0.09,
+          "length": 0.6,
+          "angleDeg": 45
+        },
+        "baton-rompu": {
+          "width": 0.09,
+          "length": 0.45
+        }
+      },
+      "dimensionUnit": "m"
     },
     {
       "id": "chene-brun",
@@ -554,14 +734,32 @@
         "sheen": 0.06,
         "cracks": 0.03
       },
-      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "maps": {
+        "albedo": null,
+        "normal": null,
+        "roughness": null
+      },
       "proceduralFallback": true,
-      "dimensions": { "width": 0.18, "length": 1.8 },
+      "dimensions": {
+        "width": 0.18,
+        "length": 1.8
+      },
       "patternProfiles": {
-        "lames": { "width": 0.18, "length": 1.8 },
-        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
-        "baton-rompu": { "width": 0.09, "length": 0.45 }
-      }
+        "lames": {
+          "width": 0.18,
+          "length": 1.8
+        },
+        "point-de-hongrie": {
+          "width": 0.09,
+          "length": 0.6,
+          "angleDeg": 45
+        },
+        "baton-rompu": {
+          "width": 0.09,
+          "length": 0.45
+        }
+      },
+      "dimensionUnit": "m"
     },
     {
       "id": "chene-fume",
@@ -602,15 +800,34 @@
         "sheen": 0.04,
         "cracks": 0.12
       },
-      "maps": { "albedo": null, "normal": null, "roughness": null },
+      "maps": {
+        "albedo": null,
+        "normal": null,
+        "roughness": null
+      },
       "proceduralFallback": true,
-      "dimensions": { "width": 0.2, "length": 2.1 },
+      "dimensions": {
+        "width": 0.2,
+        "length": 2.1
+      },
       "patternProfiles": {
-        "lames": { "width": 0.2, "length": 2.1 },
-        "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
-        "baton-rompu": { "width": 0.09, "length": 0.45 }
-      }
+        "lames": {
+          "width": 0.2,
+          "length": 2.1
+        },
+        "point-de-hongrie": {
+          "width": 0.09,
+          "length": 0.6,
+          "angleDeg": 45
+        },
+        "baton-rompu": {
+          "width": 0.09,
+          "length": 0.45
+        }
+      },
+      "dimensionUnit": "m"
     }
   ],
-  "patternNote": "Le niveau de chutes est qualitatif (faibles, modérées, élevées), pas un pourcentage : le taux réel dépend de la pièce, du calepinage et des longueurs livrées."
+  "patternNote": "Le niveau de chutes est qualitatif (faibles, modérées, élevées), pas un pourcentage : le taux réel dépend de la pièce, du calepinage et des longueurs livrées.",
+  "dimensionUnit": "m"
 }

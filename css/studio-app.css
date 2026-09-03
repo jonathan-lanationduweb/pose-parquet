@@ -1261,3 +1261,25 @@ body.app {
   .cat__card { min-height: 2.75rem; }
   .orient__item { min-height: 3rem; }
 }
+
+/**
+ * Lien vers la fiche du fabricant.
+ *
+ * Volontairement discret : pose-parquet.com reste un site editorial, pas une
+ * boutique. Pas de bouton d achat, pas de prix — une sortie sobre vers la
+ * reference, et seulement quand la reference affichee est reellement celle-la.
+ */
+.selected__ref {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+  width: fit-content;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  opacity: 0.85;
+}
+.selected__ref:hover { color: var(--text); opacity: 1; }
+.selected__ref span { font-family: var(--font-mono); font-size: 0.72rem; opacity: 0.75; }
