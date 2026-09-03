@@ -12,7 +12,7 @@
  */
 import { buildSwatch } from '../scene/texture.js';
 import { createMaterial } from '../scene/material.js';
-import { chargerProduits, versMateriau } from '../scene/product.js';
+import { loadProducts, toMaterial } from '../scene/product.js';
 
 /**
  * Charge le catalogue en passant par la **couche produit**.
@@ -25,12 +25,12 @@ import { chargerProduits, versMateriau } from '../scene/product.js';
  * source change.
  *
  * La forme rendue reste celle qu'attendait le reste de l'outil (`parquets`,
- * `byId`, `get(id)`, `patterns`), augmentée de `fiches` et `familles` pour ce
+ * `byId`, `get(id)`, `patterns`), augmentée de `products` et `families` pour ce
  * qui a besoin des données commerciales.
  */
 export async function loadCatalog(base = '') {
-  const { fiches, familles, source } = await chargerProduits(base);
-  if (!fiches.length) throw new Error('Catalogue indisponible');
+  const { products, rejected, families, source } = await loadProducts(base);
+  if (!products.length) throw new Error('Catalogue indisponible');
 
   // Les motifs de pose ne sont pas une donnée de produit : ils décrivent des
   // façons de poser et restent décrits une seule fois.
@@ -38,21 +38,21 @@ export async function loadCatalog(base = '') {
     .then((r) => (r.ok ? r.json() : {}))
     .catch(() => ({}));
 
-  const parquets = fiches.map((fiche) => createMaterial(versMateriau(fiche)));
+  const parquets = products.map((fiche) => createMaterial(toMaterial(fiche)));
   const byId = new Map(parquets.map((item) => [item.id, item]));
 
-  const incomplets = fiches.filter((f) => f.avertissements.length);
+  const incomplets = products.filter((f) => f.warnings.length);
   if (incomplets.length) {
     // Une fiche incomplète ne doit pas faire tomber la page, mais elle ne doit
     // pas passer inaperçue non plus : le jour où le catalogue vient d'un ERP,
     // c'est ici qu'on verra les trous.
     console.warn(
       '[catalogue] fiches incomplètes :',
-      incomplets.map((f) => `${f.id} (${f.avertissements.join(', ')})`).join(' · ')
+      incomplets.map((f) => `${f.id} (${f.warnings.join(', ')})`).join(' · ')
     );
   }
 
-  return { ...meta, parquets, byId, get: (id) => byId.get(id), fiches, familles, source };
+  return { ...meta, parquets, byId, get: (id) => byId.get(id), products, rejected, families, source };
 }
 
 /** Vignette de matériau, fabriquée une seule fois puis réutilisée. */

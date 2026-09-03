@@ -78,51 +78,156 @@
       "mask": {
         "polygon": [
           {
-            "x": 0.038,
-            "y": 0.7
+            "x": 0.0381,
+            "y": 0.7001
           },
           {
-            "x": 0.075,
+            "x": 0.0633,
+            "y": 0.6812
+          },
+          {
+            "x": 0.0759,
+            "y": 0.6699
+          },
+          {
+            "x": 0.1061,
+            "y": 0.6759
+          },
+          {
+            "x": 0.1469,
+            "y": 0.6675
+          },
+          {
+            "x": 0.1812,
+            "y": 0.6729
+          },
+          {
+            "x": 0.2127,
+            "y": 0.6658
+          },
+          {
+            "x": 0.2221,
             "y": 0.665
           },
           {
-            "x": 0.2,
-            "y": 0.671
+            "x": 0.2565,
+            "y": 0.6718
           },
           {
-            "x": 0.36,
-            "y": 0.679
+            "x": 0.2848,
+            "y": 0.6731
           },
           {
-            "x": 0.56,
-            "y": 0.69
+            "x": 0.3192,
+            "y": 0.6782
           },
           {
-            "x": 0.64,
-            "y": 0.731
+            "x": 0.3913,
+            "y": 0.6798
           },
           {
-            "x": 0.72,
-            "y": 0.782
+            "x": 0.4226,
+            "y": 0.6778
           },
           {
-            "x": 0.8,
-            "y": 0.815
+            "x": 0.4351,
+            "y": 0.6807
           },
           {
-            "x": 0.841,
-            "y": 0.834
+            "x": 0.4537,
+            "y": 0.6878
+          },
+          {
+            "x": 0.463,
+            "y": 0.6894
+          },
+          {
+            "x": 0.4756,
+            "y": 0.6881
+          },
+          {
+            "x": 0.4945,
+            "y": 0.6832
+          },
+          {
+            "x": 0.5101,
+            "y": 0.6837
+          },
+          {
+            "x": 0.5504,
+            "y": 0.6978
+          },
+          {
+            "x": 0.5588,
+            "y": 0.6997
+          },
+          {
+            "x": 0.5757,
+            "y": 0.7083
+          },
+          {
+            "x": 0.6543,
+            "y": 0.7401
+          },
+          {
+            "x": 0.6631,
+            "y": 0.7449
+          },
+          {
+            "x": 0.6842,
+            "y": 0.7656
+          },
+          {
+            "x": 0.6924,
+            "y": 0.7723
+          },
+          {
+            "x": 0.7376,
+            "y": 0.7906
+          },
+          {
+            "x": 0.8228,
+            "y": 0.8287
+          },
+          {
+            "x": 0.8409,
+            "y": 0.8341
+          },
+          {
+            "x": 0.8422,
+            "y": 0.8577
           },
           {
             "x": 0.841,
             "y": 1
           },
           {
-            "x": 0.038,
+            "x": 0.0411,
             "y": 1
+          },
+          {
+            "x": 0.039,
+            "y": 0.9986
+          },
+          {
+            "x": 0.0405,
+            "y": 0.9766
+          },
+          {
+            "x": 0.0411,
+            "y": 0.7844
+          },
+          {
+            "x": 0.0407,
+            "y": 0.7563
+          },
+          {
+            "x": 0.0382,
+            "y": 0.7047
           }
         ],
-        "holes": []
+        "holes": [],
+        "note": "Contour affine sur l image, independamment du quadrilatere de perspective : les 4 points du plan servent a la projection, ils n imposent pas la frontiere du sol. Methode : densification au pas de 5 px, recalage de chaque point le long de sa normale sur le maximum de gradient (recherche +/-14 px, ponderee vers l origine), filtre median puis moyenne glissante le long du contour — la moyenne supprime le feston du suivi de bord sans effacer la correction —, enfin simplification a 0,9 px. Les cotes du cadre de l image sont figes : ce ne sont pas des frontieres reelles. Qualite de placement, mesuree par le gradient median de l image le long du contour : 23,2 -> 102,3 (x4,41). Un contour pose sur du sol nu tombe au niveau du bruit (18 sur la chambre avant reprise) ; pose sur les plinthes, seuils et huisseries il monte a 200."
       }
     }
   ],

@@ -79,43 +79,96 @@
       "mask": {
         "polygon": [
           {
-            "x": 0.098,
-            "y": 0.552
+            "x": 0.0963,
+            "y": 0.5496
           },
           {
-            "x": 0.14,
-            "y": 0.547
+            "x": 0.1141,
+            "y": 0.5491
           },
           {
-            "x": 0.2,
-            "y": 0.536
+            "x": 0.1399,
+            "y": 0.5461
           },
           {
-            "x": 0.25,
+            "x": 0.2344,
+            "y": 0.5315
+          },
+          {
+            "x": 0.2501,
+            "y": 0.5278
+          },
+          {
+            "x": 0.2694,
             "y": 0.53
           },
           {
-            "x": 0.31,
-            "y": 0.544
+            "x": 0.2883,
+            "y": 0.5354
           },
           {
-            "x": 0.335,
-            "y": 0.553
+            "x": 0.3224,
+            "y": 0.549
           },
           {
-            "x": 0.352,
-            "y": 0.575
+            "x": 0.3353,
+            "y": 0.5522
           },
           {
-            "x": 0.362,
-            "y": 0.594
+            "x": 0.3531,
+            "y": 0.5734
           },
           {
-            "x": 0.098,
-            "y": 0.676
+            "x": 0.3619,
+            "y": 0.5939
+          },
+          {
+            "x": 0.2729,
+            "y": 0.6212
+          },
+          {
+            "x": 0.2294,
+            "y": 0.6309
+          },
+          {
+            "x": 0.196,
+            "y": 0.6437
+          },
+          {
+            "x": 0.1496,
+            "y": 0.6556
+          },
+          {
+            "x": 0.1221,
+            "y": 0.6647
+          },
+          {
+            "x": 0.0971,
+            "y": 0.6777
+          },
+          {
+            "x": 0.0954,
+            "y": 0.6617
+          },
+          {
+            "x": 0.0957,
+            "y": 0.6235
+          },
+          {
+            "x": 0.0936,
+            "y": 0.5949
+          },
+          {
+            "x": 0.0936,
+            "y": 0.5806
+          },
+          {
+            "x": 0.0953,
+            "y": 0.5568
           }
         ],
-        "holes": []
+        "holes": [],
+        "note": "Contour affine sur l image, independamment du quadrilatere de perspective : les 4 points du plan servent a la projection, ils n imposent pas la frontiere du sol. Methode : densification au pas de 5 px, recalage de chaque point le long de sa normale sur le maximum de gradient (recherche +/-14 px, ponderee vers l origine), filtre median puis moyenne glissante le long du contour — la moyenne supprime le feston du suivi de bord sans effacer la correction —, enfin simplification a 0,9 px. Les cotes du cadre de l image sont figes : ce ne sont pas des frontieres reelles. Qualite de placement, mesuree par le gradient median de l image le long du contour : 45,5 -> 61,5 (x1,35). Un contour pose sur du sol nu tombe au niveau du bruit (18 sur la chambre avant reprise) ; pose sur les plinthes, seuils et huisseries il monte a 200."
       }
     },
     {
@@ -131,40 +184,64 @@
             "y": 0.694
           },
           {
-            "x": 0.055,
-            "y": 0.683
+            "x": 0.0975,
+            "y": 0.6715
           },
           {
-            "x": 0.098,
-            "y": 0.676
+            "x": 0.1496,
+            "y": 0.6556
           },
           {
-            "x": 0.362,
-            "y": 0.594
+            "x": 0.196,
+            "y": 0.6437
           },
           {
-            "x": 0.372,
-            "y": 0.583
+            "x": 0.2294,
+            "y": 0.6309
           },
           {
-            "x": 0.42,
-            "y": 0.586
+            "x": 0.2729,
+            "y": 0.6212
           },
           {
-            "x": 0.5,
-            "y": 0.616
+            "x": 0.3373,
+            "y": 0.6009
           },
           {
-            "x": 0.6,
-            "y": 0.652
+            "x": 0.3625,
+            "y": 0.5957
+          },
+          {
+            "x": 0.3727,
+            "y": 0.5867
+          },
+          {
+            "x": 0.3815,
+            "y": 0.5867
+          },
+          {
+            "x": 0.4008,
+            "y": 0.5837
+          },
+          {
+            "x": 0.4136,
+            "y": 0.5841
+          },
+          {
+            "x": 0.4201,
+            "y": 0.5849
+          },
+          {
+            "x": 0.4354,
+            "y": 0.5918
+          },
+          {
+            "x": 0.5092,
+            "y": 0.6184
           },
           {
             "x": 0.7,
             "y": 0.691
-          },
-          {
-            "x": 0.8,
-            "y": 0.727
           },
           {
             "x": 0.9,
@@ -181,9 +258,14 @@
           {
             "x": 0,
             "y": 1
+          },
+          {
+            "x": 0,
+            "y": 0.6987
           }
         ],
-        "holes": []
+        "holes": [],
+        "note": "Contour affine sur l image, independamment du quadrilatere de perspective : les 4 points du plan servent a la projection, ils n imposent pas la frontiere du sol. Methode : densification au pas de 5 px, recalage de chaque point le long de sa normale sur le maximum de gradient (recherche +/-14 px, ponderee vers l origine), filtre median puis moyenne glissante le long du contour — la moyenne supprime le feston du suivi de bord sans effacer la correction —, enfin simplification a 0,9 px. Les cotes du cadre de l image sont figes : ce ne sont pas des frontieres reelles. Qualite de placement, mesuree par le gradient median de l image le long du contour : 243,4 -> 271,8 (x1,12). Un contour pose sur du sol nu tombe au niveau du bruit (18 sur la chambre avant reprise) ; pose sur les plinthes, seuils et huisseries il monte a 200."
       }
     }
   ],

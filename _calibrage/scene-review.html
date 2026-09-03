@@ -122,11 +122,12 @@ const PRODUITS_TEST = ['chene-craie', 'chene-sable', 'chene-naturel', 'chene-mie
 const TOUT_VALIDE = { Perspective: 'valide', 'Échelle': 'valide', Masque: 'valide', 'Lumière': 'valide', Motif: 'valide' };
 
 const VERDICTS = {
-  chambre: {
-    note: 'Trois murs ajustés (écarts 0,003–0,005) ; horizon corrigé de 0,45 à 0,4955 par intersection des deux murs '
-      + 'latéraux, qui sont parallèles dans la pièce. Côtés opposés concordants à 0 %, et étendue du sol invariante '
-      + 'quel que soit le rectangle de référence : 6,18 × 4,67 m, 26,3 lames de 18 cm en travers. Dix sommets de '
-      + 'contour inspectés à ×3, seuil à ×4.',
+  sejour: {
+    note: 'Référence qualité du lot. Plan sur le pied du mur droit (7 points, écart 0,0016) et le seuil ; côtés '
+      + 'opposés concordants à 0,1 %. Contour affiné : gradient médian 243 → 272 — il était déjà le mieux posé des '
+      + 'quatre, ce qui confirmait le jugement porté à l’œil. Deux zones, trame continue à travers l’ouverture. '
+      + 'Réserve nommée : le vernis très brillant du sol d’origine n’est pas restitué. C’est un choix — un mat reste '
+      + 'mat — pas une incohérence de lumière ; le Fumé paraît de ce fait plus éteint que la photo ne le suggère.',
     vues: {
       'droit-naturel': { ...TOUT_VALIDE },
       'droit-fume': { ...TOUT_VALIDE },
@@ -134,36 +135,38 @@ const VERDICTS = {
       'baton-rompu': { ...TOUT_VALIDE },
     },
   },
-  sejour: {
-    note: 'Deux zones, trame continue à travers l’ouverture. Plan sur le pied du mur droit (7 points, écart 0,0016) '
-      + 'et le seuil ; côtés opposés concordants à 0,1 %. Vingt-et-un sommets inspectés à ×3. Lumière « correct » et '
-      + 'non « validé » : le vernis très brillant du sol d’origine n’est pas restitué — choix assumé, un mat reste '
-      + 'mat — mais le Fumé paraît de ce fait plus éteint que la photo ne le suggère.',
+  chambre: {
+    note: 'Horizon corrigé de 0,45 à 0,4955 par intersection des deux murs latéraux, parallèles dans la pièce — donc '
+      + 'sans supposer d’horizon. Côtés opposés concordants à 0 %, et étendue du sol invariante quel que soit le '
+      + 'rectangle de référence : 6,18 × 4,67 m, 26,3 lames de 18 cm. Contour affiné : gradient médian 18 → 202, '
+      + 'soit ×11 — il traversait du sol nu au niveau du bruit, il suit maintenant le seuil, la grille et la '
+      + 'plinthe. C’était le défaut le plus visible du lot précédent.',
     vues: {
-      'droit-naturel': { ...TOUT_VALIDE, 'Lumière': 'correct' },
-      'droit-fume': { ...TOUT_VALIDE, 'Lumière': 'correct' },
-      'point-de-hongrie': { ...TOUT_VALIDE, 'Lumière': 'correct' },
-      'baton-rompu': { ...TOUT_VALIDE, 'Lumière': 'correct' },
+      'droit-naturel': { ...TOUT_VALIDE },
+      'droit-fume': { ...TOUT_VALIDE },
+      'point-de-hongrie': { ...TOUT_VALIDE },
+      'baton-rompu': { ...TOUT_VALIDE },
     },
   },
   'piece-claire': {
-    note: 'Les deux fuites tombent du même côté du centre : la focale n’est pas déductible, donc l’horizon n’est pas '
-      + 'vérifié indépendamment — d’où « Perspective : correct » et non « validé ». Le résultat visible est juste '
-      + '(lames sur la fuite du mur droit) et l’échelle est recoupée par comptage : 5,69 × 3,76 m, 21 lames. Neuf '
-      + 'sommets inspectés à ×3 ; la bande épargnée derrière le meuble est la plinthe bois, pas un trou.',
+    note: 'Contour affiné : gradient médian 23 → 102, soit ×4,4 — la découpe droite qui passait devant la plinthe, le '
+      + 'radiateur et les pieds du meuble a disparu. Réserve nommée : les deux fuites tombent du même côté du centre, '
+      + 'donc la focale n’est pas déductible et l’horizon n’est pas vérifié indépendamment. Le résultat visible est '
+      + 'juste et l’échelle est recoupée par comptage (5,69 × 3,76 m, 21 lames), mais cette scène repose sur une '
+      + 'vérification de moins que les deux autres.',
     vues: {
-      'droit-naturel': { ...TOUT_VALIDE, Perspective: 'correct' },
-      'droit-fume': { ...TOUT_VALIDE, Perspective: 'correct' },
-      'point-de-hongrie': { ...TOUT_VALIDE, Perspective: 'correct' },
-      'baton-rompu': { ...TOUT_VALIDE, Perspective: 'correct' },
+      'droit-naturel': { ...TOUT_VALIDE },
+      'droit-fume': { ...TOUT_VALIDE },
+      'point-de-hongrie': { ...TOUT_VALIDE },
+      'baton-rompu': { ...TOUT_VALIDE },
     },
   },
   contraste: {
-    note: 'Seule scène dont la géométrie n’est PAS mesurable : mur frontal, bande de sol très basse, aucune ligne du '
-      + 'sol orthogonale visible — rien ne contraint l’horizon, et 0,54 est une hypothèse (elle place le mur à '
-      + '4,08 m). La construction est correcte pour cette hypothèse : côtés opposés à 0 %. Sa force est la lumière : '
-      + 'l’ombre de fenêtre passe avec son arête franche et le bois reste lisible dans la tache de soleil. Les motifs '
-      + 'en chevron restent peu lisibles sur une bande aussi basse. Scène secondaire : ne pas la mettre en avant.',
+    note: 'Scène secondaire, et elle le reste. Sa géométrie n’est PAS mesurable : mur frontal, bande de sol très '
+      + 'basse, aucune ligne du sol orthogonale visible — rien ne contraint l’horizon, et 0,54 est une hypothèse '
+      + '(elle place le mur à 4,08 m). La construction est correcte pour cette hypothèse, côtés opposés à 0 %. Sa '
+      + 'force est la lumière : l’ombre de fenêtre passe avec son arête franche et le bois reste lisible dans la '
+      + 'tache de soleil. Les chevrons restent peu lisibles sur une bande aussi basse. Ne pas la mettre en avant.',
     vues: {
       'droit-naturel': { Perspective: 'correct', 'Échelle': 'correct', Masque: 'valide', 'Lumière': 'valide', Motif: 'correct' },
       'droit-fume': { Perspective: 'correct', 'Échelle': 'correct', Masque: 'valide', 'Lumière': 'valide', Motif: 'correct' },
@@ -279,10 +282,10 @@ async function renderScene(entry) {
     const node = document.createElement('canvas');
     renderer.paint(node, { material, pattern: 'lames', angle: 0, width: null, scale: 1 });
     const cap = document.createElement('figcaption');
-    const fiche = material.produit || {};
+    const fiche = material.product || {};
     cap.innerHTML = `<div class="titre">${material.name}<span>${Math.round(zoneLuma(node, renderer.masks, 0) || 0)}</span></div>`
-      + `<div class="critere"><span>${[fiche.teinte, fiche.finition].filter(Boolean).join(' · ') || '—'}</span>`
-      + `<span>${fiche.largeurLame ? Math.round(fiche.largeurLame * 100) + ' cm' : '—'}</span></div>`;
+      + `<div class="critere"><span>${[fiche.tone, fiche.finish].filter(Boolean).join(' · ') || '—'}</span>`
+      + `<span>${fiche.dimensions && fiche.dimensions.widthMm ? fiche.dimensions.widthMm + " mm" : '—'}</span></div>`;
     fig.append(node, cap);
     bande.appendChild(fig);
   });
