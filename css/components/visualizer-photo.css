@@ -357,8 +357,27 @@
 .vz-onboarding__actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.9rem; }
 
 /* ---------- Aperçu avant / après (accueil) ---------- */
-.vzp { display: grid; gap: var(--sp-4); }
-.vzp__figure { margin: 0; display: grid; gap: 0.7rem; }
+/**
+ * La scène ne se dimensionne plus sur le ratio intrinsèque de la photo.
+ *
+ * Elle le faisait — `.vzp__photo { width: 100%; height: auto }` — et une photo
+ * en 3/2 donnait un composant de 1280 px de haut à 1920 px de large, 1707 px à
+ * 2560 px : il chassait le reste de la page hors de l'écran.
+ *
+ * À la place : largeur plafonnée, rapport de forme choisi, hauteur bornée par
+ * la fenêtre. `object-fit: cover` recadre la photo dans ce cadre, et le canvas
+ * suit **exactement** la même règle — c'est la condition pour que le parquet
+ * reste aligné sur la pièce.
+ */
+.vzp {
+  display: grid;
+  gap: var(--sp-4);
+  /* Au-delà, la démonstration n'y gagne rien et la page se disloque. */
+  max-width: 76rem;
+  width: 100%;
+  margin-inline: auto;
+}
+.vzp__figure { margin: 0; display: grid; gap: 0.7rem; min-width: 0; }
 .vzp__stage {
   position: relative;
   --compare: 52%;
@@ -366,15 +385,25 @@
   overflow: hidden;
   background: var(--c-mineral);
   touch-action: pan-y;
+  aspect-ratio: 16 / 10;
+  /* Écrans bas : la scène cède avant de pousser la page. */
+  max-height: min(70svh, 620px);
 }
-.vzp__photo { display: block; width: 100%; height: auto; }
+/* Téléphones : un cadre plus haut tient mieux la pièce dans une colonne
+   étroite qu'un panoramique où le sol ne serait qu'un bandeau. */
+@media (max-width: 40rem) {
+  .vzp__stage { aspect-ratio: 4 / 3; max-height: min(58svh, 460px); }
+}
+.vzp__photo,
 .vzp__canvas {
   position: absolute;
   inset: 0;
+  display: block;
   width: 100%;
   height: 100%;
-  clip-path: inset(0 0 0 var(--compare));
+  object-fit: cover;
 }
+.vzp__canvas { clip-path: inset(0 0 0 var(--compare)); }
 .vzp__range {
   position: absolute;
   inset: 0;
@@ -395,6 +424,14 @@
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18);
   z-index: 2;
 }
+/**
+ * Le bouton de la poignée.
+ *
+ * Il est centré sur le trait, donc à moitié hors cadre quand le curseur touche
+ * un bord — et l'`overflow: hidden` de la scène le coupait net. La course du
+ * curseur est bornée à 3–97 % dans `preview.js` : le trait et le découpage
+ * restent rigoureusement identiques, et le bouton reste entièrement saisissable.
+ */
 .vzp__handle::after {
   content: "";
   position: absolute;
@@ -406,6 +443,11 @@
   border-radius: var(--r-pill);
   background: #fff;
   box-shadow: var(--shadow-2);
+}
+/* Doigts sur petit écran : la cible reste à 44 px, la pastille rétrécit à
+   peine pour ne pas manger la scène. */
+@media (max-width: 30rem) {
+  .vzp__handle::after { width: 40px; height: 40px; }
 }
 .vzp__range:focus-visible ~ .vzp__handle::after { outline: 3px solid var(--focus); }
 .vzp__tag {

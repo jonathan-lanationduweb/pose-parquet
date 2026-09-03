@@ -47,9 +47,13 @@ const PHOTOS = {
   },
 
   // --- Motifs -------------------------------------------------------------
+  // L'image précédente (Designecologist, 15226296) était composée aux quatre
+  // cinquièmes d'un mur blanc vide, avec un simple liseré de parquet en bas.
+  // Recadrée dans le bandeau de couverture, elle se lisait comme un grand
+  // rectangle gris : le sujet de la page en était absent.
   'cover-pose-droite': {
-    id: 15226296, w: 1400, h: 875, credit: 'Designecologist',
-    alt: 'Parquet à lames droites au pied d’un mur blanc',
+    id: 3935327, w: 1400, h: 875, credit: 'Curtis Adams',
+    alt: 'Séjour lumineux dont les lames filent droit vers le fond de la pièce',
   },
   'cover-pose-longueur': {
     id: 8146330, w: 1400, h: 875, credit: 'Max Vakhtbovych',
@@ -59,9 +63,21 @@ const PHOTOS = {
     id: 8146337, w: 1400, h: 875, credit: 'Max Vakhtbovych',
     alt: 'Pièce vide et minimaliste dont les lames traversent la largeur',
   },
+  // Visuel **produit pour le site**, et non photographié.
+  //
+  // L'image précédente (James Frid, 8918712) montrait des pavés de bois usés
+  // vus de dessus : aucune pose en diagonale, aucun rapport avec le sujet de
+  // la page. Son texte alternatif — « motif géométrique orienté » — le
+  // trahissait déjà.
+  //
+  // Aucune photothèque à notre disposition ne propose de pose réellement
+  // diagonale, et une photo approchante serait à nouveau fausse. Le visuel est
+  // donc calculé par le moteur du visualiseur sur la scène « chambre », lames
+  // à −45° : c'est le motif exact dont parle la page. `local: true` empêche
+  // `fetch-photos.js` de le remplacer par un téléchargement.
   'cover-pose-diagonale': {
-    id: 8918712, w: 1400, h: 875, credit: 'James Frid',
-    alt: 'Lames de bois assemblées en motif géométrique orienté',
+    local: true, w: 1400, h: 875, credit: 'Rendu du Visualiseur Parquet',
+    alt: 'Parquet clair posé en diagonale dans une chambre aux murs bleus',
   },
   'cover-point-de-hongrie': {
     id: 37341468, w: 1400, h: 875, credit: 'Diana',

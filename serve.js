@@ -34,9 +34,36 @@ const send = (res, status, body, type) => {
   res.end(body);
 };
 
+/**
+ * Dépôt d'un fichier produit par le navigateur, réservé au développement.
+ *
+ * Certains visuels du site sont **calculés par le moteur du visualiseur** :
+ * un parquet posé en diagonale, par exemple, ne se trouve pas en photothèque.
+ * Le rendu se fait donc dans un canvas, et il faut un moyen d'en récupérer les
+ * octets. Sans cela, il fallait faire passer un JPEG en base64 à travers la
+ * console, ce qui est absurde.
+ *
+ * Cette route n'existe que dans `serve.js`, qui n'est pas déployé : GitHub
+ * Pages ne sert que des fichiers statiques. Elle refuse tout ce qui sort
+ * d'`assets/images/`.
+ */
+function depot(req, res, url) {
+  const cible = path.join(ROOT, url.replace(/^\/__depot\//, 'assets/images/'));
+  const dossier = path.join(ROOT, 'assets', 'images');
+  if (!cible.startsWith(dossier)) return send(res, 403, 'Hors assets/images', TYPES['.txt']);
+  const morceaux = [];
+  req.on('data', (c) => morceaux.push(c));
+  req.on('end', () => {
+    fs.writeFileSync(cible, Buffer.concat(morceaux));
+    console.log(`déposé : ${path.relative(ROOT, cible)} (${Buffer.concat(morceaux).length} octets)`);
+    send(res, 200, 'ok', TYPES['.txt']);
+  });
+}
+
 http
   .createServer((req, res) => {
     const url = decodeURIComponent(req.url.split('?')[0].split('#')[0]);
+    if (req.method === 'PUT' && url.startsWith('/__depot/')) return depot(req, res, url);
     let filePath = path.join(ROOT, url);
 
     if (!filePath.startsWith(ROOT)) return send(res, 403, 'Interdit', TYPES['.txt']);

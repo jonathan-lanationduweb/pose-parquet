@@ -1,6 +1,6 @@
 # Crédits photographiques
 
-Toutes les photographies proviennent de [Pexels](https://www.pexels.com)
+La plupart des photographies proviennent de [Pexels](https://www.pexels.com)
 (licence gratuite, usage commercial autorisé, attribution non obligatoire).
 Elles sont créditées ici par respect du travail des auteurs.
 
@@ -14,10 +14,10 @@ Elles sont créditées ici par respect du travail des auteurs.
 | `cover-parquet-massif-ou-contrecolle.jpg` | cottonbro studio | [Pexels #6568684](https://www.pexels.com/photo/6568684/) |
 | `cover-sens-de-pose-couloir.jpg` | Lisa Anna | [Pexels #19889159](https://www.pexels.com/photo/19889159/) |
 | `cover-sens-de-pose-piece-etroite.jpg` | Max Vakhtbovych | [Pexels #7031616](https://www.pexels.com/photo/7031616/) |
-| `cover-pose-droite.jpg` | Designecologist | [Pexels #15226296](https://www.pexels.com/photo/15226296/) |
+| `cover-pose-droite.jpg` | Curtis Adams | [Pexels #3935327](https://www.pexels.com/photo/3935327/) |
 | `cover-pose-longueur.jpg` | Max Vakhtbovych | [Pexels #8146330](https://www.pexels.com/photo/8146330/) |
 | `cover-pose-largeur.jpg` | Max Vakhtbovych | [Pexels #8146337](https://www.pexels.com/photo/8146337/) |
-| `cover-pose-diagonale.jpg` | James Frid | [Pexels #8918712](https://www.pexels.com/photo/8918712/) |
+| `cover-pose-diagonale.jpg` | Rendu du Visualiseur Parquet | produit pour le site |
 | `cover-point-de-hongrie.jpg` | Diana | [Pexels #37341468](https://www.pexels.com/photo/37341468/) |
 | `cover-baton-rompu.jpg` | Francesca Cruccu | [Pexels #16101859](https://www.pexels.com/photo/16101859/) |
 | `cover-poser-un-parquet-flottant.jpg` | Antoni Shkraba | [Pexels #4981802](https://www.pexels.com/photo/4981802/) |
@@ -53,6 +53,11 @@ Elles sont créditées ici par respect du travail des auteurs.
 | `inspi-6.jpg` | Max Vakhtbovych | [Pexels #7045700](https://www.pexels.com/photo/7045700/) |
 | `inspi-7.jpg` | Max Vakhtbovych | [Pexels #8082327](https://www.pexels.com/photo/8082327/) |
 | `inspi-8.jpg` | Curtis Adams | [Pexels #8583672](https://www.pexels.com/photo/8583672/) |
+
+Les visuels marqués « produit pour le site » ne sont pas des photographies :
+ils sont calculés par le moteur du visualiseur sur une scène calibrée, quand
+aucune photographie disponible n’illustre réellement le sujet de la page.
+Voir `_generator/photos.js` pour le détail de chacun.
 
 Les schémas (`guide-sens-proportions.svg`, `lumiere-avant.svg`,
 `lumiere-apres.svg`) sont des illustrations vectorielles produites pour le site.
