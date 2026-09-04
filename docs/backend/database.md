@@ -9,7 +9,7 @@ seule description de la structure. Moteur InnoDB (celui du site) : les
 écritures d'une demande se font sous transaction.
 
 Schéma versionné par l'entier `POSE_PARQUET_DB_VERSION` (code) comparé à
-l'option `pose_parquet_db_version` (base). Version actuelle : **2**.
+l'option `pose_parquet_db_version` (base). Version actuelle : **3**.
 
 ## `{prefix}pp_projects` — une demande
 
@@ -18,6 +18,7 @@ l'option `pose_parquet_db_version` (base). Version actuelle : **2**.
 | Identité | `id`, `reference` (unique, nullable — voir plus bas), `status`, `first_name`, `last_name`, `email`, `phone` |
 | Projet | `postal_code` (non collecté par le formulaire, reste vide), `city`, `department`, `region`, `housing_type`, `room_type`, `surface` (decimal 8,2), `parquet_type`, `support_type`, `installation_type`, `style` (schéma 2), `timeframe`, `message` |
 | Visualiseur (facultatif) | `scene_id`, `product_id`, `pattern`, `orientation` (angle), `visualizer_config` (JSON) |
+| Emails (schéma 3) | `internal_mail_status`, `internal_mail_sent_at`, `visitor_mail_status`, `visitor_mail_sent_at` |
 | Traçabilité | `source_url`, `utm_source`, `utm_medium`, `utm_campaign`, `consent_at`, `created_at`, `updated_at` |
 
 Index : `PRIMARY(id)`, `UNIQUE(reference)`, `status`, `created_at`, `email`,
@@ -31,9 +32,16 @@ par le plugin ; pas de PHP sérialisé. Seul `status` a un domaine fixé dans
 `Projects\Status` : `new`, `to_contact`, `contacted`, `qualified`,
 `completed`, `lost`, `spam`.
 
-**Pas d'adresse IP.** Ni colonne ni journal : la limite de débit du lot 3, si
-elle s'appuie sur l'IP, passera par des transients éphémères, pas par la
-table.
+**Pas d'adresse IP.** Ni colonne, ni journal. La limite de débit s'appuie sur
+un **condensat** HMAC de `REMOTE_ADDR` (voir `antispam.md`), rangé dans des
+transients éphémères — jamais dans cette table.
+
+**États des emails** (schéma 3) : `pending` (aucun envoi tenté — état initial,
+et celui des demandes antérieures au lot 3), `sent`, `failed`, et `skipped`
+pour la confirmation quand elle est désactivée dans les réglages. La date
+n'est posée qu'en cas d'envoi réussi. Ces colonnes portent un mot et une
+date : jamais le contenu d'un email, jamais une copie des données
+personnelles. Voir `email.md`.
 
 ## `{prefix}pp_project_history` — transitions de statut
 
@@ -81,10 +89,12 @@ l'ordre, les étapes numérotées qui ne se réduisent pas à un ajout.
 |---|---|---|
 | 1 | création initiale | aucune |
 | 2 | colonne `style varchar(40) NOT NULL DEFAULT ''` (ajoutée par dbDelta) ; `reference` passe de `NOT NULL` à `DEFAULT NULL` | `ALTER TABLE … MODIFY reference varchar(20) DEFAULT NULL` — dbDelta ne sait pas changer la nullabilité |
+| 3 | quatre colonnes d'état des emails, `*_mail_status varchar(10) NOT NULL DEFAULT 'pending'` et `*_mail_sent_at datetime NULL` | aucune : dbDelta ajoute les colonnes, et les lignes existantes prennent le défaut `pending` — ce qui dit vrai, aucune demande antérieure n'a reçu d'email |
 
 Testé (`tests/run-projects.php`) : une table remise à l'état 1 avec une ligne,
-puis `maybe_upgrade()` → version 2, colonne ajoutée, nullabilité changée,
-index unique conservé, ligne intacte ; seconde exécution sans effet.
+puis `maybe_upgrade()` → version 3, colonnes ajoutées, nullabilité changée,
+index unique conservé, ligne intacte et ses états d'email à `pending` ;
+seconde exécution sans effet.
 
 Pour faire évoluer le schéma : modifier le SQL dans `Schema`, incrémenter
 `POSE_PARQUET_DB_VERSION`, ajouter un `case` dans `migrate()` si nécessaire.

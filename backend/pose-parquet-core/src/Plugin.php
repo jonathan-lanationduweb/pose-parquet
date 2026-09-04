@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace PoseParquet\Core;
 
 use PoseParquet\Core\Admin\Menu;
+use PoseParquet\Core\Admin\Settings;
 use PoseParquet\Core\Database\Installer;
 use PoseParquet\Core\Rest\Cors;
 use PoseParquet\Core\Rest\Routes;
@@ -46,6 +47,7 @@ final class Plugin {
 
 		if ( is_admin() ) {
 			Menu::register();
+			Settings::register();
 		}
 	}
 

@@ -3,14 +3,17 @@
  * POST /pose-parquet/v1/projects — dépôt public d'une demande.
  *
  * Contrôleur mince : il lit le corps, vérifie ce qui relève du transport
- * (JSON valide, taille raisonnable), délègue à Projects\Service, et traduit le
- * résultat en HTTP. Il ne valide pas un champ métier lui-même.
+ * (JSON valide, taille raisonnable), délègue à Projects\SubmissionService
+ * (anti-spam → validation → écriture → emails), et traduit le résultat en
+ * HTTP. Il ne valide pas un champ métier lui-même.
  *
  * Réponses :
  *   201  { success: true, reference: "PP-2026-000123" }
  *   400  corps absent ou JSON illisible
  *   413  corps trop volumineux (avant même de le lire)
- *   422  validation refusée — { code, message, fields: { champ: raison } }
+ *   422  validation refusée — { code, message, fields: { champ: raison } } ;
+ *        aussi submission_rejected (pot de miel) et form_token_invalid (jeton)
+ *   429  rate_limited, avec Retry-After
  *   500  écriture impossible
  *   503  schéma de base absent ou en retard
  *
@@ -28,7 +31,7 @@ namespace PoseParquet\Core\Rest;
 
 use PoseParquet\Core\Database\Installer;
 use PoseParquet\Core\Database\Schema;
-use PoseParquet\Core\Projects\Service;
+use PoseParquet\Core\Projects\SubmissionService;
 use PoseParquet\Core\Support\Logger;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -68,19 +71,21 @@ final class ProjectsController {
 			return self::error( 503, 'service_unavailable', 'Service momentanément indisponible.', [], $request_id );
 		}
 
-		$result = ( new Service() )->create( $input );
+		$result = ( new SubmissionService() )->submit( $input, $request_id );
 
 		if ( ! $result['ok'] ) {
-			if ( $result['code'] === Service::ERR_VALIDATION ) {
-				return self::error( 422, 'validation_failed', 'Certains champs sont invalides.', $result['fields'] ?? [], $request_id );
+			$response = self::error( $result['status'], $result['code'] ?? 'error', $result['message'] ?? 'Requête refusée.', $result['fields'] ?? [], $request_id );
+			if ( ! empty( $result['retry_after'] ) ) {
+				$response->header( 'Retry-After', (string) (int) $result['retry_after'] );
 			}
-			return self::error( 500, 'storage_failed', 'La demande n’a pas pu être enregistrée.', [], $request_id );
+			return $response;
 		}
 
 		Logger::info( 'Demande créée', [
 			'request_id'  => $request_id,
 			'route'       => 'projects.create',
 			'project_id'  => $result['id'],
+			'mails'       => $result['mails'] ?? [],
 			'duration_ms' => (int) round( ( microtime( true ) - $start ) * 1000 ),
 		] );
 

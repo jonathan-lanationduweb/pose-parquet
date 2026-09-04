@@ -31,6 +31,8 @@ final class Logger {
 		'email', 'phone', 'first_name', 'last_name', 'firstName', 'lastName', 'message', 'city', 'ip',
 		// Un corps de requête entier contient tout ce qui précède : il ne passe pas non plus.
 		'payload', 'body', 'input', 'data', 'fields',
+		// Jeton, destinataires, adresse réseau : pas davantage.
+		'formToken', 'token', 'to', 'reply_to', 'remote_addr', 'website',
 	];
 
 	/** @param array<string,mixed> $contexte */

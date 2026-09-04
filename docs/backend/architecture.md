@@ -17,9 +17,10 @@ navigateur ── site statique (GitHub Pages aujourd'hui, hébergeur définitif
 ```
 
 Ce que WordPress apporte sans qu'on l'écrive : comptes et connexion de
-l'équipe, rôles et capabilities, options, envoi d'email (`wp_mail`, dont le
-transport SMTP est réglé au niveau du site, pas du plugin), REST avec
-authentification par cookie + nonce pour l'administration.
+l'équipe, rôles et capabilities, options et Settings API, envoi d'email
+(`wp_mail`, dont le transport SMTP est réglé au niveau du site, pas du
+plugin), transients pour la limite de débit, sels pour signer un jeton, REST
+avec authentification par cookie + nonce pour l'administration.
 
 Ce qu'on refuse : convertir le front en thème, stocker les demandes en articles,
 dépendre d'ACF, WooCommerce ou d'un constructeur de pages.
@@ -28,6 +29,34 @@ dépendre d'ACF, WooCommerce ou d'un constructeur de pages.
 
 Demandes de projet, statuts, notes, historique, emails, anti-spam, réglages,
 permissions, API REST publique (dépôt d'une demande) et privée (administration).
+
+## Le pipeline d'un dépôt public
+
+Un seul chemin d'écriture, `Projects\SubmissionService`, et un ordre qui ne
+change pas :
+
+```
+POST /projects
+  contrôle de transport (corps présent, JSON lisible, ≤ 16 Ko)   ProjectsController
+  limite de tentatives · pot de miel · jeton temporel            Antispam\Guard
+  limite de créations                                            Antispam\RateLimiter
+  ── validation métier                                           Projects\Validator
+  ── transaction : demande → référence → historique → COMMIT     Projects\Service
+  ── notification interne, puis confirmation visiteur            Mail\Notifier
+  201 { success, reference }
+```
+
+Deux règles de séparation, tenues par cette architecture :
+
+- **avant le COMMIT**, rien n'écrit hors de la transaction ; ce qui est refusé
+  ne laisse aucune trace (ni demande, ni historique, ni email) ;
+- **après le COMMIT**, rien ne peut défaire la demande. Un email en échec
+  n'est qu'un état en base. La base est la source de vérité, l'email une
+  notification. Aucun email n'annonce donc une demande non enregistrée.
+
+`SubmissionService` orchestre, il ne fait rien lui-même : chaque étape a sa
+classe (`Guard`, `Validator`, `Service`, `Notifier`), et `Service` — validation
+et écriture — est resté celui du lot 2.
 
 Plus tard, et seulement plus tard : catalogue et synchronisation Premibel
 (gelés aujourd'hui), passerelle vers un service Python d'analyse d'image.
