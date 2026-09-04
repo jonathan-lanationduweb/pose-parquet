@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Recette front — sonde multi-pages, multi-largeurs</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #101212; color: #e8e6df; font: 12px/1.5 ui-monospace, monospace; }
+  header { padding: 8px 10px; border-bottom: 1px solid #2a2e2e; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  #cadre { position: fixed; right: 0; top: 40px; border: 1px solid #333; background: #fff; transform-origin: top right; }
+  #out { padding: 8px 10px; white-space: pre-wrap; max-width: 60vw; }
+  b { color: #fff; }
+  .ko { color: #ff6b5e; }
+</style>
+</head>
+<body>
+<header>
+  <b>Recette front</b>
+  <span id="etat">prêt</span>
+</header>
+<iframe id="cadre" title="page sous test"></iframe>
+<pre id="out"></pre>
+
+<script>
+/**
+ * Sonde de recette : charge chaque page publique dans un cadre à la largeur
+ * demandée et relève ce qu'un œil ne verrait qu'en scrollant trente-trois
+ * pages à dix largeurs. Elle NE remplace pas le regard : elle dit où poser
+ * les yeux. Les captures d'écran restent la validation.
+ *
+ * Ce qu'elle mesure, par page et par largeur :
+ *   - débordement horizontal du document ;
+ *   - éléments qui sortent du cadre (hors SVG internes et pistes défilantes
+ *     volontairement larges) ;
+ *   - blocs de texte étroits (moins de 120 px pour plus de 24 caractères) —
+ *     c'est la signature des colonnes écrasées qu'on a déjà connues ;
+ *   - texte rogné (nowrap dont le contenu dépasse) ;
+ *   - cibles tactiles interactives de moins de 40 px de côté (sous 768 px) ;
+ *   - texte de moins de 12 px ;
+ *   - images cassées (naturalWidth 0) ou déformées (rapport CSS ≠ rapport
+ *     natif à plus de 3 %) ;
+ *   - chevauchements de titres avec le texte suivant ;
+ *   - hiérarchie de titres (saut de niveau) ;
+ *   - hauteur totale du document, pour repérer les pages démesurées ;
+ *   - liens sans texte ni aria-label ; boutons vides.
+ */
+const PAGES = [
+  '/', '/guides/', '/guides/quel-sens-de-pose-choisir.html', '/guides/parquet-massif-ou-contrecolle.html',
+  '/guides/point-de-hongrie-ou-baton-rompu.html', '/guides/poser-parquet-sens-de-la-lumiere.html',
+  '/guides/preparer-son-sol-avant-la-pose.html', '/guides/erreurs-a-eviter-avant-de-poser.html',
+  '/guides/sens-de-pose-couloir.html', '/guides/sens-de-pose-piece-etroite.html',
+  '/tutoriels/', '/tutoriels/poser-un-parquet-flottant.html', '/tutoriels/coller-un-parquet-contrecolle.html',
+  '/tutoriels/reussir-le-calepinage.html',
+  '/motifs/', '/motifs/pose-droite.html', '/motifs/pose-longueur.html', '/motifs/pose-largeur.html',
+  '/motifs/pose-diagonale.html', '/motifs/point-de-hongrie.html', '/motifs/baton-rompu.html',
+  '/inspiration/', '/outils/', '/outils/visualiseur.html', '/outils/simulateur-pose.html',
+  '/projet/', '/contact/', '/a-propos/', '/a-propos/methode-editoriale.html', '/404.html',
+];
+const LARGEURS = { 320: 568, 360: 800, 375: 812, 390: 844, 430: 932, 600: 900, 768: 1024, 820: 1180, 1024: 768, 1280: 800, 1366: 768, 1440: 900, 1536: 864, 1920: 1080, 2560: 1440 };
+
+const $ = (id) => document.getElementById(id);
+const cadre = $('cadre');
+const resultats = [];
+window.__recette = { resultats, fini: false };
+
+const charge = (url, w, h) => new Promise((resolve) => {
+  cadre.style.width = w + 'px';
+  cadre.style.height = h + 'px';
+  const echelle = Math.min(1, (window.innerWidth * 0.38) / w);
+  cadre.style.transform = `scale(${echelle})`;
+  cadre.onload = () => setTimeout(resolve, 700);
+  cadre.src = url + (url.includes('?') ? '&' : '?') + 'recette=1';
+});
+
+function sonde(win, w) {
+  const doc = win.document;
+  const de = doc.documentElement;
+  const r = {
+    deborde: de.scrollWidth - de.clientWidth,
+    hauteur: de.scrollHeight,
+    hors: [], etroits: [], rognes: [], petitesCibles: [], petitTexte: [], imagesKo: [], imagesDeformees: [],
+    liensVides: [], boutonsVides: [], sautsTitres: [], chevauchements: [],
+  };
+  const nom = (el) => el.tagName.toLowerCase() + (el.className && typeof el.className === 'string' ? '.' + el.className.trim().split(/\s+/)[0] : '') + (el.id ? '#' + el.id : '');
+  const svgInterne = (el) => el.namespaceURI === 'http://www.w3.org/2000/svg' && el.tagName.toLowerCase() !== 'svg';
+  const dansPiste = (el) => !!el.closest('[class*="marquee"], [class*="carousel"], [class*="scroll"], [style*="overflow"]');
+  const cibleMobile = w < 768;
+  const niveaux = [];
+  doc.querySelectorAll('body *').forEach((el) => {
+    if (svgInterne(el)) return;
+    const s = win.getComputedStyle(el);
+    if (s.display === 'none' || s.visibility === 'hidden') return;
+    const b = el.getBoundingClientRect();
+    if (b.width === 0 || b.height === 0) return;
+    if ((b.right > w + 1.5 || b.left < -1.5) && s.position !== 'fixed' && !dansPiste(el)) r.hors.push(`${nom(el)} [${Math.round(b.left)}→${Math.round(b.right)}]`);
+    const feuille = el.children.length === 0;
+    const texte = feuille ? (el.textContent || '').trim() : '';
+    if (feuille && texte.length > 24 && b.width < 120 && s.position !== 'absolute') r.etroits.push(`${nom(el)} w=${Math.round(b.width)} « ${texte.slice(0, 30)} »`);
+    if (feuille && texte && s.whiteSpace === 'nowrap' && el.scrollWidth > el.clientWidth + 2 && s.overflow !== 'hidden') r.rognes.push(`${nom(el)} « ${texte.slice(0, 30)} »`);
+    if (feuille && texte.length > 2 && parseFloat(s.fontSize) < 12 && s.position !== 'absolute') r.petitTexte.push(`${nom(el)} ${s.fontSize} « ${texte.slice(0, 24)} »`);
+    if (cibleMobile && (el.matches('a, button, input, select, textarea, [role="button"]')) && (b.width < 40 || b.height < 40) && !el.closest('[hidden]')) {
+      r.petitesCibles.push(`${nom(el)} ${Math.round(b.width)}×${Math.round(b.height)} « ${(el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 20)} »`);
+    }
+    if (el.tagName === 'IMG') {
+      if (el.complete && el.naturalWidth === 0) r.imagesKo.push(`${nom(el)} ${el.getAttribute('src')}`);
+      else if (el.naturalWidth && s.objectFit === 'fill') {
+        const rc = b.width / b.height; const rn = el.naturalWidth / el.naturalHeight;
+        if (Math.abs(rc - rn) / rn > 0.03) r.imagesDeformees.push(`${nom(el)} css=${rc.toFixed(2)} natif=${rn.toFixed(2)}`);
+      }
+    }
+    if (el.tagName === 'A' && !(el.textContent || '').trim() && !el.getAttribute('aria-label') && !el.querySelector('img[alt]:not([alt=""])')) r.liensVides.push(nom(el));
+    if (el.tagName === 'BUTTON' && !(el.textContent || '').trim() && !el.getAttribute('aria-label') && !el.getAttribute('title')) r.boutonsVides.push(nom(el));
+    if (/^H[1-6]$/.test(el.tagName)) {
+      const n = +el.tagName[1];
+      if (niveaux.length && n > niveaux[niveaux.length - 1] + 1) r.sautsTitres.push(`${niveaux[niveaux.length - 1]}→${n} « ${(el.textContent || '').trim().slice(0, 30)} »`);
+      niveaux.push(n);
+      const suivant = el.nextElementSibling;
+      if (suivant) { const bs = suivant.getBoundingClientRect(); if (bs.top < b.bottom - 2 && bs.height > 0) r.chevauchements.push(`${nom(el)} / ${nom(suivant)}`); }
+    }
+  });
+  return r;
+}
+
+async function tout(largeurs = Object.keys(LARGEURS).map(Number), pages = PAGES) {
+  window.__recette.fini = false;
+  for (const w of largeurs) {
+    for (const url of pages) {
+      $('etat').textContent = `${w} px — ${url}`;
+      await charge(url, w, LARGEURS[w] || 900);
+      let r;
+      try { r = sonde(cadre.contentWindow, w); } catch (e) { r = { erreur: String(e) }; }
+      const ligne = { url, w, ...r };
+      resultats.push(ligne);
+      const alertes = ['hors', 'etroits', 'rognes', 'petitesCibles', 'petitTexte', 'imagesKo', 'imagesDeformees', 'liensVides', 'boutonsVides', 'sautsTitres', 'chevauchements']
+        .filter((k) => r[k] && r[k].length).map((k) => `${k}=${r[k].length}`);
+      $('out').textContent += `${String(w).padStart(4)} ${url.padEnd(48)} déb=${r.deborde} h=${r.hauteur} ${alertes.join(' ')}\n`;
+    }
+  }
+  window.__recette.fini = true;
+  $('etat').textContent = 'terminé';
+}
+window.tout = tout;
+window.sonde = sonde;
+</script>
+</body>
+</html>

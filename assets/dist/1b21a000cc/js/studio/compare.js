@@ -60,7 +60,18 @@ export function createCompare(host, { renderer, catalog, paintConfig, onUse, pro
   const canvasFor = (variant) => {
     const canvas = document.createElement('canvas');
     canvas.className = 'cmp__canvas';
-    renderer.paint(canvas, paintConfig(variant.config), null, 1);
+    const config = paintConfig(variant.config);
+    // Les cartes d'une version comparée peuvent ne pas être en cache — elles
+    // se fabriquent alors dans le worker et `paint` rend `false` en laissant
+    // le canevas vide. Sans cette attente, deux versions sur trois s'affichaient
+    // en noir dans la comparaison (recette globale). On peint dès que c'est prêt.
+    if (!renderer.paint(canvas, config, null, 1) && renderer.enAttente) {
+      canvas.classList.add('is-loading');
+      renderer.preparer(config).then(() => {
+        if (canvas.isConnected) renderer.paint(canvas, config, null, 1);
+        canvas.classList.remove('is-loading');
+      });
+    }
     return canvas;
   };
 
@@ -174,8 +185,11 @@ export function createCompare(host, { renderer, catalog, paintConfig, onUse, pro
     document.body.classList.remove('is-comparing');
   };
   root.querySelector('[data-close]').addEventListener('click', close);
-  root.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') close();
+  // Au niveau du document, pas de la boîte : un Échap tapé alors que le focus
+  // est resté sur la page — le cas d'un clic souris qui l'a déplacé — doit
+  // fermer aussi. Sans effet tant que la boîte est cachée.
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !root.hidden) close();
   });
 
   host.appendChild(root);

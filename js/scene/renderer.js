@@ -18,7 +18,7 @@ import { createSceneMasks } from './mask.js';
 import { mark, mesure } from '../utils/perf.js';
 import { buildShadingMap, buildGlossMap } from './shading.js';
 import { lightDirection } from './geometry.js';
-import { materialMaps, warmMaterial } from './material.js';
+import { materialMaps, materialMapsAsync, warmMaterial } from './material.js';
 import { createCanvasRenderer } from './renderer-canvas.js';
 import { createGlRenderer, glAvailable } from './renderer-gl.js';
 
@@ -120,12 +120,37 @@ export function createSceneRenderer({ prefer = 'auto' } = {}) {
      * que soit leur perspective. C'est ce qui fait qu'un parquet choisi change
      * la pièce du fond en même temps que celle du premier plan.
      */
+    /** Vrai après un `surfacesFor` dont au moins une surface attend ses cartes. */
+    enAttente: false,
+
+    /**
+     * Attend que les cartes de toutes les surfaces soient prêtes.
+     *
+     * `paint()` est synchrone et rend `false` quand une carte se fabrique dans
+     * le worker : l'application, elle, repeindra au signal. Les pages d'outil
+     * qui peignent UNE fois puis lisent les pixels — revue des scènes, contrôle
+     * des zones — n'ont pas ce signal ; sans cette attente elles lisaient un
+     * canevas noir. Elles appellent donc `await renderer.preparer(config)`.
+     */
+    async preparer(config, perSurface) {
+      if (!this.ready || !config || !config.material) return false;
+      await Promise.all(scene.surfaces.map((surface) => {
+        const entry = (perSurface && perSurface.get(surface.id)) || config;
+        return entry && entry.material ? materialMapsAsync(entry.material, entry) : null;
+      }));
+      return true;
+    },
+
     surfacesFor(config, perSurface) {
       const map = new Map();
+      this.enAttente = false;
       scene.surfaces.forEach((surface) => {
         const entry = (perSurface && perSurface.get(surface.id)) || config;
         if (!entry || !entry.material) return;
         const maps = materialMaps(entry.material, entry);
+        // `null` : les cartes se fabriquent dans le worker. On ne peint pas
+        // cette surface maintenant ; l'application sera prévenue et repeindra.
+        if (!maps) { this.enAttente = true; return; }
         if (maps.surface.clearcoat > GLOSS_THRESHOLD && !glossWanted) {
           // Première finition brillante rencontrée : la carte de reflets n'a
           // pas été calculée, on la fabrique maintenant plutôt qu'à l'avance.

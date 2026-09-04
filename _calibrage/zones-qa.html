@@ -98,14 +98,15 @@ for (const entry of index.scenes) {
   const orig = prepared.canvas.getContext('2d', { willReadFrequently: true })
     .getImageData(0, 0, width, height).data;
 
-  const peindre = (id) => {
+  const peindre = async (id) => {
     const c = document.createElement('canvas');
+    await renderer.preparer({ material: catalog.get(id), pattern: 'lames' });
     const ok = renderer.paint(c, { material: catalog.get(id), pattern: 'lames', angle: 0, width: null, scale: 1 });
     if (!ok) return null;
     return c.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, width, height).data;
   };
-  const clair = peindre(CLAIR);
-  const fonce = peindre(FONCE);
+  const clair = await peindre(CLAIR);
+  const fonce = await peindre(FONCE);
   if (!clair || !fonce) { log(`${entry.id} : rendu impossible`); continue; }
 
   const labels = renderer.masks.labels;

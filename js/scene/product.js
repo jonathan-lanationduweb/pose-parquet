@@ -464,6 +464,24 @@ export function toMaterial(fiche) {
  *
  * Les fiches `unavailable` sont écartées comme les inactives.
  */
+/**
+ * Un même fichier de catalogue n'est lu qu'une fois par session.
+ *
+ * `loadCatalog` relit `data/parquets.json` pour ses métadonnées de motifs
+ * après que `loadProducts` l'a déjà chargé : deux requêtes pour le même
+ * octet au démarrage du Studio, mesuré. La promesse est partagée par URL.
+ */
+const fichiers = new Map();
+export function lireJson(url) {
+  if (!fichiers.has(url)) {
+    fichiers.set(url, fetch(url).then((r) => {
+      if (!r.ok) throw new Error(`introuvable : ${url}`);
+      return r.json();
+    }));
+  }
+  return fichiers.get(url);
+}
+
 export async function loadProducts(base = '') {
   const manifeste = await fetch(`${base}data/render-families.json`)
     .then((r) => (r.ok ? r.json() : {}))
@@ -475,10 +493,7 @@ export async function loadProducts(base = '') {
 
   const toutes = [];
   for (const s of sources) {
-    const data = await fetch(`${base}${s.fichier}`).then((r) => {
-      if (!r.ok) throw new Error(`catalogue introuvable : ${s.fichier}`);
-      return r.json();
-    });
+    const data = await lireJson(`${base}${s.fichier}`);
     const brutes = Array.isArray(data.produits) ? data.produits : data.parquets;
     if (!Array.isArray(brutes)) throw new Error(`catalogue vide ou mal formé : ${s.fichier}`);
     brutes.forEach((r) => toutes.push(normalizeProduct({ source: s.source, ...r }, families)));

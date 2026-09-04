@@ -33,7 +33,7 @@
 .tile__title { font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.15rem); line-height: 0.98; max-width: 9ch; }
 .tile__num {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   letter-spacing: 0.06em;
   opacity: 0.65;
   padding-top: 0.35rem;
@@ -321,9 +321,9 @@
   text-decoration: none;
   transition: padding-left var(--dur-3) var(--ease-out), background var(--dur-3) var(--ease-out);
 }
-.list-row__num { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); }
+.list-row__num { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); }
 .list-row__title { font-family: var(--font-display); font-size: clamp(1.35rem, 1.1rem + 1.2vw, 2rem); line-height: 1.08; letter-spacing: var(--tracking-display); }
-.list-row__meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); }
+.list-row__meta { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); }
 /* Le résumé respire un peu plus que la méta, qui appartient encore au titre. */
 .list-row__text { color: var(--text-soft); font-size: 0.94rem; margin: 0.35rem 0 0; }
 

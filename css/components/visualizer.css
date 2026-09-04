@@ -44,7 +44,13 @@
 
 .visualizer__range { display: grid; gap: 0.35rem; font-size: 0.86rem; }
 .visualizer__range output { font-family: var(--font-mono); color: var(--text-muted); font-size: 0.82rem; }
-.visualizer__range input[type="range"] { width: 100%; accent-color: var(--accent); }
+.visualizer__range input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+  /* 16 px de haut, c'est le trait ; la cible tactile en prend 28. */
+  min-height: 1.75rem;
+  cursor: pointer;
+}
 
 .pattern-switch { display: grid; gap: 0.4rem; }
 .pattern-switch button {

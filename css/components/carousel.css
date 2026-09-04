@@ -105,7 +105,7 @@
 .slide-card__link { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.88rem; font-weight: 500; }
 .slide-card__link svg { width: 0.95em; height: 0.95em; transition: transform var(--dur-2) var(--ease-out); }
 .slide-card:hover .slide-card__link svg { transform: translateX(5px); }
-.slide-card__meta { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); }
+.slide-card__meta { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); }
 
 /* ---------- Slide galerie (très visuelle) ----------
    Un seul gabarit : même largeur, même ratio, même alignement.
@@ -151,7 +151,7 @@
   z-index: 1;
 }
 .shot__cat {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(255,255,255,0.8);

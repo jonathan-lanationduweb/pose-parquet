@@ -141,6 +141,16 @@
 
 /* Tableau comparatif */
 .table-wrap { overflow-x: auto; max-width: 100%; margin: var(--sp-6) 0; border: 1px solid var(--line); border-radius: var(--r-md); }
+/* Sur un écran étroit le tableau défile : un voile sur le bord droit le dit,
+   là où la seule barre de défilement se lisait mal. */
+@media (max-width: 47.99rem) {
+  .table-wrap {
+    background:
+      linear-gradient(to right, var(--c-paper) 30%, rgba(255, 255, 255, 0)) left / 2.5rem 100% no-repeat local,
+      linear-gradient(to left, var(--c-paper) 30%, rgba(255, 255, 255, 0)) right / 2.5rem 100% no-repeat local,
+      var(--c-paper);
+  }
+}
 .table-compare { min-width: 34rem; font-size: 0.94rem; background: var(--surface); }
 .table-compare th, .table-compare td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
 .table-compare thead th { background: var(--c-paper); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
@@ -174,6 +184,10 @@
 }
 .ba__tag--before { left: 0.75rem; }
 .ba__tag--after { right: 0.75rem; }
+/* Le côté réduit perd son étiquette : voir before-after.js. */
+.ba__tag { transition: opacity 0.18s ease; }
+.ba[data-ba-side="right"] .ba__tag--before,
+.ba[data-ba-side="left"] .ba__tag--after { opacity: 0; }
 .ba__range {
   position: absolute;
   inset: 0;

@@ -1077,7 +1077,7 @@ body[data-drawer-open="true"] { overflow: hidden; }
 .tile__title { font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.15rem); line-height: 0.98; max-width: 9ch; }
 .tile__num {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   letter-spacing: 0.06em;
   opacity: 0.65;
   padding-top: 0.35rem;
@@ -1365,9 +1365,9 @@ body[data-drawer-open="true"] { overflow: hidden; }
   text-decoration: none;
   transition: padding-left var(--dur-3) var(--ease-out), background var(--dur-3) var(--ease-out);
 }
-.list-row__num { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); }
+.list-row__num { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); }
 .list-row__title { font-family: var(--font-display); font-size: clamp(1.35rem, 1.1rem + 1.2vw, 2rem); line-height: 1.08; letter-spacing: var(--tracking-display); }
-.list-row__meta { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); }
+.list-row__meta { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); }
 /* Le résumé respire un peu plus que la méta, qui appartient encore au titre. */
 .list-row__text { color: var(--text-soft); font-size: 0.94rem; margin: 0.35rem 0 0; }
 
@@ -1836,7 +1836,7 @@ body[data-drawer-open="true"] { overflow: hidden; }
 .slide-card__link { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.88rem; font-weight: 500; }
 .slide-card__link svg { width: 0.95em; height: 0.95em; transition: transform var(--dur-2) var(--ease-out); }
 .slide-card:hover .slide-card__link svg { transform: translateX(5px); }
-.slide-card__meta { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); }
+.slide-card__meta { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); }
 
 /* ---------- Slide galerie (très visuelle) ----------
    Un seul gabarit : même largeur, même ratio, même alignement.
@@ -1882,7 +1882,7 @@ body[data-drawer-open="true"] { overflow: hidden; }
   z-index: 1;
 }
 .shot__cat {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(255,255,255,0.8);
@@ -2369,6 +2369,16 @@ body[data-drawer-open="true"] { overflow: hidden; }
 
 /* Tableau comparatif */
 .table-wrap { overflow-x: auto; max-width: 100%; margin: var(--sp-6) 0; border: 1px solid var(--line); border-radius: var(--r-md); }
+/* Sur un écran étroit le tableau défile : un voile sur le bord droit le dit,
+   là où la seule barre de défilement se lisait mal. */
+@media (max-width: 47.99rem) {
+  .table-wrap {
+    background:
+      linear-gradient(to right, var(--c-paper) 30%, rgba(255, 255, 255, 0)) left / 2.5rem 100% no-repeat local,
+      linear-gradient(to left, var(--c-paper) 30%, rgba(255, 255, 255, 0)) right / 2.5rem 100% no-repeat local,
+      var(--c-paper);
+  }
+}
 .table-compare { min-width: 34rem; font-size: 0.94rem; background: var(--surface); }
 .table-compare th, .table-compare td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
 .table-compare thead th { background: var(--c-paper); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
@@ -2402,6 +2412,10 @@ body[data-drawer-open="true"] { overflow: hidden; }
 }
 .ba__tag--before { left: 0.75rem; }
 .ba__tag--after { right: 0.75rem; }
+/* Le côté réduit perd son étiquette : voir before-after.js. */
+.ba__tag { transition: opacity 0.18s ease; }
+.ba[data-ba-side="right"] .ba__tag--before,
+.ba[data-ba-side="left"] .ba__tag--after { opacity: 0; }
 .ba__range {
   position: absolute;
   inset: 0;
@@ -2659,7 +2673,13 @@ body[data-drawer-open="true"] { overflow: hidden; }
 
 .visualizer__range { display: grid; gap: 0.35rem; font-size: 0.86rem; }
 .visualizer__range output { font-family: var(--font-mono); color: var(--text-muted); font-size: 0.82rem; }
-.visualizer__range input[type="range"] { width: 100%; accent-color: var(--accent); }
+.visualizer__range input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+  /* 16 px de haut, c'est le trait ; la cible tactile en prend 28. */
+  min-height: 1.75rem;
+  cursor: pointer;
+}
 
 .pattern-switch { display: grid; gap: 0.4rem; }
 .pattern-switch button {
@@ -3758,7 +3778,14 @@ body[data-drawer-open="true"] { overflow: hidden; }
   border-radius: var(--r-pill);
   background: var(--line);
   transition: background var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
+  /* Le trait fait 4 px, la cible non : un pseudo-élément étend la zone
+     cliquable à 40 px de haut sans changer le dessin. */
+  position: relative;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
 }
+.pf__dot::after { content: ""; position: absolute; inset: -18px 0; }
 .pf__dot:hover { transform: scaleY(1.6); }
 .pf__dot[data-state="done"] { background: var(--accent); }
 .pf__dot[data-state="current"] { background: var(--c-ink); }

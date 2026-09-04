@@ -308,7 +308,7 @@ async function renderScene(entry) {
   grid.className = 'grid';
   $('out').appendChild(grid);
 
-  VUES.forEach((vue) => {
+  for (const vue of VUES) {
     const fig = document.createElement('figure');
     const node = document.createElement('canvas');
     let mesure = 'photo';
@@ -318,6 +318,7 @@ async function renderScene(entry) {
       node.getContext('2d').drawImage(prepared.canvas, 0, 0);
     } else {
       const material = materials.find((m) => m.id === vue.material);
+      await renderer.preparer({ material, pattern: vue.pattern });
       renderer.paint(node, { material, pattern: vue.pattern, angle: 0, width: null, scale: 1 });
       const lumas = scene.floorZones.map((z, i) => zoneLuma(node, renderer.masks, i));
       mesure = lumas.map((v) => Math.round(v || 0)).join(' / ');
@@ -342,7 +343,7 @@ async function renderScene(entry) {
     }
     fig.append(node, cap);
     grid.appendChild(fig);
-  });
+  }
 
   // Deuxième rangée : la même scène en pose droite avec plusieurs produits.
   // Elle sert à autre chose que la première : on y vérifie que la teinte ne
@@ -351,11 +352,12 @@ async function renderScene(entry) {
   const bande = document.createElement('div');
   bande.className = 'grid produits';
   $('out').appendChild(bande);
-  PRODUITS_TEST.forEach((id) => {
+  for (const id of PRODUITS_TEST) {
     const material = materials.find((m) => m.id === id);
-    if (!material) return;
+    if (!material) continue;
     const fig = document.createElement('figure');
     const node = document.createElement('canvas');
+    await renderer.preparer({ material, pattern: 'lames' });
     renderer.paint(node, { material, pattern: 'lames', angle: 0, width: null, scale: 1 });
     const cap = document.createElement('figcaption');
     const fiche = material.product || {};
@@ -364,7 +366,7 @@ async function renderScene(entry) {
       + `<span>${fiche.dimensions && fiche.dimensions.widthMm ? fiche.dimensions.widthMm + " mm" : '—'}</span></div>`;
     fig.append(node, cap);
     bande.appendChild(fig);
-  });
+  }
 
   log(`${entry.id.padEnd(14)} ${verdict.texte.padEnd(9)} ${prepared.width}×${prepared.height}`
     + ` — ${scene.floorZones.length} zone(s), ${scene.occluders.length} occlusion(s)`);

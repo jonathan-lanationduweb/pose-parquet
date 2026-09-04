@@ -1426,3 +1426,80 @@ body.app {
 }
 .selected__ref:hover { color: var(--text); opacity: 1; }
 .selected__ref span { font-family: var(--font-mono); font-size: 0.72rem; opacity: 0.75; }
+
+
+/* ================================================================== */
+/* Téléphone en paysage : peu de hauteur, tout doit tenir dans l'écran  */
+/* ================================================================== */
+
+/**
+ * À 844 × 390, la mise en page « tablette paysage » gardait deux colonnes
+ * mais laissait la barre d'actions en flux sous la scène : mesurée à
+ * y = 446 pour 390 px de haut, donc invisible sans défiler — les commandes
+ * Parquet / Motif / Orientation n'existaient plus. Et dans un panneau de
+ * 248 px, la recherche et les filtres du catalogue (256 px de largeur
+ * minimale) sortaient de leur colonne.
+ *
+ * Ici : la scène et le panneau se partagent la largeur, la barre d'actions
+ * redevient flottante et compacte au bas de la scène (icônes seules, une
+ * rangée), le canevas se plafonne à la hauteur disponible, et le catalogue
+ * renonce à sa largeur minimale.
+ */
+@media (orientation: landscape) and (max-height: 30rem) and (min-width: 30rem) {
+  .studio__main,
+  .studio:not([data-panel="closed"]) .studio__main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(15rem, 38vw, 19rem);
+    grid-template-rows: minmax(0, 1fr);
+    flex-direction: row;
+  }
+  .studio[data-panel="closed"] .studio__main { grid-template-columns: minmax(0, 1fr); }
+  .studio__stage {
+    order: 0;
+    flex: none;
+    padding-bottom: 0;
+    height: calc(100svh - var(--bar-h));
+    display: grid;
+    place-items: center;
+  }
+  .stage__canvas { max-height: calc(100svh - var(--bar-h) - 3.4rem); }
+  .studio__panel {
+    order: 0;
+    position: relative;
+    inset: auto;
+    height: calc(100svh - var(--bar-h));
+    max-height: none;
+    border-radius: 0;
+    border-left: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow: none;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    transition: none;
+  }
+  .studio[data-panel="closed"] .studio__panel { display: none; }
+  .panel__grab { display: none; }
+  .studio__actions {
+    position: absolute;
+    order: 0;
+    left: 0.5rem;
+    right: 0.5rem;
+    bottom: 0.5rem;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0.3rem;
+    flex-wrap: nowrap;
+    gap: 0.3rem;
+    background: rgba(16, 18, 19, 0.84);
+  }
+  .actions__contexts { flex: 0 1 auto; }
+  .context-btn { font-size: 0.85rem; padding: 0 0.6rem; }
+  .actions__buttons { display: flex; gap: 0.3rem; }
+  .action { padding: 0 0.6rem; }
+  .action span { display: none; }
+  .actions__variants { display: none; }
+  .cat__search, .cat__filters { min-width: 0; width: auto; }
+  .cat__search input { min-width: 0; }
+  .cat__grid { grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr)); }
+  .studio[data-sheet] .cat__head { display: block; }
+}
