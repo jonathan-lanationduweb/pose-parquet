@@ -78,6 +78,9 @@ final class Schema {
 		 * `style` : ambiance choisie dans le formulaire (schéma 2).
 		 * `visualizer_config` : JSON tel que produit par le Visualiseur, stocké
 		 * tel quel et jamais interprété par le plugin — le rendu reste côté front.
+		 * `*_mail_status` / `*_mail_sent_at` (schéma 3) : sort de la notification
+		 * interne et de la confirmation visiteur — pending / sent / failed /
+		 * skipped, voir Mail\Notifier. Un état, jamais le contenu de l'email.
 		 *
 		 * Les champs de projet sont des VARCHAR courts et non des ENUM SQL : les
 		 * valeurs possibles sont des listes éditoriales du front (types de pièce,
@@ -114,6 +117,10 @@ final class Schema {
   utm_medium varchar(100) NOT NULL DEFAULT '',
   utm_campaign varchar(100) NOT NULL DEFAULT '',
   consent_at datetime DEFAULT NULL,
+  internal_mail_status varchar(10) NOT NULL DEFAULT 'pending',
+  internal_mail_sent_at datetime DEFAULT NULL,
+  visitor_mail_status varchar(10) NOT NULL DEFAULT 'pending',
+  visitor_mail_sent_at datetime DEFAULT NULL,
   created_at datetime NOT NULL,
   updated_at datetime NOT NULL,
   PRIMARY KEY  (id),

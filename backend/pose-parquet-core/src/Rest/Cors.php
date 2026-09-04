@@ -40,7 +40,8 @@ final class Cors {
 		'https://www.pose-parquet.com',
 	];
 
-	public const ALLOWED_METHODS = 'POST, OPTIONS';
+	/** GET pour /health et /form-token, POST pour /projects ; jamais PUT/PATCH/DELETE. */
+	public const ALLOWED_METHODS = 'GET, POST, OPTIONS';
 	public const ALLOWED_HEADERS = 'Content-Type';
 	public const MAX_AGE         = 600;
 

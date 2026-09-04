@@ -92,7 +92,8 @@ final class Installer {
 	 *
 	 * Chaque étape porte le numéro de la version qu'elle amène, et s'exécute une
 	 * seule fois, dans l'ordre. Version 1 : création initiale, tout est fait par
-	 * dbDelta. Version 2 : `reference` nullable, colonne `style`.
+	 * dbDelta. Version 2 : `reference` nullable, colonne `style`. Version 3 :
+	 * colonnes d'état des emails (dbDelta suffit).
 	 */
 	private static function migrate( int $from, int $to ): void {
 		for ( $version = $from + 1; $version <= $to; $version++ ) {
@@ -110,6 +111,14 @@ final class Installer {
 					global $wpdb;
 					$table = Schema::table( 'projects' );
 					$wpdb->query( "ALTER TABLE {$table} MODIFY reference varchar(20) DEFAULT NULL" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					break;
+				case 3:
+					/*
+					 * Colonnes d'état des emails : ajoutées par dbDelta avec leur
+					 * DEFAULT 'pending', que prennent les lignes existantes — aucune
+					 * demande antérieure n'a reçu d'email, « pending » dit vrai.
+					 * Rien d'autre à transformer.
+					 */
 					break;
 				default:
 					Logger::error( 'Version de schéma sans migration', [ 'version' => $version ] );

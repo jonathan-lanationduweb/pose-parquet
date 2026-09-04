@@ -113,6 +113,26 @@ final class Repository {
 		return (bool) $ok;
 	}
 
+	/**
+	 * État d'un email de la demande (`internal` ou `visitor`) : un mot et une date, jamais un contenu.
+	 */
+	public function set_mail_status( int $id, string $type, string $status, ?string $sent_at ): bool {
+		global $wpdb;
+
+		if ( ! in_array( $type, [ 'internal', 'visitor' ], true ) ) {
+			return false;
+		}
+		$updated = $wpdb->update(
+			Schema::table( 'projects' ),
+			[ $type . '_mail_status' => $status, $type . '_mail_sent_at' => $sent_at ],
+			[ 'id' => $id ],
+			[ '%s', $sent_at === null ? null : '%s' ],
+			[ '%d' ]
+		);
+
+		return $updated !== false;
+	}
+
 	/** @return array<string,mixed>|null ligne brute de pp_projects */
 	public function find_by_id( int $id ): ?array {
 		global $wpdb;

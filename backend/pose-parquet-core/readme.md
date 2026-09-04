@@ -8,7 +8,7 @@ HTML/CSS/JS appelle. Le front reste dans le dépôt, indépendant, déployé à 
 front (statique)  →  REST /wp-json/pose-parquet/v1/…  →  ce plugin  →  tables pp_*
 ```
 
-## Ce que contient la version 0.2.0
+## Ce que contient la version 0.3.0
 
 Fondation (0.1.0) :
 
@@ -35,8 +35,23 @@ Création d'une demande (0.2.0) :
 - schéma 2 : colonne `style`, `reference` nullable ;
 - page « État » : nombre de demandes en base.
 
-Pas encore : emails, anti-spam, écrans de gestion, connexion du formulaire
-public. Voir `docs/backend/roadmap.md` à la racine du dépôt.
+Emails et anti-spam (0.3.0) :
+
+- notification interne à l'équipe et accusé de réception au visiteur, envoyés
+  **après** le COMMIT par `Mail\Notifier` sur `wp_mail()` ; gabarits HTML
+  sobres, valeurs échappées ; un échec d'envoi ne défait jamais une demande ;
+- états d'envoi en base (schéma 3) : `pending` / `sent` / `failed` /
+  `skipped`, avec la date d'envoi ;
+- page « Réglages » : adresse de réception (par défaut `admin_email`) et
+  confirmation automatique au visiteur ;
+- anti-spam : pot de miel `website`, jeton temporel signé
+  (`GET /form-token`), limite de débit par identité réseau condensée, avec
+  `429` et `Retry-After` ; aucune adresse IP stockée ni journalisée ;
+- pipeline unique `Projects\SubmissionService` : anti-spam → validation →
+  écriture → emails.
+
+Pas encore : écrans de gestion des demandes, connexion du formulaire public,
+Turnstile. Voir `docs/backend/roadmap.md` à la racine du dépôt.
 
 ## Prérequis
 
@@ -59,18 +74,29 @@ define( 'POSE_PARQUET_ALLOWED_ORIGINS', [ 'https://pose-parquet.com', 'https://w
 
 ou par code, filtre `pose_parquet_allowed_origins`. Une étoile est ignorée.
 
+Adresse de réception des demandes : *Pose Parquet → Réglages*. Le transport
+des emails (SMTP, Brevo…) se règle au niveau de WordPress, pas ici.
+
+Limites d'anti-spam par défaut : 5 demandes et 30 tentatives par heure et par
+identité réseau, jeton valide 2 heures avec 2 secondes d'âge minimum.
+Ajustables par le filtre `pose_parquet_rate_limits`.
+
 ## Arborescence
 
 ```
 pose-parquet-core.php   bootstrap, constantes, hooks d'activation
 src/Plugin.php          assemblage des modules
 src/Database/           Schema (tables, SQL dbDelta), Installer (versions, migrations)
-src/Projects/           Fields (contrat), Validator, Reference, Repository, Service, Status
+src/Projects/           Fields (contrat), Validator, Reference, Repository, Service,
+                        SubmissionService (pipeline), Status
+src/Antispam/           Guard, FormToken, Honeypot, RateLimiter, ClientIdentity
+src/Mail/               Mailer, Notifier, InternalNotification, VisitorConfirmation,
+                        Template, Labels
 src/Security/           Capabilities
-src/Rest/               Routes, HealthController, ProjectsController, Cors
-src/Admin/              Menu (page État)
+src/Rest/               Routes, HealthController, ProjectsController, FormTokenController, Cors
+src/Admin/              Menu (États), Settings (Réglages)
 src/Support/            Logger (sans donnée personnelle)
-templates/              gabarits d'administration
+templates/              gabarits d'administration et d'email (templates/mail/)
 tests/                  quatre suites (voir ci-dessous)
 uninstall.php           suppression prudente
 ```
@@ -81,20 +107,25 @@ Tous en ligne de commande, contre un WordPress installé où ce dossier est
 copié dans les extensions (`<wp>` = racine WordPress) :
 
 ```
-php tests/run-validator.php <wp>          validation et normalisation, sans écriture
+php tests/run-validator.php <wp>          validation, normalisation, jeton, pot de miel,
+                                          identité réseau — aucune écriture
 php tests/run-foundation.php <wp>         activation, schéma, droits, /health, désactivation
-php tests/run-projects.php <wp>           POST réel, 422 sans écriture, injections, 503,
-                                          migration 1→2, concurrence (6 processus), méthodes,
-                                          CORS (fonctions), journal sans donnée personnelle
-php tests/run-http.php http://127.0.0.1:8181   preflight OPTIONS, en-têtes CORS réels,
-                                          méthodes, accès direct aux fichiers
+php tests/run-http.php http://127.0.0.1:8181   HTTP réel : /form-token, preflight OPTIONS,
+                                          en-têtes CORS, 429, méthodes, accès aux fichiers
+php tests/run-projects.php <wp>           POST réel, emails simulés, réglages, gabarits,
+                                          jeton, pot de miel, limite de débit, 503,
+                                          migration 1→3, concurrence (6 processus)
 ```
 
 `run-http.php` suppose un serveur HTTP devant le WordPress (par exemple
-`php -S 127.0.0.1:8181` dans `<wp>`). Les demandes qu'il crée sont supprimées
-par `run-projects.php`. Résultat au 4 septembre 2026 : 115 + 54 + 111 + 27,
-aucun échec. Un `php -l` sur chaque fichier fait office de vérification
-statique.
+`php -S 127.0.0.1:8181` dans `<wp>`). Le lancer **avant** `run-projects.php`,
+qui nettoie ses demandes et ses compteurs de débit.
+
+Aucun email réel n'est envoyé : les tests court-circuitent `wp_mail()` par le
+filtre `pre_wp_mail`, ce qui permet de lire destinataire, sujet, en-têtes et
+corps, et de simuler un échec. Résultat au 4 septembre 2026 : 134 + 57 + 45 +
+227, soit 463 vérifications, aucun échec. Un `php -l` sur chaque fichier fait
+office de vérification statique.
 
 ## Développement
 

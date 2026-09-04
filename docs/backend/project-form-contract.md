@@ -34,11 +34,22 @@ code divergent, c'est le code qui a raison et ce tableau qu'il faut corriger.
 | `source` | `sourceUrl` | `source_url` varchar(500) | chaîne | non | réduit au **chemin** (`wp_parse_url` → `PHP_URL_PATH`) : requête et fragment tombent, donc rien de sensible ne finit en base ; ≤ 500 |
 | — | `utmSource` `utmMedium` `utmCampaign` | `utm_*` varchar(100) | chaîne | non | texte nettoyé, ≤ 100. Le formulaire ne les envoie pas aujourd'hui ; réservés au lot 5 |
 | — | `visualizer` | voir ci-dessous | objet | non | structure contrôlée, jamais interprétée |
+| — (à ajouter au lot 5) | `formToken` | **aucune** | chaîne | **oui** | jeton signé obtenu de `GET /form-token` ; âge ≥ 2 s, validité 2 h. Champ technique : jamais stocké, jamais journalisé |
+| — (à ajouter au lot 5) | `website` | **aucune** | chaîne | non | pot de miel : doit rester vide. Rempli → refus générique. Champ technique : jamais stocké |
 
 Traductions à faire par l'adaptateur du lot 5 : renommer les clés (`prenom` →
 `firstName`…), convertir `surface` en entier, convertir `consentement` (`"on"`)
 en `true`, passer `source` dans `sourceUrl`, **ne pas envoyer `zone`/`region`
-autrement que tels quels** (le serveur déduit).
+autrement que tels quels** (le serveur déduit), demander un jeton à
+`GET /form-token` au chargement et l'envoyer dans `formToken`, ajouter le
+champ `website` invisible et vide.
+
+### Champs techniques
+
+`formToken` et `website` ne sont **pas** des champs métier : l'API les
+accepte (ils ne comptent pas comme champs inconnus), `SubmissionService` les
+retire avant la validation, et aucune colonne ne les reçoit. Voir
+`antispam.md`.
 
 ### Pourquoi `orientation` → `installationType`
 
@@ -102,4 +113,5 @@ l'équipe.
 `status` = `new`, `reference` = `PP-<année>-<id sur 6 chiffres>`, `consent_at`
 = `created_at` = `updated_at` = heure UTC du serveur, `region` =
 `Île-de-France` si `zone` = `idf`, premier événement d'historique
-(`old_status` NULL → `new`, `user_id` 0).
+(`old_status` NULL → `new`, `user_id` 0), états d'email à `pending` puis
+`sent` / `failed` / `skipped` selon le sort des envois.
