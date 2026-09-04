@@ -85,7 +85,7 @@ foreach ( $tables as $logique => $nom ) {
 	$verifie( "table $logique porte le préfixe du site (" . $wpdb->prefix . ')', str_starts_with( $nom, $wpdb->prefix ) && ! str_starts_with( $nom, 'wp_pp' ) || $wpdb->prefix === 'wp_' );
 }
 $colonnes = $wpdb->get_col( "DESCRIBE {$tables['projects']}", 0 ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-foreach ( [ 'reference', 'status', 'email', 'postal_code', 'surface', 'visualizer_config', 'consent_at', 'created_at', 'updated_at' ] as $col ) {
+foreach ( [ 'reference', 'status', 'email', 'postal_code', 'surface', 'style', 'visualizer_config', 'consent_at', 'internal_mail_status', 'visitor_mail_sent_at', 'created_at', 'updated_at' ] as $col ) {
 	$verifie( "pp_projects a la colonne $col", in_array( $col, $colonnes, true ) );
 }
 $index = $wpdb->get_results( "SHOW INDEX FROM {$tables['projects']}", ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared

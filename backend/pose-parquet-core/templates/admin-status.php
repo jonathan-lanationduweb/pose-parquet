@@ -57,6 +57,32 @@ $oui_non = static fn( bool $ok ): string => $ok
 	<h2><?php esc_html_e( 'API REST', 'pose-parquet-core' ); ?></h2>
 	<p><a href="<?php echo esc_url( $state['health_url'] ); ?>" target="_blank" rel="noopener"><code><?php echo esc_html( $state['health_url'] ); ?></code></a></p>
 	<p><code>POST <?php echo esc_html( $state['projects_url'] ); ?></code> — <?php esc_html_e( 'dépôt d’une demande (formulaire public).', 'pose-parquet-core' ); ?></p>
+	<p><code>GET <?php echo esc_html( $state['form_token_url'] ); ?></code> — <?php esc_html_e( 'jeton temporel à joindre à chaque dépôt.', 'pose-parquet-core' ); ?></p>
+
+	<h2><?php esc_html_e( 'Emails', 'pose-parquet-core' ); ?></h2>
+	<table class="widefat striped" style="max-width:40rem">
+		<tbody>
+			<tr><th scope="row"><?php esc_html_e( 'Adresse de réception', 'pose-parquet-core' ); ?></th><td><?php echo $oui_non( $state['mail_configured'] ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php echo $state['mail_configured'] ? esc_html__( 'configurée', 'pose-parquet-core' ) : esc_html__( 'non configurée', 'pose-parquet-core' ); ?></td></tr>
+			<tr><th scope="row"><?php esc_html_e( 'Confirmation au visiteur', 'pose-parquet-core' ); ?></th><td><?php echo $state['visitor_mail'] ? esc_html__( 'activée', 'pose-parquet-core' ) : esc_html__( 'désactivée', 'pose-parquet-core' ); ?></td></tr>
+		</tbody>
+	</table>
+	<p><a href="<?php echo esc_url( $state['settings_url'] ); ?>"><?php esc_html_e( 'Modifier dans Réglages', 'pose-parquet-core' ); ?></a></p>
+
+	<h2><?php esc_html_e( 'Anti-spam', 'pose-parquet-core' ); ?></h2>
+	<p>
+		<?php esc_html_e( 'Actif : pot de miel, jeton temporel signé, limite de débit.', 'pose-parquet-core' ); ?>
+		<?php
+		echo esc_html( sprintf(
+			/* translators: 1: âge minimum du jeton, 2: durée de vie, 3: créations, 4: tentatives, 5: fenêtre en minutes */
+			__( 'Jeton : %1$d s minimum, %2$d s de validité. Débit : %3$d demandes et %4$d tentatives par %5$d min et par identité réseau.', 'pose-parquet-core' ),
+			(int) $state['token_min_age'],
+			(int) $state['token_max_age'],
+			(int) $state['rate_limits']['successes'],
+			(int) $state['rate_limits']['attempts'],
+			(int) round( $state['rate_limits']['window'] / 60 )
+		) );
+		?>
+	</p>
 
 	<h2><?php esc_html_e( 'Demandes', 'pose-parquet-core' ); ?></h2>
 	<p>

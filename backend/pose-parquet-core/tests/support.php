@@ -53,12 +53,26 @@ function pp_test_outils(): array {
 }
 
 /**
- * La requête que le formulaire réel produirait, une fois traduite en JSON API.
- * Tous les obligatoires, quelques facultatifs, aucun champ réservé.
+ * La requête que le formulaire réel produirait, une fois traduite en JSON API :
+ * champs métier **et** champs techniques (jeton), tels qu'ils arrivent sur
+ * POST /projects.
  *
  * @return array<string,mixed>
  */
 function pp_requete_valide( array $surcharge = [] ): array {
+	return array_replace( pp_requete_metier(), [
+		// Jeton émis il y a dix secondes : passé l'âge minimum, loin de l'expiration.
+		'formToken' => PoseParquet\Core\Antispam\FormToken::issue( time() - 10 ),
+	], $surcharge );
+}
+
+/**
+ * La même requête sans les champs techniques : ce que le validateur métier
+ * voit, une fois SubmissionService passé.
+ *
+ * @return array<string,mixed>
+ */
+function pp_requete_metier( array $surcharge = [] ): array {
 	return array_replace( [
 		'zone'             => 'autre',
 		'region'           => 'Bretagne',

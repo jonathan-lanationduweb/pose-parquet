@@ -50,5 +50,16 @@ final class Routes {
 				'permission_callback' => [ ProjectsController::class, 'permission' ],
 			]
 		);
+
+		// Jeton temporel signé, à demander avant de soumettre. GET seulement.
+		register_rest_route(
+			self::NAMESPACE,
+			'/form-token',
+			[
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => [ FormTokenController::class, 'issue' ],
+				'permission_callback' => [ FormTokenController::class, 'permission' ],
+			]
+		);
 	}
 }

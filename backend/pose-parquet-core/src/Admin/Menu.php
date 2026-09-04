@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace PoseParquet\Core\Admin;
 
+use PoseParquet\Core\Antispam\FormToken;
+use PoseParquet\Core\Antispam\RateLimiter;
 use PoseParquet\Core\Database\Installer;
 use PoseParquet\Core\Database\Schema;
 use PoseParquet\Core\Projects\Repository;
@@ -53,6 +55,14 @@ final class Menu {
 			self::SLUG,
 			[ self::class, 'render_status' ]
 		);
+		add_submenu_page(
+			self::SLUG,
+			__( 'Réglages Pose Parquet', 'pose-parquet-core' ),
+			__( 'Réglages', 'pose-parquet-core' ),
+			Capabilities::MANAGE_SETTINGS,
+			Settings::PAGE,
+			[ Settings::class, 'render' ]
+		);
 	}
 
 	/** Page « État » : les faits, lus en base au moment de l'affichage. */
@@ -77,6 +87,13 @@ final class Menu {
 			'projects_url'     => rest_url( Routes::NAMESPACE . '/projects' ),
 			// Un nombre, pas une liste : la gestion des demandes est le lot 4.
 			'projects_count'   => ( new Repository() )->count(),
+			'form_token_url'   => rest_url( Routes::NAMESPACE . '/form-token' ),
+			'settings_url'     => admin_url( 'admin.php?page=' . Settings::PAGE ),
+			'mail_configured'  => Settings::is_configured(),
+			'visitor_mail'     => Settings::visitor_confirmation_enabled(),
+			'rate_limits'      => RateLimiter::limits(),
+			'token_min_age'    => FormToken::MIN_AGE,
+			'token_max_age'    => FormToken::MAX_AGE,
 		];
 
 		require POSE_PARQUET_DIR . '/templates/admin-status.php';
