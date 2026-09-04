@@ -49,12 +49,15 @@ Elles sont créditées ici par respect du travail des auteurs.
 | `room-petite-piece.jpg` | Image Hunter | [Pexels #26747989](https://www.pexels.com/photo/26747989/) |
 | `room-bureau-vide.jpg` | Curtis Adams | [Pexels #7028110](https://www.pexels.com/photo/7028110/) |
 | `room-appartement-ancien.jpg` | Curtis Adams | [Pexels #8583672](https://www.pexels.com/photo/8583672/) |
-| `room-sejour-traversant.jpg` | Max Vakhtbovych | [Pexels #7587865](https://www.pexels.com/photo/7587865/) |
 | `room-chambre-parisienne.jpg` | Max Vakhtbovych | [Pexels #7587872](https://www.pexels.com/photo/7587872/) |
+| `room-couloir-bleu.jpg` | Max Vakhtbovych | [Pexels #7587868](https://www.pexels.com/photo/7587868/) |
+| `room-cuisine-ouverte.jpg` | Max Vakhtbovych | [Pexels #8146149](https://www.pexels.com/photo/8146149/) |
+| `room-salon-angle.jpg` | Gustavo Galeano Maz | [Pexels #9826455](https://www.pexels.com/photo/9826455/) |
+| `room-entree.jpg` | Max Vakhtbovych | [Pexels #7166928](https://www.pexels.com/photo/7166928/) |
 | `room-sous-les-toits.jpg` | Max Vakhtbovych | [Pexels #8082327](https://www.pexels.com/photo/8082327/) |
 | `hero-poster.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
 | `og-default.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
-| `inspi-1.jpg` | Max Vakhtbovych | [Pexels #7587865](https://www.pexels.com/photo/7587865/) |
+| `inspi-1.jpg` | Curtis Adams | [Pexels #3935327](https://www.pexels.com/photo/3935327/) |
 | `inspi-2.jpg` | Max Vakhtbovych | [Pexels #7587872](https://www.pexels.com/photo/7587872/) |
 | `inspi-3.jpg` | Max Vakhtbovych | [Pexels #7060823](https://www.pexels.com/photo/7060823/) |
 | `inspi-4.jpg` | Max Vakhtbovych | [Pexels #7587374](https://www.pexels.com/photo/7587374/) |

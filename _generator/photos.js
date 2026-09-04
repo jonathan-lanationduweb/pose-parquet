@@ -229,6 +229,33 @@ const PHOTOS = {
     id: 7587872, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
     alt: 'Pièce aux murs bleus et parquet en chevrons',
   },
+  /*
+   * Deux photographies retenues pour les cartes qui n'avaient pas de scène.
+   *
+   * Toutes sont passées, AVANT tout calibrage, par le pré-filtre de
+   * _calibrage/calibrer.html — `diagnostic()` pour la distorsion et la part
+   * de sol, `mesurabilite()` pour la seule question qui décide du coût :
+   * peut-on relever le bas des murs ? Les mesures sont dans
+   * docs/inspiration-studio.md. Dix-huit candidates ont été qualifiées ;
+   * ces deux-là sont les seules dont la géométrie se soit recoupée jusqu'au
+   * bout. Quatre autres, pourtant classées EXCELLENT ou BON au dépistage, ont
+   * été abandonnées en cours de calibrage : le dépistage dit si une frontière
+   * est RELEVABLE, pas si les frontières relevées appartiennent à des murs
+   * parallèles. Voir la documentation.
+   *
+   * Même contributeur que la chambre parisienne, et ce n'est pas un hasard :
+   * ses intérieurs sont photographiés au grand angle rectiligne, sol dégagé
+   * et plinthes franches, ce qui se mesure. Une photo dont la jonction
+   * mur/sol ne se relève pas coûte des heures pour rien.
+   */
+  'room-cuisine-ouverte': {
+    id: 8146149, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
+    alt: 'Cuisine ouverte sur un grand séjour vide, sol en lames foncées',
+  },
+  'room-salon-angle': {
+    id: 9826455, w: 1600, h: 1067, credit: 'Gustavo Galeano Maz',
+    alt: 'Grande pièce vide formant un angle, sol en lames de noyer et plinthes bois',
+  },
   'room-sous-les-toits': {
     id: 8082327, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
     alt: 'Pièce sous combles éclairée par des fenêtres de toit, parquet clair',
@@ -313,15 +340,22 @@ const INSPIRATION_PHOTOS = [
     image: 'room-chambre-parisienne', sceneId: 'chambre-parisienne', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-naturel', pattern: 'point-de-hongrie', orientation: 0 } },
   { id: 7060823, tags: 'droite cuisine', credit: 'Max Vakhtbovych', title: 'Cuisine ouverte', meta: 'Lames larges · chêne gris', size: 'sm',
-    alt: 'Cuisine ouverte sur salle à manger, parquet aux lames larges et grises',
-    // room-cuisine : un grand tapis couvre le centre du sol et six chaises y
-    // posent des pieds de 4 px. Non calibrée, non essayable.
-    image: 'inspi-3', sceneId: null, visualizerAvailable: false,
+    alt: 'Cuisine ouverte sur un grand séjour vide, sol en lames foncées',
+    // Photo remplacée : l'ancienne (room-cuisine, 7060823) avait un grand tapis
+    // au centre du sol et six chaises à pieds de 4 px. La nouvelle a le sol le
+    // plus dégagé du dépôt et des plinthes blanches sur lames foncées.
+    image: 'room-cuisine-ouverte', sceneId: 'cuisine-ouverte', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-gris', pattern: 'lames', orientation: 0 } },
   { id: 7587374, tags: 'droite couloir', credit: 'Max Vakhtbovych', title: 'Couloir en enfilade', meta: 'Lames dans l’axe · chêne clair', size: 'sm',
     alt: 'Couloir minimaliste aux portes en bois et parquet clair posé dans l’axe',
-    // room-couloir : calibrée mais experimental — jonction mur/sol sans
-    // contraste, frontière non mesurable.
+    // Trois photos essayées, aucune retenue. room-couloir (7587374) : bois
+    // clair sur bois clair, aucune marche sur AUCUNE colonne — profils relevés
+    // de haut en bas, variation de 20 niveaux sur toute la hauteur. Le couloir
+    // bleu à moulures (7587868), classé EXCELLENT au dépistage : ses deux
+    // frontières sont si raides (pentes -3,7 et +4,0) que l'ajustement rend
+    // 15 et 35 px de résidu, et son sol visible ne fait que 6 pour cent du
+    // cadre. Deux autres couloirs (19899087, 7005286) : aucune frontière
+    // mesurable, et REJETÉ au dépistage.
     image: 'inspi-4', sceneId: null, visualizerAvailable: false,
     config: { productId: 'chene-craie', pattern: 'lames', orientation: 90 } },
   { id: 20771870, tags: 'droite chambre', credit: 'Алан Албегов', title: 'Chambre sous combles', meta: 'Lames droites · chêne brun', size: 'md',
@@ -338,11 +372,12 @@ const INSPIRATION_PHOTOS = [
     image: 'room-petit-bureau', sceneId: null, visualizerAvailable: false,
     config: { productId: 'chene-brun', pattern: 'lames', orientation: 0 } },
   { id: 7045700, tags: 'droite sejour', credit: 'Max Vakhtbovych', title: 'Salon d’angle', meta: 'Lames droites · chêne foncé', size: 'wide',
-    alt: 'Salon classique meublé, parquet foncé au sol',
-    // room-grande-piece : sol sombre et miroitant. Le champ d'orientation du
-    // sol ne donne aucune fuite (r = -0,016) et les reflets créent des
-    // gradients plus forts que la jonction mur/sol.
-    image: 'inspi-6', sceneId: null, visualizerAvailable: false,
+    alt: 'Grande pièce vide formant un angle, sol en lames de noyer et plinthes bois',
+    // Photo remplacée : l'ancienne (room-grande-piece, 7045700) avait un sol
+    // sombre et miroitant dont le champ d'orientation ne donnait aucune fuite
+    // (r = -0,016). La nouvelle a pour sujet un angle de murs, ce qui lui donne
+    // deux frontières horizontales à deux profondeurs.
+    image: 'room-salon-angle', sceneId: 'salon-angle', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-tabac', pattern: 'lames', orientation: 0 } },
   { id: 8082327, tags: 'droite chambre', credit: 'Max Vakhtbovych', title: 'Sous les toits', meta: 'Lames larges · chêne clair', size: 'sm',
     alt: 'Pièce sous combles éclairée par des fenêtres de toit, parquet clair',
@@ -357,9 +392,14 @@ const INSPIRATION_PHOTOS = [
     config: { productId: 'chene-sable', pattern: 'lames', orientation: 0 } },
   { id: 8583672, tags: 'droite couloir', credit: 'Curtis Adams', title: 'Entrée cadrée', meta: 'Lames dans l’axe · chêne miel', size: 'md',
     alt: 'Entrée spacieuse au sol en bois clair et décoration soignée',
-    // room-appartement-ancien : géométrie prouvée, rendu rejeté. Un meuble à
-    // claire-voie occupe un tiers du sol visible ; le couvrir demanderait
-    // d'occulter une douzaine de traverses de quelques pixels.
+    // room-appartement-ancien : géométrie prouvée, rendu rejeté — un meuble à
+    // claire-voie occupe un tiers du sol visible. Deux remplaçantes essayées :
+    // l'entrée en noyer (7166928, EXCELLENT au dépistage) dont le mur de
+    // gauche ne s'ajuste qu'à 5 px de résidu et dont la fuite tombe à 0,62,
+    // au ras du bord arrière du sol — les profondeurs y explosent à 200 m ;
+    // et l'entrée minimaliste (19866475) dont une seule colonne sur
+    // quarante-huit porte une marche exploitable, les murs étant pâles sur
+    // sol pâle.
     image: 'inspi-8', sceneId: null, visualizerAvailable: false,
     config: { productId: 'chene-miel', pattern: 'lames', orientation: 90 } },
 ];
