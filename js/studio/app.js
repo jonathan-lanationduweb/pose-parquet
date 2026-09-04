@@ -460,12 +460,38 @@ const REGROUPEMENT_MS = 70;
     root.dataset.state = 'edit';
   }
 
+  /**
+   * Ouvre la pièce demandée — CELLE-LÀ, ou aucune.
+   *
+   * Cette fonction retombait sur `bibliotheque[0]` quand l'identifiant n'était
+   * pas résolu, et le démarrage n'appelait même pas openRoom si le manifeste
+   * ignorait la scène : un lien « Essayer cette ambiance » pouvait donc ouvrir
+   * le séjour à la place de la cuisine, ou ne rien faire du tout et laisser le
+   * visiteur sur l'écran d'accueil. Les deux sont le même défaut que la page
+   * Inspiration vient de réparer — promettre une pièce et en montrer une autre —
+   * et il s'était réinstallé ici.
+   *
+   * Désormais :
+   *
+   *   - une scène que le manifeste déclare `disabled` est refusée, avec un mot ;
+   *   - une scène que le manifeste IGNORE est tout de même tentée, car le
+   *     fichier est adressé par son identifiant : un manifeste servi depuis un
+   *     cache périmé — le cas le plus probable quand une scène vient d'être
+   *     ajoutée — ne doit pas rendre le lien inopérant ;
+   *   - un échec de chargement le dit et ramène à la bibliothèque, au lieu de
+   *     laisser un écran d'accueil muet.
+   */
   async function openRoom(id) {
-    const entry = sceneOuvrable(sceneIndex, id) || bibliotheque[0];
+    const connue = (sceneIndex.scenes || []).find((e) => e.id === id);
+    if (connue && !sceneOuvrable(sceneIndex, id)) {
+      root.dataset.state = 'start';
+      setStatus('Cette pièce n’est plus proposée.');
+      return;
+    }
     interaction('ouverture');
     setStatus('Chargement…');
     try {
-      const scene = await analyzeScene({ sceneId: entry.id, base });
+      const scene = await analyzeScene({ sceneId: id, base });
       // Dès ici la scène a sa taille finale et montre la photo d'origine.
       reserverScene({ width: scene.image.width, height: scene.image.height, file: scene.image.file, alt: scene.image.alt });
       setStatus('Préparation du rendu…');
@@ -476,9 +502,11 @@ const REGROUPEMENT_MS = 70;
       const fichier = petit ? scene.image.file.replace(/\.jpg$/, '-1120.jpg') : scene.image.file;
       const prepared = await loadImage(`${base}assets/images/${fichier}`).catch(() => loadImage(`${base}assets/images/${scene.image.file}`));
       renderer.setScene(scene, prepared);
-      sceneId = entry.id;
+      sceneId = id;
       photo.alt = scene.image.alt;
-      const stem = entry.file.replace(/\.jpg$/, '');
+      // Le nom du fichier vient de la scène chargée, plus du manifeste : c'est
+      // ce qui permet d'ouvrir une pièce que le manifeste en cache ignore.
+      const stem = scene.image.file.replace(/\.jpg$/, '');
       qs('[data-room-thumb]', root).style.backgroundImage = `url(${base}assets/images/${stem}-640.jpg)`;
       afterScene(scene.label);
       setStatus('');
@@ -487,7 +515,10 @@ const REGROUPEMENT_MS = 70;
       // est la seule chose à faire ensuite.
       setContext('parquets');
     } catch (error) {
-      setStatus('La pièce n’a pas pu être chargée.');
+      // Ramener à la bibliothèque plutôt que laisser l'écran d'accueil sans
+      // explication : le visiteur voit ce qui a échoué et ce qu'il peut ouvrir.
+      root.dataset.state = 'start';
+      setStatus('Cette pièce n’a pas pu être chargée. Choisissez-en une autre.');
       console.error('[visualiseur]', error);
     }
   }
@@ -1251,9 +1282,12 @@ const REGROUPEMENT_MS = 70;
 
   const requested = params.get('piece');
   // Un lien direct ouvre aussi une scène expérimentale : c'est ce qui permet de
-  // la relire sans la proposer. Une scène `disabled` ne s'ouvre pas.
-  if (requested && sceneOuvrable(sceneIndex, requested)) openRoom(requested);
-  else if (params.get('demarrer') === '1') openRoom(bibliotheque[0].id);
+  // la relire sans la proposer. On appelle openRoom SANS filtrer sur le
+  // manifeste — c'est elle qui refuse une scène fermée et qui explique un
+  // échec. Filtrer ici rendait le lien silencieusement inopérant dès que le
+  // manifeste ne connaissait pas encore la scène.
+  if (requested) openRoom(requested);
+  else if (params.get('demarrer') === '1' && bibliotheque.length) openRoom(bibliotheque[0].id);
 
   on(window, 'resize', () => {
     if (!renderer.ready) return;
