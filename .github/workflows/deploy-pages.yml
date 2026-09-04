@@ -35,10 +35,12 @@ jobs:
         run: |
           rm -rf _site
           mkdir _site
-          # On copie le site sans les sources du générateur, l'outillage interne
-          # ni le dossier git
+          # On copie le site sans les sources du générateur, l'outillage interne,
+          # le dossier git, ni le backend WordPress (backend/ : du PHP qui n'a rien
+          # à faire sur un hébergement statique et ne doit jamais être public)
           rsync -a --exclude '.git' --exclude '_generator' --exclude '.github' \
-                --exclude '_calibrage' --exclude 'serve.js' --exclude '_site' ./ _site/
+                --exclude '_calibrage' --exclude 'serve.js' --exclude '_site' \
+                --exclude 'backend' ./ _site/
           touch _site/.nojekyll
 
       # Les fichiers du dépôt décrivent toujours la PRODUCTION : canoniques en

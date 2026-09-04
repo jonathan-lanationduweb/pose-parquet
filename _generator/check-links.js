@@ -15,7 +15,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
-const IGNORER = ['_calibrage', '_site', 'node_modules', 'assets', '_generator', '.git', 'components', 'design'];
+const IGNORER = ['_calibrage', '_site', 'node_modules', 'assets', '_generator', '.git', 'components', 'design', 'backend'];
 
 function pages(dir = ROOT, out = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
