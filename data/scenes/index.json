@@ -103,6 +103,28 @@
       "geometryStatus": "validated",
       "visualStatus": "validated",
       "showInRoomLibrary": true
+    },
+    {
+      "id": "cuisine-ouverte",
+      "label": "Cuisine ouverte sur le séjour",
+      "file": "room-cuisine-ouverte.jpg",
+      "thumb": "room-cuisine-ouverte-640.jpg",
+      "zones": 1,
+      "highlight": "Grand sol dégagé, plinthes blanches sur lames foncées",
+      "geometryStatus": "validated",
+      "visualStatus": "validated",
+      "showInRoomLibrary": true
+    },
+    {
+      "id": "salon-angle",
+      "label": "Salon d’angle",
+      "file": "room-salon-angle.jpg",
+      "thumb": "room-salon-angle-640.jpg",
+      "zones": 1,
+      "highlight": "Un mur qui avance : deux frontières horizontales",
+      "geometryStatus": "validated",
+      "visualStatus": "validated",
+      "showInRoomLibrary": true
     }
   ]
 }

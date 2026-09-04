@@ -972,9 +972,117 @@ function diagnostic({ verbeux = false } = {}) {
   return bilan;
 }
 
+
+/**
+ * La frontière mur/sol est-elle MESURABLE ? — dépistage en trente secondes.
+ *
+ * `diagnostic()` mesure la distorsion, la résolution, la part de sol et le
+ * balayage angulaire. Il ne dit rien de ce qui décide vraiment du coût d'une
+ * calibration : peut-on relever le bas des murs ? Sa documentation l'assume,
+ * parce que la mesure tentée alors — `frontieres()` — cherchait des droites
+ * franches n'importe où et se posait volontiers sur un meuble.
+ *
+ * Ici, deux principes appris à la calibration de la chambre parisienne :
+ *
+ *   1. on relève la marche la plus franche de chaque colonne dans le tiers
+ *      bas, en luminance ET en teinte — un mur bleu sur un sol de chêne ne
+ *      change pas de clarté, il change de teinte, et c'est ce relevé-là qui
+ *      a débloqué cette scène ;
+ *   2. on cherche les plus longues SÉRIES DE COLONNES VOISINES dont les
+ *      points sont alignés. Un mur donne une série continue ; un semis de
+ *      bords de meubles n'en donne pas. Une première version de cette
+ *      fonction découpait l'image en deux moitiés fixes : elle déclarait
+ *      « aucune frontière mesurable » sur la chambre parisienne, dont les
+ *      deux plinthes sont pourtant droites à 1 px — parce qu'une moitié
+ *      d'image contient trois murs différents, pas un.
+ *
+ * Deux séries longues et non parallèles = deux directions du sol =
+ * quadrilatère prouvable. Une seule = il faudra une autre source pour la
+ * seconde direction (joints du sol, ligne de plafond, chevron), ou écarter.
+ *
+ * Ne remplace pas le regard : une photo mesurable peut être laide, et une
+ * carte d'inspiration se juge aussi à l'œil.
+ */
+function mesurabilite({ pas = 0.01, basse = 0.5, haute = 0.995, forceMin = 18, tol = 2.5, longMin = 0.1 } = {}) {
+  const ctx = photo.getContext('2d', { willReadFrequently: true });
+  const data = ctx.getImageData(0, 0, W, H).data;
+  const lum = (x, y) => {
+    const p = ((y | 0) * W + (x | 0)) * 4;
+    return 0.2126 * data[p] + 0.7152 * data[p + 1] + 0.0722 * data[p + 2];
+  };
+  const chaud = (x, y) => {
+    const p = ((y | 0) * W + (x | 0)) * 4;
+    return data[p] - data[p + 2];
+  };
+
+  /* 1. Marche la plus franche de chaque colonne. */
+  const pts = [];
+  for (let nx = 0.01; nx <= 0.99; nx += pas) {
+    const x = nx * W;
+    let bestY = null;
+    let force = 0;
+    for (let y = Math.round(basse * H); y < Math.round(haute * H) - 4; y += 1) {
+      let dl = 0;
+      let dc = 0;
+      for (let dx = -4; dx <= 4; dx += 1) {
+        dl += lum(x + dx, y + 3) - lum(x + dx, y - 3);
+        dc += chaud(x + dx, y + 3) - chaud(x + dx, y - 3);
+      }
+      const f = (Math.abs(dl) + Math.abs(dc)) / 9;
+      if (f > force) { force = f; bestY = y; }
+    }
+    if (bestY !== null && force >= forceMin) pts.push({ x, y: bestY, nx: +nx.toFixed(3), ny: +(bestY / H).toFixed(4), force: +force.toFixed(1) });
+  }
+
+  /* 2. Plus longues séries de colonnes voisines alignées. */
+  const series = [];
+  for (let i = 0; i < pts.length; i += 1) {
+    for (let j = pts.length - 1; j > i + 5; j -= 1) {
+      // Colonnes voisines : pas de trou de plus de trois pas dans la série.
+      let continu = true;
+      for (let k = i; k < j; k += 1) if (pts[k + 1].nx - pts[k].nx > pas * 3.5) { continu = false; break; }
+      if (!continu) continue;
+      const seg = pts.slice(i, j + 1);
+      const fit = ajusteDroite(seg);
+      if (!fit || fit.residuMax > tol) continue;
+      const etendue = +(seg[seg.length - 1].nx - seg[0].nx).toFixed(3);
+      if (etendue < longMin) continue;
+      const forces = seg.map((p) => p.force).sort((a, b) => a - b);
+      series.push({
+        de: seg[0].nx, a: seg[seg.length - 1].nx, etendue, points: seg.length,
+        residuMax: fit.residuMax, residuMoyen: fit.residuMoyen,
+        forceMediane: forces[Math.floor(forces.length / 2)],
+        pente: +(fit.d.y / fit.d.x).toFixed(4),
+        yDe: seg[0].ny, yA: seg[seg.length - 1].ny,
+      });
+      break; // la plus longue série partant de i suffit
+    }
+  }
+  series.sort((a, b) => b.etendue - a.etendue);
+
+  /* 3. Deux séries retenues : la plus longue, puis la plus longue qui ne la
+        recouvre pas et dont la pente diffère — deux murs, pas deux fois un. */
+  const retenues = [];
+  for (const s of series) {
+    if (!retenues.length) { retenues.push(s); continue; }
+    const chevauche = retenues.some((r) => Math.min(r.a, s.a) - Math.max(r.de, s.de) > 0.02);
+    const memePente = retenues.some((r) => Math.abs(r.pente - s.pente) < 0.05);
+    if (!chevauche && !memePente) { retenues.push(s); break; }
+  }
+
+  const deux = retenues.length === 2;
+  return {
+    fichier,
+    colonnesRetenues: pts.length,
+    verdict: deux ? 'DEUX DIRECTIONS' : retenues.length === 1 ? 'UNE SEULE DIRECTION' : 'AUCUNE FRONTIÈRE MESURABLE',
+    directions: retenues,
+    autresSeries: series.filter((s) => !retenues.includes(s)).slice(0, 4),
+  };
+}
+
 window.C = {
   photo, W, H, fichier, log, trace, apercu, fermer,
-  loupe, grille, traqueVerticale, traqueGradient, traqueGradientH, courbure, diagnostic, flecheDe, frontieres,
+  loupe, grille, traqueVerticale, traqueGradient, traqueGradientH, courbure, diagnostic, flecheDe, frontieres, mesurabilite,
   ligneDuSol, ligneDepuisPoints, fuite, calibre, affine,
   intersecte, ajusteDroite, focaleParOrthogonalite, quadDepuisPiece,
   pointAuSol, mesureQuad, etendueVisible,

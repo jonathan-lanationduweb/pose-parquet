@@ -37,6 +37,21 @@ const lire = (p) => JSON.parse(fs.readFileSync(path.join(RACINE, p), 'utf8'));
 
 const ORIENTATIONS = [0, 90, 45, -45];
 
+/**
+ * Plancher du nombre de cartes essayables.
+ *
+ * Une carte cesse d'être essayable sans bruit : il suffit qu'une scène soit
+ * rétrogradée à la revue, ou qu'un `sceneId` passe à null. Le mécanisme est
+ * fait pour ça — mieux vaut une carte muette qu'un faux lien — mais il rend
+ * la perte invisible. Ce plancher la rend visible : il vaut le nombre atteint
+ * au dernier lot, et la vérification échoue si l'on descend en dessous.
+ *
+ * À RELEVER quand une inspiration de plus devient essayable, jamais à
+ * baisser pour faire passer la vérification. Le jour où les huit y sont, ce
+ * nombre vaut 8 et la garde interdit tout retour en arrière.
+ */
+const ESSAYABLES_MINIMUM = 4;
+
 function verifie() {
   const manifeste = lire('data/scenes/index.json');
   const catalogue = lire('data/parquets.json');
@@ -105,7 +120,16 @@ function verifie() {
     lignes.push([nom, carte.image, carte.sceneId, 'essayable']);
   }
 
-  return { erreurs, lignes };
+  const essayables = lignes.filter((l) => l[3] === 'essayable').length;
+  if (essayables < ESSAYABLES_MINIMUM) {
+    erreurs.push(
+      `${essayables} carte(s) essayable(s) sur ${lignes.length}, alors que le plancher est ${ESSAYABLES_MINIMUM}. `
+        + 'Une carte a cessé d\'être essayable : scène rétrogradée, sceneId retiré, ou image désaccordée. '
+        + 'Corriger la cause, ou baisser ESSAYABLES_MINIMUM en connaissance de cause.'
+    );
+  }
+
+  return { erreurs, lignes, essayables };
 }
 
 /** Utilisé par build.js : jette si le contrat est rompu. */
@@ -123,7 +147,7 @@ if (require.main === module) {
     console.log(`  ${etat === 'essayable' ? '✓' : '·'} ${nom.padEnd(large)}  ${image.padEnd(26)} ${String(scene).padEnd(20)} ${etat}`);
   }
   const essayables = lignes.filter((l) => l[3] === 'essayable').length;
-  console.log(`\n${essayables} / ${lignes.length} inspirations essayables.`);
+  console.log(`\n${essayables} / ${lignes.length} inspirations essayables (plancher : ${ESSAYABLES_MINIMUM}).`);
   if (erreurs.length) {
     console.error(`\n${erreurs.length} incohérence(s) :`);
     for (const e of erreurs) console.error(`  - ${e}`);
