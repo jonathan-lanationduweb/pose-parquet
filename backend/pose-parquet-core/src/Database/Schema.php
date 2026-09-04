@@ -69,12 +69,15 @@ final class Schema {
 		/*
 		 * pp_projects.
 		 *
-		 * `reference` : identifiant lisible PP-AAAA-NNNNNN attribué à la création
-		 * (voir docs/backend/database.md) ; unique, c'est ce que le client et
-		 * l'équipe se communiquent. `status` : voir Projects\Status. `surface` en
-		 * m² avec deux décimales. `visualizer_config` : JSON tel que produit par le
-		 * Visualiseur (scène, produit, motif, orientation…), stocké tel quel et
-		 * jamais interprété par le plugin — le rendu reste côté front.
+		 * `reference` : identifiant lisible PP-AAAA-NNNNNN dérivé de `id` (voir
+		 * Projects\Reference) ; unique, c'est ce que le client et l'équipe se
+		 * communiquent. Nullable parce qu'il n'existe qu'après l'insertion — la
+		 * ligne est insérée, l'id connu, la référence posée, le tout dans une
+		 * transaction : aucune ligne validée n'a de référence NULL (schéma 2).
+		 * `status` : voir Projects\Status. `surface` en m² avec deux décimales.
+		 * `style` : ambiance choisie dans le formulaire (schéma 2).
+		 * `visualizer_config` : JSON tel que produit par le Visualiseur, stocké
+		 * tel quel et jamais interprété par le plugin — le rendu reste côté front.
 		 *
 		 * Les champs de projet sont des VARCHAR courts et non des ENUM SQL : les
 		 * valeurs possibles sont des listes éditoriales du front (types de pièce,
@@ -82,7 +85,7 @@ final class Schema {
 		 */
 		$projects = "CREATE TABLE {$t['projects']} (
   id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  reference varchar(20) NOT NULL,
+  reference varchar(20) DEFAULT NULL,
   status varchar(20) NOT NULL DEFAULT 'new',
   first_name varchar(100) NOT NULL DEFAULT '',
   last_name varchar(100) NOT NULL DEFAULT '',
@@ -98,6 +101,7 @@ final class Schema {
   parquet_type varchar(40) NOT NULL DEFAULT '',
   support_type varchar(40) NOT NULL DEFAULT '',
   installation_type varchar(40) NOT NULL DEFAULT '',
+  style varchar(40) NOT NULL DEFAULT '',
   timeframe varchar(40) NOT NULL DEFAULT '',
   message text,
   scene_id varchar(60) DEFAULT NULL,

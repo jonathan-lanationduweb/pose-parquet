@@ -27,11 +27,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class Logger {
 
 	/** Clés jamais journalisées, quel que soit l'appelant. */
-	private const CLES_PERSONNELLES = [ 'email', 'phone', 'first_name', 'last_name', 'message', 'ip' ];
+	private const CLES_PERSONNELLES = [
+		'email', 'phone', 'first_name', 'last_name', 'firstName', 'lastName', 'message', 'city', 'ip',
+		// Un corps de requête entier contient tout ce qui précède : il ne passe pas non plus.
+		'payload', 'body', 'input', 'data', 'fields',
+	];
 
 	/** @param array<string,mixed> $contexte */
 	public static function error( string $message, array $contexte = [] ): void {
 		self::write( 'ERREUR', $message, $contexte );
+	}
+
+	/** Trace d'exploitation (requête traitée, durée) : identifiants et nombres, rien de la personne. */
+	public static function info( string $message, array $contexte = [] ): void {
+		self::write( 'INFO', $message, $contexte );
 	}
 
 	/** @param array<string,mixed> $contexte */

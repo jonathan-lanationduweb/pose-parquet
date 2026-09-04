@@ -149,7 +149,8 @@ $verifie( 'health envoie Cache-Control: no-store', ( $reponse->get_headers()['Ca
 $reponse_post = rest_do_request( new WP_REST_Request( 'POST', '/pose-parquet/v1/health' ) );
 $verifie( 'POST /health refusé (méthode)', in_array( $reponse_post->get_status(), [ 404, 405 ], true ), (string) $reponse_post->get_status() );
 $reponse_404 = rest_do_request( new WP_REST_Request( 'GET', '/pose-parquet/v1/projects' ) );
-$verifie( '/projects n’existe pas encore (lot 2)', $reponse_404->get_status() === 404 );
+$verifie( 'GET /projects n’expose aucune liste (404)', $reponse_404->get_status() === 404 );
+$verifie( 'route POST /projects enregistrée (lot 2)', isset( $routes['/pose-parquet/v1/projects'] ) );
 
 /* ------------------------------------------------------------------ */
 $section( 'Journal' );
