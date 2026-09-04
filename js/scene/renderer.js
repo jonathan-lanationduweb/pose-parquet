@@ -15,6 +15,7 @@
  * éclairement et la même caméra. Seul le matériau change.
  */
 import { createSceneMasks } from './mask.js';
+import { mark, mesure } from '../utils/perf.js';
 import { buildShadingMap, buildGlossMap } from './shading.js';
 import { lightDirection } from './geometry.js';
 import { materialMaps, warmMaterial } from './material.js';
@@ -146,6 +147,7 @@ export function createSceneRenderer({ prefer = 'auto' } = {}) {
      */
     paint(target, config, perSurface, step = 1) {
       if (!this.ready || !config || !config.material) return false;
+      mark('paint:debut');
       const { width, height } = photo;
       if (target.width !== width || target.height !== height) {
         target.width = width;
@@ -163,15 +165,22 @@ export function createSceneRenderer({ prefer = 'auto' } = {}) {
         const ctx = target.getContext('2d');
         ctx.clearRect(0, 0, width, height);
         ctx.drawImage(gl.canvas, 0, 0);
+        mark('paint:fin');
+        mesure(`paint.webgl.q${step}`, 'paint:debut', 'paint:fin');
         return true;
       }
 
       const ctx = target.getContext('2d', { willReadFrequently: true });
       if (!buffers.has(target)) buffers.set(target, ctx.createImageData(width, height));
       const buffer = buffers.get(target);
+      // Le moteur logiciel échantillonne toute la pyramide : on la complète ici,
+      // une fois, plutôt que de la calculer pour tout le monde.
+      surfaces.forEach((entry) => { if (entry.maps.completer) entry.maps.completer(); });
       const ok = cpu.paint({ source, target: buffer, scene, masks, shading, gloss, surfaces, step });
       if (!ok) return false;
       ctx.putImageData(buffer, 0, 0);
+      mark('paint:fin');
+      mesure(`paint.canvas.q${step}`, 'paint:debut', 'paint:fin');
       return true;
     },
 
@@ -186,6 +195,9 @@ export function createSceneRenderer({ prefer = 'auto' } = {}) {
       target.height = height;
       const ctx = target.getContext('2d', { willReadFrequently: true });
       const buffer = ctx.createImageData(width, height);
+      const surfaces = this.surfacesFor(config, perSurface);
+      // Même raison que dans paint() : le moteur logiciel lit tous les niveaux.
+      surfaces.forEach((entry) => { if (entry.maps.completer) entry.maps.completer(); });
       const ok = cpu.paint({
         source,
         target: buffer,
@@ -193,7 +205,7 @@ export function createSceneRenderer({ prefer = 'auto' } = {}) {
         masks,
         shading,
         gloss,
-        surfaces: this.surfacesFor(config, perSurface),
+        surfaces,
         step,
       });
       if (ok) ctx.putImageData(buffer, 0, 0);

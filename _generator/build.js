@@ -11,7 +11,7 @@ const { PHOTOS, INSPIRATION_PHOTOS } = require('./photos');
 const { buildHomeBody } = require('./home');
 const { buildVisualiseurPage } = require('./visualiseur');
 const { resolveSources } = require('./sources');
-const { NB_PIECES } = require('./scenes');
+const { NB_PIECES, PIECES } = require('./scenes');
 const { buildAssets } = require('./assets');
 const { picture } = require('./responsive');
 
@@ -598,6 +598,32 @@ function buildTutos() {
   );
 }
 
+/**
+ * Le bouton « Essayer ce style », et la seule condition qui l'autorise.
+ *
+ * Une carte ne l'obtient que si elle déclare un `sceneId` ET que cette scène
+ * est publiable dans le manifeste — géométrie ET rendu validés. Deux raisons
+ * de le vérifier ICI plutôt que dans les données : la liste des inspirations
+ * ne sait pas ce que vaut une scène, et une scène rétrogradée à la revue doit
+ * faire disparaître le bouton sans que personne y pense.
+ *
+ * Pas de repli. Une carte sans scène correspondante n'est pas cliquable : elle
+ * reste une inspiration, ce qu'elle a toujours été.
+ */
+function lienEssai(item) {
+  if (!item.visualizerAvailable || !item.sceneId) return '';
+  if (!PIECES.some((p) => p.id === item.sceneId)) return '';
+  const c = item.config || {};
+  const params = [
+    `piece=${item.sceneId}`,
+    c.productId ? `parquet=${c.productId}` : null,
+    c.pattern ? `motif=${c.pattern}` : null,
+    Number.isFinite(c.orientation) ? `orientation=${c.orientation}` : null,
+  ].filter(Boolean).join('&');
+  return `
+                <a class="gallery__try" href="../outils/studio.html?${params}">Essayer ce style ${ICON.arrow}</a>`;
+}
+
 function buildInspiration() {
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'Inspiration' }]);
   const gallery = INSPIRATIONS.map(
@@ -608,8 +634,7 @@ function buildInspiration() {
               </button>
               <figcaption class="gallery__caption">
                 <span>${item.title}</span>
-                <span class="mono">${item.meta}</span>
-                <a class="gallery__try" href="../outils/studio.html?${item.try}">Essayer ce style ${ICON.arrow}</a>
+                <span class="mono">${item.meta}</span>${lienEssai(item)}
               </figcaption>
             </figure>`
   ).join('\n            ');
