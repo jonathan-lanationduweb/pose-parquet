@@ -16,6 +16,7 @@ namespace PoseParquet\Core\Admin;
 
 use PoseParquet\Core\Database\Installer;
 use PoseParquet\Core\Database\Schema;
+use PoseParquet\Core\Projects\Repository;
 use PoseParquet\Core\Projects\Status;
 use PoseParquet\Core\Rest\Routes;
 use PoseParquet\Core\Security\Capabilities;
@@ -73,6 +74,9 @@ final class Menu {
 			),
 			'statuses'         => Status::labels(),
 			'health_url'       => rest_url( Routes::NAMESPACE . '/health' ),
+			'projects_url'     => rest_url( Routes::NAMESPACE . '/projects' ),
+			// Un nombre, pas une liste : la gestion des demandes est le lot 4.
+			'projects_count'   => ( new Repository() )->count(),
 		];
 
 		require POSE_PARQUET_DIR . '/templates/admin-status.php';

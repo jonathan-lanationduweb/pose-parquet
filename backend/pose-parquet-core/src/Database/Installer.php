@@ -92,13 +92,24 @@ final class Installer {
 	 *
 	 * Chaque étape porte le numéro de la version qu'elle amène, et s'exécute une
 	 * seule fois, dans l'ordre. Version 1 : création initiale, tout est fait par
-	 * dbDelta, il n'y a rien à transformer.
+	 * dbDelta. Version 2 : `reference` nullable, colonne `style`.
 	 */
 	private static function migrate( int $from, int $to ): void {
 		for ( $version = $from + 1; $version <= $to; $version++ ) {
 			switch ( $version ) {
 				case 1:
 					// Schéma initial : rien au-delà de dbDelta.
+					break;
+				case 2:
+					/*
+					 * `reference` devient nullable (posée après l'insertion, sous
+					 * transaction). dbDelta ajoute la colonne `style` mais ne sait
+					 * pas changer la nullabilité d'une colonne : on le fait ici.
+					 * Idempotent, et sans effet sur les lignes existantes.
+					 */
+					global $wpdb;
+					$table = Schema::table( 'projects' );
+					$wpdb->query( "ALTER TABLE {$table} MODIFY reference varchar(20) DEFAULT NULL" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 					break;
 				default:
 					Logger::error( 'Version de schéma sans migration', [ 'version' => $version ] );

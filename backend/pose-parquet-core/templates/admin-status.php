@@ -56,4 +56,14 @@ $oui_non = static fn( bool $ok ): string => $ok
 
 	<h2><?php esc_html_e( 'API REST', 'pose-parquet-core' ); ?></h2>
 	<p><a href="<?php echo esc_url( $state['health_url'] ); ?>" target="_blank" rel="noopener"><code><?php echo esc_html( $state['health_url'] ); ?></code></a></p>
+	<p><code>POST <?php echo esc_html( $state['projects_url'] ); ?></code> — <?php esc_html_e( 'dépôt d’une demande (formulaire public).', 'pose-parquet-core' ); ?></p>
+
+	<h2><?php esc_html_e( 'Demandes', 'pose-parquet-core' ); ?></h2>
+	<p>
+		<?php
+		/* translators: %d : nombre de demandes en base. */
+		echo esc_html( sprintf( _n( '%d demande enregistrée.', '%d demandes enregistrées.', (int) $state['projects_count'], 'pose-parquet-core' ), (int) $state['projects_count'] ) );
+		?>
+		<?php esc_html_e( 'La liste et les fiches arrivent avec le lot 4.', 'pose-parquet-core' ); ?>
+	</p>
 </div>

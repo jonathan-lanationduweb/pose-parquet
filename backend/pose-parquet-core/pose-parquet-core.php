@@ -3,7 +3,7 @@
  * Plugin Name:       Pose Parquet
  * Plugin URI:        https://pose-parquet.com/
  * Description:       Backend métier de pose-parquet.com : demandes de projet, administration, API REST. Le site public reste un front indépendant qui dialogue avec ce plugin par l'API REST.
- * Version:           0.1.0
+ * Version:           0.2.0
  * Requires at least: 6.5
  * Requires PHP:      8.2
  * Author:            La Nation du Web
@@ -29,8 +29,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * deux sont volontairement distinctes — la plupart des versions du plugin ne
  * touchent pas au schéma.
  */
-define( 'POSE_PARQUET_VERSION', '0.1.0' );
-define( 'POSE_PARQUET_DB_VERSION', 1 );
+define( 'POSE_PARQUET_VERSION', '0.2.0' );
+define( 'POSE_PARQUET_DB_VERSION', 2 );
 define( 'POSE_PARQUET_FILE', __FILE__ );
 define( 'POSE_PARQUET_DIR', __DIR__ );
 

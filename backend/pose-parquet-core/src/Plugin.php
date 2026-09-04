@@ -15,6 +15,7 @@ namespace PoseParquet\Core;
 
 use PoseParquet\Core\Admin\Menu;
 use PoseParquet\Core\Database\Installer;
+use PoseParquet\Core\Rest\Cors;
 use PoseParquet\Core\Rest\Routes;
 use PoseParquet\Core\Security\Capabilities;
 
@@ -40,6 +41,8 @@ final class Plugin {
 		Capabilities::ensure();
 
 		add_action( 'rest_api_init', [ Routes::class, 'register' ] );
+		// Liste fermée d'origines pour notre espace REST, à la place du CORS permissif de WordPress.
+		Cors::register();
 
 		if ( is_admin() ) {
 			Menu::register();
