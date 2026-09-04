@@ -21,7 +21,22 @@
  *      petite déclinaison réactive : sans quoi la carte afficherait un cadre
  *      vide, ou un `srcset` pointant sur un fichier absent ;
  *   6. `config` ne nomme que des produits et des motifs du catalogue, et une
- *      orientation que le Visualiseur accepte.
+ *      orientation que le Visualiseur accepte ;
+ *   7. la scène est **réellement chargeable** par le Studio : son fichier JSON
+ *      se lit, il déclare ce que le moteur consomme — image avec dimensions,
+ *      plan avec quadrilatère et mètres, zone avec contour — et les
+ *      déclinaisons d'image que le Studio demande existent, dont la 1120 qu'il
+ *      charge sous 600 px de fenêtre ;
+ *   8. l'adresse produite est celle qu'on croit : mêmes paramètres que
+ *      `config`, et `piece` égal à `sceneId`.
+ *
+ * Le point 7 vient d'un rapport d'essai réel : deux cartes déclarées
+ * essayables n'ouvraient pas leur pièce. Le contrat image = image était
+ * respecté, la scène était publiable — et le Studio restait sur son écran
+ * d'accueil, parce que son démarrage exigeait que le manifeste connaisse la
+ * scène et ne disait rien quand ce n'était pas le cas. Vérifier le contrat
+ * des données ne suffit pas : il faut vérifier que le chemin de chargement
+ * aboutit.
  *
  * `visualizerAvailable: true` signifie donc « essayable », pas « on aimerait ».
  * Une scène en cours de calibration se déclare `false` : la carte reste une
@@ -51,6 +66,68 @@ const ORIENTATIONS = [0, 90, 45, -45];
  * nombre vaut 8 et la garde interdit tout retour en arrière.
  */
 const ESSAYABLES_MINIMUM = 4;
+
+/**
+ * L'adresse que `build.js` produira pour cette carte.
+ *
+ * Dupliquer la construction serait le meilleur moyen de la voir divorcer du
+ * générateur ; elle est donc écrite ici sous la même forme, et le contrôle
+ * compare ses paramètres à `config`. Si les deux versions divergent un jour,
+ * c'est la comparaison qui le dira.
+ */
+function adresseStudio(carte) {
+  const c = carte.config || {};
+  const params = [
+    `piece=${carte.sceneId}`,
+    c.productId ? `parquet=${c.productId}` : null,
+    c.pattern ? `motif=${c.pattern}` : null,
+    Number.isFinite(c.orientation) ? `orientation=${c.orientation}` : null,
+  ].filter(Boolean).join('&');
+  return `../outils/studio.html?${params}`;
+}
+
+/**
+ * La scène est-elle chargeable par le Studio ? Rend la liste des griefs.
+ *
+ * On lit le fichier comme le Studio le lit, et on vérifie ce que le moteur
+ * consomme réellement : le quadrilatère et les mètres du plan (c'est d'eux
+ * que sort l'homographie), le contour de chaque zone, l'image et ses
+ * dimensions. Puis les fichiers image, dont la déclinaison 1120 que
+ * `openRoom` demande quand la fenêtre fait moins de 600 px : son absence
+ * casserait le mobile sans que rien d'autre le signale.
+ */
+function chargeable(sceneId, entree) {
+  const griefs = [];
+  let scene;
+  try {
+    scene = lire(`data/scenes/${sceneId}.json`);
+  } catch (error) {
+    return [`data/scenes/${sceneId}.json illisible — ${error.message}`];
+  }
+  if (scene.id !== sceneId) griefs.push(`le fichier de scène porte l'identifiant « ${scene.id} » et non « ${sceneId} ».`);
+  if (!scene.image || !scene.image.file) griefs.push('la scène ne déclare pas son image.');
+  else {
+    if (scene.image.file !== entree.file) griefs.push(`la scène charge ${scene.image.file}, le manifeste annonce ${entree.file}.`);
+    if (!scene.image.width || !scene.image.height) griefs.push('les dimensions de l\'image manquent.');
+    const base = scene.image.file.replace(/\.jpg$/, '');
+    for (const f of [scene.image.file, `${base}-640.jpg`, `${base}-1120.jpg`]) {
+      if (!fs.existsSync(path.join(RACINE, 'assets/images', f))) griefs.push(`${f} absent — le Studio le demande.`);
+    }
+  }
+  const zones = Array.isArray(scene.floorZones) ? scene.floorZones : [];
+  if (!zones.length) griefs.push('aucune zone de sol.');
+  for (const z of zones) {
+    const plan = (z.planeRef && scene.planes && scene.planes[z.planeRef]) || z.plane;
+    if (!plan) griefs.push(`zone « ${z.id} » : aucun plan (planeRef « ${z.planeRef} » introuvable).`);
+    else {
+      if (!Array.isArray(plan.quad) || plan.quad.length !== 4) griefs.push(`zone « ${z.id} » : le quadrilatère n'a pas quatre sommets.`);
+      if (!plan.meters || !(plan.meters.width > 0) || !(plan.meters.depth > 0)) griefs.push(`zone « ${z.id} » : mètres du plan absents ou nuls.`);
+    }
+    const contour = (z.mask && z.mask.polygon) || z.mask;
+    if (!Array.isArray(contour) || contour.length < 3) griefs.push(`zone « ${z.id} » : contour de moins de trois sommets.`);
+  }
+  return griefs;
+}
 
 function verifie() {
   const manifeste = lire('data/scenes/index.json');
@@ -117,7 +194,18 @@ function verifie() {
     if (c.orientation !== undefined && !ORIENTATIONS.includes(c.orientation)) {
       erreurs.push(`${nom} : orientation ${c.orientation} non acceptée (${ORIENTATIONS.join(', ')}).`);
     }
-    lignes.push([nom, carte.image, carte.sceneId, 'essayable']);
+    /* La scène se charge-t-elle vraiment ? */
+    for (const grief of chargeable(carte.sceneId, scene)) erreurs.push(`${nom} : ${grief}`);
+
+    /* L'adresse produite est-elle celle qu'on croit ? */
+    const url = adresseStudio(carte);
+    const p = new URLSearchParams(url.split('?')[1] || '');
+    if (p.get('piece') !== carte.sceneId) erreurs.push(`${nom} : l'adresse produite ouvre « ${p.get('piece')} » et non « ${carte.sceneId} ».`);
+    if (c.productId && p.get('parquet') !== c.productId) erreurs.push(`${nom} : parquet absent de l'adresse.`);
+    if (c.pattern && p.get('motif') !== c.pattern) erreurs.push(`${nom} : motif absent de l'adresse.`);
+    if (c.orientation !== undefined && p.get('orientation') !== String(c.orientation)) erreurs.push(`${nom} : orientation absente de l'adresse.`);
+
+    lignes.push([nom, carte.image, carte.sceneId, 'essayable', url]);
   }
 
   const essayables = lignes.filter((l) => l[3] === 'essayable').length;

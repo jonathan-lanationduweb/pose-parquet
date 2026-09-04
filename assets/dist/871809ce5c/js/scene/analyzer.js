@@ -59,7 +59,12 @@ export async function loadSceneIndex(base = '') {
   if (!cache.has('__index__')) {
     cache.set(
       '__index__',
-      fetch(`${base}data/scenes/index.json`).then((response) => {
+      // `no-cache` : le navigateur peut garder le fichier, mais il le
+      // revalide à chaque chargement. Sans cela, un manifeste gardé dix
+      // minutes par l'hébergeur suffit à faire disparaître une scène qu'on
+      // vient d'ajouter — et un lien profond vers elle tombe dans le vide.
+      // La réponse est de quelques kilo-octets et revient en 304.
+      fetch(`${base}data/scenes/index.json`, { cache: 'no-cache' }).then((response) => {
         if (!response.ok) throw new Error('Pièces d’exemple indisponibles');
         return response.json();
       })

@@ -236,7 +236,83 @@ Deux scènes de plus dans la bibliothèque ne coûtent rien à l'ouverture : au
 chargement du Studio, sept vignettes 640 et la haute résolution de la seule
 scène active. Le worker de texture reste en service.
 
+## Le lien profond pouvait ne rien faire
+
+Un essai utilisateur réel a montré ce que les contrôles automatiques
+n'attrapaient pas : les deux cartes ajoutées n'ouvraient pas leur pièce, et
+l'écran obtenu pouvait être le formulaire de projet. Les vérifications
+passaient pourtant — contrat image = image respecté, scène publiable, adresse
+correcte. Elles vérifiaient les DONNÉES, pas le CHEMIN DE CHARGEMENT.
+
+La cause, dans `js/studio/app.js`, tenait en deux lignes :
+
+```js
+// au démarrage
+if (requested && sceneOuvrable(sceneIndex, requested)) openRoom(requested);
+// et dans openRoom
+const entry = sceneOuvrable(sceneIndex, id) || bibliotheque[0];
+```
+
+La première exige que le manifeste connaisse la scène ; sinon elle ne fait
+RIEN — pas d'ouverture, pas de message, le visiteur reste sur l'écran
+d'accueil du Studio, où les actions visibles mènent ailleurs, dont « Votre
+projet ». La seconde, si elle était atteinte avec un identifiant non résolu,
+ouvrait la PREMIÈRE pièce de la bibliothèque : cliquer sur une cuisine et
+recevoir un séjour, exactement le défaut que la page Inspiration venait de
+réparer, réinstallé un étage plus bas.
+
+Il suffit que le manifeste servi soit périmé pour que le premier cas se
+produise, et c'est le cas le plus probable juste après l'ajout d'une scène :
+GitHub Pages garde un fichier une dizaine de minutes, et un navigateur qui a
+déjà ouvert le Studio a l'ancienne liste, sans les nouvelles pièces.
+
+Trois corrections :
+
+1. **`openRoom(id)` ouvre `id`, ou rien.** Une scène que le manifeste déclare
+   fermée est refusée avec un mot. Une scène que le manifeste IGNORE est tout
+   de même tentée : le fichier est adressé par son identifiant, et le nom de
+   son image vient désormais de la scène chargée, plus du manifeste. Un
+   manifeste périmé ne peut donc plus rendre un lien inopérant.
+2. **Un échec le dit.** Le Studio revient à la bibliothèque avec « Cette pièce
+   n'a pas pu être chargée. Choisissez-en une autre. » au lieu d'un écran
+   d'accueil muet.
+3. **Le manifeste est revalidé à chaque chargement** (`cache: 'no-cache'` sur
+   `data/scenes/index.json`) : quelques kilo-octets, une réponse 304 le plus
+   souvent, et une scène nouvelle n'est jamais invisible.
+
+Vérifié par les deux cas limites : `?piece=salon` — une scène présente sur le
+disque mais absente du manifeste — ouvre maintenant la pièce, alors qu'elle ne
+faisait rien avant ; `?piece=piece-inexistante` affiche le message et la
+bibliothèque au lieu du silence.
+
+La garde `check-inspiration.js` a été étendue en conséquence : elle lit
+maintenant le fichier de scène comme le Studio le lit et vérifie ce que le
+moteur consomme — quadrilatère à quatre sommets, mètres non nuls, contour d'au
+moins trois sommets, image déclarée et concordante avec le manifeste — plus
+l'existence des déclinaisons 640 et **1120**, cette dernière étant celle que
+`openRoom` demande sous 600 px de fenêtre : son absence aurait cassé le mobile
+en silence. Elle recompose enfin l'adresse et compare ses paramètres à
+`config`. Éprouvée à blanc en cassant volontairement les mètres et le contour
+d'une scène : les deux griefs sortent.
+
 ## Parcours vérifié
+
+Les quatre cartes ont été reprises **au clic réel** après correction, et non
+par lecture du lien : clic sur la carte, page obtenue, nom de la pièce lu dans
+la barre du Studio, puis clics réels sur deux parquets et sur un motif ou une
+orientation, en vérifiant à chaque fois que les pixels du sol changent.
+
+| carte | page obtenue | pièce affichée | deux parquets | motif ou orientation |
+|---|---|---|---|---|
+| Séjour traversant | `/outils/studio.html?piece=sejour…` | Séjour et salle à manger | sol changé | — |
+| Chambre parisienne | `…?piece=chambre-parisienne…` | Chambre parisienne | sol changé | — |
+| Cuisine ouverte | `…?piece=cuisine-ouverte…` | Cuisine ouverte sur le séjour | sol changé | bâton rompu : sol changé |
+| Salon d'angle | `…?piece=salon-angle…` | Salon d'angle | sol changé | Point de Hongrie : sol changé |
+
+Quatre sur quatre. Aucune n'a mené au formulaire de projet : cette page ne
+s'ouvre que par « Utiliser dans mon projet », depuis la comparaison du Studio.
+Sur 390 × 844, les deux nouvelles cartes refont le parcours complet, clic sur
+la carte et changement de parquet compris.
 
 375 × 812, 844 × 390, 1440 × 900 et 1920 × 1080 : aucun débordement
 horizontal, la carte entière est cliquable (335 × 419 px sur mobile), la
