@@ -169,6 +169,8 @@
  * Tout est sous `pointer: coarse` : la densité du bureau ne change pas.
  */
 @media (pointer: coarse) {
+  /* Le curseur de largeur de lame : 28 px au bureau, 44 px sous le pouce. */
+  .visualizer__range input[type="range"] { min-height: 44px; }
   .pattern-switch { gap: 0.75rem; }
   .pattern-switch button { min-height: 44px; }
   .visualizer__dims { gap: 0.75rem; }
