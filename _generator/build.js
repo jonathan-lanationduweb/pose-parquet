@@ -8,6 +8,7 @@ const { MOTIFS } = require('./content-motifs');
 const { TUTOS } = require('./content-tutos');
 const images = require('./images');
 const { PHOTOS, INSPIRATION_PHOTOS } = require('./photos');
+const { exigeCoherence } = require('./check-inspiration');
 const { buildHomeBody } = require('./home');
 const { buildVisualiseurPage } = require('./visualiseur');
 const { resolveSources } = require('./sources');
@@ -599,7 +600,7 @@ function buildTutos() {
 }
 
 /**
- * Le bouton « Essayer ce style », et la seule condition qui l'autorise.
+ * L'adresse du Studio pour une carte, et les quatre conditions qui l'autorisent.
  *
  * Une carte ne l'obtient que si elle déclare un `sceneId` ET que cette scène
  * est publiable dans le manifeste — géométrie ET rendu validés. Deux raisons
@@ -610,9 +611,29 @@ function buildTutos() {
  * Pas de repli. Une carte sans scène correspondante n'est pas cliquable : elle
  * reste une inspiration, ce qu'elle a toujours été.
  */
-function lienEssai(item) {
-  if (!item.visualizerAvailable || !item.sceneId) return '';
-  if (!PIECES.some((p) => p.id === item.sceneId)) return '';
+function lienStudio(item) {
+  if (!item.visualizerAvailable || !item.sceneId) return null;
+  const scene = PIECES.find((p) => p.id === item.sceneId);
+  if (!scene) return null;
+  /*
+   * La condition qui manquait, et dont l'absence a produit huit faux liens :
+   * la scene doit ouvrir LE MEME FICHIER que la carte affiche. On compare
+   * fichier contre fichier, pas identifiant contre identifiant.
+   *
+   * Et on JETTE au lieu de retomber en silence. Les trois conditions
+   * precedentes rendent la carte muette — une scene retrogradee a la revue
+   * doit faire disparaitre le lien sans que personne y pense. Celle-ci est
+   * d'une autre nature : une carte qui se declare essayable en montrant une
+   * autre photo que le Studio est exactement le defaut qu'on vient de
+   * reparer. Le site ne se construit pas tant qu'elle n'est pas corrigee.
+   */
+  const attendu = `${item.image}.jpg`;
+  if (scene.file !== attendu) {
+    throw new Error(
+      `Inspiration « ${item.title} » : la carte affiche ${attendu}, la scene « ${item.sceneId} » ouvre ${scene.file}. `
+        + 'Une carte essayable doit montrer la photo que le Studio ouvre — corriger `image` ou `sceneId` dans _generator/photos.js.'
+    );
+  }
   const c = item.config || {};
   const params = [
     `piece=${item.sceneId}`,
@@ -620,24 +641,51 @@ function lienEssai(item) {
     c.pattern ? `motif=${c.pattern}` : null,
     Number.isFinite(c.orientation) ? `orientation=${c.orientation}` : null,
   ].filter(Boolean).join('&');
-  return `
-                <a class="gallery__try" href="../outils/studio.html?${params}">Essayer ce style ${ICON.arrow}</a>`;
+  return `../outils/studio.html?${params}`;
+}
+
+/**
+ * Une carte : essayable, c'est un lien vers le Studio ; sinon, un bouton de
+ * loupe, comme avant.
+ *
+ * Les deux surfaces couvrent toute la vignette, ce qui donne sur mobile une
+ * zone tactile de la taille de la carte. La difference se voit : le curseur
+ * (`pointer` contre `zoom-in`), la pastille « Essayer cette ambiance » dans
+ * la legende, et un liligne au survol. Une carte non essayable n'a pas de
+ * pastille : elle reste une inspiration, ce qu'elle a toujours ete.
+ *
+ * La pastille porte `tabindex="-1"` : elle mene au meme endroit que la
+ * vignette, et deux arrets de tabulation pour une seule destination sont une
+ * gene au clavier, pas une aide.
+ */
+function carteInspiration(item) {
+  const href = lienStudio(item);
+  const sizes = '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw';
+  const vignette = picture(item.image, { base: '../', alt: item.alt, sizes });
+  const surface = href
+    ? `<a class="gallery__open" href="${href}" aria-label="Essayer cette ambiance dans le Studio : ${item.title}">
+                ${vignette}
+              </a>`
+    : `<button class="gallery__zoom" type="button"
+                data-lightbox-trigger="${item.title} — ${item.meta}" aria-label="Agrandir : ${item.title}">
+                ${vignette}
+              </button>`;
+  const pastille = href
+    ? `
+                <a class="gallery__try" href="${href}" tabindex="-1">Essayer cette ambiance ${ICON.arrow}</a>`
+    : '';
+  return `<figure class="gallery__item${href ? ' gallery__item--try' : ''}" data-tags="${item.tags}">
+              ${surface}
+              <figcaption class="gallery__caption">
+                <span>${item.title}</span>
+                <span class="mono">${item.meta}</span>${pastille}
+              </figcaption>
+            </figure>`;
 }
 
 function buildInspiration() {
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'Inspiration' }]);
-  const gallery = INSPIRATIONS.map(
-    (item, index) => `<figure class="gallery__item" data-tags="${item.tags}">
-              <button class="gallery__zoom" type="button"
-                data-lightbox-trigger="${item.title} — ${item.meta}" aria-label="Agrandir : ${item.title}">
-                ${picture(`inspi-${index + 1}`, { base: '../', alt: item.alt, sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw' })}
-              </button>
-              <figcaption class="gallery__caption">
-                <span>${item.title}</span>
-                <span class="mono">${item.meta}</span>${lienEssai(item)}
-              </figcaption>
-            </figure>`
-  ).join('\n            ');
+  const gallery = INSPIRATIONS.map(carteInspiration).join('\n            ');
 
   // Filtres limités aux motifs réellement visibles dans les photographies.
   const filters = [
@@ -655,7 +703,7 @@ function buildInspiration() {
             <p class="eyebrow">Inspiration</p>
             <h1 class="page-hero__title">Des sols, des directions, des ambiances</h1>
           </div>
-          <p class="page-hero__lead">Une sélection de configurations réelles, classées par motif et par type de pièce. Chaque visuel indique le motif et le type de pose retenus.</p>
+          <p class="page-hero__lead">Une sélection d’ambiances, classées par motif et par type de pièce : la légende donne le motif et la teinte. Celles dont la pièce est calibrée s’ouvrent dans le Studio — sur cette photographie même — pour y essayer d’autres parquets.</p>
         </div>
       </header>
 
@@ -1254,6 +1302,12 @@ buildHome();
 buildGuides();
 buildMotifs();
 buildTutos();
+/*
+ * Le contrat Inspiration → Studio est vérifié AVANT d'écrire la page : une
+ * carte qui se déclare essayable en montrant une autre photo que celle que le
+ * Studio ouvrira arrête la construction. Voir check-inspiration.js.
+ */
+exigeCoherence();
 buildInspiration();
 buildTools();
 buildVisualiseurPage(write);

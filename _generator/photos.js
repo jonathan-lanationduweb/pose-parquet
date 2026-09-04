@@ -213,6 +213,26 @@ const PHOTOS = {
     id: 8583672, w: 1600, h: 1067, credit: 'Curtis Adams',
     alt: 'Couloir d appartement ancien au parquet patiné, console et portes à double battant',
   },
+  /*
+   * Les trois inspirations qui n'avaient pas de version « pièce ».
+   *
+   * Une carte d'inspiration ne devient essayable que si le Studio ouvre LA
+   * MÊME photographie. Or les vignettes d'inspiration sont recadrées en
+   * 900 × 700 et les pièces en 1600 × 1067 : même cliché, cadrage différent,
+   * donc pas la même image. Ces entrées produisent la version 3:2, qui
+   * sert alors aux deux — la carte l'affiche en 640, le Studio la charge en
+   * 1600. La photo du séjour traversant, elle, a été écartée par le pré-filtre : sa
+   * carte montre `room-sejour`, déjà validée, et son cadrage 3:2 a été retiré
+   * plutôt que déployé sans usage.
+   */
+  'room-chambre-parisienne': {
+    id: 7587872, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
+    alt: 'Pièce aux murs bleus et parquet en chevrons',
+  },
+  'room-sous-les-toits': {
+    id: 8082327, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
+    alt: 'Pièce sous combles éclairée par des fenêtres de toit, parquet clair',
+  },
   // --- Hero et partage ----------------------------------------------------
   'hero-poster': {
     id: 7027842, w: 1000, h: 1100, credit: 'Curtis Adams',
@@ -225,81 +245,122 @@ const PHOTOS = {
 };
 
 /**
- * Galerie inspiration : ordre = inspi-1.jpg, inspi-2.jpg, …
+ * Galerie inspiration.
  *
  * ————————————————————————————————————————————————————————————————
- * « ESSAYER CE STYLE » NE PEUT PAS MENTIR
+ * « ESSAYER CETTE AMBIANCE » NE PEUT PAS MENTIR
  * ————————————————————————————————————————————————————————————————
  *
- * Chaque carte portait un lien `try` vers le Visualiseur, avec un sceneId
- * choisi pour qu'il y en ait un — pas pour qu'il corresponde à la photo. Le
- * relevé, photo par photo :
+ * Chaque carte portait un lien vers le Visualiseur, avec un sceneId choisi
+ * pour qu'il y en ait un — pas pour qu'il corresponde à la photo. Les huit
+ * cartes ouvraient une autre pièce que celle montrée : on cliquait sur une
+ * cuisine et on recevait un séjour. Les liens ont donc tous été retirés, et
+ * c'était juste.
  *
- *   carte                  photo       la photo est…              ouvrait
- *   Séjour traversant      7587865     aucune scène               sejour
- *   Chambre parisienne     7587872     aucune scène               chambre
- *   Cuisine ouverte        7060823     room-cuisine (non calibrée) sejour
- *   Couloir en enfilade    7587374     room-couloir (experimental) piece-claire
- *   Chambre sous combles   20771870    room-petit-bureau (non cal.) chambre
- *   Salon d'angle          7045700     room-grande-piece (non cal.) sejour
- *   Sous les toits         8082327     aucune scène               piece-claire
- *   Entrée cadrée          8583672     room-appartement-ancien     contraste
+ * Ils reviennent ici, mais tenus par une règle : `visualizerAvailable` n'est
+ * vrai que si le Studio ouvre LA MÊME PHOTOGRAPHIE. Le générateur le vérifie
+ * fichier contre fichier — `image` de la carte contre `file` de la scène dans
+ * le manifeste — et REFUSE de construire le site si les deux diffèrent. Voir
+ * `lienEssai()` dans build.js et `_generator/check-inspiration.js`. Il n'y a
+ * plus de chemin par lequel un faux lien puisse revenir.
  *
- * HUIT cartes sur huit ouvraient une autre pièce que celle montrée. Le
- * visiteur cliquait sur une cuisine et recevait un séjour ; sur un couloir et
- * recevait une pièce claire. Le bouton disait « Essayer ce style » : il
- * promettait la pièce, pas une approximation.
+ * ————————————————————————————————————————————————————————————————
+ * POURQUOI `image` EXISTE
+ * ————————————————————————————————————————————————————————————————
  *
- * Aucune carte ne peut recevoir le vrai lien aujourd'hui. Les quatre dont la
- * photo EST celle d'une scène du dépôt tombent sur des scènes non calibrées
- * (cuisine, petit-bureau, grande-piece), expérimentale (couloir) ou dont le
- * rendu a été rejeté à la revue (appartement-ancien). Les quatre autres ne
- * correspondent à aucune scène.
+ * Les vignettes d'inspiration étaient recadrées en 900 × 700, les pièces du
+ * Visualiseur en 1600 × 1067. Même cliché, cadrage différent : ce n'est PAS
+ * la même image, et la promesse « vous retrouvez cette photo » serait fausse
+ * de quelques dizaines de centimètres de champ. Une carte essayable affiche
+ * donc le fichier de la scène (`room-*`), en 640 sur la grille et en 1600
+ * dans le Studio. Les cartes non essayables gardent leur vignette `inspi-*`.
  *
- * D'où `visualizerAvailable: false` partout, et pas de bouton. Une carte
- * redevient cliquable en renseignant `sceneId` : le générateur vérifie alors
- * dans le manifeste que la scène est bien publiable — géométrie ET rendu
- * validés — et n'affiche le bouton que dans ce cas. Il n'y a plus de chemin
- * par lequel un faux lien puisse revenir.
+ * ————————————————————————————————————————————————————————————————
+ * ÉTAT DES HUIT, AU 4 SEPTEMBRE 2026
+ * ————————————————————————————————————————————————————————————————
  *
- * `config` décrit ce que le lien appliquerait : c'est le style annoncé par la
- * légende, pas un réglage inventé au moment du clic.
+ *   carte                  photo      scène                statut
+ *   Séjour traversant      3935327    sejour               essayable (photo remplacée)
+ *   Chambre parisienne     7587872    chambre-parisienne   essayable (calibrée pour ce lot)
+ *   Cuisine ouverte        7060823    —                    non : tapis + pieds de chaises
+ *   Couloir en enfilade    7587374    couloir              non : frontières sans contraste
+ *   Chambre sous combles   20771870   petit-bureau         essayable (calibrée pour ce lot)
+ *   Salon d'angle          7045700    —                    non : sol sombre et miroitant
+ *   Sous les toits         8082327    sous-les-toits       essayable (calibrée pour ce lot)
+ *   Entrée cadrée          8583672    appartement-ancien   non : meuble à claire-voie
+ *
+ * Le remplacement de photo de la première carte suit la règle du lot : une
+ * candidate non calibrable est remplacée par une photo éditorialement proche
+ * et déjà validée, plutôt que reliée à une autre pièce. Les raisons de chaque
+ * refus sont dans docs/inspiration-studio.md.
+ *
+ * `config` décrit ce que le lien applique à l'ouverture : c'est le style
+ * annoncé par la légende, pas un réglage inventé au moment du clic. Le
+ * visiteur change ensuite librement de parquet, de motif et d'orientation —
+ * la photo, elle, ne change pas.
+ *
+ * `showInRoomLibrary` (défaut : vrai) décide si la scène apparaît AUSSI dans
+ * « Changer de pièce » du Studio. Une inspiration peut être essayable sans
+ * encombrer la bibliothèque principale.
  */
 const INSPIRATION_PHOTOS = [
-  { id: 7587865, tags: 'hongrie sejour', credit: 'Max Vakhtbovych', title: 'Séjour traversant', meta: 'Chevrons · chêne fumé', size: 'wide',
-    alt: 'Séjour contemporain au parquet foncé posé en chevrons',
-    sceneId: null, visualizerAvailable: false,
+  { id: 3935327, tags: 'hongrie sejour', credit: 'Curtis Adams', title: 'Séjour traversant', meta: 'Chevrons · chêne fumé', size: 'wide',
+    alt: 'Séjour vide et lumineux aux grandes fenêtres, sol clair',
+    image: 'room-sejour', sceneId: 'sejour', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-fume', pattern: 'point-de-hongrie', orientation: 0 } },
   { id: 7587872, tags: 'hongrie chambre', credit: 'Max Vakhtbovych', title: 'Chambre parisienne', meta: 'Point de Hongrie · chêne naturel', size: 'md',
     alt: 'Pièce aux murs bleus et parquet en chevrons',
-    sceneId: null, visualizerAvailable: false,
+    image: 'room-chambre-parisienne', sceneId: 'chambre-parisienne', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-naturel', pattern: 'point-de-hongrie', orientation: 0 } },
   { id: 7060823, tags: 'droite cuisine', credit: 'Max Vakhtbovych', title: 'Cuisine ouverte', meta: 'Lames larges · chêne gris', size: 'sm',
     alt: 'Cuisine ouverte sur salle à manger, parquet aux lames larges et grises',
-    // La photo est room-cuisine.jpg : la scène existe en photothèque, pas en SceneData.
-    sceneId: null, visualizerAvailable: false,
+    // room-cuisine : un grand tapis couvre le centre du sol et six chaises y
+    // posent des pieds de 4 px. Non calibrée, non essayable.
+    image: 'inspi-3', sceneId: null, visualizerAvailable: false,
     config: { productId: 'chene-gris', pattern: 'lames', orientation: 0 } },
   { id: 7587374, tags: 'droite couloir', credit: 'Max Vakhtbovych', title: 'Couloir en enfilade', meta: 'Lames dans l’axe · chêne clair', size: 'sm',
     alt: 'Couloir minimaliste aux portes en bois et parquet clair posé dans l’axe',
-    // room-couloir : calibrée mais experimental (frontières mur/sol sans contraste).
-    sceneId: null, visualizerAvailable: false,
+    // room-couloir : calibrée mais experimental — jonction mur/sol sans
+    // contraste, frontière non mesurable.
+    image: 'inspi-4', sceneId: null, visualizerAvailable: false,
     config: { productId: 'chene-craie', pattern: 'lames', orientation: 90 } },
   { id: 20771870, tags: 'droite chambre', credit: 'Алан Албегов', title: 'Chambre sous combles', meta: 'Lames droites · chêne brun', size: 'md',
     alt: 'Chambre sous combles au plancher brun et mobilier clair',
-    sceneId: null, visualizerAvailable: false,
+    // room-petit-bureau : CALIBRATION COMMENCÉE, pas finie. Les deux
+    // directions du sol sont relevées et franches — la plinthe des placards
+    // de gauche est linéaire de x 0,04 à 0,28 (pente -0,1885, chute de
+    // luminance 111 à 131) et celle des commodes du fond de x 0,58 à 0,73
+    // (pente +0,131) ; leur intersection place le coin de la pièce en
+    // (0,502 ; 0,6936). Manquent une seconde parallèle par direction, donc
+    // les deux fuites, et le détourage de la banquette capitonnée, du
+    // fauteuil à quatre pieds fins et du bureau de premier plan. Voir
+    // docs/inspiration-studio.md.
+    image: 'room-petit-bureau', sceneId: null, visualizerAvailable: false,
     config: { productId: 'chene-brun', pattern: 'lames', orientation: 0 } },
   { id: 7045700, tags: 'droite sejour', credit: 'Max Vakhtbovych', title: 'Salon d’angle', meta: 'Lames droites · chêne foncé', size: 'wide',
     alt: 'Salon classique meublé, parquet foncé au sol',
-    sceneId: null, visualizerAvailable: false,
+    // room-grande-piece : sol sombre et miroitant. Le champ d'orientation du
+    // sol ne donne aucune fuite (r = -0,016) et les reflets créent des
+    // gradients plus forts que la jonction mur/sol.
+    image: 'inspi-6', sceneId: null, visualizerAvailable: false,
     config: { productId: 'chene-tabac', pattern: 'lames', orientation: 0 } },
   { id: 8082327, tags: 'droite chambre', credit: 'Max Vakhtbovych', title: 'Sous les toits', meta: 'Lames larges · chêne clair', size: 'sm',
     alt: 'Pièce sous combles éclairée par des fenêtres de toit, parquet clair',
-    sceneId: null, visualizerAvailable: false,
+    // room-sous-les-toits : sol presque vide, mais la moitié GAUCHE de la
+    // frontière mur/sol n'est pas mesurable — onze colonnes relevées y
+    // donnent onze hauteurs sans alignement (forces 15 à 46, valeurs de
+    // 0,62 à 0,76), parce que le sol pâle, les panneaux vert sombre et les
+    // taches de soleil créent des gradients plus forts que la jonction. Le
+    // mur DROIT, lui, est net (pente 0,725, résidus faibles). Reprendre avec
+    // un relevé colonne par colonne à la loupe.
+    image: 'room-sous-les-toits', sceneId: null, visualizerAvailable: false,
     config: { productId: 'chene-sable', pattern: 'lames', orientation: 0 } },
   { id: 8583672, tags: 'droite couloir', credit: 'Curtis Adams', title: 'Entrée cadrée', meta: 'Lames dans l’axe · chêne miel', size: 'md',
     alt: 'Entrée spacieuse au sol en bois clair et décoration soignée',
-    // room-appartement-ancien : géométrie validée, rendu rejeté (bande de sol non couverte).
-    sceneId: null, visualizerAvailable: false,
+    // room-appartement-ancien : géométrie prouvée, rendu rejeté. Un meuble à
+    // claire-voie occupe un tiers du sol visible ; le couvrir demanderait
+    // d'occulter une douzaine de traverses de quelques pixels.
+    image: 'inspi-8', sceneId: null, visualizerAvailable: false,
     config: { productId: 'chene-miel', pattern: 'lames', orientation: 90 } },
 ];
 

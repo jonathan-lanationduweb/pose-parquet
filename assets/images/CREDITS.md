@@ -49,6 +49,9 @@ Elles sont créditées ici par respect du travail des auteurs.
 | `room-petite-piece.jpg` | Image Hunter | [Pexels #26747989](https://www.pexels.com/photo/26747989/) |
 | `room-bureau-vide.jpg` | Curtis Adams | [Pexels #7028110](https://www.pexels.com/photo/7028110/) |
 | `room-appartement-ancien.jpg` | Curtis Adams | [Pexels #8583672](https://www.pexels.com/photo/8583672/) |
+| `room-sejour-traversant.jpg` | Max Vakhtbovych | [Pexels #7587865](https://www.pexels.com/photo/7587865/) |
+| `room-chambre-parisienne.jpg` | Max Vakhtbovych | [Pexels #7587872](https://www.pexels.com/photo/7587872/) |
+| `room-sous-les-toits.jpg` | Max Vakhtbovych | [Pexels #8082327](https://www.pexels.com/photo/8082327/) |
 | `hero-poster.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
 | `og-default.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
 | `inspi-1.jpg` | Max Vakhtbovych | [Pexels #7587865](https://www.pexels.com/photo/7587865/) |

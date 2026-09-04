@@ -2077,6 +2077,37 @@ body[data-drawer-open="true"] { overflow: hidden; }
   cursor: zoom-in;
 }
 
+/**
+ * Carte essayable : la vignette entière est un lien vers le Studio.
+ *
+ * Elle couvre la carte, donc la zone tactile fait la taille de la carte —
+ * c'est ce qui rend l'action atteignable au doigt sans viser la pastille.
+ * Le curseur distingue les deux familles de cartes avant même le survol :
+ * `pointer` mène au Studio, `zoom-in` agrandit la photo.
+ */
+.gallery__open {
+  position: absolute;
+  inset: 0;
+  display: block;
+  cursor: pointer;
+}
+.gallery__item--try { cursor: pointer; }
+
+/* Survol discret : la photo respire, un liséré apparaît. Rien de plus — la
+   direction artistique de la page ne change pas pour un état d'interaction. */
+.gallery__item--try::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border: 2px solid transparent;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: border-color var(--dur-3) var(--ease-out);
+}
+.gallery__item--try:hover::after { border-color: rgba(255, 255, 255, 0.55); }
+.gallery__open:focus-visible { outline: 3px solid #fff; outline-offset: -5px; }
+
 .gallery__item {
   position: relative;
   display: block;
@@ -2133,7 +2164,9 @@ body[data-drawer-open="true"] { overflow: hidden; }
   align-items: center;
   gap: 0.35rem;
   margin-top: 0.5rem;
-  min-height: 2.4rem;
+  /* 44 px : la cible tactile minimale. La carte entière est cliquable, mais
+     la pastille reste atteignable au doigt sans viser. */
+  min-height: 2.75rem;
   padding: 0 0.95rem;
   border-radius: var(--r-pill);
   background: rgba(255, 255, 255, 0.92);

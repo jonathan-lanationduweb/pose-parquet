@@ -148,6 +148,22 @@ export const scenesPubliques = (index) =>
     .filter((e) => geometrieDe(e) === 'validated' && visuelDe(e) === 'validated');
 
 /**
+ * Les pièces listées dans « Changer de pièce ».
+ *
+ * Publiable et proposée dans la bibliothèque sont deux choses différentes.
+ * Une scène calibrée pour une carte d'inspiration est essayable par son lien
+ * sans devoir figurer dans la liste principale : les huit inspirations
+ * calibrées, la bibliothèque doublerait et le choix deviendrait un catalogue
+ * à faire défiler.
+ *
+ * `showInRoomLibrary: false` retire une scène de la liste sans la déclasser.
+ * Le défaut est VRAI : une scène validée se propose, sauf décision contraire
+ * écrite dans le manifeste. Un oubli garde donc le comportement d'avant.
+ */
+export const scenesBibliotheque = (index) =>
+  scenesPubliques(index).filter((e) => e.showInRoomLibrary !== false);
+
+/**
  * Les pièces qu'on accepte d'ouvrir sur demande explicite (lien direct).
  * Une scène expérimentale reste atteignable pour la relecture ; une scène
  * `disabled` ne s'ouvre pas.
