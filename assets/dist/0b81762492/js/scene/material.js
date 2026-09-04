@@ -22,7 +22,8 @@
  *
  * Il suffit alors de déclarer `maps` dans data/parquets.json.
  */
-import { buildTexture, buildMips, TILE, TILE_METERS } from './texture.js';
+import { buildTexture, buildMips, etendreMips, TILE, TILE_METERS } from './texture.js';
+import { chrono } from '../utils/perf.js';
 
 /** Rugosité de référence par finition : ce qui distingue mat, satiné, verni. */
 const FINISH = {
@@ -102,6 +103,8 @@ export function createMaterial(entry) {
 
 const cache = new Map();
 const MAX_CACHE = 12;
+/** Niveaux de la pyramide attendus par le moteur logiciel. */
+const NIVEAUX = 5;
 const key = (material, config) =>
   `${material.id}|${config.pattern}|${config.width || 'auto'}|${config.plankLength || 'auto'}`;
 
@@ -160,24 +163,70 @@ export function materialMaps(material, config = {}) {
   // `width` n'est transmis que si l'utilisateur l'a explicitement réglé : sans
   // quoi on court-circuiterait le choix de largeur propre au motif (une lame
   // droite de 18 cm, un chevron de 9 cm).
-  const tile = buildTexture(material, {
+  const tile = chrono('texture.tuile', () => buildTexture(material, {
     pattern: config.pattern || material.defaultPattern,
     width: config.width || null,
-  });
-  const albedo = buildMips(tile);
-  const relief = albedo.map((mip) => reliefFromAlbedo(mip, material.surface));
+  }));
+  // Niveau 0 seulement : les réductions ne servent qu'au moteur logiciel, et
+  // `completer()` les fabrique le jour où il les demande. Voir etendreMips().
+  const albedo = chrono('texture.mips0', () => buildMips(tile, 1));
+  const relief = chrono('texture.relief0', () => [reliefFromAlbedo(albedo[0], material.surface)]);
 
-  const maps = { albedo, relief, tile, meters: TILE_METERS, size: TILE, surface: material.surface };
+  const maps = {
+    albedo,
+    relief,
+    tile,
+    meters: TILE_METERS,
+    size: TILE,
+    surface: material.surface,
+    /**
+     * Complète la pyramide : à appeler avant tout échantillonnage de niveau > 0.
+     *
+     * Le moteur logiciel lit `maps.albedo.length - 1` comme niveau maximal ;
+     * il doit donc appeler ceci d'abord, sinon il travaillera à la seule pleine
+     * résolution et le moirage des lames lointaines reviendra. Idempotent.
+     */
+    completer() {
+      if (albedo.length >= NIVEAUX) return maps;
+      chrono('texture.mips+', () => etendreMips(albedo, NIVEAUX));
+      chrono('texture.relief+', () => {
+        for (let i = relief.length; i < albedo.length; i += 1) relief.push(reliefFromAlbedo(albedo[i], material.surface));
+      });
+      return maps;
+    },
+  };
   cache.set(id, maps);
   return maps;
 }
 
 /** Prépare des cartes sans bloquer : sert à précharger les références voisines. */
+/**
+ * Les cartes de ce matériau sont-elles déjà prêtes ?
+ *
+ * Sert à l'interface, pas au moteur : construire une tuile coûte de 0,8 à
+ * 3 secondes de fil principal, et un clic qui déclenche cette construction
+ * doit pouvoir le dire au lieu de laisser croire à un blocage.
+ */
+export function enCache(material, config) {
+  return cache.has(key(material, config));
+}
+
+/**
+ * Prépare les cartes d'un matériau pendant une période d'inactivité.
+ *
+ * Sans délai de garde, volontairement. La version précédente passait
+ * `{ timeout: 1200 }` à `requestIdleCallback`, ce qui garantit l'exécution
+ * au bout d'une seconde et demie même si le fil principal est occupé — donc
+ * exactement au moment où il ne faut pas, une tuile coûtant jusqu'à trois
+ * secondes. Sans garde, si le navigateur ne trouve jamais de répit, la tuile
+ * ne se construit pas d'avance : elle se construira à la demande, ce qui est
+ * le comportement correct.
+ */
 export function warmMaterial(material, config) {
   if (cache.has(key(material, config))) return;
   const run = () => materialMaps(material, config);
-  if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(run, { timeout: 1200 });
-  else window.setTimeout(run, 120);
+  if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(run);
+  else window.setTimeout(run, 400);
 }
 
 export const clearMaterialCache = () => cache.clear();

@@ -76,6 +76,44 @@ export function patternProfile(material, pattern, widthOverride) {
 }
 
 const clampByte = (v) => Math.max(0, Math.min(255, Math.round(v)));
+/**
+ * Couleurs opaques, mémoïsées.
+ *
+ * Un veinage, c'est 34 000 traits en pose droite et 74 000 en point de
+ * Hongrie, chacun d'une teinte légèrement différente. Écrire
+ * `rgba(r,g,b,a)` et le donner à `strokeStyle` oblige le navigateur à
+ * analyser une couleur CSS à chaque trait.
+ *
+ * Ce que ça coûte, mesuré : 100 ms pour 34 000 affectations en chaîne contre
+ * 42 ms mémoïsées — 59 ms gagnées par tuile en pose droite, environ 130 en
+ * point de Hongrie. C'est réel et c'est petit : 4 à 7 % du temps de la tuile.
+ * Un premier micro-banc annonçait 886 ms, en comparant deux boucles qui ne
+ * traçaient pas la même chose ; la mesure en situation l'a démenti. Le gros du
+ * temps est dans le tracé lui-même, pas dans la couleur — voir le rapport de
+ * profilage. Ce qui est gardé ici l'est parce que c'est gratuit et prouvé
+ * identique, pas parce que ça règle le problème.
+ *
+ * L'alpha passe donc par `globalAlpha` et la couleur reste opaque. Comme
+ * `globalAlpha` multiplie l'alpha de la source, le résultat composité est
+ * exactement le même ; et comme les composantes ne prennent qu'une poignée de
+ * valeurs — deux accents décalés d'un petit entier — la chaîne est réutilisée
+ * au lieu d'être reconstruite. Vérifié : les neuf tuiles de contrôle gardent
+ * la même empreinte au pixel après ce changement.
+ */
+const opaques = new Map();
+const opaque = (r, g, b) => {
+  const r8 = clampByte(r);
+  const g8 = clampByte(g);
+  const b8 = clampByte(b);
+  const cle = (r8 << 16) | (g8 << 8) | b8;
+  let v = opaques.get(cle);
+  if (v === undefined) {
+    v = `rgb(${r8},${g8},${b8})`;
+    opaques.set(cle, v);
+  }
+  return v;
+};
+
 const rgb = (c, shift = 0, warm = 0) =>
   `rgb(${clampByte(c[0] + shift + warm)},${clampByte(c[1] + shift)},${clampByte(c[2] + shift - warm)})`;
 
@@ -176,7 +214,7 @@ function accents(tex) {
  * dans le repère de la lame, de plus en plus étroits et de plus en plus
  * marqués vers le centre.
  */
-function cathedral(ctx, x, y, w, h, horizontal, random, encre, tex, vigueur) {
+function cathedral(ctx, x, y, w, h, horizontal, random, poseEncre, tex, vigueur) {
   const long = horizontal ? w : h;
   const across = horizontal ? h : w;
   // Une à trois cathédrales par lame, jamais alignées d'une lame à l'autre.
@@ -196,7 +234,7 @@ function cathedral(ctx, x, y, w, h, horizontal, random, encre, tex, vigueur) {
       // est une bande d'un à deux centimètres, pas un cheveu. Un arc d'un
       // pixel à 6 % d'opacité, comme au premier essai, ne survit pas à la
       // réduction — le sol reprend aussitôt son aspect de placage strié.
-      ctx.strokeStyle = encre(tex.grainAlpha * vigueur * (0.7 + t * 1.1), 12);
+      poseEncre(tex.grainAlpha * vigueur * (0.7 + t * 1.1), 12);
       ctx.lineWidth = Math.max(1.2, across * (0.05 + 0.09 * t));
       ctx.beginPath();
       if (horizontal) {
@@ -228,11 +266,20 @@ function grain(ctx, x, y, w, h, tex, random) {
   // dessin. Faire varier la *force* du veinage, et pas seulement la teinte,
   // distingue les lames sans créer le patchwork d'un décalage de couleur.
   const vigueurLame = acc.vigueur * (0.72 + random() * 0.62);
-  /** Choisit l'accent sombre ou clair, et rend une couleur rgba(). */
-  const encre = (alpha, ecartTeinte) => {
+  /**
+   * Pose l'accent — sombre ou clair — comme style de trait courant.
+   *
+   * Ne rend plus une chaîne `rgba()` : voir `opaque()`. L'alpha est
+   * arrondi à trois décimales comme le faisait `toFixed(3)`, pour que le
+   * résultat reste identique au pixel, et borné à [0, 1] parce que CSS
+   * bornait la chaîne alors qu'une affectation hors bornes de
+   * `globalAlpha` serait ignorée.
+   */
+  const poseEncre = (alpha, ecartTeinte) => {
     const c = random() < acc.partClaire ? acc.lift : acc.deep;
     const t = Math.round((random() - 0.5) * ecartTeinte);
-    return `rgba(${clampByte(c[0] + t)},${clampByte(c[1] + t)},${clampByte(c[2] + t)},${alpha.toFixed(3)})`;
+    ctx.strokeStyle = opaque(c[0] + t, c[1] + t, c[2] + t);
+    ctx.globalAlpha = Math.min(1, Math.max(0, Math.round(alpha * 1000) / 1000));
   };
 
   ctx.save();
@@ -246,20 +293,20 @@ function grain(ctx, x, y, w, h, tex, random) {
   //    sont elles qui survivent à la réduction quand la lame s’éloigne.
   const bandes = 2 + Math.round(random() * 2);
   for (let i = 0; i < bandes; i += 1) {
-    ctx.strokeStyle = encre(tex.grainAlpha * vigueurLame * (0.5 + random() * 0.5), 10);
+    poseEncre(tex.grainAlpha * vigueurLame * (0.5 + random() * 0.5), 10);
     ctx.lineWidth = across * (0.14 + random() * 0.2);
     streak(ctx, x, y, w, h, horizontal, 0.1 + random() * 0.8, 0.3, random);
   }
 
   // 2. Cathédrales : le dessin propre au chêne débité sur dosse. Posées avant
   //    la fibre, pour que celle-ci les traverse comme sur une planche réelle.
-  cathedral(ctx, x, y, w, h, horizontal, random, encre, tex, vigueurLame);
+  cathedral(ctx, x, y, w, h, horizontal, random, poseEncre, tex, vigueurLame);
 
   // 3. Fibre de fond : une strie tous les pixels environ, presque invisible
   //    une à une. C'est ce qui casse l'aplat.
   const fibres = Math.max(26, Math.round(across * 1.15));
   for (let i = 0; i < fibres; i += 1) {
-    ctx.strokeStyle = encre(tex.grainAlpha * vigueurLame * 0.62 * (0.3 + random()), 11);
+    poseEncre(tex.grainAlpha * vigueurLame * 0.62 * (0.3 + random()), 11);
     ctx.lineWidth = Math.max(0.5, across * 0.0065 * (0.6 + random()));
     streak(ctx, x, y, w, h, horizontal, 0.015 + random() * 0.97, 0.05, random);
   }
@@ -270,10 +317,15 @@ function grain(ctx, x, y, w, h, tex, random) {
   //    de la même force donnent une rayure régulière, donc une fausse texture.
   const lines = Math.max(2, Math.round(tex.grainLines * (0.7 + random() * 0.6)));
   for (let i = 0; i < lines; i += 1) {
-    ctx.strokeStyle = encre(tex.grainAlpha * vigueurLame * (0.3 + Math.pow(random(), 0.45) * 0.95), 16);
+    poseEncre(tex.grainAlpha * vigueurLame * (0.3 + Math.pow(random(), 0.45) * 0.95), 16);
     ctx.lineWidth = Math.max(0.6, across * tex.grainWidth * (0.5 + random()));
     streak(ctx, x, y, w, h, horizontal, 0.05 + random() * 0.9, 0.14, random);
   }
+
+  // Les boucles ci-dessus ont réglé globalAlpha ; tout ce qui suit donne son
+  // alpha dans la couleur, comme avant. Le save/restore de la lame le
+  // rétablirait de toute façon, mais pas avant la fin de cette fonction.
+  ctx.globalAlpha = 1;
 
   // Nœuds : cercles sombres cernés d'un halo, fréquence propre au matériau
   if (random() < tex.knots) {
@@ -677,11 +729,25 @@ export function buildTexture(material, { pattern = 'lames', width, size = TILE }
 export function buildMips(base, levels = 5) {
   const size0 = base.width;
   const data0 = base.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, size0, size0).data;
-  const mips = [{ size: size0, data: data0 }];
+  return etendreMips([{ size: size0, data: data0 }], levels);
+}
 
-  let previous = data0;
-  let previousSize = size0;
-  for (let level = 1; level < levels; level += 1) {
+/**
+ * Complète une pyramide déjà commencée jusqu'à `levels` niveaux.
+ *
+ * Séparé de `buildMips` parce que les deux moteurs n'ont pas les mêmes
+ * besoins : le moteur WebGL n'utilise que le niveau 0 et laisse le GPU faire
+ * ses mipmaps (`gl.generateMipmap`), tandis que le moteur logiciel échantillonne
+ * tous les niveaux. Calculer les quatre réductions puis les jeter coûtait, mesuré,
+ * 870 ms de fil principal par matériau sur le chemin GPU — plus que le dessin de
+ * la tuile en pose droite, qui n'en coûte que 135.
+ *
+ * Reprend là où la pyramide s'arrête, et ne recalcule rien.
+ */
+export function etendreMips(mips, levels = 5) {
+  let previous = mips[mips.length - 1].data;
+  let previousSize = mips[mips.length - 1].size;
+  for (let level = mips.length; level < levels; level += 1) {
     const size = previousSize >> 1;
     if (size < 8) break;
     const data = new Uint8ClampedArray(size * size * 4);

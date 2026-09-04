@@ -26,11 +26,12 @@ import { loadImage, loadFile } from '../scene/image-loader.js';
 import { createFloorEditor } from '../scene/editor.js';
 import { composeRender, downloadCanvas } from '../scene/export.js';
 import { createSceneRenderer } from '../scene/renderer.js';
-import { warmMaterial } from '../scene/material.js';
+import { warmMaterial, enCache } from '../scene/material.js';
 import { addZone, removeZone } from '../scene/schema.js';
 import { loadCatalog, createCatalog, swatchFor } from './catalog.js';
 import { createCompare } from './compare.js';
 import { buildTexture } from '../scene/texture.js';
+import { mark, mesure, perfActif } from '../utils/perf.js';
 
 const ORIENTATIONS = [
   { angle: 0, label: 'Lames dans la largeur', icon: 'M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4' },
@@ -204,6 +205,17 @@ export async function mountStudio(root) {
   let pending = false;
   let refine = 0;
   let quality = 1;
+  /**
+   * Interaction en cours de mesure : son repère de départ.
+   *
+   * Ce qui se ressent n'est pas la durée de `renderer.paint`, c'est le délai
+   * entre le clic et le pixel. Entre les deux il y a un setTimeout, une frame
+   * d'attente, et parfois la construction d'une texture. On nomme donc le
+   * point de départ au clic et on referme à l'affichage.
+   */
+  let attente = null;
+  let regroupement = 0;
+  const interaction = (nom) => { if (perfActif) { attente = nom; mark(nom); } };
   let editor = null;
   /** Zone visée par la correction du sol : la plus proche par défaut. */
   let activeZone = null;
@@ -224,12 +236,21 @@ export async function mountStudio(root) {
   function paint() {
     pending = false;
     if (!renderer.ready) return;
+    mark('app:paint:debut');
     const ok = renderer.paint(canvas, paintConfig(), null, quality);
     if (!ok) {
       setStatus('Zone de sol invalide : reprenez-la dans « Délimiter le sol ».');
       return;
     }
     setStatus('');
+    mark('app:paint:fin');
+    // Cet ordre n'est pas indifférent : `mesure` vide le repère de fin
+    // derrière elle pour ne pas saturer le tampon du navigateur. La mesure du
+    // clic au pixel — la seule qui décrive ce que ressent l'utilisateur — doit
+    // donc passer avant celle de la peinture, sinon elle ne trouve plus son
+    // repère et disparaît silencieusement du rapport.
+    if (attente) { mesure(`interaction.${attente}`, attente, 'app:paint:fin'); attente = null; }
+    mesure(`app.rendu.q${quality}`, 'app:paint:debut', 'app:paint:fin');
     if (quality > 1) {
       window.clearTimeout(refine);
       refine = window.setTimeout(() => {
@@ -238,6 +259,29 @@ export async function mountStudio(root) {
       }, 180);
     }
   }
+
+/**
+ * Regroupe les demandes de rendu, et le dit quand ça va coûter cher.
+ *
+ * Construire la tuile d'un matériau prend de 0,8 à 3,0 secondes de fil
+ * principal — mesuré, c'est LA cause du lag signalé. Le rendu lui-même en
+ * coûte 56 ms. Or trois clics rapides — Naturel, Miel, Fumé — produisaient
+ * trois constructions complètes, soit près de neuf secondes, dont deux pour
+ * des choix que l'utilisateur venait d'abandonner : le fil étant bloqué, les
+ * clics suivants n'arrivaient qu'après la fin du précédent rendu et
+ * relançaient chacun le leur.
+ *
+ * Deux règles, donc. Un : on attend 70 ms avant de lancer le travail lourd,
+ * et toute nouvelle demande dans cet intervalle remplace la précédente — le
+ * dernier choix est le seul construit. Deux : si les cartes du matériau ne
+ * sont pas déjà en cache, on l'annonce, parce qu'une interface qui ne répond
+ * pas sans rien dire se lit comme une panne.
+ *
+ * 70 ms est en dessous du seuil où un clic cesse d'être perçu comme
+ * instantané, et l'accusé de réception visuel — pastille active, panneau —
+ * a déjà été peint quand le travail commence.
+ */
+const REGROUPEMENT_MS = 70;
 
   function schedule(draft) {
     // Le rendu allégé ne concerne que le moteur logiciel : sur GPU, un rendu
@@ -257,6 +301,17 @@ export async function mountStudio(root) {
     }, 0);
   }
 
+  /**
+   * Demande un rendu en regroupant les clics rapprochés.
+   * @param {boolean} draft rendu allégé pendant le réglage
+   */
+  function demandeRendu(draft) {
+    window.clearTimeout(regroupement);
+    const mat = material();
+    if (mat && !enCache(mat, paintConfig())) setStatus('Préparation du rendu…');
+    regroupement = window.setTimeout(() => schedule(draft), REGROUPEMENT_MS);
+  }
+
   /* ---------------- Contextes ---------------- */
 
   /**
@@ -266,6 +321,7 @@ export async function mountStudio(root) {
    * plein cadre, sans un pixel de chrome à droite.
    */
   function setContext(id) {
+    mark('panneau:debut');
     const next = root.dataset.panel === id ? 'closed' : id;
     root.dataset.panel = next;
     contextsHost.querySelectorAll('[data-context]').forEach((button) => {
@@ -373,6 +429,7 @@ export async function mountStudio(root) {
 
   async function openRoom(id) {
     const entry = sceneOuvrable(sceneIndex, id) || bibliotheque[0];
+    interaction('ouverture');
     setStatus('Chargement…');
     try {
       const scene = await analyzeScene({ sceneId: entry.id, base });
@@ -434,20 +491,53 @@ export async function mountStudio(root) {
 
   const catalogUi = createCatalog(catalogSlot, catalog, {
     onSelect: (item) => selectMaterial(item.id),
-    onVisible: (item) => warmMaterial(item, config),
+    /*
+     * Plus de préchauffage sur apparition d'une pastille.
+     *
+     * Le catalogue signalait chaque référence devenue visible pour qu'on
+     * prépare sa tuile pleine résolution. Mesuré au démarrage du Visualiseur :
+     * SEPT constructions de tuile, dont six pour des références sur
+     * lesquelles personne n'avait cliqué, soit environ 6,2 secondes de fil
+     * principal — c'est ce qui rendait l'ouverture longue et le catalogue
+     * poisseux au premier scroll.
+     *
+     * Ce dont le catalogue a besoin pour s'afficher, c'est de sa vignette
+     * (`buildSwatch`, 260 x 320 px, quelques dizaines de millisecondes), pas
+     * de la tuile de 1280 x 1280 du moteur. Le coût de la tuile est payé au
+     * clic, et il est annoncé — voir demandeRendu().
+     */
+    onVisible: null,
   });
 
   function selectMaterial(id) {
     const next = catalog.get(id);
     if (!next) return;
+    interaction('produit');
     config = { ...config, materialId: id };
     if (!next.compatiblePatterns.includes(config.pattern)) config.pattern = next.defaultPattern;
     catalogUi.setActive(id);
     syncSelected();
-    schedule(true);
+    demandeRendu(true);
     save();
-    // Les références voisines sont préparées pendant que l'on regarde le rendu
-    catalogUi.neighbours(id).forEach((item) => warmMaterial(item, config));
+    /*
+     * On ne précharge plus les références voisines.
+     *
+     * L'intention était bonne : préparer pendant qu'on regarde. Mais une
+     * tuile coûte de 0,8 à 3,0 secondes de fil principal, et `warmMaterial`
+     * passe par `requestIdleCallback` avec un délai de garde de 1 200 ms —
+     * donc au bout d'une seconde et demie le travail part, que le fil soit
+     * libre ou non.
+     *
+     * Mesuré : trois clics rapprochés — Naturel, Miel, Fumé — déclenchaient
+     * DOUZE constructions de tuile, 33 secondes de fil principal cumulées, et
+     * douze tâches longues de 3 secondes chacune. Onze de ces tuiles ne
+     * servaient à rien. C'était la première cause du lag ressenti, devant le
+     * coût du matériau demandé lui-même.
+     *
+     * Précharger n'a de sens que si le travail préchargé est court, ou s'il
+     * sort du fil principal. Ni l'un ni l'autre n'est vrai aujourd'hui : à
+     * rétablir le jour où la tuile se construira dans un worker.
+     */
   }
 
   function syncSelected() {
@@ -515,9 +605,10 @@ export async function mountStudio(root) {
         drawPatternPreview(preview, item, pattern.id);
       }
       card.addEventListener('click', () => {
+        interaction('motif');
         config = { ...config, pattern: pattern.id };
         syncPatterns();
-        schedule(true);
+        demandeRendu(true);
         save();
       });
       grid.appendChild(card);
@@ -550,8 +641,11 @@ export async function mountStudio(root) {
       // comparer d'un coup d'œil.
       ctx.drawImage(tile, 40, 60, 240, 135, 0, 0, target.width, target.height);
     };
-    if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(draw, { timeout: 700 });
-    else window.setTimeout(draw, 40);
+    // Sans délai de garde : ces trois aperçus se construisent pendant que le
+    // panneau des motifs est fermé, et rien ne justifie de forcer le travail
+    // au bout de 700 ms si le navigateur n'a pas de répit à donner.
+    if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(draw);
+    else window.setTimeout(draw, 400);
   }
 
   /* ---------------- Contexte : orientation ---------------- */
@@ -570,9 +664,10 @@ export async function mountStudio(root) {
       button.setAttribute('aria-pressed', String(Math.round(config.angle) === item.angle));
       button.innerHTML = icon(item.icon);
       button.addEventListener('click', () => {
+        interaction('orientation');
         config = { ...config, angle: item.angle };
         syncOrientation();
-        schedule(true);
+        demandeRendu(true);
         save();
       });
       grid.appendChild(button);
@@ -1125,8 +1220,24 @@ export async function mountStudio(root) {
   else if (params.get('demarrer') === '1') openRoom(bibliotheque[0].id);
 
   on(window, 'resize', () => {
-    if (renderer.ready) schedule();
+    if (!renderer.ready) return;
+    interaction('resize');
+    schedule();
   });
+
+  if (perfActif) {
+    window.__studio = {
+      get config() { return config; },
+      selectMaterial,
+      setPattern: (id) => { interaction('motif'); config = { ...config, pattern: id }; syncPatterns(); demandeRendu(true); },
+      setAngle: (a) => { interaction('orientation'); config = { ...config, angle: a }; syncOrientation(); demandeRendu(true); },
+      openRoom,
+      setContext,
+      canvas,
+      get renderer() { return renderer; },
+      catalog,
+    };
+  }
 
   return {
     element: root,

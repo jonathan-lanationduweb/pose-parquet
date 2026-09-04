@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Zones de sol — contrôle automatique</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #101212; color: #e8e6df; font: 13px/1.6 ui-monospace, monospace; }
+  header { padding: 10px; border-bottom: 1px solid #2a2e2e; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 5px 9px; border-bottom: 1px solid #212525; white-space: nowrap; }
+  th { color: #8fa; font-weight: normal; }
+  b { color: #fff; }
+  .ok { color: #6ee7a0; }
+  .ko { color: #ff6b5e; background: #2a1210; }
+  #log { padding: 8px 10px; white-space: pre-wrap; color: #9aa; }
+</style>
+</head>
+<body>
+<header>
+  <b>Zones de sol — contrôle automatique</b> — page interne, ni liée ni indexée ni déployée.
+  <span id="etat"></span>
+</header>
+<div id="out"></div>
+<pre id="log"></pre>
+
+<script type="module">
+/**
+ * « Tout le sol ne change pas toujours » — vérifié par les pixels.
+ *
+ * Le signalement était fonctionnel : en choisissant un parquet, une partie du
+ * sol garderait l'ancien revêtement. Une revue à l'œil ne peut pas trancher —
+ * sur une photo, un coin de sol resté d'origine ressemble à un coin de sol
+ * éclairé autrement. Il faut compter.
+ *
+ * MÉTHODE. Pour chaque scène, on peint deux fois avec deux matériaux aussi
+ * éloignés que le catalogue le permet — chêne craie, très clair, et chêne
+ * fumé, très sombre. Un pixel de sol correctement repeint change forcément
+ * entre les deux. Un pixel qui reste identique à la PHOTO D'ORIGINE dans les
+ * deux rendus n'a été peint ni une fois ni l'autre : c'est un trou.
+ *
+ * Le double critère compte. Comparer un seul rendu à la photo laisserait
+ * passer les coïncidences — un parquet clair sur un sol clair donne
+ * localement la même couleur. Exiger l'immobilité sous DEUX matériaux
+ * opposés rend la coïncidence improbable.
+ *
+ * Le seuil de 4 niveaux sur 255 par canal absorbe le bruit de compression
+ * JPEG et l'arrondi du moteur, sans absorber une vraie différence de teinte.
+ *
+ * LES PIXELS OCCULTÉS SONT EXCLUS. Une grille de ventilation, un pied de
+ * chaise, un tapis : le moteur y restitue volontairement la photo d'origine,
+ * et les compter comme des trous n'a aucun sens. La première version de cette
+ * page le faisait, et accusait la chambre de 3,755 % de sol non repeint —
+ * c'était sa grille de ventilation, qui doit rester devant le parquet. Le
+ * masque d'occlusion étant antialiasé, on écarte tout pixel dont
+ * l'occultation dépasse 8/255 : au bord d'un pied de chaise, un pixel à
+ * moitié occulté est à moitié peint, donc ni un trou ni une preuve.
+ *
+ * Ce que la page NE dit pas : si le contour est au bon endroit. Un masque qui
+ * s'arrête 20 px avant la plinthe donne 0 % de trous et un rendu raté. Le
+ * contour se juge à l'œil, sur scene-review.html.
+ */
+import { analyzeScene, loadSceneIndex, statutDe } from '../js/scene/analyzer.js';
+import { createSceneRenderer } from '../js/scene/renderer.js';
+import { loadImage } from '../js/scene/image-loader.js';
+import { loadCatalog } from '../js/studio/catalog.js';
+
+const BASE = '../';
+const $ = (id) => document.getElementById(id);
+const log = (l) => { $('log').textContent += l + '\n'; };
+
+/** Deux matériaux aux extrêmes du catalogue : la différence doit être franche. */
+const CLAIR = 'chene-craie';
+const FONCE = 'chene-fume';
+/** Écart par canal en dessous duquel deux pixels sont « les mêmes ». */
+const TOLERANCE = 4;
+
+const catalog = await loadCatalog(BASE);
+const index = await loadSceneIndex(BASE);
+const renderer = createSceneRenderer();
+$('etat').textContent = `${renderer.backend} · clair=${CLAIR} foncé=${FONCE}`;
+
+const table = document.createElement('table');
+table.innerHTML = `<thead><tr>
+  <th>scène</th><th>statut</th><th>zone</th><th>surface (groupe)</th>
+  <th>pixels</th><th>occultés</th><th>non repeints</th><th>lum. clair</th><th>lum. foncé</th><th>écart</th><th>verdict</th>
+</tr></thead><tbody></tbody>`;
+$('out').appendChild(table);
+const tbody = table.querySelector('tbody');
+
+for (const entry of index.scenes) {
+  const scene = await analyzeScene({ sceneId: entry.id, base: BASE });
+  const prepared = await loadImage(`${BASE}assets/images/${scene.image.file}`);
+  renderer.setScene(scene, prepared);
+
+  const { width, height } = prepared;
+  const orig = prepared.canvas.getContext('2d', { willReadFrequently: true })
+    .getImageData(0, 0, width, height).data;
+
+  const peindre = (id) => {
+    const c = document.createElement('canvas');
+    const ok = renderer.paint(c, { material: catalog.get(id), pattern: 'lames', angle: 0, width: null, scale: 1 });
+    if (!ok) return null;
+    return c.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, width, height).data;
+  };
+  const clair = peindre(CLAIR);
+  const fonce = peindre(FONCE);
+  if (!clair || !fonce) { log(`${entry.id} : rendu impossible`); continue; }
+
+  const labels = renderer.masks.labels;
+  // null quand la scène n'a aucun occulteur : le moteur ne fabrique pas la
+  // carte pour rien, et bureau-vide est justement dans ce cas.
+  const occlusion = renderer.masks.occlusion;
+  const occulte = (i) => (occlusion ? occlusion[i] > 8 : false);
+  const stats = scene.floorZones.map((z) => ({
+    id: z.id, surfaceId: z.surfaceId, n: 0, occultes: 0, trous: 0, sClair: 0, sFonce: 0,
+  }));
+
+  for (let i = 0; i < labels.length; i += 1) {
+    const zone = labels[i] - 1;
+    if (zone < 0 || zone >= stats.length) continue;
+    if (occulte(i)) { stats[zone].occultes += 1; continue; }
+    const p = i * 4;
+    const s = stats[zone];
+    s.n += 1;
+    s.sClair += 0.2126 * clair[p] + 0.7152 * clair[p + 1] + 0.0722 * clair[p + 2];
+    s.sFonce += 0.2126 * fonce[p] + 0.7152 * fonce[p + 1] + 0.0722 * fonce[p + 2];
+    const immobileClair = Math.abs(clair[p] - orig[p]) <= TOLERANCE
+      && Math.abs(clair[p + 1] - orig[p + 1]) <= TOLERANCE
+      && Math.abs(clair[p + 2] - orig[p + 2]) <= TOLERANCE;
+    if (!immobileClair) continue;
+    const immobileFonce = Math.abs(fonce[p] - orig[p]) <= TOLERANCE
+      && Math.abs(fonce[p + 1] - orig[p + 1]) <= TOLERANCE
+      && Math.abs(fonce[p + 2] - orig[p + 2]) <= TOLERANCE;
+    if (immobileFonce) s.trous += 1;
+  }
+
+  stats.forEach((s) => {
+    const pct = s.n ? (100 * s.trous) / s.n : 0;
+    const lc = s.n ? s.sClair / s.n : 0;
+    const lf = s.n ? s.sFonce / s.n : 0;
+    // Un groupe qui reçoit bien le matériau voit sa luminance chuter du clair
+    // au foncé. Un écart faible sur une zone pleine, c'est une zone qui n'a
+    // pas suivi.
+    const bon = pct < 0.5 && lc - lf > 20;
+    const tr = document.createElement('tr');
+    tr.className = bon ? 'ok' : 'ko';
+    tr.innerHTML = `<td>${entry.id}</td><td>${statutDe(entry)}</td><td>${s.id}</td><td>${s.surfaceId}</td>`
+      + `<td>${s.n.toLocaleString('fr')}</td><td>${s.occultes.toLocaleString('fr')}</td><td>${s.trous} (${pct.toFixed(3)} %)</td>`
+      + `<td>${lc.toFixed(1)}</td><td>${lf.toFixed(1)}</td><td>${(lc - lf).toFixed(1)}</td>`
+      + `<td>${bon ? 'OK' : 'À REPRENDRE'}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  const total = stats.reduce((a, s) => a + s.n, 0);
+  const trous = stats.reduce((a, s) => a + s.trous, 0);
+  const occ = stats.reduce((a, s) => a + s.occultes, 0);
+  log(`${entry.id.padEnd(20)} ${scene.floorZones.length} zone(s), ${total.toLocaleString('fr')} px peignables, ${occ.toLocaleString('fr')} occultés, ${trous} non repeint(s)`);
+}
+
+log('\ncontrôle terminé');
+window.zonesQa = { renderer, catalog, index };
+</script>
+</body>
+</html>

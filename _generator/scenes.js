@@ -14,7 +14,7 @@ const INDEX = path.join(__dirname, '..', 'data', 'scenes', 'index.json');
 
 function scenesValidees() {
   const manifeste = JSON.parse(fs.readFileSync(INDEX, 'utf8'));
-  return (manifeste.scenes || []).filter((s) => s.status === 'validated');
+  return (manifeste.scenes || []).filter((s) => s.geometryStatus === 'validated' && s.visualStatus === 'validated');
 }
 
 const EN_LETTRES = ['zéro', 'une', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix'];

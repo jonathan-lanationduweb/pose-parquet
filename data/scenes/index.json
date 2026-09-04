@@ -1,6 +1,6 @@
 {
   "schema": "pose-parquet/scene-index@1",
-  "note": "Pièces d'exemple du Visualiseur Parquet. Chaque scène est calibrée à la main : zones de sol, plans de perspective, trous et occlusions. Aucune analyse d'image n'intervient. L'outil de calibrage est dans _calibrage/ — calibrage.html au clic, calibrer.html en script. `status` décide de ce qui est proposé aux visiteurs : seules les scènes `validated` apparaissent, et le défaut, en cas d'oubli, est `experimental`. Une scène difficile se garde : elle montre où le moteur plie.",
+  "note": "Pièces d'exemple du Visualiseur Parquet. Chaque scène est calibrée à la main : zones de sol, plans de perspective, trous et occlusions. Aucune analyse d'image n'intervient. L'outil de calibrage est dans _calibrage/ — calibrage.html au clic, calibrer.html en script. DEUX statuts décident de ce qui est proposé aux visiteurs, et il faut les deux : `geometryStatus` (perspective, échelle et contour prouvés) ET `visualStatus` (rendu regardé et jugé présentable). Une scène peut être juste et laide — trois l'étaient. Le défaut, en cas d'oubli, est `experimental` de part et d'autre : une scène qu'on n'a pas regardée ne se publie pas. `visualStatus: failed` se distingue de `experimental` : regardée et rejetée, avec `visualReason` et `visualNote` à l'appui. Une scène difficile se garde : elle montre où le moteur plie.",
   "scenes": [
     {
       "id": "sejour",
@@ -8,8 +8,9 @@
       "file": "room-sejour.jpg",
       "thumb": "room-sejour-640.jpg",
       "zones": 2,
-      "status": "validated",
-      "highlight": "Deux pièces en enfilade, un seul parquet"
+      "highlight": "Deux pièces en enfilade, un seul parquet",
+      "geometryStatus": "validated",
+      "visualStatus": "validated"
     },
     {
       "id": "piece-claire",
@@ -17,8 +18,11 @@
       "file": "room-piece-claire.jpg",
       "thumb": "room-piece-claire-640.jpg",
       "zones": 1,
-      "status": "validated",
-      "highlight": "Meuble et radiateur devant le sol"
+      "highlight": "Meuble et radiateur devant le sol",
+      "geometryStatus": "validated",
+      "visualStatus": "failed",
+      "visualReason": "mask-over-wall",
+      "visualNote": "Le masque monte sur le mur de gauche entre x 0,05 et 0,28, avec un bord en dents de scie visible au rendu ; les occulteurs du radiateur et du meuble bas sont des boîtes englobantes. Vérifié en superposant la couverture réelle du masque sur la photo."
     },
     {
       "id": "chambre",
@@ -26,8 +30,9 @@
       "file": "room-chambre.jpg",
       "thumb": "room-chambre-640.jpg",
       "zones": 1,
-      "status": "validated",
-      "highlight": "Lumière franche, perspective profonde"
+      "highlight": "Lumière franche, perspective profonde",
+      "geometryStatus": "validated",
+      "visualStatus": "validated"
     },
     {
       "id": "appartement-ancien",
@@ -35,8 +40,11 @@
       "file": "room-appartement-ancien.jpg",
       "thumb": "room-appartement-ancien-640.jpg",
       "zones": 1,
-      "status": "validated",
-      "highlight": "Couloir profond, meubles à pieds fins"
+      "highlight": "Couloir profond, meubles à pieds fins",
+      "geometryStatus": "validated",
+      "visualStatus": "failed",
+      "visualReason": "floor-partially-covered",
+      "visualNote": "Une bande du MÊME sol, le long du mur droit vers la seconde embrasure, n est pas couverte par le masque : au rendu, la moitié du couloir change et l autre garde son parquet d origine. C est le défaut « tout le sol ne change pas » signalé, et il est ici bien réel — non pas un trou dans une zone, mais une zone qui s arrête trop tôt."
     },
     {
       "id": "bureau-vide",
@@ -44,8 +52,9 @@
       "file": "room-bureau-vide.jpg",
       "thumb": "room-bureau-vide-640.jpg",
       "zones": 1,
-      "status": "validated",
-      "highlight": "Vue d’angle, deux plinthes mesurées, sol dégagé"
+      "highlight": "Vue d’angle, deux plinthes mesurées, sol dégagé",
+      "geometryStatus": "validated",
+      "visualStatus": "validated"
     },
     {
       "id": "petite-piece",
@@ -53,9 +62,10 @@
       "file": "room-petite-piece.jpg",
       "thumb": "room-petite-piece-640.jpg",
       "zones": 1,
-      "status": "experimental",
       "highlight": "Petite pièce ; contour et occultations à reprendre",
-      "reason": "boundary-not-verifiable"
+      "reason": "boundary-not-verifiable",
+      "geometryStatus": "experimental",
+      "visualStatus": "experimental"
     },
     {
       "id": "contraste",
@@ -63,8 +73,11 @@
       "file": "room-contraste.jpg",
       "thumb": "room-contraste-640.jpg",
       "zones": 1,
-      "status": "validated",
-      "highlight": "Ombre découpée reportée sur le parquet"
+      "highlight": "Ombre découpée reportée sur le parquet",
+      "geometryStatus": "validated",
+      "visualStatus": "failed",
+      "visualReason": "not-a-room",
+      "visualNote": "Ce n est pas une pièce : un mur, un rai de soleil, et une lisière de sol sur le cinquième bas de l image. Le report de lumière y est excellent — c est pour cela qu elle avait été validée — mais offerte au visiteur comme « pièce d exemple », elle ne montre aucune pièce. Gardée comme banc d essai de la lumière."
     },
     {
       "id": "couloir",
@@ -72,9 +85,10 @@
       "file": "room-couloir.jpg",
       "thumb": "room-couloir-640.jpg",
       "zones": 1,
-      "status": "experimental",
       "highlight": "Jonction mur/sol sans contraste : frontière non mesurable",
-      "reason": "low-contrast-boundaries"
+      "reason": "low-contrast-boundaries",
+      "geometryStatus": "experimental",
+      "visualStatus": "experimental"
     }
   ]
 }
