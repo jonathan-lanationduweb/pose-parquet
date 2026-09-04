@@ -76,6 +76,24 @@ export function patternProfile(material, pattern, widthOverride) {
 }
 
 const clampByte = (v) => Math.max(0, Math.min(255, Math.round(v)));
+
+/**
+ * Un canevas 2D, sur le fil principal comme dans un Web Worker.
+ *
+ * Le dessin d'une tuile est le même partout ; ce qui change, c'est la surface
+ * sur laquelle on dessine. `document` n'existe pas dans un worker, et
+ * `OffscreenCanvas` expose le même contexte 2D. La détection est faite à
+ * l'appel, pas à l'import : ce module est chargé dans les deux mondes.
+ */
+function creerCanvas(largeur, hauteur) {
+  if (typeof document !== 'undefined') {
+    const c = document.createElement('canvas');
+    c.width = largeur;
+    c.height = hauteur;
+    return c;
+  }
+  return new OffscreenCanvas(largeur, hauteur);
+}
 /**
  * Couleurs opaques, mémoïsées.
  *
@@ -520,6 +538,21 @@ function drawHerringbone(ctx, tex, profile, random) {
   // la condition pour que le motif se referme sur lui-même.
   const l = w * Math.max(2, Math.round(profile.length / profile.width));
   const steps = Math.ceil((TILE * 1.6) / w) + 2;
+  /**
+   * Marge de couverture, calculée sur la géométrie et non au doigt mouillé.
+   *
+   * Le réseau est dessiné dans un repère tourné de 45°. Dans ce repère, le
+   * carré de la tuile déborde de ses propres bords de (√2 − 1)·TILE/2 ≈ 265 px
+   * aux quatre coins. L'ancienne marge valait 1,5·l, soit 180 px pour une lame
+   * de 120 px : les coins n'étaient donc **jamais** couverts, et la tuile
+   * gardait 2,13 % de fond uni (34 882 px sur 1280²) — des plaques sans lame
+   * qui réapparaissaient au sol tous les 4,80 m. Mesuré sur le séjour en chêne
+   * miel, où deux de ces plaques tombaient en plein milieu de la pièce.
+   *
+   * La marge couvre maintenant le débord de la rotation plus une lame entière,
+   * quelle que soit la largeur de lame.
+   */
+  const marge = (Math.SQRT2 - 1) * (TILE / 2) + l + w;
 
   ctx.save();
   ctx.translate(TILE / 2, TILE / 2);
@@ -529,8 +562,7 @@ function drawHerringbone(ctx, tex, profile, random) {
     for (let j = -steps; j <= steps; j += 1) {
       const ox = TILE / 2 + i * l + j * w;
       const oy = TILE / 2 + i * l - j * w;
-      // Le repère est tourné de 45° : on écarte largement, mais pas tout le plan
-      if (ox < -l * 1.5 || ox > TILE + l * 1.5 || oy < -l * 1.5 || oy > TILE + l * 1.5) continue;
+      if (ox < -marge || ox > TILE + marge || oy < -marge || oy > TILE + marge) continue;
       board(ctx, ox, oy, l, w, tex, random);
       board(ctx, ox + l, oy, w, l, tex, random);
     }
@@ -654,9 +686,7 @@ let noiseTile = null;
 function noise() {
   if (noiseTile) return noiseTile;
   const size = 128;
-  noiseTile = document.createElement('canvas');
-  noiseTile.width = size;
-  noiseTile.height = size;
+  noiseTile = creerCanvas(size, size);
   const ctx = noiseTile.getContext('2d');
   const image = ctx.createImageData(size, size);
   const data = image.data;
@@ -698,9 +728,7 @@ function filmGrain(ctx, w, h, amount) {
 export function buildTexture(material, { pattern = 'lames', width, size = TILE } = {}) {
   const tex = material.texture;
   const profile = patternProfile(material, pattern, width);
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
+  const canvas = creerCanvas(size, size);
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
   const random = seeded(seedOf(material.id) + Math.round(profile.width * 1000));
 
@@ -780,9 +808,7 @@ export function etendreMips(mips, levels = 5) {
  */
 export function buildSwatch(material, { width = 260, height = 320, boards = 4 } = {}) {
   const tex = material.texture;
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
+  const canvas = creerCanvas(width, height);
   const ctx = canvas.getContext('2d');
   const random = seeded(seedOf(material.id) + 7);
 

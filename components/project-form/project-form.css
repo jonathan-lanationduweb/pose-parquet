@@ -33,7 +33,14 @@
   border-radius: var(--r-pill);
   background: var(--line);
   transition: background var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
+  /* Le trait fait 4 px, la cible non : un pseudo-élément étend la zone
+     cliquable à 40 px de haut sans changer le dessin. */
+  position: relative;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
 }
+.pf__dot::after { content: ""; position: absolute; inset: -18px 0; }
 .pf__dot:hover { transform: scaleY(1.6); }
 .pf__dot[data-state="done"] { background: var(--accent); }
 .pf__dot[data-state="current"] { background: var(--c-ink); }

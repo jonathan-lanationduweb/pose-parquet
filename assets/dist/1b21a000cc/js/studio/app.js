@@ -26,11 +26,10 @@ import { loadImage, loadFile } from '../scene/image-loader.js';
 import { createFloorEditor } from '../scene/editor.js';
 import { composeRender, downloadCanvas } from '../scene/export.js';
 import { createSceneRenderer } from '../scene/renderer.js';
-import { warmMaterial, enCache } from '../scene/material.js';
+import { warmMaterial, enCache, quandCartesPretes, apercuAsync } from '../scene/material.js';
 import { addZone, removeZone } from '../scene/schema.js';
 import { loadCatalog, createCatalog, swatchFor } from './catalog.js';
 import { createCompare } from './compare.js';
-import { buildTexture } from '../scene/texture.js';
 import { mark, mesure, perfActif } from '../utils/perf.js';
 
 const ORIENTATIONS = [
@@ -238,6 +237,12 @@ export async function mountStudio(root) {
     if (!renderer.ready) return;
     mark('app:paint:debut');
     const ok = renderer.paint(canvas, paintConfig(), null, quality);
+    if (!ok && renderer.enAttente) {
+      // Les cartes du matériau se fabriquent dans le worker : le rendu
+      // précédent reste affiché, on le dit, et `quandCartesPretes` replanifiera.
+      setStatus('Préparation du rendu…');
+      return;
+    }
     if (!ok) {
       setStatus('Zone de sol invalide : reprenez-la dans « Délimiter le sol ».');
       return;
@@ -305,6 +310,11 @@ const REGROUPEMENT_MS = 70;
    * Demande un rendu en regroupant les clics rapprochés.
    * @param {boolean} draft rendu allégé pendant le réglage
    */
+  // Quand le worker livre des cartes, on repeint. Si l'utilisateur a changé
+  // d'avis entre-temps, `paint()` lira la configuration courante et demandera
+  // les cartes de ce nouveau choix : le dernier choix gagne toujours.
+  quandCartesPretes(() => { if (renderer.ready) schedule(); });
+
   function demandeRendu(draft) {
     window.clearTimeout(regroupement);
     const mat = material();
@@ -322,6 +332,12 @@ const REGROUPEMENT_MS = 70;
    */
   function setContext(id) {
     mark('panneau:debut');
+    // Sur téléphone, re-toucher le contexte actif replie la feuille au rail au
+    // lieu de la retirer : voir le commentaire de [data-panel-close].
+    if (root.dataset.panel === id && window.matchMedia('(max-width: 47.99rem)').matches) {
+      root.dataset.sheet = 'peek';
+      return;
+    }
     const next = root.dataset.panel === id ? 'closed' : id;
     root.dataset.panel = next;
     contextsHost.querySelectorAll('[data-context]').forEach((button) => {
@@ -348,7 +364,24 @@ const REGROUPEMENT_MS = 70;
     button.addEventListener('click', () => setContext(entry.id));
     contextsHost.appendChild(button);
   });
-  on(qs('[data-panel-close]', root), 'click', () => setContext(root.dataset.panel));
+  /**
+   * Sur téléphone, « fermer » ne ferme pas : il replie.
+   *
+   * La mise en page en colonne compte sur la feuille pour occuper le bas de
+   * l'écran ; l'état `closed` la retirait (`display: none`) et laissait, mesuré
+   * à 375 × 812, quelque 360 px de noir sous les commandes — la moitié de
+   * l'écran. Le geste attendu derrière la croix, c'est « moins de catalogue,
+   * plus de pièce » : c'est exactement le niveau `peek`, le rail de matières.
+   * Au-dessus de 48 rem la croix garde son sens de fermeture.
+   */
+  const TELEPHONE = () => window.matchMedia('(max-width: 47.99rem)').matches;
+  on(qs('[data-panel-close]', root), 'click', () => {
+    if (TELEPHONE()) {
+      root.dataset.sheet = 'peek';
+      return;
+    }
+    setContext(root.dataset.panel);
+  });
 
   /** Poignée de la feuille : elle fait défiler les trois niveaux. */
   on(qs('[data-sheet-toggle]', root), 'click', () => {
@@ -436,7 +469,12 @@ const REGROUPEMENT_MS = 70;
       // Dès ici la scène a sa taille finale et montre la photo d'origine.
       reserverScene({ width: scene.image.width, height: scene.image.height, file: scene.image.file, alt: scene.image.alt });
       setStatus('Préparation du rendu…');
-      const prepared = await loadImage(`${base}assets/images/${scene.image.file}`);
+      // Sous 600 px de fenêtre, image-loader réduit de toute façon à 1100 px :
+      // télécharger le fichier de 1600 px pour le jeter aussitôt coûtait ~200 Ko
+      // par pièce sur la connexion la plus lente. La variante 1120 existe déjà.
+      const petit = window.innerWidth < 600;
+      const fichier = petit ? scene.image.file.replace(/\.jpg$/, '-1120.jpg') : scene.image.file;
+      const prepared = await loadImage(`${base}assets/images/${fichier}`).catch(() => loadImage(`${base}assets/images/${scene.image.file}`));
       renderer.setScene(scene, prepared);
       sceneId = entry.id;
       photo.alt = scene.image.alt;
@@ -633,19 +671,17 @@ const REGROUPEMENT_MS = 70;
    * chaque changement de parquet reconstruirait trois tuiles pleines.
    */
   function drawPatternPreview(target, item, pattern) {
-    const draw = () => {
-      const tile = buildTexture(item, { pattern, size: 320 });
+    // L'aperçu vient du worker (voir apercuAsync) : le fil principal ne fait
+    // que le dessiner. Si le panneau a été reconstruit entre-temps, le canevas
+    // n'est plus dans le document et on n'y touche pas.
+    apercuAsync(item, pattern, 320).then((image) => {
+      if (!target.isConnected) return;
       const ctx = target.getContext('2d');
       ctx.imageSmoothingQuality = 'high';
       // Cadrage identique pour les trois motifs : c'est ce qui permet de les
       // comparer d'un coup d'œil.
-      ctx.drawImage(tile, 40, 60, 240, 135, 0, 0, target.width, target.height);
-    };
-    // Sans délai de garde : ces trois aperçus se construisent pendant que le
-    // panneau des motifs est fermé, et rien ne justifie de forcer le travail
-    // au bout de 700 ms si le navigateur n'a pas de répit à donner.
-    if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(draw);
-    else window.setTimeout(draw, 400);
+      ctx.drawImage(image, 40, 60, 240, 135, 0, 0, target.width, target.height);
+    }).catch(() => { /* pas d'aperçu : la carte garde son libellé */ });
   }
 
   /* ---------------- Contexte : orientation ---------------- */

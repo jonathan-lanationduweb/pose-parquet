@@ -31,7 +31,10 @@ export function initNav() {
     document.body.dataset.drawerOpen = String(open);
     if (open) {
       header.dataset.over = 'false';
-      const first = qs('a, button', drawer);
+      // Le premier lien de la LISTE, pas le premier lien du tiroir : celui-ci
+      // était le lien d'évitement « Aller au contenu », ce qui envoyait le
+      // lecteur d'écran hors du menu qu'il venait d'ouvrir.
+      const first = qs('.drawer__list a', drawer) || qs('a, button', drawer);
       if (first) first.focus();
     } else {
       sync();

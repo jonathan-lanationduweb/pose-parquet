@@ -11,6 +11,7 @@
  * obtient dans la pièce.
  */
 import { buildSwatch } from '../scene/texture.js';
+import { lireJson } from '../scene/product.js';
 import { createMaterial } from '../scene/material.js';
 import { loadProducts, toMaterial } from '../scene/product.js';
 
@@ -34,9 +35,7 @@ export async function loadCatalog(base = '') {
 
   // Les motifs de pose ne sont pas une donnée de produit : ils décrivent des
   // façons de poser et restent décrits une seule fois.
-  const meta = await fetch(`${base}data/parquets.json`, { cache: 'force-cache' })
-    .then((r) => (r.ok ? r.json() : {}))
-    .catch(() => ({}));
+  const meta = await lireJson(`${base}data/parquets.json`).catch(() => ({}));
 
   const parquets = products.map((fiche) => createMaterial(toMaterial(fiche)));
   const byId = new Map(parquets.map((item) => [item.id, item]));

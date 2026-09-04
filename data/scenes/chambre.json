@@ -176,11 +176,23 @@
           },
           {
             "x": 0.8848,
-            "y": 0.7136
+            "y": 0.6955
           },
           {
-            "x": 0.9174,
-            "y": 0.763
+            "x": 0.89,
+            "y": 0.7105
+          },
+          {
+            "x": 0.9,
+            "y": 0.7435
+          },
+          {
+            "x": 0.92,
+            "y": 0.7495
+          },
+          {
+            "x": 0.93,
+            "y": 0.7945
           },
           {
             "x": 0.9434,
@@ -212,7 +224,7 @@
           }
         ],
         "holes": [],
-        "note": "Contour affine sur l image, independamment du quadrilatere de perspective : les 4 points du plan servent a la projection, ils n imposent pas la frontiere du sol. Methode : densification au pas de 5 px, recalage de chaque point le long de sa normale sur le maximum de gradient (recherche +/-14 px, ponderee vers l origine), filtre median puis moyenne glissante le long du contour — la moyenne supprime le feston du suivi de bord sans effacer la correction —, enfin simplification a 0,9 px. Les cotes du cadre de l image sont figes : ce ne sont pas des frontieres reelles. Qualite de placement, mesuree par le gradient median de l image le long du contour : 18,1 -> 201,6 (x11,14). Un contour pose sur du sol nu tombe au niveau du bruit (18 sur la chambre avant reprise) ; pose sur les plinthes, seuils et huisseries il monte a 200."
+        "note": "Contour affine sur l image, independamment du quadrilatere de perspective : les 4 points du plan servent a la projection, ils n imposent pas la frontiere du sol. Methode : densification au pas de 5 px, recalage de chaque point le long de sa normale sur le maximum de gradient (recherche +/-14 px, ponderee vers l origine), filtre median puis moyenne glissante le long du contour — la moyenne supprime le feston du suivi de bord sans effacer la correction —, enfin simplification a 0,9 px. Les cotes du cadre de l image sont figes : ce ne sont pas des frontieres reelles. Qualite de placement, mesuree par le gradient median de l image le long du contour : 18,1 -> 201,6 (x11,14). Un contour pose sur du sol nu tombe au niveau du bruit (18 sur la chambre avant reprise) ; pose sur les plinthes, seuils et huisseries il monte a 200. Coin droit repris (recette globale) : le contour coupait en diagonale de (0,8848 ; 0,7136) à (0,9174 ; 0,763) et laissait une bande du parquet d origine visible entre x = 0,89 et 0,92. Il suit maintenant le pied du mur puis le seuil, relevés au saut de chaleur mur bleu / sol."
       }
     }
   ],
