@@ -21,7 +21,7 @@
  * calculé localement, aucun envoi vers un serveur.
  */
 import { qs, on } from '../utils/dom.js';
-import { analyzeScene, loadSceneIndex, scenesPubliques, sceneOuvrable } from '../scene/analyzer.js';
+import { analyzeScene, loadSceneIndex, scenesBibliotheque, sceneOuvrable } from '../scene/analyzer.js';
 import { loadImage, loadFile } from '../scene/image-loader.js';
 import { createFloorEditor } from '../scene/editor.js';
 import { composeRender, downloadCanvas } from '../scene/export.js';
@@ -190,7 +190,7 @@ export async function mountStudio(root) {
    * direct — c'est ce qui permet de garder une pièce difficile pour la
    * relecture sans l'imposer à quelqu'un qui découvre l'outil.
    */
-  const bibliotheque = scenesPubliques(sceneIndex);
+  const bibliotheque = scenesBibliotheque(sceneIndex);
 
   let config = {
     materialId: catalog.parquets[0].id,
