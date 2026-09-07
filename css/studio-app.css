@@ -33,9 +33,13 @@
 body.app {
   margin: 0;
   height: 100svh;
-  /* L'application ne défile pas… sauf quand la hauteur devient critique : voir
-     la requête @media (max-height) en fin de feuille, qui libère le défilement
-     plutôt que de rendre un contrôle inatteignable. */
+  /* L'application ne défile pas, et ce n'est plus « sauf quand la hauteur
+     devient critique ». Quand la hauteur se resserre, c'est la MISE EN PAGE
+     qui se compacte — deux colonnes, panneau à défilement interne, barre
+     flottante — de sorte que tout tienne encore dans une vue. Le défilement de
+     page n'est plus qu'un dernier recours sous 480 px de large, où deux
+     colonnes sont impossibles. Voir les deux requêtes de hauteur en fin de
+     feuille : elles partagent désormais le même seuil, 34rem. */
   overflow: hidden;
   background: var(--c-ink);
   color: var(--text);
@@ -1316,12 +1320,33 @@ body.app {
 /* ================================================================== */
 
 /**
- * Paysage téléphone et zoom fort : la hauteur est la ressource rare.
- * On laisse l'application défiler plutôt que d'écraser des contrôles jusqu'à
- * les rendre inatteignables — un bouton qu'on ne peut plus atteindre est un
- * défaut plus grave qu'un écran qui défile.
+ * DERNIER RECOURS, et seulement sous 480 px de large.
+ *
+ * Cette requête n'avait aucune condition de largeur, et c'est ce qui a rendu
+ * le Visualiseur inutilisable à 1440 × 505. Le raisonnement d'origine — mieux
+ * vaut une page qui défile qu'un bouton inatteignable — reste juste ; il ne
+ * s'appliquait qu'à la disposition en feuille basse, où le panneau est une
+ * bandeau `fixed` au bas de l'écran. Posé sur la disposition à deux colonnes,
+ * il faisait exactement le contraire de ce qu'il visait : il dépunaisait le
+ * panneau (`position: static`, `max-height: 100svh`), donc le panneau prenait
+ * toute la hauteur de vue, donc la barre d'actions rendue statique passait
+ * SOUS la ligne de flottaison. Mesuré à 1440 × 505 : les onglets Parquet,
+ * Motif et Orientation à y 567 pour 505 px de haut. Le visiteur ne pouvait
+ * plus changer de parquet sans deviner que cette page-là défile.
+ *
+ * La disposition large, elle, tient déjà dans une hauteur quelconque : le
+ * `.studio` fait `100svh` en deux rangées, le panneau est une colonne à
+ * défilement interne, la barre d'actions flotte au-dessus de la scène. Vérifié
+ * à 1440 × 505 en neutralisant cette seule requête : plus de défilement de
+ * page, barre d'actions à y 427, canevas de 685 × 457, catalogue qui défile
+ * chez lui. Il n'y avait rien à corriger dans la disposition large — il y
+ * avait à cesser de la casser.
+ *
+ * Sous 480 px de large, deux colonnes sont impossibles et le défilement de
+ * page redevient la réponse honnête. Entre 480 px et la disposition large,
+ * c'est la mise en page compacte en fin de feuille qui prend le relais.
  */
-@media (max-height: 34rem) {
+@media (max-height: 34rem) and (max-width: 29.99rem) {
   body.app { height: auto; min-height: 100svh; overflow: auto; }
   .studio { height: auto; min-height: 100svh; }
   .studio__main { grid-template-rows: auto; }
@@ -1429,7 +1454,7 @@ body.app {
 
 
 /* ================================================================== */
-/* Téléphone en paysage : peu de hauteur, tout doit tenir dans l'écran  */
+/* Hauteur serrée : tout tient dans l'écran, sans défilement de page   */
 /* ================================================================== */
 
 /**
@@ -1441,11 +1466,23 @@ body.app {
  * minimale) sortaient de leur colonne.
  *
  * Ici : la scène et le panneau se partagent la largeur, la barre d'actions
- * redevient flottante et compacte au bas de la scène (icônes seules, une
- * rangée), le canevas se plafonne à la hauteur disponible, et le catalogue
- * renonce à sa largeur minimale.
+ * redevient flottante au bas de la scène, le canevas se plafonne à la hauteur
+ * disponible, et le catalogue renonce à sa largeur minimale.
+ *
+ * LE SEUIL A ÉTÉ RELEVÉ de 30rem à 34rem, et `orientation: landscape` a
+ * disparu. Les deux requêtes de hauteur de cette feuille ne s'accordaient
+ * pas : le repli qui laisse défiler la page commençait à 34rem (544 px),
+ * cette mise en page compacte qui rend le défilement inutile ne commençait
+ * qu'à 30rem (480 px). Entre les deux, soixante-quatre pixels de hauteur où
+ * la page défilait sans que rien ne rattrape les commandes sorties du cadre.
+ * 505 px tombe pile dedans, et c'est là que le défaut a été trouvé.
+ * `orientation` était de trop : à 480 px de large et 544 de haut on est
+ * presque carré, et cette disposition tient dans les deux sens.
+ *
+ * Les deux seuils sont désormais le même nombre. S'ils doivent bouger, ils
+ * bougent ensemble.
  */
-@media (orientation: landscape) and (max-height: 30rem) and (min-width: 30rem) {
+@media (max-height: 34rem) and (min-width: 30rem) {
   .studio__main,
   .studio:not([data-panel="closed"]) .studio__main {
     display: grid;
@@ -1493,13 +1530,45 @@ body.app {
     background: rgba(16, 18, 19, 0.84);
   }
   .actions__contexts { flex: 0 1 auto; }
-  .context-btn { font-size: 0.85rem; padding: 0 0.6rem; }
   .actions__buttons { display: flex; gap: 0.3rem; }
+  .cat__search, .cat__filters { min-width: 0; width: auto; }
+  .cat__search input { min-width: 0; }
+  .studio[data-sheet] .cat__head { display: block; }
+}
+
+/**
+ * Densification : elle suit la LARGEUR, pas la hauteur.
+ *
+ * Ce qui précède est une affaire de hauteur — faire tenir la scène, le panneau
+ * et la barre dans une vue basse. Réduire les libellés et masquer les variantes
+ * est une affaire de largeur, et ces règles étaient dans le même bloc. À
+ * 1440 × 505 elles retiraient donc les mots « Avant / après », « Comparer » et
+ * « Enregistrer » et les trois pastilles de variantes, alors que la barre
+ * mesure 889 px pour 1123 px de scène : il y avait de la place pour tout.
+ *
+ * LE SEUIL EST MESURÉ, pas choisi au hasard. Avec ses libellés et ses trois
+ * pastilles, la barre demande 889 px sur une rangée ; elle vit entre
+ * `left: 0.5rem` et `right: 0.5rem`, donc elle dispose de la fenêtre moins
+ * 16 px. Sous 960 px de large, elle n'y tient plus et passe à deux rangées, ce
+ * qui lui fait manger le coin bas de la pièce — constaté à 844 × 390, où la
+ * seconde rangée ne portait que « Enregistrer ». 60rem est donc la largeur en
+ * dessous de laquelle il faut densifier, avec 55 px de marge sur la mesure.
+ *
+ * Les cibles ne rétrécissent pas : `min-height` n'est pas touché ici, et la
+ * requête `pointer: coarse` plus haut garde ses 2,75rem au doigt. Ce qui
+ * disparaît, ce sont des MOTS et des raccourcis de variantes, jamais une
+ * commande : Parquet, Motif, Orientation, Avant/après, Comparer et Enregistrer
+ * restent tous cliquables, en icônes.
+ */
+@media (max-height: 34rem) and (min-width: 30rem) and (max-width: 59.99rem) {
+  .context-btn { font-size: 0.85rem; padding: 0 0.6rem; }
   .action { padding: 0 0.6rem; }
   .action span { display: none; }
   .actions__variants { display: none; }
-  .cat__search, .cat__filters { min-width: 0; width: auto; }
-  .cat__search input { min-width: 0; }
+}
+
+/* La grille du catalogue se resserre plus tard : à 480 px de panneau il y a
+   encore la place pour des vignettes confortables. */
+@media (max-height: 34rem) and (min-width: 30rem) and (max-width: 47.99rem) {
   .cat__grid { grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr)); }
-  .studio[data-sheet] .cat__head { display: block; }
 }
