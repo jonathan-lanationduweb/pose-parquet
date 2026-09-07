@@ -9,11 +9,12 @@ d'une mise en production.
 Le formulaire lui-même n'a pas changé : mêmes étapes, mêmes champs, même
 direction artistique. Ce lot n'a touché que la couche d'envoi.
 
-## Les quatre fichiers
+## Les cinq fichiers
 
 | Fichier | Rôle |
 |---|---|
 | `js/forms/api-config.js` | où vit l'API, et nulle part ailleurs |
+| `js/forms/studio-handoff.js` | la convention d'URL entre le Studio et le formulaire |
 | `js/forms/project-payload.js` | traduction `FormData` → JSON du contrat |
 | `js/forms/submit-adapter.js` | jeton, envoi, erreurs typées, réessai unique |
 | `components/project-form/project-form.js` | l'interface : états, messages, focus |
@@ -37,7 +38,7 @@ HTTP.
 
 | Hôte du front | Racine REST | État |
 |---|---|---|
-| `localhost`, `127.0.0.1` | `http://localhost:8181/index.php?rest_route=/pose-parquet/v1` | en service |
+| `localhost`, `127.0.0.1` | `http://pose-parquet-dev.local/wp-json/pose-parquet/v1` | en service |
 | `jonathan-lanationduweb.github.io` | `null` — prévu : `https://staging-admin.pose-parquet.com/wp-json/pose-parquet/v1` | **n'existe pas** |
 | `pose-parquet.com`, `www.pose-parquet.com` | `null` — prévu : `https://admin.pose-parquet.com/wp-json/pose-parquet/v1` | **n'existe pas** |
 
@@ -140,20 +141,68 @@ Les champs vides sont omis, pas envoyés à `''` : le serveur traite l'absence.
 
 ### Le contexte du Studio, sans la photo
 
-Quand le visiteur arrive du Studio par « Décrire ce projet », l'URL porte
-`parquet`, `motif` et `orientation`. `visualizerFromParams()` en tire un bloc
-`visualizer` léger :
+Quand le visiteur arrive du Studio par « Décrire mon projet », l'URL porte six
+paramètres courts, et un seul module en décide — `js/forms/studio-handoff.js` :
+
+| Paramètre | Contenu | Exemple |
+|---|---|---|
+| `piece` | identifiant de la scène | `sejour` |
+| `libelle-piece` | nom de la scène | `Séjour et salle à manger` |
+| `parquet` | identifiant du produit | `chene-fume` |
+| `libelle` | nom commercial du produit | `Chêne Fumé` |
+| `motif` | motif de pose | `point-de-hongrie` |
+| `orientation` | angle du rendu, en degrés | `90` |
+
+`parquet` porte l'**identifiant**, jamais le libellé : c'est déjà ce que
+veulent les liens profonds qui ouvrent le Studio depuis la page Inspiration, et
+le Studio les valide contre son catalogue. Le nom humain a donc son propre
+paramètre. L'identifiant du produit est relu dans le catalogue avant de partir —
+`catalog.get()` répond, ou l'identifiant ne part pas — de sorte qu'aucun slug
+fabriqué à partir d'un libellé ne peut finir en base.
+
+`visualizerFromParams()` en tire un bloc `visualizer` léger :
 
 ```json
 {
-  "pattern": "lames",
+  "sceneId": "sejour",
+  "productId": "chene-fume",
+  "pattern": "point-de-hongrie",
   "orientation": 90,
-  "config": { "origine": "studio", "motif": "lames", "angle": 90 }
+  "config": {
+    "origine": "studio",
+    "scene": "sejour",
+    "nomScene": "Séjour et salle à manger",
+    "produit": "chene-fume",
+    "nom": "Chêne Fumé",
+    "motif": "point-de-hongrie",
+    "angle": 90
+  }
 }
 ```
 
-Mesuré en recette : charge complète de 777 octets, dont environ 105 pour
-`config`. Le plafond du contrat est de 4 Ko.
+Mesuré en recette : charge complète de 923 octets, dont 175 pour `config`. Le
+plafond du contrat est de 4 Ko.
+
+#### Identifiants d'un côté, libellés de l'autre
+
+Les identifiants vont dans les colonnes `scene_id` et `product_id` : ce sont
+la vérité technique, et rien ne les remplace. Les libellés vivent dans
+`config`, et ce sont des **instantanés d'affichage** : ils disent ce que le
+visiteur avait sous les yeux au moment de son envoi.
+
+Ce choix a une conséquence qu'il faut assumer : si une référence est renommée
+l'an prochain, les demandes déjà envoyées garderont l'ancien nom. C'est
+voulu. Une demande est une trace commerciale, pas une vue sur le catalogue du
+jour — et l'équipe qui rappelle un client six mois plus tard a besoin de savoir
+ce qu'il a vu, pas ce que le catalogue dit aujourd'hui.
+
+C'est aussi ce qui évite de recopier le catalogue du front dans le plugin. Le
+serveur n'a aucune table `sejour → Séjour et salle à manger` : il ne saurait
+pas la tenir à jour, et elle aurait menti dès la première scène retitrée.
+
+Un libellé venu du navigateur n'est pas pour autant une donnée de confiance :
+le serveur le borne à 120 caractères, le passe par `sanitize_text_field()` et
+l'échappe à l'affichage. Voir `admin-projects.md`.
 
 **Aucune photo, jamais.** La photo importée dans le Studio ne quitte pas le
 navigateur : ni en base64, ni en blob, ni en data URL, ni dans `config`, ni
@@ -161,12 +210,12 @@ ailleurs. Il n'y a pas non plus de `SceneData`, de masque, de texture. Le
 backend V1 n'a aucune raison de recevoir l'intérieur de chez quelqu'un, et le
 formulaire le dit au visiteur : « Votre photo n'a pas été transmise. »
 
-Le nom commercial du parquet (`Chêne Fumé`) n'est pas un identifiant : il ne
-passe pas le motif `^[a-z0-9][a-z0-9_-]{0,59}$` et n'est donc pas envoyé comme
-`productId`. Il reste lisible dans le message prérempli, ce qui est sa place.
+Quand le visiteur a importé sa propre photo plutôt qu'ouvert une scène du
+catalogue, `piece` et `libelle-piece` sont simplement absents : il n'y a pas de
+scène à nommer.
 
 Le formulaire fonctionne évidemment sans le Visualiseur : sans paramètres,
-`visualizer` est simplement absent.
+`visualizer` est simplement absent de la charge.
 
 ## Pot de miel
 
@@ -263,8 +312,14 @@ sans écran de confirmation fantôme.
 
 ## Recette
 
-Menée sur le WordPress dédié (`localhost:8181`) avec le front de développement
+Menée sur le WordPress dédié avec le front de développement
 (`localhost:5180`).
+
+> Cette recette a été jouée alors que le WordPress était encore servi par le
+> serveur intégré de PHP sur `localhost:8181`. Les adresses relevées à
+> l'époque portent donc ce port ; l'environnement actuel est
+> `http://pose-parquet-dev.local`, servi par Apache. Les résultats, eux, n'ont
+> pas changé — le lot 5.1 a rejoué le parcours sur le nouvel hôte.
 
 | Cas | Résultat |
 |---|---|

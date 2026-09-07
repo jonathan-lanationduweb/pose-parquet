@@ -4,7 +4,7 @@
  * les en-têtes effectivement envoyés (CORS, preflight) et le comportement du
  * serveur face aux méthodes.
  *
- *   php tests/run-http.php http://127.0.0.1:8181
+ *   php tests/run-http.php http://pose-parquet-dev.local
  *
  * Sans WordPress chargé : le script est un client. Il crée une demande (201)
  * puis la signale pour nettoyage par run-projects (préfixe « HttpTest »).

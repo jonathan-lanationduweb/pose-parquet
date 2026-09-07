@@ -111,14 +111,20 @@ export function visualizerFromParams(params) {
    * `config` : le récapitulatif de ce que le visiteur a essayé, en clair, pour
    * que l'équipe le relise sans ouvrir le Studio. Quelques dizaines d'octets.
    *
-   * Le nom commercial y figure quand on le connaît. C'est le seul endroit de
-   * la charge où il a sa place : `productId` identifie, `nom` se lit. La fiche
-   * d'administration, elle, affiche les identifiants — elle ne connaît pas le
-   * catalogue du front, et ce n'est pas à elle de le devenir.
+   * Les noms humains — `nomScene` pour la pièce, `nom` pour le parquet — y
+   * figurent quand on les connaît, et c'est leur seule place dans la charge :
+   * `sceneId` et `productId` identifient, ces deux-là se lisent. C'est ce qui
+   * permet à la fiche d'administration d'écrire « Séjour et salle à manger ·
+   * Chêne Fumé » sans que le serveur ait à recopier le catalogue du front.
+   *
+   * Ce sont des INSTANTANÉS : ce que le visiteur avait sous les yeux ce
+   * jour-là. Une référence renommée plus tard ne réécrit pas les demandes
+   * déjà envoyées, et c'est le comportement voulu pour une trace commerciale.
    */
   v.config = {
     origine: 'studio',
     ...(v.sceneId ? { scene: v.sceneId } : {}),
+    ...(lu.sceneLabel ? { nomScene: lu.sceneLabel } : {}),
     ...(v.productId ? { produit: v.productId } : {}),
     ...(lu.productLabel ? { nom: lu.productLabel } : {}),
     ...(v.pattern ? { motif: v.pattern } : {}),

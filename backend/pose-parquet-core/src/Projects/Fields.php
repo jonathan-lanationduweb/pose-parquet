@@ -49,6 +49,28 @@ final class Fields {
 	/** Taille maximale, en octets JSON, de `visualizer.config`. */
 	public const MAX_VISUALIZER_CONFIG_BYTES = 4096;
 
+	/**
+	 * Longueur maximale d'une chaîne à l'intérieur de `visualizer.config`.
+	 *
+	 * `config` est un carnet libre : le serveur n'en connaît pas la forme et
+	 * n'a pas à la connaître. Il en borne quand même chaque chaîne, parce
+	 * qu'une valeur libre reste une valeur envoyée par un navigateur. Cent
+	 * vingt caractères couvrent largement le nom d'une scène ou d'une
+	 * référence — la plus longue du catalogue de démonstration en fait 45 — et
+	 * le front applique la même limite de son côté.
+	 */
+	public const MAX_VISUALIZER_TEXT = 120;
+
+	/**
+	 * Profondeur maximale de `visualizer.config`.
+	 *
+	 * Deux niveaux suffisent à un récapitulatif plat. La limite existe pour que
+	 * le nettoyage récursif ne puisse pas être occupé par un objet imbriqué
+	 * mille fois : la borne d'octets seule n'y suffirait pas, un JSON très
+	 * profond tenant dans très peu de place.
+	 */
+	public const MAX_VISUALIZER_DEPTH = 3;
+
 	/** Listes fermées : nom API → valeurs acceptées. */
 	public const ENUMS = [
 		'zone'             => [ self::ZONE_IDF, self::ZONE_AUTRE ],

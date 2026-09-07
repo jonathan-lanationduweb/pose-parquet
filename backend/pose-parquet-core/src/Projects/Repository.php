@@ -65,7 +65,13 @@ final class Repository {
 				$formats[]          = '%d';
 			}
 			if ( isset( $v['config'] ) ) {
-				// Stocké tel quel, jamais lu par le serveur : c'est un carnet, pas une commande.
+				/*
+				 * Carnet du front, nettoyé par le validateur avant d arriver ici.
+				 * Le serveur n en impose pas la forme, mais il n est plus vrai qu il
+				 * ne le lit jamais : depuis les libellés d affichage, la fiche
+				 * d administration y cherche `nomScene` et `nom` pour nommer la
+				 * scène et le parquet. Deux clés connues dans un carnet libre.
+				 */
 				$row['visualizer_config'] = wp_json_encode( $v['config'] );
 				$formats[]                = '%s';
 			}

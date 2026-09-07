@@ -151,11 +151,35 @@ final class Projects {
 	 * quel parquet, quel motif, quelle orientation — et on dit s'il y a une
 	 * configuration détaillée, sans la dérouler.
 	 *
+	 * ## Libellés plutôt qu'identifiants
+	 *
+	 * `scene_id` et `product_id` restent la vérité technique et ne bougent
+	 * pas. Mais « sejour » et « chene-fume » ne se disent pas au téléphone :
+	 * quand le front a joint le nom humain — « Séjour et salle à manger »,
+	 * « Chêne Fumé » — c'est lui qu'on affiche, l'identifiant venant ensuite
+	 * entre parenthèses pour qui en a besoin.
+	 *
+	 * Ces noms sont un INSTANTANÉ pris au moment de l'envoi, lu dans
+	 * `visualizer_config`. Le plugin ne recopie pas le catalogue du front et
+	 * n'a aucune table de correspondance : il ne saurait pas traduire un
+	 * identifiant, et surtout il ne le saurait plus le jour où une référence
+	 * est renommée. Une demande garde donc ce que le visiteur voyait, pas ce
+	 * que le catalogue dit aujourd'hui.
+	 *
+	 * Les demandes antérieures à ce mécanisme n'ont pas de libellé : elles
+	 * affichent leur identifiant, et rien n'est réécrit pour leur en inventer
+	 * un.
+	 *
 	 * @param array<string,mixed> $project
 	 * @return array<string,string> vide si le visiteur n'a pas utilisé le Visualiseur
 	 */
 	private static function visualizer_view( array $project ): array {
-		$lignes = [];
+		$lignes  = [];
+		$carnet  = self::visualizer_config( $project );
+		$libelle = static function ( string $cle ) use ( $carnet ): string {
+			$valeur = $carnet[ $cle ] ?? '';
+			return is_string( $valeur ) ? trim( $valeur ) : '';
+		};
 
 		/*
 		 * « Scène » et non « Pièce » : la section Projet porte déjà un champ
@@ -163,11 +187,13 @@ final class Projects {
 		 * chambre…). Deux champs du même nom sur un même écran, avec deux sens
 		 * différents, est le genre de détail qui fait douter de tout le reste.
 		 */
-		if ( (string) ( $project['scene_id'] ?? '' ) !== '' ) {
-			$lignes[ __( 'Scène', 'pose-parquet-core' ) ] = (string) $project['scene_id'];
+		$scene_id = (string) ( $project['scene_id'] ?? '' );
+		if ( $scene_id !== '' ) {
+			$lignes[ __( 'Scène', 'pose-parquet-core' ) ] = self::nom_ou_identifiant( $libelle( 'nomScene' ), $scene_id );
 		}
-		if ( (string) ( $project['product_id'] ?? '' ) !== '' ) {
-			$lignes[ __( 'Produit', 'pose-parquet-core' ) ] = (string) $project['product_id'];
+		$product_id = (string) ( $project['product_id'] ?? '' );
+		if ( $product_id !== '' ) {
+			$lignes[ __( 'Produit', 'pose-parquet-core' ) ] = self::nom_ou_identifiant( $libelle( 'nom' ), $product_id );
 		}
 		$motif = View::label( 'pattern', $project['pattern'] ?? '' );
 		if ( $motif !== '' ) {
@@ -179,6 +205,48 @@ final class Projects {
 		}
 
 		return $lignes;
+	}
+
+	/**
+	 * Le carnet `visualizer_config` d'une demande, décodé sans confiance.
+	 *
+	 * Un JSON illisible — tronqué par une migration, écrit par une version
+	 * plus ancienne, saisi à la main en base — ne doit pas faire tomber la
+	 * fiche. On rend un tableau vide et la fiche se replie sur les
+	 * identifiants : une information manquante vaut mieux qu'un écran blanc.
+	 *
+	 * @param array<string,mixed> $project
+	 * @return array<string,mixed>
+	 */
+	private static function visualizer_config( array $project ): array {
+		$brut = (string) ( $project['visualizer_config'] ?? '' );
+		if ( $brut === '' ) {
+			return [];
+		}
+
+		$decode = json_decode( $brut, true );
+
+		return is_array( $decode ) ? $decode : [];
+	}
+
+	/**
+	 * Le nom humain s'il existe, l'identifiant sinon.
+	 *
+	 * Quand les deux sont là, l'identifiant suit entre parenthèses : il reste
+	 * la clé qui permet de retrouver la scène ou la référence, et le masquer
+	 * entièrement obligerait à ouvrir la base pour la lire. Il passe au second
+	 * plan, il ne disparaît pas.
+	 *
+	 * Aucun échappement ici : la valeur rendue traverse `esc_html()` dans le
+	 * gabarit, et échapper deux fois afficherait les entités en clair.
+	 */
+	private static function nom_ou_identifiant( string $nom, string $identifiant ): string {
+		if ( $nom === '' ) {
+			return $identifiant;
+		}
+
+		/* translators: 1 : nom lisible, 2 : identifiant technique. */
+		return sprintf( __( '%1$s (%2$s)', 'pose-parquet-core' ), $nom, $identifiant );
 	}
 
 	/**

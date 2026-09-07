@@ -13,11 +13,26 @@
  *
  * ## La convention
  *
- *   piece        identifiant de la scène        sejour
- *   parquet      identifiant du produit         chene-fume
- *   libelle      nom commercial, pour l'humain  Chêne Fumé
- *   motif        motif de pose                  point-de-hongrie
- *   orientation  angle du rendu, en degrés      90
+ *   piece          identifiant de la scène        sejour
+ *   libelle-piece  nom de la scène, pour l'humain Séjour et salle à manger
+ *   parquet        identifiant du produit         chene-fume
+ *   libelle        nom commercial, pour l'humain  Chêne Fumé
+ *   motif          motif de pose                  point-de-hongrie
+ *   orientation    angle du rendu, en degrés      90
+ *
+ * ## Pourquoi des libellés en plus des identifiants
+ *
+ * Les identifiants sont la vérité technique et ne bougent pas ; ils partent
+ * dans `scene_id` et `product_id`, et rien ne les remplace. Les libellés sont
+ * un **instantané d'affichage** : ils disent ce que le visiteur avait sous les
+ * yeux au moment de son envoi. Une référence renommée l'an prochain, une
+ * scène retitrée, un produit retiré du catalogue — la demande, elle, garde son
+ * libellé d'origine. C'est ce qui permet à une fiche commerciale de rester
+ * lisible des mois plus tard sans dépendre d'un catalogue que le serveur ne
+ * connaît pas.
+ *
+ * Le corollaire : un libellé venu du navigateur n'est pas une donnée de
+ * confiance. Le serveur le borne, le nettoie et l'échappe à l'affichage.
  *
  * `parquet` porte l'IDENTIFIANT, jamais le libellé. Ce n'est pas un choix
  * nouveau : les liens profonds qui ouvrent le Studio depuis la page
@@ -43,14 +58,32 @@
  * `installationType`.
  */
 
-/** Noms des paramètres d'URL. La seule liste qui fasse foi. */
+/**
+ * Noms des paramètres d'URL. La seule liste qui fasse foi.
+ *
+ * `label` porte le nom du PRODUIT et garde son nom court : il existait avant
+ * le libellé de scène et des demandes déjà enregistrées s'y réfèrent. Le
+ * renommer par symétrie aurait cassé la lecture de ces demandes pour la seule
+ * satisfaction d'une table alignée.
+ */
 export const PARAMS = {
   scene: 'piece',
+  sceneLabel: 'libelle-piece',
   product: 'parquet',
   label: 'libelle',
   pattern: 'motif',
   angle: 'orientation',
 };
+
+/**
+ * Longueur maximale d'un libellé, en caractères.
+ *
+ * Cent vingt : « Point de Hongrie Couronne Impériale 92x15x520 », la référence
+ * la plus longue du catalogue, en fait 45. Le plafond laisse donc largement la
+ * place à un nom commercial bavard tout en refusant qu'une URL fabriquée à la
+ * main serve à gonfler la charge. Le serveur applique la même limite.
+ */
+export const MAX_LIBELLE = 120;
 
 /** Motifs de pose que le Visualiseur sait rendre. */
 export const MOTIFS = new Set(['lames', 'point-de-hongrie', 'baton-rompu']);
@@ -83,21 +116,33 @@ export function estIdentifiant(valeur) {
  * fiche savent tous les deux se passer d'une information, pas se méfier d'une
  * information inventée.
  *
+ * Un libellé n'est écrit qu'accompagné de son identifiant : un nom seul ne
+ * désigne rien de vérifiable, et le stocker donnerait à la fiche un air de
+ * précision qu'elle n'aurait pas.
+ *
  * @param {object} etat
  * @param {string|null} [etat.sceneId]      identifiant de la scène ouverte
+ * @param {string|null} [etat.sceneLabel]   nom de la scène ouverte
  * @param {string|null} [etat.productId]    identifiant du parquet actif
  * @param {string|null} [etat.productLabel] nom commercial du parquet actif
  * @param {string|null} [etat.pattern]      motif de pose
  * @param {number|null} [etat.angle]        angle du rendu, en degrés
  * @returns {URLSearchParams}
  */
-export function buildHandoffParams({ sceneId, productId, productLabel, pattern, angle } = {}) {
+export function buildHandoffParams({ sceneId, sceneLabel, productId, productLabel, pattern, angle } = {}) {
   const params = new URLSearchParams();
 
-  if (estIdentifiant(sceneId)) params.set(PARAMS.scene, sceneId);
+  const propre = (v) => (typeof v === 'string' ? v.trim().slice(0, MAX_LIBELLE) : '');
+
+  if (estIdentifiant(sceneId)) {
+    params.set(PARAMS.scene, sceneId);
+    const nom = propre(sceneLabel);
+    if (nom) params.set(PARAMS.sceneLabel, nom);
+  }
+
   if (estIdentifiant(productId)) params.set(PARAMS.product, productId);
 
-  const libelle = typeof productLabel === 'string' ? productLabel.trim() : '';
+  const libelle = propre(productLabel);
   if (libelle) params.set(PARAMS.label, libelle);
 
   if (MOTIFS.has(pattern)) params.set(PARAMS.pattern, pattern);
@@ -120,15 +165,17 @@ export function buildHandoffParams({ sceneId, productId, productLabel, pattern, 
  * une panne.
  *
  * @param {URLSearchParams} params
- * @returns {{sceneId: string|null, productId: string|null, productLabel: string|null,
- *            pattern: string|null, angle: number|null, present: boolean}}
+ * @returns {{sceneId: string|null, sceneLabel: string|null, productId: string|null,
+ *            productLabel: string|null, pattern: string|null, angle: number|null,
+ *            present: boolean}}
  */
 export function readHandoffParams(params) {
   const lire = (nom) => (params.get(nom) || '').trim();
 
   const scene = lire(PARAMS.scene);
+  const nomScene = lire(PARAMS.sceneLabel).slice(0, MAX_LIBELLE);
   const produit = lire(PARAMS.product);
-  const libelle = lire(PARAMS.label);
+  const libelle = lire(PARAMS.label).slice(0, MAX_LIBELLE);
   const motif = lire(PARAMS.pattern);
   const angleBrut = params.get(PARAMS.angle);
 
@@ -140,6 +187,9 @@ export function readHandoffParams(params) {
 
   const lecture = {
     sceneId: estIdentifiant(scene) ? scene : null,
+    // Un libellé sans identifiant valide n'est pas retenu : il ne pourrait
+    // que décorer une donnée absente.
+    sceneLabel: estIdentifiant(scene) && nomScene ? nomScene : null,
     productId: estIdentifiant(produit) ? produit : null,
     productLabel: libelle || null,
     pattern: MOTIFS.has(motif) ? motif : null,
@@ -152,9 +202,9 @@ export function readHandoffParams(params) {
    * un ancien lien, ou avec un produit que le catalogue ne connaît plus, vient
    * bel et bien du Studio, et le formulaire doit le lui dire.
    */
-  lecture.present = Boolean(scene || produit || libelle || motif || angleBrut);
+  lecture.present = Boolean(scene || nomScene || produit || libelle || motif || angleBrut);
 
   return lecture;
 }
 
-export default { PARAMS, MOTIFS, ANGLES, estIdentifiant, buildHandoffParams, readHandoffParams };
+export default { PARAMS, MOTIFS, ANGLES, MAX_LIBELLE, estIdentifiant, buildHandoffParams, readHandoffParams };
