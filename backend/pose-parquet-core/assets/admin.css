@@ -1,0 +1,224 @@
+/*
+ * Feuille de style des écrans « Demandes ».
+ *
+ * Volontairement courte, et posée SUR les styles de l'administration
+ * WordPress plutôt qu'à leur place : les tableaux gardent `wp-list-table`, les
+ * boutons `button-primary`, les onglets `subsubsub`. On n'ajoute que ce qui
+ * manque — une grille pour la fiche, des pastilles de statut, et le repli des
+ * colonnes secondaires en petite largeur.
+ *
+ * Aucune police, aucune couleur de marque : cette interface appartient à
+ * WordPress, et un gestionnaire ne doit pas avoir à réapprendre où sont les
+ * choses.
+ */
+
+/* ---- Liste ---- */
+
+/*
+ * `clear: both` n'est pas décoratif : c'est la correction d'un débordement.
+ *
+ * Les onglets de filtre portent la classe WordPress `subsubsub`, que
+ * l'administration met en `float: left`. Un conteneur flex placé à côté d'un
+ * flottant ne le chevauche pas : il se range à côté, et sa largeur disponible
+ * tombe à ce qui reste. Les onglets prenant toute la ligne, il restait zéro.
+ * Mesuré à 768 × 1024 : `.pp-search` faisait 0 px de large, posé au bord droit
+ * du contenu, et son bouton de 191 px sortait du cadre — 164 px de
+ * débordement horizontal. Le champ de recherche était réduit à 26 px.
+ *
+ * En dégageant le flottant, le formulaire retrouve sa ligne et sa largeur.
+ */
+.pp-admin .pp-search {
+	clear: both;
+	margin: 0.75rem 0 0.25rem;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+}
+.pp-admin .pp-search input[type="search"] {
+	min-width: 18rem;
+	max-width: 100%;
+}
+
+.pp-admin .pp-filters {
+	margin-bottom: 0.25rem;
+}
+
+.pp-admin .pp-table .pp-ref {
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+/* Deuxième ligne d'une cellule : l'email sous le nom, la date sous l'auteur. */
+.pp-admin .pp-sub {
+	display: block;
+	color: #646970;
+	font-size: 0.85em;
+}
+.pp-admin p .pp-sub,
+.pp-admin .pp-note-head .pp-sub,
+.pp-admin .pp-history .pp-sub {
+	display: inline;
+}
+
+/* Pastille de statut. Le fond reste neutre : sept couleurs vives sur une liste
+   de vingt lignes, c'est un sapin de Noël, pas une information. Seuls les deux
+   états qui terminent une demande sont grisés, et « spam » barré. */
+.pp-admin .pp-status {
+	display: inline-block;
+	padding: 0.1em 0.6em;
+	border: 1px solid #c3c4c7;
+	border-radius: 999px;
+	background: #f6f7f7;
+	font-size: 0.85em;
+	white-space: nowrap;
+}
+.pp-admin .pp-status--new {
+	border-color: #2271b1;
+	background: #f0f6fc;
+	font-weight: 600;
+}
+.pp-admin .pp-status--to_contact {
+	border-color: #bd8600;
+	background: #fcf9e8;
+}
+.pp-admin .pp-status--completed,
+.pp-admin .pp-status--lost {
+	color: #646970;
+}
+.pp-admin .pp-status--spam {
+	color: #646970;
+	text-decoration: line-through;
+}
+
+.pp-admin .pp-mail-flag {
+	display: block;
+	color: #b32d2e;
+	font-size: 0.8em;
+}
+
+/*
+ * Repli en petite largeur.
+ *
+ * Sous 900 px, les quatre colonnes secondaires — téléphone, ville, surface,
+ * projet — disparaissent. Restent Référence, Date, Client et Statut : de quoi
+ * reconnaître une demande et l'ouvrir. Le reste est sur la fiche, à un clic,
+ * et vaut mieux que huit colonnes de six caractères.
+ */
+@media (max-width: 900px) {
+	.pp-admin .pp-col-secondary {
+		display: none;
+	}
+	.pp-admin .pp-search input[type="search"] {
+		min-width: 0;
+		flex: 1 1 12rem;
+	}
+}
+
+/* ---- Fiche ---- */
+
+.pp-detail .pp-ref-title {
+	font-variant-numeric: tabular-nums;
+	color: #646970;
+}
+
+.pp-detail .pp-meta {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin: 0.5rem 0 1rem;
+}
+
+.pp-detail .pp-cols {
+	display: grid;
+	grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+	gap: 1rem;
+	align-items: start;
+}
+@media (max-width: 960px) {
+	.pp-detail .pp-cols {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+.pp-detail .pp-card {
+	margin-bottom: 1rem;
+	padding: 0.25rem 1rem 1rem;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	background: #fff;
+}
+.pp-detail .pp-card--quiet {
+	background: #f6f7f7;
+}
+.pp-detail .pp-card h2 {
+	font-size: 1rem;
+	margin: 0.9rem 0 0.4rem;
+}
+.pp-detail .pp-card h3 {
+	font-size: 0.9rem;
+	margin: 1rem 0 0.3rem;
+}
+
+/*
+ * Les champs sont une liste de définitions, pas un tableau : ce sont des
+ * paires libellé/valeur, et un lecteur d'écran les annonce correctement.
+ */
+.pp-detail .pp-fields {
+	margin: 0;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+	gap: 0.5rem 1.5rem;
+}
+.pp-detail .pp-field dt {
+	margin: 0;
+	color: #646970;
+	font-size: 0.85em;
+}
+.pp-detail .pp-field dd {
+	margin: 0;
+}
+
+.pp-detail .pp-message {
+	margin: 0;
+	padding: 0.6rem 0.8rem;
+	border-left: 3px solid #c3c4c7;
+	background: #f6f7f7;
+}
+
+.pp-detail .pp-status-form label,
+.pp-detail .pp-note-form label {
+	display: block;
+	margin-bottom: 0.2rem;
+}
+.pp-detail .pp-status-form select {
+	width: 100%;
+	margin-bottom: 0.6rem;
+}
+.pp-detail .pp-note-form textarea {
+	width: 100%;
+	margin-bottom: 0.5rem;
+}
+
+.pp-detail .pp-notes,
+.pp-detail .pp-history {
+	margin: 0.5rem 0 0;
+	padding: 0;
+	list-style: none;
+}
+.pp-detail .pp-notes > li,
+.pp-detail .pp-history > li {
+	padding: 0.5rem 0;
+	border-top: 1px solid #f0f0f1;
+}
+.pp-detail .pp-notes > li:first-child,
+.pp-detail .pp-history > li:first-child {
+	border-top: 0;
+}
+.pp-detail .pp-note-head,
+.pp-detail .pp-history-line {
+	margin: 0 0 0.2rem;
+}
+.pp-detail .pp-note-body {
+	margin: 0;
+}

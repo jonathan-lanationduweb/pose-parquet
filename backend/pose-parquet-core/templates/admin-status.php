@@ -18,7 +18,7 @@ $oui_non = static fn( bool $ok ): string => $ok
 ?>
 <div class="wrap">
 	<h1><?php esc_html_e( 'Pose Parquet — État du plugin', 'pose-parquet-core' ); ?></h1>
-	<p><?php esc_html_e( 'Fondation backend. Les écrans de gestion des demandes arrivent avec les lots suivants ; cette page montre ce qui est réellement installé.', 'pose-parquet-core' ); ?></p>
+	<p><?php esc_html_e( 'Page de diagnostic technique : ce que le plugin a réellement installé. Le travail quotidien se fait dans « Demandes ».', 'pose-parquet-core' ); ?></p>
 
 	<table class="widefat striped" style="max-width:40rem">
 		<tbody>
@@ -84,12 +84,36 @@ $oui_non = static fn( bool $ok ): string => $ok
 		?>
 	</p>
 
+	<h2><?php esc_html_e( 'Rôle gestionnaire', 'pose-parquet-core' ); ?></h2>
+	<?php if ( ! $state['manager_role'] ) : ?>
+		<p><?php echo $oui_non( false ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php esc_html_e( 'le rôle « Gestionnaire Pose Parquet » n’existe pas.', 'pose-parquet-core' ); ?></p>
+	<?php else : ?>
+		<table class="widefat striped" style="max-width:40rem">
+			<tbody>
+				<?php foreach ( $state['manager_caps'] as $cap => $ok ) : ?>
+					<tr><th scope="row"><code><?php echo esc_html( $cap ); ?></code></th><td><?php echo $oui_non( $ok ); // phpcs:ignore WordPress.Security.EscapeOutput ?></td></tr>
+				<?php endforeach; ?>
+			</tbody>
+		</table>
+		<p class="description"><?php esc_html_e( 'Lecture et traitement des demandes, sans accès aux réglages.', 'pose-parquet-core' ); ?></p>
+	<?php endif; ?>
+
 	<h2><?php esc_html_e( 'Demandes', 'pose-parquet-core' ); ?></h2>
 	<p>
 		<?php
 		/* translators: %d : nombre de demandes en base. */
 		echo esc_html( sprintf( _n( '%d demande enregistrée.', '%d demandes enregistrées.', (int) $state['projects_count'], 'pose-parquet-core' ), (int) $state['projects_count'] ) );
 		?>
-		<?php esc_html_e( 'La liste et les fiches arrivent avec le lot 4.', 'pose-parquet-core' ); ?>
 	</p>
+	<table class="widefat striped" style="max-width:40rem">
+		<tbody>
+			<?php foreach ( $state['statuses'] as $value => $label ) : ?>
+				<tr>
+					<th scope="row"><?php echo esc_html( $label ); ?></th>
+					<td><?php echo esc_html( number_format_i18n( (int) ( $state['counts_by_status'][ $value ] ?? 0 ) ) ); ?></td>
+				</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+	<p><a href="<?php echo esc_url( $state['projects_admin'] ); ?>"><?php esc_html_e( 'Ouvrir la liste des demandes', 'pose-parquet-core' ); ?></a></p>
 </div>

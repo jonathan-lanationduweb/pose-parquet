@@ -8,7 +8,7 @@ HTML/CSS/JS appelle. Le front reste dans le dépôt, indépendant, déployé à 
 front (statique)  →  REST /wp-json/pose-parquet/v1/…  →  ce plugin  →  tables pp_*
 ```
 
-## Ce que contient la version 0.3.0
+## Ce que contient la version 0.4.0
 
 Fondation (0.1.0) :
 
@@ -49,6 +49,29 @@ Emails et anti-spam (0.3.0) :
   `429` et `Retry-After` ; aucune adresse IP stockée ni journalisée ;
 - pipeline unique `Projects\SubmissionService` : anti-spam → validation →
   écriture → emails.
+
+Administration des demandes (0.4.0) — **schéma inchangé (3)** :
+
+- menu « Pose Parquet » → **Demandes** (l'entrée parente), **Réglages**,
+  **État** ; l'écran de travail s'ouvre par défaut, « État » descend en
+  dernier et reste sur `pp_manage_settings` ;
+- liste paginée de vingt, ordonnée `created_at DESC, id DESC`, avec les sept
+  filtres de statut et leurs compteurs, et une recherche sur référence,
+  prénom, nom, email, téléphone, ville et département ;
+- fiche métier : client avec `mailto:` et `tel:`, projet, message, Visualiseur
+  rendu lisible (jamais le JSON brut), notes internes, statut, états des
+  emails, historique, acquisition. Les champs facultatifs vides ne sont pas
+  affichés ;
+- changement de statut en **POST** sur `admin-post.php`, avec capability puis
+  nonce puis redirection ; historique automatique, aucun événement quand le
+  statut ne change pas ; **refus de l'écrasement concurrent** par
+  `expected_status`, porté jusque dans le `WHERE` de l'UPDATE ;
+- notes internes en texte brut, 5 000 caractères, auteur = utilisateur
+  connecté, **ni modifiables ni supprimables** ;
+- rôle **« Gestionnaire Pose Parquet »** : `read`, `pp_view_projects`,
+  `pp_manage_projects`, et rien d'autre ;
+- aucune route REST d'administration, aucun fichier JavaScript, aucune
+  suppression de demande, aucune action groupée.
 
 Pas encore : écrans de gestion des demandes, connexion du formulaire public,
 Turnstile. Voir `docs/backend/roadmap.md` à la racine du dépôt.
@@ -94,10 +117,11 @@ src/Mail/               Mailer, Notifier, InternalNotification, VisitorConfirmat
                         Template, Labels
 src/Security/           Capabilities
 src/Rest/               Routes, HealthController, ProjectsController, FormTokenController, Cors
-src/Admin/              Menu (États), Settings (Réglages)
+src/Admin/              Menu, Projects (liste + fiche), Actions, Notices, View, Settings
 src/Support/            Logger (sans donnée personnelle)
+assets/admin.css        styles des écrans Demandes
 templates/              gabarits d'administration et d'email (templates/mail/)
-tests/                  quatre suites (voir ci-dessous)
+tests/                  cinq suites (voir ci-dessous)
 uninstall.php           suppression prudente
 ```
 
@@ -115,6 +139,10 @@ php tests/run-http.php http://127.0.0.1:8181   HTTP réel : /form-token, preflig
 php tests/run-projects.php <wp>           POST réel, emails simulés, réglages, gabarits,
                                           jeton, pot de miel, limite de débit, 503,
                                           migration 1→3, concurrence (6 processus)
+php tests/run-admin.php <wp>              administration : liste, pagination, filtres,
+                                          recherche, statut, historique, concurrence,
+                                          notes, droits des trois rôles, nonce,
+                                          échappement, 1000 demandes chronométrées
 ```
 
 `run-http.php` suppose un serveur HTTP devant le WordPress (par exemple
@@ -123,9 +151,14 @@ qui nettoie ses demandes et ses compteurs de débit.
 
 Aucun email réel n'est envoyé : les tests court-circuitent `wp_mail()` par le
 filtre `pre_wp_mail`, ce qui permet de lire destinataire, sujet, en-têtes et
-corps, et de simuler un échec. Résultat au 4 septembre 2026 : 134 + 57 + 45 +
-227, soit 463 vérifications, aucun échec. Un `php -l` sur chaque fichier fait
-office de vérification statique.
+corps, et de simuler un échec. `run-admin.php` fait de même pour les sorties
+de l'administration : deux filtres, `wp_redirect` et `wp_die_handler`, lèvent
+une exception au lieu de terminer le processus, ce qui permet d'appeler les
+vraies poignées d'écriture avec leur `$_POST` et leur nonce.
+
+Résultat au 7 septembre 2026 : 134 + 57 + 45 + 227 + 202, soit **665
+vérifications**, aucun échec. Un `php -l` sur chaque fichier fait office de
+vérification statique.
 
 ## Développement
 
