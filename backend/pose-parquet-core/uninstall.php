@@ -27,10 +27,14 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 require_once __DIR__ . '/src/Security/Capabilities.php';
+require_once __DIR__ . '/src/Security/Roles.php';
 require_once __DIR__ . '/src/Database/Installer.php';
 require_once __DIR__ . '/src/Database/Schema.php';
 
 PoseParquet\Core\Security\Capabilities::remove_all();
+// Le rôle gestionnaire disparaît avec les capabilities qu'il portait : le
+// laisser derrière nous donnerait un rôle qui référence des droits inexistants.
+PoseParquet\Core\Security\Roles::remove();
 
 delete_option( PoseParquet\Core\Database\Installer::OPTION_DB_VERSION );
 delete_option( PoseParquet\Core\Database\Installer::OPTION_INSTALLED_AT );

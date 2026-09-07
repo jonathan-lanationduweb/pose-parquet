@@ -91,20 +91,54 @@ Le reste de l'API WordPress (`/wp/v2/*`) garde le CORS par défaut de
 WordPress : hors périmètre du plugin, et à traiter au niveau du site en
 préproduction (lot 6).
 
+## Écrans d'administration (lot 4)
+
+Ces pages affichent des données personnelles. Sept règles y sont tenues, et
+chacune est vérifiée par `tests/run-admin.php` :
+
+- **Capability à l'affichage, pas seulement au menu.** La capability passée à
+  `add_menu_page()` masque un lien ; elle n'interdit pas l'URL. Chaque page
+  revérifie la sienne et rend un 403. Un abonné qui tape
+  `admin.php?page=pose-parquet` ne reçoit aucune donnée.
+- **Écritures en POST uniquement**, vers `admin-post.php`, sur `admin_post_*`
+  — sans variante `nopriv`, donc la poignée n'existe pas pour un visiteur non
+  connecté : mesuré, un POST sans session reçoit un 400 et la base ne bouge
+  pas. Un changement de statut atteignable par un lien serait déclenché par un
+  prefetch de navigateur ou une image dans un email.
+- **Nonce propre à la demande** : `check_admin_referer( 'pp_update_status_123' )`.
+  Un nonce valide mais émis pour une autre demande est refusé. Testé absent,
+  invalide, et emprunté à une autre fiche — aucune écriture dans les trois cas.
+- **Capability avant nonce** : un abonné muni d'un nonce valide est refusé.
+- **Sortie échappée** partout : `esc_html`, `esc_attr`, `esc_url`. Une demande
+  dont la ville vaut `"><img src=x onerror=…>` s'affiche en texte inerte ; les
+  notes, elles, n'ont plus de balise du tout, retirée à l'enregistrement.
+- **Aucune phrase dans l'URL** : la redirection ne porte qu'un **code**
+  (`pp_notice=status_updated`), traduit côté serveur. Un code inconnu ne
+  produit aucun message. Personne ne peut faire dire ce qu'il veut à
+  l'administration en envoyant un lien.
+- **Identifiant interne dans l'URL**, jamais de donnée personnelle :
+  `?page=pose-parquet&project=123`.
+
+Le rôle `pose_parquet_manager` ne porte que `read`, `pp_view_projects` et
+`pp_manage_projects`. Pas `pp_manage_settings` : les réglages commandent
+l'adresse de réception des demandes, donc l'acheminement des emails.
+
 ## Où vivent les données personnelles
 
 L'email interne contient les coordonnées du prospect : c'est sa fonction, et
 c'est le seul endroit hors base où elles circulent. Elles ne sont copiées **ni**
 dans le journal, **ni** dans une option, **ni** dans l'historique de statut,
-**ni** dans un transient d'anti-spam. Les colonnes d'état des emails ne
-portent qu'un mot et une date.
+**ni** dans les notes internes, **ni** dans un transient d'anti-spam. Les
+colonnes d'état des emails ne portent qu'un mot et une date.
+
+Les actions d'administration journalisent `project_id`, `user_id`,
+`status_before`, `status_after`, `action`, `error_code` — jamais un nom, un
+email, un téléphone, ni le contenu d'une note.
 
 ## Règles pour les lots suivants
 
 - Turnstile si le bruit le justifie (lot 6) : un contrôle de plus dans
   `Antispam\Guard`, sans toucher au reste.
-- Actions d'administration : nonce WordPress (`X-WP-Nonce` en REST),
-  capabilities `pp_view_projects` / `pp_manage_projects`.
 - Jamais de JWT ni de jeton en `localStorage` : authentification native.
 - Données personnelles : durée de conservation et purge à décider avant la
   mise en production (RGPD), à documenter ici.

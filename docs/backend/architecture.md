@@ -28,7 +28,15 @@ dépendre d'ACF, WooCommerce ou d'un constructeur de pages.
 ## Périmètre du plugin (à terme)
 
 Demandes de projet, statuts, notes, historique, emails, anti-spam, réglages,
-permissions, API REST publique (dépôt d'une demande) et privée (administration).
+permissions, API REST publique (dépôt d'une demande) et écrans
+d'administration.
+
+L'API REST est **publique seulement**. Aucune route d'administration n'a été
+créée au lot 4, et ce n'est pas un report : les écrans sont du PHP côté
+serveur, ils appellent directement la couche métier, et une route privée
+n'aurait fait qu'ajouter une surface d'authentification pour rendre le même
+service. Le jour où un client hors WordPress en aura besoin, la règle est
+posée : `permission_callback` avec `pp_manage_projects`.
 
 ## Le pipeline d'un dépôt public
 
@@ -85,3 +93,16 @@ Un WordPress local dédié (`C:\wamp64\www\pose-parquet-dev`, base
 `pose_parquet_dev`, préfixe `ppdev_`, servi par le serveur PHP intégré sur
 `127.0.0.1:8181`) — jamais un site client. Le préfixe volontairement différent
 de `wp_` fait échouer tout `wp_` codé en dur.
+
+Deux pièges de cet environnement, notés parce qu'ils ont chacun coûté un
+diagnostic :
+
+- **Se connecter par l'hôte que WordPress connaît.** Le site est déclaré sur
+  `localhost:8181` ; une session ouverte sur `127.0.0.1:8181` pose son cookie
+  sur le mauvais domaine et la connexion échoue en silence, en renvoyant sur
+  le formulaire.
+- **Ne jamais nommer une variable `$wp` dans un script de ligne de commande.**
+  Un `$wp` de portée globale écrase l'objet `WP` de WordPress, et
+  `create_initial_taxonomies()` meurt sur « Call to a member function
+  add_query_var() on string » avant même que le script commence. Les suites du
+  dépôt utilisent `$wp_root`, et c'est pour cette raison.

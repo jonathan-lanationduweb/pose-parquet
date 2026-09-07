@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace PoseParquet\Core;
 
+use PoseParquet\Core\Admin\Actions;
 use PoseParquet\Core\Admin\Menu;
 use PoseParquet\Core\Admin\Settings;
 use PoseParquet\Core\Database\Installer;
 use PoseParquet\Core\Rest\Cors;
 use PoseParquet\Core\Rest\Routes;
 use PoseParquet\Core\Security\Capabilities;
+use PoseParquet\Core\Security\Roles;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -40,6 +42,9 @@ final class Plugin {
 
 		// Les droits doivent exister avant que l'admin ou le REST ne les testent.
 		Capabilities::ensure();
+		// Le rôle gestionnaire, pour la même raison : il vit en base et peut avoir
+		// été effacé par un plugin de gestion de rôles ou une restauration.
+		Roles::ensure();
 
 		add_action( 'rest_api_init', [ Routes::class, 'register' ] );
 		// Liste fermée d'origines pour notre espace REST, à la place du CORS permissif de WordPress.
@@ -48,6 +53,13 @@ final class Plugin {
 		if ( is_admin() ) {
 			Menu::register();
 			Settings::register();
+			/*
+			 * Les poignées d'écriture se branchent sur `admin_post_*`, qui passe
+			 * par admin-post.php — donc dans le contexte admin, mais AVANT que
+			 * `is_admin()` ne soit vrai pour une page d'écran. admin-post.php
+			 * définit WP_ADMIN, la condition tient.
+			 */
+			Actions::register();
 		}
 	}
 

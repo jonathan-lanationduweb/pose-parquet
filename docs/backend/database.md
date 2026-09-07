@@ -50,10 +50,32 @@ personnelles. Voir `email.md`.
 `created_at`. Chaque demande créée par l'API a exactement un événement
 initial `NULL → new`, `user_id` 0, daté du même instant que la demande.
 
+Depuis le lot 4, chaque changement de statut fait par l'administration ajoute
+un événement, sous la même transaction que l'UPDATE — un statut qui bouge sans
+trace, ou une trace sans changement, sont deux mensonges différents. **Aucun
+événement n'est écrit quand l'ancien statut égale le nouveau** : un historique
+qui note « new → new » se remplit de bruit et devient illisible.
+
+Le nom de l'auteur n'est jamais copié ici : seul `user_id` y est, et le nom se
+résout depuis `wp_users` à l'affichage. Un utilisateur qui change de nom le
+change partout ; un utilisateur supprimé ne laisse pas son nom dans une table
+métier.
+
 ## `{prefix}pp_project_notes` — notes internes
 
 `id`, `project_id`, `user_id`, `content`, `created_at`, `updated_at`. Index
-`project_id`. Jamais visibles du client. Inutilisée jusqu'au lot 4.
+`project_id`. Jamais visibles du client, jamais servies par une route publique,
+jamais reprises dans un email.
+
+Écrite depuis le lot 4. `content` est du texte brut, retours à la ligne
+conservés, balises retirées à l'enregistrement par `sanitize_textarea_field()`,
+au plus 5 000 caractères. `user_id` est l'utilisateur connecté, lu côté
+serveur : aucun écran ne propose de choisir un auteur.
+
+`updated_at` **reste NULL** : une note ne se modifie pas et ne se supprime pas.
+Une erreur se rectifie par une note de plus, ce qui laisse les deux visibles.
+La colonne est conservée pour le jour où une version ouvrirait l'édition — elle
+dira alors ce qu'elle promet. Voir `admin-projects.md`.
 
 ## Référence d'une demande
 

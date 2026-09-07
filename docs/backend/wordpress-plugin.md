@@ -49,15 +49,26 @@ src/Mail/InternalNotification.php sujet et corps de la notification interne
 src/Mail/VisitorConfirmation.php  sujet et corps de l'accusé de réception
 src/Mail/Template.php             rendu des gabarits, lignes et sections
 src/Mail/Labels.php               libellés français des valeurs codées
+src/Projects/Notes.php            notes internes : nettoyage, bornes, écriture
+src/Projects/StatusService.php    changement de statut : garde de concurrence, historique, transaction
 src/Security/Capabilities.php     3 capabilities, octroi à administrator
+src/Security/Roles.php            rôle « Gestionnaire Pose Parquet »
 src/Rest/Routes.php               espace pose-parquet/v1 : GET /health, GET /form-token, POST /projects
 src/Rest/HealthController.php
 src/Rest/ProjectsController.php   contrôleur mince : corps, tailles, traduction HTTP
 src/Rest/FormTokenController.php  émission du jeton
 src/Rest/Cors.php                 liste fermée d'origines, remplace le CORS WordPress sur l'espace
-src/Admin/Menu.php                menu « Pose Parquet » → pages « État » et « Réglages »
+src/Admin/Menu.php                menu « Pose Parquet » → Demandes, Réglages, État ; feuille de style
+src/Admin/Projects.php            l'écran Demandes : liste et fiche, modèles de vue
+src/Admin/Actions.php             les deux écritures, en POST sur admin-post.php
+src/Admin/Notices.php             codes de message et leurs phrases
+src/Admin/View.php                dates au fuseau du site, libellés, URLs des écrans
 src/Admin/Settings.php            Settings API : destinataire, confirmation visiteur
 src/Support/Logger.php            journal sans donnée personnelle
+assets/admin.css                  styles des écrans Demandes, posés sur ceux de WordPress
+templates/admin-projects-list.php
+templates/admin-projects-detail.php
+templates/admin-projects-missing.php
 templates/admin-status.php
 templates/admin-settings.php
 templates/mail/layout.php         enveloppe commune des emails
@@ -69,6 +80,7 @@ tests/run-foundation.php
 tests/run-projects.php
 tests/concurrency-worker.php      ouvrier lancé en parallèle par run-projects
 tests/run-http.php
+tests/run-admin.php               administration : liste, statut, notes, droits, nonce, 1000 lignes
 uninstall.php
 readme.md
 ```
@@ -99,15 +111,29 @@ Détails : `antispam.md`, `email.md`, `rest-api.md`, `project-form-contract.md`.
 
 ## Administration
 
-Menu **Pose Parquet**, deux pages, toutes deux réservées à
-`pp_manage_settings` :
+Menu **Pose Parquet**, trois pages. Détail complet dans `admin-projects.md`.
 
-- **État** : version du plugin, schéma attendu et installé, tables, droits,
-  statuts, URLs des trois routes, nombre de demandes, adresse de notification
-  configurée ou non, confirmation visiteur activée ou non, et les valeurs
-  d'anti-spam en vigueur. Pas de liste de demandes : lot 4.
-- **Réglages** : adresse de réception des demandes, confirmation automatique
-  au visiteur. Deux réglages, pas vingt.
+- **Demandes** (`pp_view_projects`) — l'entrée parente, donc l'écran qui
+  s'ouvre par défaut. Liste paginée de vingt, sept filtres de statut avec
+  compteurs, recherche sur sept colonnes ; fiche métier avec changement de
+  statut, notes internes, historique et états des emails. Aucun JavaScript.
+- **Réglages** (`pp_manage_settings`) : adresse de réception des demandes,
+  confirmation automatique au visiteur. Deux réglages, pas vingt.
+- **État** (`pp_manage_settings`) : version du plugin, schéma attendu et
+  installé, tables, droits, rôle gestionnaire, statuts et leurs compteurs,
+  URLs des trois routes, adresse de notification configurée ou non,
+  confirmation visiteur, valeurs d'anti-spam en vigueur. Page de diagnostic,
+  rangée en dernier — un gestionnaire ne la voit pas.
+
+Écritures en **POST** vers `admin-post.php`, dans l'ordre capability, nonce,
+données, écriture, redirection (POST → traitement → redirect → GET). Aucune
+route REST d'administration : l'administration PHP appelle directement la
+couche métier.
+
+Un rôle **`pose_parquet_manager`** (« Gestionnaire Pose Parquet ») porte
+`read`, `pp_view_projects` et `pp_manage_projects`, et rien d'autre. Il est
+créé à l'activation et re-complété à chaque chargement, comme les
+capabilities.
 
 ## Activation, désactivation, suppression
 
@@ -127,11 +153,14 @@ après retrait des clés personnelles et techniques (voir `security.md`).
 
 ## Tests
 
-Cinq fichiers, quatre suites, toutes contre un WordPress réel (commandes dans
-le `readme.md` du plugin). Au 4 septembre 2026 : validateur 134, fondation 57,
+Six fichiers, cinq suites, toutes contre un WordPress réel (commandes dans le
+`readme.md` du plugin). Au 7 septembre 2026 : validateur 134, fondation 57,
 WordPress réel 227 (dont emails simulés par `pre_wp_mail`, jeton, pot de miel,
 limite de débit, réglages, gabarits, concurrence 6 × 5 et migration 1 → 3),
-HTTP réel 45 ; aucun échec, 463 vérifications.
+HTTP réel 45, administration 202 (liste, pagination, filtres, recherche,
+statut, historique, concurrence, notes, droits des trois rôles, nonce,
+échappement, mille demandes chronométrées) ; aucun échec,
+**665 vérifications**.
 
 Il n'y a pas de suite PHPUnit : `run-validator.php` joue le rôle des tests
 unitaires (aucune écriture, aucune requête SQL) tout en utilisant les vraies
