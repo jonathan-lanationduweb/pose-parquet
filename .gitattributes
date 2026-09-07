@@ -1,0 +1,70 @@
+# Fins de ligne : LF partout, dans le dépôt ET dans la copie de travail.
+#
+# Pourquoi `eol=lf` et pas seulement `text=auto` : `text=auto` normalise les
+# objets Git en LF mais laisse la copie de travail suivre `core.autocrlf`, qui
+# vaut `true` par défaut sur Git for Windows. Les fichiers arrivaient donc en
+# CRLF sur le disque, et deux choses en découlaient :
+#
+#   1. le générateur hachait ce CRLF : l'empreinte d'un asset dépendait du
+#      système de la personne qui construisait. Mesuré sur ce dépôt — le bundle
+#      `assets/dist/studio.<empreinte>.css` avait des fins de ligne mixtes,
+#      parce que `css/studio-app.css` était en CRLF et les cinq autres feuilles
+#      en LF. Le même commit construit sous Linux donnait un autre nom ;
+#   2. les fichiers produits par le générateur, écrits en LF, paraissaient
+#      modifiés en permanence : Git attendait du CRLF dans la copie de travail
+#      et rendait un `git status` sale à contenu identique.
+#
+# `eol=lf` répond aux deux : la forme canonique est la même sur disque et dans
+# les objets, sur toutes les plateformes, quelle que soit la configuration
+# locale de qui clone.
+#
+# Cette liste est le pendant de `EXTENSIONS_TEXTE` dans `_generator/eol.js`.
+# Les deux doivent rester d'accord : un fichier normalisé par Git mais haché
+# brut par le générateur, ou l'inverse, ramènerait le défaut corrigé ici.
+
+# Par défaut : Git décide texte/binaire par son heuristique, et tout ce qu'il
+# juge texte est stocké et posé en LF.
+* text=auto eol=lf
+
+# Types texte du projet, déclarés explicitement plutôt que devinés.
+*.html   text eol=lf
+*.css    text eol=lf
+*.js     text eol=lf
+*.mjs    text eol=lf
+*.cjs    text eol=lf
+*.json   text eol=lf
+*.webmanifest text eol=lf
+*.xml    text eol=lf
+*.svg    text eol=lf
+*.md     text eol=lf
+*.txt    text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+*.php    text eol=lf
+*.sql    text eol=lf
+
+# Fichiers texte que seul leur nom identifie.
+.gitattributes text eol=lf
+.gitignore     text eol=lf
+.nojekyll      text eol=lf
+
+# Binaires : jamais de normalisation. Un octet 0x0D dans un PNG, une police ou
+# un JPEG n'est pas une fin de ligne, c'est une donnée ; le convertir corrompt
+# le fichier. `-text` le dit à Git de façon explicite, sans dépendre de son
+# heuristique.
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.webp   binary
+*.avif   binary
+*.gif    binary
+*.ico    binary
+*.woff   binary
+*.woff2  binary
+*.ttf    binary
+*.otf    binary
+*.eot    binary
+*.pdf    binary
+*.mp4    binary
+*.webm   binary
+*.zip    binary
