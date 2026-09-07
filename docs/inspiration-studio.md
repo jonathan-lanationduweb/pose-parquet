@@ -489,12 +489,123 @@ pas la pleine résolution. Aucun débordement horizontal sur aucune des deux
 pages, et les huit pastilles mesurent 44 × 203 px, au-dessus du minimum
 tactile.
 
-Une réserve à porter au compte de l'ergonomie et non de ce lot : à **505
+## Le Studio ne tenait pas dans une fenêtre basse
+
+Une réserve relevée à la recette du lot précédent, corrigée depuis : à **505
 pixels de hauteur de fenêtre**, les onglets Parquet / Motif / Orientation
-tombent sous la zone visible, dans un tiroir replié dont la poignée est masquée
-en disposition large. Le visiteur ne peut alors plus changer de motif. Ce n'est
-pas lié aux scènes ; c'est une hauteur de fenêtre inhabituelle, mais elle
-existe.
+tombaient sous la zone visible. Le visiteur ne pouvait plus changer de parquet
+ni de motif sans deviner que cette page-là défile. Mesuré : les trois onglets à
+y 567 pour 505 px de haut.
+
+### La cause : deux seuils de hauteur qui ne s'accordaient pas
+
+`css/studio-app.css` portait deux requêtes de hauteur, écrites à deux moments
+différents, qui ne parlaient pas de la même chose :
+
+| requête | seuil | ce qu'elle fait |
+|---|---|---|
+| repli « laisse défiler » | `max-height: 34rem` (544 px) | dépunaise le panneau et la barre, autorise le défilement de page |
+| mise en page compacte | `max-height: 30rem` (480 px) | deux colonnes, barre flottante, tout tient dans une vue |
+
+Entre 480 et 544 px de hauteur, le repli s'appliquait **sans** que la mise en
+page compacte vienne rattraper les commandes sorties du cadre. 505 px tombe
+pile dans ces soixante-quatre pixels.
+
+Le repli avait par ailleurs un défaut plus profond : **aucune condition de
+largeur**. Il avait été écrit pour la disposition en feuille basse, où le
+panneau est un bandeau `fixed` en bas d'écran. Posé sur la disposition à deux
+colonnes, il faisait l'inverse de ce qu'il visait : il rendait le panneau
+statique avec `max-height: 100svh`, donc le panneau prenait toute la hauteur de
+vue, donc la barre d'actions rendue statique passait dessous.
+
+Or la disposition large tient déjà dans une hauteur quelconque : `.studio` fait
+`100svh` en deux rangées, le panneau est une colonne à défilement interne, la
+barre flotte au-dessus de la scène. Vérifié en neutralisant cette seule requête
+à 1440 × 505 : plus de défilement de page, barre à y 427, canevas de 685 × 457,
+catalogue qui défile chez lui. **Il n'y avait rien à corriger dans la
+disposition large — il y avait à cesser de la casser.**
+
+### La correction
+
+Trois changements, tous dans les requêtes de hauteur ; aucun patch spécifique à
+505 px, aucune touche au moteur de rendu ni au worker.
+
+1. **Le repli est borné en largeur** : `and (max-width: 29.99rem)`. Sous 480 px
+   deux colonnes sont impossibles et le défilement de page redevient la réponse
+   honnête. Au-dessus, il ne s'applique plus.
+2. **La mise en page compacte monte à 34rem**, le même seuil que le repli, et
+   perd `orientation: landscape` qui la privait des fenêtres presque carrées.
+   Les deux seuils sont désormais le même nombre : s'ils doivent bouger, ils
+   bougent ensemble.
+3. **La densification est séparée de la hauteur.** Masquer les libellés et les
+   pastilles de variantes est une affaire de largeur, et ces règles vivaient
+   dans le bloc de hauteur : à 1440 × 505 elles retiraient « Avant / après »,
+   « Comparer » et « Enregistrer » alors que la barre mesure 889 px pour
+   1123 px de scène. Le seuil retenu est mesuré : la barre demande 889 px sur
+   une rangée et dispose de la fenêtre moins 16 px, donc sous 60rem (960 px)
+   elle passe à deux rangées et mange le coin bas de la pièce. C'est ce qui
+   s'est produit au premier essai à 844 × 390, où la seconde rangée ne portait
+   que « Enregistrer ».
+
+Les cibles ne rétrécissent jamais pour résoudre le problème : `min-height`
+n'est touché dans aucun de ces blocs, et `@media (pointer: coarse)` garde ses
+2,75rem au doigt. Vérifié à 767 × 390 avec émulation tactile : onglets et
+actions à **44 px**, libellés masqués. À 1440 × 505 à la souris : 38 px,
+libellés et variantes **affichés**.
+
+### Recette de la hauteur
+
+Toutes les mesures sur `entree-cadree`, panneau ouvert. « barre » est la
+largeur × hauteur de la barre d'actions flottante ; une hauteur au-delà de
+60 px signifie qu'elle a débordé sur une seconde rangée.
+
+| fenêtre | barre | rangées | libellés | onglets | canevas affiché | débordement X / Y |
+|---|---|---|---|---|---|---|
+| 1440 × 900 | 889 × 53 | une | affichés | 3/3 dans la vue | 1123 × 749 | 0 / 0 |
+| 1440 × 505 | 1424 × 51 | une | affichés | 3/3 dans la vue | 604 × 403 | 0 / 0 |
+| 1440 × 450 | 1424 × 51 | une | affichés | 3/3 dans la vue | 521 × 348 | 0 / 0 |
+| 1366 × 505 | 1350 × 51 | une | affichés | 3/3 dans la vue | 604 × 403 | 0 / 0 |
+| 1280 × 505 | 1264 × 51 | une | affichés | 3/3 dans la vue | 604 × 403 | 0 / 0 |
+| 1024 × 505 | 1008 × 51 | une | affichés | 3/3 dans la vue | 604 × 403 | 0 / 0 |
+| 844 × 390 | 828 × 51 | une | icônes | 3/3 dans la vue | 431 × 288 | 0 / 0 |
+| 812 × 375 | 796 × 51 | une | icônes | 3/3 dans la vue | 409 × 273 | 0 / 0 |
+| 390 × 844 | 390 × 162 | trois | affichés | 3/3 dans la vue | 390 × 260 | 0 / 0 |
+
+La scène ne devient jamais une vignette : à 505 px de fenêtre le canevas
+occupe 403 px, soit quatre cinquièmes de la hauteur.
+
+**Redimensionnement dynamique**, sans rechargement, 1440 × 900 → 700 → 600 →
+505 → 450 → 844 × 390 → retour à 1440 × 900 : aucune commande ne disparaît, et
+l'empreinte du sol — huit pixels relevés sur le parquet rendu — est identique
+à l'octet à chacune des sept étapes. Le canevas reste 1600 × 1067 tout du long.
+La géométrie ne bouge pas.
+
+**Un seul défilement, et il est voulu** : celui du catalogue, dans
+`.panel__body`. Mesuré à 1440 × 505 : 407 px visibles pour 3 026 px de contenu.
+Le document, lui, ne défile ni verticalement ni horizontalement à aucune des
+neuf tailles. La molette sur le panneau l'atteint : trois crans ne suffisaient
+pas à faire venir le troisième motif, huit l'ont amené de y 475 à y 260.
+
+**Aucun état n'emprisonne le visiteur.** Le panneau se ferme par sa croix et se
+rouvre par n'importe lequel des trois onglets, qui restent dans la vue quand il
+est fermé — vérifié au clic réel à 1440 × 505. La poignée `.panel__grab` reste
+masquée en disposition large, et c'est correct : le panneau y est une colonne
+permanente, pas un tiroir. Elle réapparaît en feuille basse, à 390 × 844, où
+elle est bien dans la vue.
+
+### Ce que l'outillage n'a pas permis
+
+La reproduction a été faite dans le volet du navigateur intégré, qui fixe la
+fenêtre au pixel. Chrome refusait de se redimensionner — sa fenêtre était
+maximisée, `resize_window` rendait « succès » sans effet, et le viewport restait
+à 1536 × 826. Une mesure prise dans Chrome à cette taille annonçait un
+débordement horizontal de 32 px et une colonne de panneau à zéro ; la sonde
+suivante a montré l'onglet retombé à `0 × 0`, donc la mise en page était
+dégénérée et la mesure sans valeur. À la même taille de 1536 × 826, le volet
+rend `1200px 336px` de colonnes et aucun débordement, comme à 1920 × 1080,
+1280 × 800, 1024 × 505, 812 × 375 et 390 × 844. Ce que Chrome a tout de même
+apporté, sur un onglet correctement affiché : **aucune erreur de console**, et
+les commandes toutes dans la vue.
 
 ## Crédits
 
