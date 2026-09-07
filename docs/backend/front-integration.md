@@ -224,6 +224,23 @@ Le bloc d'échec porte `role="alert"` et prend le focus, sauf quand un champ
 précis est en cause : dans ce cas le focus va au champ, pas à l'alerte. L'écran
 de confirmation prend le focus à son apparition.
 
+### Cibles tactiles
+
+Les cinq points de progression sont réellement interactifs — revenir en arrière
+est libre, avancer passe par la validation de l'étape courante — et leur zone
+d'appui mesurait 34 × 40 px. Sous `pointer: coarse` elle passe à 45,6 × 44 px
+par le pseudo-élément, sans que le trait dessiné change d'un pixel ; l'écart
+entre les points passe de 6,4 à 12 px, faute de quoi deux zones de cette
+largeur se chevaucheraient et un appui à la frontière irait au point désigné
+par l'ordre du DOM plutôt qu'à celui que le doigt visait. Le raisonnement
+complet est dans `project-form.css`.
+
+La case de consentement fait 13,3 × 16 px, mais elle est enveloppée par son
+`<label>`, qui mesure 300 × 45 px : un appui n'importe où dans le libellé
+bascule la case. Elle n'a donc pas été grossie — un contrôle de 16 px dont
+toute la ligne est active est confortable, et l'agrandir aurait abîmé le dessin
+pour rien.
+
 ## Jamais de fausse réussite
 
 C'est la règle qui a motivé la réécriture de `submit-adapter.js` : l'ancien

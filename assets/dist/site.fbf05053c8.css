@@ -3825,6 +3825,39 @@ body[data-drawer-open="true"] { overflow: hidden; }
 .pf__dot[data-state="done"] { background: var(--accent); }
 .pf__dot[data-state="current"] { background: var(--c-ink); }
 
+/*
+ * Au doigt, 44 × 44 px.
+ *
+ * Les cinq points sont réellement interactifs : revenir en arrière est libre,
+ * avancer passe par la validation de l'étape courante. Ils méritent donc une
+ * cible franche, et 34 × 40 px n'en est pas une pour un pouce.
+ *
+ * Le dessin ne change pas d'un pixel — le trait reste à 2,1rem sur 4 px. Seule
+ * la zone invisible grandit : 4 + 2 × 20 = 44 px de haut, et
+ * 33,6 + 2 × 6 = 45,6 px de large. Six pixels et non cinq parce que 2,1rem
+ * vaut 33,6 px : cinq auraient donné 43,6 px, c'est-à-dire juste en dessous du
+ * seuil, ce qui n'est pas une cible de 44 px mais une cible qui en a l'air.
+ *
+ * L'écart entre les points passe en revanche de 6,4 à 12 px, et c'est
+ * nécessaire, pas cosmétique : à 6,4 px d'écart, deux zones de cette largeur
+ * se chevaucheraient, et un appui dans la zone commune irait au point que
+ * l'ordre du DOM désigne, pas à celui que le doigt visait. Deux cibles qui se
+ * disputent un appui valent moins qu'une cible un peu petite. Douze pixels
+ * mettent les centres à 45,6 px, exactement la largeur d'une zone : elles se
+ * touchent sans jamais se recouvrir.
+ *
+ * Le surcoût est de 22,4 px sur la largeur de la rangée, mesurée à 194 px pour
+ * 300 px disponibles à 390 px de viewport : aucun débordement, aucun
+ * changement de retour à la ligne.
+ *
+ * Rien de tout cela ne s'applique à la souris, où 34 × 40 px se visent très
+ * bien et où le survol donne déjà un retour.
+ */
+@media (pointer: coarse) {
+  .pf__dots { gap: 0.75rem; }
+  .pf__dot::after { inset: -20px -6px; }
+}
+
 .pf__step { animation: pf-in var(--dur-3) var(--ease-out) both; }
 @keyframes pf-in { from { opacity: 0; transform: translateY(10px); } }
 @media (prefers-reduced-motion: reduce) { .pf__step { animation: none; } }
