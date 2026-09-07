@@ -65,7 +65,7 @@ const ORIENTATIONS = [0, 90, 45, -45];
  * baisser pour faire passer la vérification. Le jour où les huit y sont, ce
  * nombre vaut 8 et la garde interdit tout retour en arrière.
  */
-const ESSAYABLES_MINIMUM = 4;
+const ESSAYABLES_MINIMUM = 8;
 
 /**
  * L'adresse que `build.js` produira pour cette carte.
@@ -215,6 +215,29 @@ function verifie() {
         + 'Une carte a cessé d\'être essayable : scène rétrogradée, sceneId retiré, ou image désaccordée. '
         + 'Corriger la cause, ou baisser ESSAYABLES_MINIMUM en connaissance de cause.'
     );
+  }
+
+  /*
+   * Contrôle 9 : TOUTE scène publiable du manifeste se charge, pas seulement
+   * celles qu'une carte d'inspiration ouvre.
+   *
+   * Deux fichiers de scène ont été écrits avec `planes` fermé par un crochet
+   * au lieu d'une accolade, à deux passes différentes. Le JSON ne se parse
+   * plus, le Studio échoue au chargement, et rien ne le disait : le fichier
+   * existe, le manifeste le déclare, la carte pointe dessus. Le premier des
+   * deux a été trouvé à la main après un rendu vide ; le second aurait pu
+   * partir en production. Une scène proposée dans « Changer de pièce » n'est
+   * couverte par aucun autre contrôle — celui-ci la couvre.
+   *
+   * Le coût est nul : c'est un `JSON.parse` par scène.
+   */
+  for (const entree of manifeste.scenes || []) {
+    const publiable = entree.geometryStatus === 'validated' && entree.visualStatus === 'validated';
+    if (!publiable) continue;
+    if (lignes.some((l) => l[2] === entree.id)) continue; // déjà vérifiée plus haut
+    for (const grief of chargeable(entree.id, entree)) {
+      erreurs.push(`scène « ${entree.id} » (manifeste, hors carte) : ${grief}`);
+    }
   }
 
   return { erreurs, lignes, essayables };
