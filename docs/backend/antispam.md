@@ -21,7 +21,7 @@ src/Projects/SubmissionService.php  le pipeline complet
 ## Pot de miel
 
 Champ `website`, accepté par l'API et **jamais stocké**. Un humain ne le voit
-pas (le front du lot 5 le placera hors écran, sans autocomplétion,
+pas (le front le place hors écran depuis le lot 5, sans autocomplétion,
 `tabindex="-1"`) ; un robot qui remplit tout le remplit.
 
 Vide, absent, `null`, `false` ou seulement des espaces : la soumission
@@ -148,15 +148,24 @@ Deux POST valides quasi simultanés depuis le même formulaire créent
 aujourd'hui deux demandes, si tous deux passent la limite de débit. C'est
 assumé pour ce lot : les deux demandes sont légitimes du point de vue du
 serveur. Une clé d'idempotence (en-tête ou champ, dédupliquée sur une courte
-fenêtre) pourra s'ajouter au lot 5, quand le vrai formulaire sera branché et
-que le comportement du bouton sera connu.
+fenêtre) reste possible plus tard. Le lot 5 a rendu le cas improbable côté
+navigateur : le bouton est désactivé dès le premier envoi et un drapeau
+`sending` verrouille le gestionnaire, ce qui a été vérifié à quatre clics
+successifs — un seul POST. Ce n'est pas une garantie serveur pour autant.
 
-## Ce que le front devra faire (lot 5)
+## Ce que fait le front (lot 5, livré)
 
-1. `GET /form-token` au chargement du formulaire, garder `token` ;
-2. rendre le champ `website` invisible et le laisser vide ;
-3. envoyer `formToken` et `website` avec la charge métier ;
-4. traiter `429` (message d'attente) et `422` `form_token_invalid`
-   (redemander un jeton, réessayer).
+1. `GET /form-token` au montage du formulaire, jeton gardé **en mémoire JS
+   seulement** — ni `localStorage`, ni cookie, ni URL ;
+2. champ `website` sorti du cadre par `position: absolute; left: -9999px`,
+   jamais `display: none`, avec `aria-hidden` et `tabindex="-1"` pour qu'aucun
+   humain ne puisse l'atteindre ;
+3. `formToken` et `website` envoyés avec la charge métier, `website` toujours
+   présent même vide ;
+4. `429` → message d'attente spécifique ; `422 form_token_invalid` → un seul
+   réessai après un nouveau jeton, jamais de boucle ;
+5. refus du pot de miel → **la même phrase** qu'une erreur générale, pour ne
+   pas apprendre au robot ce qu'il doit éviter.
 
-Rien de tout cela n'est écrit dans le front à ce stade.
+Si le jeton a moins de deux secondes, l'adaptateur attend le reste du délai
+plutôt que de se faire refuser. Détail : `front-integration.md`.

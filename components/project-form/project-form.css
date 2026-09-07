@@ -102,3 +102,52 @@
   color: var(--c-sage-deep);
   font-size: 0.88rem;
 }
+
+/*
+ * Pot de miel.
+ *
+ * Sorti du cadre par `position: absolute`, PAS masqué par `display: none`.
+ * La différence est tout l'intérêt du piège : `display: none` est la première
+ * chose qu'un robot un peu écrit vérifie, et un champ ainsi marqué lui dit de
+ * ne pas y toucher. Ici le champ est, du point de vue du CSS, affiché et
+ * remplissable ; il est simplement à mille pixels de l'écran.
+ *
+ * `aria-hidden` et `tabindex="-1"`, posés dans le gabarit, le retirent en
+ * revanche du parcours clavier et de l'arbre d'accessibilité : un lecteur
+ * d'écran ne l'annonce pas, une tabulation ne l'atteint pas. Aucun utilisateur
+ * réel ne peut donc le remplir — un anti-spam qui écarte des humains serait
+ * pire que pas d'anti-spam.
+ *
+ * `overflow: hidden` et la hauteur nulle empêchent la page de gagner mille
+ * pixels de défilement à cause de lui.
+ */
+.pf__trap {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Échec d'envoi : au-dessus des actions, annoncé par role="alert". */
+.pf__failure {
+  margin: var(--sp-3) 0 0;
+  padding: 0.7rem 0.95rem;
+  border-left: 3px solid var(--c-clay, #b3462f);
+  border-radius: var(--r-sm);
+  background: rgba(179, 70, 47, 0.08);
+  color: var(--text);
+  font-size: 0.92rem;
+}
+.pf__failure:focus-visible { outline: none; }
+
+/* Référence de la demande, sur l'écran de confirmation. */
+.pf__reference {
+  margin: 0;
+  padding: 0.7rem 0.95rem;
+  border-radius: var(--r-sm);
+  background: var(--c-sage-pale);
+  color: var(--c-sage-deep);
+  font-variant-numeric: tabular-nums;
+}

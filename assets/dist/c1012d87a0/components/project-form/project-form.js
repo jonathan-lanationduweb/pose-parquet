@@ -2,13 +2,22 @@
  * Composant « formulaire projet » — autonome et remplaçable.
  *
  * Dépendances : uniquement son fichier de configuration et une fonction
- * d'envoi passée en option (`onSubmit`). Aucune page ne connaît sa structure
- * interne : elle déclare un point de montage `[data-project-form]` et c'est tout.
+ * d'envoi. Aucune page ne connaît sa structure interne : elle déclare un point
+ * de montage `[data-project-form]` et c'est tout.
  *
  *   import { mountProjectForm } from './project-form.js';
- *   mountProjectForm(document.querySelector('[data-project-form]'), { onSubmit });
+ *   mountProjectForm(document.querySelector('[data-project-form]'));
+ *
+ * L'envoi ne passe plus par une fonction injectée : le composant appelle
+ * directement l'API du plugin WordPress, via `js/forms/`. La couche
+ * d'abstraction avait un intérêt tant qu'aucun destinataire n'existait ; elle
+ * n'en a plus, et elle avait un coût — c'est elle qui portait le faux succès
+ * en `localStorage`. Voir `docs/backend/front-integration.md`.
  */
 import { projectFormConfig } from './project-form.config.js';
+import { apiConfigured } from '../../js/forms/api-config.js';
+import { buildProjectPayload, visualizerFromParams, frontFieldFor } from '../../js/forms/project-payload.js';
+import { fetchFormToken, submitProject, SubmitError, ERREURS } from '../../js/forms/submit-adapter.js';
 
 const uid = () => Math.random().toString(36).slice(2, 8);
 
@@ -137,10 +146,47 @@ function prefillFromStudio(form) {
   if (message && !message.value) message.value = `Simulation réalisée dans le Studio : ${parts.join(', ')}.`;
 }
 
+/**
+ * Paramètres d'acquisition présents dans l'URL d'arrivée.
+ *
+ * Trois clés, pas une de plus, et lues une seule fois au montage : elles
+ * survivent ainsi aux étapes du formulaire et à un retour en arrière, sans
+ * mesure d'audience maison, sans cookie et sans rien conserver après l'envoi.
+ * On ne collecte pas le référent, ni l'historique, ni les autres paramètres :
+ * ce qui n'est pas prévu au contrat n'est pas ramassé.
+ */
+function utmFromParams(params) {
+  const lire = (nom) => (params.get(nom) || '').trim().slice(0, 100);
+
+  return {
+    utmSource: lire('utm_source'),
+    utmMedium: lire('utm_medium'),
+    utmCampaign: lire('utm_campaign'),
+  };
+}
+
+/** Phrases d'échec, par code d'erreur de l'adaptateur. */
+const MESSAGES_ECHEC = {
+  not_configured:
+    'Ce formulaire n’est pas encore relié à nos serveurs sur cette version du site : votre demande n’a pas été envoyée. Écrivez-nous depuis la page contact.',
+  rate_limited: 'Trop de demandes ont été envoyées. Veuillez réessayer plus tard.',
+  network: 'L’envoi n’a pas pu aboutir. Vérifiez votre connexion et réessayez.',
+  timeout: 'L’envoi n’a pas pu aboutir. Vérifiez votre connexion et réessayez.',
+  server: 'L’envoi n’a pas pu aboutir. Réessayez dans un instant.',
+  /*
+   * Pot de miel et jeton définitivement refusé : même phrase que pour une
+   * erreur générale. Dire « vous avez rempli le champ piège » apprendrait à un
+   * robot ce qu'il doit éviter la prochaine fois, et n'aiderait aucun humain —
+   * un humain n'a pas pu le remplir.
+   */
+  submission_rejected: 'L’envoi n’a pas pu aboutir. Réessayez dans un instant.',
+  form_token_invalid: 'L’envoi n’a pas pu aboutir. Rechargez la page et réessayez.',
+  validation: 'Certains champs doivent être corrigés.',
+};
+
 export function mountProjectForm(root, options = {}) {
   if (!root) return null;
   const config = options.config || projectFormConfig;
-  const onSubmit = options.onSubmit || (async (payload) => ({ ok: true, mode: 'noop', payload }));
   const prefix = `pf-${uid()}`;
   let current = 0;
 
@@ -173,18 +219,35 @@ export function mountProjectForm(root, options = {}) {
         )
         .join('')}
 
+      <!--
+        Pot de miel : le champ que seul un robot remplit. Le raisonnement et le
+        choix de la technique de masquage sont dans project-form.css, sur la
+        classe .pf__trap — commentaire volontairement court ICI, parce que ce
+        bloc vit dans un littéral de gabarit et qu'un accent grave y refermerait
+        la chaîne. C'est exactement l'erreur qui a été faite en l'écrivant :
+        « display: none » entre accents graves a produit un SyntaxError et le
+        formulaire ne se montait plus du tout.
+      -->
+      <div class="pf__trap" aria-hidden="true">
+        <label for="${prefix}-website">Site web (ne pas remplir)</label>
+        <input type="text" id="${prefix}-website" name="website" tabindex="-1"
+          autocomplete="off" value="" />
+      </div>
+
       <div class="pf__actions">
         <button type="button" class="btn btn--ghost" data-prev hidden>Retour</button>
         <button type="button" class="btn" data-next>Continuer</button>
         <button type="submit" class="btn btn--accent" data-submit hidden>${config.submitLabel}</button>
       </div>
       <p class="pf__status" role="status" aria-live="polite"></p>
+      <p class="pf__failure" role="alert" hidden tabindex="-1"></p>
     </form>
 
     <div class="pf__success" hidden tabindex="-1">
       <p class="eyebrow" data-success-eyebrow>Demande enregistrée</p>
       <h2 data-success-title>Merci, votre projet est bien décrit.</h2>
-      <p data-success-text>Nous revenons vers vous rapidement. En attendant, le visualiseur peut vous aider à essayer les options retenues sur une photo de votre pièce.</p>
+      <p data-success-text>Nous avons reçu votre demande et nous vous répondrons par email ou par téléphone.</p>
+      <p class="pf__reference" data-success-reference hidden></p>
       <button type="button" class="btn btn--ghost btn--sm" data-restart>Décrire un autre projet</button>
     </div>`;
 
@@ -196,12 +259,53 @@ export function mountProjectForm(root, options = {}) {
   const nextBtn = root.querySelector('[data-next]');
   const submitBtn = root.querySelector('[data-submit]');
   const status = root.querySelector('.pf__status');
+  const failure = root.querySelector('.pf__failure');
   const success = root.querySelector('.pf__success');
 
   const fieldsByName = new Map();
   config.steps.forEach((step) => step.fields.forEach((field) => fieldsByName.set(field.name, field)));
 
   prefillFromStudio(form);
+
+  /* ---- Contexte de la visite, lu une fois ---- */
+
+  const params = new URLSearchParams(window.location.search);
+  const utm = utmFromParams(params);
+  const visualizer = visualizerFromParams(params);
+
+  /*
+   * Le jeton anti-spam.
+   *
+   * Demandé DÈS LE MONTAGE, et pas au moment d'envoyer. Deux raisons, et la
+   * seconde est la vraie : le serveur refuse un jeton de moins de deux
+   * secondes, donc un « GET puis POST » collés se ferait rejeter
+   * systématiquement ; et une erreur de réseau au tout début se voit avant que
+   * le visiteur ait saisi quoi que ce soit, ce qui est le bon moment pour lui
+   * dire que le formulaire est indisponible.
+   *
+   * Il vit ici, dans cette fermeture. Nulle part ailleurs.
+   */
+  let token = '';
+  let tokenIssuedAt = 0;
+  let tokenPromise = null;
+
+  const renewToken = async () => {
+    const { token: neuf, issuedAt } = await fetchFormToken();
+    token = neuf;
+    tokenIssuedAt = issuedAt;
+  };
+
+  if (apiConfigured()) {
+    // L'échec est avalé ici : il se manifestera à l'envoi, avec un message.
+    // Prévenir au chargement d'une page qu'on vient peut-être seulement de
+    // parcourir serait bruyant pour rien.
+    tokenPromise = renewToken().catch(() => {});
+  }
+
+  /** Vrai tant qu'une requête d'envoi est en vol. */
+  let sending = false;
+  /** Vrai après un 201 : la demande est partie, on ne la renvoie pas. */
+  let sent = false;
 
   const applyConditionalVisibility = () => {
     fieldsByName.forEach((field) => {
@@ -287,8 +391,82 @@ export function mountProjectForm(root, options = {}) {
     }
   });
 
+  /**
+   * Affiche un échec et le fait annoncer.
+   *
+   * `prendreFocus` est faux quand un champ vient d'être désigné : c'est LUI
+   * qui doit recevoir le curseur, pas le message. Le bloc porte `role="alert"`,
+   * donc un lecteur d'écran l'annonce de toute façon, sans qu'on ait à y
+   * déplacer le focus — et déplacer le focus vers un texte qu'on ne peut pas
+   * corriger obligerait à retabuler jusqu'au champ.
+   */
+  const montrerEchec = (texte, prendreFocus = true) => {
+    status.textContent = '';
+    failure.textContent = texte;
+    failure.hidden = false;
+    if (prendreFocus) failure.focus();
+  };
+
+  const effacerEchec = () => {
+    failure.hidden = true;
+    failure.textContent = '';
+  };
+
+  /**
+   * Reporte les refus du serveur sur les champs concernés.
+   *
+   * Le serveur rend `fields: { email: "…", surface: "…" }` avec les noms de
+   * l'API ; le formulaire connaît les noms français. `frontFieldFor()` fait la
+   * traduction inverse, et le premier champ fautif reçoit le focus après avoir
+   * ramené son étape à l'écran — corriger un champ qu'on ne voit pas est
+   * impossible.
+   *
+   * @returns {boolean} vrai si au moins un champ a été désigné
+   */
+  const appliquerErreursServeur = (fields) => {
+    let premier = null;
+
+    for (const [cleApi, raison] of Object.entries(fields || {})) {
+      const nom = frontFieldFor(cleApi);
+      if (!nom) continue;
+      const container = root.querySelector(`[data-field="${nom}"]`);
+      if (!container) continue;
+
+      container.dataset.invalid = 'true';
+      const message = container.querySelector('.field__error');
+      // Le texte vient du serveur : il est posé comme TEXTE, jamais comme HTML.
+      if (message && typeof raison === 'string' && raison !== '') message.textContent = raison;
+      if (!premier) premier = { container, nom };
+    }
+
+    if (!premier) return false;
+
+    const etape = config.steps.findIndex((step) => step.fields.some((f) => f.name === premier.nom));
+    if (etape >= 0) show(etape);
+    const focusable = premier.container.querySelector('input, select, textarea');
+    if (focusable) focusable.focus();
+
+    return true;
+  };
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
+
+    /*
+     * Deux verrous, et ils ne protègent pas de la même chose.
+     *
+     * `sending` bloque le double clic : le backend n'a pas encore de clé
+     * d'idempotence, donc deux requêtes parties ensemble créeraient deux
+     * demandes identiques chez le destinataire. Le bouton est désactivé, mais
+     * un `Entrée` maintenu ou un double clic très rapide peut passer avant que
+     * le navigateur ne l'applique — d'où ce test en tête de fonction.
+     *
+     * `sent` interdit de renvoyer une demande déjà partie. L'écran de
+     * confirmation remplace le formulaire, mais rien n'empêche un script ou un
+     * raccourci de resoumettre.
+     */
+    if (sending || sent) return;
+
     const allValid = config.steps.every((step, index) => {
       const valid = step.fields.map(validateField).every(Boolean);
       if (!valid && index < current) show(index);
@@ -299,39 +477,68 @@ export function mountProjectForm(root, options = {}) {
       return;
     }
 
+    effacerEchec();
+    sending = true;
     submitBtn.disabled = true;
     status.textContent = 'Envoi en cours…';
-    const payload = Object.fromEntries(new FormData(form).entries());
-    payload.source = window.location.pathname;
 
     try {
-      const result = await onSubmit(payload);
-      /**
-       * Mode démonstration : sans point d'envoi configuré, la demande est
-       * seulement conservée dans ce navigateur. Le dire, et le dire nettement.
-       *
-       * Un écran « Merci, nous revenons vers vous » alors que personne ne
-       * reçoit rien n'est pas une imprécision d'interface : c'est une promesse
-       * fausse faite à quelqu'un qui vient de saisir son adresse et son projet.
-       * Tant qu'aucun backend n'est branché, l'écran de fin doit être explicite.
-       * Voir docs/formulaire-production.md.
-       */
-      if (result && (result.mode === 'local' || result.mode === 'noop')) {
-        root.querySelector('[data-success-eyebrow]').textContent = 'Mode démonstration';
-        root.querySelector('[data-success-title]').textContent = 'Votre demande n’a pas été envoyée.';
-        root.querySelector('[data-success-text]').innerHTML =
-          'Ce formulaire fonctionne, mais aucun destinataire n’est encore branché : votre demande est restée dans ce navigateur et personne ne l’a reçue. ' +
-          'Pour nous joindre dès maintenant, passez par la <a href="' +
-          (root.dataset.base || '') +
-          'contact/">page contact</a>.';
+      // Le jeton demandé au montage a pu ne pas être arrivé : on l'attend.
+      if (tokenPromise) await tokenPromise;
+      if (!token && apiConfigured()) await renewToken();
+
+      const resultat = await submitProject({
+        buildPayload: () => buildProjectPayload({
+          formData: new FormData(form),
+          formToken: token,
+          // Le serveur ne garde que le chemin ; on ne lui donne que cela.
+          sourcePath: window.location.pathname,
+          utm,
+          visualizer,
+        }),
+        renewToken,
+        tokenIssuedAt: () => tokenIssuedAt,
+      });
+
+      sent = true;
+      status.textContent = '';
+
+      const refBloc = root.querySelector('[data-success-reference]');
+      if (resultat.reference) {
+        refBloc.textContent = `Référence : ${resultat.reference}. Conservez-la si vous souhaitez nous contacter à ce sujet.`;
+        refBloc.hidden = false;
+      } else {
+        refBloc.hidden = true;
       }
+
       form.hidden = true;
       success.hidden = false;
       success.focus();
-    } catch (error) {
-      status.textContent = "L'envoi a échoué. Réessayez dans un instant.";
+    } catch (erreur) {
+      const code = erreur instanceof SubmitError ? erreur.code : ERREURS.SERVEUR;
+
+      /*
+       * 422 de validation : on désigne les champs plutôt que d'afficher une
+       * phrase générale. Si aucun champ n'a pu être rattaché — un cas qui ne
+       * devrait pas arriver, le contrat étant partagé — on retombe sur le
+       * message général plutôt que de laisser l'écran muet.
+       */
+      if (code === ERREURS.VALIDATION && appliquerErreursServeur(erreur.fields)) {
+        status.textContent = '';
+        // Le champ fautif garde le focus que `appliquerErreursServeur` lui a donné.
+        montrerEchec(MESSAGES_ECHEC.validation, false);
+      } else {
+        montrerEchec(MESSAGES_ECHEC[code] || MESSAGES_ECHEC.server);
+      }
+
+      /*
+       * Le formulaire reste tel quel : rien n'est vidé, aucune étape n'est
+       * perdue, et le bouton redevient actif. Quelqu'un qui vient de remplir
+       * cinq étapes ne doit pas les ressaisir parce que le réseau a hoqueté.
+       */
       submitBtn.disabled = false;
-      void error;
+    } finally {
+      sending = false;
     }
   });
 
@@ -341,14 +548,30 @@ export function mountProjectForm(root, options = {}) {
     success.hidden = true;
     submitBtn.disabled = false;
     status.textContent = '';
+    effacerEchec();
     root.querySelectorAll('[data-invalid]').forEach((el) => { el.dataset.invalid = 'false'; });
+    // Nouvelle demande, donc nouveau jeton : celui qui a servi est consommé
+    // côté limite de débit, et le suivant doit avoir son propre âge.
+    sent = false;
+    if (apiConfigured()) tokenPromise = renewToken().catch(() => {});
     show(0);
     form.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
-  /** Pré-remplissage depuis l'URL (ex. retour du simulateur de pose). */
+  /**
+   * Pré-remplissage depuis l'URL (ex. retour du simulateur de pose).
+   *
+   * `website` en est EXCLU, et c'est une faille qu'il a fallu voir venir : ce
+   * pré-remplissage écrit dans tout champ dont le nom apparaît en paramètre
+   * d'URL. Un lien `?website=x` aurait donc rempli le pot de miel à l'insu du
+   * visiteur, et le serveur aurait refusé chacune de ses demandes avec un
+   * message générique — un déni de service en un lien, indétectable pour lui
+   * comme pour nous.
+   */
+  const CHAMPS_NON_PREREMPLISSABLES = new Set(['website']);
   const prefill = new URLSearchParams(window.location.search);
   prefill.forEach((value, key) => {
+    if (CHAMPS_NON_PREREMPLISSABLES.has(key)) return;
     const input = form.elements[key];
     if (!input) return;
     if (input instanceof RadioNodeList) {

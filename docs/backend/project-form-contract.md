@@ -4,10 +4,12 @@ Relevé du formulaire réel le 4 septembre 2026, en lecture seule :
 `components/project-form/project-form.config.js` (champs, options, règles) et
 `components/project-form/project-form.js` (construction de la charge :
 `Object.fromEntries(new FormData(form))` + `source = location.pathname`).
-Le front n'est **pas** branché sur l'API dans ce lot ; ce document est le
-contrat que le lot 5 (`submit-adapter.js`) devra honorer. Côté plugin, la
-seule source de vérité est `src/Projects/Fields.php` : si ce tableau et le
-code divergent, c'est le code qui a raison et ce tableau qu'il faut corriger.
+Le front est branché sur l'API depuis le lot 5 : la traduction décrite ici est
+appliquée par `js/forms/project-payload.js`, seul endroit du front où un nom
+de champ français devient un nom d'API (voir `front-integration.md`). Côté
+plugin, la seule source de vérité est `src/Projects/Fields.php` : si ce tableau
+et le code divergent, c'est le code qui a raison et ce tableau qu'il faut
+corriger.
 
 ## Traduction champ par champ
 
@@ -32,12 +34,12 @@ code divergent, c'est le code qui a raison et ce tableau qu'il faut corriger.
 | `message` | `message` | `message` text | chaîne | non | `sanitize_textarea_field` (sauts de ligne gardés, HTML retiré), ≤ 4000 caractères |
 | `consentement` | `consent` | `consent_at` datetime | booléen | oui | doit valoir exactement `true` ; le serveur écrit **sa** date UTC. Toute date fournie par le client (`consentAt`, `consent_at`) est refusée |
 | `source` | `sourceUrl` | `source_url` varchar(500) | chaîne | non | réduit au **chemin** (`wp_parse_url` → `PHP_URL_PATH`) : requête et fragment tombent, donc rien de sensible ne finit en base ; ≤ 500 |
-| — | `utmSource` `utmMedium` `utmCampaign` | `utm_*` varchar(100) | chaîne | non | texte nettoyé, ≤ 100. Le formulaire ne les envoie pas aujourd'hui ; réservés au lot 5 |
+| — | `utmSource` `utmMedium` `utmCampaign` | `utm_*` varchar(100) | chaîne | non | texte nettoyé, ≤ 100. Relevés dans l'URL de la page et envoyés par le front depuis le lot 5 |
 | — | `visualizer` | voir ci-dessous | objet | non | structure contrôlée, jamais interprétée |
-| — (à ajouter au lot 5) | `formToken` | **aucune** | chaîne | **oui** | jeton signé obtenu de `GET /form-token` ; âge ≥ 2 s, validité 2 h. Champ technique : jamais stocké, jamais journalisé |
-| — (à ajouter au lot 5) | `website` | **aucune** | chaîne | non | pot de miel : doit rester vide. Rempli → refus générique. Champ technique : jamais stocké |
+| — (technique, ajouté au lot 5) | `formToken` | **aucune** | chaîne | **oui** | jeton signé obtenu de `GET /form-token` ; âge ≥ 2 s, validité 2 h. Champ technique : jamais stocké, jamais journalisé |
+| — (technique, ajouté au lot 5) | `website` | **aucune** | chaîne | non | pot de miel : doit rester vide. Rempli → refus générique. Champ technique : jamais stocké |
 
-Traductions à faire par l'adaptateur du lot 5 : renommer les clés (`prenom` →
+Traductions faites par l'adaptateur (lot 5) : renommer les clés (`prenom` →
 `firstName`…), convertir `surface` en entier, convertir `consentement` (`"on"`)
 en `true`, passer `source` dans `sourceUrl`, **ne pas envoyer `zone`/`region`
 autrement que tels quels** (le serveur déduit), demander un jeton à
@@ -67,10 +69,11 @@ La colonne reste, vide, pour une évolution éventuelle ; l'API ne l'accepte pas
 
 ## Objet `visualizer` (facultatif)
 
-Le Studio ne transmet rien au formulaire aujourd'hui hormis des paramètres
-d'URL (`parquet`, `motif`, `orientation`) qui préremplissent le mode de pose
-et le message. L'objet est prévu pour le lot 5, quand le front enverra le
-contexte du Visualiseur.
+Le Studio transmet au formulaire des paramètres d'URL (`parquet`, `motif`,
+`orientation`) qui préremplissent le mode de pose et le message. Depuis le lot
+5, le front en tire aussi cet objet, réduit au choix du visiteur : ni photo, ni
+`SceneData`, ni masque, ni texture. Le nom commercial du parquet n'étant pas un
+identifiant, il ne part pas comme `productId`.
 
 | Clé | Colonne | Validation |
 |---|---|---|
