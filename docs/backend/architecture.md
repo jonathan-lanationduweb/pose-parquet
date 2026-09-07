@@ -90,17 +90,29 @@ dépôt quand ce sera utile.
 ## Environnement de test
 
 Un WordPress local dédié (`C:\wamp64\www\pose-parquet-dev`, base
-`pose_parquet_dev`, préfixe `ppdev_`, servi par le serveur PHP intégré sur
-`127.0.0.1:8181`) — jamais un site client. Le préfixe volontairement différent
-de `wp_` fait échouer tout `wp_` codé en dur.
+`pose_parquet_dev`, préfixe `ppdev_`) — jamais un site client. Le préfixe
+volontairement différent de `wp_` fait échouer tout `wp_` codé en dur.
+
+Il est servi par **Apache (Wamp)** sur `http://pose-parquet-dev.local` : un
+VirtualHost dont le `DocumentRoot` est ce dossier, plus une entrée
+`127.0.0.1 pose-parquet-dev.local` dans le fichier hosts de Windows. Avec
+`mod_rewrite` et `AllowOverride All`, les permaliens jolis fonctionnent, donc
+`/wp-json/pose-parquet/v1/…`.
+
+Jusqu'au lot 5, c'était le serveur intégré de PHP (`php -S 127.0.0.1:8181`),
+lancé à la main. Il ne réécrivait aucune URL : l'API n'y répondait que sous la
+forme `?rest_route=`, et il fallait penser à le démarrer. Les adresses en
+`:8181` qui subsistent dans les traces d'anciennes recettes viennent de là.
 
 Deux pièges de cet environnement, notés parce qu'ils ont chacun coûté un
 diagnostic :
 
-- **Se connecter par l'hôte que WordPress connaît.** Le site est déclaré sur
-  `localhost:8181` ; une session ouverte sur `127.0.0.1:8181` pose son cookie
-  sur le mauvais domaine et la connexion échoue en silence, en renvoyant sur
-  le formulaire.
+- **Se connecter par l'hôte que WordPress connaît.** Le site se déclare
+  aujourd'hui sur `http://pose-parquet-dev.local` (constantes `WP_HOME` et
+  `WP_SITEURL` de `wp-config.php`, options `home` et `siteurl`) ; une session
+  ouverte sur une autre adresse — `127.0.0.1`, ou l'ancien `localhost:8181` —
+  pose son cookie sur le mauvais domaine et la connexion échoue en silence, en
+  renvoyant sur le formulaire.
 - **Ne jamais nommer une variable `$wp` dans un script de ligne de commande.**
   Un `$wp` de portée globale écrase l'objet `WP` de WordPress, et
   `create_initial_taxonomies()` meurt sur « Call to a member function

@@ -215,6 +215,7 @@ export async function mountStudio(root) {
   };
   let variants = [];
   let sceneId = null;
+  let sceneLabel = null;
   let pending = false;
   let refine = 0;
   let quality = 1;
@@ -526,6 +527,14 @@ const REGROUPEMENT_MS = 70;
       const prepared = await loadImage(`${base}assets/images/${fichier}`).catch(() => loadImage(`${base}assets/images/${scene.image.file}`));
       renderer.setScene(scene, prepared);
       sceneId = id;
+      /*
+       * Le libelle humain de la scene voyage avec son identifiant, et sert de
+       * pense-bete a l equipe commerciale : la fiche d une demande doit dire
+       * « Sejour et salle a manger » et pas « sejour ». C est un instantane —
+       * si la scene est renommee demain, la demande garde ce que le visiteur
+       * avait sous les yeux.
+       */
+      sceneLabel = scene.label;
       photo.alt = scene.image.alt;
       // Le nom du fichier vient de la scène chargée, plus du manifeste : c'est
       // ce qui permet d'ouvrir une pièce que le manifeste en cache ignore.
@@ -560,6 +569,8 @@ const REGROUPEMENT_MS = 70;
       setStatus('Préparation du rendu…');
       renderer.setScene(scene, prepared);
       sceneId = null;
+      // Photo importee : il n y a pas de scene du catalogue a nommer.
+      sceneLabel = null;
       photo.alt = 'Votre pièce';
       qs('[data-room-thumb]', root).style.backgroundImage = 'none';
       afterScene('Ma photo');
@@ -809,6 +820,7 @@ const REGROUPEMENT_MS = 70;
 
     const query = buildHandoffParams({
       sceneId,
+      sceneLabel,
       productId: item ? item.id : null,
       productLabel: item ? item.name : null,
       pattern: source.pattern,

@@ -158,7 +158,7 @@ $nettoie();
 /* ================================================================== */
 $section( 'Pré-requis' );
 
-$verifie( 'plugin en version 0.4.0', POSE_PARQUET_VERSION === '0.4.0', POSE_PARQUET_VERSION );
+$verifie( 'plugin en version 0.4.1', POSE_PARQUET_VERSION === '0.4.1', POSE_PARQUET_VERSION );
 $verifie( 'schéma de base inchangé (3)', POSE_PARQUET_DB_VERSION === 3, (string) POSE_PARQUET_DB_VERSION );
 $verifie( 'table des notes présente', ( Schema::status()['notes'] ?? false ) === true );
 $verifie( 'classes du lot chargées', class_exists( ProjectsPage::class ) && class_exists( Actions::class ) && class_exists( Notes::class ) && class_exists( StatusService::class ) );

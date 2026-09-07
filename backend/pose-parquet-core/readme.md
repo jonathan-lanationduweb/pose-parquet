@@ -8,7 +8,7 @@ HTML/CSS/JS appelle. Le front reste dans le dépôt, indépendant, déployé à 
 front (statique)  →  REST /wp-json/pose-parquet/v1/…  →  ce plugin  →  tables pp_*
 ```
 
-## Ce que contient la version 0.4.0
+## Ce que contient la version 0.4.1
 
 Fondation (0.1.0) :
 
@@ -73,8 +73,21 @@ Administration des demandes (0.4.0) — **schéma inchangé (3)** :
 - aucune route REST d'administration, aucun fichier JavaScript, aucune
   suppression de demande, aucune action groupée.
 
-Pas encore : écrans de gestion des demandes, connexion du formulaire public,
-Turnstile. Voir `docs/backend/roadmap.md` à la racine du dépôt.
+Libellés du Visualiseur (0.4.1) — **schéma inchangé (3)** :
+
+- la fiche affiche « Séjour et salle à manger (sejour) » et « Chêne Fumé
+  (chene-fume) » quand le front a joint le nom humain, l'identifiant seul
+  sinon. Les noms sont lus dans `visualizer_config` (`nomScene`, `nom`) : ce
+  sont des instantanés pris à l'envoi, pas des traductions, et le plugin ne
+  recopie aucun catalogue ;
+- `visualizer.config` est désormais **borné et nettoyé** à l'écriture :
+  120 caractères par chaîne et par nom de champ, trois niveaux d'imbrication,
+  `sanitize_text_field()` sur chaque valeur et chaque clé. Ce qui dépasse est
+  refusé en 422 plutôt que tronqué en silence — le plafond de 4 Ko reste ;
+- aucune migration, aucune demande existante modifiée.
+
+Pas encore : renvoi d'un email, suppression de demande, Turnstile. Voir
+`docs/backend/roadmap.md` à la racine du dépôt.
 
 ## Prérequis
 
@@ -134,7 +147,8 @@ copié dans les extensions (`<wp>` = racine WordPress) :
 php tests/run-validator.php <wp>          validation, normalisation, jeton, pot de miel,
                                           identité réseau — aucune écriture
 php tests/run-foundation.php <wp>         activation, schéma, droits, /health, désactivation
-php tests/run-http.php http://127.0.0.1:8181   HTTP réel : /form-token, preflight OPTIONS,
+php tests/run-http.php http://pose-parquet-dev.local
+                                          HTTP réel : /form-token, preflight OPTIONS,
                                           en-têtes CORS, 429, méthodes, accès aux fichiers
 php tests/run-projects.php <wp>           POST réel, emails simulés, réglages, gabarits,
                                           jeton, pot de miel, limite de débit, 503,
@@ -145,9 +159,16 @@ php tests/run-admin.php <wp>              administration : liste, pagination, fi
                                           échappement, 1000 demandes chronométrées
 ```
 
-`run-http.php` suppose un serveur HTTP devant le WordPress (par exemple
-`php -S 127.0.0.1:8181` dans `<wp>`). Le lancer **avant** `run-projects.php`,
-qui nettoie ses demandes et ses compteurs de débit.
+`run-http.php` suppose un serveur HTTP devant le WordPress. En local, c'est
+Apache (Wamp), qui sert le WordPress dédié sur `http://pose-parquet-dev.local`
+via un VirtualHost et une entrée du fichier hosts — avec `mod_rewrite`, donc
+aussi les permaliens jolis de `/wp-json/`. Le lancer **avant**
+`run-projects.php`, qui nettoie ses demandes et ses compteurs de débit.
+
+> Jusqu'au lot 5 le WordPress était servi par le serveur intégré de PHP
+> (`php -S 127.0.0.1:8181`), qui ne réécrit aucune URL : l'API n'y répondait
+> que sous la forme `?rest_route=`. C'est l'origine des adresses en `:8181`
+> que l'on peut croiser dans les traces des anciennes recettes.
 
 Aucun email réel n'est envoyé : les tests court-circuitent `wp_mail()` par le
 filtre `pre_wp_mail`, ce qui permet de lire destinataire, sujet, en-têtes et

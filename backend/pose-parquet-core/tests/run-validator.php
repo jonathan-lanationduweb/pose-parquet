@@ -178,6 +178,127 @@ $verifie( 'config géante (> 4 Ko) refusée', $refuse( pp_requete_metier( [ 'vis
 $verifie( 'config base64 d’image refusée par la taille', $refuse( pp_requete_metier( [ 'visualizer' => [ 'config' => [ 'image' => 'data:image/png;base64,' . base64_encode( random_bytes( 6000 ) ) ] ] ] ), 'visualizer.config' ) );
 
 /* ------------------------------------------------------------------ */
+$section( 'Visualiseur : libellés d’affichage (instantané)' );
+
+/*
+ * Les libellés vivent dans `config`, pas dans une colonne : ce sont des noms
+ * lisibles, pas des identifiants, et le serveur ne les interprète pas. Il les
+ * borne, les nettoie, et l’administration les échappe à l’affichage.
+ */
+$avec_libelles = [
+	'sceneId'     => 'sejour',
+	'productId'   => 'chene-fume',
+	'pattern'     => 'point-de-hongrie',
+	'orientation' => 90,
+	'config'      => [
+		'origine'  => 'studio',
+		'scene'    => 'sejour',
+		'nomScene' => 'Séjour et salle à manger',
+		'produit'  => 'chene-fume',
+		'nom'      => 'Chêne Fumé',
+		'motif'    => 'point-de-hongrie',
+		'angle'    => 90,
+	],
+];
+$v = $valide( pp_requete_metier( [ 'visualizer' => $avec_libelles ] ) );
+$verifie( 'objet avec libellés accepté', $v['ok'], wp_json_encode( $v['errors'] ) );
+$verifie(
+	'libellé de scène conservé',
+	( $v['data']['visualizer']['config']['nomScene'] ?? '' ) === 'Séjour et salle à manger'
+);
+$verifie(
+	'libellé de produit conservé',
+	( $v['data']['visualizer']['config']['nom'] ?? '' ) === 'Chêne Fumé'
+);
+$verifie(
+	'les identifiants restent dans leurs colonnes',
+	( $v['data']['visualizer']['sceneId'] ?? '' ) === 'sejour'
+		&& ( $v['data']['visualizer']['productId'] ?? '' ) === 'chene-fume'
+);
+$verifie(
+	'un accent survit au nettoyage',
+	mb_strpos( (string) wp_json_encode( $v['data']['visualizer']['config'] ), 'Chêne' ) !== false
+		|| mb_strpos( (string) ( $v['data']['visualizer']['config']['nom'] ?? '' ), 'ê' ) !== false
+);
+
+$taille = strlen( (string) wp_json_encode( $v['data']['visualizer']['config'] ) );
+$verifie( 'config avec libellés bien en dessous de 4 Ko (' . $taille . ' octets)', $taille < 1024, (string) $taille );
+
+/* ------------------------------------------------------------------ */
+$section( 'Visualiseur : libellés hostiles' );
+
+$hostile = static function ( string $valeur ): array {
+	return [ 'visualizer' => [ 'sceneId' => 'sejour', 'config' => [ 'nomScene' => $valeur ] ] ];
+};
+
+$cas_xss = [
+	'balise script'      => '<script>alert(1)</script>Séjour',
+	'img onerror'        => '<img src=x onerror=alert(1)>',
+	'balise ouverte'     => 'Séjour <b>gras',
+	'iframe'             => '<iframe src="//mal.example"></iframe>',
+	'javascript: en URL' => '<a href="javascript:alert(1)">Séjour</a>',
+	'guillemets'         => 'Séjour" onmouseover="alert(1)',
+];
+foreach ( $cas_xss as $nom => $charge ) {
+	$r = $valide( pp_requete_metier( $hostile( $charge ) ) );
+	$stocke = (string) ( $r['data']['visualizer']['config']['nomScene'] ?? '' );
+	$verifie(
+		'accepté puis nettoyé : ' . $nom,
+		$r['ok'] && stripos( $stocke, '<script' ) === false && stripos( $stocke, '<img' ) === false
+			&& stripos( $stocke, '<iframe' ) === false && stripos( $stocke, '<a ' ) === false,
+		$stocke
+	);
+	$verifie(
+		'plus aucune balise : ' . $nom,
+		strip_tags( $stocke ) === $stocke,
+		$stocke
+	);
+}
+
+/*
+ * `onerror=` sans balise autour reste du texte, et c’est normal : ce n’est
+ * dangereux qu’en attribut. Ce qu’on exige, c’est qu’aucune balise ne
+ * subsiste — le gabarit échappe ensuite ce texte avec esc_html().
+ */
+$r = $valide( pp_requete_metier( $hostile( '<img src=x onerror=alert(1)>' ) ) );
+$verifie(
+	'aucun chevron ne survit',
+	strpos( (string) ( $r['data']['visualizer']['config']['nomScene'] ?? '' ), '<' ) === false
+);
+
+/* Une clé hostile est nettoyée elle aussi : une clé finit dans une page. */
+$r = $valide( pp_requete_metier( [ 'visualizer' => [ 'sceneId' => 'sejour', 'config' => [ '<script>x</script>zoom' => 2 ] ] ] ) );
+$cles = array_keys( (array) ( $r['data']['visualizer']['config'] ?? [] ) );
+$verifie(
+	'clé hostile nettoyée',
+	$r['ok'] && ! in_array( '<script>x</script>zoom', $cles, true ),
+	implode( ',', array_map( 'strval', $cles ) )
+);
+
+/* ------------------------------------------------------------------ */
+$section( 'Visualiseur : bornes du carnet' );
+$verifie(
+	'libellé de 121 caractères refusé',
+	$refuse( pp_requete_metier( [ 'visualizer' => [ 'config' => [ 'nom' => str_repeat( 'a', 121 ) ] ] ] ), 'visualizer.config' )
+);
+$verifie(
+	'libellé de 120 caractères accepté',
+	$valide( pp_requete_metier( [ 'visualizer' => [ 'config' => [ 'nom' => str_repeat( 'a', 120 ) ] ] ] ) )['ok']
+);
+$verifie(
+	'nom de champ trop long refusé',
+	$refuse( pp_requete_metier( [ 'visualizer' => [ 'config' => [ str_repeat( 'k', 121 ) => 'x' ] ] ] ), 'visualizer.config' )
+);
+$verifie(
+	'carnet trop imbriqué refusé',
+	$refuse( pp_requete_metier( [ 'visualizer' => [ 'config' => [ 'a' => [ 'b' => [ 'c' => [ 'd' => 1 ] ] ] ] ] ] ), 'visualizer.config' )
+);
+$verifie(
+	'trois niveaux acceptés',
+	$valide( pp_requete_metier( [ 'visualizer' => [ 'config' => [ 'a' => [ 'b' => [ 'c' => 1 ] ] ] ] ] ) )['ok']
+);
+
+/* ------------------------------------------------------------------ */
 $section( 'Champs techniques (retirés avant le validateur)' );
 $verifie( 'formToken et website sont les deux champs techniques', Guard::TECHNICAL_FIELDS === [ 'formToken', 'website' ] );
 $verifie( 'aucun champ technique dans le contrat métier', ! array_intersect( Guard::TECHNICAL_FIELDS, array_keys( Fields::ROOT ) ) );

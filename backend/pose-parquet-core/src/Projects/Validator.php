@@ -266,17 +266,126 @@ final class Validator {
 			if ( ! is_array( $v['config'] ) ) {
 				$errors['visualizer.config'] = 'Type invalide : objet attendu.';
 			} else {
-				$json = wp_json_encode( $v['config'] );
-				if ( ! is_string( $json ) || strlen( $json ) > Fields::MAX_VISUALIZER_CONFIG_BYTES ) {
-					$errors['visualizer.config'] = sprintf( 'Configuration trop volumineuse (%d octets maximum).', Fields::MAX_VISUALIZER_CONFIG_BYTES );
+				/*
+				 * Deux temps, et l'ordre compte.
+				 *
+				 * D'abord on REFUSE ce qui est hors bornes : une chaîne trop
+				 * longue, un empilement trop profond. Le refus est explicite,
+				 * en 422, parce que tronquer en silence ferait perdre une
+				 * donnée sans que personne l'apprenne — ni le visiteur, ni
+				 * nous. Le plafond de 4 Ko existait déjà pour cette raison ; le
+				 * contourner en coupant chaque valeur l'aurait vidé de son
+				 * sens.
+				 *
+				 * Ensuite seulement on NETTOIE ce qui reste — balises,
+				 * caractères de contrôle — et on mesure le résultat. Mesurer
+				 * avant de nettoyer laisserait passer un contenu que le
+				 * nettoyage rallonge : une esperluette devient `&amp;`.
+				 *
+				 * Ce nettoyage est arrivé avec les libellés d'affichage :
+				 * depuis, la fiche d'administration LIT deux clés de ce carnet
+				 * pour nommer la scène et le parquet. Un carnet qu'on relit
+				 * mérite d'être propre dès l'écriture, même s'il est aussi
+				 * échappé à l'affichage. Les deux, pas l'un ou l'autre.
+				 */
+				$souci = self::config_hors_bornes( $v['config'], 1 );
+				if ( $souci !== null ) {
+					$errors['visualizer.config'] = $souci;
 				} else {
-					$out['config'] = $v['config'];
+					$propre = self::sanitize_config( $v['config'], 1 );
+					$json   = wp_json_encode( $propre );
+					if ( ! is_string( $json ) || strlen( $json ) > Fields::MAX_VISUALIZER_CONFIG_BYTES ) {
+						$errors['visualizer.config'] = sprintf( 'Configuration trop volumineuse (%d octets maximum).', Fields::MAX_VISUALIZER_CONFIG_BYTES );
+					} else {
+						$out['config'] = $propre;
+					}
 				}
 			}
 		}
 		if ( $out ) {
 			$data['visualizer'] = $out;
 		}
+	}
+
+	/**
+	 * Cherche ce qui, dans le carnet, dépasse les bornes admises.
+	 *
+	 * Renvoie le message d'erreur à afficher, ou `null` si tout va bien. Les
+	 * clés comptent autant que les valeurs : une clé est du texte, elle finit
+	 * elle aussi dans une page.
+	 *
+	 * La profondeur est bornée parce que la limite d'octets ne suffit pas —
+	 * un objet imbriqué mille fois tient dans très peu de place et coûte cher
+	 * à parcourir.
+	 *
+	 * @param array<mixed> $config
+	 * @param int          $depth  profondeur courante, 1 pour la racine
+	 */
+	private static function config_hors_bornes( array $config, int $depth ): ?string {
+		if ( $depth > Fields::MAX_VISUALIZER_DEPTH ) {
+			return sprintf( 'Configuration trop imbriquée (%d niveaux maximum).', Fields::MAX_VISUALIZER_DEPTH );
+		}
+
+		foreach ( $config as $cle => $valeur ) {
+			if ( is_string( $cle ) && mb_strlen( $cle ) > Fields::MAX_VISUALIZER_TEXT ) {
+				return sprintf( 'Nom de champ trop long (%d caractères maximum).', Fields::MAX_VISUALIZER_TEXT );
+			}
+			if ( is_string( $valeur ) && mb_strlen( $valeur ) > Fields::MAX_VISUALIZER_TEXT ) {
+				return sprintf( 'Valeur trop longue (%d caractères maximum).', Fields::MAX_VISUALIZER_TEXT );
+			}
+			if ( is_array( $valeur ) ) {
+				$souci = self::config_hors_bornes( $valeur, $depth + 1 );
+				if ( $souci !== null ) {
+					return $souci;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Nettoie le carnet `visualizer.config`, sans en imposer la forme.
+	 *
+	 * Le serveur ne décide pas de ce que le front y met — c'est le principe de
+	 * ce champ. Il décide en revanche de ce qui peut y entrer : du texte
+	 * simple, des nombres, des booléens, et rien qui exécute quoi que ce soit.
+	 *
+	 * Les chaînes et les clés passent par `sanitize_text_field()`, qui retire
+	 * les balises et les caractères de contrôle. Aucune troncature ici : ce qui
+	 * dépassait a déjà été refusé par `config_hors_bornes()`, en amont.
+	 *
+	 * @param array<mixed> $config
+	 * @param int          $depth   profondeur courante, 1 pour la racine
+	 * @return array<mixed>
+	 */
+	private static function sanitize_config( array $config, int $depth ): array {
+		if ( $depth > Fields::MAX_VISUALIZER_DEPTH ) {
+			return [];
+		}
+
+		$out = [];
+		foreach ( $config as $cle => $valeur ) {
+			$cle_propre = is_int( $cle ) ? $cle : sanitize_text_field( (string) $cle );
+
+			// Une clé qui ne survit pas au nettoyage — « <script> » seul, par
+			// exemple — n'avait rien à faire là : sa valeur part avec elle.
+			if ( $cle_propre === '' ) {
+				continue;
+			}
+
+			if ( is_string( $valeur ) ) {
+				$out[ $cle_propre ] = sanitize_text_field( $valeur );
+			} elseif ( is_int( $valeur ) || is_float( $valeur ) || is_bool( $valeur ) || $valeur === null ) {
+				$out[ $cle_propre ] = $valeur;
+			} elseif ( is_array( $valeur ) ) {
+				$out[ $cle_propre ] = self::sanitize_config( $valeur, $depth + 1 );
+			}
+			// Tout autre type — objet, ressource — est simplement écarté : il
+			// n'aurait pas survécu au JSON de toute façon.
+		}
+
+		return $out;
 	}
 
 	/** Présent = clé existante et valeur non nulle, non vide si chaîne. */

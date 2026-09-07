@@ -84,7 +84,7 @@ function surcharge() {
 /**
  * Racine de l'API, ou `null` si cet environnement n'a pas de backend.
  *
- * @returns {string|null} ex. 'http://localhost:8181/wp-json/pose-parquet/v1'
+ * @returns {string|null} ex. 'http://pose-parquet-dev.local/wp-json/pose-parquet/v1'
  */
 export function apiBaseUrl() {
   const c = surcharge();

@@ -10,7 +10,7 @@ Le formulaire de `projet/` envoie pour de vrai, là où un backend existe.
 
 | Hôte | Backend | Ce que vit le visiteur |
 |---|---|---|
-| `localhost` (développement) | WordPress dédié sur `localhost:8181` | la demande est enregistrée, la référence du serveur s'affiche |
+| `localhost` (développement) | WordPress dédié sur `http://pose-parquet-dev.local` | la demande est enregistrée, la référence du serveur s'affiche |
 | `jonathan-lanationduweb.github.io` | **aucun** (`null`) | le formulaire annonce qu'il n'est pas relié et renvoie vers la page contact |
 | `pose-parquet.com`, `www.` | **aucun** (`null`) | idem |
 

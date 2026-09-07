@@ -144,7 +144,47 @@ action n'est déclenchée automatiquement.
 orientation en degrés. Le JSON de `visualizer_config` **n'est pas montré** :
 c'est un carnet du moteur de rendu, utile au front et illisible pour un
 gestionnaire. Vérifié par test : une valeur placée dans la configuration
-n'apparaît nulle part dans la page.
+n'apparaît nulle part dans la page — à deux exceptions près, décrites juste
+dessous.
+
+### Noms lisibles plutôt qu'identifiants (0.4.1)
+
+« sejour » et « chene-fume » ne se disent pas au téléphone. Quand le front a
+joint le nom humain, la fiche affiche donc :
+
+```
+Scène      Séjour et salle à manger (sejour)
+Produit    Chêne Fumé (chene-fume)
+```
+
+L'identifiant reste, entre parenthèses : c'est la clé qui permet de retrouver
+la scène ou la référence, et le masquer obligerait à ouvrir la base pour la
+lire. Il passe au second plan, il ne disparaît pas.
+
+Ces deux noms sont les seules valeurs de `visualizer_config` que le serveur
+lit : `nomScene` et `nom`. Ce sont des **instantanés** pris au moment de
+l'envoi, pas des traductions. Le plugin n'a aucune table de correspondance et
+ne recopie pas le catalogue du front : il ne saurait pas la tenir à jour, et
+elle mentirait dès la première scène retitrée. Une demande garde donc ce que le
+visiteur voyait ce jour-là.
+
+**Les demandes antérieures à 0.4.1 n'ont pas ces noms** : elles affichent leur
+identifiant seul, et rien n'est réécrit pour leur en inventer un. Aucune
+migration, aucun rattrapage — `PP-2026-009034` et `PP-2026-009035` servent de
+témoins de ce comportement.
+
+Un libellé vient du navigateur, donc il n'est pas cru sur parole. À
+l'écriture, le validateur refuse toute chaîne de plus de 120 caractères et tout
+carnet de plus de trois niveaux, puis passe chaque chaîne et chaque clé par
+`sanitize_text_field()` — aucune balise ne survit. À l'affichage, le gabarit
+échappe avec `esc_html()`. Les deux, pas l'un ou l'autre : vingt-cinq
+vérifications couvrent ces libellés dans `run-validator.php`, dont six charges
+hostiles (`<script>`, `<img onerror>`, `<iframe>`, `javascript:`, guillemets,
+balise ouverte) et une clé hostile.
+
+Un JSON illisible en base — tronqué, écrit par une version plus ancienne — ne
+fait pas tomber la fiche : la lecture rend un tableau vide et l'affichage se
+replie sur les identifiants.
 
 Le champ du Visualiseur s'appelle « Scène » et non « Pièce », parce que la
 section Projet porte déjà un « Pièce » qui est le type de pièce déclaré. De
