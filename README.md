@@ -185,22 +185,35 @@ Le formulaire est un **composant indépendant** monté sur un conteneur neutre :
 - `components/project-form/project-form.css` : styles isolés sous `.project-form`.
 - `components/project-form/project-form.html` : bloc de montage à copier dans une page.
 
-> **État réel : le formulaire n'envoie rien.** Sans `endpoint` configuré, la
-> demande est conservée dans le `localStorage` du visiteur et personne ne la
-> reçoit. L'écran de fin le dit explicitement (« Mode démonstration — votre
-> demande n'a pas été envoyée »), et redevient un remerciement normal dès qu'un
-> point de réception existe. Ce qu'il reste à faire avant le lancement, y
-> compris la vérification des adresses email affichées :
-> [docs/formulaire-production.md](docs/formulaire-production.md).
+> **État réel : le formulaire envoie pour de vrai, là où un backend existe.**
+> `js/forms/api-config.js` associe chaque hôte à sa racine REST. En
+> développement (`localhost`), le WordPress dédié reçoit les demandes et le
+> visiteur voit la référence rendue par le serveur. Sur GitHub Pages et sur le
+> domaine de production, **aucun backend n'est encore déployé** : l'entrée vaut
+> `null` et le formulaire l'annonce clairement au lieu de faire semblant
+> d'envoyer. Il n'y a plus de mode démonstration, plus de fausse réussite en
+> `localStorage` : l'écran de confirmation n'apparaît que sur un `201`
+> réellement reçu. Détail du branchement, matrice d'erreurs et actions de mise
+> en production :
+> [docs/backend/front-integration.md](docs/backend/front-integration.md).
 
 ### Brancher un backend
 
-`js/forms/submit-adapter.js` isole l'envoi. Sans `endpoint`, la demande est
-stockée en local (`localStorage`) et l'écran de confirmation s'affiche.
+Trois modules, un seul endroit à modifier pour changer d'adresse :
+
+- `js/forms/api-config.js` : le tableau `PAR_HOTE` associe l'hôte du front à la
+  racine REST du backend. `null` signifie « pas de backend ici », et le
+  formulaire l'annonce au visiteur plutôt que de faire semblant d'envoyer.
+- `js/forms/project-payload.js` : traduction unique `FormData` → JSON du
+  contrat (`prenom` → `firstName`…), plus le contexte du Studio, sans aucune
+  photo.
+- `js/forms/submit-adapter.js` : jeton, envoi, erreurs typées, réessai unique
+  sur jeton périmé, délai de 12 s.
+
+Pour un essai ponctuel depuis un hôte absent du tableau, la page peut poser :
 
 ```js
-import { configureSubmit } from './js/forms/submit-adapter.js';
-configureSubmit({ endpoint: 'https://api.exemple.fr/leads' });
+window.POSE_PARQUET_CONFIG = { apiBaseUrl: 'https://exemple.fr/wp-json/pose-parquet/v1' };
 ```
 
 ### Remplacer le formulaire

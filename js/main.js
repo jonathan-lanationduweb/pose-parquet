@@ -87,11 +87,11 @@ async function boot() {
   }
 
   if (has('[data-project-form]')) {
-    const [{ mountProjectForm }, { submitProject }] = await Promise.all([
-      import('../components/project-form/project-form.js'),
-      import('./forms/submit-adapter.js'),
-    ]);
-    mountProjectForm(qs('[data-project-form]'), { onSubmit: submitProject });
+    // Le composant importe lui-même sa couche d'envoi : il n'y a plus de
+    // fonction à injecter, donc plus de risque d'en injecter une qui fasse
+    // semblant. Voir components/project-form/project-form.js.
+    const { mountProjectForm } = await import('../components/project-form/project-form.js');
+    mountProjectForm(qs('[data-project-form]'));
   }
 }
 

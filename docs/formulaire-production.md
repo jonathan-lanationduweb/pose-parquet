@@ -1,99 +1,74 @@
 # Formulaire projet : état réel et ce qu'il manque avant le lancement
 
+Mis à jour le 7 septembre 2026, après le branchement du formulaire sur le
+backend WordPress (lot 5).
+
 ## État constaté
 
-Le formulaire de `projet/` fonctionne : validation, étapes, résumé, envoi. Mais
-**aucun destinataire n'est branché.**
+Le formulaire de `projet/` envoie pour de vrai, là où un backend existe.
+`js/forms/api-config.js` associe chaque hôte du front à sa racine REST :
 
-`js/forms/submit-adapter.js` :
+| Hôte | Backend | Ce que vit le visiteur |
+|---|---|---|
+| `localhost` (développement) | WordPress dédié sur `localhost:8181` | la demande est enregistrée, la référence du serveur s'affiche |
+| `jonathan-lanationduweb.github.io` | **aucun** (`null`) | le formulaire annonce qu'il n'est pas relié et renvoie vers la page contact |
+| `pose-parquet.com`, `www.` | **aucun** (`null`) | idem |
 
-```js
-export async function submitProject(payload) {
-  if (!config.endpoint) {
-    storeLocally(payload);                 // localStorage, 20 dernières demandes
-    await new Promise((r) => setTimeout(r, 700));
-    return { ok: true, mode: 'local' };    // ← succès annoncé
-  }
-  …
-}
-```
+Ce qui a disparu au lot 5 : le mode démonstration, qui écrivait la demande dans
+le `localStorage` du visiteur et **annonçait un succès** sans qu'aucune requête
+ne parte. Il n'y a plus de chemin de ce genre. L'écran de confirmation
+n'apparaît que sur un `201` réellement reçu, et affiche la référence rendue par
+le serveur.
 
-`config.endpoint` vaut `null` et rien n'appelle `configureSubmit()`. Donc, à ce
-jour : la demande est écrite dans le `localStorage` du visiteur, l'adaptateur
-renvoie un succès, et **personne ne reçoit rien.**
+L'ancienne piste — service de formulaire hébergé, fonction serverless, relais
+SMTP appelé depuis le navigateur — est abandonnée : le site parle à un
+WordPress qui porte la base, les emails, l'anti-spam et l'administration des
+demandes. Voir `docs/backend/`.
 
-## Ce qui a été corrigé dans cette passe
-
-Le comportement technique n'a pas changé — brancher un backend n'était pas
-l'objet de cette passe. Ce qui a changé, c'est ce que le visiteur lit.
-
-Avant, l'écran de fin affichait :
-
-> **Demande enregistrée**
-> Merci, votre projet est bien décrit.
-> Nous revenons vers vous rapidement.
-
-C'est une promesse fausse faite à quelqu'un qui vient de saisir son adresse, son
-budget et le détail de son chantier. Désormais, quand l'adaptateur renvoie
-`mode: 'local'` ou `mode: 'noop'`, l'écran de fin dit :
-
-> **Mode démonstration**
-> Votre demande n'a pas été envoyée.
-> Ce formulaire fonctionne, mais aucun destinataire n'est encore branché : votre
-> demande est restée dans ce navigateur et personne ne l'a reçue. Pour nous
-> joindre dès maintenant, passez par la page contact.
-
-Le message redevient vrai automatiquement le jour où un `endpoint` est
-configuré : l'adaptateur renvoie alors `mode: 'remote'` et l'écran de
-remerciement normal réapparaît. **Il n'y a rien à penser à enlever.**
+La règle « jamais de clé d'API dans le JavaScript du site » reste entière, et
+elle est respectée : le front n'a aucun secret. Le jeton anti-spam est public
+par construction, à usage unique et de courte durée, et ne quitte jamais la
+mémoire du navigateur.
 
 ## Ce qu'il faut avant le lancement
 
-Trois choses, dans cet ordre.
+### 1. Héberger le backend
 
-### 1. Un point de réception
+Rien n'est déployé. Le WordPress de développement vit sur cette machine
+seulement. Il faut un WordPress en préproduction puis en production, en HTTPS
+avec un certificat valide — une page en `https://` ne peut pas appeler une API
+en `http://`.
 
-Le site est statique, hébergé sur GitHub Pages : il n'y a pas de serveur.
-Options, de la plus légère à la plus lourde :
+Puis, dans l'ordre : renseigner la racine REST réelle dans `PAR_HOTE`
+(`js/forms/api-config.js`), déclarer les origines CORS autorisées côté plugin
+(constante `POSE_PARQUET_ALLOWED_ORIGINS` ou filtre
+`pose_parquet_allowed_origins`, jamais `*`), configurer un vrai SMTP, et
+renseigner l'adresse destinataire dans « Pose Parquet → Réglages » — elle n'est
+codée nulle part.
 
-| solution | avantages | à vérifier |
-| --- | --- | --- |
-| Service de formulaire hébergé (Formspree, Basin, Web3Forms…) | branché en une ligne, pas de code serveur | traitement des données personnelles, sous-traitant hors UE, tarif au volume |
-| Fonction serverless (Netlify / Vercel / Cloudflare Worker) | on maîtrise le code et la destination, coût quasi nul | il faut un compte et un déploiement à part du site |
-| Boîte mail via un relais SMTP | simple à comprendre | une clé d'API dans du JavaScript public est exposée : il faut un intermédiaire |
+La liste détaillée est dans
+[`docs/backend/front-integration.md`](backend/front-integration.md).
 
-Quel que soit le choix : **jamais de clé d'API dans le JavaScript du site.**
-Le code est public, la clé aussi.
+### 2. Conformité et robustesse
 
-### 2. Le branchement
-
-Une seule ligne, au démarrage :
-
-```js
-import { configureSubmit } from './js/forms/submit-adapter.js';
-configureSubmit({ endpoint: 'https://…/leads' });
-```
-
-L'adaptateur existe précisément pour ça : aucun autre fichier n'est à toucher.
-
-### 3. Conformité et robustesse
-
-- [ ] **RGPD** : finalité, base légale, durée de conservation, destinataire.
-      Le formulaire collecte au minimum une adresse email et la description d'un
-      logement — ce sont des données personnelles.
-- [ ] **Consentement** : une case explicite, non pré-cochée, et un lien vers la
-      politique de confidentialité — qui reste à écrire.
-- [ ] **Anti-spam** : sans protection, un formulaire public reçoit du spam sous
-      quelques jours. Un piège à robots (champ caché) ou le mécanisme du
-      prestataire.
-- [ ] **Accusé de réception** au demandeur, avec un délai de réponse réaliste.
-- [ ] **Notification** au destinataire, et une adresse de secours si l'envoi
-      échoue.
-- [ ] **Sortie du `localStorage`** : une fois un endpoint branché, la sauvegarde
-      locale devient un filet en cas d'échec réseau, plus le mécanisme
-      principal. Vérifier qu'elle ne conserve pas de données personnelles plus
-      longtemps que nécessaire.
-- [ ] **Test réel** de bout en bout, depuis le domaine de production.
+- [x] **Anti-spam** : pot de miel hors cadre, jeton temporel signé, limite de
+      débit par condensat d'IP (lot 3).
+- [x] **Accusé de réception** au demandeur et **notification** au destinataire,
+      avec états d'envoi en base ; un échec d'email ne supprime jamais la
+      demande enregistrée (lot 3).
+- [x] **Sortie du `localStorage`** : plus aucune demande n'y est écrite.
+- [x] **Consentement** : case explicite, non pré-cochée ; la date est celle du
+      serveur, jamais celle du navigateur.
+- [ ] **Politique de confidentialité** : le lien existe, la page reste à
+      écrire.
+- [ ] **RGPD** : finalité, base légale, **durée de conservation** et
+      destinataire à formaliser. Le formulaire collecte une adresse email, un
+      téléphone et la description d'un logement — ce sont des données
+      personnelles. La purge automatique n'est pas écrite (prévue au lot 6).
+- [ ] **Délai de réponse** : l'écran de confirmation ne promet rien de chiffré
+      (« nous vous répondrons par email ou par téléphone »). Le jour où
+      l'équipe s'engage sur un délai, c'est là qu'il s'écrit — et pas avant.
+- [ ] **Test réel** de bout en bout depuis le domaine de production.
 
 ## Adresses email affichées
 
@@ -117,7 +92,8 @@ faux envoi de formulaire — sauf que l'interface ne peut pas le détecter.
 
 ## Règle
 
-**Ne jamais laisser en production un envoi qui ne part pas.** Si le point de
-réception n'est pas prêt le jour du lancement, le formulaire doit soit être
-retiré, soit annoncer clairement qu'il est en démonstration — ce qu'il fait
-aujourd'hui.
+**Ne jamais laisser en production un envoi qui ne part pas.** Elle est
+désormais tenue par le code plutôt que par la vigilance : là où aucun backend
+n'est configuré, le formulaire le dit et n'affiche aucun succès. Il n'y a plus
+de chemin par lequel l'interface annonce « demande envoyée » alors que rien
+n'est parti.

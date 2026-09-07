@@ -167,17 +167,30 @@ HTTP réel (`tests/run-http.php`).
 
 ## Routes prévues
 
-| Lot | Route | Accès |
-|---|---|---|
-| 4 | `GET /admin/projects`, `GET /admin/projects/{id}`, `PATCH /admin/projects/{id}/status`, `POST /admin/projects/{id}/notes` | cookie WordPress + nonce `X-WP-Nonce`, capabilities `pp_view_projects` / `pp_manage_projects` |
+Le lot 4 a livré l'administration **sans route REST** : les écrans sont des
+pages `wp-admin` et les écritures passent par `admin-post.php` avec nonce. Des
+routes d'administration n'auraient d'intérêt qu'avec un client distinct de
+wp-admin ; elles ne sont plus prévues à court terme.
 
 Pas de JWT, pas de jeton en `localStorage`.
 
 ## Contrat côté front
 
-Le front appelle l'API via `js/forms/submit-adapter.js` (`configureSubmit({
-endpoint })`). Rien n'est branché dans ce lot ; le formulaire reste en mode
-démonstration. Le lot 5 traduira la charge `FormData` vers le JSON ci-dessus
-(voir la table de `project-form-contract.md`), demandera un jeton à
-`GET /form-token` au chargement du formulaire, ajoutera le champ `website`
-invisible, et traitera les réponses `422 form_token_invalid` et `429`.
+Branché depuis le lot 5. Le front appelle l'API par trois modules :
+`js/forms/api-config.js` (l'adresse, résolue une seule fois),
+`js/forms/project-payload.js` (traduction `FormData` → JSON du contrat) et
+`js/forms/submit-adapter.js` (jeton, envoi, erreurs typées, réessai unique sur
+jeton périmé).
+
+Le formulaire demande `GET /form-token` à son montage, garde le jeton en
+mémoire JS seulement, puis envoie `POST /projects` au clic. Les réponses `422`
+sont ramenées sur les champs, `429` a sa propre phrase, et l'écran de
+confirmation n'apparaît que sur un `201` réellement reçu — l'ancien mode
+démonstration, qui écrivait en `localStorage` et annonçait un succès sans
+requête, n'existe plus.
+
+Aucune photo ne circule : le contexte du Studio est réduit à `visualizer`
+(scène, produit, motif, angle), quelques dizaines d'octets.
+
+Détail complet, table de correspondance des champs, matrice d'erreurs et liste
+des actions de mise en production : `front-integration.md`.
