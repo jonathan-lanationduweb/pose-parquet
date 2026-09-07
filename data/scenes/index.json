@@ -125,6 +125,50 @@
       "geometryStatus": "validated",
       "visualStatus": "validated",
       "showInRoomLibrary": true
+    },
+    {
+      "id": "couloir-enfilade",
+      "label": "Couloir en enfilade",
+      "file": "room-couloir-bleu.jpg",
+      "thumb": "room-couloir-bleu-640.jpg",
+      "zones": 1,
+      "highlight": "Moulures pour la fuite, teinte pour le contour",
+      "geometryStatus": "validated",
+      "visualStatus": "validated",
+      "showInRoomLibrary": false
+    },
+    {
+      "id": "entree-cadree",
+      "label": "Entrée cadrée",
+      "file": "room-entree-cadree.jpg",
+      "thumb": "room-entree-cadree-640.jpg",
+      "zones": 1,
+      "highlight": "Pièce vide, deux plinthes suivies, aucun occulteur",
+      "geometryStatus": "validated",
+      "visualStatus": "validated",
+      "showInRoomLibrary": true
+    },
+    {
+      "id": "chambre-claire",
+      "label": "Chambre claire",
+      "file": "room-chambre-claire.jpg",
+      "thumb": "room-chambre-claire-640.jpg",
+      "zones": 1,
+      "highlight": "Vue d’angle : focale mesurée par orthogonalité",
+      "geometryStatus": "validated",
+      "visualStatus": "validated",
+      "showInRoomLibrary": true
+    },
+    {
+      "id": "piece-arcades",
+      "label": "Pièce aux arcades",
+      "file": "room-piece-arcades.jpg",
+      "thumb": "room-piece-arcades-640.jpg",
+      "zones": 1,
+      "highlight": "Focale et hauteur d’œil toutes deux mesurées",
+      "geometryStatus": "validated",
+      "visualStatus": "validated",
+      "showInRoomLibrary": true
     }
   ]
 }

@@ -51,20 +51,22 @@ Elles sont créditées ici par respect du travail des auteurs.
 | `room-appartement-ancien.jpg` | Curtis Adams | [Pexels #8583672](https://www.pexels.com/photo/8583672/) |
 | `room-chambre-parisienne.jpg` | Max Vakhtbovych | [Pexels #7587872](https://www.pexels.com/photo/7587872/) |
 | `room-couloir-bleu.jpg` | Max Vakhtbovych | [Pexels #7587868](https://www.pexels.com/photo/7587868/) |
+| `room-entree-cadree.jpg` | Gustavo Galeano Maz | [Pexels #7865621](https://www.pexels.com/photo/7865621/) |
+| `room-chambre-claire.jpg` | Curtis Adams | [Pexels #16641359](https://www.pexels.com/photo/16641359/) |
+| `room-piece-arcades.jpg` | Daniel Tanque | [Pexels #13702811](https://www.pexels.com/photo/13702811/) |
 | `room-cuisine-ouverte.jpg` | Max Vakhtbovych | [Pexels #8146149](https://www.pexels.com/photo/8146149/) |
 | `room-salon-angle.jpg` | Gustavo Galeano Maz | [Pexels #9826455](https://www.pexels.com/photo/9826455/) |
-| `room-entree.jpg` | Max Vakhtbovych | [Pexels #7166928](https://www.pexels.com/photo/7166928/) |
 | `room-sous-les-toits.jpg` | Max Vakhtbovych | [Pexels #8082327](https://www.pexels.com/photo/8082327/) |
 | `hero-poster.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
 | `og-default.jpg` | Curtis Adams | [Pexels #7027842](https://www.pexels.com/photo/7027842/) |
 | `inspi-1.jpg` | Curtis Adams | [Pexels #3935327](https://www.pexels.com/photo/3935327/) |
 | `inspi-2.jpg` | Max Vakhtbovych | [Pexels #7587872](https://www.pexels.com/photo/7587872/) |
 | `inspi-3.jpg` | Max Vakhtbovych | [Pexels #7060823](https://www.pexels.com/photo/7060823/) |
-| `inspi-4.jpg` | Max Vakhtbovych | [Pexels #7587374](https://www.pexels.com/photo/7587374/) |
-| `inspi-5.jpg` | Алан Албегов | [Pexels #20771870](https://www.pexels.com/photo/20771870/) |
+| `inspi-4.jpg` | Max Vakhtbovych | [Pexels #7587868](https://www.pexels.com/photo/7587868/) |
+| `inspi-5.jpg` | Curtis Adams | [Pexels #16641359](https://www.pexels.com/photo/16641359/) |
 | `inspi-6.jpg` | Max Vakhtbovych | [Pexels #7045700](https://www.pexels.com/photo/7045700/) |
-| `inspi-7.jpg` | Max Vakhtbovych | [Pexels #8082327](https://www.pexels.com/photo/8082327/) |
-| `inspi-8.jpg` | Curtis Adams | [Pexels #8583672](https://www.pexels.com/photo/8583672/) |
+| `inspi-7.jpg` | Daniel Tanque | [Pexels #13702811](https://www.pexels.com/photo/13702811/) |
+| `inspi-8.jpg` | Gustavo Galeano Maz | [Pexels #7865621](https://www.pexels.com/photo/7865621/) |
 
 Les visuels marqués « produit pour le site » ne sont pas des photographies :
 ils sont calculés par le moteur du visualiseur sur une scène calibrée, quand

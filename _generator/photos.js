@@ -248,6 +248,31 @@ const PHOTOS = {
    * et plinthes franches, ce qui se mesure. Une photo dont la jonction
    * mur/sol ne se relève pas coûte des heures pour rien.
    */
+  'room-couloir-bleu': {
+    id: 7587868, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
+    alt: 'Couloir aux murs bleu nuit à moulures, parquet en chevrons dans l axe',
+  },
+  /*
+   * Les trois pièces de la dernière passe. Elles ont été choisies sur MESURE
+   * avant d'être importées : un pré-filtre a cherché, sur chaque candidate, le
+   * plus long train de colonnes voisines dont la frontière basse s'aligne à
+   * moins de 3 px. Celles-ci rendent 79, 75 et 61 colonnes à moins de 1,3 px.
+   * Les neuf candidates de combles essayées avant elles plafonnaient à 32
+   * colonnes à 2,56 px, et leurs sols étaient meublés : un comble se
+   * photographie mal pour cet usage, ses murs bas sont courts et interrompus.
+   */
+  'room-entree-cadree': {
+    id: 7865621, w: 1600, h: 1067, credit: 'Gustavo Galeano Maz',
+    alt: 'Entrée vide aux murs blancs et plinthes bois, parquet miel, portes en enfilade au fond',
+  },
+  'room-chambre-claire': {
+    id: 16641359, w: 1600, h: 1067, credit: 'Curtis Adams',
+    alt: 'Chambre vide aux murs blancs et plafond à caisson, sol en lames foncées, trois fenêtres',
+  },
+  'room-piece-arcades': {
+    id: 13702811, w: 1600, h: 1067, credit: 'Daniel Tanque',
+    alt: 'Grande pièce vide à arcades, murs crème et parquet en point de Hongrie',
+  },
   'room-cuisine-ouverte': {
     id: 8146149, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
     alt: 'Cuisine ouverte sur un grand séjour vide, sol en lames foncées',
@@ -346,30 +371,45 @@ const INSPIRATION_PHOTOS = [
     // plus dégagé du dépôt et des plinthes blanches sur lames foncées.
     image: 'room-cuisine-ouverte', sceneId: 'cuisine-ouverte', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-gris', pattern: 'lames', orientation: 0 } },
-  { id: 7587374, tags: 'droite couloir', credit: 'Max Vakhtbovych', title: 'Couloir en enfilade', meta: 'Lames dans l’axe · chêne clair', size: 'sm',
-    alt: 'Couloir minimaliste aux portes en bois et parquet clair posé dans l’axe',
-    // Trois photos essayées, aucune retenue. room-couloir (7587374) : bois
-    // clair sur bois clair, aucune marche sur AUCUNE colonne — profils relevés
-    // de haut en bas, variation de 20 niveaux sur toute la hauteur. Le couloir
-    // bleu à moulures (7587868), classé EXCELLENT au dépistage : ses deux
-    // frontières sont si raides (pentes -3,7 et +4,0) que l'ajustement rend
-    // 15 et 35 px de résidu, et son sol visible ne fait que 6 pour cent du
-    // cadre. Deux autres couloirs (19899087, 7005286) : aucune frontière
-    // mesurable, et REJETÉ au dépistage.
-    image: 'inspi-4', sceneId: null, visualizerAvailable: false,
-    config: { productId: 'chene-craie', pattern: 'lames', orientation: 90 } },
-  { id: 20771870, tags: 'droite chambre', credit: 'Алан Албегов', title: 'Chambre sous combles', meta: 'Lames droites · chêne brun', size: 'md',
-    alt: 'Chambre sous combles au plancher brun et mobilier clair',
-    // room-petit-bureau : CALIBRATION COMMENCÉE, pas finie. Les deux
-    // directions du sol sont relevées et franches — la plinthe des placards
-    // de gauche est linéaire de x 0,04 à 0,28 (pente -0,1885, chute de
-    // luminance 111 à 131) et celle des commodes du fond de x 0,58 à 0,73
-    // (pente +0,131) ; leur intersection place le coin de la pièce en
-    // (0,502 ; 0,6936). Manquent une seconde parallèle par direction, donc
-    // les deux fuites, et le détourage de la banquette capitonnée, du
-    // fauteuil à quatre pieds fins et du bureau de premier plan. Voir
-    // docs/inspiration-studio.md.
-    image: 'room-petit-bureau', sceneId: null, visualizerAvailable: false,
+  { id: 7587868, tags: 'hongrie couloir', credit: 'Max Vakhtbovych', title: 'Couloir en enfilade', meta: 'Point de Hongrie · chêne naturel', size: 'sm',
+    alt: 'Couloir aux murs bleu nuit à moulures, parquet en chevrons dans l’axe',
+    // Photo remplacée, puis calibrée à la QUATRIÈME tentative. Les rejets :
+    // room-couloir (7587374), bois clair sur bois clair, aucune marche sur
+    // AUCUNE colonne ; deux autres couloirs (19899087, 7005286) sans frontière
+    // mesurable et REJETÉS au dépistage.
+    //
+    // Ce couloir bleu (7587868) avait lui aussi été écarté, sur un relevé qui
+    // rendait 15 et 35 px de résidu. Le relevé était en cause, pas la photo :
+    // il cherchait la fuite dans les jonctions du sol, qui sont ici très
+    // raides et bruitées. Repris par la méthode du bureau vide — les MOULURES
+    // du lambris donnent la fuite (résidus 1,83 et 0,30 px), la TEINTE donne
+    // le contour — la scène se mesure à 0,02 pour cent de concordance en
+    // largeur et 1,14 en profondeur. Voir data/scenes/couloir-enfilade.json.
+    //
+    // `showInRoomLibrary: false` : son sol ne fait que 7 pour cent du cadre.
+    // Essayable par sa carte, sans allonger « Changer de pièce ».
+    image: 'room-couloir-bleu', sceneId: 'couloir-enfilade', visualizerAvailable: true, showInRoomLibrary: false,
+    config: { productId: 'chene-naturel', pattern: 'point-de-hongrie', orientation: 0 } },
+  { id: 16641359, tags: 'droite chambre', credit: 'Curtis Adams', title: 'Chambre claire', meta: 'Lames droites · chêne brun', size: 'md',
+    alt: 'Chambre vide aux murs blancs et plafond à caisson, sol en lames foncées, trois fenêtres',
+    // Photo remplacée, et le titre suit la photo. L'ancienne (room-petit-bureau,
+    // 20771870) était un dressing sous combles : ses deux plinthes de placards
+    // se relevaient franchement, mais son mur du fond est masqué sur sa moitié
+    // droite par un fauteuil, donc sa seconde fuite n'était pas mesurable — et
+    // son sol portait une banquette capitonnée, ce fauteuil à quatre pieds fins
+    // et une console de premier plan.
+    //
+    // Neuf candidates de combles ont été essayées ensuite, et pré-filtrées sur
+    // le plus long train de colonnes voisines alignées à moins de 3 px : la
+    // meilleure rendait 32 colonnes à 2,56 px, contre 75 à 0,74 pour celle-ci.
+    // Un comble se photographie mal pour cet usage — ses murs bas sont courts
+    // et interrompus, et son sol est meublé. Le type de pièce est conservé :
+    // c'est toujours une chambre.
+    //
+    // Première scène du dépôt dont la FOCALE est mesurée, par orthogonalité de
+    // deux fuites relevées sur deux murs différents dont les horizons
+    // concordent à 4,2 px. Voir data/scenes/chambre-claire.json.
+    image: 'room-chambre-claire', sceneId: 'chambre-claire', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-brun', pattern: 'lames', orientation: 0 } },
   { id: 7045700, tags: 'droite sejour', credit: 'Max Vakhtbovych', title: 'Salon d’angle', meta: 'Lames droites · chêne foncé', size: 'wide',
     alt: 'Grande pièce vide formant un angle, sol en lames de noyer et plinthes bois',
@@ -379,29 +419,41 @@ const INSPIRATION_PHOTOS = [
     // deux frontières horizontales à deux profondeurs.
     image: 'room-salon-angle', sceneId: 'salon-angle', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-tabac', pattern: 'lames', orientation: 0 } },
-  { id: 8082327, tags: 'droite chambre', credit: 'Max Vakhtbovych', title: 'Sous les toits', meta: 'Lames larges · chêne clair', size: 'sm',
-    alt: 'Pièce sous combles éclairée par des fenêtres de toit, parquet clair',
-    // room-sous-les-toits : sol presque vide, mais la moitié GAUCHE de la
-    // frontière mur/sol n'est pas mesurable — onze colonnes relevées y
-    // donnent onze hauteurs sans alignement (forces 15 à 46, valeurs de
-    // 0,62 à 0,76), parce que le sol pâle, les panneaux vert sombre et les
-    // taches de soleil créent des gradients plus forts que la jonction. Le
-    // mur DROIT, lui, est net (pente 0,725, résidus faibles). Reprendre avec
-    // un relevé colonne par colonne à la loupe.
-    image: 'room-sous-les-toits', sceneId: null, visualizerAvailable: false,
-    config: { productId: 'chene-sable', pattern: 'lames', orientation: 0 } },
-  { id: 8583672, tags: 'droite couloir', credit: 'Curtis Adams', title: 'Entrée cadrée', meta: 'Lames dans l’axe · chêne miel', size: 'md',
-    alt: 'Entrée spacieuse au sol en bois clair et décoration soignée',
-    // room-appartement-ancien : géométrie prouvée, rendu rejeté — un meuble à
-    // claire-voie occupe un tiers du sol visible. Deux remplaçantes essayées :
-    // l'entrée en noyer (7166928, EXCELLENT au dépistage) dont le mur de
-    // gauche ne s'ajuste qu'à 5 px de résidu et dont la fuite tombe à 0,62,
-    // au ras du bord arrière du sol — les profondeurs y explosent à 200 m ;
-    // et l'entrée minimaliste (19866475) dont une seule colonne sur
-    // quarante-huit porte une marche exploitable, les murs étant pâles sur
-    // sol pâle.
-    image: 'inspi-8', sceneId: null, visualizerAvailable: false,
-    config: { productId: 'chene-miel', pattern: 'lames', orientation: 90 } },
+  { id: 13702811, tags: 'hongrie sejour', credit: 'Daniel Tanque', title: 'Pièce aux arcades', meta: 'Point de Hongrie · chêne fumé', size: 'sm',
+    alt: 'Grande pièce vide à arcades, murs crème et parquet en point de Hongrie',
+    // Photo remplacée, et le titre suit la photo. L'ancienne
+    // (room-sous-les-toits, 8082327) avait un sol presque vide, mais sa moitié
+    // gauche n'était pas mesurable — onze colonnes, onze hauteurs sans
+    // alignement — et surtout un pilier de brique en plein cadre avec une
+    // échelle ajourée appuyée dessus. Ses deux murs latéraux se coupaient à
+    // y 0,8287, SOUS la ligne de sol du mur du fond à 0,554 : géométriquement
+    // impossible, donc l'un des deux relevés était faux.
+    //
+    // La remplaçante est la scène la mieux mesurée du dépôt : quatre droites,
+    // deux par direction, dont deux corniches ; les deux fuites placent
+    // l'horizon à 2,2 PIXELS l'une de l'autre ; la focale vient de leur
+    // orthogonalité ; et la hauteur d'œil est mesurée sur quatre longueurs
+    // connues — porte, hauteur sous corniche, plinthe, largeur de porte — ce
+    // qui n'était jamais arrivé. Son sol est en bâton rompu et occupe près de
+    // la moitié du cadre. Voir data/scenes/piece-arcades.json.
+    image: 'room-piece-arcades', sceneId: 'piece-arcades', visualizerAvailable: true, showInRoomLibrary: true,
+    config: { productId: 'chene-fume', pattern: 'point-de-hongrie', orientation: 0 } },
+  { id: 7865621, tags: 'droite couloir', credit: 'Gustavo Galeano Maz', title: 'Entrée cadrée', meta: 'Lames dans l’axe · chêne miel', size: 'md',
+    alt: 'Entrée vide aux murs blancs et plinthes bois, parquet miel, portes en enfilade au fond',
+    // Quatrième photo pour cette carte, et les trois refus ont tous la même
+    // cause : le mobilier, jamais la géométrie. room-appartement-ancien avait
+    // sa géométrie prouvée et un meuble à claire-voie sur un tiers du sol ;
+    // l'entrée en noyer (7166928) plaçait sa fuite à y 0,62, au ras du bord
+    // arrière du sol, ce qui faisait exploser les profondeurs à 200 m ;
+    // l'entrée minimaliste (19866475) n'offrait qu'une colonne exploitable
+    // sur quarante-huit, murs pâles sur sol pâle.
+    //
+    // Celle-ci a été choisie sur MESURE avant import : 61 colonnes voisines
+    // alignées à 1,23 px. Sol entièrement vide, plinthes bois sur murs blancs,
+    // bord arrière horizontal à 0,002 de pente — donc point principal imposé.
+    // Voir data/scenes/entree-cadree.json.
+    image: 'room-entree-cadree', sceneId: 'entree-cadree', visualizerAvailable: true, showInRoomLibrary: true,
+    config: { productId: 'chene-miel', pattern: 'lames', orientation: 0 } },
 ];
 
 /** `fm: 'webp'` demande la version WebP au CDN Pexels. */
