@@ -19,14 +19,24 @@
  * leur nom et restent en cache.
  *
  * Aucun bundler : quelques dizaines de lignes de Node suffisent ici.
+ *
+ * Les empreintes passent par `eol.js` : elles portent sur une représentation
+ * canonique (texte ramené en LF, binaires octet pour octet) et non sur ce que
+ * le checkout a bien voulu écrire sur ce disque. Sans cela, la même révision
+ * donnait `studio.ec9baa1d65.css` sous Windows et un autre nom sous Linux,
+ * pour un contenu logiquement identique.
  */
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
+const {
+  empreinte: hash,
+  empreinteDeFichiers,
+  lireTexte,
+  ecrireTexte,
+  copierCanonique,
+} = require('./eol');
 
 const DIST = path.join('assets', 'dist');
-
-const hash = (content) => crypto.createHash('sha1').update(content).digest('hex').slice(0, 10);
 
 const listFiles = (dir, filter) => {
   const out = [];
@@ -51,7 +61,7 @@ function inlineCss(root, entry, seen = new Set()) {
   seen.add(file);
 
   const dir = path.dirname(entry).split(path.sep).join('/');
-  let css = fs.readFileSync(file, 'utf8');
+  let css = lireTexte(file);
 
   // 1. Les imports sont mis de côté : leur contenu sera déjà réécrit quand on
   //    le réinsérera, il ne doit donc pas repasser par l'étape 2.
@@ -80,7 +90,7 @@ function writeHashed(root, name, extension, content) {
   const id = hash(content);
   const file = `${DIST.split(path.sep).join('/')}/${name}.${id}.${extension}`;
   fs.mkdirSync(path.join(root, DIST), { recursive: true });
-  fs.writeFileSync(path.join(root, file), content, 'utf8');
+  ecrireTexte(path.join(root, file), content);
   return file;
 }
 
@@ -108,24 +118,29 @@ function buildAssets(root, { pageCss = [] } = {}) {
   /* ---- CSS du Visualiseur Parquet (fichier interne : css/studio.css) ---- */
   const studioCss = writeHashed(root, 'studio', 'css', inlineCss(root, 'css/studio.css'));
 
-  /* ---- JS : l'arbre est copié tel quel dans un dossier daté par son contenu ----
+  /* ---- JS : l'arbre est recopié dans un dossier daté par son contenu ----
      Les imports internes sont relatifs : recopier l'arbre suffit à changer
-     l'URL de tous les modules d'un coup. */
+     l'URL de tous les modules d'un coup. La copie est canonique — fins de
+     ligne en LF — pour que le fichier publié soit bien celui dont on vient de
+     calculer l'empreinte. */
   const jsFiles = [...listFiles(path.join(root, 'js')), ...listFiles(path.join(root, 'components'))]
     .filter((file) => file.endsWith('.js'))
     .sort();
-  const jsHash = hash(jsFiles.map((file) => fs.readFileSync(file, 'utf8')).join('\n'));
+  const jsHash = empreinteDeFichiers(jsFiles, root);
   jsFiles.forEach((file) => {
     const relative = path.relative(root, file);
     const target = path.join(distPath, jsHash, relative);
     fs.mkdirSync(path.dirname(target), { recursive: true });
-    fs.copyFileSync(file, target);
+    copierCanonique(file, target);
   });
   const jsDir = `${DIST.split(path.sep).join('/')}/${jsHash}`;
 
-  /* ---- Icônes : une empreinte suffit, elles changent rarement ---- */
+  /* ---- Icônes : une empreinte suffit, elles changent rarement ----
+     Le dossier mêle des PNG et des SVG : `empreinteDeFichiers` hache chaque
+     fichier selon son type, ce qui évite d'avoir à choisir un traitement
+     unique pour du binaire et du texte. */
   const iconFiles = listFiles(path.join(root, 'assets', 'icons')).sort();
-  const iconHash = hash(iconFiles.map((file) => fs.readFileSync(file)).join(''));
+  const iconHash = empreinteDeFichiers(iconFiles, root);
 
   manifest = {
     css: siteCss,

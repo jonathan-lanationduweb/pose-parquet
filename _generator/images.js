@@ -1,6 +1,6 @@
 /* Génère des visuels SVG placeholders : compositions d'intérieur abstraites. */
-const fs = require('fs');
 const path = require('path');
+const { ecrireTexte } = require('./eol');
 
 function rng(seed) {
   let s = seed % 2147483647;
@@ -125,10 +125,11 @@ function og() {
 `;
 }
 
+/* Les SVG sont ecrits en LF : ce sont des fichiers texte, et leur contenu ne
+   doit pas dependre des fins de ligne des gabarits de ce module. */
 function write(dir, files) {
-  fs.mkdirSync(dir, { recursive: true });
   Object.entries(files).forEach(([name, content]) => {
-    fs.writeFileSync(path.join(dir, name), content, 'utf8');
+    ecrireTexte(path.join(dir, name), content);
   });
 }
 

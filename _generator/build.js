@@ -14,15 +14,20 @@ const { buildVisualiseurPage } = require('./visualiseur');
 const { resolveSources } = require('./sources');
 const { NB_PIECES, PIECES } = require('./scenes');
 const { buildAssets } = require('./assets');
+const { ecrireTexte } = require('./eol');
 const { picture } = require('./responsive');
 
 const ROOT = process.env.SITE_ROOT || path.join(process.env.USERPROFILE || '', 'Desktop', 'pose-parquet.com');
 
-const write = (relPath, content) => {
-  const full = path.join(ROOT, relPath);
-  fs.mkdirSync(path.dirname(full), { recursive: true });
-  fs.writeFileSync(full, content, 'utf8');
-};
+/*
+ * Toutes les sorties texte du site passent par ici, et toutes sortent en LF.
+ *
+ * Le HTML nait de literaux de gabarit ecrits dans les fichiers de ce dossier :
+ * sans normalisation, il heriterait des fins de ligne de `_generator/*.js`
+ * telles que le checkout les a posees, et le site genere differerait d'une
+ * machine a l'autre. Voir eol.js.
+ */
+const write = (relPath, content) => ecrireTexte(path.join(ROOT, relPath), content);
 
 const frDate = (iso) =>
   new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -100,9 +105,9 @@ function buildDiagrams() {
   fs.mkdirSync(dir, { recursive: true });
 
   // Schemas explicatifs : vectoriels, produits pour le site.
-  fs.writeFileSync(path.join(dir, 'guide-sens-proportions.svg'), proportionsFigure(), 'utf8');
-  fs.writeFileSync(path.join(dir, 'lumiere-avant.svg'), lightFigure('across'), 'utf8');
-  fs.writeFileSync(path.join(dir, 'lumiere-apres.svg'), lightFigure('along'), 'utf8');
+  ecrireTexte(path.join(dir, 'guide-sens-proportions.svg'), proportionsFigure());
+  ecrireTexte(path.join(dir, 'lumiere-avant.svg'), lightFigure('across'));
+  ecrireTexte(path.join(dir, 'lumiere-apres.svg'), lightFigure('along'));
 
   // Les icônes sont produites par _generator/make-icons.js et ne sont
   // jamais écrasées ici.
