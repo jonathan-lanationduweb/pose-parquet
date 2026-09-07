@@ -838,6 +838,24 @@ body.app {
 .action--primary { background: var(--c-sage); border-color: var(--c-sage); color: #12140f; font-weight: 600; }
 .action--primary:hover:not([disabled]) { background: #9cb098; }
 
+/*
+ * « Décrire mon projet » est un lien, pas un bouton : il mène à une autre
+ * page, et le clic milieu, l'ouverture dans un nouvel onglet et l'aperçu de
+ * l'adresse au survol doivent fonctionner. Il porte donc `.action` pour le
+ * dessin, et ces deux lignes pour ce qu'un `<a>` apporte en trop : un
+ * soulignement dont on ne veut pas, et un alignement du texte qui ne se règle
+ * pas tout seul dans une pilule.
+ *
+ * Le focus clavier reste celui du site — aucun `outline: none` ici, ce serait
+ * rendre le bouton invisible au clavier pour gagner un pixel d'esthétique.
+ */
+a.action {
+  text-decoration: none;
+  justify-content: center;
+}
+a.action:hover { background: rgba(255, 255, 255, 0.1); }
+a.action--primary:hover { background: #9cb098; }
+
 /* ================================================================== */
 /* Tiroir : correction du sol, réglages avancés                        */
 /* ================================================================== */

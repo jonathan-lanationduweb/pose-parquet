@@ -30,6 +30,7 @@ import { warmMaterial, enCache, quandCartesPretes, apercuAsync } from '../scene/
 import { addZone, removeZone } from '../scene/schema.js';
 import { loadCatalog, createCatalog, swatchFor } from './catalog.js';
 import { createCompare } from './compare.js';
+import { buildHandoffParams } from '../forms/studio-handoff.js';
 import { mark, mesure, perfActif } from '../utils/perf.js';
 
 const ORIENTATIONS = [
@@ -61,6 +62,7 @@ const ICONS = {
   reset: 'M4 10a8 8 0 1 1 1.6 6M4 4v6h6',
   more: 'M6 12h.01M12 12h.01M18 12h.01',
   close: 'm6 6 12 12M18 6 6 18',
+  forward: 'M5 12h13m-6-7 7 7-7 7',
 };
 
 const STORAGE = 'pose-parquet:studio';
@@ -146,7 +148,18 @@ export async function mountStudio(root) {
         <div class="actions__buttons">
           <button class="action" type="button" data-toggle-ba aria-pressed="false" aria-label="Avant / après">${icon(ICONS.before)}<span>Avant / après</span></button>
           <button class="action" type="button" data-compare disabled aria-label="Comparer">${icon(ICONS.layers)}<span data-compare-label>Comparer</span></button>
-          <button class="action action--primary" type="button" data-save>${icon(ICONS.save)}<span>Enregistrer</span></button>
+          <button class="action" type="button" data-save aria-label="Enregistrer l’image">${icon(ICONS.save)}<span>Enregistrer</span></button>
+          <!--
+            « Décrire mon projet » vit ici, dans les actions principales, et
+            non plus seulement dans le panneau Comparer. Comparer demande deux
+            versions enregistrées — c'est sa logique et elle ne change pas —
+            mais décrire son projet n'a aucune raison d'attendre : quelqu'un
+            qui a essayé un seul parquet a déjà tout ce qu'il faut pour nous
+            écrire. C'est un lien et non un bouton, parce que cela mène à une
+            autre page : le clic milieu, l'ouverture dans un nouvel onglet et
+            l'aperçu de l'adresse au survol doivent marcher.
+          -->
+          <a class="action action--primary" data-project-cta href="${base}projet/">${icon(ICONS.forward)}<span>Décrire mon projet</span></a>
         </div>
       </footer>
     </main>
@@ -170,6 +183,7 @@ export async function mountStudio(root) {
   const contextsHost = qs('[data-contexts]', root);
   const variantsHost = qs('[data-variants]', root);
   const addBtn = qs('[data-add]', root);
+  const projectCta = qs('[data-project-cta]', root);
   const compareBtn = qs('[data-compare]', root);
   const compareLabel = qs('[data-compare-label]', root);
   const panelTitle = qs('[data-panel-title]', root);
@@ -434,6 +448,15 @@ const REGROUPEMENT_MS = 70;
     quality = 1;
     schedule();
     warmMaterial(material(), config);
+    /*
+     * Le lien « Décrire mon projet » est remis à jour ici parce que c'est le
+     * point de passage commun aux deux façons d'obtenir une pièce : ouvrir une
+     * scène du catalogue, ou importer sa propre photo. Sans cette ligne, le
+     * bouton gardait la pièce précédente jusqu'à ce que le visiteur touche
+     * autre chose — et un clic juste après un changement de pièce partait avec
+     * l'ancienne scène.
+     */
+    syncProjectCta();
   }
 
   /**
@@ -765,17 +788,46 @@ const REGROUPEMENT_MS = 70;
 
   /**
    * Lien vers la demande de projet, prérempli avec la simulation.
-   * Seuls le parquet, le motif et l'orientation partent : jamais la photo.
+   *
+   * Sans argument, il décrit **ce que le visiteur a sous les yeux** : la scène
+   * ouverte et la configuration active. Avec une variante, il décrit cette
+   * variante — c'est ce dont le panneau Comparer a besoin.
+   *
+   * L'identifiant du parquet est relu dans le catalogue avant de partir :
+   * `catalog.get()` répond, ou l'identifiant ne part pas. On n'envoie donc
+   * jamais un identifiant fabriqué à partir d'un libellé, ce qui finirait en
+   * base comme s'il désignait un vrai produit. Le libellé voyage à part, pour
+   * l'affichage.
+   *
+   * `sceneId` vaut `null` quand le visiteur a importé sa propre photo : il n'y
+   * a alors pas de scène du catalogue à nommer, et le paramètre est absent.
+   * La photo, elle, ne quitte pas le navigateur — voir studio-handoff.js.
    */
   function projectLink(variant) {
     const source = variant ? variant.config : config;
     const item = catalog.get(source.materialId);
-    const query = new URLSearchParams({
-      parquet: item ? item.name : '',
-      motif: source.pattern,
-      orientation: String(source.angle),
+
+    const query = buildHandoffParams({
+      sceneId,
+      productId: item ? item.id : null,
+      productLabel: item ? item.name : null,
+      pattern: source.pattern,
+      angle: source.angle,
     });
+
     return `${base}projet/?${query.toString()}`;
+  }
+
+  /**
+   * Tient à jour le lien du bouton « Décrire mon projet » de la barre.
+   *
+   * Appelée à chaque changement de parquet, de motif, d'angle ou de pièce :
+   * le bouton pointe toujours sur l'état affiché, jamais sur un état précédent
+   * ni sur une version enregistrée.
+   */
+  function syncProjectCta() {
+    if (!projectCta) return;
+    projectCta.href = projectLink();
   }
 
   const compareUi = createCompare(root, {
@@ -1225,6 +1277,15 @@ const REGROUPEMENT_MS = 70;
   });
 
   function save() {
+    /*
+     * Le lien du bouton « Decrire mon projet » est une projection du meme etat
+     * que celui qu on persiste ici. Le remettre a jour au meme endroit evite
+     * d avoir a le faire aux neuf endroits qui modifient la configuration —
+     * et evite surtout d en oublier un, ce qui donnerait un bouton qui
+     * decrit l avant-derniere simulation.
+     */
+    syncProjectCta();
+
     try {
       window.localStorage.setItem(STORAGE, JSON.stringify({ config, variants, sceneId }));
     } catch (error) {
@@ -1279,6 +1340,7 @@ const REGROUPEMENT_MS = 70;
   catalogUi.setActive(config.materialId);
   syncSelected();
   syncVariants();
+  syncProjectCta();
 
   const requested = params.get('piece');
   // Un lien direct ouvre aussi une scène expérimentale : c'est ce qui permet de

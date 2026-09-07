@@ -14,6 +14,7 @@
  *
  * @see docs/backend/project-form-contract.md
  */
+import { readHandoffParams } from './studio-handoff.js';
 
 /**
  * Nom du champ dans le formulaire → nom de la clé dans l'API.
@@ -71,16 +72,14 @@ const RESERVES_SERVEUR = new Set([
   'internalMailStatus', 'visitorMailStatus', 'mailStatus',
 ]);
 
-/** Motifs acceptés par `visualizer.pattern`. */
-const MOTIFS_VISUALISEUR = new Set(['lames', 'point-de-hongrie', 'baton-rompu']);
-/** Angles acceptés par `visualizer.orientation`. */
-const ANGLES_VISUALISEUR = new Set([0, 90, 45, -45]);
-
-/** Identifiant plausible pour `sceneId` / `productId` : la règle du serveur. */
-const ID_VALIDE = /^[a-z0-9][a-z0-9_-]{0,59}$/;
-
 /**
  * Contexte du Visualiseur, à partir des paramètres d'URL du Studio.
+ *
+ * La lecture des paramètres est déléguée à `studio-handoff.js`, qui porte la
+ * convention pour les trois endroits qui la lisent ou l'écrivent. Ce module
+ * n'a plus sa propre copie des noms, des motifs valides et des angles admis :
+ * c'est cette duplication qui avait laissé passer un libellé commercial là où
+ * un identifiant était attendu.
  *
  * PAS DE PHOTO, jamais. La photo importée dans le Studio ne quitte pas le
  * navigateur : elle n'est ni dans l'URL, ni dans `config`, ni nulle part
@@ -95,33 +94,33 @@ const ID_VALIDE = /^[a-z0-9][a-z0-9_-]{0,59}$/;
  * @returns {object|undefined} absent si le visiteur n'est pas passé par le Studio
  */
 export function visualizerFromParams(params) {
-  const scene = (params.get('piece') || '').trim();
-  const produit = (params.get('parquet') || '').trim();
-  const motif = (params.get('motif') || '').trim();
-  const angleBrut = params.get('orientation');
+  const lu = readHandoffParams(params);
 
   const v = {};
-  if (ID_VALIDE.test(scene)) v.sceneId = scene;
-  if (ID_VALIDE.test(produit)) v.productId = produit;
-  if (MOTIFS_VISUALISEUR.has(motif)) v.pattern = motif;
-
-  if (angleBrut !== null && angleBrut.trim() !== '') {
-    const angle = Number(angleBrut);
-    if (Number.isInteger(angle) && ANGLES_VISUALISEUR.has(angle)) v.orientation = angle;
-  }
+  if (lu.sceneId) v.sceneId = lu.sceneId;
+  if (lu.productId) v.productId = lu.productId;
+  if (lu.pattern) v.pattern = lu.pattern;
+  if (lu.angle !== null) v.orientation = lu.angle;
 
   // Rien de reconnu : on n'envoie pas un objet vide, qui n'apprendrait rien à
-  // personne et occuperait une section de la fiche pour rien.
+  // personne et occuperait une section de la fiche pour rien. Un libellé seul,
+  // sans identifiant ni motif ni angle, n'est pas un contexte de simulation.
   if (!Object.keys(v).length) return undefined;
 
   /*
    * `config` : le récapitulatif de ce que le visiteur a essayé, en clair, pour
    * que l'équipe le relise sans ouvrir le Studio. Quelques dizaines d'octets.
+   *
+   * Le nom commercial y figure quand on le connaît. C'est le seul endroit de
+   * la charge où il a sa place : `productId` identifie, `nom` se lit. La fiche
+   * d'administration, elle, affiche les identifiants — elle ne connaît pas le
+   * catalogue du front, et ce n'est pas à elle de le devenir.
    */
   v.config = {
     origine: 'studio',
     ...(v.sceneId ? { scene: v.sceneId } : {}),
     ...(v.productId ? { produit: v.productId } : {}),
+    ...(lu.productLabel ? { nom: lu.productLabel } : {}),
     ...(v.pattern ? { motif: v.pattern } : {}),
     ...(v.orientation !== undefined ? { angle: v.orientation } : {}),
   };

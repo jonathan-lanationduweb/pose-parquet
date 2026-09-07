@@ -18,6 +18,7 @@ import { projectFormConfig } from './project-form.config.js';
 import { apiConfigured } from '../../js/forms/api-config.js';
 import { buildProjectPayload, visualizerFromParams, frontFieldFor } from '../../js/forms/project-payload.js';
 import { fetchFormToken, submitProject, SubmitError, ERREURS } from '../../js/forms/submit-adapter.js';
+import { readHandoffParams } from '../../js/forms/studio-handoff.js';
 
 const uid = () => Math.random().toString(36).slice(2, 8);
 
@@ -110,17 +111,23 @@ const ANGLE_LABELS = {
 /**
  * Reprise d'une simulation faite dans le Studio.
  *
- * Seuls le parquet, le motif et l'orientation transitent par l'URL — jamais la
- * photo, qui ne quitte pas le navigateur. Les valeurs sont insérées comme
- * texte, jamais comme HTML.
+ * Cinq champs courts transitent par l'URL — scène, produit, libellé, motif,
+ * angle — et jamais la photo, qui ne quitte pas le navigateur. La convention
+ * est celle de `js/forms/studio-handoff.js` : ce module la lit, il ne la
+ * redéfinit pas. Les valeurs sont insérées comme texte, jamais comme HTML.
+ *
+ * Le nom du produit affiché ici vient de `libelle`. Un ancien lien qui portait
+ * le nom commercial dans `parquet` ne le montrera plus — `parquet` porte
+ * désormais l'identifiant — mais la reprise continue de s'afficher avec le
+ * motif et l'angle : on perd un mot, pas un parcours.
  */
 function prefillFromStudio(form) {
   const params = new URLSearchParams(window.location.search);
-  const parquet = params.get('parquet');
-  const motif = params.get('motif');
-  if (!parquet && !motif) return;
+  const lu = readHandoffParams(params);
+  if (!lu.present) return;
 
-  const angle = Number(params.get('orientation') || 0);
+  const motif = lu.pattern;
+  const angle = lu.angle === null ? 0 : lu.angle;
   let orientation = motif === 'point-de-hongrie' || motif === 'baton-rompu' ? motif : null;
   if (!orientation && motif === 'lames') {
     orientation = angle === 90 ? 'longueur' : Math.abs(angle) === 45 ? 'diagonale' : 'largeur';
@@ -133,9 +140,13 @@ function prefillFromStudio(form) {
   }
 
   const parts = [];
-  if (parquet) parts.push(parquet);
+  if (lu.productLabel) parts.push(lu.productLabel);
   if (motif) parts.push(MOTIF_LABELS[motif] || motif);
   if (motif === 'lames' && ANGLE_LABELS[String(angle)]) parts.push(ANGLE_LABELS[String(angle)]);
+
+  // Ni produit reconnu ni motif : il n'y a rien à annoncer, et une phrase de
+  // reprise vide serait pire que pas de phrase.
+  if (!parts.length) return;
 
   const note = document.createElement('p');
   note.className = 'pf__from-studio';
@@ -567,8 +578,25 @@ export function mountProjectForm(root, options = {}) {
    * visiteur, et le serveur aurait refusé chacune de ses demandes avec un
    * message générique — un déni de service en un lien, indétectable pour lui
    * comme pour nous.
+   *
+   * `piece` en est exclu aussi, pour une raison différente. Depuis le Studio,
+   * `piece` porte un identifiant de SCÈNE (`sejour`, `chambre-parisienne`,
+   * `salon-angle`), et le formulaire a un champ `piece` qui est le TYPE de
+   * pièce déclaré par le visiteur. Les deux se ressemblent assez pour que
+   * `sejour` tombe juste par accident, et pas assez pour que ce soit une
+   * règle : `salon-angle` est un séjour, `bureau-vide` n'est pas une chambre.
+   * Deviner le type de pièce à partir du nom d'une photo, c'est le genre de
+   * coïncidence qui marche jusqu'au jour où elle décide à la place du visiteur.
+   * Le type de pièce reste donc une réponse, pas une déduction.
+   *
+   * `parquet` pour la même raison : le Studio y met l'identifiant d'une
+   * référence du catalogue (`chene-fume`), le formulaire y attend une famille
+   * (`massif`, `contrecolle`…). Aucune valeur ne coïncide, si bien que le
+   * pré-remplissage ne fait aujourd'hui que décocher le groupe — sans
+   * conséquence puisque rien n'y est coché d'avance. Le jour où une valeur par
+   * défaut y serait ajoutée, un lien venu du Studio l'effacerait en silence.
    */
-  const CHAMPS_NON_PREREMPLISSABLES = new Set(['website']);
+  const CHAMPS_NON_PREREMPLISSABLES = new Set(['website', 'piece', 'parquet']);
   const prefill = new URLSearchParams(window.location.search);
   prefill.forEach((value, key) => {
     if (CHAMPS_NON_PREREMPLISSABLES.has(key)) return;

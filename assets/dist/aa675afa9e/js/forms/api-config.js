@@ -43,12 +43,25 @@
  * racine complète ici plutôt que de recomposer un chemin.
  */
 const PAR_HOTE = {
-  // Développement : le serveur `node serve.js` du dépôt, et le WordPress
-  // dédié de `C:\wamp64\www\pose-parquet-dev`. L'hôte est `localhost` et non
-  // `127.0.0.1` : WordPress connaît le site sous ce nom, et une session
-  // ouverte sur l'autre adresse pose son cookie sur le mauvais domaine.
-  'localhost': 'http://localhost:8181/index.php?rest_route=/pose-parquet/v1',
-  '127.0.0.1': 'http://localhost:8181/index.php?rest_route=/pose-parquet/v1',
+  /*
+   * Développement : le front est servi par `node serve.js` sur
+   * `localhost:5180`, et le WordPress dédié de
+   * `C:\wamp64\www\pose-parquet-dev` répond sur son propre hôte Apache,
+   * `pose-parquet-dev.local` — entrée du fichier hosts et VirtualHost Wamp.
+   *
+   * Cette adresse remplace `http://localhost:8181`, qui était le serveur
+   * intégré de PHP lancé à la main le temps des premiers lots. Le garder ici
+   * avait un coût très concret : une recette locale normale échouait dès le
+   * chargement du formulaire (`ERR_CONNECTION_REFUSED` sur `/form-token`) et
+   * il fallait poser un `window.POSE_PARQUET_CONFIG` à la main pour
+   * travailler. Une porte de sortie n'est pas un environnement.
+   *
+   * Permaliens jolis, donc `/wp-json/…` : le WordPress est servi par Apache
+   * avec `mod_rewrite` et `AllowOverride All`. Le serveur intégré de PHP, qui
+   * ne réécrit aucune URL, imposait la forme `?rest_route=`.
+   */
+  'localhost': 'http://pose-parquet-dev.local/wp-json/pose-parquet/v1',
+  '127.0.0.1': 'http://pose-parquet-dev.local/wp-json/pose-parquet/v1',
 
   // Préproduction GitHub Pages. Aucun backend public ne lui répond
   // aujourd'hui : le formulaire y affiche son indisponibilité, il ne prétend
