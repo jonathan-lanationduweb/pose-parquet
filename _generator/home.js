@@ -150,32 +150,138 @@ function tilesSection() {
       </section>`;
 }
 
+/**
+ * La démonstration du Visualiseur, deuxième section de l'accueil.
+ *
+ * Tout le balisage est ici, en HTML, et non fabriqué par JavaScript comme
+ * avant ce lot. Trois raisons, dans cet ordre :
+ *
+ *   1. sans JavaScript, la section reste une vraie section — un poster du
+ *      rendu, une légende, deux liens. Un `innerHTML` posé par un module
+ *      lazy-chargé laissait, lui, un bloc vide ;
+ *   2. le poster porte `width` et `height`, donc la place est réservée avant
+ *      le décodage : aucun décalage de mise en page quand le canvas arrive ;
+ *   3. le moteur n'a plus à écrire de structure, seulement à s'y brancher.
+ *
+ * Le curseur avant / après fonctionne dès le premier octet, sur le poster :
+ * c'est `js/home/visualizer-teaser.js`, quelques centaines d'octets, qui le
+ * relie au découpage CSS. Le moteur ne vient qu'à l'approche de la section.
+ *
+ * Les commandes de teinte et de motif sont présentes mais `hidden` : elles
+ * n'apparaissent qu'une fois le moteur monté, parce qu'un bouton qui ne
+ * répondrait pas serait un mensonge. Leur hauteur est réservée en CSS.
+ *
+ * Scène : `sejour`. Deux sols visibles — le séjour et la salle à manger
+ * derrière l'ouverture — qui partagent le même plan calibré et changent donc
+ * ensemble, ce qui montre d'un coup d'œil que le rendu est calculé et non
+ * collé. `geometryStatus` et `visualStatus` sont tous deux à `validated` au
+ * manifeste. (Cette section utilisait `chambre`, retenue à l'époque où
+ * `sejour` n'était encore que « correct » sur la revue visuelle ; ce n'est
+ * plus le cas.)
+ *
+ * ## Provenance du poster, et sa limite
+ *
+ * `assets/images/apercu-sejour-chene-naturel.jpg` (1600 × 1067, qualité 0,7)
+ * et sa variante `-1120.jpg` (1120 × 747, qualité 0,68) sont la SORTIE DU
+ * MOTEUR, pas une retouche : scène `sejour`, matériau `chene-naturel`, motif
+ * `lames`, angle 0, photo réduite à la largeur cible avant `setScene`.
+ *
+ * La limite est réelle et vaut d'être écrite : ce fichier est figé, alors que
+ * le moteur évolue. Le jour où le rendu du chêne naturel change — texture,
+ * éclairement, relief — le poster ne le suit pas tout seul, et l'écart se
+ * verrait pendant les quelques centaines de millisecondes qui précèdent le
+ * premier rendu. Il faut alors le régénérer avec les paramètres ci-dessus.
+ * C'est le prix d'une section qui existe sans JavaScript.
+ */
 function simulatorSection() {
+  const teintes = [
+    { id: 'chene-craie', label: 'Craie' },
+    { id: 'chene-naturel', label: 'Naturel' },
+    { id: 'chene-miel', label: 'Miel' },
+    { id: 'chene-fume', label: 'Fumé' },
+  ];
+  const motifs = [
+    { id: 'lames', label: 'Lames' },
+    { id: 'point-de-hongrie', label: 'Point de Hongrie' },
+    { id: 'baton-rompu', label: 'Bâton rompu' },
+  ];
+
+  const pastille = (item, groupe, actif) =>
+    `<button class="vzp__chip" type="button" data-${groupe}="${item.id}" aria-pressed="${item.id === actif}">${item.label}</button>`;
+
   return `      <section class="section section--mineral" aria-labelledby="sim-title">
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
-              <p class="eyebrow">Visualiseur · outil</p>
-              <h2 id="sim-title">Essayez votre parquet dans votre pièce.</h2>
+              <p class="eyebrow">Visualiseur · essai immédiat</p>
+              <h2 id="sim-title">Essayez votre parquet, ici, tout de suite.</h2>
             </div>
             <div>
-              <p class="lead">Importez une photo, choisissez un parquet et comparez plusieurs rendus. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée ni conservée.</p>
-              <p class="u-mt-5 u-actions">
-                <a class="btn" href="outils/studio.html"><span>Visualiser mon parquet</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
-                <a class="link-arrow" href="outils/simulateur-pose.html">Étudier le sens de pose ${ICON.arrow}</a>
-              </p>
+              <p class="lead">Changez la teinte, changez le motif, faites glisser pour comparer avec la pièce nue. Le calcul se fait dans votre navigateur : aucune photo n’est envoyée.</p>
             </div>
           </div>
-          <!-- Scène de l'avant/après : uniquement une scène VALIDÉE sur les cinq
-               critères de _calibrage/scene-review.html. « chambre » est la seule à
-               l'être — géométrie mesurée sur trois murs, recoupée par un contrôle
-               d'invariance. « sejour » reste à « correct » : la brillance du sol
-               d'origine n'est pas restituée. -->
-          <div data-vz-preview data-room="chambre" data-base="" data-reveal></div>
+
+          <div class="vzp" data-vz-preview data-room="sejour" data-base="" data-reveal>
+            <figure class="vzp__figure">
+              <div class="vzp__stage" data-stage>
+                <img class="vzp__photo" src="assets/images/room-sejour.jpg"
+                  srcset="assets/images/room-sejour-1120.jpg 1120w, assets/images/room-sejour-1600.jpg 1600w"
+                  sizes="(min-width: 75rem) 76rem, 94vw"
+                  alt="Le séjour d’exemple avant pose, sol nu" width="1600" height="1067"
+                  loading="lazy" decoding="async" data-photo />
+                <img class="vzp__poster" src="assets/images/apercu-sejour-chene-naturel.jpg"
+                  srcset="assets/images/apercu-sejour-chene-naturel-1120.jpg 1120w, assets/images/apercu-sejour-chene-naturel.jpg 1600w"
+                  sizes="(min-width: 75rem) 76rem, 94vw"
+                  alt="Le même séjour avec un parquet en chêne naturel posé à lames droites"
+                  width="1600" height="1067" loading="lazy" decoding="async" data-poster />
+                <canvas class="vzp__canvas" data-canvas></canvas>
+                <span class="vzp__tag vzp__tag--before">Avant</span>
+                <span class="vzp__tag vzp__tag--after">Après</span>
+                <!-- Course bornée à 3–97 % : le bouton de la poignée est centré sur le
+                     trait, donc à moitié hors cadre à 0 et à 100 %, où l'overflow de la
+                     scène le coupait net. Le trait et le découpage restent identiques. -->
+                <input class="vzp__range" type="range" min="3" max="97" value="52"
+                  aria-label="Curseur de comparaison entre la pièce d’origine et le parquet simulé" data-range />
+                <span class="vzp__handle" aria-hidden="true"></span>
+              </div>
+              <figcaption class="vzp__caption">
+                <span data-caption>Chêne Naturel · lames droites</span> — rendu calculé dans votre navigateur.
+                <span data-credit>Photo : Curtis Adams / Pexels.</span>
+              </figcaption>
+            </figure>
+
+            <div class="vzp__controls" data-controls hidden>
+              <div class="vzp__row">
+                <span class="vzp__label" id="vzp-teinte">Teinte</span>
+                <div class="vzp__chips" role="group" aria-labelledby="vzp-teinte" data-tones>
+                  ${teintes.map((t) => pastille(t, 'tone', 'chene-naturel')).join('\n                  ')}
+                </div>
+              </div>
+              <div class="vzp__row">
+                <span class="vzp__label" id="vzp-motif">Motif de pose</span>
+                <div class="vzp__chips" role="group" aria-labelledby="vzp-motif" data-patterns>
+                  ${motifs.map((m) => pastille(m, 'pattern', 'lames')).join('\n                  ')}
+                </div>
+              </div>
+              <p class="vzp__live" aria-live="polite" data-live></p>
+            </div>
+
+            <!--
+              « Visualiser dans ma pièce » mène à l'ÉCRAN DE DÉPART du Studio, dont le
+              bouton principal est « Essayer dans ma pièce » : un clic de plus, mais
+              aucun second flux d'import à maintenir sur l'accueil, et le visiteur
+              garde le choix entre sa photo et une pièce d'exemple. Le Studio ne
+              connaît aucun paramètre d'import : en inventer un aurait donné un lien
+              qui ne fait rien.
+            -->
+            <p class="vzp__actions u-actions">
+              <a class="btn" href="outils/studio.html"><span>Visualiser dans ma pièce</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+              <a class="link-arrow" data-open-studio href="outils/studio.html?piece=sejour&amp;parquet=chene-naturel&amp;motif=lames&amp;orientation=0">Ouvrir le Visualiseur ${ICON.arrow}</a>
+            </p>
+          </div>
         </div>
       </section>`;
 }
-
 function carouselEditorial(guides) {
   const slides = guides
     .map(
@@ -440,8 +546,17 @@ function buildHomeBody({ GUIDES, TUTOS }) {
   const carouselGuides = GUIDES.slice(0, 6);
   return [
     heroSection(),
-    tilesSection(),
+    /*
+     * La démonstration passe en DEUXIÈME position, juste après le hero.
+     *
+     * Elle était en troisième, après « Quatre entrées » : à 1440 × 900 elle
+     * commençait à 1 921 px, soit deux écrans plus bas, et à 3 219 px sur un
+     * téléphone — près de quatre écrans. Le hero annonçait l'outil sans jamais
+     * le montrer. Les autres sections descendent d'un rang, rien d'autre ne
+     * bouge. Voir simulatorSection().
+     */
     simulatorSection(),
+    tilesSection(),
     carouselEditorial(carouselGuides),
     immersiveSection(),
     carouselGallery(),

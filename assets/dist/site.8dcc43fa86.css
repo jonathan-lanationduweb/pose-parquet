@@ -3376,7 +3376,22 @@ body[data-drawer-open="true"] { overflow: hidden; }
 @media (max-width: 40rem) {
   .vzp__stage { aspect-ratio: 4 / 3; max-height: min(58svh, 460px); }
 }
+/*
+ * Grands écrans : le plafond absolu de 620 px disparaît.
+ *
+ * Il bornait la scène en HAUTEUR, donc aussi en largeur par le rapport 16/10 :
+ * mesurée à 992 px de large sur un écran de 1 920, la pièce n'occupait que
+ * 52 % de la fenêtre alors que la colonne lui en offrait davantage. Seule la
+ * fraction de hauteur reste, ce qui laisse la pièce grandir avec l'écran sans
+ * jamais pousser les commandes hors du premier coup d'œil : à 1 080 px de
+ * haut, 70 svh donnent 756 px de scène, et la section entière en demande
+ * moins de 950.
+ */
+@media (min-width: 90rem) {
+  .vzp__stage { max-height: 70svh; }
+}
 .vzp__photo,
+.vzp__poster,
 .vzp__canvas {
   position: absolute;
   inset: 0;
@@ -3385,7 +3400,25 @@ body[data-drawer-open="true"] { overflow: hidden; }
   height: 100%;
   object-fit: cover;
 }
-.vzp__canvas { clip-path: inset(0 0 0 var(--compare)); }
+/*
+ * Le poster et le canvas partagent le même découpage.
+ *
+ * Le poster est le rendu pré-calculé de la scène en chêne naturel, lames
+ * droites. Il tient la place tant que le moteur n'est pas là — au chargement
+ * de la page, et pour toujours si le JavaScript est coupé — puis s'efface sous
+ * le canvas au premier rendu. Comme les deux portent le même `clip-path`, le
+ * curseur avant / après fonctionne avant le moteur exactement comme après, et
+ * la bascule ne se voit pas.
+ *
+ * Empilement : photo (le « avant »), poster, canvas.
+ */
+.vzp__canvas,
+.vzp__poster { clip-path: inset(0 0 0 var(--compare)); }
+.vzp__poster { transition: opacity var(--dur-2, 0.2s) var(--ease-out, ease); }
+.vzp[data-ready="true"] .vzp__poster { opacity: 0; }
+/* Rendu impossible : on garde le parquet pré-calculé en pleine largeur plutôt
+   que de laisser le visiteur sur une pièce nue. */
+.vzp[data-ready="photo"] .vzp__poster { clip-path: none; }
 .vzp__range {
   position: absolute;
   inset: 0;
@@ -3450,6 +3483,48 @@ body[data-drawer-open="true"] { overflow: hidden; }
 .vzp[data-ready="photo"] .vzp__handle,
 .vzp[data-ready="photo"] .vzp__range { display: none; }
 .vzp__caption { font-size: var(--fs-xs); color: var(--text-muted); }
+
+/*
+ * Les deux rangées de commandes : teinte, puis motif de pose.
+ *
+ * Deux rangées et non une, parce que ce sont deux questions différentes. Les
+ * mélanger — une pastille qui change la teinte ET le motif — empêchait de voir
+ * laquelle des deux produisait la différence, et c'était le défaut de la
+ * version précédente.
+ *
+ * `min-height` réserve la place : les commandes n'apparaissent qu'une fois le
+ * moteur monté, et sans cette réserve leur arrivée décalerait la page.
+ */
+.vzp__controls {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1.1rem;
+  min-height: 6.5rem;
+}
+.vzp__controls[hidden] { display: grid; visibility: hidden; }
+.vzp__row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.8rem; }
+.vzp__label {
+  flex: 0 0 auto;
+  min-width: 6.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+/* La légende parlée double la légende écrite : elle n'a rien à afficher. */
+.vzp__live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.vzp__actions { margin-top: 1.2rem; }
+
 .vzp__chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .vzp__chip {
   padding: 0.45rem 0.9rem;
@@ -3462,6 +3537,40 @@ body[data-drawer-open="true"] { overflow: hidden; }
 }
 .vzp__chip:hover { border-color: var(--line-strong); color: var(--text); }
 .vzp__chip[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); }
+
+/*
+ * Une pastille en cours de fabrication.
+ *
+ * Le seul cas mesuré comme réellement lent est le point de Hongrie demandé
+ * avant son préchauffage : une seconde sur un poste de bureau, davantage sur
+ * un téléphone. Plutôt qu'un voile sur toute la scène, la pastille concernée
+ * s'assombrit et le curseur devient une attente : le reste de la page continue
+ * de répondre, et le sol change dès que les cartes sont prêtes.
+ */
+.vzp__chip[aria-busy="true"] { opacity: 0.55; cursor: progress; }
+.vzp__chip[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+/* Au doigt, 44 px : la règle du site, appliquée aussi ici. */
+@media (pointer: coarse) {
+  .vzp__chip { min-height: 2.75rem; }
+}
+
+/*
+ * Téléphone en paysage — 844 × 390.
+ *
+ * C'est le format où les visualiseurs concurrents s'effondrent : les commandes
+ * mangent la hauteur et la pièce se réduit à un bandeau. On fait l'inverse.
+ * Les intitulés « Teinte » et « Motif de pose » disparaissent — les pastilles
+ * se lisent seules, et les groupes gardent leur nom accessible par
+ * `aria-labelledby` — les deux rangées passent côte à côte, et la scène garde
+ * la hauteur qui lui reste.
+ */
+@media (max-height: 30rem) and (min-width: 40rem) {
+  .vzp__stage { aspect-ratio: auto; height: min(58svh, 300px); max-height: none; }
+  .vzp__controls { grid-template-columns: 1fr 1fr; align-items: start; gap: 0.5rem 1.4rem; min-height: 0; margin-top: 0.8rem; }
+  .vzp__label { display: none; }
+  .vzp__actions { margin-top: 0.8rem; }
+}
 
 
 
