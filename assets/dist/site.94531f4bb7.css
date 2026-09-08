@@ -2660,115 +2660,272 @@ body[data-drawer-open="true"] { overflow: hidden; }
 }
 
 
-/* Studio de pose : simulateur SVG */
+/**
+ * Mode Plan — vue du dessus à l’échelle.
+ *
+ * Deux colonnes dès qu’il y a la place : les réglages à gauche, sur une
+ * largeur tenue entre 340 et 420 px, et le plan à droite, qui prend le reste.
+ * L’ordre du DOM est réglages puis plan, ce qui donne sur téléphone la
+ * séquence attendue : introduction, réglages, aperçu, résultats.
+ *
+ * Attention à l’ordre des règles : la remise à une colonne doit rester dans
+ * une requête média bornée en haut. Une règle nue plus bas dans le fichier
+ * l’emporte sur `@media (min-width: 62rem)` à spécificité égale — c’est
+ * exactement ce qui neutralisait la mise en page bureau jusqu’ici.
+ */
 .visualizer {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--sp-5);
   align-items: start;
 }
-@media (min-width: 62rem) {
-  .visualizer { grid-template-columns: 19.5rem minmax(0, 1fr); gap: var(--sp-6); }
-  .visualizer--compact { grid-template-columns: 16rem minmax(0, 1fr); }
+.visualizer__panel,
+.visualizer__group,
+.pattern-switch,
+.seg {
+  min-width: 0;
 }
 
+@media (min-width: 62rem) {
+  .visualizer {
+    grid-template-columns: clamp(21.25rem, 24vw, 26.25rem) minmax(0, 1fr);
+    gap: clamp(1.25rem, 0.5rem + 1.4vw, 2rem);
+  }
+  /* L’aperçu compact vit dans un bloc éditorial d’environ 576 px, pas dans la
+     largeur de la fenêtre : une part en vw y prendrait la moitié du plan.
+     D’où une largeur fixe, laissant le reste au dessin. */
+  .visualizer--compact { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); }
+}
+
+/**
+ * Paysage de téléphone et petite tablette.
+ *
+ * En une colonne, 844 x 390 demandait onze écrans de défilement et le plan
+ * n’apparaissait qu’au quatrième. Deux colonnes dès 48rem quand la hauteur est
+ * courte : les réglages et le plan côte à côte, et le plan borné à la hauteur
+ * disponible.
+ */
+@media (min-width: 48rem) and (max-height: 34rem) {
+  .visualizer { grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr); gap: var(--sp-4); }
+  .visualizer__canvas { --plan-max-h: 72svh; }
+}
+
+/* ---------- Réglages ---------- */
 .visualizer__panel {
-  border-radius: var(--r-card);
   display: grid;
-  gap: var(--sp-5);
-  padding: var(--sp-5);
+  gap: clamp(0.9rem, 0.75rem + 0.5vw, 1.3rem);
+  padding: clamp(0.9rem, 0.75rem + 0.6vw, 1.35rem);
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--r-card);
 }
-.visualizer__group { display: grid; gap: 0.7rem; }
+
+.visualizer__group { display: grid; gap: 0.5rem; border: 0; margin: 0; padding: 0; }
 .visualizer__group > legend,
 .visualizer__group-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
   font-size: var(--fs-xs);
   text-transform: uppercase;
   letter-spacing: var(--tracking-eyebrow);
   color: var(--text-muted);
   font-weight: 600;
-  padding: 0;
 }
-.visualizer__group { border: 0; margin: 0; padding: 0; }
+/* La valeur courante se lit dans le titre du groupe, en chiffres. */
+.visualizer__group-title output {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text);
+}
 
-.visualizer__dims { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
-.visualizer__num { display: grid; gap: 0.3rem; font-size: 0.86rem; }
+/* Motifs : grille compacte, deux ou trois colonnes selon la place. */
+.pattern-switch {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(5.75rem, 1fr));
+  gap: 0.4rem;
+}
+.pattern-switch button {
+  display: grid;
+  align-content: start;
+  gap: 0.3rem;
+  padding: 0.35rem 0.35rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: transparent;
+  text-align: center;
+  font-size: 0.74rem;
+  line-height: 1.2;
+  color: var(--text-soft);
+  transition: background var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
+}
+.pattern-switch button:hover { border-color: var(--line-strong); color: var(--text); }
+.pattern-switch button[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); font-weight: 600; }
+.pattern-switch svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  border-radius: var(--r-xs);
+  background: var(--c-mineral);
+}
+
+/* Dimensions : une seule ligne, longueur puis largeur. */
+.visualizer__dims { display: flex; align-items: flex-end; gap: 0.45rem; }
+.visualizer__num { flex: 1 1 0; display: grid; gap: 0.25rem; min-width: 0; font-size: 0.74rem; color: var(--text-muted); }
 .visualizer__num input {
   width: 100%;
-  padding: 0.55rem 0.6rem;
+  padding: 0.5rem 0.55rem;
   border: 1px solid var(--line-strong);
   border-radius: var(--r-sm);
   font-family: var(--font-mono);
   font-size: 0.9rem;
+  color: var(--text);
 }
-.visualizer__num input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--c-sage-pale); }
+/* `outline: none` retiré : le halo sauge marquait le champ actif mais faisait
+   disparaître l’anneau de focus du site, seul indicateur assez contrasté pour
+   la navigation au clavier. Les deux coexistent maintenant. */
+.visualizer__num input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--c-sage-pale); }
+.visualizer__times { flex: none; padding-bottom: 0.6rem; color: var(--text-muted); font-size: 0.85rem; }
 
-.visualizer__range { display: grid; gap: 0.35rem; font-size: 0.86rem; }
-.visualizer__range output { font-family: var(--font-mono); color: var(--text-muted); font-size: 0.82rem; }
+/* Largeur de lame : le curseur, ses bornes, sa valeur dans le titre. */
+.visualizer__range { display: grid; gap: 0.15rem; }
 .visualizer__range input[type="range"] {
   width: 100%;
   accent-color: var(--accent);
-  /* 16 px de haut, c'est le trait ; la cible tactile en prend 28. */
+  /* 16 px de haut, c’est le trait ; la cible tactile en prend 28. */
   min-height: 1.75rem;
   cursor: pointer;
 }
-
-.pattern-switch { display: grid; gap: 0.4rem; }
-.pattern-switch button {
+.visualizer__bounds {
   display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  width: 100%;
-  padding: 0.55rem 0.65rem;
-  border: 1px solid transparent;
-  border-radius: var(--r-sm);
-  text-align: left;
-  font-size: 0.92rem;
-  color: var(--text-soft);
-  transition: background var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
+  justify-content: space-between;
+  /* Les bornes appartiennent au curseur : elles se collent sous son trait
+     plutôt que de flotter à la distance des autres groupes. */
+  margin-top: -0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
 }
-.pattern-switch button:hover { background: var(--c-paper); color: var(--text); }
-.pattern-switch button[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); }
-.pattern-switch svg { width: 30px; height: 22px; flex: none; border-radius: 2px; background: var(--c-mineral); }
 
-.seg { display: flex; gap: 0.25rem; padding: 0.25rem; border: 1px solid var(--line); border-radius: var(--r-pill); }
+/* Pastilles segmentées : Haut / Droite / Bas / Gauche / Aucune. */
+.seg {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(3.25rem, 1fr));
+  gap: 0.2rem;
+  padding: 0.2rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+}
 .seg button {
-  flex: 1;
-  padding: 0.4rem 0.5rem;
-  border-radius: var(--r-pill);
-  font-size: 0.82rem;
+  padding: 0.4rem 0.3rem;
+  border-radius: var(--r-sm);
+  font-size: 0.74rem;
   color: var(--text-soft);
+  white-space: nowrap;
   transition: background var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
 }
+.seg button:hover { background: var(--c-paper); color: var(--text); }
 .seg button[aria-pressed="true"] { background: var(--c-ink); color: var(--text-invert); }
 
-.visualizer__stage {
-  border-radius: var(--r-card);
-  position: relative;
+/* Teintes : la pastille porte la couleur réellement utilisée au rendu. */
+.tone-swatches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; }
+.tone-swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.45rem;
   border: 1px solid var(--line);
-  border-radius: var(--r-card);
-  background:
-    radial-gradient(120% 100% at 50% 0%, var(--c-white), var(--c-paper));
-  padding: clamp(0.75rem, 2vw, 1.6rem);
+  border-radius: var(--r-pill);
+  background: transparent;
+  font-size: 0.76rem;
+  color: var(--text-soft);
+}
+.tone-swatch i {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--tone);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+}
+.tone-swatch:hover { border-color: var(--line-strong); color: var(--text); }
+.tone-swatch[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); font-weight: 600; }
+
+/* Actions : le secondaire à sa taille, le principal occupe le reste. */
+.visualizer__actions { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5rem; }
+.visualizer__actions .btn { width: 100%; }
+
+/* ---------- Plan ---------- */
+.visualizer__stage {
+  position: relative;
   display: grid;
   gap: var(--sp-4);
+  padding: clamp(0.6rem, 0.4rem + 0.8vw, 1.1rem);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: radial-gradient(120% 100% at 50% 0%, var(--c-white), var(--c-paper));
 }
-.visualizer__canvas { width: 100%; max-width: 44rem; margin-inline: auto; height: auto; display: block; border-radius: var(--r-md); overflow: hidden; }
-.visualizer__canvas svg { width: 100%; height: auto; display: block; }
 
-.visualizer__readout {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-  justify-content: space-between;
-  align-items: center;
-  font-family: var(--font-mono);
-  font-size: var(--fs-xs);
-  color: var(--text-muted);
-  letter-spacing: 0.03em;
+/**
+ * Le plan prend toute la largeur de sa colonne, sans dépasser `--plan-max-h`
+ * en hauteur. La proportion vient des dimensions saisies : elle n’est donc
+ * connue qu’au rendu, et le composant écrit `--plan-ratio`, dont se déduit la
+ * largeur maximale. Un `max-height` posé sur le SVG aurait produit deux
+ * bandes vides à gauche et à droite.
+ */
+.visualizer__canvas {
+  width: 100%;
+  max-width: calc(var(--plan-max-h, 200vh) * var(--plan-ratio, 1.4));
+  margin-inline: auto;
+  border-radius: var(--r-md);
+  overflow: hidden;
 }
-.visualizer__readout b { color: var(--text); font-weight: 600; }
+.visualizer__canvas svg { display: block; width: 100%; height: auto; }
+@media (min-width: 62rem) {
+  /* 68svh : mesuré à 1440 x 900, le plan fait alors 817 x 612 dans une colonne
+     de 960, et le panneau de réglages 821 de haut — les deux colonnes tombent
+     ensemble, sans grande bande vide de part et d’autre du plan. */
+  .visualizer__canvas { --plan-max-h: min(68svh, 42rem); }
+}
+
+/* Résultats : quatre repères courts, lus d’un coup d’œil. */
+.visualizer__readout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7.25rem, 1fr));
+  gap: 0.4rem;
+  margin: 0;
+}
+.visualizer__readout > div {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.visualizer__readout dt {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+.visualizer__readout dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.94rem;
+  font-weight: 600;
+  color: var(--text);
+}
+/* Le nom du motif n’est pas un chiffre : en chasse fixe, « Point de Hongrie »
+   dépassait de sa carte sur téléphone. */
+.visualizer__readout dd.is-text { font-family: inherit; font-size: 0.88rem; }
 
 .visualizer__advice {
   display: flex;
@@ -2777,121 +2934,86 @@ body[data-drawer-open="true"] { overflow: hidden; }
   padding: var(--sp-4);
   border-radius: var(--r-md);
   background: var(--c-sage-pale);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
   color: var(--c-sage-deep);
 }
 .visualizer__advice svg { width: 1.1em; height: 1.1em; flex: none; margin-top: 0.2em; }
 .visualizer__advice p { margin: 0; }
 
-.visualizer__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-
-/* Animation d'apparition des lames */
-@media (prefers-reduced-motion: no-preference) {
-  .plank-anim { animation: plank-in 520ms var(--ease-out) both; }
-  @keyframes plank-in {
-    from { opacity: 0; transform: translateY(6px); }
-  }
+/* ---------- Écrans étroits ---------- */
+@media (max-width: 61.99rem) {
+  .visualizer__readout { grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); }
 }
 
-/* Grands écrans : le plan profite de toute la largeur disponible */
-@media (min-width: 90rem) {
-  .visualizer__canvas { max-width: none; }
-  .visualizer__readout {
-    padding: var(--sp-4);
-    border: 1px solid var(--line);
-    border-radius: var(--r-md);
-    background: var(--surface);
-    justify-content: flex-start;
-    gap: 0.5rem 2.5rem;
+/**
+ * Téléphone : la vignette repasse à côté du libellé.
+ *
+ * En colonne unique, les cinq motifs à vignette large faisaient 381 px de
+ * réglages à eux seuls, soit presque un demi-écran avant d’arriver aux
+ * dimensions. Vignette à gauche, libellé à droite, deux colonnes : 148 px
+ * pour la même information, et la cible reste à 44 px.
+ */
+@media (max-width: 47.99rem) {
+  .pattern-switch { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pattern-switch button {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.5rem;
+    text-align: left;
   }
+  .pattern-switch svg { width: 2.5rem; }
+  /* Quatre repères en deux fois deux : aucune carte orpheline. */
+  .visualizer__readout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .visualizer__readout > div { padding: 0.45rem 0.55rem; }
+  .visualizer__readout dt { font-size: 0.64rem; }
 }
-
-/* Très petits écrans : rien ne doit dépasser à 320 px */
-.visualizer { grid-template-columns: minmax(0, 1fr); }
-.visualizer__panel, .visualizer__group, .pattern-switch, .seg { min-width: 0; }
 @media (max-width: 26rem) {
   .visualizer__panel { padding: var(--sp-4); }
-  .seg { flex-wrap: wrap; border-radius: var(--r-md); }
-  .seg button { flex: 1 0 auto; }
-  .pattern-switch button { font-size: 0.86rem; gap: 0.5rem; }
+  .pattern-switch { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* À 320 px, la colonne de libellé tombe à 62 px et « Diagonale », qui ne
+     peut pas se couper, dépassait d’un pixel. Vignette et corps resserrés. */
+  .pattern-switch button { grid-template-columns: 2rem minmax(0, 1fr); font-size: 0.72rem; }
+  .pattern-switch svg { width: 2rem; }
+  /* Les deux libellés d’action font ensemble plus de 300 px : en colonne, le
+     principal passe au-dessus et « Réinitialiser » reste dessous. */
+  .visualizer__actions { grid-template-columns: minmax(0, 1fr); }
+  .visualizer__actions .btn--ghost { order: 2; }
 }
 
 /**
  * Mode Plan sur écran tactile.
  *
- * Mesuré à 390 px avec émulation tactile : les cinq boutons de motif faisaient
+ * Mesuré à 390 px avec émulation tactile : les boutons de motif faisaient
  * 42 px de haut, les deux champs de dimensions 43 px, et les boutons empilés
- * n'étaient séparés que de 6 à 7 px. Sous le pouce, c'est trop juste — la
+ * n’étaient séparés que de 6 à 7 px. Sous le pouce, c’est trop juste — la
  * recommandation usuelle est 44 px de cible et au moins 8 px entre deux.
  *
  * Les titres de groupe passent de 12 à 13 px : ce sont des libellés de
- * contrôle, pas de la métadonnée décorative, et ils doivent rester lisibles
- * sur un téléphone.
+ * contrôle, pas de la métadonnée décorative.
  *
  * Tout est sous `pointer: coarse` : la densité du bureau ne change pas.
  */
 @media (pointer: coarse) {
-  /* Le curseur de largeur de lame : 28 px au bureau, 44 px sous le pouce. */
   .visualizer__range input[type="range"] { min-height: 44px; }
-  .pattern-switch { gap: 0.75rem; }
+  .pattern-switch { gap: 0.5rem; }
   .pattern-switch button { min-height: 44px; }
-  .visualizer__dims { gap: 0.75rem; }
+  .visualizer__dims { gap: 0.6rem; }
   .visualizer__num input { min-height: 44px; }
-  .seg { gap: 0.4rem; }
-  /* 44 et non 40 : c'est la cible de référence, et rien ici ne justifiait une
+  .seg { gap: 0.3rem; }
+  /* 44 et non 40 : c’est la cible de référence, et rien ici ne justifiait une
      exception — la contrainte de largeur est réglée par la grille. */
-  .seg button { min-height: 44px; padding-inline: 0.75rem; }
+  .seg button { min-height: 44px; }
+  .tone-swatches { gap: 0.5rem; }
+  .tone-swatch { min-height: 44px; }
+  .visualizer__actions { gap: 0.6rem; }
   .visualizer__actions .btn { min-height: 44px; }
   .visualizer__group > legend,
   .visualizer__group-title { font-size: 0.82rem; }
   /* La scène du plan est un SVG : sans cela, un glissement vertical dessus
      pouvait être capté au lieu de faire défiler la page. */
   .visualizer__canvas { touch-action: pan-y; }
-}
-
-/**
- * Densité des contrôles sur téléphone, à cibles tactiles constantes.
- *
- * Les réglages mesuraient 1544 px de haut à 390 px : cinq motifs empilés un par
- * rangée en occupaient 300, et chaque groupe de pastilles 129 parce que la
- * cinquième — « Aucune » — passait seule à la ligne en laissant un vide.
- * Beaucoup de défilement pour peu de réglages.
- *
- * Deux changements, aucun sur la taille des cibles, qui restent à 44 px :
- *
- *   - les motifs passent en deux colonnes, soit trois rangées au lieu de cinq ;
- *   - les pastilles deviennent une grille qui accueille les cinq de front là où
- *     la place existe, et se replie proprement en dessous — plutôt qu'un
- *     `flex-wrap` qui laisse une orpheline centrée.
- */
-@media (max-width: 47.99rem) {
-  .pattern-switch { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  /* Le motif actif garde toute la largeur : c'est l'état, il se lit d'abord. */
-  .pattern-switch button[aria-pressed="true"] { grid-column: 1 / -1; }
-  /* 4,6rem et non 3,4 : à cinq colonnes sur 390 px, une cellule tombe à 58 px
-     et « Gauche » comme « Aucune » débordent. Quatre de front puis un repli
-     propre valent mieux qu'une rangée de mots rognés. */
-  .seg {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(4.6rem, 1fr));
-    border-radius: var(--r-md);
-  }
-  .seg button { width: 100%; white-space: nowrap; }
-}
-
-/**
- * Actions finales : en colonne quand deux boutons ne tiennent plus côte à côte.
- *
- * « Réinitialiser » et « Utiliser dans mon projet » font ensemble plus de
- * 300 px de libellé : sur 320 px ils se serrent jusqu'à l'illisible ou
- * s'enroulent en laissant le principal en second. En colonne, l'ordre visuel
- * est renversé pour que le CTA domine — il passe au-dessus, pleine largeur, et
- * « Réinitialiser » reste dessous, secondaire comme il doit l'être.
- */
-@media (max-width: 26rem) {
-  .visualizer__actions { flex-direction: column; align-items: stretch; }
-  .visualizer__actions .btn { width: 100%; }
-  .visualizer__actions .btn--ghost { order: 2; }
 }
 
 

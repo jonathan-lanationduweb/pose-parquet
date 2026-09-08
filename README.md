@@ -109,6 +109,13 @@ Point de montage :
 - Paramètres : longueur, largeur, largeur de lame, position de la fenêtre,
   position de l'entrée, teinte, motif.
 - Sorties : surface, chutes estimées, nombre de lames, conseil contextuel.
+- Mise en page : réglages à gauche (340 à 420 px), plan à droite, à partir de
+  62 rem — et dès 48 rem quand la fenêtre est basse (téléphone en paysage).
+  L'ordre du DOM reste réglages puis plan, ce qui donne la bonne séquence en
+  colonne unique.
+- Le composant écrit `--plan-ratio` sur `.visualizer__canvas` : la proportion
+  du plan dépend des dimensions saisies, et c'est elle qui borne sa hauteur
+  sans laisser de bandes vides. Voir la note dans `css/components/visualizer.css`.
 
 ### Ajouter un motif
 

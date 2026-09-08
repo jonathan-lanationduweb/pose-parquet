@@ -1,12 +1,16 @@
 /**
- * Studio de pose — simulateur de sens de pose.
+ * Mode Plan — simulateur de sens de pose.
  *
- * Rendu SVG pur, sans dépendance. L'UI est construite par le composant afin
- * qu'une page n'ait qu'un point de montage à déclarer :
+ * Rendu SVG pur, sans dépendance. L’UI est construite par le composant afin
+ * qu’une page n’ait qu’un point de montage à déclarer :
  *   <div data-visualizer data-mode="compact"></div>
  *
  * Les motifs proviennent de js/tools/patterns.js : en ajouter un suffit
- * à l'exposer ici (sélecteur, rendu, conseil).
+ * à l’exposer ici (sélecteur, rendu, conseil).
+ *
+ * Le calcul est inchangé : surface, taux de chutes, nombre de lames et
+ * géométrie des motifs viennent des mêmes formules qu’avant. Ce fichier ne
+ * traite que la présentation — disposition, libellés, échelle du dessin.
  */
 import { PATTERNS, getPattern, patternThumb } from './patterns.js';
 import { clamp } from '../utils/dom.js';
@@ -40,10 +44,30 @@ const TONES = {
   fume: { hue: 26, sat: 14, light: 52 },
 };
 
+const TONE_LABELS = [
+  { id: 'clair', label: 'Clair' },
+  { id: 'naturel', label: 'Naturel' },
+  { id: 'fume', label: 'Fumé' },
+];
+
+const PLANK_MIN = 7;
+const PLANK_MAX = 26;
+
+/** Marge autour de la pièce, en proportion de son plus grand côté. */
+const PAD_RATIO = 0.09;
+
 const svgEl = (name, attrs = {}) => {
   const node = document.createElementNS('http://www.w3.org/2000/svg', name);
   Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, String(value)));
   return node;
+};
+
+/** Nombres à la française : la virgule décimale, comme sur les cotes du plan. */
+const fr = (value, digits = 2) => value.toFixed(digits).replace('.', ',');
+
+const toneColor = (id) => {
+  const tone = TONES[id] || TONES.naturel;
+  return `hsl(${tone.hue} ${tone.sat}% ${tone.light}%)`;
 };
 
 export class FloorVisualizer {
@@ -59,11 +83,13 @@ export class FloorVisualizer {
       ...options,
       ...this.readUrlState(),
     };
+    /** Groupes de boutons indexés par clé d’état, pour la resynchronisation. */
+    this.controls = {};
     this.build();
     this.render();
   }
 
-  /** Permet de partager une configuration via l'URL (#pose=...). */
+  /** Permet de partager une configuration via l’URL (#motif=...). */
   readUrlState() {
     const hash = new URLSearchParams(window.location.hash.slice(1));
     const state = {};
@@ -101,7 +127,9 @@ export class FloorVisualizer {
     this.canvas = document.createElement('div');
     this.canvas.className = 'visualizer__canvas';
 
-    this.readout = document.createElement('div');
+    // Une liste de définitions : chaque chiffre garde son intitulé, y compris
+    // pour un lecteur d’écran qui parcourt la page repère par repère.
+    this.readout = document.createElement('dl');
     this.readout.className = 'visualizer__readout';
 
     this.stage.append(this.canvas, this.readout);
@@ -129,12 +157,17 @@ export class FloorVisualizer {
     }
   }
 
-  buildGroup(title) {
+  /**
+   * Un groupe de réglage : son titre, et à droite du titre la valeur courante
+   * quand il y en a une à lire (la largeur de lame, par exemple).
+   */
+  buildGroup(title, value) {
     const group = document.createElement('div');
     group.className = 'visualizer__group';
     const heading = document.createElement('p');
     heading.className = 'visualizer__group-title';
-    heading.textContent = title;
+    heading.append(document.createTextNode(title));
+    if (value) heading.append(value);
     group.append(heading);
     return group;
   }
@@ -151,7 +184,13 @@ export class FloorVisualizer {
       button.type = 'button';
       button.dataset.pattern = pattern.id;
       button.setAttribute('aria-pressed', String(pattern.id === this.state.pattern));
-      button.innerHTML = `${patternThumb(pattern.id, { w: 60, h: 44 })}<span>${pattern.label}</span>`;
+      button.innerHTML = `${patternThumb(pattern.id, { w: 72, h: 48 })}<span>${pattern.label}</span>`;
+      // La vignette est décorative ici : son propre libellé doublerait celui
+      // du bouton, qui annoncerait « Motif Bâton rompu, Bâton rompu ».
+      const thumb = button.querySelector('svg');
+      thumb.removeAttribute('role');
+      thumb.removeAttribute('aria-label');
+      thumb.setAttribute('aria-hidden', 'true');
       button.addEventListener('click', () => this.set({ pattern: pattern.id }));
       list.append(button);
       return button;
@@ -166,10 +205,18 @@ export class FloorVisualizer {
     const wrap = document.createElement('div');
     wrap.className = 'visualizer__dims';
 
+    this.dimInputs = {};
     [
       { key: 'length', label: 'Longueur (m)' },
       { key: 'width', label: 'Largeur (m)' },
-    ].forEach(({ key, label }) => {
+    ].forEach(({ key, label }, index) => {
+      if (index === 1) {
+        const times = document.createElement('span');
+        times.className = 'visualizer__times';
+        times.setAttribute('aria-hidden', 'true');
+        times.textContent = '×';
+        wrap.append(times);
+      }
       const field = document.createElement('label');
       field.className = 'visualizer__num';
       const id = `viz-${key}-${Math.random().toString(36).slice(2, 6)}`;
@@ -184,11 +231,20 @@ export class FloorVisualizer {
       input.value = String(this.state[key]);
       input.inputMode = 'decimal';
       input.addEventListener('input', () => {
-        const value = clamp(Number(input.value) || 1, 1, 25);
-        this.set({ [key]: value });
+        // Un champ momentanément vide est une saisie en cours, pas une pièce
+        // de un mètre : on garde la dernière valeur valide jusqu’à la suivante.
+        const raw = input.value.trim();
+        if (raw === '') return;
+        this.set({ [key]: clamp(Number(raw) || this.state[key], 1, 25) });
+      });
+      // Au relâchement, le champ affiche la valeur réellement dessinée : sans
+      // cela, saisir 40 laissait « 40 » à l’écran pour un plan borné à 25 m.
+      input.addEventListener('change', () => {
+        input.value = String(this.state[key]);
       });
       field.append(input);
       wrap.append(field);
+      this.dimInputs[key] = input;
     });
 
     group.append(wrap);
@@ -196,7 +252,10 @@ export class FloorVisualizer {
   }
 
   buildPlankWidth() {
-    const group = this.buildGroup('Largeur de lame');
+    this.plankOutput = document.createElement('output');
+    this.plankOutput.textContent = `${this.state.plankWidth} cm`;
+
+    const group = this.buildGroup('Largeur de lame', this.plankOutput);
     const label = document.createElement('label');
     label.className = 'visualizer__range';
     const id = `viz-plank-${Math.random().toString(36).slice(2, 6)}`;
@@ -206,76 +265,74 @@ export class FloorVisualizer {
     const input = document.createElement('input');
     input.type = 'range';
     input.id = id;
-    input.min = '7';
-    input.max = '26';
+    input.min = String(PLANK_MIN);
+    input.max = String(PLANK_MAX);
     input.step = '1';
     input.value = String(this.state.plankWidth);
+    this.plankInput = input;
 
-    this.plankOutput = document.createElement('output');
-    this.plankOutput.textContent = `${this.state.plankWidth} cm`;
+    const bounds = document.createElement('div');
+    bounds.className = 'visualizer__bounds';
+    bounds.setAttribute('aria-hidden', 'true');
+    bounds.innerHTML = `<span>${PLANK_MIN} cm</span><span>${PLANK_MAX} cm</span>`;
 
     input.addEventListener('input', () => this.set({ plankWidth: Number(input.value) }));
-    label.append(input, this.plankOutput);
-    group.append(label);
+    label.append(input);
+    // Les bornes restent hors du <label> : dedans, le nom accessible du
+    // curseur devenait « Largeur de lame en centimètres 7 cm 26 cm ».
+    group.append(label, bounds);
+    return group;
+  }
+
+  /**
+   * Un groupe de boutons exclusifs pour une clé d’état. Les boutons sont
+   * mémorisés dans `this.controls[key]` : la resynchronisation retrouve ainsi
+   * son groupe par son nom, et non par sa position dans le panneau.
+   */
+  buildButtonGroup(key, title, options, { className, decorate, ariaLabel } = {}) {
+    const group = this.buildGroup(title);
+    const list = document.createElement('div');
+    list.className = className || 'seg';
+    list.setAttribute('role', 'group');
+    list.setAttribute('aria-label', ariaLabel || `${title} de la pièce`);
+
+    const buttons = options.map((option) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.value = option.id;
+      if (decorate) decorate(button, option);
+      button.append(document.createTextNode(option.label));
+      button.setAttribute('aria-pressed', String(this.state[key] === option.id));
+      button.addEventListener('click', () => {
+        this.set({ [key]: option.id });
+        this.syncGroup(key);
+      });
+      list.append(button);
+      return button;
+    });
+
+    this.controls[key] = buttons;
+    group.append(list);
     return group;
   }
 
   buildWallSelect(key, title, noneLabel) {
-    const group = this.buildGroup(title);
-    const seg = document.createElement('div');
-    seg.className = 'seg';
-    seg.setAttribute('role', 'group');
-    seg.setAttribute('aria-label', `${title} de la pièce`);
-
-    const options = [...WALLS, { id: 'none', label: noneLabel }];
-    const buttons = options.map((wall) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.textContent = wall.label;
-      button.setAttribute('aria-pressed', String(this.state[key] === wall.id));
-      button.addEventListener('click', () => {
-        this.set({ [key]: wall.id });
-        buttons.forEach((other, index) =>
-          other.setAttribute('aria-pressed', String(options[index].id === this.state[key]))
-        );
-      });
-      seg.append(button);
-      return button;
-    });
-
-    group.append(seg);
-    return group;
+    return this.buildButtonGroup(key, title, [...WALLS, { id: 'none', label: noneLabel }]);
   }
 
   buildTone() {
-    const group = this.buildGroup('Teinte');
-    const seg = document.createElement('div');
-    seg.className = 'seg';
-    seg.setAttribute('role', 'group');
-    seg.setAttribute('aria-label', 'Teinte du parquet');
-
-    const tones = [
-      { id: 'clair', label: 'Clair' },
-      { id: 'naturel', label: 'Naturel' },
-      { id: 'fume', label: 'Fumé' },
-    ];
-    const buttons = tones.map((tone) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.textContent = tone.label;
-      button.setAttribute('aria-pressed', String(this.state.tone === tone.id));
-      button.addEventListener('click', () => {
-        this.set({ tone: tone.id });
-        buttons.forEach((other, index) =>
-          other.setAttribute('aria-pressed', String(tones[index].id === this.state.tone))
-        );
-      });
-      seg.append(button);
-      return button;
+    return this.buildButtonGroup('tone', 'Teinte', TONE_LABELS, {
+      className: 'tone-swatches',
+      ariaLabel: 'Teinte du parquet',
+      decorate: (button, option) => {
+        button.classList.add('tone-swatch');
+        const dot = document.createElement('i');
+        // La pastille montre la couleur qui sera réellement peinte au sol.
+        dot.style.setProperty('--tone', toneColor(option.id));
+        dot.setAttribute('aria-hidden', 'true');
+        button.append(dot);
+      },
     });
-
-    group.append(seg);
-    return group;
   }
 
   buildActions() {
@@ -286,11 +343,7 @@ export class FloorVisualizer {
     reset.type = 'button';
     reset.className = 'btn btn--ghost btn--sm';
     reset.textContent = 'Réinitialiser';
-    reset.addEventListener('click', () => {
-      this.state = { ...DEFAULTS };
-      this.syncControls();
-      this.render();
-    });
+    reset.addEventListener('click', () => this.reset());
 
     this.projectLink = document.createElement('a');
     this.projectLink.className = 'btn btn--sm';
@@ -301,33 +354,42 @@ export class FloorVisualizer {
     return group;
   }
 
-  /** Réaligne les contrôles sur l'état courant (après réinitialisation). */
+  /**
+   * Retour aux valeurs par défaut.
+   *
+   * Le retour passe par `set()`, donc l’état partagé avec le visualiseur photo
+   * est remis à zéro lui aussi. Sans cela, un rechargement de page ressortait
+   * le motif et la teinte que l’on venait justement d’abandonner.
+   */
+  reset() {
+    this.set({ ...DEFAULTS });
+    this.syncControls();
+  }
+
+  /** Réaligne un groupe de boutons sur l’état courant. */
+  syncGroup(key) {
+    (this.controls[key] || []).forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.value === this.state[key]));
+    });
+  }
+
+  /** Réaligne tous les contrôles sur l’état courant (après réinitialisation). */
   syncControls() {
-    this.panel.querySelectorAll('input[type="number"]').forEach((input, index) => {
-      input.value = String(index === 0 ? this.state.length : this.state.width);
-    });
-    const range = this.panel.querySelector('input[type="range"]');
-    if (range) range.value = String(this.state.plankWidth);
-    this.panel.querySelectorAll('.seg').forEach((seg) => {
-      seg.querySelectorAll('button').forEach((button) => button.setAttribute('aria-pressed', 'false'));
-    });
-    const segs = this.panel.querySelectorAll('.seg');
-    const map = [this.state.window, this.state.door, this.state.tone];
-    segs.forEach((seg, index) => {
-      const buttons = Array.from(seg.querySelectorAll('button'));
-      const labels = index === 2
-        ? ['clair', 'naturel', 'fume']
-        : [...WALLS.map((wall) => wall.id), 'none'];
-      const position = labels.indexOf(map[index]);
-      if (position >= 0) buttons[position].setAttribute('aria-pressed', 'true');
-    });
+    if (this.dimInputs) {
+      Object.entries(this.dimInputs).forEach(([key, input]) => {
+        input.value = String(this.state[key]);
+      });
+    }
+    if (this.plankInput) this.plankInput.value = String(this.state.plankWidth);
+    Object.keys(this.controls).forEach((key) => this.syncGroup(key));
+    this.updatePatternButtons();
   }
 
   /** Géométrie : la pièce est dessinée en centimètres, longueur sur X. */
   geometry() {
     const length = this.state.length * 100;
     const width = this.state.width * 100;
-    const pad = Math.max(length, width) * 0.14;
+    const pad = Math.max(length, width) * PAD_RATIO;
     return { length, width, pad };
   }
 
@@ -346,10 +408,12 @@ export class FloorVisualizer {
       door: this.state.door,
     };
 
+    const boxWidth = length + pad * 2;
+    const boxHeight = width + pad * 2;
     const svg = svgEl('svg', {
-      viewBox: `${-pad} ${-pad} ${length + pad * 2} ${width + pad * 2}`,
+      viewBox: `${-pad} ${-pad} ${boxWidth} ${boxHeight}`,
       role: 'img',
-      'aria-label': `Pièce de ${this.state.length} m sur ${this.state.width} m, pose ${pattern.label}`,
+      'aria-label': `Pièce de ${fr(this.state.length)} m sur ${fr(this.state.width)} m, pose ${pattern.label}`,
     });
 
     const defs = svgEl('defs');
@@ -411,9 +475,10 @@ export class FloorVisualizer {
     svg.append(...this.buildDimensionLines(length, width, pad));
 
     this.canvas.innerHTML = '';
-    const wrapper = svgEl('g');
-    svg.classList.add('plank-anim');
     this.canvas.append(svg);
+    // La proportion du plan sert à borner sa hauteur sans laisser de bandes
+    // vides : voir la note sur --plan-ratio dans css/components/visualizer.css.
+    this.canvas.style.setProperty('--plan-ratio', (boxWidth / boxHeight).toFixed(3));
 
     this.updateReadout(ctx, pattern);
     this.updatePatternButtons();
@@ -423,7 +488,6 @@ export class FloorVisualizer {
         this.state.length * this.state.width
       )}`;
     }
-    void wrapper;
   }
 
   /** Préfixe de chemin fourni par la page (data-base), pour les liens internes. */
@@ -470,18 +534,34 @@ export class FloorVisualizer {
     }
   }
 
+  /**
+   * La fenêtre : le trait de mur, le verre, et son nom.
+   *
+   * Le libellé était centré sur le trait à 0,045 fois le grand côté : il
+   * débordait à moitié hors de la pièce sur les murs latéraux, et pesait
+   * presque autant que les cotes. Il est ramené à 0,03, posé du bon côté du
+   * mur, et cerné de la couleur du fond pour rester lisible sur le parquet.
+   */
   buildWindow(length, width) {
-    const seg = this.wallSegment(this.state.window, length, width, 0.42);
+    const wall = this.state.window;
+    const seg = this.wallSegment(wall, length, width, 0.42);
     const base = svgEl('line', { ...seg, stroke: '#f6f4ef', 'stroke-width': 9 });
     const glass = svgEl('line', { ...seg, stroke: '#7aa7b8', 'stroke-width': 4 });
+    const size = Math.max(length, width) * 0.03;
+    const anchor = wall === 'left' ? 'start' : wall === 'right' ? 'end' : 'middle';
     const label = svgEl('text', {
       x: (seg.x1 + seg.x2) / 2,
       y: (seg.y1 + seg.y2) / 2,
       fill: '#4c6570',
-      'font-size': Math.max(length, width) * 0.045,
+      stroke: '#f6f4ef',
+      'stroke-width': size * 0.28,
+      'stroke-linejoin': 'round',
+      'paint-order': 'stroke',
+      'font-size': size,
       'font-family': 'ui-monospace, monospace',
-      'text-anchor': 'middle',
-      dy: this.state.window === 'top' ? -14 : this.state.window === 'bottom' ? 26 : -14,
+      'text-anchor': anchor,
+      dx: wall === 'left' ? size * 0.5 : wall === 'right' ? -size * 0.5 : 0,
+      dy: wall === 'top' ? size * 1.25 : wall === 'bottom' ? -size * 0.6 : -size * 0.45,
     });
     label.textContent = 'fenêtre';
     return [base, glass, label];
@@ -506,48 +586,56 @@ export class FloorVisualizer {
     return [gap, arc];
   }
 
+  /**
+   * Les cotes.
+   *
+   * Les libellés passent sous le trait de cote et à sa gauche, c’est-à-dire
+   * dans la marge, plutôt qu’entre le trait et le mur : la pièce récupère
+   * l’espace, et la cote reste lisible à 0,033 fois le grand côté.
+   */
   buildDimensionLines(length, width, pad) {
-    const size = Math.max(length, width) * 0.05;
+    const size = Math.max(length, width) * 0.033;
+    const offset = pad * 0.55;
     const nodes = [];
 
     const lengthLine = svgEl('line', {
       x1: 0,
-      y1: width + pad * 0.55,
+      y1: width + offset,
       x2: length,
-      y2: width + pad * 0.55,
+      y2: width + offset,
       stroke: '#a5afb5',
       'stroke-width': 1.6,
     });
     const lengthLabel = svgEl('text', {
       x: length / 2,
-      y: width + pad * 0.55,
-      dy: -6,
+      y: width + offset,
+      dy: size * 0.95,
       fill: '#6d7b84',
       'font-size': size,
       'font-family': 'ui-monospace, monospace',
       'text-anchor': 'middle',
     });
-    lengthLabel.textContent = `${this.state.length.toFixed(2).replace('.', ',')} m`;
+    lengthLabel.textContent = `${fr(this.state.length)} m`;
 
     const widthLine = svgEl('line', {
-      x1: -pad * 0.55,
+      x1: -offset,
       y1: 0,
-      x2: -pad * 0.55,
+      x2: -offset,
       y2: width,
       stroke: '#a5afb5',
       'stroke-width': 1.6,
     });
     const widthLabel = svgEl('text', {
-      x: -pad * 0.55,
+      x: -offset,
       y: width / 2,
-      dy: -8,
+      dy: -size * 0.4,
       fill: '#6d7b84',
       'font-size': size,
       'font-family': 'ui-monospace, monospace',
       'text-anchor': 'middle',
-      transform: `rotate(-90 ${-pad * 0.55} ${width / 2})`,
+      transform: `rotate(-90 ${-offset} ${width / 2})`,
     });
-    widthLabel.textContent = `${this.state.width.toFixed(2).replace('.', ',')} m`;
+    widthLabel.textContent = `${fr(this.state.width)} m`;
 
     nodes.push(lengthLine, lengthLabel, widthLine, widthLabel);
     return nodes;
@@ -568,12 +656,18 @@ export class FloorVisualizer {
     const plankArea = (ctx.plankWidth * ctx.plankLength) / 10000;
     const planks = Math.ceil((surface * (1 + loss / 100)) / plankArea);
 
-    this.readout.innerHTML = `
-      <span>Surface <b>${surface.toFixed(1).replace('.', ',')} m²</b></span>
-      <span>Chutes estimées <b>+${loss} %</b></span>
-      <span>Lames <b>~${planks}</b></span>
-      <span>Motif <b>${pattern.label}</b></span>
-    `;
+    const cards = [
+      ['Surface', `${fr(surface, 1)} m²`, true],
+      ['Chutes estimées', `+${loss} %`, true],
+      ['Lames', `~${planks}`, true],
+      ['Motif', pattern.label, false],
+    ];
+    this.readout.innerHTML = cards
+      .map(
+        ([label, value, mono]) =>
+          `<div><dt>${label}</dt><dd${mono ? '' : ' class="is-text"'}>${value}</dd></div>`
+      )
+      .join('');
 
     if (this.advice) {
       this.advice.querySelector('p').textContent = pattern.advice({ ...this.state });
