@@ -29,8 +29,8 @@
     <link rel="manifest" href="site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-400-1.woff2" crossorigin />
-    <link rel="stylesheet" href="assets/dist/site.d772643ada.css" />
-    <script type="module" src="assets/dist/6f3485176b/js/main.js"></script>
+    <link rel="stylesheet" href="assets/dist/site.8dcc43fa86.css" />
+    <script type="module" src="assets/dist/fed09b4402/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Pose Parquet","url":"https://pose-parquet.com","inLanguage":"fr-FR","description":"Comprendre, préparer, visualiser et réussir la pose de son parquet."}</script>
   </head>
   <body class="page">
@@ -134,6 +134,84 @@
         </div>
       </div>
 
+      <section class="section section--mineral" aria-labelledby="sim-title">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Visualiseur · essai immédiat</p>
+              <h2 id="sim-title">Essayez votre parquet, ici, tout de suite.</h2>
+            </div>
+            <div>
+              <p class="lead">Changez la teinte, changez le motif, faites glisser pour comparer avec la pièce nue. Le calcul se fait dans votre navigateur : aucune photo n’est envoyée.</p>
+            </div>
+          </div>
+
+          <div class="vzp" data-vz-preview data-room="sejour" data-base="" data-reveal>
+            <figure class="vzp__figure">
+              <div class="vzp__stage" data-stage>
+                <img class="vzp__photo" src="assets/images/room-sejour.jpg"
+                  srcset="assets/images/room-sejour-1120.jpg 1120w, assets/images/room-sejour-1600.jpg 1600w"
+                  sizes="(min-width: 75rem) 76rem, 94vw"
+                  alt="Le séjour d’exemple avant pose, sol nu" width="1600" height="1067"
+                  loading="lazy" decoding="async" data-photo />
+                <img class="vzp__poster" src="assets/images/apercu-sejour-chene-naturel.jpg"
+                  srcset="assets/images/apercu-sejour-chene-naturel-1120.jpg 1120w, assets/images/apercu-sejour-chene-naturel.jpg 1600w"
+                  sizes="(min-width: 75rem) 76rem, 94vw"
+                  alt="Le même séjour avec un parquet en chêne naturel posé à lames droites"
+                  width="1600" height="1067" loading="lazy" decoding="async" data-poster />
+                <canvas class="vzp__canvas" data-canvas></canvas>
+                <span class="vzp__tag vzp__tag--before">Avant</span>
+                <span class="vzp__tag vzp__tag--after">Après</span>
+                <!-- Course bornée à 3–97 % : le bouton de la poignée est centré sur le
+                     trait, donc à moitié hors cadre à 0 et à 100 %, où l'overflow de la
+                     scène le coupait net. Le trait et le découpage restent identiques. -->
+                <input class="vzp__range" type="range" min="3" max="97" value="52"
+                  aria-label="Curseur de comparaison entre la pièce d’origine et le parquet simulé" data-range />
+                <span class="vzp__handle" aria-hidden="true"></span>
+              </div>
+              <figcaption class="vzp__caption">
+                <span data-caption>Chêne Naturel · lames droites</span> — rendu calculé dans votre navigateur.
+                <span data-credit>Photo : Curtis Adams / Pexels.</span>
+              </figcaption>
+            </figure>
+
+            <div class="vzp__controls" data-controls hidden>
+              <div class="vzp__row">
+                <span class="vzp__label" id="vzp-teinte">Teinte</span>
+                <div class="vzp__chips" role="group" aria-labelledby="vzp-teinte" data-tones>
+                  <button class="vzp__chip" type="button" data-tone="chene-craie" aria-pressed="false">Craie</button>
+                  <button class="vzp__chip" type="button" data-tone="chene-naturel" aria-pressed="true">Naturel</button>
+                  <button class="vzp__chip" type="button" data-tone="chene-miel" aria-pressed="false">Miel</button>
+                  <button class="vzp__chip" type="button" data-tone="chene-fume" aria-pressed="false">Fumé</button>
+                </div>
+              </div>
+              <div class="vzp__row">
+                <span class="vzp__label" id="vzp-motif">Motif de pose</span>
+                <div class="vzp__chips" role="group" aria-labelledby="vzp-motif" data-patterns>
+                  <button class="vzp__chip" type="button" data-pattern="lames" aria-pressed="true">Lames</button>
+                  <button class="vzp__chip" type="button" data-pattern="point-de-hongrie" aria-pressed="false">Point de Hongrie</button>
+                  <button class="vzp__chip" type="button" data-pattern="baton-rompu" aria-pressed="false">Bâton rompu</button>
+                </div>
+              </div>
+              <p class="vzp__live" aria-live="polite" data-live></p>
+            </div>
+
+            <!--
+              « Visualiser dans ma pièce » mène à l'ÉCRAN DE DÉPART du Studio, dont le
+              bouton principal est « Essayer dans ma pièce » : un clic de plus, mais
+              aucun second flux d'import à maintenir sur l'accueil, et le visiteur
+              garde le choix entre sa photo et une pièce d'exemple. Le Studio ne
+              connaît aucun paramètre d'import : en inventer un aurait donné un lien
+              qui ne fait rien.
+            -->
+            <p class="vzp__actions u-actions">
+              <a class="btn" href="outils/studio.html"><span>Visualiser dans ma pièce</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+              <a class="link-arrow" data-open-studio href="outils/studio.html?piece=sejour&amp;parquet=chene-naturel&amp;motif=lames&amp;orientation=0">Ouvrir le Visualiseur <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section class="section" id="parcours" aria-labelledby="parcours-title">
         <div class="wrap-wide">
           <div class="section-head section-head__row">
@@ -197,30 +275,6 @@
             </picture></div>
             </a>
           </div>
-        </div>
-      </section>
-
-      <section class="section section--mineral" aria-labelledby="sim-title">
-        <div class="wrap-wide">
-          <div class="section-head section-head__row">
-            <div>
-              <p class="eyebrow">Visualiseur · outil</p>
-              <h2 id="sim-title">Essayez votre parquet dans votre pièce.</h2>
-            </div>
-            <div>
-              <p class="lead">Importez une photo, choisissez un parquet et comparez plusieurs rendus. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée ni conservée.</p>
-              <p class="u-mt-5 u-actions">
-                <a class="btn" href="outils/studio.html"><span>Visualiser mon parquet</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
-                <a class="link-arrow" href="outils/simulateur-pose.html">Étudier le sens de pose <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
-              </p>
-            </div>
-          </div>
-          <!-- Scène de l'avant/après : uniquement une scène VALIDÉE sur les cinq
-               critères de _calibrage/scene-review.html. « chambre » est la seule à
-               l'être — géométrie mesurée sur trois murs, recoupée par un contrôle
-               d'invariance. « sejour » reste à « correct » : la brillance du sol
-               d'origine n'est pas restituée. -->
-          <div data-vz-preview data-room="chambre" data-base="" data-reveal></div>
         </div>
       </section>
 

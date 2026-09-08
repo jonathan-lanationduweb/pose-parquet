@@ -77,8 +77,18 @@ async function boot() {
   }
 
   if (has('[data-vz-preview]')) {
-    const { mountPreview } = await import('./scene/preview.js');
-    mountAll('[data-vz-preview]', mountPreview);
+    /*
+     * On importe le DÉCLENCHEUR, pas le moteur.
+     *
+     * `visualizer-teaser.js` pèse quelques centaines d'octets : il relie le
+     * curseur avant/après au poster pré-rendu, puis attend que la section
+     * approche de l'écran pour charger `scene/preview.js` et les quinze
+     * modules du moteur. Importer `preview.js` ici, comme avant ce lot,
+     * faisait payer à toute la page d'accueil un moteur de rendu que la
+     * plupart des visiteurs n'atteignent jamais.
+     */
+    const { initVisualizerTeaser } = await import('./home/visualizer-teaser.js');
+    mountAll('[data-vz-preview]', initVisualizerTeaser);
   }
 
   if (has('[data-visualizer]')) {
