@@ -873,7 +873,7 @@ function buildTools() {
         <p class="u-mt-5"><a class="link-arrow" href="visualiseur.html">Plutôt voir le rendu dans une photo ? Ouvrir le visualiseur</a></p>
       </header>
 
-      <section class="tool-shell">
+      <section class="tool-shell" id="plan" aria-label="Plan de la pièce et réglages">
         <div class="wrap-wide">
           <div data-visualizer data-base="../"></div>
         </div>
