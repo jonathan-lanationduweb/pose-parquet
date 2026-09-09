@@ -34,8 +34,28 @@ function buildStudioPage(write) {
   );
 }
 
+/**
+ * Le Visualiseur produit : l'UX validee sur le prototype pose-parquet-ai,
+ * branchee DIRECTEMENT sur le moteur de cette page. Pas d'index : c'est un
+ * parcours en cours de validation, atteignable par lien.
+ */
+function buildProductPage(write) {
+  write(
+    'outils/visualiseur-produit.html',
+    appLayout({
+      app: 'product',
+      title: 'Visualiseur produit · Pose Parquet',
+      description:
+        'Essayez cinq références Premibel dans une pièce : la pièce occupe l’écran, le parquet change à chaque clic, tout est calculé dans votre navigateur.',
+      path: 'outils/visualiseur-produit.html',
+      depth: 1,
+    })
+  );
+}
+
 function buildVisualiseurPage(write) {
   buildStudioPage(write);
+  buildProductPage(write);
 
   const crumbs = breadcrumb('../', [
     { label: 'Accueil', href: 'index.html' },
