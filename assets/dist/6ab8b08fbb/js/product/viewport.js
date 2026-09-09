@@ -157,7 +157,7 @@ export function createViewport({ stage, layers, sceneSize, onChange }) {
   /* ---------------- Gestes ---------------- */
   const pointers = new Map();
   let pinch = null;
-  const ignore = (e, extra) => e.target.closest(`.pv-nav, .pv-tools, .pv-card, .pv-zoom, .pv-status, .pv-veil, .pv-split${extra || ''}`);
+  const ignore = (e, extra) => e.target.closest(`.pv-tools, .pv-bar, .pv-zoom, .pv-veil, .pv-split, .pv-drawer, .pv-menu${extra || ''}`);
 
   function onDown(e) {
     if (ignore(e)) return;
@@ -194,7 +194,8 @@ export function createViewport({ stage, layers, sceneSize, onChange }) {
     if (!pointers.size) stage.classList.remove('grabbing');
   }
   function onWheel(e) {
-    if (e.target.closest('.pv-sheet, .pv-menu')) return;
+    /* La molette dans le tiroir fait defiler le tiroir, pas zoomer la piece. */
+    if (e.target.closest('.pv-drawer, .pv-menu, .pv-bar')) return;
     e.preventDefault();
     const b = box();
     const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? b.height : 1;
