@@ -36,6 +36,7 @@ Il ne touche **jamais** à `css/`, `js/`, `components/` ni `serve.js`.
 | `images.js` | Génération des visuels SVG placeholders |
 | `eol.js` | Fins de ligne, types texte/binaire, empreintes — voir ci-dessous |
 | `check-reproducible.js` | Contrôle que le build est reproductible entre systèmes |
+| `check-studio-api.js` | Contrôle le contrat de pilotage `window.__studio` — voir ci-dessous |
 
 ## Fins de ligne et empreintes
 
@@ -86,3 +87,25 @@ relancer le script. La page, la liste de rubrique, le sitemap, les liens
 C'est possible : éditez directement les fichiers HTML. Pensez alors à supprimer
 ce dossier, ou à ne plus lancer le script, sous peine d'écraser vos
 modifications.
+
+## Le contrat de pilotage du Visualiseur
+
+`?perf=1` expose `window.__studio`, à l'origine pour instrumenter le rendu.
+L'outil d'analyse de photo qui vit dans un autre dépôt s'en sert aussi pour
+appliquer un produit sans toucher à l'état interne du studio : il appelle
+`selectMaterial`, `setPattern`, `setWidth`, `setAngle`, lit
+`getCapabilities()` et attend `onRendered()`. `apiVersion` vaut `1` ; un
+appelant qui ne sait pas conduire cette version doit refuser plutôt que
+deviner.
+
+Ce point d'accroche **reste derrière `?perf=1`** : aucune page publique n'en
+dépend, et `check-studio-api.js` le vérifie. Il vérifie aussi que la copie
+publiée dans `assets/dist/<empreinte>/` porte bien le même contrat que la
+source — une modification de `js/studio/app.js` sans `node _generator/build.js`
+ne change rien à ce que le navigateur exécute.
+
+```
+node _generator/check-studio-api.js            la forme, en lisant la source
+node _generator/check-studio-api.js --script   le comportement, à coller dans
+                                               la console d'un studio ?perf=1
+```

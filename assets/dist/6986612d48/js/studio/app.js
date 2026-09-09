@@ -247,6 +247,16 @@ export async function mountStudio(root) {
 
   /* ---------------- Rendu ---------------- */
 
+  /**
+   * Abonnes au rendu termine.
+   *
+   * Sans signal, celui qui pilote le studio de l'exterieur — le pont du
+   * visualiseur de pose-parquet-ai — n'a qu'une solution : sonder le canevas
+   * jusqu'a ce qu'il cesse de changer. C'est cher, c'est approximatif, et ca
+   * fausse toute mesure de latence. Un abonnement coute trois lignes.
+   */
+  const apresRendu = new Set();
+
   function paint() {
     pending = false;
     if (!renderer.ready) return;
@@ -271,6 +281,8 @@ export async function mountStudio(root) {
     // repère et disparaît silencieusement du rapport.
     if (attente) { mesure(`interaction.${attente}`, attente, 'app:paint:fin'); attente = null; }
     mesure(`app.rendu.q${quality}`, 'app:paint:debut', 'app:paint:fin');
+    // Un abonne qui casse ne doit pas arreter le rendu.
+    apresRendu.forEach((cb) => { try { cb(quality); } catch { /* ignore */ } });
     if (quality > 1) {
       window.clearTimeout(refine);
       refine = window.setTimeout(() => {
@@ -1370,17 +1382,77 @@ const REGROUPEMENT_MS = 70;
   });
 
   if (perfActif) {
-    window.__studio = {
+    /**
+     * Contrat de pilotage du studio.
+     *
+     * Reste derriere `?perf=1` : c'est un point d'accroche d'instrumentation,
+     * pas une API publique du site. Le pont du visualiseur de pose-parquet-ai
+     * s'en sert pour appliquer un produit sans toucher a l'etat interne.
+     *
+     * `apiVersion` permet a l'appelant de refuser une version qu'il ne sait
+     * pas conduire, plutot que d'echouer au premier appel manquant.
+     */
+    const api = {
+      apiVersion: 1,
       get config() { return config; },
       selectMaterial,
       setPattern: (id) => { interaction('motif'); config = { ...config, pattern: id }; syncPatterns(); demandeRendu(true); },
       setAngle: (a) => { interaction('orientation'); config = { ...config, angle: a }; syncOrientation(); demandeRendu(true); },
+
+      /**
+       * Largeur de lame, en metres — `null` rend la main a la largeur propre
+       * au motif. Meme chemin que le curseur du tiroir « Avancé » : on ecrit
+       * la configuration puis on demande un rendu, sans court-circuit.
+       *
+       * @param {number|null} metres
+       * @returns {boolean} refuse une valeur hors du plausible
+       */
+      setWidth: (metres) => {
+        if (metres !== null && !(Number.isFinite(metres) && metres >= 0.02 && metres <= 0.5)) return false;
+        interaction('largeur');
+        config = { ...config, width: metres };
+        demandeRendu(true);
+        return true;
+      },
+
+      /**
+       * Ce que le pont peut REELLEMENT piloter.
+       *
+       * Chaque entree est deduite de la presence d'une commande, jamais
+       * declaree a la main : ajouter un setter suffit a rendre la capacite
+       * vraie, et en oublier un la laisse fausse.
+       *
+       * `finish`, `grain` et `joints` sont a `false` pour une autre raison :
+       * ces proprietes sont cuites dans la famille de texture par
+       * `createMaterial()`, aucune configuration ne les change.
+       */
+      getCapabilities: () => ({
+        pattern: typeof api.setPattern === 'function',
+        width: typeof api.setWidth === 'function',
+        orientation: typeof api.setAngle === 'function',
+        scale: typeof api.setScale === 'function',
+        finish: false,
+        grain: false,
+        joints: false,
+      }),
+
+      /**
+       * S'abonner au rendu termine. Renvoie la fonction de desabonnement.
+       * @param {(quality: number) => void} cb
+       */
+      onRendered: (cb) => {
+        if (typeof cb !== 'function') return () => {};
+        apresRendu.add(cb);
+        return () => apresRendu.delete(cb);
+      },
+
       openRoom,
       setContext,
       canvas,
       get renderer() { return renderer; },
       catalog,
     };
+    window.__studio = api;
   }
 
   return {
