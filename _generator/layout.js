@@ -255,10 +255,27 @@ ${page.body}
  * /outils/visualiseur.html, à laquelle cette page renvoie — l'application
  * elle-même n'a rien à indexer.
  */
+/**
+ * Coquille d'une APPLICATION : pas de prose, pas de pied de page.
+ *
+ * Deux applications partagent cette coquille et ne different que par leurs
+ * assets et leur point de montage :
+ *
+ *   studio   outils/studio.html            [data-studio]   js/studio/main.js
+ *   product  outils/visualiseur-produit.html [data-product] js/product/main.js
+ *
+ * Le Visualiseur produit n'est pas une iframe autour du Studio : il importe
+ * les memes modules de scene et de rendu, dans la meme page. Voir
+ * docs/product-visualizer-integration-v1.md.
+ */
 function appLayout(page) {
   const p = page.depth === 0 ? '' : '../';
   const build = assets();
   const canonical = `${SITE.domain}/${page.path}`;
+  const produit = page.app === 'product';
+  const css = produit ? build.productCss : build.studioCss;
+  const js = produit ? build.productJs : build.studioJs;
+  const mount = produit ? 'data-product' : 'data-studio';
   return `<!doctype html>
 <html lang="fr">
   <head>
@@ -276,11 +293,11 @@ function appLayout(page) {
     <link rel="manifest" href="${p}site.webmanifest?v=${build.icons}" />
     <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/inter-400-1.woff2" crossorigin />
     <link rel="preload" as="fetch" href="${p}data/parquets.json" crossorigin />
-    <link rel="stylesheet" href="${p}${build.studioCss}" />
-    <script type="module" src="${p}${build.studioJs}"></script>
+    <link rel="stylesheet" href="${p}${css}" />
+    <script type="module" src="${p}${js}"></script>
   </head>
-  <body class="app">
-    <div data-studio data-base="${p}">
+  <body class="app${produit ? ' app--product' : ''}">
+    <div ${mount} data-base="${p}">
       <noscript>
         <p class="studio__noscript">Le visualiseur a besoin de JavaScript pour calculer le rendu dans votre navigateur.
         Vous pouvez lire la présentation de l’outil sur la page

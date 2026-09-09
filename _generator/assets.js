@@ -117,6 +117,8 @@ function buildAssets(root, { pageCss = [] } = {}) {
 
   /* ---- CSS du Visualiseur Parquet (fichier interne : css/studio.css) ---- */
   const studioCss = writeHashed(root, 'studio', 'css', inlineCss(root, 'css/studio.css'));
+  /* ---- CSS du Visualiseur produit (css/product.css) ---- */
+  const productCss = writeHashed(root, 'product', 'css', inlineCss(root, 'css/product.css'));
 
   /* ---- JS : l'arbre est recopié dans un dossier daté par son contenu ----
      Les imports internes sont relatifs : recopier l'arbre suffit à changer
@@ -145,8 +147,10 @@ function buildAssets(root, { pageCss = [] } = {}) {
   manifest = {
     css: siteCss,
     studioCss,
+    productCss,
     js: `${jsDir}/js/main.js`,
     studioJs: `${jsDir}/js/studio/main.js`,
+    productJs: `${jsDir}/js/product/main.js`,
     icons: iconHash,
     sizes: {
       css: Buffer.byteLength(site),

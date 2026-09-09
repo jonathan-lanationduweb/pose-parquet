@@ -1,0 +1,514 @@
+/* Feuille du Visualiseur produit : socle du design system + interface applicative */
+/* Polices auto-hébergées — généré par _generator/fetch-fonts.js
+   Instrument Serif et Inter, licence SIL Open Font License 1.1. */
+
+@font-face {
+  font-family: "Instrument Serif";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/instrument-serif-400-italic-0.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Instrument Serif";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/instrument-serif-400-italic-1.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Instrument Serif";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/instrument-serif-400-2.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Instrument Serif";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/instrument-serif-400-3.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/inter-400-0.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/inter-400-1.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/inter-500-2.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("../fonts/inter-500-3.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/inter-600-4.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/inter-600-5.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+
+/* =========================================================
+   Design tokens — Pose Parquet
+   Direction : éditorial graphique, blocs pleine largeur,
+   très grande typographie serif, aplats minéraux.
+   ========================================================= */
+
+:root {
+  /* ---- Couleurs de base ---- */
+  --c-bone:        #f2efe8; /* blanc cassé, fond principal */
+  --c-paper:       #fbf9f5; /* surfaces claires */
+  --c-mineral:     #e3ded4; /* aplat minéral */
+  --c-mineral-2:   #d5cfc3;
+  --c-ink:         #16181a; /* charbon */
+  --c-ink-2:       #2b3134;
+  --c-slate:       #6c7a80; /* gris bleuté */
+  --c-slate-pale:  #ccd8dc;
+  --c-sage:        #8ba088; /* vert sauge */
+  --c-sage-deep:   #46594a;
+  --c-sage-pale:   #dae2d4;
+  --c-clay:        #c07f5e; /* accent terre cuite, usage rare */
+  --c-clay-pale:   #eed9cb;
+  --c-white:       #ffffff;
+
+  /* ---- Rôles ---- */
+  --bg:            var(--c-bone);
+  --bg-alt:        var(--c-paper);
+  --bg-invert:     var(--c-ink);
+  --surface:       var(--c-white);
+  --text:          var(--c-ink);
+  --text-soft:     #4c5457;
+  --text-muted:    var(--c-slate);
+  --text-invert:   #f4f2ec;
+  --accent:        var(--c-sage-deep);
+  --accent-soft:   var(--c-sage);
+  --line:          #dcd6ca;
+  --line-strong:   #c3bcac;
+  --focus:         #2f6f5e;
+
+  /* ---- Typographie ---- */
+  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+
+  /* Échelle typographique fluide.
+     Chaque niveau a sa propre pente : les très grands titres grandissent vite,
+     le texte courant presque pas. Les pentes sont volontairement douces pour
+     que la zone 768–1280 px — celle où l'on regarde le plus — reste juste. */
+  --fs-display: clamp(2.9rem, 2.1rem + 3.6vw, 6rem);
+  --fs-h1:      clamp(2.2rem, 1.7rem + 2.4vw, 4.2rem);
+  --fs-h2:      clamp(1.9rem, 1.5rem + 1.9vw, 3.4rem);
+  --fs-h3:      clamp(1.35rem, 1.2rem + 0.7vw, 1.9rem);
+  --fs-h4:      clamp(1.08rem, 1.02rem + 0.3vw, 1.28rem);
+  --fs-lead:    clamp(1.02rem, 0.98rem + 0.22vw, 1.16rem);
+  --fs-base:    1rem;
+  --fs-sm:      0.875rem;
+  --fs-xs:      0.75rem;
+
+  /* Interlignes : plus le corps est grand, plus l'interligne se resserre */
+  --lh-display: 0.94;
+  --lh-h1:      1.03;
+  --lh-h2:      1.07;
+  --lh-h3:      1.22;
+  --lh-title:   1.05;
+  --lh-body:    1.62;
+
+  --tracking-display: -0.022em;
+  --tracking-h1: -0.018em;
+  --tracking-h2: -0.014em;
+  --tracking-eyebrow: 0.16em;
+
+  /* Longueurs de ligne : le confort de lecture, pas la largeur du conteneur */
+  --measure:       68ch;  /* texte courant */
+  --measure-lead:  50ch;  /* chapeau */
+  --measure-title: 20ch;  /* grand titre éditorial */
+  --measure-short: 36ch;  /* texte de carte */
+
+  /* ---- Espacements ---- */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+  --sp-8: 4.5rem;
+  --sp-9: 6.5rem;
+  --section-y: clamp(4.5rem, 2rem + 8vw, 10rem);
+
+  /* ---- Grille ---- */
+  --wrap: 1180px;
+  --wrap-wide: 1560px;
+  --wrap-text: 42rem;
+  --gutter: clamp(1.25rem, 0.5rem + 2.6vw, 3.5rem);
+
+  /* ---- Formes ----
+     Trois rayons, pas sept. L'échelle précédente comptait 4, 10, 16, 22, 28 et
+     34 px : à l'usage, personne ne distingue 28 de 34, et l'écart finit par se
+     lire comme une négligence plutôt que comme une intention. Les anciens noms
+     survivent en alias pour ne pas réécrire toutes les feuilles, mais ils ne
+     désignent plus que trois valeurs réelles.
+
+       sm  détails : puces, champs, petits médias
+       md  cartes, images, panneaux
+       lg  grands blocs, sections immersives                                */
+  --r-sm: 8px;
+  --r-md: 16px;
+  --r-lg: 28px;
+  --r-pill: 100px;
+  /* Alias historiques → une des trois valeurs ci-dessus */
+  --r-xs: var(--r-sm);
+  --r-media: var(--r-md);
+  --r-card: var(--r-lg);
+  --r-block: var(--r-lg);
+
+  /* ---- Ombres ----
+     Très peu d'ombres, et jamais sur une carte posée dans le flux : elles sont
+     réservées à ce qui flotte réellement au-dessus du contenu — menu déroulant,
+     panneau coulissant, feuille modale. Une ombre douce sur chaque bloc est la
+     signature la plus sûre d'une interface générée sans intention.           */
+  --shadow-1: 0 1px 2px rgba(22, 24, 26, 0.05);
+  --shadow-2: 0 18px 40px -26px rgba(22, 24, 26, 0.5);
+  --shadow-3: 0 40px 80px -40px rgba(22, 24, 26, 0.55);
+
+  /* ---- Mouvement ---- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-1: 150ms;
+  --dur-2: 280ms;
+  --dur-3: 520ms;
+  --dur-4: 900ms;
+
+  /* ---- Divers ---- */
+  --header-h: 76px;
+  --z-header: 100;
+  --z-drawer: 200;
+  --z-modal: 300;
+}
+
+/* Aplats de section réutilisables */
+:root {
+  --tint-sage: var(--c-sage-pale);
+  --tint-slate: var(--c-slate-pale);
+  --tint-mineral: var(--c-mineral);
+  --tint-clay: var(--c-clay-pale);
+}
+
+/* Motifs graphiques issus du calepinage */
+:root {
+  --plank-lines: repeating-linear-gradient(
+    to bottom,
+    transparent 0 13px,
+    color-mix(in srgb, var(--line-strong) 60%, transparent) 13px 14px
+  );
+  --plank-lines-diag: repeating-linear-gradient(
+    45deg,
+    transparent 0 10px,
+    color-mix(in srgb, var(--line-strong) 50%, transparent) 10px 11px
+  );
+  --chevron-lines: repeating-linear-gradient(135deg, currentColor 0 1px, transparent 1px 16px),
+    repeating-linear-gradient(45deg, currentColor 0 1px, transparent 1px 16px);
+}
+
+
+/* Reset minimal et moderne */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body, h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd { margin: 0; }
+
+ul[class], ol[class] { list-style: none; margin: 0; padding: 0; }
+
+img, picture, video, canvas, svg { display: block; max-width: 100%; }
+
+img { height: auto; }
+
+input, button, textarea, select { font: inherit; color: inherit; }
+
+button { background: none; border: 0; cursor: pointer; }
+
+a { color: inherit; }
+
+table { border-collapse: collapse; width: 100%; }
+
+:where(h1, h2, h3, h4, p, li) { overflow-wrap: break-word; }
+
+[hidden] { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+picture { display: contents; }
+
+
+/**
+ * Visualiseur produit — interface.
+ *
+ * Direction validee sur le prototype : la piece occupe l'ecran, le chrome est
+ * clair et flottant, jamais un tableau de bord. Une seule regle de
+ * composition : ce qui n'est pas la piece doit tenir dans une carte.
+ *
+ *   header 54 px      Pose Parquet | Changer de piece · Favoris · Menu
+ *   stage             la photo, cadree pour couvrir (100 % = immersif)
+ *   nav flottante     Changer de piece · Choisir un parquet · Personnaliser
+ *   barre haute       Avant / apres · Comparer · Plein ecran
+ *   carte produit     vignette, nom, motif, largeur, reference, fiche, favori
+ *   barre de zoom     discrete, en bas a droite
+ */
+
+:root {
+  --pv-ink: #1c1e1d;
+  --pv-ink-2: #4b4f4d;
+  --pv-ink-3: #7a7f7c;
+  --pv-ink-4: #a9aeab;
+  --pv-line: #e6e2da;
+  --pv-card: rgba(255, 255, 255, 0.96);
+  --pv-stage: #26251f;
+  --pv-terre: #8a5a3c;
+  --pv-shadow: 0 10px 34px rgba(20, 18, 14, 0.18), 0 1px 3px rgba(20, 18, 14, 0.12);
+  --pv-r: 14px;
+  --pv-bar: 54px;
+}
+
+body.app--product {
+  margin: 0;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--pv-stage);
+  color: var(--pv-ink);
+  font: 14px/1.45 var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.pv { position: fixed; inset: 0; display: flex; flex-direction: column; }
+.pv [hidden] { display: none !important; }
+.pv button { font: inherit; color: inherit; cursor: pointer; background: none; border: 0; padding: 0; }
+.pv button:focus-visible, .pv a:focus-visible { outline: 2px solid var(--pv-terre); outline-offset: 2px; }
+
+/* ---------------- En-tete ---------------- */
+.pv__header {
+  height: var(--pv-bar); flex: 0 0 var(--pv-bar);
+  display: flex; align-items: center; gap: 14px; padding: 0 18px;
+  background: #fbfaf7; border-bottom: 1px solid var(--pv-line);
+}
+.pv__brand { display: flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; margin-right: auto; }
+.pv__brand b { font: 500 17px/1 var(--font-display); letter-spacing: -0.01em; }
+.pv__brand small { display: block; font-size: 10px; color: var(--pv-ink-3); margin-top: 3px; }
+.pv__mark { width: 24px; height: 24px; border-radius: 50%; background: var(--pv-ink); color: #fff; display: grid; place-items: center; font-size: 14px; }
+.hbtn {
+  display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 12px;
+  border-radius: 9px; font-size: 13px; color: var(--pv-ink-2);
+}
+.hbtn:hover { background: #f0ede6; color: var(--pv-ink); }
+.hbtn .cnt { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--pv-ink); color: #fff; font-size: 11px; display: grid; place-items: center; }
+.hbtn[aria-pressed="true"] { color: var(--pv-terre); }
+
+/* ---------------- Accueil ---------------- */
+.pv__start { flex: 1; min-height: 0; overflow: auto; background: #f4f1eb; display: grid; place-items: center; padding: 36px 26px; }
+.start__inner { width: min(760px, 100%); text-align: center; }
+.start__inner h1 { font: 400 clamp(1.9rem, 1.4rem + 1.6vw, 2.6rem)/1.1 var(--font-display); margin: 0 0 8px; }
+.start__lead { color: var(--pv-ink-3); margin: 0 0 26px; }
+.start__doors { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 26px; }
+.door { text-align: left; background: #fff; border: 1px solid var(--pv-line); border-radius: var(--pv-r); padding: 18px; display: grid; gap: 4px; }
+.door:hover { border-color: var(--pv-ink-4); }
+.door b { font-size: 15px; }
+.door span { font-size: 12px; color: var(--pv-ink-3); }
+.start__label { text-align: left; font-size: 12px; color: var(--pv-ink-3); margin: 0 0 8px; }
+.rooms { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.rcard { text-align: left; display: grid; gap: 6px; }
+.rcard .ph { display: block; aspect-ratio: 3 / 2; border-radius: 10px; overflow: hidden; background: #ddd8cf; position: relative; }
+.rcard .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rcard .ph .tick { position: absolute; top: 8px; left: 8px; width: 22px; height: 22px; border-radius: 50%; background: var(--pv-ink); color: #fff; display: grid; place-items: center; }
+.rcard .nm { font-size: 13px; font-weight: 500; }
+.rcard .cat { font-size: 11px; color: var(--pv-ink-3); }
+.rcard:hover .ph { outline: 2px solid var(--pv-ink-4); }
+.rcard[aria-pressed="true"] .ph { outline: 2px solid var(--pv-ink); }
+
+/* ---------------- Scene ---------------- */
+.pv__stage { flex: 1; min-height: 0; position: relative; overflow: hidden; background: var(--pv-stage); cursor: grab; touch-action: none; }
+.pv__stage.grabbing { cursor: grabbing; }
+.pv-scene, .pv-clip { position: absolute; inset: 0; }
+.pv-layer { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+.pv-layer canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; -webkit-user-drag: none; pointer-events: none; }
+.pv-layer[data-layer="a"] canvas { transition: opacity 160ms linear; }
+.pv-split { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(255, 255, 255, 0.96); cursor: ew-resize; z-index: 4; }
+.pv-split::after { content: ""; position: absolute; top: 50%; left: 50%; width: 30px; height: 30px; margin: -15px; border-radius: 50%; background: #fff; box-shadow: var(--pv-shadow); }
+.pv-split::before { content: ""; position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; margin: -5px; border: 2px solid var(--pv-ink); border-width: 0 2px 2px 0; transform: rotate(-45deg); z-index: 1; }
+.pv-tag { position: absolute; top: 16px; padding: 4px 9px; border-radius: 7px; background: rgba(28, 30, 29, 0.78); color: #fff; font-size: 11px; z-index: 4; pointer-events: none; }
+
+/* ---------------- Chrome flottant ---------------- */
+.pv-nav { position: absolute; left: 16px; top: 16px; width: 250px; display: grid; gap: 1px; background: var(--pv-card); border-radius: var(--pv-r); box-shadow: var(--pv-shadow); overflow: hidden; z-index: 6; backdrop-filter: blur(8px); }
+.pv-nav button { display: grid; grid-template-columns: 30px 1fr 12px; align-items: center; gap: 8px; text-align: left; padding: 10px 12px; }
+.pv-nav button:hover { background: #f5f2ec; }
+.pv-nav .ic { width: 30px; height: 30px; border-radius: 8px; background: #f0ece4; display: grid; place-items: center; color: var(--pv-ink-2); }
+.pv-nav .tx { display: grid; gap: 1px; min-width: 0; }
+.pv-nav .tx b { font-size: 13px; font-weight: 500; }
+.pv-nav .tx span { font-size: 11px; color: var(--pv-ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pv-nav .ar { color: var(--pv-ink-4); }
+
+.pv-tools { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 2px; padding: 4px; background: var(--pv-card); border-radius: 11px; box-shadow: var(--pv-shadow); z-index: 6; backdrop-filter: blur(8px); }
+.pv-tools button { display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px; border-radius: 8px; font-size: 13px; color: var(--pv-ink-2); }
+.pv-tools button:hover { background: #f0ece4; color: var(--pv-ink); }
+.pv-tools button[aria-pressed="true"] { background: var(--pv-ink); color: #fff; }
+
+.pv-card { position: absolute; top: 16px; right: 16px; width: 214px; background: var(--pv-card); border-radius: var(--pv-r); box-shadow: var(--pv-shadow); padding: 12px 12px 8px; display: grid; gap: 4px; z-index: 6; backdrop-filter: blur(8px); }
+.pv-card .sw { display: block; height: 96px; border-radius: 10px; overflow: hidden; background: #ddd; margin-bottom: 6px; }
+.pv-card .sw canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pv-card b { font-size: 14px; font-weight: 500; text-align: center; }
+.pv-card .dim, .pv-card .ref { font-size: 12px; color: var(--pv-ink-3); text-align: center; }
+.pv-card .ref { font-size: 11px; color: var(--pv-ink-4); }
+.pv-card .fiche { display: block; margin: 8px auto 4px; padding: 7px 12px; border: 1px solid var(--pv-ink); border-radius: 8px; color: var(--pv-ink); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-decoration: none; text-align: center; }
+.pv-card .fiche:hover { background: var(--pv-ink); color: #fff; }
+.pv-card .row { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 12px; color: var(--pv-ink-2); }
+.pv-card .row button { padding: 6px 7px; border-radius: 7px; display: inline-flex; align-items: center; gap: 4px; }
+.pv-card .row button:hover { background: #f0ece4; }
+.pv-card .row .fav[aria-pressed="true"] { color: var(--pv-terre); }
+.pv-card .row .sep { width: 1px; height: 14px; background: var(--pv-line); }
+.pv-card .busy { font-size: 11px; color: var(--pv-ink-3); text-align: center; }
+.pv-card--b { right: auto; left: 16px; }
+
+.pv-zoom { position: absolute; right: 16px; bottom: 16px; display: flex; align-items: center; gap: 2px; padding: 4px; background: var(--pv-card); border-radius: 10px; box-shadow: var(--pv-shadow); z-index: 6; backdrop-filter: blur(8px); }
+.pv-zoom button { height: 30px; min-width: 30px; padding: 0 8px; border-radius: 7px; font-size: 13px; color: var(--pv-ink-2); display: grid; place-items: center; }
+.pv-zoom button:hover { background: #f0ece4; }
+.pv-zoom button:disabled { opacity: 0.35; cursor: default; }
+.pv-zoom .sep { width: 1px; height: 16px; background: var(--pv-line); margin: 0 3px; }
+.pv-zoom [data-level] { min-width: 52px; font-variant-numeric: tabular-nums; }
+
+.pv-status { position: absolute; left: 16px; bottom: 16px; display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 12px 0 8px; border-radius: 9px; background: var(--pv-card); box-shadow: var(--pv-shadow); font-size: 12px; color: var(--pv-ink-2); z-index: 6; }
+.pv-status .dot { width: 16px; height: 16px; border-radius: 50%; background: #3f8a5c; color: #fff; display: grid; place-items: center; }
+.pv-status[data-kind="busy"] .dot { background: var(--pv-ink-4); }
+.pv-status[data-kind="warn"] .dot { background: #c2792d; }
+
+.pv-toast { position: absolute; left: 50%; bottom: 20px; transform: translate(-50%, 12px); padding: 8px 14px; border-radius: 9px; background: rgba(28, 30, 29, 0.9); color: #fff; font-size: 12px; opacity: 0; transition: opacity 160ms, transform 160ms; z-index: 8; pointer-events: none; }
+.pv-toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------------- Voile : photo importee ---------------- */
+.pv-veil { position: absolute; inset: 0; display: grid; place-items: end center; padding: 0 0 84px; z-index: 5; pointer-events: none; }
+.pv-veil .box { pointer-events: auto; width: min(520px, calc(100% - 32px)); background: var(--pv-card); border-radius: var(--pv-r); box-shadow: var(--pv-shadow); padding: 18px 20px; display: grid; gap: 8px; }
+.pv-veil h2 { margin: 0; font: 400 20px/1.15 var(--font-display); }
+.pv-veil p { margin: 0; font-size: 13px; color: var(--pv-ink-2); }
+.pv-veil .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.btn { display: inline-flex; align-items: center; height: 34px; padding: 0 14px; border-radius: 9px; border: 1px solid var(--pv-ink); font-size: 13px; color: var(--pv-ink); background: #fff; }
+.btn.warm { background: var(--pv-ink); color: #fff; }
+.btn.quiet { border-color: transparent; color: var(--pv-ink-3); }
+.btn:hover { filter: brightness(0.96); }
+
+/* ---------------- Panneaux ---------------- */
+.pv-scrim { position: fixed; inset: var(--pv-bar) 0 0; background: rgba(28, 30, 29, 0.28); z-index: 20; }
+.pv-sheet { position: fixed; top: var(--pv-bar); right: 0; bottom: 0; width: min(420px, 100%); background: #fbfaf7; box-shadow: -12px 0 40px rgba(0, 0, 0, 0.18); z-index: 21; display: flex; flex-direction: column; }
+.pv-sheet__head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--pv-line); }
+.pv-sheet__head h2 { margin: 0; font: 400 20px/1 var(--font-display); }
+.pv-sheet__head .count { font-size: 12px; color: var(--pv-ink-3); }
+.pv-sheet__head .close { margin-left: auto; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; }
+.pv-sheet__head .close:hover { background: #f0ece4; }
+.pv-sheet__body { flex: 1; min-height: 0; overflow: auto; padding: 14px 16px 24px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { height: 30px; padding: 0 11px; border-radius: 15px; border: 1px solid var(--pv-line); background: #fff; font-size: 12px; color: var(--pv-ink-2); }
+.chip[aria-pressed="true"] { background: var(--pv-ink); border-color: var(--pv-ink); color: #fff; }
+.chip:disabled { opacity: 0.4; cursor: default; }
+.prods { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.pd { text-align: left; display: grid; gap: 4px; position: relative; }
+.pd .tex { display: block; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden; background: #ddd8cf; }
+.pd .tex canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pd .nm { font-size: 13px; font-weight: 500; }
+.pd .rf { font-size: 11px; color: var(--pv-ink-3); }
+.pd[aria-pressed="true"] .tex { outline: 2px solid var(--pv-ink); outline-offset: 2px; }
+.pd .hh { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.92); display: grid; place-items: center; color: var(--pv-ink-2); }
+.pd .hh[aria-pressed="true"] { color: var(--pv-terre); }
+.sect { padding: 14px 0; border-bottom: 1px solid var(--pv-line); }
+.sect:last-child { border-bottom: 0; }
+.sect h3 { margin: 0 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--pv-ink-3); }
+.sect .note { margin: 8px 0 0; font-size: 12px; color: var(--pv-ink-3); }
+.sect .intro { margin: 0; font-size: 13px; color: var(--pv-ink-2); }
+.orient { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.or { display: grid; place-items: center; gap: 6px; padding: 10px 6px; border: 1px solid var(--pv-line); border-radius: 10px; background: #fff; font-size: 12px; color: var(--pv-ink-2); }
+.or[aria-pressed="true"] { border-color: var(--pv-ink); color: var(--pv-ink); box-shadow: inset 0 0 0 1px var(--pv-ink); }
+
+/* ---------------- Menu ---------------- */
+.pv-menu { position: fixed; top: calc(var(--pv-bar) + 6px); right: 12px; width: 240px; background: #fff; border-radius: 12px; box-shadow: var(--pv-shadow); padding: 6px; z-index: 30; display: grid; gap: 1px; }
+.pv-menu .mi { display: block; width: 100%; text-align: left; padding: 9px 10px; border-radius: 8px; font-size: 13px; color: var(--pv-ink); text-decoration: none; }
+.pv-menu .mi:hover { background: #f4f1eb; }
+.pv-menu .sepm { height: 1px; background: var(--pv-line); margin: 4px 6px; }
+
+/* ---------------- Immersif ---------------- */
+body.immersive .pv__header, body.immersive .pv-nav, body.immersive .pv-status { display: none !important; }
+body.immersive .pv-card .dim, body.immersive .pv-card .ref, body.immersive .pv-card .fiche { display: none; }
+body.immersive .pv-card { width: 160px; padding: 10px 10px 6px; }
+body.immersive .pv-card .sw { height: 70px; }
+body.immersive .pv-scrim, body.immersive .pv-sheet { top: 0; }
+body.immersive.calm .pv-tools, body.immersive.calm .pv-card, body.immersive.calm .pv-zoom { opacity: 0.35; transition: opacity 400ms; }
+body.immersive .pv-tools:hover, body.immersive .pv-card:hover, body.immersive .pv-zoom:hover { opacity: 1; }
+
+/* ---------------- Ecrans etroits ---------------- */
+@media (max-width: 1279px) {
+  .pv-nav { width: 200px; }
+  .pv-card { width: 190px; }
+}
+@media (max-width: 1099px) {
+  .pv-nav { width: auto; grid-auto-flow: column; top: auto; bottom: 16px; left: 16px; right: auto; }
+  .pv-nav button { grid-template-columns: 30px; padding: 8px; }
+  .pv-nav .tx, .pv-nav .ar { display: none; }
+  .pv-status { left: auto; right: 16px; bottom: 58px; }
+  .pv-card { width: 176px; }
+  .pv-tools button span { display: none; }
+  .start__doors, .rooms { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 720px) {
+  .pv-card { top: auto; bottom: 64px; right: 12px; width: 164px; }
+  .pv-card .fiche { margin: 6px auto 2px; }
+  .rooms { grid-template-columns: 1fr; }
+}
+
+
+
