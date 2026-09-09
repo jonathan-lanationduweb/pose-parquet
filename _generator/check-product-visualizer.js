@@ -92,9 +92,11 @@ function verifierApp(pv) {
 
   /* aucun bouton mort dans l'en-tête ni le menu */
   ok('pas de bouton Enregistrer', !document.querySelector('[data-save], [data-h-save]'));
+  ok('rien de permanent sur les cotes', !document.querySelector('.pv-nav, .pv-card, .pv-sheet'));
+  ok('trois objets flottants au repos', ['[data-tools]', '[data-bar]', '[data-zoom]'].every((q) => { const e = document.querySelector(q); return e && !e.hidden; }) && document.querySelector('[data-drawer]').hidden);
   const liens = [...document.querySelectorAll('[data-menu] a')];
   ok('les liens du menu mènent quelque part', liens.length === 2 && liens.every((a) => /\.html$/.test(a.getAttribute('href'))));
-  const fiche = document.querySelector('[data-card] .fiche');
+  const fiche = document.querySelector('[data-bar] [data-fiche]');
   ok('la fiche Premibel s ouvre dans un nouvel onglet, sans opener',
     fiche && fiche.getAttribute('target') === '_blank' && /noopener/.test(fiche.getAttribute('rel')) && /premibel\.fr/.test(fiche.getAttribute('href')));
   return r;
@@ -134,7 +136,14 @@ function controlerSource() {
     ok(`l état porte ${clef}`, new RegExp(`\\n\\s+${clef}:`).test(app));
   }
   ok('la largeur n est pas un réglage : elle vient du produit', /width: null/.test(code) && !/setWidth/.test(code));
-  ok('trois orientations, toutes rendues par le moteur', /\[0, 'Dans la longueur'/.test(app) && /\[90,/.test(app) && /\[45,/.test(app));
+  ok('trois orientations, toutes rendues par le moteur', /\[0, '0°', 'Dans la longueur'/.test(app) && /\[90,/.test(app) && /\[45,/.test(app));
+  /* Direction V2 : rien de permanent sur les cotes, un tiroir bas, une barre produit. */
+  ok('aucun panneau lateral permanent', !/pv-nav|pv-card|pv-sheet/.test(app + vp) && /class="pv-bar"/.test(app) && /class="pv-drawer"/.test(app));
+  ok('trois objets flottants au repos', ['pv-tools', 'pv-bar', 'pv-zoom'].every((c) => app.includes(`class="${c}"`)) && !/pv-status/.test(app));
+  ok('la premiere impression est une piece, pas un accueil', /if \(rooms\.length\) openRoom\(rooms\[0\]\.id\);/.test(app) && !/pv__start/.test(app));
+  ok('avant / apres est un segment a deux etats', /data-ba="off"/.test(app) && /data-ba="ba"/.test(app));
+  ok('la fiche Premibel est un lien discret', /data-fiche>Voir la fiche Premibel/.test(app) && !/VOIR LA FICHE PREMIBEL/.test(app));
+  ok('le chrome s attenue pendant un deplacement', /document\.body\.classList\.add\('panning'\)/.test(app));
   ok('aucun curseur décoratif', !/type="range"/.test(app));
 
   /* Robustesse héritée de la stabilisation. */
