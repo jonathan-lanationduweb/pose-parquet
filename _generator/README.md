@@ -38,6 +38,27 @@ Il ne touche **jamais** à `css/`, `js/`, `components/` ni `serve.js`.
 | `check-reproducible.js` | Contrôle que le build est reproductible entre systèmes |
 | `check-studio-api.js` | Contrôle le contrat de pilotage `window.__studio` — voir ci-dessous |
 
+## `sitemap.xml` : `lastmod` et date de build
+
+`buildMeta()` date chaque URL par `item.updated || item.date`, et **retombe
+sur la date du jour** quand l'entrée n'en porte aucune. Les 8 guides ont une
+date éditoriale ; les 21 autres URL — accueil, index, motifs, tutoriels,
+outils, pages annexes — reçoivent donc la date du build.
+
+Conséquence à connaître : **toute construction, même sans changement
+éditorial, modifie `sitemap.xml`.** Un lot qui ne touche qu'à du code — une
+API développeur du Studio, par exemple — n'a aucune raison d'annoncer aux
+moteurs de recherche que 21 pages ont été mises à jour. Dans ce cas, restaurer
+le fichier après le build est légitime :
+
+```
+git checkout <avant-le-lot> -- sitemap.xml
+```
+
+Ce n'est pas un défaut à corriger dans ce README : c'est un choix du
+générateur, et le changer demanderait de décider quelle date porter pour une
+page sans date éditoriale — ce qui dépasse la simple mécanique.
+
 ## Fins de ligne et empreintes
 
 **Politique : LF partout**, dans les objets Git comme dans la copie de travail.
