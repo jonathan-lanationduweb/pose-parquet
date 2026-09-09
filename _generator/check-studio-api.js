@@ -98,14 +98,28 @@ function verifierApi(studio) {
       `retour ${refus}, largeur ${studio.config.width}`);
   }
 
-  /* --- abonnement au rendu --- */
-  let vus = 0;
-  const desabonner = studio.onRendered(() => { vus += 1; });
-  ok('onRendered rend un désabonnement', typeof desabonner === 'function');
+  /* --- abonnement au rendu ---
+     Trois abonnés, pour éprouver ce qui compte vraiment : que le
+     désabonnement fonctionne, qu'un abonné n'écrase pas l'autre, et qu'un
+     abonné qui lève une exception ne prive pas les suivants de leur appel.
+     Sans désabonnement, le pont laisserait un écouteur fantôme à chaque
+     changement de pièce, reconnexion ou comparaison. */
+  const compte = { garde: 0, retire: 0, casse: 0 };
+  const desabonner = studio.onRendered(() => { compte.garde += 1; });
+  const desabonnerCasse = studio.onRendered(() => {
+    compte.casse += 1;
+    throw new Error('exprès : cet abonné casse');
+  });
+  const desabonnerRetire = studio.onRendered(() => { compte.retire += 1; });
+  ok('onRendered rend un désabonnement', typeof desabonner === 'function'
+    && typeof desabonnerCasse === 'function' && typeof desabonnerRetire === 'function');
   ok('onRendered ignore ce qui n est pas une fonction',
     typeof studio.onRendered('nope') === 'function');
-  let casse = 0;
-  const offCasse = studio.onRendered(() => { casse += 1; throw new Error('exprès'); });
+  /* Désabonner deux fois ne doit pas jeter : le pont le fait dans un `finally`
+     qu'un chemin d'erreur peut traverser deux fois. */
+  let doubleRetraitOk = true;
+  try { const o = studio.onRendered(() => {}); o(); o(); } catch { doubleRetraitOk = false; }
+  ok('un désabonnement peut être appelé deux fois sans erreur', doubleRetraitOk);
 
   /* --- pas de régression sur ce qui existait avant --- */
   for (const membre of ['selectMaterial', 'setPattern', 'setAngle', 'openRoom', 'setContext']) {
@@ -121,36 +135,64 @@ function verifierApi(studio) {
     ok: resultats.every((r) => r.ok),
     resultats,
     /**
-     * Provoque un rendu et attend d'en être prévenu.
+     * Éprouve les abonnements sur deux rendus successifs.
      *
-     * Attendre un délai fixe ne marche pas : la tuile de texture se refabrique
-     * dans un worker, et trois secondes de retard sont normales à froid. On
-     * attend donc le signal lui-même, avec une échéance — ce qui est
-     * précisément le service que `onRendered` rend au pont.
+     * Deux rendus, parce qu'un seul ne prouverait que la moitié : le premier
+     * montre que les abonnés sont prévenus, le second — après retrait de l'un
+     * d'eux — montre que le retrait est réel. Un `onRendered` sans
+     * désabonnement effectif laisse un écouteur fantôme par changement de
+     * pièce, et personne ne s'en aperçoit avant que ça compte.
      *
-     * @param {number} msMax échéance
+     * On attend le signal lui-même, jamais un délai fixe : la tuile de texture
+     * se refabrique dans un worker, et trois secondes de retard sont normales
+     * à froid.
+     *
+     * @param {number} msMax échéance par rendu
      */
-    attendreNotification: (msMax = 15000) => new Promise((resolve) => {
-      const depart = vus;
-      const t0 = Date.now();
-      const fin = (ok, detail) => {
-        desabonner(); offCasse();
-        resolve([
-          { nom: 'onRendered prévient après un rendu', ok, detail },
-          { nom: 'un abonné qui lève une exception ne bloque pas les autres',
-            ok: casse > 0 && ok, detail: `${casse} appels sur l abonné cassé` },
-        ]);
-      };
-      const echeance = setTimeout(() => fin(false, `aucun signal en ${msMax} ms`), msMax);
-      const guetteur = studio.onRendered(() => {
-        clearTimeout(echeance);
-        guetteur();
-        fin(true, `${vus - depart} signal(aux) en ${Date.now() - t0} ms`);
+    eprouverAbonnements: async (msMax = 20000) => {
+      const rendu = () => new Promise((resolve) => {
+        let fini = false;
+        const fin = (obtenu) => {
+          if (fini) return; fini = true;
+          clearTimeout(echeance); guetteur(); resolve(obtenu);
+        };
+        const echeance = setTimeout(() => fin(false), msMax);
+        const guetteur = studio.onRendered(() => fin(true));
+        /* Une largeur différente de la courante, sinon le moteur peut
+           n'avoir rien à repeindre. */
+        studio.setWidth(studio.config.width === 0.16 ? 0.13 : 0.16);
       });
-      /* Une largeur différente de la courante, sinon le moteur peut n'avoir
-         rien à repeindre. */
-      studio.setWidth(studio.config.width === 0.16 ? 0.13 : 0.16);
-    }),
+
+      const r = [];
+      const premier = await rendu();
+      const apres1 = { ...compte };
+      r.push({ nom: 'un rendu prévient les abonnés', ok: premier && apres1.garde > 0,
+        detail: `garde ${apres1.garde}, retiré ${apres1.retire}, cassé ${apres1.casse}` });
+      r.push({ nom: 'plusieurs abonnés sont tous prévenus',
+        ok: apres1.garde > 0 && apres1.retire > 0 && apres1.casse > 0,
+        detail: `${apres1.garde}/${apres1.retire}/${apres1.casse}` });
+      r.push({ nom: 'un abonné qui lève une exception ne prive pas les autres',
+        ok: apres1.casse > 0 && apres1.retire > 0,
+        detail: `l abonné cassé a été appelé ${apres1.casse} fois, le suivant ${apres1.retire}` });
+
+      desabonnerRetire();
+      const second = await rendu();
+      const apres2 = { ...compte };
+      r.push({ nom: 'un abonné retiré n est plus appelé',
+        ok: second && apres2.retire === apres1.retire,
+        detail: `${apres1.retire} avant, ${apres2.retire} après` });
+      r.push({ nom: 'les abonnés restants le sont toujours',
+        ok: apres2.garde > apres1.garde,
+        detail: `${apres1.garde} puis ${apres2.garde}` });
+
+      desabonner(); desabonnerCasse();
+      const troisieme = await rendu();
+      const apres3 = { ...compte };
+      r.push({ nom: 'tout retirer laisse le rendu fonctionner',
+        ok: troisieme && apres3.garde === apres2.garde && apres3.casse === apres2.casse,
+        detail: `garde ${apres3.garde}, cassé ${apres3.casse}` });
+      return r;
+    },
   };
 }
 
@@ -188,6 +230,23 @@ function controlerSource() {
      dur : un setter oublié laisse sa capacité fausse au lieu de mentir. */
   ok('les capacités pilotables sont déduites',
     (bloc.match(/typeof api\.set\w+ === 'function'/g) || []).length >= 4);
+
+  /* Les deux moitiés du point d'accroche sont nommées : ce sur quoi un
+     appelant externe peut s'appuyer, et ce qui n'est là que pour lire un état
+     pendant une mesure. Sans cette distinction écrite, `renderer` et `config`
+     finissent par être traités comme des promesses. */
+  ok('le contrat et le diagnostic sont distingués',
+    /CONTRAT DE PILOTAGE/.test(bloc) && /DONNEES DE DIAGNOSTIC/.test(bloc));
+  /* On regarde les DEFINITIONS, pas l'en-tete qui les enumere : sans quoi le
+     controle se contenterait de relire le commentaire qu'il est censé
+     verifier. */
+  const definitions = bloc.slice(bloc.indexOf('const api = {'));
+  for (const [membre, jeton] of [['config', 'get config()'], ['setContext', 'setContext,'],
+    ['renderer', 'get renderer()'], ['catalog', 'catalog,']]) {
+    const i = definitions.indexOf(jeton);
+    const avant = i < 0 ? '' : definitions.slice(Math.max(0, i - 260), i);
+    ok(`${membre} est marqué hors contrat`, i > 0 && /hors contrat/.test(avant));
+  }
 
   /* Rien n a disparu du point d accroche qui existait avant. */
   for (const membre of ['get config()', 'selectMaterial,', 'setPattern:', 'setAngle:',

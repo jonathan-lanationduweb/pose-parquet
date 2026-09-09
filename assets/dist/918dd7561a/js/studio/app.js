@@ -1391,9 +1391,25 @@ const REGROUPEMENT_MS = 70;
      *
      * `apiVersion` permet a l'appelant de refuser une version qu'il ne sait
      * pas conduire, plutot que d'echouer au premier appel manquant.
+     *
+     * Deux moities, a ne pas confondre :
+     *
+     *   CONTRAT DE PILOTAGE — apiVersion, openRoom, selectMaterial,
+     *   setPattern, setAngle, setWidth, getCapabilities, onRendered, canvas.
+     *   C'est la seule partie sur laquelle un appelant externe a le droit de
+     *   s'appuyer. Elle est versionnee, et une garde automatique cote
+     *   pose-parquet-ai refuse tout acces en dehors de cette liste.
+     *
+     *   DONNEES DE DIAGNOSTIC — config, renderer, catalog, setContext. Sans
+     *   garantie, sans version, susceptibles de bouger avec l'interne. Elles
+     *   servent a lire un etat depuis la console pendant une mesure, pas a
+     *   piloter. Rien ne les retire — d'autres sessions de mesure s'en
+     *   servent — mais rien ne promet non plus de les conserver.
      */
     const api = {
       apiVersion: 1,
+      /* Diagnostic, hors contrat. Un appelant externe passe par les
+         commandes ; lire l'etat interne, c'est en dependre. */
       get config() { return config; },
       selectMaterial,
       setPattern: (id) => { interaction('motif'); config = { ...config, pattern: id }; syncPatterns(); demandeRendu(true); },
@@ -1447,8 +1463,10 @@ const REGROUPEMENT_MS = 70;
       },
 
       openRoom,
-      setContext,
       canvas,
+
+      /* Diagnostic, hors contrat : voir l'en-tete de ce bloc. */
+      setContext,
       get renderer() { return renderer; },
       catalog,
     };
