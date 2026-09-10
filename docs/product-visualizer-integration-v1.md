@@ -104,10 +104,50 @@ Il reste un écart de contraste (écart-type 0,12 contre 0,15 sur le sol
 d'origine) et une compression des hautes lumières sur les familles pâles :
 c'est le renderer, hors du périmètre de ce lot.
 
+## Photo importée : la photo EST la pièce
+
+Une version précédente affichait, après un import, un écran qui expliquait que
+l'analyse n'était pas connectée, avec trois boutons dont « Explorer ma photo
+quand même ». C'était un refus déguisé en explication : l'utilisateur venait
+d'importer sa photo, il était déjà dans sa photo, et on lui demandait de le
+confirmer. Cet écran n'existe plus.
+
+`state.room` porte la provenance et rien d'autre ne la porte :
+
+```
+{ type: 'demo',     id, label }
+{ type: 'uploaded', url, fileName, width, height }
+```
+
+`state.scene` reste le seul interrupteur : une scène calibrée existe, le moteur
+peut poser un parquet ; elle vaut `null`, il ne pose rien. Il n'y a **pas**
+de second écran, de second mode d'application, ni de drapeau d'interface pour
+la photo importée. Après un import : cadrage cover, zoom, pan, double clic,
+Ajuster, plein écran, Changer de pièce — exactement une pièce d'exemple, moins
+le rendu. Avant / après et Comparer s'effacent de la capsule, puisqu'il n'y a
+rien à comparer ; la barre nomme la pièce et donne accès au catalogue.
+
+Ce qui manque se dit dans une note de deux lignes en bas à gauche, qui s'efface
+seule après neuf secondes, se ferme d'un clic et ne couvre rien : le viewport
+reste manipulable à travers elle. Un clic produit sur une photo personnelle
+retient le choix et répond par la même note — jamais un faux parquet, jamais
+une modale. Le second import révoque l'URL du premier (`libererPhoto()`) et
+réinitialise le cadrage.
+
+## Une vraie visite : ce qu'il faudrait
+
+L'exploration actuelle est celle d'une photo : pan, zoom vers le curseur,
+double clic. Ce n'est pas de la navigation dans la pièce, et rien ici ne le
+simule — pas de faux déplacement 3D, pas de mini-carte. Se déplacer réellement
+demanderait un panorama 360, plusieurs photos calibrées entre elles, une vidéo,
+ou une reconstruction 3D. Aucune de ces pistes n'est engagée : une seule photo
+ne les remplace pas.
+
 ## IA future
 
-L'import d'une photo affiche la photo, permet pan et zoom, et dit qu'aucun
-parquet ne sera posé sans connaître le sol. Le jour où un analyseur existe
-(`registerAnalyzer('remote', …)` dans `analyzer.js`), `importPhoto()` appelle
-`analyzeScene({ file })` et `renderer.setScene()` ; l'UX ne change pas.
-LOT IA 2B non commencé.
+L'import d'une photo affiche la photo, permet pan et zoom, et dit en une note
+qu'aucun parquet ne sera posé sans connaître le sol. Le jour où un analyseur
+existe (`registerAnalyzer('remote', …)` dans `analyzer.js`), `importPhoto()`
+appelle `analyzeScene({ file })` — `state.room.url` est la poignée gardée pour
+lui — puis `renderer.setScene()` ; `state.scene` cesse d'être `null` et tout le
+reste de l'écran suit sans qu'une ligne d'UX change. LOT IA 2B non commencé.

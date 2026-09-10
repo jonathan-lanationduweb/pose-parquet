@@ -159,23 +159,34 @@ body.app--product {
 .pv-zoom [data-level] { min-width: 48px; font-variant-numeric: tabular-nums; }
 
 /* Pendant un déplacement, le chrome s'efface un peu. */
-body.panning .pv-bar, body.panning .pv-zoom, body.panning .pv-tools { opacity: 0.35; }
+body.panning .pv-bar, body.panning .pv-zoom, body.panning .pv-tools, body.panning .pv-note.on { opacity: 0.35; }
 
 .pv-toast { position: absolute; left: 50%; bottom: 112px; transform: translate(-50%, 8px); padding: 8px 14px; border-radius: 10px; background: rgba(28, 28, 26, 0.88); color: #fff; font-size: 13px; opacity: 0; transition: opacity 160ms, transform 160ms; z-index: 12; pointer-events: none; }
 /* Le message reste lisible quand le tiroir est ouvert : il passe au-dessus. */
 body.drawer-open .pv-toast { bottom: calc(44% + 112px); }
 .pv-toast.on { opacity: 1; transform: translate(-50%, 0); }
 
-/* ---------------- Voile : photo importée ---------------- */
-.pv-veil { position: absolute; inset: 0; display: grid; place-items: end center; padding: 0 0 116px; z-index: 5; pointer-events: none; }
-.pv-veil .box { pointer-events: auto; width: min(560px, calc(100% - 32px)); background: var(--ui-t); backdrop-filter: blur(16px); border: 1px solid var(--ui-line); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px 24px; display: grid; gap: 8px; }
-.pv-veil h2 { margin: 0; font: 400 22px/1.15 var(--font-display); }
-.pv-veil p { margin: 0; font-size: 14px; color: var(--ink-2); }
-.pv-veil .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-.btn { display: inline-flex; align-items: center; height: 38px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--ink); font-size: 14px; color: var(--ink); background: transparent; }
-.btn.warm { background: var(--ink); color: #fff; }
-.btn.quiet { border-color: transparent; color: var(--ink-2); }
-.btn:hover { filter: brightness(0.96); }
+/* ---------------- Note : ce qui manque, sans barrer la route ----------------
+   Une photo personnelle n'a pas de sol connu. Ça se dit en deux lignes, en bas
+   à gauche, au-dessus de la barre produit — et ça s'efface. Rien n'est
+   couvert : `pointer-events` ne vit que sur la note elle-même, jamais sur la
+   pièce, et la note ne dépasse jamais 2 lignes de texte. */
+.pv-note {
+  position: absolute; left: 24px; bottom: 112px; z-index: 11;
+  display: flex; align-items: flex-start; gap: 8px;
+  width: min(380px, calc(100% - 48px)); padding: 12px 12px 12px 16px;
+  background: var(--ui-t); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--ui-line); border-left: 2px solid var(--accent); border-radius: 14px;
+  box-shadow: var(--shadow);
+  opacity: 0; transform: translateY(8px);
+  transition: opacity var(--t-bar) var(--ease), transform var(--t-bar) var(--ease);
+}
+.pv-note.on { opacity: 1; transform: none; }
+.pv-note p { margin: 0; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
+.pv-note button { flex: none; width: 24px; height: 24px; border-radius: 8px; display: grid; place-items: center; color: var(--ink-3); }
+.pv-note button:hover { background: rgba(28, 28, 26, 0.06); color: var(--ink); }
+/* Le tiroir monte : la note reste visible au-dessus de lui. */
+body.drawer-open .pv-note { bottom: calc(44% + 112px); }
 
 /* ---------------- Le tiroir ---------------- */
 .pv-drawer {
@@ -198,6 +209,7 @@ body.drawer-open .pv-bar { bottom: calc(44% + 16px); }
 .pv-drawer__close:hover { background: rgba(28, 28, 26, 0.06); color: var(--ink); }
 .pv-drawer__body { flex: 1; min-height: 0; overflow: auto; padding: 4px 32px 24px; }
 
+.grid__note { margin: 0 0 12px; font-size: 13px; color: var(--ink-2); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
 .chip { height: 32px; padding: 0 14px; border-radius: 16px; border: 1px solid var(--ui-line); background: transparent; font-size: 13px; color: var(--ink-2); transition: background var(--t-card), color var(--t-card), border-color var(--t-card); }
 .chip:hover { border-color: var(--ink-3); color: var(--ink); }
@@ -257,7 +269,7 @@ body.immersive .pv-bar { height: 64px; bottom: 16px; }
 body.immersive .bar__sw--lg { width: 40px; height: 40px; }
 body.immersive .bar__ref { display: none; }
 body.immersive .pv-menu { top: 12px; }
-body.immersive.calm .pv-tools, body.immersive.calm .pv-bar, body.immersive.calm .pv-zoom { opacity: 0.35; }
+body.immersive.calm .pv-tools, body.immersive.calm .pv-bar, body.immersive.calm .pv-zoom, body.immersive.calm .pv-note.on { opacity: 0.35; }
 body.immersive .pv-tools:hover, body.immersive .pv-bar:hover, body.immersive .pv-zoom:hover { opacity: 1; }
 
 /* ---------------- Écrans étroits ---------------- */
