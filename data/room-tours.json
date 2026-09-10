@@ -1,0 +1,5 @@
+{
+  "schema": "pose-parquet/room-tours@1",
+  "note": "Aucune piece visitable aujourd'hui : les seize scenes calibrees du site sont seize pieces differentes, aucune serie multi-angle n'existe. Le protocole de prise de vue est decrit dans docs/room-tour-protocol.md. Un exemple de visite bien formee vit dans les controles (_generator/check-product-visualizer.js), pas ici : ce fichier ne contient que du reel.",
+  "tours": []
+}
