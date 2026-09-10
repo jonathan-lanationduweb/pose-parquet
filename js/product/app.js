@@ -45,6 +45,12 @@ const ORIENTATIONS = [
 ];
 
 const REGROUPEMENT_MS = 70;
+
+/* Ce qui manque, dit sans jargon et sans barrer la route. Le sol d'une photo
+   personnelle n'est pas connu : on ne le devine pas, et on ne s'en explique
+   pas sur un écran entier. */
+const NOTE_IMPORT = 'Votre pièce est prête. La pose du parquet sur vos propres photos arrivera avec l’analyse de pièce.';
+const NOTE_SANS_SOL = 'Le rendu sur votre propre photo sera disponible après analyse de la pièce.';
 const DEV = (() => {
   try { return new URLSearchParams(window.location.search).get('dev') === '1'; } catch { return false; }
 })();
@@ -93,17 +99,20 @@ export async function mountProduct(root) {
 
   /* ---------------- L'état : une seule source de vérité ---------------- */
   const state = {
+    /* LA PIÈCE AFFICHÉE, quelle que soit sa provenance. Une photo importée
+       n'est pas un second mode ni un second écran : c'est une pièce.
+         { type: 'demo',     id, label }
+         { type: 'uploaded', url, fileName, width, height } */
     room: null,
-    roomLabel: '',
-    scene: null,                 /* SceneData de la pièce ouverte, ou null */
-    photo: null,                 /* photo importée : { name, width, height } */
+    /* La scène calibrée de cette pièce, ou `null` quand son sol est inconnu.
+       Sans masque réel, le moteur ne pose rien : c'est le seul interrupteur. */
+    scene: null,
     product: products[0].id,
     rendererSettings: { angle: 0 },
     comparison: null,            /* { b: productId } */
     favoriteIds: new Set(),
     originalMode: 'off',         /* 'off' | 'ba' : avant / après */
     ui: {
-      screen: 'room',            /* 'room' | 'photo' */
       panel: null,               /* 'catalog' | 'custom' | 'rooms' — le tiroir */
       menu: false,
       picking: false,            /* le prochain choix de produit devient B */
@@ -112,7 +121,6 @@ export async function mountProduct(root) {
       split: 0.5,
       catalogueView: 'all',      /* 'all' | 'favourites' */
       patternFilter: null,
-      veil: false,
       busy: false,
       status: '',
     },
@@ -124,6 +132,12 @@ export async function mountProduct(root) {
        VRAI rendu, pas un statut qui n'a pas encore bougé. */
     renders: 0,
   };
+
+  /* Provenance de la pièce, et la seule question qui gouverne le rendu. */
+  const importee = () => Boolean(state.room && state.room.type === 'uploaded');
+  const posable = () => Boolean(state.scene);
+  /* Un nom de fichier vient de l'utilisateur : il ne devient jamais du HTML. */
+  const txt = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   /* ---------------- DOM ---------------- */
   root.className = 'pv';
@@ -147,27 +161,20 @@ export async function mountProduct(root) {
       <span class="pv-tag" data-tag-b hidden>B</span>
 
       <div class="pv-tools" data-tools>
-        <div class="seg" role="group" aria-label="Avant / après">
+        <div class="seg" data-seg role="group" aria-label="Avant / après">
           <button type="button" data-ba="ba" aria-pressed="false">Avant</button>
           <button type="button" data-ba="off" aria-pressed="true">Après</button>
         </div>
-        <span class="sep"></span>
+        <span class="sep" data-tools-sep></span>
         <button type="button" data-cmp aria-pressed="false">${svg(ICON.cmp)}<span>Comparer</span></button>
         <button type="button" class="ico" data-full aria-label="Plein écran">${svg(ICON.full)}</button>
       </div>
 
       <div class="pv-bar" data-bar hidden></div>
 
-      <div class="pv-veil" data-veil hidden>
-        <div class="box">
-          <h2>Votre photo est affichée. Le parquet, pas encore.</h2>
-          <p>Poser un parquet sur une photo demande de connaître son sol : où il commence, où il s'arrête, comment il fuit. Cette analyse n'est pas connectée à cette version — et un sol deviné serait un sol faux.</p>
-          <div class="acts">
-            <button class="btn warm" type="button" data-veil-rooms>Tester avec une pièce d'exemple</button>
-            <button class="btn" type="button" data-veil-import>Essayer une autre photo</button>
-            <button class="btn quiet" type="button" data-veil-explore>Explorer ma photo quand même</button>
-          </div>
-        </div>
+      <div class="pv-note" data-note hidden role="status">
+        <p data-note-text></p>
+        <button type="button" data-note-close aria-label="Fermer">${svg(ICON.close, 14)}</button>
       </div>
 
       <div class="pv-zoom" data-zoom>
@@ -213,7 +220,7 @@ export async function mountProduct(root) {
   /* ---------------- Viewport ---------------- */
   const sceneSize = () => {
     if (state.scene && renderer.size) return { w: renderer.size.width, h: renderer.size.height };
-    if (state.photo) return { w: state.photo.width, h: state.photo.height };
+    if (importee()) return { w: state.room.width, h: state.room.height };
     return { w: 1600, h: 1067 };
   };
   const viewport = createViewport({
@@ -296,6 +303,19 @@ export async function mountProduct(root) {
   /** La barre produit : un seul objet, au bas de la pièce. */
   function barHtml() {
     const m = productOf(state.product);
+    /* Sur une photo personnelle, la barre dit la pièce, pas un parquet qui
+       n'est pas posé : ses actions de rendu n'y figurent pas. */
+    if (importee()) {
+      return `
+        <span class="bar__tx">
+          <b>${txt(state.room.fileName || 'Votre photo')}</b>
+          <span>Votre pièce · aucun parquet posé pour l'instant</span>
+        </span>
+        <span class="bar__acts">
+          <button class="bar__btn" type="button" data-open-catalog aria-pressed="${state.ui.panel === 'catalog'}">${svg(ICON.floor, 16)}<span>Voir les parquets</span></button>
+          <button class="bar__btn quiet" type="button" data-open-rooms aria-pressed="${state.ui.panel === 'rooms'}">${svg(ICON.room, 16)}<span>Changer de pièce</span></button>
+        </span>`;
+    }
     const p = fiche(m);
     const secondaire = state.ui.busy || state.ui.status
       ? `<span class="bar__busy">${state.ui.status || 'Préparation du rendu…'}</span>`
@@ -326,11 +346,14 @@ export async function mountProduct(root) {
   }
 
   function paintChrome() {
-    const inRoom = state.ui.screen === 'room';
-    const inPhoto = state.ui.screen === 'photo';
-    const hasRender = inRoom && canvasA.width > 0 && Boolean(state.scene);
-    $('[data-tools]').hidden = !hasRender;
-    $('[data-veil]').hidden = !(inPhoto && state.ui.veil);
+    const enPiece = Boolean(state.room);
+    const hasRender = posable() && canvasA.width > 0;
+    /* La capsule reste : le plein écran vaut pour toute pièce. Ce qui n'aurait
+       aucun sens sans parquet posé — avant/après, comparer — s'efface. */
+    $('[data-tools]').hidden = !enPiece;
+    $('[data-seg]').hidden = !hasRender;
+    $('[data-tools-sep]').hidden = !hasRender;
+    $('[data-cmp]').hidden = !hasRender;
 
     const cut = hasRender && (state.originalMode === 'ba' || Boolean(state.comparison));
     clip.style.clipPath = cut ? `inset(0 ${((1 - state.ui.split) * 100).toFixed(2)}% 0 0)` : 'none';
@@ -348,7 +371,7 @@ export async function mountProduct(root) {
 
     /* la barre produit */
     const bar = $('[data-bar]');
-    bar.hidden = !inRoom || !state.scene;
+    bar.hidden = !enPiece;
     bar.classList.toggle('pv-bar--cmp', Boolean(state.comparison));
     if (!bar.hidden) { bar.innerHTML = barHtml(); poserSwatch(bar); }
 
@@ -381,10 +404,10 @@ export async function mountProduct(root) {
   function paintRooms() {
     drawerHead('Changer de pièce', '', null);
     $('[data-drawer-body]').innerHTML = `<div class="gal">
-      <button class="gal__card gal__card--import" type="button" data-import>${svg(ICON.import, 22)}<b>Importer ma photo</b><span>Rien ne quitte votre ordinateur</span></button>
+      <button class="gal__card gal__card--import" type="button" data-import>${svg(ICON.import, 22)}<b>${importee() ? 'Importer une autre photo' : 'Importer ma photo'}</b><span>Rien ne quitte votre ordinateur</span></button>
       ${rooms.map((r) => {
         const stem = r.file.replace(/\.jpg$/, '');
-        const on = r.id === state.room;
+        const on = !importee() && state.room && r.id === state.room.id;
         return `<button class="gal__card" type="button" data-room="${r.id}" aria-pressed="${on}">
           <span class="gal__ph"><img alt="" src="${base}assets/images/${stem}-640.jpg" decoding="async" />${on ? `<span class="gal__tick">${svg(ICON.tick, 12)}</span>` : ''}</span>
           <b>${r.label}</b><span>${r.highlight || ''}</span></button>`;
@@ -398,7 +421,7 @@ export async function mountProduct(root) {
     const intent = ++state.intent;
     t0 = performance.now();
     closeAll();
-    state.ui.screen = 'room';
+    fermerNote();
     setStatus('Chargement…', 'busy');
     paintChrome();
     try {
@@ -406,17 +429,16 @@ export async function mountProduct(root) {
       const prepared = await loadImage(`${base}assets/images/${scene.image.file}`);
       if (intent !== state.intent) return;          /* une autre intention est passée */
       renderer.setScene(scene, prepared);
+      libererPhoto();
       state.scene = scene;
-      state.room = id;
-      state.roomLabel = scene.label || entry.label;
-      state.photo = null;
+      state.room = { type: 'demo', id, label: scene.label || entry.label };
       canvasPhoto.width = prepared.width; canvasPhoto.height = prepared.height;
       canvasPhoto.getContext('2d').drawImage(prepared.canvas, 0, 0);
       /* La couche A prend ses dimensions dès maintenant : la photo d'origine
          s'affiche à sa place finale, le rendu vient la remplacer sans saut. */
       canvasA.width = prepared.width; canvasA.height = prepared.height;
       viewport.scheduleFit();
-      toast(state.roomLabel);
+      toast(state.room.label);
       schedule();
       paintChrome();
     } catch (error) {
@@ -429,6 +451,19 @@ export async function mountProduct(root) {
   }
 
   /* ---------------- Photo importée ---------------- */
+  /** Libère l'URL de la photo précédente : un import n'en laisse jamais deux. */
+  function libererPhoto() {
+    if (state.room && state.room.type === 'uploaded' && state.room.url) {
+      try { URL.revokeObjectURL(state.room.url); } catch { /* déjà libérée */ }
+    }
+  }
+
+  /**
+   * L'utilisateur vient d'importer sa photo : il est DÉJÀ dans sa photo.
+   * Aucun écran intermédiaire, aucune modale, aucune action de plus à faire —
+   * la photo devient la pièce du viewport, et ce qui manque se dit dans une
+   * note qui s'efface. Le sol inconnu interdit le rendu, rien d'autre.
+   */
   async function importPhoto(file) {
     if (!file) return;
     const intent = ++state.intent;
@@ -436,20 +471,23 @@ export async function mountProduct(root) {
     try {
       const prepared = await loadFile(file);
       if (intent !== state.intent) return;
+      /* La poignée que l'analyse de pièce consommera le jour où elle existe. */
+      const url = URL.createObjectURL(file);
+      libererPhoto();
       state.scene = null;
-      state.room = null;
-      state.roomLabel = '';
-      state.photo = { name: prepared.name, width: prepared.width, height: prepared.height };
+      state.room = { type: 'uploaded', url, fileName: prepared.name, width: prepared.width, height: prepared.height };
       state.comparison = null;
       state.originalMode = 'off';
-      state.ui.screen = 'photo';
-      state.ui.veil = true;
+      state.ui.split = 0.5;
+      setStatus('', 'ok');
       canvasPhoto.width = prepared.width; canvasPhoto.height = prepared.height;
       canvasPhoto.getContext('2d').drawImage(prepared.canvas, 0, 0);
-      /* Aucun parquet sur une photo dont on ne connaît pas le sol : on le dit. */
+      /* Aucun parquet sur une photo dont on ne connaît pas le sol : on
+         n'invente pas de rendu, la couche A reste vide. */
       canvasA.width = 0; canvasA.height = 0; canvasB.width = 0; canvasB.height = 0;
       viewport.scheduleFit();
       paintChrome();
+      note(NOTE_IMPORT);
     } catch (error) {
       if (intent !== state.intent) return;
       toast(error.message || 'Cette image n’a pas pu être lue');
@@ -478,7 +516,10 @@ export async function mountProduct(root) {
         <button class="chip" type="button" data-filter="" aria-pressed="${!state.ui.patternFilter}">Tous</button>
         ${presentPatterns().map((k) => `<button class="chip" type="button" data-filter="${k}" aria-pressed="${state.ui.patternFilter === k}">${PATTERNS[k]}</button>`).join('')}
       </div>`;
-    $('[data-drawer-body]').innerHTML = `${filtres}<div class="grid" data-prods>${list.map((p) => {
+    /* Sur une photo personnelle le catalogue reste consultable — références,
+       favoris, fiches — et le dit avant le premier clic. */
+    const avis = posable() ? '' : `<p class="grid__note">${NOTE_SANS_SOL}</p>`;
+    $('[data-drawer-body]').innerHTML = `${filtres}${avis}<div class="grid" data-prods>${list.map((p) => {
       const on = p.id === state.product && !state.ui.picking;
       return `<button class="pcard" type="button" data-id="${p.id}" aria-pressed="${on}">
         <span class="pcard__tex" data-swatch="${p.id}"></span>
@@ -493,6 +534,14 @@ export async function mountProduct(root) {
   function select(id) {
     const material = productOf(id);
     if (!material) return;
+    /* Pas de masque réel : le choix est retenu, aucun parquet n'est inventé. */
+    if (!posable()) {
+      state.product = id;
+      state.ui.picking = false;
+      paintChrome();
+      note(NOTE_SANS_SOL);
+      return;
+    }
     if (state.ui.picking) {
       /* Comparer une référence à elle-même n'a aucun sens. */
       if (id === state.product) { toast('Choisissez une autre référence que celle déjà posée'); return; }
@@ -557,6 +606,7 @@ export async function mountProduct(root) {
     pickB();
   }
   function pickB() {
+    if (!posable()) { note(NOTE_SANS_SOL); return; }
     state.originalMode = 'off';
     state.ui.menu = false;
     state.ui.catalogueView = 'all';
@@ -566,6 +616,7 @@ export async function mountProduct(root) {
     toast('Choisissez la seconde référence');
   }
   function setBa(on) {
+    if (!posable()) { note(NOTE_SANS_SOL); return; }
     if (state.comparison) { state.intent += 1; state.comparison = null; }
     state.originalMode = on ? 'ba' : 'off';
     state.ui.split = 0.5;
@@ -590,7 +641,7 @@ export async function mountProduct(root) {
      regarde le sol, pas les boutons. Il revient à la fin du geste. */
   let panTimer = 0;
   on(stage, 'pointerdown', (e) => {
-    if (e.target.closest('.pv-tools, .pv-bar, .pv-zoom, .pv-drawer, .pv-veil, .pv-split')) return;
+    if (e.target.closest('.pv-tools, .pv-bar, .pv-zoom, .pv-drawer, .pv-note, .pv-split')) return;
     clearTimeout(panTimer);
     state.ui.panning = true;
     document.body.classList.add('panning');
@@ -661,9 +712,29 @@ export async function mountProduct(root) {
     toastTimer = setTimeout(() => el.classList.remove('on'), 1700);
   }
 
+  /* ---------------- Note discrète ---------------- */
+  let noteTimer = 0;
+  /** Deux lignes en bas de la pièce, qui s'effacent seules et ne bloquent
+      rien : le viewport reste manipulable à travers elles. */
+  function note(message) {
+    const el = $('[data-note]');
+    $('[data-note-text]').textContent = message;
+    el.hidden = false;
+    /* Un tour d'horloge avant la classe : la note glisse au lieu d'apparaître. */
+    setTimeout(() => el.classList.add('on'), 0);
+    clearTimeout(noteTimer);
+    noteTimer = setTimeout(fermerNote, 9000);
+  }
+  function fermerNote() {
+    clearTimeout(noteTimer);
+    const el = $('[data-note]');
+    el.classList.remove('on');
+    el.hidden = true;
+  }
+  on($('[data-note-close]'), 'click', fermerNote);
+
   /* ---------------- Câblage ---------------- */
   on($('[data-menu-import]'), 'click', () => { closeAll(); fileInput.click(); });
-  on($('[data-veil-import]'), 'click', () => fileInput.click());
   on(fileInput, 'change', () => { importPhoto(fileInput.files && fileInput.files[0]); fileInput.value = ''; });
   ['dragover', 'dragenter'].forEach((t) => on(document, t, (e) => e.preventDefault()));
   on(document, 'drop', (e) => {
@@ -673,8 +744,7 @@ export async function mountProduct(root) {
     if (externe && dt.files && dt.files[0]) importPhoto(dt.files[0]);
   });
 
-  ['[data-h-rooms]', '[data-menu-rooms]', '[data-veil-rooms]'].forEach((sel) => on($(sel), 'click', () => openPanel('rooms')));
-  on($('[data-veil-explore]'), 'click', () => { state.ui.veil = false; paintChrome(); toast('Molette pour zoomer, glisser pour déplacer'); });
+  ['[data-h-rooms]', '[data-menu-rooms]'].forEach((sel) => on($(sel), 'click', () => openPanel('rooms')));
   on($('[data-close]'), 'click', closeAll);
 
   on($('[data-h-fav]'), 'click', () => {
@@ -704,6 +774,7 @@ export async function mountProduct(root) {
     const deg = t.closest('[data-deg]'); if (deg) { const d = Number(deg.dataset.deg); if (d !== state.rendererSettings.angle) { state.intent += 1; state.rendererSettings.angle = d; demandeRendu(); paintChrome(); } return; }
     if (t.closest('[data-open-catalog]')) { openPanel('catalog'); return; }
     if (t.closest('[data-open-custom]')) { openPanel('custom'); return; }
+    if (t.closest('[data-open-rooms]')) { openPanel('rooms'); return; }
     if (t.closest('[data-pick-b]')) { pickB(); return; }
     if (t.closest('[data-cmp-close]')) { startCompare(); return; }
     const ba = t.closest('[data-ba]'); if (ba) { setBa(ba.dataset.ba === 'ba'); return; }

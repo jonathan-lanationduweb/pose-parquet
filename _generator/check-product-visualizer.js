@@ -10,6 +10,7 @@
  *       aucun état par requestAnimationFrame, et est publiée dans le bundle.
  *
  *   node _generator/check-product-visualizer.js --script
+ *   node _generator/check-product-visualizer.js --script-import
  *       le COMPORTEMENT : le code à exécuter dans la page ouverte avec
  *       `?dev=1`. Viewport (couverture, Ajuster, plancher de zoom), choix de
  *       B annulé à la fermeture, A = B refusé, dernier clic gagne.
@@ -40,7 +41,7 @@ function verifierApp(pv) {
   const vide = () => { const b = box(); const p = photo(); return Math.max(p.x - b.x, p.y - b.y, (b.x + b.width) - (p.x + p.width), (b.y + b.height) - (p.y + p.height)); };
 
   ok('cinq références pilote', pv.products.length === 5, pv.products.join(' '));
-  ok('une pièce est ouverte', !!s.scene && s.room, s.room);
+  ok('une pièce est ouverte', !!s.scene && s.room && s.room.type === 'demo', s.room && s.room.type);
 
   /* viewport */
   pv.viewport.fitToView();
@@ -103,6 +104,113 @@ function verifierApp(pv) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Comportement — l'import, de bout en bout (async)                   */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Non-régression du parcours d'import : une photo importée EST la pièce.
+ * Le refus humain portait sur un écran intermédiaire ; ce contrôle vérifie
+ * qu'aucun overlay ne couvre le viewport, qu'aucun dialogue ne s'ouvre, et
+ * que tout ce qui manipule la pièce marche comme sur une pièce d'exemple.
+ */
+async function verifierImport(pv) {
+  const r = [];
+  const ok = (nom, c, detail = '') => r.push({ nom, ok: !!c, detail: String(detail) });
+  if (!pv || !pv.state) { ok('la poignée de diagnostic est là (?dev=1)', false); return r; }
+  const s = pv.state;
+  const pause = (ms) => new Promise((res) => setTimeout(res, ms));
+  const stage = document.querySelector('[data-stage]');
+  const box = () => stage.getBoundingClientRect();
+  const photo = () => document.querySelector('[data-layer="photo"]').getBoundingClientRect();
+  const vide = () => { const b = box(); const p = photo(); return Math.max(p.x - b.x, p.y - b.y, (b.x + b.width) - (p.x + p.width), (b.y + b.height) - (p.y + p.height)); };
+  const attendre = async (test, msMax = 15000) => {
+    const t0 = performance.now();
+    while (performance.now() - t0 < msMax) { if (test()) return true; await pause(30); }
+    return false;
+  };
+  /* Une photo de test fabriquée sur place : le contrôle ne dépend d'aucun fichier. */
+  const fichier = async (nom, w, h, teinte) => {
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    const g = c.getContext('2d');
+    g.fillStyle = teinte; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#333'; g.fillRect(0, Math.round(h * 0.62), w, Math.round(h * 0.38));
+    const blob = await new Promise((res) => c.toBlob(res, 'image/png'));
+    return new File([blob], nom, { type: 'image/png' });
+  };
+
+  const demoDepart = s.room && s.room.type === 'demo' ? s.room.id : null;
+
+  /* --- premier import --- */
+  await pv.importPhoto(await fichier('salon-perso.png', 1200, 800, '#c8b79a'));
+  ok('la photo importée devient la pièce', await attendre(() => s.room && s.room.type === 'uploaded'), s.room && s.room.type);
+  ok('l état porte la photo, pas un second écran',
+    s.room && s.room.fileName === 'salon-perso.png' && s.room.width > 0 && s.room.height > 0 && typeof s.room.url === 'string' && s.scene === null,
+    JSON.stringify({ f: s.room && s.room.fileName, w: s.room && s.room.width, u: !!(s.room && s.room.url) }));
+  const texte = document.body.innerText;
+  ok('plus aucun écran « moteur IA »', !/moteur IA|maquette|quand même/i.test(texte));
+  ok('aucun dialogue bloquant', !document.querySelector('dialog[open]') && !document.querySelector('[data-drawer]:not([hidden])'));
+  /* Rien ne couvre le viewport : au centre de la pièce, l'élément touché est la scène. */
+  const b0 = box();
+  const cible = document.elementFromPoint(Math.round(b0.x + b0.width / 2), Math.round(b0.y + b0.height / 2));
+  ok('aucun overlay ne couvre le viewport', !!cible && !cible.closest('.pv-note, [data-drawer], .pv-menu') && !!cible.closest('[data-stage]'), cible && cible.className);
+  ok('l information est une note discrète de deux lignes au plus',
+    (() => { const n = document.querySelector('[data-note]'); if (!n || n.hidden) return false; const p = n.querySelector('[data-note-text]'); const lignes = p.getBoundingClientRect().height / parseFloat(getComputedStyle(p).lineHeight); return lignes <= 2.2 && n.getBoundingClientRect().width <= 420; })());
+  ok('la note se ferme et ne revient pas', (() => { document.querySelector('[data-note-close]').click(); return document.querySelector('[data-note]').hidden; })());
+  ok('la barre et le zoom restent là', !document.querySelector('[data-bar]').hidden && !document.querySelector('[data-zoom]').hidden);
+  ok('avant / après et comparer s effacent sans parquet posé',
+    document.querySelector('[data-seg]').hidden && document.querySelector('[data-cmp]').hidden && !document.querySelector('[data-tools]').hidden);
+
+  /* --- viewport : exactement comme une pièce d'exemple --- */
+  pv.viewport.fitToView();
+  ok('100 % couvre le cadre sur une photo importée', pv.viewport.vp.z === 1 && vide() <= 0.5, vide());
+  pv.viewport.zoomAt(2, 300, 200, false);
+  ok('le zoom marche après import', pv.viewport.vp.z > 1, pv.viewport.vp.z);
+  const x0 = pv.viewport.vp.x;
+  pv.viewport.setVp({ z: pv.viewport.vp.z, x: x0 - 60, y: pv.viewport.vp.y }, false);
+  ok('le pan marche après import', pv.viewport.vp.x !== x0);
+  pv.viewport.fitAll();
+  ok('Ajuster marche après import', pv.viewport.vp.z < 1 && Math.abs(pv.viewport.vp.z - pv.viewport.zContain) < 1e-9);
+  pv.viewport.fitToView();
+  pv.setImmersive(true);
+  ok('le plein écran marche après import', s.ui.immersive === true && getComputedStyle(document.querySelector('.pv__header')).display === 'none');
+  pv.setImmersive(false);
+
+  /* --- produit sans sol connu : aucun faux parquet --- */
+  const canvasA = pv.canvases.a;
+  const cible2 = pv.products.find((id) => id !== s.product) || pv.products[0];
+  const rendus = s.renders;
+  pv.select(cible2);
+  await pause(200);
+  ok('cliquer un parquet n invente aucun rendu', canvasA.width === 0 && s.renders === rendus, `${canvasA.width}px, ${s.renders} rendus`);
+  ok('le clic produit répond par une information non bloquante',
+    !document.querySelector('[data-note]').hidden && /après analyse de la pièce/.test(document.querySelector('[data-note-text]').textContent));
+  ok('la photo reste visible et le viewport manipulable', pv.canvases.photo.width > 0 && (() => { const z = pv.viewport.vp.z; pv.viewport.zoomAt(1.5, null, null, false); const bougé = pv.viewport.vp.z !== z; pv.viewport.fitToView(); return bougé; })());
+  ok('comparer reste refusé proprement, sans crash', (() => { pv.startCompare(); return s.comparison === null && s.ui.picking === false; })());
+  ok('le catalogue reste consultable', (() => { pv.openPanel('catalog'); const n = document.querySelectorAll('[data-prods] .pcard').length; const note = document.querySelector('[data-drawer-body] .grid__note'); pv.closeAll(); return n === pv.products.length && !!note; })());
+
+  /* --- second import : rien de la première photo ne survit --- */
+  const url1 = s.room.url;
+  const w1 = s.room.width;
+  await pv.importPhoto(await fichier('cuisine-perso.png', 900, 1200, '#a9b7c8'));
+  ok('un second import remplace la photo', await attendre(() => s.room && s.room.fileName === 'cuisine-perso.png'), s.room && s.room.fileName);
+  ok('l ancienne URL est révoquée', s.room.url !== url1);
+  ok('la nouvelle taille remplace l ancienne', s.room.width !== w1 && s.room.width === 900 && s.room.height === 1200, `${s.room.width}x${s.room.height}`);
+  pv.viewport.fitToView();
+  ok('le viewport est réinitialisé sur la nouvelle photo', pv.viewport.vp.z === 1 && vide() <= 0.5, vide());
+  ok('aucun parquet hérité de la première photo', pv.canvases.a.width === 0 && s.comparison === null && s.originalMode === 'off');
+
+  /* --- retour à une pièce d'exemple --- */
+  if (demoDepart) {
+    await pv.openRoom(demoDepart);
+    ok('retour à une pièce d exemple', await attendre(() => s.room && s.room.type === 'demo' && !!s.scene), s.room && s.room.type);
+    ok('le rendu revient sur une pièce d exemple', await attendre(() => pv.canvases.a.width > 0 && s.renders > 0), pv.canvases.a.width);
+    ok('avant / après et comparer reviennent', !document.querySelector('[data-seg]').hidden && !document.querySelector('[data-cmp]').hidden);
+  }
+  return r;
+}
+
+/* ------------------------------------------------------------------ */
 /* Forme                                                              */
 /* ------------------------------------------------------------------ */
 
@@ -132,7 +240,7 @@ function controlerSource() {
 
   /* Un seul état. */
   ok('un seul objet d état', (code.match(/const state = \{/g) || []).length === 1);
-  for (const clef of ['room', 'scene', 'photo', 'product', 'rendererSettings', 'comparison', 'favoriteIds', 'originalMode', 'ui', 'intent']) {
+  for (const clef of ['room', 'scene', 'product', 'rendererSettings', 'comparison', 'favoriteIds', 'originalMode', 'ui', 'intent']) {
     ok(`l état porte ${clef}`, new RegExp(`\\n\\s+${clef}:`).test(app));
   }
   ok('la largeur n est pas un réglage : elle vient du produit', /width: null/.test(code) && !/setWidth/.test(code));
@@ -159,6 +267,17 @@ function controlerSource() {
   ok('pas de bouton Enregistrer ni Partager', !/Enregistrer|Partager/.test(app));
   ok('la fiche produit ouvre un nouvel onglet sans opener', /target="_blank" rel="noopener noreferrer"/.test(app));
   ok('la photo importée ne reçoit aucun parquet', /canvasA\.width = 0; canvasA\.height = 0;/.test(app));
+  /* Import : la photo est la pièce, et rien ne s'interpose. */
+  ok('la pièce dit sa provenance, il n y a pas deux écrans',
+    /type: 'demo'/.test(app) && /type: 'uploaded'/.test(app) && !/ui\.screen|state\.photo\b/.test(code));
+  ok('aucun écran bloquant après un import',
+    !/pv-veil|moteur IA|quand même|Explorer ma photo/.test(app) && !/<dialog/.test(app));
+  ok('l information d import est une note, pas un obstacle',
+    /class="pv-note"/.test(app) && /NOTE_IMPORT/.test(app) && !/jargon|segmentation|floor ?mask|prototype/i.test(app.replace(/\/\*[\s\S]*?\*\//g, '')));
+  ok('un sol inconnu bloque le rendu, rien d autre',
+    /const posable = \(\) => Boolean\(state\.scene\)/.test(app) && /if \(!posable\(\)\) \{\s*\n?\s*state\.product = id;/.test(app));
+  ok('l URL de la photo précédente est révoquée', /URL\.revokeObjectURL\(state\.room\.url\)/.test(app) && /libererPhoto\(\);/.test(app));
+  ok('un nom de fichier ne devient jamais du HTML', /txt\(state\.room\.fileName/.test(app));
 
   /* Publication. */
   const dist = path.join(RACINE, 'assets', 'dist');
@@ -185,10 +304,14 @@ if (require.main === module) {
     console.log(`(${verifierApp.toString()})(window.__pv)`);
     process.exit(0);
   }
+  if (process.argv.includes('--script-import')) {
+    console.log(`await (${verifierImport.toString()})(window.__pv)`);
+    process.exit(0);
+  }
   console.log('Visualiseur produit');
   const echecs = controlerSource();
-  console.log(echecs === 0 ? '\nConforme. Comportement : --script, dans la page ouverte avec ?dev=1.' : `\n${echecs} échec(s).`);
+  console.log(echecs === 0 ? '\nConforme. Comportement : --script et --script-import, dans la page ouverte avec ?dev=1.' : `\n${echecs} échec(s).`);
   process.exit(echecs === 0 ? 0 : 1);
 }
 
-module.exports = { verifierApp, controlerSource };
+module.exports = { verifierApp, verifierImport, controlerSource };

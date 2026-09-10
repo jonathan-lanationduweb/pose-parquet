@@ -157,7 +157,7 @@ export function createViewport({ stage, layers, sceneSize, onChange }) {
   /* ---------------- Gestes ---------------- */
   const pointers = new Map();
   let pinch = null;
-  const ignore = (e, extra) => e.target.closest(`.pv-tools, .pv-bar, .pv-zoom, .pv-veil, .pv-split, .pv-drawer, .pv-menu${extra || ''}`);
+  const ignore = (e, extra) => e.target.closest(`.pv-tools, .pv-bar, .pv-zoom, .pv-note, .pv-split, .pv-drawer, .pv-menu${extra || ''}`);
 
   function onDown(e) {
     if (ignore(e)) return;
