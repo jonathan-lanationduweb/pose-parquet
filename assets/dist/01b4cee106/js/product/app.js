@@ -30,6 +30,7 @@ import { createSceneRenderer } from '../scene/renderer.js';
 import { quandCartesPretes } from '../scene/material.js';
 import { loadCatalog, swatchFor } from '../studio/catalog.js';
 import { createViewport, ZOOM_MAX } from './viewport.js';
+import { loadTours } from './tour.js';
 
 /** Les cinq références pilote Premibel, dans l'ordre du catalogue. */
 const PILOT = ['POINF36005', 'BTRPF39009', 'CHENF39031', 'CHENF36014', 'CHENF36015'];
@@ -88,6 +89,10 @@ export async function mountProduct(root) {
   const catalog = await loadCatalog(base);
   const sceneIndex = await loadSceneIndex(base);
   const rooms = scenesBibliotheque(sceneIndex);
+  /* Visites de pièce : le contrat existe, les photos pas encore. `visites` est
+     vide aujourd'hui, donc `state.tour` reste `null` et l'écran est
+     exactement celui d'avant. Voir js/product/tour.js. */
+  const visites = await loadTours(base, rooms.map((r) => r.id));
   const products = PILOT.map((id) => catalog.get(id)).filter(Boolean);
   if (!products.length) throw new Error('Aucune référence pilote dans le catalogue');
   const productOf = (id) => catalog.get(id);
@@ -107,6 +112,10 @@ export async function mountProduct(root) {
     /* La scène calibrée de cette pièce, ou `null` quand son sol est inconnu.
        Sans masque réel, le moteur ne pose rien : c'est le seul interrupteur. */
     scene: null,
+    /* Le point de vue occupé, quand la pièce fait partie d'une visite :
+       { tourId, viewpointId, room, connections }. `null` partout aujourd'hui —
+       aucune pièce n'est visitable, et rien ne s'affiche à ce titre. */
+    tour: null,
     product: products[0].id,
     rendererSettings: { angle: 0 },
     comparison: null,            /* { b: productId } */
@@ -432,6 +441,7 @@ export async function mountProduct(root) {
       libererPhoto();
       state.scene = scene;
       state.room = { type: 'demo', id, label: scene.label || entry.label };
+      state.tour = visites.pourScene(id);
       canvasPhoto.width = prepared.width; canvasPhoto.height = prepared.height;
       canvasPhoto.getContext('2d').drawImage(prepared.canvas, 0, 0);
       /* La couche A prend ses dimensions dès maintenant : la photo d'origine
@@ -475,6 +485,9 @@ export async function mountProduct(root) {
       const url = URL.createObjectURL(file);
       libererPhoto();
       state.scene = null;
+      /* Une photo personnelle n'est la vue d'aucune visite : on n'invente pas
+         de déplacement hors de son cadre. */
+      state.tour = null;
       state.room = { type: 'uploaded', url, fileName: prepared.name, width: prepared.width, height: prepared.height };
       state.comparison = null;
       state.originalMode = 'off';
@@ -829,6 +842,7 @@ export async function mountProduct(root) {
       state, renderer, catalog, products: products.map((p) => p.id), viewport,
       pieces: () => rooms.map((r) => ({ id: r.id, label: r.label })),
       get build() { return window.__pvBuild || null; },
+      visites,
       openRoom, select, importPhoto, startCompare, pickB, setBa, toggleBa: () => setBa(state.originalMode !== 'ba'), toggleFav, setImmersive, closeAll, openPanel, paintChrome,
       canvases: { photo: canvasPhoto, a: canvasA, b: canvasB },
     };

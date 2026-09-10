@@ -336,6 +336,60 @@ function controlerSource() {
     /assets\/dev-build\.json/.test(lire('_generator/build.js')) && /assets\/dev-build\.json/.test(lire('.gitignore')));
   ok('la signature ne se charge qu en dev', /if \(DEV\) \{[\s\S]{0,600}dev-build\.json/.test(app));
 
+  /* UNE SEULE PAGE. Le produit a vecu dans deux implementations qui se
+     ressemblaient ; la regle est desormais qu'il n'y a qu'une entree HTML et
+     que tout evolue en JS, CSS et donnees. */
+  const pagesOutils = fs.readdirSync(path.join(RACINE, 'outils')).filter((n) => n.endsWith('.html'));
+  const suspectes = pagesOutils.filter((n) => /visualiseur|produit|viewer|concept|prototype/i.test(n) && n !== 'visualiseur-produit.html' && n !== 'visualiseur.html');
+  ok('une seule entree HTML pour le visualiseur produit', suspectes.length === 0, suspectes.join(' ') || pagesOutils.join(' '));
+  const montages = pagesOutils.filter((n) => /<div data-product\b/.test(lire(`outils/${n}`)));
+  ok('une seule page monte l application produit', montages.length === 1 && montages[0] === 'visualiseur-produit.html', montages.join(' '));
+  ok('la coquille HTML reste une coquille', (() => {
+    const page = lire('outils/visualiseur-produit.html');
+    const scripts = page.match(/<script(?![^>]*\bsrc=)[^>]*>[\s\S]*?<\/script>/g) || [];
+    return scripts.every((s) => s.length < 400) && !/function |addEventListener|querySelector/.test(scripts.join(''));
+  })());
+  ok('aucun lien public ne mene a une ancienne maquette',
+    !/product-concept|visualiseur-produit-v|visualiseur-demo|roomviewer|prototype\.html/.test(
+      ['index.html', 'outils/index.html', 'outils/visualiseur.html', 'outils/studio.html', 'outils/visualiseur-produit.html'].map(lire).join('')));
+
+  /* Visites de pièce : le contrat, et ce qu'il refuse. */
+  const tour = lire('js/product/tour.js');
+  ok('le contrat de visite existe et ne dessine rien',
+    /export function validerVisites/.test(tour) && /export async function loadTours/.test(tour)
+    && !/innerHTML|classList|addEventListener/.test(tour));
+  const manifeste = JSON.parse(lire('data/room-tours.json'));
+  ok('le manifeste de visites est vide et le dit', manifeste.schema === 'pose-parquet/room-tours@1' && manifeste.tours.length === 0);
+  ok('aucune visite n est presentee dans l interface',
+    !/data-tour|data-viewpoint|hotspot|goToViewpoint/.test(app) && /state\.tour = visites\.pourScene/.test(app));
+  ok('le protocole de prise de vue est documente', fs.existsSync(path.join(RACINE, 'docs', 'room-tour-protocol.md')));
+
+  /* La validation elle-meme, sur des manifestes fabriques : c'est la garde
+     qui empeche une fausse visite recousue a partir de pieces differentes. */
+  const { validerVisites } = require('../js/product/tour.js');
+  const scenes = ['sejour', 'piece-claire', 'chambre'];
+  const vue = (id, sceneId, room, vers) => ({ id, sceneId, room, position: { x: 0.5, y: 0.8 }, connections: vers.map((to) => ({ to, at: { x: 0.6, y: 0.75 } })) });
+  const paquet = (tours) => ({ schema: 'pose-parquet/room-tours@1', tours });
+  const bonne = paquet([{ id: 't1', label: 'Séjour', room: 'maison-a/sejour', viewpoints: [vue('vp1', 'sejour', 'maison-a/sejour', ['vp2']), vue('vp2', 'piece-claire', 'maison-a/sejour', ['vp1'])] }]);
+  const r0 = validerVisites(bonne, scenes);
+  ok('une visite bien formee est acceptee', r0.visites.length === 1 && r0.refus.length === 0, JSON.stringify(r0.refus));
+  for (const [nom, manif] of [
+    ['une visite d une seule vue', paquet([{ id: 't', room: 'r', viewpoints: [vue('vp1', 'sejour', 'r', [])] }])],
+    ['une scene non calibree', paquet([{ id: 't', room: 'r', viewpoints: [vue('vp1', 'inconnue', 'r', ['vp2']), vue('vp2', 'sejour', 'r', ['vp1'])] }])],
+    ['deux pieces differentes dans une meme visite', paquet([{ id: 't', room: 'r', viewpoints: [vue('vp1', 'sejour', 'r', ['vp2']), vue('vp2', 'chambre', 'autre', ['vp1'])] }])],
+    ['une liaison vers une vue inconnue', paquet([{ id: 't', room: 'r', viewpoints: [vue('vp1', 'sejour', 'r', ['vp9']), vue('vp2', 'chambre', 'r', ['vp1'])] }])],
+    ['une liaison a sens unique', paquet([{ id: 't', room: 'r', viewpoints: [vue('vp1', 'sejour', 'r', ['vp2']), vue('vp2', 'chambre', 'r', [])] }])],
+    ['un schema inattendu', { schema: 'autre', tours: [] }],
+  ]) {
+    const r = validerVisites(manif, scenes);
+    ok(`refusee : ${nom}`, r.visites.length === 0 && r.refus.length === 1, (r.refus[0] || {}).raison || 'acceptee a tort');
+  }
+  ok('le prechargement se limite aux vues voisines', (() => {
+    const { visites } = validerVisites(bonne, scenes);
+    const vp1 = visites[0].viewpoints[0];
+    return vp1.connections.length === 1 && vp1.connections[0].to === 'vp2';
+  })());
+
   /* Publication. */
   const dist = path.join(RACINE, 'assets', 'dist');
   const arbres = fs.readdirSync(dist).filter((n) => fs.statSync(path.join(dist, n)).isDirectory());
