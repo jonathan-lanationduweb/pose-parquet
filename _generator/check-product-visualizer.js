@@ -97,9 +97,54 @@ function verifierApp(pv) {
   ok('trois objets flottants au repos', ['[data-tools]', '[data-bar]', '[data-zoom]'].every((q) => { const e = document.querySelector(q); return e && !e.hidden; }) && document.querySelector('[data-drawer]').hidden);
   const liens = [...document.querySelectorAll('[data-menu] a')];
   ok('les liens du menu mènent quelque part', liens.length === 2 && liens.every((a) => /\.html$/.test(a.getAttribute('href'))));
+  /* Une revue humaine a comparé des captures de l'ANCIEN prototype au rapport
+     du produit intégré. Ces deux contrôles rendent la confusion impossible :
+     l'ancienne carcasse n'est pas dans la page, et la signature dit laquelle
+     tourne. */
+  ok('aucun reste de l ancienne interface dans la page',
+    !document.querySelector('.pv-nav, .pv-card, .pv-sheet, #nav, #card, [data-nav], [data-sheet]'));
+  ok('la signature de build est lisible en dev', !!pv.build && !!pv.build.bundle, pv.build && `${pv.build.branch || '?'} ${pv.build.commitCourt || ''} ${pv.build.bundle}`);
+
   const fiche = document.querySelector('[data-bar] [data-fiche]');
   ok('la fiche Premibel s ouvre dans un nouvel onglet, sans opener',
     fiche && fiche.getAttribute('target') === '_blank' && /noopener/.test(fiche.getAttribute('rel')) && /premibel\.fr/.test(fiche.getAttribute('href')));
+  return r;
+}
+
+/* ------------------------------------------------------------------ */
+/* Comportement — toutes les pièces, une seule interface (async)      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Une scène ne change pas la structure de l'écran. Le refus humain montrait
+ * une pièce où « plusieurs contrôles produit disparaissent » : ce contrôle
+ * ouvre chaque pièce de la bibliothèque et vérifie que la carcasse est la
+ * même partout — capsule, barre produit, zoom, aucun panneau latéral.
+ */
+async function verifierPieces(pv) {
+  const r = [];
+  const ok = (nom, c, detail = '') => r.push({ nom, ok: !!c, detail: String(detail) });
+  if (!pv || !pv.state) { ok('la poignée de diagnostic est là (?dev=1)', false); return r; }
+  const s = pv.state;
+  const pause = (ms) => new Promise((res) => setTimeout(res, ms));
+  const attendre = async (test, msMax = 25000) => {
+    const t0 = performance.now();
+    while (performance.now() - t0 < msMax) { if (test()) return true; await pause(30); }
+    return false;
+  };
+  const pieces = pv.pieces ? pv.pieces() : [];
+  ok('la bibliothèque a ses pièces', pieces.length >= 9, pieces.length);
+  for (const p of pieces) {
+    await pv.openRoom(p.id);
+    const charge = await attendre(() => s.room && s.room.type === 'demo' && s.room.id === p.id && pv.canvases.a.width > 0);
+    const structure = ['[data-tools]', '[data-bar]', '[data-zoom]'].every((q) => { const e = document.querySelector(q); return e && !e.hidden; });
+    const lateraux = !!document.querySelector('.pv-nav, .pv-card, .pv-sheet, #nav, #card');
+    const commandes = ['[data-seg]', '[data-cmp]', '[data-open-catalog]', '[data-open-custom]', '[data-fav]', '[data-z-in]', '[data-fit]']
+      .filter((q) => { const e = document.querySelector(q); return !e || e.hidden; });
+    ok(`${p.label} : rendu du moteur`, charge, pv.canvases.a.width);
+    ok(`${p.label} : même carcasse, aucun panneau latéral`, structure && !lateraux);
+    ok(`${p.label} : aucune commande produit ne disparaît`, commandes.length === 0, commandes.join(' '));
+  }
   return r;
 }
 
@@ -278,6 +323,18 @@ function controlerSource() {
     /const posable = \(\) => Boolean\(state\.scene\)/.test(app) && /if \(!posable\(\)\) \{\s*\n?\s*state\.product = id;/.test(app));
   ok('l URL de la photo précédente est révoquée', /URL\.revokeObjectURL\(state\.room\.url\)/.test(app) && /libererPhoto\(\);/.test(app));
   ok('un nom de fichier ne devient jamais du HTML', /txt\(state\.room\.fileName/.test(app));
+  /* Une seule architecture d'UI vivante, et aucune route vers le prototype :
+     la confusion entre les deux applications a coûté une revue entière. */
+  const cssProduit = lire('css/product-app.css');
+  ok('aucun composant de l ancienne interface ne survit',
+    !/pv-nav|pv-card|pv-sheet|pv-status|data-nav\b|data-sheet\b/.test(app + cssProduit));
+  ok('aucune route du produit ne mène au prototype',
+    !/product-concept/.test(sansCommentaires(app + main + vp)) && !/product-concept/.test(lire('outils/visualiseur-produit.html')));
+  ok('aucun service worker ne peut servir une ancienne interface',
+    !/serviceWorker|navigator\.serviceWorker/.test(app + main) && !fs.existsSync(path.join(RACINE, 'sw.js')));
+  ok('la signature de build est écrite par le générateur, jamais publiée',
+    /assets\/dev-build\.json/.test(lire('_generator/build.js')) && /assets\/dev-build\.json/.test(lire('.gitignore')));
+  ok('la signature ne se charge qu en dev', /if \(DEV\) \{[\s\S]{0,600}dev-build\.json/.test(app));
 
   /* Publication. */
   const dist = path.join(RACINE, 'assets', 'dist');
@@ -308,10 +365,28 @@ if (require.main === module) {
     console.log(`await (${verifierImport.toString()})(window.__pv)`);
     process.exit(0);
   }
+  if (process.argv.includes('--script-pieces')) {
+    console.log(`await (${verifierPieces.toString()})(window.__pv)`);
+    process.exit(0);
+  }
+  /* Quelle version DEVRAIT tourner : à comparer à la ligne « build » que la
+     page écrit en console avec `?dev=1`. */
+  if (process.argv.includes('--build')) {
+    const git = (args) => { try { return require('child_process').execFileSync('git', args, { cwd: RACINE, encoding: 'utf8' }).trim(); } catch { return 'inconnu'; } };
+    const dist = fs.readdirSync(path.join(RACINE, 'assets', 'dist')).filter((n) => fs.statSync(path.join(RACINE, 'assets', 'dist', n)).isDirectory());
+    console.log(JSON.stringify({
+      commitCourt: git(['rev-parse', '--short', 'HEAD']),
+      branch: git(['rev-parse', '--abbrev-ref', 'HEAD']),
+      propre: git(['status', '--porcelain']) === '' ? 'oui' : 'non',
+      page: 'outils/visualiseur-produit.html',
+      bundle: dist.length === 1 ? dist[0] : dist.join(' + '),
+    }, null, 2));
+    process.exit(0);
+  }
   console.log('Visualiseur produit');
   const echecs = controlerSource();
-  console.log(echecs === 0 ? '\nConforme. Comportement : --script et --script-import, dans la page ouverte avec ?dev=1.' : `\n${echecs} échec(s).`);
+  console.log(echecs === 0 ? '\nConforme. Comportement : --script, --script-import et --script-pieces, dans la page ouverte avec ?dev=1.\nQuelle version tourne : --build ici, ligne « build » en console là-bas.' : `\n${echecs} échec(s).`);
   process.exit(echecs === 0 ? 0 : 1);
 }
 
-module.exports = { verifierApp, verifierImport, controlerSource };
+module.exports = { verifierApp, verifierImport, verifierPieces, controlerSource };

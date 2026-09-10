@@ -1323,5 +1323,38 @@ buildMethode();
 build404();
 buildMeta();
 
+/*
+ * Signature de build, pour le développement seulement.
+ *
+ * Une revue humaine a un jour comparé des captures à un rapport sans pouvoir
+ * dire QUELLE application les avait produites : deux interfaces existaient sur
+ * la machine — le prototype UX de pose-parquet-ai et le produit intégré — et
+ * elles se ressemblaient assez pour être confondues. Ce fichier lève
+ * l'ambiguïté : ouvert avec `?dev=1`, le visualiseur écrit en console le
+ * commit, la branche, la page et l'empreinte du bundle qu'il exécute.
+ *
+ * Il n'est PAS publié : `.gitignore` l'exclut, et la page ne le lit qu'en mode
+ * développement. En production la signature se réduit à ce que la page porte
+ * déjà — son chemin et l'empreinte de son bundle.
+ */
+function ecrireSignature() {
+  const git = (args, defaut) => {
+    try { return require('child_process').execFileSync('git', args, { cwd: ROOT, encoding: 'utf8' }).trim(); }
+    catch { return defaut; }
+  };
+  write('assets/dev-build.json', `${JSON.stringify({
+    commit: git(['rev-parse', 'HEAD'], 'inconnu'),
+    commitCourt: git(['rev-parse', '--short', 'HEAD'], 'inconnu'),
+    branch: git(['rev-parse', '--abbrev-ref', 'HEAD'], 'inconnue'),
+    propre: git(['status', '--porcelain'], '') === '' ? 'oui' : 'non (modifications non commitées)',
+    page: 'outils/visualiseur-produit.html',
+    bundle: build.productJs,
+    ui: 'v2',
+    date: new Date().toISOString(),
+  }, null, 2)}
+`);
+}
+ecrireSignature();
+
 console.log('Site généré dans', ROOT);
 console.log(`Assets : ${build.css} (${Math.round(build.sizes.css / 1024)} Ko), ${build.js} (${build.sizes.js} modules)`);
