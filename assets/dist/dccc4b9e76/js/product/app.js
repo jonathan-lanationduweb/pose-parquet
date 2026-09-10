@@ -799,6 +799,24 @@ export async function mountProduct(root) {
     else if (e.key === 'f' || e.key === 'F') { e.preventDefault(); setImmersive(!state.ui.immersive); }
   });
 
+  /* Quelle version tourne ? En `?dev=1` la question ne se pose plus : le
+     commit, la branche, la page et l'empreinte du bundle passent en console.
+     Sans `?dev=1`, rien n'est demandé au réseau et rien n'est écrit. */
+  if (DEV) {
+    (async () => {
+      const signature = { page: location.pathname, bundle: null, ui: 'v2' };
+      try {
+        const script = [...document.scripts].map((s) => s.src).find((s) => /js\/product\/main\.js/.test(s));
+        const trouve = script && script.match(/assets\/dist\/([0-9a-f]+)\//);
+        signature.bundle = trouve ? trouve[1] : 'inconnu';
+        const rep = await fetch(`${base}assets/dev-build.json`, { cache: 'no-store' });
+        if (rep.ok) Object.assign(signature, await rep.json());
+      } catch { /* pas de signature de build : la page reste utilisable */ }
+      window.__pvBuild = signature;
+      console.info('[visualiseur produit] build', signature);
+    })();
+  }
+
   paintChrome();
 
   /* Première impression : une pièce et un parquet, pas un écran d'accueil.
@@ -809,6 +827,8 @@ export async function mountProduct(root) {
   if (DEV) {
     window.__pv = {
       state, renderer, catalog, products: products.map((p) => p.id), viewport,
+      pieces: () => rooms.map((r) => ({ id: r.id, label: r.label })),
+      get build() { return window.__pvBuild || null; },
       openRoom, select, importPhoto, startCompare, pickB, setBa, toggleBa: () => setBa(state.originalMode !== 'ba'), toggleFav, setImmersive, closeAll, openPanel, paintChrome,
       canvases: { photo: canvasPhoto, a: canvasA, b: canvasB },
     };

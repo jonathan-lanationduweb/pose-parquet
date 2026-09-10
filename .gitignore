@@ -8,3 +8,6 @@ desktop.ini
 .idea/
 *.swp
 _calibrage/_candidates/
+
+# Signature de build, ecrite par le generateur, jamais publiee
+assets/dev-build.json
