@@ -1346,7 +1346,12 @@ function ecrireSignature() {
     commit: git(['rev-parse', 'HEAD'], 'inconnu'),
     commitCourt: git(['rev-parse', '--short', 'HEAD'], 'inconnu'),
     branch: git(['rev-parse', '--abbrev-ref', 'HEAD'], 'inconnue'),
-    propre: git(['status', '--porcelain'], '') === '' ? 'oui' : 'non (modifications non commitées)',
+    /* `sitemap.xml` est re-tamponne par CE build : le juger salirait
+       toujours l'arbre. Voir la convention dans _generator/README.md. */
+    propre: git(['status', '--porcelain'], '')
+      .split(String.fromCharCode(10)).map((l) => l.trim())
+      .filter((l) => l && !l.endsWith('sitemap.xml')).length === 0
+      ? 'oui' : 'non (modifications non commitees)',
     page: 'outils/visualiseur-produit.html',
     bundle: build.productJs,
     ui: 'v2',
