@@ -3,13 +3,23 @@
  * Le pipeline d'une soumission publique, dans l'ordre et rien que l'ordre.
  *
  *   identité réseau → limite de tentatives → pot de miel → jeton
- *   → limite de créations → validation + écriture (Service, transaction)
- *   → compteur de créations → emails (Notifier) → résultat.
+ *   → limite de créations → réservation du jeton → validation + écriture
+ *   (Service, transaction) → compteur de créations → emails (Notifier).
  *
  * Tout ce qui précède l'écriture ne touche pas la base. Tout ce qui la suit
  * ne peut pas l'annuler : les emails partent après COMMIT et leur échec
  * n'est qu'un état enregistré. Le contrôleur ne connaît que ce service ;
  * Service (validation + écriture) reste tel qu'au lot 2.
+ *
+ * OÙ LE JETON EST CONSOMMÉ, ET POURQUOI LÀ. La réservation doit précéder
+ * l'écriture : après, deux requêtes simultanées portant le même jeton
+ * auraient déjà créé deux demandes avant que l'une des deux ne s'aperçoive
+ * de rien. Elle ne doit pas non plus être définitive trop tôt : un code
+ * postal mal saisi rend un 422, et tuer le jeton à cet instant obligerait à
+ * recharger le formulaire pour corriger un champ. D'où la règle retenue —
+ * on réserve juste avant la création, et on relâche si la création n'a pas
+ * eu lieu. Un jeton n'est donc perdu que lorsqu'une demande existe, ce qui
+ * est exactement ce qu'on veut empêcher de répéter.
  *
  * @package PoseParquet\Core
  */
@@ -19,6 +29,7 @@ declare(strict_types=1);
 namespace PoseParquet\Core\Projects;
 
 use PoseParquet\Core\Antispam\ClientIdentity;
+use PoseParquet\Core\Antispam\FormToken;
 use PoseParquet\Core\Antispam\Guard;
 use PoseParquet\Core\Mail\Notifier;
 
@@ -55,6 +66,20 @@ final class SubmissionService {
 			return [ 'ok' => false, 'status' => 429, 'code' => Guard::CODE_RATE_LIMITED, 'message' => Guard::MESSAGE_RATE_LIMITED, 'fields' => [], 'retry_after' => $attente ];
 		}
 
+		// Le jeton a été vérifié par le Guard ; reste à s'assurer qu'il n'a pas
+		// déjà servi. Le code de refus est celui du jeton, donc le front
+		// applique sa reprise habituelle : un jeton neuf, un seul réessai.
+		$jeton = is_array( $input ) ? ( $input['formToken'] ?? null ) : null;
+		if ( ! FormToken::consume( $jeton ) ) {
+			return [
+				'ok'      => false,
+				'status'  => 422,
+				'code'    => Guard::CODE_TOKEN,
+				'message' => Guard::MESSAGE_REJECTED,
+				'fields'  => [ 'formToken' => 'Jeton de formulaire déjà utilisé : recharger le formulaire.' ],
+			];
+		}
+
 		// Les champs techniques ne sont ni validés ni stockés : ils s'arrêtent ici.
 		if ( is_array( $input ) ) {
 			$input = array_diff_key( $input, array_flip( Guard::TECHNICAL_FIELDS ) );
@@ -62,6 +87,9 @@ final class SubmissionService {
 
 		$resultat = $this->service->create( $input );
 		if ( ! $resultat['ok'] ) {
+			// Aucune demande n'a été créée : le jeton redevient utilisable, sans
+			// quoi corriger un champ refusé coûterait un rechargement de page.
+			FormToken::release( $jeton );
 			if ( $resultat['code'] === Service::ERR_VALIDATION ) {
 				return [ 'ok' => false, 'status' => 422, 'code' => 'validation_failed', 'message' => 'Certains champs sont invalides.', 'fields' => $resultat['fields'] ?? [] ];
 			}

@@ -326,6 +326,18 @@ $verifie( 'trop jeune, expiré, signature fausse, absent : chacun son code', For
 $verifie( 'le jeton ne contient pas le secret', ! str_contains( FormToken::issue(), wp_salt( 'nonce' ) ) );
 $verifie( 'deux jetons du même instant diffèrent (nonce aléatoire)', FormToken::issue( 1000 ) !== FormToken::issue( 1000 ) );
 
+// Usage unique : le nonce, jusqu'ici décoratif, est désormais consommé.
+$j = FormToken::issue( time() - 10 );
+$verifie( 'consume() : vrai la première fois, faux la seconde', FormToken::consume( $j ) === true && FormToken::consume( $j ) === false );
+$verifie( 'is_consumed() reflète la réservation', FormToken::is_consumed( $j ) );
+$verifie( 'un jeton voisin reste libre', ! FormToken::is_consumed( FormToken::issue( time() - 10 ) ) );
+FormToken::release( $j );
+$verifie( 'release() rouvre le jeton', ! FormToken::is_consumed( $j ) && FormToken::consume( $j ) === true );
+$verifie( 'consume() refuse ce qui n’est pas un jeton', ! FormToken::consume( null ) && ! FormToken::consume( '' ) && ! FormToken::consume( 'v1.abc.def.ghi' ) && ! FormToken::consume( [ 'a' ] ) );
+$verifie( 'consume() refuse un jeton expiré (plus rien à réserver)', ! FormToken::consume( FormToken::issue( time() - 7300 ) ) );
+$verifie( 'la vérification de signature reste indépendante de la réservation', FormToken::verify( $j ) === '' );
+FormToken::release( $j );
+
 /* ------------------------------------------------------------------ */
 $section( 'Identité réseau (fonction pure)' );
 $verifie( 'condensat de 32 hexadécimaux', (bool) preg_match( '/^[a-f0-9]{32}$/', ClientIdentity::hash( '203.0.113.5' ) ) );

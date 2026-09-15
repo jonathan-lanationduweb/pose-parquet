@@ -11,6 +11,7 @@
  *   201  { success: true, reference: "PP-2026-000123" }
  *   400  corps absent ou JSON illisible
  *   413  corps trop volumineux (avant même de le lire)
+ *   415  Content-Type autre que application/json
  *   422  validation refusée — { code, message, fields: { champ: raison } } ;
  *        aussi submission_rejected (pot de miel) et form_token_invalid (jeton)
  *   429  rate_limited, avec Retry-After
@@ -21,6 +22,16 @@
  * contient de SQL, de chemin, de trace ni de donnée saisie. La route est
  * publique (permission_callback → true) : l'authentification n'a pas de sens
  * pour un formulaire de contact, et CORS n'en est pas une (voir Cors).
+ *
+ * Pourquoi le Content-Type est exigé. Les en-têtes CORS sont une réponse :
+ * ils n'empêchent aucune requête de partir, ils empêchent seulement le
+ * navigateur d'en lire le résultat. Le navigateur ne demande la permission
+ * AVANT d'envoyer — le préflight — que si la requête sort du cadre des
+ * requêtes dites simples, et `text/plain` y reste. Un site tiers pouvait
+ * donc poster ce JSON avec ce type depuis le navigateur d'un visiteur : la
+ * réponse lui était illisible, mais la demande était créée, depuis l'adresse
+ * du visiteur, et partait en courrier. Exiger `application/json` rend le
+ * préflight obligatoire, et donne enfin à Cors le pouvoir qu'on lui prêtait.
  *
  * @package PoseParquet\Core
  */
@@ -45,6 +56,9 @@ final class ProjectsController {
 	/** Taille maximale du corps JSON, en octets : un formulaire tient dans bien moins. */
 	public const MAX_BODY_BYTES = 16384;
 
+	/** Le seul type de contenu accepté ; les paramètres (charset) sont ignorés. */
+	public const MEDIA_TYPE = 'application/json';
+
 	public static function permission(): bool {
 		return true;
 	}
@@ -52,6 +66,16 @@ final class ProjectsController {
 	public static function create( WP_REST_Request $request ): WP_REST_Response {
 		$request_id = self::request_id();
 		$start      = microtime( true );
+
+		if ( self::media_type( $request ) !== self::MEDIA_TYPE ) {
+			return self::error(
+				415,
+				'unsupported_media_type',
+				'Type de contenu non pris en charge : application/json attendu.',
+				[],
+				$request_id
+			);
+		}
 
 		$body = (string) $request->get_body();
 		if ( strlen( $body ) > self::MAX_BODY_BYTES ) {
@@ -108,6 +132,21 @@ final class ProjectsController {
 	private static function headers( WP_REST_Response $response, string $request_id ): void {
 		$response->header( 'Cache-Control', 'no-store' );
 		$response->header( 'X-Request-Id', $request_id );
+	}
+
+	/**
+	 * Type de média de la requête, sans ses paramètres et en minuscules.
+	 *
+	 * `get_content_type()` a déjà séparé `charset=utf-8` de la valeur et l'a
+	 * abaissée en casse : `application/json; charset=utf-8` rend donc bien
+	 * `application/json`. Un en-tête absent rend `null`, donc une chaîne vide,
+	 * donc un refus — ce qui est voulu : une requête sans type déclaré n'est
+	 * pas une requête JSON.
+	 */
+	private static function media_type( WP_REST_Request $request ): string {
+		$type = $request->get_content_type();
+
+		return is_array( $type ) ? strtolower( trim( (string) ( $type['value'] ?? '' ) ) ) : '';
 	}
 
 	/** Tables présentes et schéma au niveau attendu : sinon on n'écrit pas. */
