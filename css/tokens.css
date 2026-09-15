@@ -84,7 +84,22 @@
   --sp-7: 3rem;
   --sp-8: 4.5rem;
   --sp-9: 6.5rem;
-  --section-y: clamp(4.5rem, 2rem + 8vw, 10rem);
+  /**
+   * Respiration verticale d'une section.
+   *
+   * Elle valait clamp(4.5rem, 2rem + 8vw, 10rem) : 147 px de chaque côté à
+   * 1440, 160 à 1920. Deux sections voisines mettaient donc 320 px de vide
+   * entre leurs contenus, et 392 avec la marge d'un en-tête de section —
+   * mesuré sur /tutoriels/ en 1920 x 1080 : un trou continu de 396 px entre
+   * le dernier bouton d'une section et le titre de la suivante. À l'écran,
+   * cela ne se lit pas comme de l'air, mais comme une page qui s'est arrêtée.
+   *
+   * La pente compte autant que le plafond : 8vw faisait grossir le vide plus
+   * vite que le texte, si bien que le défaut empirait précisément là où
+   * l'écran est le plus large. 4vw suit mieux la mesure de lecture, et le
+   * plafond tombe à 6rem.
+   */
+  --section-y: clamp(3.25rem, 1.5rem + 4vw, 6rem);
 
   /* ---- Grille ---- */
   --wrap: 1180px;
