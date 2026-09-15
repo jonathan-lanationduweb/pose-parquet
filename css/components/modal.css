@@ -38,3 +38,9 @@
 }
 .modal__close:hover { background: var(--c-ink); color: var(--text-invert); }
 .modal__caption { color: #e8e6e0; font-size: var(--fs-sm); margin-top: var(--sp-3); text-align: center; }
+
+/* Meme raison que .btn--sm : 39 px se visent mal au doigt, et la croix de
+   fermeture est la commande qu'on cherche quand on veut sortir vite. */
+@media (pointer: coarse) {
+  .modal__close { min-width: 44px; min-height: 44px; }
+}

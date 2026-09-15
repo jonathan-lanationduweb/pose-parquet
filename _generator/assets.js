@@ -38,6 +38,48 @@ const {
 
 const DIST = path.join('assets', 'dist');
 
+/**
+ * Feuilles rattachées à une page par un marqueur, et non au site entier.
+ *
+ * Le principe : une feuille de composant ne part dans le paquet global que si
+ * la plupart des pages en ont l'usage. Les cinq ci-dessous n'y étaient pour
+ * personne — 51 Ko sur 151 payés par les 32 pages pour des composants
+ * présents sur une à treize d'entre elles.
+ *
+ * Le rattachement ne se DÉCLARE pas, il se CONSTATE : `layout()` cherche le
+ * marqueur dans le corps de la page. Une déclaration manuelle s'oublie, et
+ * son oubli produit une page sans style que personne ne remarque avant la
+ * mise en ligne ; un marqueur, lui, est le composant lui-même. Si le
+ * composant est là, la feuille est là.
+ *
+ * `verifierRattachements()` referme la boucle en relisant le HTML produit.
+ *
+ * `marqueur` doit apparaître TEL QUEL dans le HTML généré — attribut de
+ * montage de préférence, car c'est ce qui ne peut pas changer sans que le
+ * composant change aussi.
+ */
+const BUNDLES_PAGE = [
+  { nom: 'plan', feuille: 'css/components/visualizer.css', marqueur: 'data-visualizer' },
+  { nom: 'scene', feuille: 'css/components/visualizer-photo.css', marqueur: 'data-vz-preview' },
+  { nom: 'spotlight', feuille: 'css/components/spotlight.css', marqueur: 'class="section spotlight' },
+  { nom: 'formulaire', feuille: 'components/project-form/project-form.css', marqueur: 'data-project-form' },
+];
+
+/*
+ * `css/components/gallery.css` n'est plus dans aucun paquet, et ce n'est pas
+ * un oubli.
+ *
+ * Ses 4,8 Ko décrivaient la grille de vignettes de la page Inspiration, que le
+ * carrousel « pleins feux » a remplacée. Vérifié le 14/09/2026 : aucune des
+ * 32 pages générées ne porte `.gallery` ni `.gallery__*`, et aucun script ne
+ * les pose — `carousel--gallery`, qui existe bien dans le HTML, est stylé par
+ * components/carousel.css et n'a rien à voir. La feuille était donc servie à
+ * tout le site pour zéro élément.
+ *
+ * Le fichier est laissé en place : le supprimer est une décision d'entretien,
+ * pas une optimisation, et il ne coûte plus rien à personne.
+ */
+
 const listFiles = (dir, filter) => {
   const out = [];
   const walk = (current) => {
@@ -115,6 +157,15 @@ function buildAssets(root, { pageCss = [] } = {}) {
   });
   const siteCss = writeHashed(root, 'site', 'css', site);
 
+  /* ---- Feuilles rattachées à une page par marqueur ---- */
+  const pageBundles = BUNDLES_PAGE.map((bundle) => ({
+    ...bundle,
+    // `seen` n'est PAS partagé avec le paquet du site : ces feuilles en ont été
+    // retirées, et un `seen` commun les ferait taire ici aussi — on écrirait
+    // alors des paquets vides sans qu'aucune erreur ne le signale.
+    url: writeHashed(root, bundle.nom, 'css', inlineCss(root, bundle.feuille, new Set())),
+  }));
+
   /* ---- CSS du Visualiseur Parquet (fichier interne : css/studio.css) ---- */
   const studioCss = writeHashed(root, 'studio', 'css', inlineCss(root, 'css/studio.css'));
   /* ---- CSS du Visualiseur produit (css/product.css) ---- */
@@ -146,6 +197,7 @@ function buildAssets(root, { pageCss = [] } = {}) {
 
   manifest = {
     css: siteCss,
+    pageBundles,
     studioCss,
     productCss,
     js: `${jsDir}/js/main.js`,
@@ -166,4 +218,35 @@ function assets() {
   return manifest;
 }
 
-module.exports = { buildAssets, assets };
+/**
+ * Le contrôle qui rend le découpage sûr.
+ *
+ * On relit les pages écrites et on vérifie, pour chaque feuille rattachée, que
+ * la présence du marqueur et la présence du lien sont la MÊME chose. Les deux
+ * sens comptent : un marqueur sans lien donne une page sans style, un lien
+ * sans marqueur donne un téléchargement pour rien.
+ *
+ * C'est ce contrôle, et lui seul, qui autorise à sortir des feuilles du paquet
+ * global. Sans lui, le découpage serait un pari renouvelé à chaque page
+ * ajoutée.
+ *
+ * @param {string} root racine du site
+ * @param {string[]} pages chemins relatifs des pages écrites
+ * @returns {string[]} anomalies, vide si tout concorde
+ */
+function verifierRattachements(root, pages) {
+  const anomalies = [];
+  const bundles = assets().pageBundles || [];
+  pages.forEach((page) => {
+    const html = lireTexte(path.join(root, page));
+    bundles.forEach((bundle) => {
+      const marque = html.includes(bundle.marqueur);
+      const lie = html.includes(bundle.url);
+      if (marque && !lie) anomalies.push(`${page} : porte « ${bundle.marqueur} » sans charger ${bundle.nom}`);
+      if (!marque && lie) anomalies.push(`${page} : charge ${bundle.nom} sans porter « ${bundle.marqueur} »`);
+    });
+  });
+  return anomalies;
+}
+
+module.exports = { buildAssets, assets, verifierRattachements };
