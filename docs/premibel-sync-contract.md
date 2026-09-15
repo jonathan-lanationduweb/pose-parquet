@@ -130,6 +130,43 @@ Premibel produit un fichier, on le récupère (dépôt, S3, URL statique).
 - **fraîcheur** ★★★ — temps réel
 - *bloquant en l'état* : le site est statique
 
+### B bis. Store API WooCommerce (`/wp-json/wc/store/v1/products`) — **relevée le 11/09/2026**
+
+Cette option manquait à la comparaison, et elle change la donne : la Store API
+n'est **pas** l'API d'administration. Elle est publique, en lecture seule, et
+**ne demande aucune clé** — c'est celle que WooCommerce expose pour les
+vitrines découplées.
+
+Relevé effectué sur `www.premibel.fr` :
+
+| Constat | Valeur |
+| --- | --- |
+| Réponse | `HTTP 200`, `application/json`, sans authentification |
+| Volume | `X-WP-Total: 779` produits |
+| Pagination | 100 par page, 8 pages |
+| Attributs | taxonomies structurées : `pa_essence`, `pa_largeur`, `pa_epaisseur`, `pa_finition`, `pa_aspect`, `pa_famille`, `pa_longueur_variable`, `pa_pose`, `pa_qualite` |
+| Identité | `sku`, `slug`, `permalink`, `images[]`, `categories[]` |
+| CORS | **aucun `Access-Control-Allow-Origin`** — un appel depuis le navigateur est donc impossible |
+
+- **simplicité** ★★★ — rien à écrire côté Premibel
+- **sécurité** ★★★ — aucune clé, aucune donnée privée, lecture seule
+- **maintenance** ★★★ — contrat WooCommerce stable et documenté
+- **fraîcheur** ★★★ — temps réel à la construction du site
+- *conséquence de l'absence de CORS* : la récupération se fait **à la
+  construction**, dans un script Node du générateur, et produit un fichier
+  `data/products.premibel.json` servi comme les autres. Ce n'est pas une
+  limite : c'est exactement ce que veut un site statique, et cela rend le
+  catalogue reproductible et versionné.
+
+Cette option supprime l'objection qui rendait B « bloquant en l'état » : il n'y
+a ni clé, ni serveur intermédiaire à prévoir.
+
+**Ce que l'ancien relevé perdait.** Le pilote a été constitué en lisant le
+JSON-LD et un tableau HTML de spécifications. La Store API rend les mêmes
+informations sous forme de taxonomies — `pa_largeur` vaut `"190mm"`, unité
+comprise — au lieu de les faire deviner à une expression régulière sur du
+HTML. C'est la différence entre lire une donnée et l'extraire.
+
 ### C. Endpoint personnalisé côté Premibel
 
 Une route publique en lecture seule qui rend exactement la fiche canonique.
@@ -152,15 +189,24 @@ Une route publique en lecture seule qui rend exactement la fiche canonique.
 
 ### Recommandation
 
-**A pour continuer le pilote, C comme cible.**
+**B bis maintenant, C comme cible** — la recommandation change depuis le relevé
+du 11/09/2026.
 
-A ne demande rien à personne et suffit pour passer de 14 à 100 références.
-C est la seule option qui place le mapping là où vivent les données, et qui
-survit à une refonte de l'un des deux sites — mais elle demande du travail
-côté Premibel et **ne doit pas être lancée sans décision explicite**.
+B bis ne demande rien à personne, elle existe, elle est publique, et elle rend
+les spécifications déjà structurées. Elle remplace A pour la suite du pilote :
+un export déposé à la main aurait la même fraîcheur qu'un fichier oublié, alors
+que la Store API est interrogée à chaque construction du site.
 
-B est écartée tant que pose-parquet.com est statique. D dépend d'informations
-que nous n'avons pas encore.
+C reste la cible : c'est la seule option qui place le mapping là où vivent les
+données, et qui survit à une refonte de l'un des deux sites — mais elle demande
+du travail côté Premibel et **ne doit pas être lancée sans décision explicite**.
+
+A garde un intérêt de secours : si la Store API venait à être fermée, un export
+déposé prend le relais sans rien changer en aval, puisque le format consommé
+reste `data/products.premibel.json`.
+
+B (`wc/v3`) reste écartée : elle demande des clés, et une clé dans un site
+statique est une clé publiée. D dépend d'informations que nous n'avons pas.
 
 ## Ce qui reste à obtenir de Premibel
 
