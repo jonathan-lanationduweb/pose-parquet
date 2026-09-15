@@ -20,7 +20,7 @@ use PoseParquet\Core\Database\Installer;
 use PoseParquet\Core\Rest\Cors;
 use PoseParquet\Core\Rest\Routes;
 use PoseParquet\Core\Security\Capabilities;
-use PoseParquet\Core\Security\Roles;
+use PoseParquet\Core\Security\Hardening;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -40,11 +40,25 @@ final class Plugin {
 		 */
 		Installer::maybe_upgrade();
 
-		// Les droits doivent exister avant que l'admin ou le REST ne les testent.
-		Capabilities::ensure();
-		// Le rôle gestionnaire, pour la même raison : il vit en base et peut avoir
-		// été effacé par un plugin de gestion de rôles ou une restauration.
-		Roles::ensure();
+		/*
+		 * Droits et rôle : posés une fois, pas à chaque requête.
+		 *
+		 * Ils l'étaient auparavant à chaque chargement, au nom de
+		 * l'auto-réparation. Le prix était caché et réel : un administrateur qui
+		 * retirait volontairement `pp_manage_projects` au rôle gestionnaire le
+		 * voyait revenir à la requête suivante, sans message ni trace. Une
+		 * décision d'administration ne doit pas être défaite par le code qu'elle
+		 * administre. La pose est donc versionnée, comme le schéma de base : elle
+		 * ne rejoue qu'à l'activation, à la migration, ou quand le plancher de
+		 * droits change dans le code.
+		 *
+		 * L'auto-réparation n'est pas perdue, elle devient explicite : la page
+		 * « État » montre chaque droit manquant et propose de les réappliquer.
+		 */
+		Capabilities::ensure_once();
+
+		// Ce que WordPress expose de lui-même et dont ce site n'a pas l'usage.
+		Hardening::register();
 
 		add_action( 'rest_api_init', [ Routes::class, 'register' ] );
 		// Liste fermée d'origines pour notre espace REST, à la place du CORS permissif de WordPress.
