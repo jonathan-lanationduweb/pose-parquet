@@ -20,7 +20,7 @@
  * Rien ne quitte le navigateur : la photo est lue localement, le rendu est
  * calculé localement, aucun envoi vers un serveur.
  */
-import { qs, on } from '../utils/dom.js';
+import { qs, on, echapper } from '../utils/dom.js';
 import { analyzeScene, loadSceneIndex, scenesBibliotheque, sceneOuvrable } from '../scene/analyzer.js';
 import { loadImage, loadFile } from '../scene/image-loader.js';
 import { createFloorEditor } from '../scene/editor.js';
@@ -431,13 +431,18 @@ const REGROUPEMENT_MS = 70;
      * à choisir entre cinq pièces qui se ressemblent en vignette.
      */
     const zones = entry.zones > 1 ? `<span class="room-card__zones">${entry.zones} sols visibles</span>` : '';
-    const quoi = entry.highlight ? `<span class="room-card__quoi">${entry.highlight}</span>` : '';
+    const quoi = entry.highlight ? `<span class="room-card__quoi">${echapper(entry.highlight)}</span>` : '';
+    // `label`, `highlight` et `stem` viennent du manifeste des scènes : des
+    // données, donc échappées avant de devenir du HTML — y compris `stem`,
+    // qui atterrit dans deux attributs d'image.
+    const nom = echapper(entry.label);
+    const fichier = encodeURIComponent(stem);
     card.innerHTML = `
       <picture>
-        <source type="image/webp" srcset="${base}assets/images/${stem}-640.webp" />
-        <img src="${base}assets/images/${stem}-640.jpg" alt="${entry.label}" decoding="async" width="640" height="427" />
+        <source type="image/webp" srcset="${base}assets/images/${fichier}-640.webp" />
+        <img src="${base}assets/images/${fichier}-640.jpg" alt="${nom}" decoding="async" width="640" height="427" />
       </picture>
-      <span class="room-card__label">${entry.label}${quoi}${zones}</span>`;
+      <span class="room-card__label">${nom}${quoi}${zones}</span>`;
     card.addEventListener('click', () => openRoom(entry.id));
     roomsHost.appendChild(card);
   });
@@ -673,18 +678,21 @@ const REGROUPEMENT_MS = 70;
     // Lien vers la fiche du fabricant : **seulement** pour une vraie référence.
     // Une matière de démonstration n'a pas de fiche, et prétendre le contraire
     // renverrait vers un produit qui n'est pas celui affiché.
+    // `productUrl` a déjà été filtrée par `lienSur()` au chargement du
+    // catalogue : elle est http(s) ou nulle. Elle est malgré tout échappée
+    // ici, parce qu'elle entre dans un attribut entre guillemets.
     const lien =
       fiche.source === 'premibel' && fiche.productUrl
-        ? `<a class="selected__ref" href="${fiche.productUrl}" target="_blank" rel="noopener">Voir la référence${
-            fiche.sku ? ` <span>${fiche.sku}</span>` : ''
+        ? `<a class="selected__ref" href="${echapper(fiche.productUrl)}" target="_blank" rel="noopener">Voir la référence${
+            fiche.sku ? ` <span>${echapper(fiche.sku)}</span>` : ''
           }</a>`
         : '';
 
     selectedHost.innerHTML = `
       <span class="selected__swatch"></span>
       <span class="selected__text">
-        <strong>${item.name}</strong>
-        <span>${surface} · ${cotes}</span>
+        <strong>${echapper(item.name)}</strong>
+        <span>${echapper(surface)} · ${echapper(cotes)}</span>
         ${lien}
       </span>`;
     const slot = selectedHost.querySelector('.selected__swatch');
@@ -711,7 +719,7 @@ const REGROUPEMENT_MS = 70;
       card.dataset.pattern = pattern.id;
       card.disabled = !allowed;
       card.setAttribute('aria-pressed', String(config.pattern === pattern.id));
-      card.innerHTML = `<span class="tile-card__media"></span><span class="tile-card__label">${pattern.label}</span>`;
+      card.innerHTML = `<span class="tile-card__media"></span><span class="tile-card__label">${echapper(pattern.label)}</span>`;
       if (item) {
         const preview = document.createElement('canvas');
         preview.width = 288;
@@ -876,7 +884,7 @@ const REGROUPEMENT_MS = 70;
       const chip = document.createElement('span');
       chip.className = 'variant';
       chip.title = item.name;
-      chip.innerHTML = `<span class="variant__dot" data-index="${index + 1}"></span><span class="variant__name">${item.name}</span>`;
+      chip.innerHTML = `<span class="variant__dot" data-index="${index + 1}"></span><span class="variant__name">${echapper(item.name)}</span>`;
       const remove = document.createElement('button');
       remove.type = 'button';
       remove.className = 'variant__remove';
