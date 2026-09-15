@@ -79,10 +79,12 @@ final class Installer {
 			return;
 		}
 
-		Capabilities::ensure();
-		// Le rôle « Gestionnaire Pose Parquet » : créé ici, et re-complété à
-		// chaque chargement par Plugin::boot().
-		\PoseParquet\Core\Security\Roles::ensure();
+		/*
+		 * Droits de l'administrateur et rôle « Gestionnaire Pose Parquet ».
+		 * `apply()` pose le plancher et enregistre son numéro : c'est ce numéro
+		 * qui empêchera ensuite toute réécriture à chaque requête.
+		 */
+		Capabilities::apply();
 
 		update_option( self::OPTION_DB_VERSION, POSE_PARQUET_DB_VERSION, true );
 		if ( ! get_option( self::OPTION_INSTALLED_AT ) ) {
