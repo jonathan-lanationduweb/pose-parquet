@@ -18,6 +18,19 @@
  * dans wp-config.php si elle existe, sinon la liste ci-dessous ; puis le
  * filtre `pose_parquet_allowed_origins` pour un ajustement par code.
  *
+ * Le poste de développement n'est PAS dans la liste par défaut. Il l'était :
+ * `http://localhost:5180` était donc autorisé sur toute installation déployée
+ * sans la constante, y compris en production — n'importe quelle page servie
+ * sur ce port de la machine du visiteur pouvait alors appeler l'API et lire
+ * les réponses. Les origines de développement ne s'ajoutent plus que si le
+ * site se déclare comme tel, par `wp_get_environment_type()` — le mécanisme
+ * WordPress prévu pour cela, qui vaut `production` tant que rien ne le
+ * contredit. Un site de recette pose donc, dans son wp-config.php :
+ *
+ *   define( 'WP_ENVIRONMENT_TYPE', 'local' );
+ *
+ * ou déclare explicitement sa liste avec POSE_PARQUET_ALLOWED_ORIGINS.
+ *
  * @package PoseParquet\Core
  */
 
@@ -34,10 +47,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class Cors {
 
 	public const DEFAULT_ORIGINS = [
-		'http://localhost:5180',
 		'https://jonathan-lanationduweb.github.io',
 		'https://pose-parquet.com',
 		'https://www.pose-parquet.com',
+	];
+
+	/**
+	 * Origines du serveur de développement du front (`node serve.js`).
+	 *
+	 * Ajoutées aux origines par défaut uniquement quand le site se déclare
+	 * `local` ou `development`. Jamais en production, où elles ouvriraient
+	 * l'API à toute page servie sur ce port chez le visiteur.
+	 */
+	public const DEV_ORIGINS = [
+		'http://localhost:5180',
+		'http://127.0.0.1:5180',
 	];
 
 	/** GET pour /health et /form-token, POST pour /projects ; jamais PUT/PATCH/DELETE. */
@@ -49,11 +73,34 @@ final class Cors {
 		add_filter( 'rest_pre_serve_request', [ self::class, 'serve' ], 20, 4 );
 	}
 
+	/**
+	 * Liste retenue quand wp-config.php ne déclare rien.
+	 *
+	 * `wp_get_environment_type()` rend `production` par défaut : il faut donc
+	 * une déclaration explicite du site pour que les origines de
+	 * développement entrent dans la liste. Aucun test sur le nom d'hôte, qui
+	 * serait contournable et faux derrière un mandataire.
+	 *
+	 * L'environnement s'injecte, comme l'heure d'émission d'un jeton : la
+	 * fonction WordPress mémorise son résultat et n'est pas filtrable, donc
+	 * sans ce paramètre les quatre cas ne seraient pas vérifiables.
+	 *
+	 * @param string|null $environnement pour les tests ; sinon celui du site
+	 * @return string[]
+	 */
+	public static function defaults( ?string $environnement = null ): array {
+		$environnement ??= function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production';
+
+		return in_array( $environnement, [ 'local', 'development' ], true )
+			? array_merge( self::DEV_ORIGINS, self::DEFAULT_ORIGINS )
+			: self::DEFAULT_ORIGINS;
+	}
+
 	/** @return string[] origines normalisées (schéma + hôte + port), sans doublon */
 	public static function allowed_origins(): array {
 		$origins = defined( 'POSE_PARQUET_ALLOWED_ORIGINS' ) && is_array( POSE_PARQUET_ALLOWED_ORIGINS )
 			? POSE_PARQUET_ALLOWED_ORIGINS
-			: self::DEFAULT_ORIGINS;
+			: self::defaults();
 		$origins = apply_filters( 'pose_parquet_allowed_origins', $origins );
 
 		$propres = [];
