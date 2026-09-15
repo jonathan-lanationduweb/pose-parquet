@@ -41,11 +41,29 @@ export function mountPreview(root) {
   const sceneId = root.dataset.room || 'sejour';
 
   root.classList.add('vzp');
-  root.innerHTML = `
+
+  /*
+   * Le squelette peut déjà être là.
+   *
+   * `_generator/home.js` l'écrit dans le HTML pour que la place soit réservée
+   * avant toute exécution de JavaScript — c'est ce qui supprime les 317 px de
+   * poussée mesurés sur l'accueil. Le réécrire ici les ferait revenir : on
+   * vide et on reconstruit un DOM identique, mais entre les deux la boîte
+   * passe par zéro.
+   *
+   * On ne se contente pas de tester la présence du conteneur : on vérifie que
+   * CHAQUE élément attendu existe. Si le gabarit du générateur venait à
+   * diverger de celui-ci, la condition tombe et on reconstruit tout — un
+   * décalage vaut mieux qu'un composant à moitié câblé.
+   */
+  const CROCHETS = ['[data-stage]', '[data-photo]', '[data-canvas]', '[data-range]', '[data-caption]', '[data-credit]', '[data-chips]'];
+  const squeletteComplet = CROCHETS.every((sel) => root.querySelector(sel));
+
+  if (!squeletteComplet) root.innerHTML = `
     <figure class="vzp__figure">
       <div class="vzp__stage" data-stage>
         <img class="vzp__photo" alt="" width="1600" height="1067" data-photo />
-        <canvas class="vzp__canvas" data-canvas></canvas>
+        <canvas class="vzp__canvas" data-canvas aria-hidden="true"></canvas>
         <span class="vzp__tag vzp__tag--before">Avant</span>
         <span class="vzp__tag vzp__tag--after">Après</span>
         <!-- Course bornée à 3–97 % : le bouton de la poignée est centré sur le
@@ -96,6 +114,7 @@ export function mountPreview(root) {
           .querySelectorAll('[data-chip]')
           .forEach((el) => el.setAttribute('aria-pressed', String(el.dataset.chip === chip.material)));
         setCaption();
+        syncLien();
         draw();
       });
       chips.appendChild(button);
@@ -107,6 +126,37 @@ export function mountPreview(root) {
     const material = catalog.get(current.material);
     const pattern = catalog.patterns.find((item) => item.id === current.pattern);
     if (material && pattern) caption.textContent = `${material.name}, ${pattern.label.toLowerCase()}`;
+  }
+
+  /**
+   * Le lien « Visualiser mon parquet » porte ce que l'aperçu montre.
+   *
+   * Sans cela, le visiteur choisit une teinte et un motif sur l'accueil, clique,
+   * et retrouve le Studio sur sa configuration par défaut : son choix est perdu
+   * entre deux écrans qui parlent pourtant du même parquet.
+   *
+   * Aucun contrat nouveau n'est inventé ici. Ce sont exactement les quatre
+   * paramètres que `js/studio/app.js` lit déjà et que la page Inspiration
+   * utilise pour son « Essayer ce style » :
+   *
+   *   ?piece=<scène>&parquet=<référence>&motif=<motif>&orientation=<degrés>
+   *
+   * L'orientation vaut 0 parce que l'aperçu rend à 0 — on transmet l'état réel,
+   * pas un état souhaitable.
+   */
+  function syncLien() {
+    const liens = document.querySelectorAll('[data-vz-open]');
+    if (!liens.length) return;
+    liens.forEach((lien) => {
+      // `lien.href` est déjà absolu et déjà correct : on ne recompose pas un
+      // chemin, on ajoute seulement des paramètres à celui qui marche.
+      const url = new URL(lien.href, window.location.href);
+      url.searchParams.set('piece', sceneId);
+      url.searchParams.set('parquet', current.material);
+      url.searchParams.set('motif', current.pattern);
+      url.searchParams.set('orientation', '0');
+      lien.setAttribute('href', url.pathname + url.search);
+    });
   }
 
   function draw() {
@@ -123,6 +173,7 @@ export function mountPreview(root) {
       const scene = await analyzeScene({ sceneId, base });
       const prepared = downscale(await loadImage(`${base}assets/images/${scene.image.file}`));
       renderer.setScene(scene, prepared);
+      syncLien();
       photo.src = `${base}assets/images/${scene.image.file}`;
       photo.alt = scene.image.alt;
       if (scene.image.credit) credit.textContent = `Photo : ${scene.image.credit}.`;

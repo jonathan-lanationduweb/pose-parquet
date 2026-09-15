@@ -110,6 +110,46 @@ const key = (material, config) =>
   `${material.id}|${config.pattern}|${config.width || 'auto'}|${config.plankLength || 'auto'}`;
 
 /**
+ * Ébauche : la même tuile, en 320 px, livrée avant la définitive.
+ *
+ * Pourquoi elle existe. Ouvrir un point de Hongrie encore inconnu demandait
+ * 2 168 ms de dessin, 408 ms de lecture de pixels et 39 ms de réductions —
+ * mesuré le 14/09/2026 sur cette machine. Pendant tout ce temps la pièce
+ * restait telle quelle, avec « Préparation du rendu… » pour seule réponse.
+ * Rien n'était bloqué (le travail est dans un worker, zéro tâche longue), mais
+ * deux secondes et demie d'attente devant un choix qu'on vient de faire se
+ * ressentent comme une panne.
+ *
+ * Ce qu'elle change. La même tuile en 320 px coûte 935 ms : le parquet
+ * apparaît donc deux fois et demie plus tôt, à la bonne géométrie, au bon
+ * motif, à la bonne teinte — simplement moins net. La définitive la remplace
+ * dès qu'elle arrive, et la qualité finale est rigoureusement inchangée.
+ *
+ * Ce qu'elle coûte, et il faut le dire : le worker traite ses messages l'un
+ * après l'autre, donc la tuile définitive arrive après l'ébauche et non à sa
+ * place. Sur un point de Hongrie froid, le net est atteint vers 3,5 s au lieu
+ * de 2,6. On échange une seconde sur la fin contre une seconde et demie sur le
+ * début — et c'est le début qu'on regarde.
+ *
+ * Aucune ébauche n'est fabriquée pour un motif qui n'en a pas besoin : en
+ * dessous de SEUIL_EBAUCHE_MS de dessin estimé, la définitive arrive avant que
+ * l'ébauche n'ait servi à quelque chose.
+ */
+const EBAUCHE = 320;
+const SUFFIXE_EBAUCHE = '|ebauche';
+const cleEbauche = (material, config) => key(material, config) + SUFFIXE_EBAUCHE;
+
+/**
+ * Les motifs qui méritent une ébauche.
+ *
+ * Une pose droite se dessine en 48 ms : lui fabriquer une ébauche ajouterait
+ * un aller-retour de worker pour économiser quarante millisecondes qu'on
+ * n'aurait de toute façon pas vues. Le bâton rompu (909 ms) et le point de
+ * Hongrie (2 528 ms) sont les deux seuls au-dessus du seuil.
+ */
+const MOTIFS_LENTS = new Set(['point-de-hongrie', 'baton-rompu']);
+
+/**
  * Relief dérivé de l'albedo.
  *
  * Faute de vraie normal map, on lit le relief dans la luminance de la tuile :
@@ -140,7 +180,9 @@ function assemble(material, tile, albedo0, relief0) {
     relief,
     tile,
     meters: TILE_METERS,
-    size: TILE,
+    // La taille réelle du niveau 0, et non la constante TILE : une ébauche fait
+    // 320 px et couvre les mêmes 4,8 mètres. Annoncer 1 280 ici serait faux.
+    size: albedo0.size,
     surface: material.surface,
     /**
      * Complète la pyramide : à appeler avant tout échantillonnage de niveau > 0.
@@ -215,6 +257,14 @@ function obtenirWorker() {
     const a0 = { size: albedo.size, data: new Uint8ClampedArray(albedo.data.buffer || albedo.data) };
     const r0 = { size: relief.size, data: new Uint8ClampedArray(relief.data.buffer || relief.data) };
     const maps = retenir(attente.cle, assemble(attente.material, null, a0, r0));
+    /*
+     * La définitive chasse son ébauche.
+     *
+     * Sans cette ligne, le cache garderait les deux : deux entrées pour un même
+     * choix dans un cache de douze, donc des évictions deux fois plus fréquentes
+     * et des reconstructions qu'on croyait justement éviter.
+     */
+    if (!attente.ebauche) cache.delete(attente.cle + SUFFIXE_EBAUCHE);
     attente.resolve(maps);
     abonnes.forEach((cb) => { try { cb(attente.cle, maps); } catch { /* un abonné défaillant n'arrête pas les autres */ } });
   };
@@ -256,15 +306,47 @@ export function materialMapsAsync(material, config = {}) {
   if (deja) return deja.promesse;
   const w = obtenirWorker();
   if (!w) return Promise.resolve(materialMaps(material, config));
+
+  /*
+   * L'ébauche part EN PREMIER, et c'est tout l'intérêt.
+   *
+   * Le worker traite ses messages dans l'ordre : poster la définitive d'abord
+   * ferait attendre l'ébauche derrière deux secondes de dessin, c'est-à-dire
+   * exactement l'attente qu'elle est censée supprimer.
+   */
+  if (MOTIFS_LENTS.has(config.pattern || material.defaultPattern)) {
+    posterTuile(w, material, config, true);
+  }
+  return posterTuile(w, material, config, false);
+}
+
+/**
+ * Un message au worker, une promesse.
+ *
+ * @param {Worker} w
+ * @param {object} material
+ * @param {object} config
+ * @param {boolean} ebauche vrai pour la tuile réduite
+ */
+function posterTuile(w, material, config, ebauche) {
+  const cle = ebauche ? cleEbauche(material, config) : key(material, config);
+  if (cache.has(cle)) return Promise.resolve(cache.get(cle));
+  const deja = [...enCours.values()].find((a) => a.cle === cle);
+  if (deja) return deja.promesse;
+
   let resolve; let reject;
   const promesse = new Promise((res, rej) => { resolve = res; reject = rej; });
   const id = (compteur += 1);
-  enCours.set(id, { cle, material, resolve, reject, promesse });
+  enCours.set(id, { cle, material, resolve, reject, promesse, ebauche });
   // Le matériau part en copie structurée : données pures uniquement.
   w.postMessage({
     id,
     material: JSON.parse(JSON.stringify(material)),
-    config: { pattern: config.pattern || material.defaultPattern, width: config.width || null },
+    config: {
+      pattern: config.pattern || material.defaultPattern,
+      width: config.width || null,
+      size: ebauche ? EBAUCHE : undefined,
+    },
   });
   return promesse;
 }
@@ -326,7 +408,17 @@ export function materialMaps(material, config = {}) {
   if (cache.has(id)) return cache.get(id);
   if (obtenirWorker()) {
     materialMapsAsync(material, config);
-    return null;
+    /*
+     * À défaut de la définitive, l'ébauche.
+     *
+     * Elle porte la même géométrie, le même motif et la même teinte, à une
+     * résolution moindre. Le moteur GPU lit `maps.albedo[0].size` et le moteur
+     * logiciel rapporte chaque niveau à TILE : ni l'un ni l'autre ne suppose
+     * une taille fixe, l'ébauche se peint donc correctement, simplement moins
+     * finement. Elle sera remplacée sans clignotement dès que la définitive
+     * arrivera, par le même signal que celui qui a toujours servi.
+     */
+    return cache.get(cleEbauche(material, config)) || null;
   }
 
   // `width` n'est transmis que si l'utilisateur l'a explicitement réglé : sans

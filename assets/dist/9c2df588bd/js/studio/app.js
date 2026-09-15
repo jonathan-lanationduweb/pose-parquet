@@ -20,7 +20,7 @@
  * Rien ne quitte le navigateur : la photo est lue localement, le rendu est
  * calculé localement, aucun envoi vers un serveur.
  */
-import { qs, on } from '../utils/dom.js';
+import { qs, on, echapper } from '../utils/dom.js';
 import { analyzeScene, loadSceneIndex, scenesBibliotheque, sceneOuvrable } from '../scene/analyzer.js';
 import { loadImage, loadFile } from '../scene/image-loader.js';
 import { createFloorEditor } from '../scene/editor.js';
@@ -113,7 +113,22 @@ export async function mountStudio(root) {
       <div class="studio__stage" data-stage>
         <div class="stage__media" data-media>
           <img class="stage__photo" alt="" data-photo />
-          <canvas class="stage__canvas" data-canvas></canvas>
+          <!--
+            Le canevas est la SORTIE de l'outil, et il n'en disait rien.
+
+            Un canevas est opaque à l'assistance technique : il n'a ni texte, ni
+            structure, ni rôle par défaut. Sans libellé, tout le travail du
+            visualiseur — la pièce, le parquet, le motif — n'existait tout
+            simplement pas pour qui n'utilise pas ses yeux.
+
+            « role=img » parce que c'est ce que ce canevas EST du point de vue de
+            la restitution : une image produite, pas une zone interactive (les
+            commandes, elles, sont de vrais boutons à côté). Le libellé est
+            réécrit quand la configuration utile change — jamais à chaque rendu,
+            ce qui bavarderait sans rien apprendre.
+          -->
+          <canvas class="stage__canvas" data-canvas role="img"
+            aria-label="Aperçu du parquet : aucune pièce ouverte pour l’instant."></canvas>
           <div class="stage__ba" data-ba hidden>
             <span class="stage__tag stage__tag--a">Avant</span>
             <span class="stage__tag stage__tag--b">Après</span>
@@ -128,7 +143,7 @@ export async function mountStudio(root) {
         </button>
       </div>
 
-      <aside class="studio__panel">
+      <aside class="studio__panel" id="studio-panneau">
         <button class="panel__grab" type="button" data-sheet-toggle aria-label="Agrandir ou réduire le panneau"></button>
         <div class="panel__head">
           <p class="panel__title" data-panel-title>Choisir un parquet</p>
@@ -230,6 +245,40 @@ export async function mountStudio(root) {
   let attente = null;
   let regroupement = 0;
   const interaction = (nom) => { if (perfActif) { attente = nom; mark(nom); } };
+
+  /**
+   * Témoin de rendu muet.
+   *
+   * L'audit du 14/09/2026 a observé une fois, et une seule, une séquence où
+   * aucun rendu n'arrivait pendant environ 21 secondes après une rafale de
+   * changements — puis tout repartait. Six tentatives de reproduction depuis,
+   * dont quatre ce jour, n'ont rien redonné : le dernier choix gagne toujours,
+   * en une seconde au plus.
+   *
+   * On ne corrige donc rien, faute de cause établie — mais on cesse de compter
+   * sur la chance. Si une demande de rendu reste sans peinture au-delà du
+   * seuil, on le note, avec l'état exact qui permettrait de comprendre.
+   *
+   * Uniquement sous `?perf=1` : en production ce témoin n'existe pas, et il
+   * n'écrit jamais rien dans la console d'un visiteur.
+   */
+  const SEUIL_TEMOIN_MS = 8000;
+  let temoin = 0;
+  const armerTemoin = () => {
+    if (!perfActif) return;
+    window.clearTimeout(temoin);
+    const depuis = performance.now();
+    temoin = window.setTimeout(() => {
+      // eslint-disable-next-line no-console
+      console.warn('[studio] aucun rendu depuis %d ms', Math.round(performance.now() - depuis), {
+        pending,
+        moteurPret: renderer.ready,
+        enAttenteDeCartes: renderer.enAttente,
+        config: { ...config, material: undefined },
+      });
+    }, SEUIL_TEMOIN_MS);
+  };
+  const desarmerTemoin = () => { if (perfActif) window.clearTimeout(temoin); };
   let editor = null;
   /** Zone visée par la correction du sol : la plus proche par défaut. */
   let activeZone = null;
@@ -257,6 +306,36 @@ export async function mountStudio(root) {
    */
   const apresRendu = new Set();
 
+  /**
+   * Ce que le canevas montre, en une phrase.
+   *
+   * Écrit dans `aria-label`, donc lu uniquement quand quelqu'un atteint le
+   * canevas — ce n'est pas une région vivante et rien n'est annoncé
+   * spontanément. Le garde-fou est l'égalité : on ne réécrit l'attribut que si
+   * la phrase a changé, sinon certains lecteurs d'écran relisent l'élément à
+   * chaque rendu, et un outil qui répète « Chêne fumé en point de Hongrie »
+   * trente fois par minute est pire que muet.
+   */
+  let derniereDescription = '';
+  function decrireCanvas() {
+    const item = material();
+    if (!item) return;
+    const motif = catalog.patterns.find((p) => p.id === config.pattern);
+    const parties = [
+      `Aperçu du parquet ${item.name}`,
+      motif ? `en ${motif.label}` : null,
+      sceneLabel ? `dans ${sceneLabel}` : null,
+    ].filter(Boolean);
+    // L'orientation ne se dit que si elle a été changée : « à 0 degré » sur une
+    // pose que personne n'a tournée est du bruit.
+    const phrase = config.angle
+      ? `${parties.join(' ')}, lames orientées à ${config.angle} degrés.`
+      : `${parties.join(' ')}.`;
+    if (phrase === derniereDescription) return;
+    derniereDescription = phrase;
+    canvas.setAttribute('aria-label', phrase);
+  }
+
   function paint() {
     pending = false;
     if (!renderer.ready) return;
@@ -273,6 +352,8 @@ export async function mountStudio(root) {
       return;
     }
     setStatus('');
+    desarmerTemoin();
+    decrireCanvas();
     mark('app:paint:fin');
     // Cet ordre n'est pas indifférent : `mesure` vide le repère de fin
     // derrière elle pour ne pas saturer le tampon du navigateur. La mesure du
@@ -344,8 +425,27 @@ const REGROUPEMENT_MS = 70;
 
   function demandeRendu(draft) {
     window.clearTimeout(regroupement);
+    armerTemoin();
     const mat = material();
-    if (mat && !enCache(mat, paintConfig())) setStatus('Préparation du rendu…');
+    /*
+     * Le regroupement protège une FABRICATION, pas un rendu.
+     *
+     * Les 70 ms d'attente existent pour qu'une rafale de clics ne lance pas
+     * trois constructions de tuile dont deux seront jetées. Quand la tuile
+     * demandée est déjà en cache, il n'y a rien à protéger : le travail
+     * restant se mesure à 13 ms, et attendre 70 ms avant de le faire est une
+     * latence pure, ajoutée à un cas qui devrait être instantané.
+     *
+     * Mesuré avant ce raccourci : 229 ms entre le clic et le pixel sur un
+     * choix déjà connu, dont 216 d'attente. Le regroupement reste entier
+     * pour tout ce qui doit être fabriqué — c'est-à-dire pour le seul cas où
+     * il servait.
+     */
+    if (mat && enCache(mat, paintConfig())) {
+      schedule(draft);
+      return;
+    }
+    setStatus('Préparation du rendu…');
     regroupement = window.setTimeout(() => schedule(draft), REGROUPEMENT_MS);
   }
 
@@ -375,7 +475,7 @@ const REGROUPEMENT_MS = 70;
     });
     const found = CONTEXTS.find((entry) => entry.id === next);
     if (found) panelTitle.textContent = found.title;
-    if (next === 'motifs') syncPatterns();
+    if (next === 'motifs') { syncPatterns(); anticiperMotifs(); }
     if (next === 'orientation') syncOrientation();
     // La pièce change de largeur : le canevas doit se remesurer.
     window.setTimeout(() => schedule(), 300);
@@ -387,6 +487,15 @@ const REGROUPEMENT_MS = 70;
     button.className = 'context-btn';
     button.dataset.context = entry.id;
     button.setAttribute('aria-pressed', 'false');
+    /*
+     * `aria-controls` : « ce bouton commande CE panneau ».
+     *
+     * `aria-pressed` disait déjà lequel est actif, mais pas ce qu'il ouvre. Le
+     * panneau change de contenu sans changer de place ni de titre annoncé : la
+     * relation entre le bouton et la zone qui vient de se remplir n'était donc
+     * déductible que visuellement.
+     */
+    button.setAttribute('aria-controls', 'studio-panneau');
     button.textContent = entry.label;
     button.addEventListener('click', () => setContext(entry.id));
     contextsHost.appendChild(button);
@@ -431,13 +540,18 @@ const REGROUPEMENT_MS = 70;
      * à choisir entre cinq pièces qui se ressemblent en vignette.
      */
     const zones = entry.zones > 1 ? `<span class="room-card__zones">${entry.zones} sols visibles</span>` : '';
-    const quoi = entry.highlight ? `<span class="room-card__quoi">${entry.highlight}</span>` : '';
+    const quoi = entry.highlight ? `<span class="room-card__quoi">${echapper(entry.highlight)}</span>` : '';
+    // `label`, `highlight` et `stem` viennent du manifeste des scènes : des
+    // données, donc échappées avant de devenir du HTML — y compris `stem`,
+    // qui atterrit dans deux attributs d'image.
+    const nom = echapper(entry.label);
+    const fichier = encodeURIComponent(stem);
     card.innerHTML = `
       <picture>
-        <source type="image/webp" srcset="${base}assets/images/${stem}-640.webp" />
-        <img src="${base}assets/images/${stem}-640.jpg" alt="${entry.label}" decoding="async" width="640" height="427" />
+        <source type="image/webp" srcset="${base}assets/images/${fichier}-640.webp" />
+        <img src="${base}assets/images/${fichier}-640.jpg" alt="${nom}" decoding="async" width="640" height="427" />
       </picture>
-      <span class="room-card__label">${entry.label}${quoi}${zones}</span>`;
+      <span class="room-card__label">${nom}${quoi}${zones}</span>`;
     card.addEventListener('click', () => openRoom(entry.id));
     roomsHost.appendChild(card);
   });
@@ -673,18 +787,21 @@ const REGROUPEMENT_MS = 70;
     // Lien vers la fiche du fabricant : **seulement** pour une vraie référence.
     // Une matière de démonstration n'a pas de fiche, et prétendre le contraire
     // renverrait vers un produit qui n'est pas celui affiché.
+    // `productUrl` a déjà été filtrée par `lienSur()` au chargement du
+    // catalogue : elle est http(s) ou nulle. Elle est malgré tout échappée
+    // ici, parce qu'elle entre dans un attribut entre guillemets.
     const lien =
       fiche.source === 'premibel' && fiche.productUrl
-        ? `<a class="selected__ref" href="${fiche.productUrl}" target="_blank" rel="noopener">Voir la référence${
-            fiche.sku ? ` <span>${fiche.sku}</span>` : ''
+        ? `<a class="selected__ref" href="${echapper(fiche.productUrl)}" target="_blank" rel="noopener">Voir la référence${
+            fiche.sku ? ` <span>${echapper(fiche.sku)}</span>` : ''
           }</a>`
         : '';
 
     selectedHost.innerHTML = `
       <span class="selected__swatch"></span>
       <span class="selected__text">
-        <strong>${item.name}</strong>
-        <span>${surface} · ${cotes}</span>
+        <strong>${echapper(item.name)}</strong>
+        <span>${echapper(surface)} · ${echapper(cotes)}</span>
         ${lien}
       </span>`;
     const slot = selectedHost.querySelector('.selected__swatch');
@@ -698,8 +815,65 @@ const REGROUPEMENT_MS = 70;
   /* ---------------- Contexte : motifs ---------------- */
 
   const patternsView = qs('[data-view="motifs"]', root);
+  /**
+   * Ouvrir le panneau « Motifs » est déjà une décision.
+   *
+   * On n'y vient pas par hasard : on y vient pour changer de motif. C'est donc
+   * le bon moment pour fabriquer d'avance les tuiles des motifs compatibles,
+   * pendant que le visiteur regarde les aperçus — trois secondes de lecture
+   * qui, jusqu'ici, ne servaient à rien.
+   *
+   * Le travail part dans le worker, comme tout le reste : le fil principal
+   * n'en voit rien, et un clic pendant la fabrication reste instantané.
+   *
+   * `warmMaterial` attend une période d'inactivité pour lancer chaque tuile,
+   * et n'a pas de délai de garde : si le navigateur ne trouve jamais de répit,
+   * rien n'est fabriqué d'avance et le comportement redevient celui d'avant.
+   * Aucune régression possible, donc — seulement une attente évitée quand la
+   * machine en a les moyens.
+   */
+  function anticiperMotifs() {
+    const item = material();
+    if (!item) return;
+    item.compatiblePatterns.forEach((pattern) => {
+      if (pattern === config.pattern) return; // déjà à l'écran
+      warmMaterial(item, { ...config, pattern });
+    });
+  }
+
   function syncPatterns() {
     const item = material();
+
+    /*
+     * Panneau fermé : on met à jour l'état, pas la grille.
+     *
+     * Chaque changement de motif rappelait cette fonction, qui vide la grille,
+     * recrée une vignette par motif et relance un aperçu pour chacune — même
+     * quand le panneau n'est pas à l'écran. Mesuré : 160 ms entre le clic et le
+     * pixel sur un motif DÉJÀ en cache, dont 13 de rendu réel. Tout le reste
+     * était cette reconstruction invisible.
+     *
+     * L'état des vignettes reste juste : `aria-pressed` est mis à jour sur
+     * celles qui existent déjà, et l'ouverture du panneau reconstruit tout de
+     * toute façon.
+     */
+    /*
+     * La grille ne dépend que du MATÉRIAU ; seul `aria-pressed` dépend du motif
+     * choisi. La reconstruire à chaque clic revenait donc à tout jeter pour
+     * changer un attribut — et à le faire même panneau fermé.
+     */
+    const grilleAJour = patternsView.dataset.pour === (item ? item.id : '') && patternsView.querySelector('[data-pattern]');
+    if (grilleAJour || root.dataset.panel !== 'motifs') {
+      patternsView.querySelectorAll('[data-pattern]').forEach((carte) => {
+        carte.setAttribute('aria-pressed', String(carte.dataset.pattern === config.pattern));
+      });
+      const note = patternsView.querySelector('[data-waste]');
+      const motif = catalog.patterns.find((entry) => entry.id === config.pattern);
+      if (note && motif) note.textContent = `Chutes ${motif.waste} selon la pièce et le calepinage.`;
+      return;
+    }
+
+    patternsView.dataset.pour = item ? item.id : '';
     patternsView.innerHTML = '';
     const grid = document.createElement('div');
     grid.className = 'tile-grid';
@@ -711,7 +885,7 @@ const REGROUPEMENT_MS = 70;
       card.dataset.pattern = pattern.id;
       card.disabled = !allowed;
       card.setAttribute('aria-pressed', String(config.pattern === pattern.id));
-      card.innerHTML = `<span class="tile-card__media"></span><span class="tile-card__label">${pattern.label}</span>`;
+      card.innerHTML = `<span class="tile-card__media"></span><span class="tile-card__label">${echapper(pattern.label)}</span>`;
       if (item) {
         const preview = document.createElement('canvas');
         preview.width = 288;
@@ -736,6 +910,7 @@ const REGROUPEMENT_MS = 70;
     if (current) {
       const note = document.createElement('p');
       note.className = 'drawer__hint';
+      note.dataset.waste = '';
       note.style.marginTop = '0.6rem';
       note.textContent = `Chutes ${current.waste} selon la pièce et le calepinage.`;
       patternsView.appendChild(note);
@@ -876,7 +1051,7 @@ const REGROUPEMENT_MS = 70;
       const chip = document.createElement('span');
       chip.className = 'variant';
       chip.title = item.name;
-      chip.innerHTML = `<span class="variant__dot" data-index="${index + 1}"></span><span class="variant__name">${item.name}</span>`;
+      chip.innerHTML = `<span class="variant__dot" data-index="${index + 1}"></span><span class="variant__name">${echapper(item.name)}</span>`;
       const remove = document.createElement('button');
       remove.type = 'button';
       remove.className = 'variant__remove';

@@ -4,13 +4,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Poser un parquet dans le sens de la lumière | Pose Parquet</title>
-    <meta name="description" content="Pourquoi la règle du sens de la lumière fonctionne, dans quels cas elle ne s'applique pas, et comment repérer la bonne direction dans une pièce à plusieurs ouvertures." />
-    <!-- Balise robots toujours explicite, et toujours en « index, follow » :
-         les fichiers du dépôt décrivent la production. C'est le déploiement qui
-         la remplace par « noindex, nofollow » tant que le site est servi sur une
-         adresse de préproduction — voir .github/workflows/deploy-pages.yml et
-         docs/seo-environnements.md. Un noindex écrit ici finirait tôt ou tard
-         copié en production. -->
+    <meta name="description" content="Pourquoi la règle du sens de la lumière fonctionne, quand elle ne s'applique pas, et comment trancher dans une pièce à plusieurs ouvertures." />
+    <!-- Balise robots toujours explicite. Sa valeur par défaut est « index,
+         follow » : les fichiers du dépôt décrivent la production, et c'est le
+         déploiement qui marque une préproduction — voir
+         .github/workflows/deploy-pages.yml et docs/seo-environnements.md. Un
+         noindex écrit ici par prudence finirait tôt ou tard copié en production.
+
+         Une page peut cependant demander autre chose par « page.robots », et
+         une seule le fait : la 404. Elle n'est pas une préproduction, elle n'a
+         simplement rien à indexer — c'est un état d'erreur, pas un contenu. -->
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://pose-parquet.com/guides/poser-parquet-sens-de-la-lumiere.html" />
     <meta name="theme-color" content="#f2efe8" />
@@ -18,7 +21,7 @@
     <meta property="og:site_name" content="Pose Parquet" />
     <meta property="og:locale" content="fr_FR" />
     <meta property="og:title" content="Poser un parquet dans le sens de la lumière | Pose Parquet" />
-    <meta property="og:description" content="Pourquoi la règle du sens de la lumière fonctionne, dans quels cas elle ne s'applique pas, et comment repérer la bonne direction dans une pièce à plusieurs ouvertures." />
+    <meta property="og:description" content="Pourquoi la règle du sens de la lumière fonctionne, quand elle ne s'applique pas, et comment trancher dans une pièce à plusieurs ouvertures." />
     <meta property="og:url" content="https://pose-parquet.com/guides/poser-parquet-sens-de-la-lumiere.html" />
     <meta property="og:image" content="https://pose-parquet.com/assets/images/og-default.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -29,10 +32,11 @@
     <link rel="manifest" href="../site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-400-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../assets/dist/site.94531f4bb7.css" />
-    <script type="module" src="../assets/dist/01b4cee106/js/main.js"></script>
+    <link rel="stylesheet" href="../assets/dist/site.eebc748a4b.css" />
+    <link rel="stylesheet" href="../assets/dist/plan.e01e201ce7.css" />
+    <script type="module" src="../assets/dist/9c2df588bd/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/index.html"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://pose-parquet.com/guides/"},{"@type":"ListItem","position":3,"name":"Poser un parquet dans le sens de la lumière","item":"https://pose-parquet.com/"}]}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Poser un parquet dans le sens de la lumière","description":"Pourquoi la règle du sens de la lumière fonctionne, dans quels cas elle ne s'applique pas, et comment repérer la bonne direction dans une pièce à plusieurs ouvertures.","inLanguage":"fr-FR","datePublished":"2026-08-20","dateModified":"2026-08-20","author":{"@type":"Organization","name":"Pose Parquet","url":"https://pose-parquet.com/a-propos/"},"publisher":{"@type":"Organization","name":"Pose Parquet"},"mainEntityOfPage":"https://pose-parquet.com/guides/poser-parquet-sens-de-la-lumiere.html"}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Poser un parquet dans le sens de la lumière","description":"Pourquoi la règle du sens de la lumière fonctionne, quand elle ne s'applique pas, et comment trancher dans une pièce à plusieurs ouvertures.","inLanguage":"fr-FR","datePublished":"2026-08-20","dateModified":"2026-08-20","author":{"@type":"Organization","name":"Pose Parquet","url":"https://pose-parquet.com/a-propos/"},"publisher":{"@type":"Organization","name":"Pose Parquet"},"mainEntityOfPage":"https://pose-parquet.com/guides/poser-parquet-sens-de-la-lumiere.html"}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Que signifie exactement « dans le sens de la lumière » ?","acceptedAnswer":{"@type":"Answer","text":"Les lames sont posées perpendiculairement au mur qui porte la fenêtre, donc parallèlement à la direction des rayons qui entrent dans la pièce."}},{"@type":"Question","name":"Et si la pièce a des fenêtres sur deux murs ?","acceptedAnswer":{"@type":"Answer","text":"Retenez l'ouverture qui apporte la lumière la plus rasante et la plus durable dans la journée, souvent la plus grande ou celle exposée au sud. Les autres critères, proportions et axe d'entrée, départagent ensuite."}},{"@type":"Question","name":"La règle vaut-elle pour un parquet mat ?","acceptedAnswer":{"@type":"Answer","text":"Elle compte moins. Une finition très mate et peu texturée renvoie peu de lumière rasante : les joints se voient nettement moins, et les autres critères prennent le dessus."}}]}</script>
   </head>
   <body class="page">

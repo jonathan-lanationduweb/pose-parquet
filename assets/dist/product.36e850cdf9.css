@@ -92,6 +92,48 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* ==================================================================== */
+/* Ce qui est deja fait, et ce qui reste possible                        */
+/* ==================================================================== */
+/*
+ * Releve du 14/09/2026.
+ *
+ * Le sous-ensemblement EXISTE deja : chaque face est declaree deux fois avec
+ * un `unicode-range`, une fois pour le latin de base et une fois pour le latin
+ * etendu. Le francais — accents, oe lie, guillemets, apostrophe typographique,
+ * euro — tient entierement dans la premiere plage. Les fichiers « latin
+ * etendu » (instrument-serif-400-0 et -2, inter-400-0, inter-500-2,
+ * inter-600-4) ne sont donc JAMAIS telecharges sur ce site, bien qu'ils pesent
+ * 316 des 467 Ko presents sur le disque.
+ *
+ * Ce qui part reellement au navigateur :
+ *
+ *   inter-400-1               48 Ko
+ *   inter-500-3               48 Ko
+ *   inter-600-5               48 Ko
+ *   instrument-serif-400-3    21 Ko
+ *   instrument-serif-400-italic-1  22 Ko   (pages avec un titre en italique)
+ *   ------------------------------------
+ *   165 a 187 Ko
+ *
+ * Sous-ensembler davantage — ne garder que les caracteres presents dans les
+ * textes du site — demanderait fonttools/pyftsubset dans la chaine de
+ * construction. Ce n'est PAS fait, et volontairement : le site n'a aucune
+ * dependance de construction aujourd'hui, le gain porterait sur des glyphes
+ * qu'un contenu futur pourrait employer, et une police amputee se remarque le
+ * jour ou quelqu'un ecrit un mot avec un caractere absent.
+ *
+ * Le vrai levier restant est ailleurs : une police VARIABLE Inter couvrant
+ * 400 a 600 remplacerait trois fichiers de 48 Ko par un seul d'environ 60 Ko,
+ * soit ~85 Ko de moins. Cela demande de changer ce que fetch-fonts.js
+ * telecharge et de revoir le rendu ; c'est une decision, pas un reglage.
+ *
+ * Corrige en revanche ce jour : quatre declarations `font-weight: 700`
+ * visaient une graisse qui n'est pas chargee. Le navigateur la SYNTHETISAIT en
+ * epaississant le 600 — un faux gras, plus lourd et moins net que le vrai.
+ * Elles demandent maintenant 600, la graisse qui existe.
+ */
+
 
 /* =========================================================
    Design tokens — Pose Parquet
@@ -179,7 +221,22 @@
   --sp-7: 3rem;
   --sp-8: 4.5rem;
   --sp-9: 6.5rem;
-  --section-y: clamp(4.5rem, 2rem + 8vw, 10rem);
+  /**
+   * Respiration verticale d'une section.
+   *
+   * Elle valait clamp(4.5rem, 2rem + 8vw, 10rem) : 147 px de chaque côté à
+   * 1440, 160 à 1920. Deux sections voisines mettaient donc 320 px de vide
+   * entre leurs contenus, et 392 avec la marge d'un en-tête de section —
+   * mesuré sur /tutoriels/ en 1920 x 1080 : un trou continu de 396 px entre
+   * le dernier bouton d'une section et le titre de la suivante. À l'écran,
+   * cela ne se lit pas comme de l'air, mais comme une page qui s'est arrêtée.
+   *
+   * La pente compte autant que le plafond : 8vw faisait grossir le vide plus
+   * vite que le texte, si bien que le défaut empirait précisément là où
+   * l'écran est le plus large. 4vw suit mieux la mesure de lecture, et le
+   * plafond tombe à 6rem.
+   */
+  --section-y: clamp(3.25rem, 1.5rem + 4vw, 6rem);
 
   /* ---- Grille ---- */
   --wrap: 1180px;
@@ -224,8 +281,18 @@
   --dur-3: 520ms;
   --dur-4: 900ms;
 
+  /* ---- En-tête ----
+   * Hauteur calculée, pas estimée. `--header-h` valait 76px en dur ; mesuré, le
+   * header fait 72,8 px à 320 de large et 89,6 px au-delà de 1600. Il se
+   * décompose exactement en `contenu + 2 × padding` : le contenu est constant
+   * (44 à 44,75 px), le padding est fluide et fait toute la variation. On nomme
+   * donc le padding, `.site-header` l'utilise, et la hauteur s'en déduit — les
+   * deux ne peuvent plus diverger. 2,8rem = la mesure arrondie au-dessus, pour
+   * que le dégagement ne soit jamais court (marge : 0,8 px au pire). */
+  --header-pad: clamp(0.9rem, 0.6rem + 0.8vw, 1.4rem);
+  --header-h: calc(2.8rem + 2 * var(--header-pad));
+
   /* ---- Divers ---- */
-  --header-h: 76px;
   --z-header: 100;
   --z-drawer: 200;
   --z-modal: 300;
@@ -366,7 +433,9 @@ body.app--product {
 .pv__brand { display: flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; margin-right: auto; }
 .pv__mark { width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-size: 13px; }
 .pv__name b { display: block; font: 500 18px/1 var(--font-display); letter-spacing: -0.01em; }
-.pv__name small { display: block; font-size: 11px; color: var(--ink-3); margin-top: 3px; letter-spacing: 0.01em; }
+/* 0,75rem plutôt que 11px : un pixel en dur ignore le réglage de taille de
+   texte du navigateur, et cette ligne se lit — ce n'est pas un ornement. */
+.pv__name small { display: block; font-size: 0.75rem; color: var(--ink-3); margin-top: 3px; letter-spacing: 0.01em; }
 .hbtn {
   display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px;
   border-radius: 10px; font-size: 14px; color: var(--ink-2);
@@ -374,7 +443,9 @@ body.app--product {
 }
 .hbtn:hover { background: rgba(28, 28, 26, 0.05); color: var(--ink); }
 .hbtn--icon { width: 36px; padding: 0; justify-content: center; }
-.hbtn .cnt { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent); color: #fff; font-size: 11px; display: grid; place-items: center; }
+/* Pastille de comptage : elle reste petite — elle tient dans 18 px — mais en
+   rem, donc elle suit le réglage du navigateur au lieu de l'ignorer. */
+.hbtn .cnt { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent); color: #fff; font-size: 0.6875rem; display: grid; place-items: center; }
 .hbtn[aria-pressed="true"] { color: var(--accent); }
 
 /* ---------------- Scène ---------------- */

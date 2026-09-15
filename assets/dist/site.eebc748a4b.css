@@ -92,6 +92,48 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* ==================================================================== */
+/* Ce qui est deja fait, et ce qui reste possible                        */
+/* ==================================================================== */
+/*
+ * Releve du 14/09/2026.
+ *
+ * Le sous-ensemblement EXISTE deja : chaque face est declaree deux fois avec
+ * un `unicode-range`, une fois pour le latin de base et une fois pour le latin
+ * etendu. Le francais — accents, oe lie, guillemets, apostrophe typographique,
+ * euro — tient entierement dans la premiere plage. Les fichiers « latin
+ * etendu » (instrument-serif-400-0 et -2, inter-400-0, inter-500-2,
+ * inter-600-4) ne sont donc JAMAIS telecharges sur ce site, bien qu'ils pesent
+ * 316 des 467 Ko presents sur le disque.
+ *
+ * Ce qui part reellement au navigateur :
+ *
+ *   inter-400-1               48 Ko
+ *   inter-500-3               48 Ko
+ *   inter-600-5               48 Ko
+ *   instrument-serif-400-3    21 Ko
+ *   instrument-serif-400-italic-1  22 Ko   (pages avec un titre en italique)
+ *   ------------------------------------
+ *   165 a 187 Ko
+ *
+ * Sous-ensembler davantage — ne garder que les caracteres presents dans les
+ * textes du site — demanderait fonttools/pyftsubset dans la chaine de
+ * construction. Ce n'est PAS fait, et volontairement : le site n'a aucune
+ * dependance de construction aujourd'hui, le gain porterait sur des glyphes
+ * qu'un contenu futur pourrait employer, et une police amputee se remarque le
+ * jour ou quelqu'un ecrit un mot avec un caractere absent.
+ *
+ * Le vrai levier restant est ailleurs : une police VARIABLE Inter couvrant
+ * 400 a 600 remplacerait trois fichiers de 48 Ko par un seul d'environ 60 Ko,
+ * soit ~85 Ko de moins. Cela demande de changer ce que fetch-fonts.js
+ * telecharge et de revoir le rendu ; c'est une decision, pas un reglage.
+ *
+ * Corrige en revanche ce jour : quatre declarations `font-weight: 700`
+ * visaient une graisse qui n'est pas chargee. Le navigateur la SYNTHETISAIT en
+ * epaississant le 600 — un faux gras, plus lourd et moins net que le vrai.
+ * Elles demandent maintenant 600, la graisse qui existe.
+ */
+
 
 /* =========================================================
    Design tokens — Pose Parquet
@@ -179,7 +221,22 @@
   --sp-7: 3rem;
   --sp-8: 4.5rem;
   --sp-9: 6.5rem;
-  --section-y: clamp(4.5rem, 2rem + 8vw, 10rem);
+  /**
+   * Respiration verticale d'une section.
+   *
+   * Elle valait clamp(4.5rem, 2rem + 8vw, 10rem) : 147 px de chaque côté à
+   * 1440, 160 à 1920. Deux sections voisines mettaient donc 320 px de vide
+   * entre leurs contenus, et 392 avec la marge d'un en-tête de section —
+   * mesuré sur /tutoriels/ en 1920 x 1080 : un trou continu de 396 px entre
+   * le dernier bouton d'une section et le titre de la suivante. À l'écran,
+   * cela ne se lit pas comme de l'air, mais comme une page qui s'est arrêtée.
+   *
+   * La pente compte autant que le plafond : 8vw faisait grossir le vide plus
+   * vite que le texte, si bien que le défaut empirait précisément là où
+   * l'écran est le plus large. 4vw suit mieux la mesure de lecture, et le
+   * plafond tombe à 6rem.
+   */
+  --section-y: clamp(3.25rem, 1.5rem + 4vw, 6rem);
 
   /* ---- Grille ---- */
   --wrap: 1180px;
@@ -224,8 +281,18 @@
   --dur-3: 520ms;
   --dur-4: 900ms;
 
+  /* ---- En-tête ----
+   * Hauteur calculée, pas estimée. `--header-h` valait 76px en dur ; mesuré, le
+   * header fait 72,8 px à 320 de large et 89,6 px au-delà de 1600. Il se
+   * décompose exactement en `contenu + 2 × padding` : le contenu est constant
+   * (44 à 44,75 px), le padding est fluide et fait toute la variation. On nomme
+   * donc le padding, `.site-header` l'utilise, et la hauteur s'en déduit — les
+   * deux ne peuvent plus diverger. 2,8rem = la mesure arrondie au-dessus, pour
+   * que le dégagement ne soit jamais court (marge : 0,8 px au pire). */
+  --header-pad: clamp(0.9rem, 0.6rem + 0.8vw, 1.4rem);
+  --header-h: calc(2.8rem + 2 * var(--header-pad));
+
   /* ---- Divers ---- */
-  --header-h: 76px;
   --z-header: 100;
   --z-drawer: 200;
   --z-modal: 300;
@@ -348,6 +415,12 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 
 .section { padding-block: var(--section-y); position: relative; }
 .section--flush-top { padding-top: 0; }
+/* Première section d'une page, sans hero ni fil d'Ariane devant elle pour
+   dégager l'en-tête fixe. Seule la 404 est dans ce cas, et son « Erreur 404 »
+   passait dessous sur 9 formats sur 11. On ajoute la hauteur de l'en-tête au
+   rythme normal, rien de plus : l'écart visible vaut alors `--section-y`, comme
+   entre deux sections ailleurs. */
+.section--below-header { padding-top: calc(var(--header-h) + var(--section-y)); }
 .section--tight { padding-block: clamp(3rem, 1.5rem + 5vw, 6rem); }
 /**
  * Trois poids de section, pas un seul.
@@ -420,7 +493,10 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 .mono { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; }
 
 /* En-tête de section : titre large + accroche décalée */
-.section-head { margin-bottom: clamp(2.5rem, 1.5rem + 3vw, 4.5rem); }
+/* 72 px séparaient un titre de section de son contenu à 1920. Ajoutés aux
+   deux marges de section, ils portaient le vide entre deux sections à près de
+   400 px. L'en-tête doit annoncer ce qui suit, pas s'en éloigner. */
+.section-head { margin-bottom: clamp(1.75rem, 1.1rem + 2vw, 3rem); }
 .section-head__row {
   display: grid;
   gap: var(--sp-5);
@@ -517,7 +593,8 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: var(--z-header);
-  padding-block: clamp(0.9rem, 0.6rem + 0.8vw, 1.4rem);
+  /* Le jeton dont `--header-h` se déduit : voir tokens.css. */
+  padding-block: var(--header-pad);
   color: var(--text);
   transition: background var(--dur-3) var(--ease-out), color var(--dur-3) var(--ease-out),
               box-shadow var(--dur-3) var(--ease-out), padding var(--dur-3) var(--ease-out);
@@ -987,6 +1064,22 @@ body[data-drawer-open="true"] { overflow: hidden; }
 .icon-btn:disabled { opacity: 0.3; cursor: default; }
 .icon-btn--light { border-color: rgba(255,255,255,0.4); color: #fff; }
 .icon-btn--light:hover:not(:disabled) { background: #fff; color: var(--c-ink); border-color: #fff; }
+
+/**
+ * Cible tactile du petit bouton.
+ *
+ * `.btn--sm` mesure 37 px de haut, ce qui est juste au bureau et trop court au
+ * doigt. Les autres commandes du site avaient deja leur regle sous
+ * `pointer: coarse` — le rail de motifs, les segments, les pastilles de teinte,
+ * les puces du formulaire — mais pas celle-ci, releve le 14/09/2026 sur
+ * l'accueil et le Mode Plan.
+ *
+ * 44 px : la cible de reference, et la meme valeur que partout ailleurs. Rien
+ * ne change au pointeur fin, ou 37 px se visent tres bien.
+ */
+@media (pointer: coarse) {
+  .btn--sm { min-height: 44px; }
+}
 
 
 /* Badges et etiquettes de categorie */
@@ -1532,7 +1625,15 @@ body[data-drawer-open="true"] { overflow: hidden; }
 
 .hero__inner {
   width: 100%;
-  padding-block: clamp(2.5rem, 1rem + 6vw, 6rem) clamp(2.5rem, 1rem + 4vw, 4.5rem);
+  /*
+   * Le `max()` en tête n'est pas une précaution de style : mesuré à 320 et
+   * 360 px de large, la ligne « Guides · Motifs · Outils » commençait à 64 px
+   * du haut alors que l'en-tête fixe descend à 73 — ses neuf premiers pixels
+   * passaient dessous. La marge du haut ne peut donc pas dépendre seulement
+   * d'une part de la largeur : elle doit d'abord dégager la hauteur de
+   * l'en-tête, quelle que soit la fenêtre.
+   */
+  padding-block: max(clamp(2.5rem, 1rem + 6vw, 6rem), calc(var(--header-h) + 1.5rem)) clamp(2.5rem, 1rem + 4vw, 4.5rem);
   display: grid;
   gap: clamp(1.75rem, 1rem + 2.5vw, 3rem);
 }
@@ -2025,165 +2126,6 @@ body[data-drawer-open="true"] { overflow: hidden; }
 @keyframes tab-in { from { opacity: 0; transform: translateY(6px); } }
 
 
-/**
- * Galerie d'inspiration.
- *
- * **Une alternance stricte, pas quatre ratios qui tournent.**
- *
- * La version précédente faisait cycler quatre formats — 3/4, 1/1, 4/5, 5/6 —
- * dans une grille dont le nombre de colonnes variait avec la largeur. Le cycle
- * de quatre et la grille de deux ou trois colonnes ne retombaient jamais au
- * même endroit : selon la fenêtre, une carte se retrouvait seule et minuscule,
- * les hauteurs de rangée sautaient, et les boutons « Essayer ce style » ne
- * s'alignaient plus. L'intention était là, le résultat se lisait comme un
- * accident.
- *
- * Ici, la variété est assumée mais **régulière** : une grille de douze colonnes,
- * une rangée = deux photos, la large occupe sept colonnes et l'étroite cinq, en
- * alternance stricte. Toutes les rangées ont exactement la même hauteur, donc
- * les légendes et les appels à l'action sont alignés d'une rangée à l'autre ;
- * l'asymétrie, elle, est dans la largeur. Ce n'est ni une grille plate ni un
- * masonry approximatif : c'est un rythme qu'on peut nommer.
- */
-.gallery {
-  display: grid;
-  gap: clamp(1rem, 0.6rem + 1.2vw, 1.75rem);
-  grid-template-columns: minmax(0, 1fr);
-}
-
-@media (min-width: 48rem) {
-  .gallery {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    /* Hauteur de rangée commune : c'est elle qui garantit l'alignement. */
-    grid-auto-rows: clamp(16rem, 26vw, 24rem);
-  }
-  .gallery__item { grid-column: span 6; }
-}
-
-@media (min-width: 62rem) {
-  .gallery__item:nth-child(odd) { grid-column: span 7; }
-  .gallery__item:nth-child(even) { grid-column: span 5; }
-  .gallery { grid-auto-rows: clamp(19rem, 27vw, 27rem); }
-}
-
-.gallery__zoom {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: zoom-in;
-}
-
-/**
- * Carte essayable : la vignette entière est un lien vers le Studio.
- *
- * Elle couvre la carte, donc la zone tactile fait la taille de la carte —
- * c'est ce qui rend l'action atteignable au doigt sans viser la pastille.
- * Le curseur distingue les deux familles de cartes avant même le survol :
- * `pointer` mène au Studio, `zoom-in` agrandit la photo.
- */
-.gallery__open {
-  position: absolute;
-  inset: 0;
-  display: block;
-  cursor: pointer;
-}
-.gallery__item--try { cursor: pointer; }
-
-/* Survol discret : la photo respire, un liséré apparaît. Rien de plus — la
-   direction artistique de la page ne change pas pour un état d'interaction. */
-.gallery__item--try::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  border: 2px solid transparent;
-  border-radius: inherit;
-  pointer-events: none;
-  transition: border-color var(--dur-3) var(--ease-out);
-}
-.gallery__item--try:hover::after { border-color: rgba(255, 255, 255, 0.55); }
-.gallery__open:focus-visible { outline: 3px solid #fff; outline-offset: -5px; }
-
-.gallery__item {
-  position: relative;
-  display: block;
-  width: 100%;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  border-radius: var(--r-md);
-  overflow: hidden;
-  background: var(--c-mineral);
-  cursor: zoom-in;
-  color: #fff;
-  text-align: left;
-}
-/* Sur une colonne, la hauteur de rangée ne s'applique pas : on redonne un
-   ratio, unique, pour que le défilement reste régulier. */
-@media (max-width: 47.99rem) {
-  .gallery__item { aspect-ratio: 4 / 5; }
-}
-
-.gallery__item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform var(--dur-4) var(--ease-out);
-}
-.gallery__item:hover img { transform: scale(1.04); }
-
-.gallery__caption {
-  position: absolute;
-  inset: auto 0 0 0;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.3rem;
-  padding: 3rem 1.15rem 1.15rem;
-  background: linear-gradient(to top, rgba(12,14,15,0.88), rgba(12,14,15,0.35) 55%, transparent);
-  font-size: var(--fs-sm);
-  pointer-events: none;
-}
-
-.gallery__caption span:first-child {
-  font-family: var(--font-display);
-  font-size: 1.35rem;
-  line-height: 1.1;
-  letter-spacing: var(--tracking-display);
-}
-.gallery__caption .mono { color: rgba(255,255,255,0.78); }
-
-.gallery__try {
-  pointer-events: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  margin-top: 0.5rem;
-  /* 44 px : la cible tactile minimale. La carte entière est cliquable, mais
-     la pastille reste atteignable au doigt sans viser. */
-  min-height: 2.75rem;
-  padding: 0 0.95rem;
-  border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--c-ink);
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-decoration: none;
-}
-.gallery__try svg { width: 0.9em; height: 0.9em; }
-.gallery__try:hover { background: #fff; }
-.gallery__try:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
-
-@media (prefers-reduced-motion: reduce) {
-  .gallery__item img { transition: none; }
-}
-
-
 /* Modale generique + lightbox */
 .modal {
   position: fixed;
@@ -2224,6 +2166,12 @@ body[data-drawer-open="true"] { overflow: hidden; }
 }
 .modal__close:hover { background: var(--c-ink); color: var(--text-invert); }
 .modal__caption { color: #e8e6e0; font-size: var(--fs-sm); margin-top: var(--sp-3); text-align: center; }
+
+/* Meme raison que .btn--sm : 39 px se visent mal au doigt, et la croix de
+   fermeture est la commande qu'on cherche quand on veut sortir vite. */
+@media (pointer: coarse) {
+  .modal__close { min-width: 44px; min-height: 44px; }
+}
 
 
 /* Infobulle sur terme technique */
@@ -2359,7 +2307,7 @@ body[data-drawer-open="true"] { overflow: hidden; }
   align-items: center;
   gap: 0.5rem;
   font-size: var(--fs-xs);
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--cl-fg);
@@ -2660,932 +2608,32 @@ body[data-drawer-open="true"] { overflow: hidden; }
 }
 
 
-/**
- * Mode Plan — vue du dessus à l’échelle.
+
+/*
+ * Ce qui N'EST PLUS ici, et pourquoi.
  *
- * Deux colonnes dès qu’il y a la place : les réglages à gauche, sur une
- * largeur tenue entre 340 et 420 px, et le plan à droite, qui prend le reste.
- * L’ordre du DOM est réglages puis plan, ce qui donne sur téléphone la
- * séquence attendue : introduction, réglages, aperçu, résultats.
+ * Cette feuille est chargée par les 32 pages du site. Y laisser les styles
+ * d'outils faisait payer à un guide de lecture les 13 Ko du Mode Plan, les
+ * 15,7 Ko de l'aperçu de scène, les 8 Ko du carrousel Inspiration et les
+ * 7,5 Ko du formulaire projet — 51 Ko sur 151, pour des composants qu'il ne
+ * contient pas.
  *
- * Attention à l’ordre des règles : la remise à une colonne doit rester dans
- * une requête média bornée en haut. Une règle nue plus bas dans le fichier
- * l’emporte sur `@media (min-width: 62rem)` à spécificité égale — c’est
- * exactement ce qui neutralisait la mise en page bureau jusqu’ici.
+ * Ces feuilles sont maintenant des paquets séparés, rattachés à une page par
+ * un MARQUEUR présent dans son HTML (voir BUNDLES_PAGE dans
+ * _generator/assets.js). Le rattachement est donc automatique : une page qui
+ * gagne le composant gagne la feuille, et le générateur échoue si les deux ne
+ * concordent pas. Rien à déclarer, rien à oublier.
+ *
+ *   components/visualizer.css        → data-visualizer      (Mode Plan)
+ *   components/visualizer-photo.css  → data-vz-preview      (aperçu de scène)
+ *   components/spotlight.css         → class="section spotlight
+ *   components/gallery.css           → class="gallery
+ *   components/project-form/…        → data-project-form
+ *
+ * `components/floor-editor.css` a simplement disparu d'ici : aucune page
+ * éditoriale n'emploie ses classes, et le Visualiseur Parquet l'importe déjà
+ * par css/studio.css.
  */
-.visualizer {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--sp-5);
-  align-items: start;
-}
-.visualizer__panel,
-.visualizer__group,
-.pattern-switch,
-.seg {
-  min-width: 0;
-}
-
-@media (min-width: 62rem) {
-  .visualizer {
-    grid-template-columns: clamp(21.25rem, 24vw, 26.25rem) minmax(0, 1fr);
-    gap: clamp(1.25rem, 0.5rem + 1.4vw, 2rem);
-  }
-  /* L’aperçu compact vit dans un bloc éditorial d’environ 576 px, pas dans la
-     largeur de la fenêtre : une part en vw y prendrait la moitié du plan.
-     D’où une largeur fixe, laissant le reste au dessin. */
-  .visualizer--compact { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); }
-}
-
-/**
- * Paysage de téléphone et petite tablette.
- *
- * En une colonne, 844 x 390 demandait onze écrans de défilement et le plan
- * n’apparaissait qu’au quatrième. Deux colonnes dès 48rem quand la hauteur est
- * courte : les réglages et le plan côte à côte, et le plan borné à la hauteur
- * disponible.
- */
-@media (min-width: 48rem) and (max-height: 34rem) {
-  .visualizer { grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr); gap: var(--sp-4); }
-  .visualizer__canvas { --plan-max-h: 72svh; }
-}
-
-/* ---------- Réglages ---------- */
-.visualizer__panel {
-  display: grid;
-  gap: clamp(0.9rem, 0.75rem + 0.5vw, 1.3rem);
-  padding: clamp(0.9rem, 0.75rem + 0.6vw, 1.35rem);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
-}
-
-.visualizer__group { display: grid; gap: 0.5rem; border: 0; margin: 0; padding: 0; }
-.visualizer__group > legend,
-.visualizer__group-title {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin: 0;
-  padding: 0;
-  font-size: var(--fs-xs);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-eyebrow);
-  color: var(--text-muted);
-  font-weight: 600;
-}
-/* La valeur courante se lit dans le titre du groupe, en chiffres. */
-.visualizer__group-title output {
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--text);
-}
-
-/* Motifs : grille compacte, deux ou trois colonnes selon la place. */
-.pattern-switch {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(5.75rem, 1fr));
-  gap: 0.4rem;
-}
-.pattern-switch button {
-  display: grid;
-  align-content: start;
-  gap: 0.3rem;
-  padding: 0.35rem 0.35rem 0.4rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm);
-  background: transparent;
-  text-align: center;
-  font-size: 0.74rem;
-  line-height: 1.2;
-  color: var(--text-soft);
-  transition: background var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
-}
-.pattern-switch button:hover { border-color: var(--line-strong); color: var(--text); }
-.pattern-switch button[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); font-weight: 600; }
-.pattern-switch svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 3 / 2;
-  border-radius: var(--r-xs);
-  background: var(--c-mineral);
-}
-
-/* Dimensions : une seule ligne, longueur puis largeur. */
-.visualizer__dims { display: flex; align-items: flex-end; gap: 0.45rem; }
-.visualizer__num { flex: 1 1 0; display: grid; gap: 0.25rem; min-width: 0; font-size: 0.74rem; color: var(--text-muted); }
-.visualizer__num input {
-  width: 100%;
-  padding: 0.5rem 0.55rem;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-sm);
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  color: var(--text);
-}
-/* `outline: none` retiré : le halo sauge marquait le champ actif mais faisait
-   disparaître l’anneau de focus du site, seul indicateur assez contrasté pour
-   la navigation au clavier. Les deux coexistent maintenant. */
-.visualizer__num input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--c-sage-pale); }
-.visualizer__times { flex: none; padding-bottom: 0.6rem; color: var(--text-muted); font-size: 0.85rem; }
-
-/* Largeur de lame : le curseur, ses bornes, sa valeur dans le titre. */
-.visualizer__range { display: grid; gap: 0.15rem; }
-.visualizer__range input[type="range"] {
-  width: 100%;
-  accent-color: var(--accent);
-  /* 16 px de haut, c’est le trait ; la cible tactile en prend 28. */
-  min-height: 1.75rem;
-  cursor: pointer;
-}
-.visualizer__bounds {
-  display: flex;
-  justify-content: space-between;
-  /* Les bornes appartiennent au curseur : elles se collent sous son trait
-     plutôt que de flotter à la distance des autres groupes. */
-  margin-top: -0.35rem;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  color: var(--text-muted);
-}
-
-/* Pastilles segmentées : Haut / Droite / Bas / Gauche / Aucune. */
-.seg {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(3.25rem, 1fr));
-  gap: 0.2rem;
-  padding: 0.2rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-}
-.seg button {
-  padding: 0.4rem 0.3rem;
-  border-radius: var(--r-sm);
-  font-size: 0.74rem;
-  color: var(--text-soft);
-  white-space: nowrap;
-  transition: background var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out);
-}
-.seg button:hover { background: var(--c-paper); color: var(--text); }
-.seg button[aria-pressed="true"] { background: var(--c-ink); color: var(--text-invert); }
-
-/* Teintes : la pastille porte la couleur réellement utilisée au rendu. */
-.tone-swatches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; }
-.tone-swatch {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.45rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r-pill);
-  background: transparent;
-  font-size: 0.76rem;
-  color: var(--text-soft);
-}
-.tone-swatch i {
-  width: 15px;
-  height: 15px;
-  flex: none;
-  border-radius: 50%;
-  background: var(--tone);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
-}
-.tone-swatch:hover { border-color: var(--line-strong); color: var(--text); }
-.tone-swatch[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); font-weight: 600; }
-
-/* Actions : le secondaire à sa taille, le principal occupe le reste. */
-.visualizer__actions { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5rem; }
-.visualizer__actions .btn { width: 100%; }
-
-/* ---------- Plan ---------- */
-.visualizer__stage {
-  position: relative;
-  display: grid;
-  gap: var(--sp-4);
-  padding: clamp(0.6rem, 0.4rem + 0.8vw, 1.1rem);
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
-  background: radial-gradient(120% 100% at 50% 0%, var(--c-white), var(--c-paper));
-}
-
-/**
- * Le plan prend toute la largeur de sa colonne, sans dépasser `--plan-max-h`
- * en hauteur. La proportion vient des dimensions saisies : elle n’est donc
- * connue qu’au rendu, et le composant écrit `--plan-ratio`, dont se déduit la
- * largeur maximale. Un `max-height` posé sur le SVG aurait produit deux
- * bandes vides à gauche et à droite.
- */
-.visualizer__canvas {
-  width: 100%;
-  max-width: calc(var(--plan-max-h, 200vh) * var(--plan-ratio, 1.4));
-  margin-inline: auto;
-  border-radius: var(--r-md);
-  overflow: hidden;
-}
-.visualizer__canvas svg { display: block; width: 100%; height: auto; }
-@media (min-width: 62rem) {
-  /* 68svh : mesuré à 1440 x 900, le plan fait alors 817 x 612 dans une colonne
-     de 960, et le panneau de réglages 821 de haut — les deux colonnes tombent
-     ensemble, sans grande bande vide de part et d’autre du plan. */
-  .visualizer__canvas { --plan-max-h: min(68svh, 42rem); }
-}
-
-/* Résultats : quatre repères courts, lus d’un coup d’œil. */
-.visualizer__readout {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(7.25rem, 1fr));
-  gap: 0.4rem;
-  margin: 0;
-}
-.visualizer__readout > div {
-  display: grid;
-  gap: 0.1rem;
-  padding: 0.5rem 0.65rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface);
-}
-.visualizer__readout dt {
-  font-size: 0.66rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-}
-.visualizer__readout dd {
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: 0.94rem;
-  font-weight: 600;
-  color: var(--text);
-}
-/* Le nom du motif n’est pas un chiffre : en chasse fixe, « Point de Hongrie »
-   dépassait de sa carte sur téléphone. */
-.visualizer__readout dd.is-text { font-family: inherit; font-size: 0.88rem; }
-
-.visualizer__advice {
-  display: flex;
-  gap: 0.7rem;
-  align-items: flex-start;
-  padding: var(--sp-4);
-  border-radius: var(--r-md);
-  background: var(--c-sage-pale);
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: var(--c-sage-deep);
-}
-.visualizer__advice svg { width: 1.1em; height: 1.1em; flex: none; margin-top: 0.2em; }
-.visualizer__advice p { margin: 0; }
-
-/* ---------- Écrans étroits ---------- */
-@media (max-width: 61.99rem) {
-  .visualizer__readout { grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); }
-}
-
-/**
- * Téléphone : la vignette repasse à côté du libellé.
- *
- * En colonne unique, les cinq motifs à vignette large faisaient 381 px de
- * réglages à eux seuls, soit presque un demi-écran avant d’arriver aux
- * dimensions. Vignette à gauche, libellé à droite, deux colonnes : 148 px
- * pour la même information, et la cible reste à 44 px.
- */
-@media (max-width: 47.99rem) {
-  .pattern-switch { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .pattern-switch button {
-    grid-template-columns: 2.5rem minmax(0, 1fr);
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.4rem 0.5rem;
-    text-align: left;
-  }
-  .pattern-switch svg { width: 2.5rem; }
-  /* Quatre repères en deux fois deux : aucune carte orpheline. */
-  .visualizer__readout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .visualizer__readout > div { padding: 0.45rem 0.55rem; }
-  .visualizer__readout dt { font-size: 0.64rem; }
-}
-@media (max-width: 26rem) {
-  .visualizer__panel { padding: var(--sp-4); }
-  .pattern-switch { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  /* À 320 px, la colonne de libellé tombe à 62 px et « Diagonale », qui ne
-     peut pas se couper, dépassait d’un pixel. Vignette et corps resserrés. */
-  .pattern-switch button { grid-template-columns: 2rem minmax(0, 1fr); font-size: 0.72rem; }
-  .pattern-switch svg { width: 2rem; }
-  /* Les deux libellés d’action font ensemble plus de 300 px : en colonne, le
-     principal passe au-dessus et « Réinitialiser » reste dessous. */
-  .visualizer__actions { grid-template-columns: minmax(0, 1fr); }
-  .visualizer__actions .btn--ghost { order: 2; }
-}
-
-/**
- * Mode Plan sur écran tactile.
- *
- * Mesuré à 390 px avec émulation tactile : les boutons de motif faisaient
- * 42 px de haut, les deux champs de dimensions 43 px, et les boutons empilés
- * n’étaient séparés que de 6 à 7 px. Sous le pouce, c’est trop juste — la
- * recommandation usuelle est 44 px de cible et au moins 8 px entre deux.
- *
- * Les titres de groupe passent de 12 à 13 px : ce sont des libellés de
- * contrôle, pas de la métadonnée décorative.
- *
- * Tout est sous `pointer: coarse` : la densité du bureau ne change pas.
- */
-@media (pointer: coarse) {
-  .visualizer__range input[type="range"] { min-height: 44px; }
-  .pattern-switch { gap: 0.5rem; }
-  .pattern-switch button { min-height: 44px; }
-  .visualizer__dims { gap: 0.6rem; }
-  .visualizer__num input { min-height: 44px; }
-  .seg { gap: 0.3rem; }
-  /* 44 et non 40 : c’est la cible de référence, et rien ici ne justifiait une
-     exception — la contrainte de largeur est réglée par la grille. */
-  .seg button { min-height: 44px; }
-  .tone-swatches { gap: 0.5rem; }
-  .tone-swatch { min-height: 44px; }
-  .visualizer__actions { gap: 0.6rem; }
-  .visualizer__actions .btn { min-height: 44px; }
-  .visualizer__group > legend,
-  .visualizer__group-title { font-size: 0.82rem; }
-  /* La scène du plan est un SVG : sans cela, un glissement vertical dessus
-     pouvait être capté au lieu de faire défiler la page. */
-  .visualizer__canvas { touch-action: pan-y; }
-}
-
-
-/**
- * Calque de correction du sol : cadre, contour, pinceau.
- *
- * Ces règles vivent dans leur propre composant parce que **deux bundles** en
- * ont besoin : la feuille du site (css/main.css) et celle de l'application
- * (css/studio.css). Elles étaient auparavant noyées dans
- * components/visualizer-photo.css, que seule la première importait : dans
- * l'application, le calque se retrouvait sans positionnement, tombait dans le
- * flux sous la photo, et les poignées devenaient inatteignables. « Corriger le
- * sol » ne fonctionnait donc pas là où il sert le plus.
- */
-
-.floor-mask {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-}
-.floor-mask__svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.floor-mask__handles {
-  position: absolute;
-  inset: 0;
-}
-.floor-mask__shape {
-  fill: rgba(139, 160, 136, 0.28);
-  stroke: #f2efe8;
-  stroke-width: 0.4;
-  vector-effect: non-scaling-stroke;
-  stroke-dasharray: 2 2;
-}
-.floor-mask__handle {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  margin: -15px 0 0 -15px;
-  border-radius: var(--r-pill);
-  border: 2px solid #16181a;
-  background: #f2efe8;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
-  cursor: grab;
-  touch-action: none;
-}
-.floor-mask__handle::after {
-  content: "";
-  position: absolute;
-  inset: 8px;
-  border-radius: var(--r-pill);
-  background: var(--c-sage-deep);
-}
-.floor-mask__handle[data-active="true"] {
-  cursor: grabbing;
-  transform: scale(1.12);
-}
-.floor-mask__handle:focus-visible {
-  outline: 3px solid #fff;
-  outline-offset: 3px;
-}
-
-.floor-mask[data-mode="brush"] .floor-mask__shape {
-  fill: rgba(139, 160, 136, 0.12);
-  stroke-opacity: 0.35;
-}
-.floor-mask[data-mode="brush"] { cursor: none; }
-.floor-mask[data-mode="polygon"] { cursor: copy; }
-
-.floor-mask__cursor {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: var(--brush, 80px);
-  height: var(--brush, 80px);
-  margin: calc(var(--brush, 80px) / -2) 0 0 calc(var(--brush, 80px) / -2);
-  border-radius: var(--r-pill);
-  border: 2px solid #fff;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
-  pointer-events: none;
-}
-.floor-mask__cursor[data-mode="remove"] { border-style: dashed; }
-.floor-mask__cursor[data-mode="add"] { background: rgba(139, 160, 136, 0.25); }
-
-
-/* Visualiseur de parquet en photo */
-.vz {
-  display: grid;
-  gap: clamp(1rem, 0.6rem + 1.4vw, 1.75rem);
-  align-items: start;
-}
-@media (min-width: 64rem) {
-  .vz { grid-template-columns: minmax(0, 1fr) clamp(19rem, 24vw, 24rem); }
-}
-
-.vz__main { display: grid; gap: var(--sp-4); min-width: 0; }
-
-.vz__stage {
-  position: relative;
-  border-radius: var(--r-card);
-  overflow: hidden;
-  background: var(--c-mineral);
-  --compare: 0%;
-  --compare-a: 0%;
-  touch-action: pan-y;
-}
-.vz__stage[data-editing="true"] { cursor: crosshair; }
-
-.vz__photo,
-.vz__canvas {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-.vz__photo { position: absolute; inset: 0; height: 100%; object-fit: cover; }
-.vz__canvas { position: relative; z-index: 1; clip-path: inset(0 0 0 var(--compare-a)); }
-/* Version B superposée : même boîte que la version A, découpée au curseur */
-.vz__canvas--b {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  height: 100%;
-  width: auto;
-  max-width: 100%;
-  z-index: 2;
-  clip-path: inset(0 0 0 var(--compare));
-}
-
-.vz__status {
-  position: absolute;
-  left: 50%;
-  bottom: 1rem;
-  transform: translateX(-50%);
-  z-index: 4;
-  margin: 0;
-  padding: 0.55rem 1rem;
-  border-radius: var(--r-pill);
-  background: rgba(16, 18, 19, 0.86);
-  color: #fff;
-  font-size: var(--fs-sm);
-  text-align: center;
-  max-width: calc(100% - 2rem);
-}
-.vz__status[data-tone="warn"] { background: #8d4b34; }
-
-.vz__bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-3) var(--sp-5);
-  align-items: center;
-  justify-content: space-between;
-}
-.vz__credit { margin: 0; font-size: var(--fs-xs); color: var(--text-muted); }
-
-/* ---------- Avant / après ---------- */
-.vz-compare { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
-.vz-compare__range {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  opacity: 0;
-  pointer-events: auto;
-  cursor: ew-resize;
-}
-.vz-compare__handle {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: var(--compare);
-  width: 2px;
-  background: #fff;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18);
-}
-.vz-compare__handle::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 44px;
-  height: 44px;
-  transform: translate(-50%, -50%);
-  border-radius: var(--r-pill);
-  background: #fff;
-  box-shadow: var(--shadow-2);
-}
-.vz-compare__tag {
-  position: absolute;
-  top: 0.9rem;
-  padding: 0.3rem 0.7rem;
-  border-radius: var(--r-pill);
-  background: rgba(16, 18, 19, 0.7);
-  color: #fff;
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-.vz-compare__tag--before { left: 0.9rem; }
-.vz-compare__tag--after { right: 0.9rem; }
-.vz-compare__range:focus-visible ~ .vz-compare__handle::after { outline: 3px solid var(--focus); }
-
-/* ---------- Panneau ---------- */
-.vz-panel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
-  padding: clamp(1rem, 0.8rem + 0.8vw, 1.4rem);
-  border-radius: var(--r-card);
-  background: var(--surface);
-  border: 1px solid var(--line);
-}
-.vz-panel__scroll { display: grid; gap: var(--sp-5); }
-@media (min-width: 64rem) {
-  .vz-panel { position: sticky; top: calc(var(--header-h) + 1rem); max-height: calc(100svh - var(--header-h) - 2rem); }
-  .vz-panel__scroll { overflow-y: auto; scrollbar-width: thin; padding-right: 0.25rem; }
-}
-
-.vz-group__title {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin: 0 0 0.6rem;
-  font-size: var(--fs-xs);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-eyebrow);
-  color: var(--text-muted);
-  font-weight: 500;
-}
-.vz-group__title output { font-family: var(--font-mono); letter-spacing: 0; text-transform: none; }
-
-/* Pièces */
-.vz-rooms { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
-.vz-room {
-  display: grid;
-  gap: 0.3rem;
-  padding: 0;
-  border: 1px solid transparent;
-  border-radius: var(--r-sm);
-  background: none;
-  text-align: left;
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  overflow: hidden;
-}
-.vz-room img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r-xs); }
-.vz-room span { padding: 0 0.15rem 0.15rem; line-height: 1.25; }
-.vz-room:hover { color: var(--text); }
-.vz-room[aria-pressed="true"] { border-color: var(--accent); color: var(--text); }
-.vz-import { display: block; margin-top: 0.6rem; }
-
-/* Teintes */
-.vz-tones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem; }
-.vz-tone {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.55rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r-pill);
-  background: transparent;
-  font-size: 0.8rem;
-  text-align: left;
-  color: var(--text-soft);
-}
-.vz-tone:hover { border-color: var(--line-strong); color: var(--text); }
-.vz-tone[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); }
-.vz-tone__swatch { width: 18px; height: 18px; border-radius: var(--r-pill); flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
-
-/* Motifs */
-.vz-patterns { display: grid; gap: 0.4rem; }
-.vz-pattern {
-  display: grid;
-  gap: 0.1rem;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm);
-  background: transparent;
-  text-align: left;
-}
-.vz-pattern strong { font-size: 0.92rem; font-weight: 600; }
-.vz-pattern span { font-size: 0.78rem; color: var(--text-muted); }
-.vz-pattern:hover { border-color: var(--line-strong); }
-.vz-pattern[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); }
-
-/* Sens */
-.vz-dirs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.4rem; }
-.vz-dir {
-  display: grid;
-  place-items: center;
-  aspect-ratio: 1;
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm);
-  background: transparent;
-  color: var(--text-soft);
-}
-.vz-dir svg { width: 20px; height: 20px; }
-.vz-dir:hover { border-color: var(--line-strong); color: var(--text); }
-.vz-dir[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); }
-
-/* Curseurs */
-.vz-range { display: flex; align-items: center; gap: 0.6rem; }
-.vz-range input[type="range"] { flex: 1; accent-color: var(--c-sage-deep); }
-.vz-range output { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--text-muted); min-width: 3.2em; text-align: right; }
-
-.vz-panel__actions { display: grid; gap: 0.4rem; }
-.vz-panel__actions .btn { width: 100%; }
-.vz-panel__actions .btn[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); }
-
-/* ---------- Plein écran ---------- */
-[data-visualiseur-shell]:fullscreen,
-[data-pseudo-fullscreen="true"] {
-  background: var(--bg);
-  padding: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
-  overflow: auto;
-}
-[data-pseudo-fullscreen="true"] {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-modal);
-}
-[data-visualiseur-shell]:fullscreen .vz,
-[data-pseudo-fullscreen="true"] .vz { height: 100%; }
-[data-visualiseur-shell]:fullscreen .vz__stage,
-[data-pseudo-fullscreen="true"] .vz__stage { max-height: calc(100svh - 8rem); }
-[data-visualiseur-shell]:fullscreen .vz__canvas,
-[data-pseudo-fullscreen="true"] .vz__canvas { max-height: calc(100svh - 8rem); width: auto; margin-inline: auto; }
-
-/* ---------- Mobile : panneau sous la photo ---------- */
-@media (max-width: 63.99rem) {
-  .vz-panel { position: relative; }
-  .vz-panel__scroll { gap: var(--sp-4); }
-  .vz-rooms { grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr)); }
-  .vz-tones { grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); }
-  .vz__stage { max-height: 62svh; }
-  .vz__canvas { max-height: 62svh; width: auto; max-width: 100%; margin-inline: auto; }
-  .vz__photo { object-fit: contain; background: var(--c-mineral); }
-}
-
-/* Mobile : photo pleine largeur, actions immédiatement sous l'image */
-@media (max-width: 48rem) {
-  .vz__stage {
-    margin-inline: calc(-1 * var(--gutter));
-    border-radius: 0;
-  }
-  .vz__bar .link-arrow { font-size: 0.85rem; }
-}
-@media (max-width: 63.99rem) {
-  .vz-panel__actions {
-    order: -1;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.4rem;
-  }
-  .vz-panel__actions .btn { font-size: 0.78rem; padding: 0.6rem 0.4rem; text-align: center; }
-  .vz-room span {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-}
-
-/* Segments (mode de zone, pinceau, version A/B) */
-.vz-seg {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 2px;
-  padding: 2px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-pill);
-  background: var(--c-mineral);
-}
-.vz-seg--pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.vz-seg__item {
-  padding: 0.5rem 0.4rem;
-  border: 0;
-  border-radius: var(--r-pill);
-  background: transparent;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  cursor: pointer;
-}
-.vz-seg__item:hover { color: var(--text); }
-.vz-seg__item[aria-pressed="true"] { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: var(--shadow-1); }
-
-.vz-hint { margin: 0.55rem 0 0; font-size: 0.78rem; line-height: 1.45; color: var(--text-muted); }
-.vz-hint--privacy { margin-top: 0.5rem; }
-
-.vz-brush { display: grid; gap: 0.5rem; margin-top: 0.6rem; }
-.vz-zone-actions { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.7rem; }
-.vz-zone-actions .btn { flex: 1 1 auto; }
-.vz-zone-actions .btn--solid { flex-basis: 100%; }
-
-/* Barre sous la photo */
-.vz__bar-actions { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
-.vz__help {
-  width: 1.85rem;
-  height: 1.85rem;
-  flex: none;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--line-strong);
-  background: transparent;
-  color: var(--text-soft);
-  font-size: 0.85rem;
-  line-height: 1;
-  cursor: pointer;
-}
-.vz__help:hover { border-color: var(--accent); color: var(--text); }
-
-/* ---------- Prise en main ---------- */
-.vz-onboarding {
-  position: absolute;
-  inset: 0;
-  z-index: 6;
-  display: grid;
-  place-items: end center;
-  padding: clamp(0.75rem, 2vw, 1.5rem);
-  background: linear-gradient(to top, rgba(16, 18, 19, 0.62), rgba(16, 18, 19, 0.06));
-}
-.vz-onboarding__card {
-  width: min(100%, 30rem);
-  padding: clamp(1rem, 0.8rem + 0.8vw, 1.4rem);
-  border-radius: var(--r-card);
-  background: var(--surface);
-  box-shadow: var(--shadow-2);
-}
-.vz-onboarding__step {
-  margin: 0 0 0.35rem;
-  font-size: var(--fs-xs);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-eyebrow);
-  color: var(--text-muted);
-}
-.vz-onboarding__title { margin: 0 0 0.4rem; font-size: 1.05rem; font-weight: 600; font-family: var(--font-display); letter-spacing: var(--tracking-display); }
-.vz-onboarding__text { margin: 0; font-size: 0.88rem; line-height: 1.5; color: var(--text-soft); }
-.vz-onboarding__dots { display: flex; gap: 0.3rem; margin: 0.85rem 0 0; }
-.vz-onboarding__dot { width: 6px; height: 6px; border-radius: var(--r-pill); background: var(--line-strong); }
-.vz-onboarding__dot[data-current] { background: var(--c-sage-deep); width: 18px; }
-.vz-onboarding__actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.9rem; }
-
-/* ---------- Aperçu avant / après (accueil) ---------- */
-/**
- * La scène ne se dimensionne plus sur le ratio intrinsèque de la photo.
- *
- * Elle le faisait — `.vzp__photo { width: 100%; height: auto }` — et une photo
- * en 3/2 donnait un composant de 1280 px de haut à 1920 px de large, 1707 px à
- * 2560 px : il chassait le reste de la page hors de l'écran.
- *
- * À la place : largeur plafonnée, rapport de forme choisi, hauteur bornée par
- * la fenêtre. `object-fit: cover` recadre la photo dans ce cadre, et le canvas
- * suit **exactement** la même règle — c'est la condition pour que le parquet
- * reste aligné sur la pièce.
- */
-.vzp {
-  display: grid;
-  gap: var(--sp-4);
-  /* Au-delà, la démonstration n'y gagne rien et la page se disloque. */
-  max-width: 76rem;
-  width: 100%;
-  margin-inline: auto;
-}
-.vzp__figure { margin: 0; display: grid; gap: 0.7rem; min-width: 0; }
-.vzp__stage {
-  position: relative;
-  --compare: 52%;
-  border-radius: var(--r-card);
-  overflow: hidden;
-  background: var(--c-mineral);
-  touch-action: pan-y;
-  aspect-ratio: 16 / 10;
-  /* Écrans bas : la scène cède avant de pousser la page. */
-  max-height: min(70svh, 620px);
-}
-/* Téléphones : un cadre plus haut tient mieux la pièce dans une colonne
-   étroite qu'un panoramique où le sol ne serait qu'un bandeau. */
-@media (max-width: 40rem) {
-  .vzp__stage { aspect-ratio: 4 / 3; max-height: min(58svh, 460px); }
-}
-.vzp__photo,
-.vzp__canvas {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.vzp__canvas { clip-path: inset(0 0 0 var(--compare)); }
-.vzp__range {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  opacity: 0;
-  cursor: ew-resize;
-  z-index: 3;
-}
-.vzp__handle {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: var(--compare);
-  width: 2px;
-  background: #fff;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18);
-  z-index: 2;
-}
-/**
- * Le bouton de la poignée.
- *
- * Il est centré sur le trait, donc à moitié hors cadre quand le curseur touche
- * un bord — et l'`overflow: hidden` de la scène le coupait net. La course du
- * curseur est bornée à 3–97 % dans `preview.js` : le trait et le découpage
- * restent rigoureusement identiques, et le bouton reste entièrement saisissable.
- */
-.vzp__handle::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 46px;
-  height: 46px;
-  transform: translate(-50%, -50%);
-  border-radius: var(--r-pill);
-  background: #fff;
-  box-shadow: var(--shadow-2);
-}
-/* Doigts sur petit écran : la cible reste à 44 px, la pastille rétrécit à
-   peine pour ne pas manger la scène. */
-@media (max-width: 30rem) {
-  .vzp__handle::after { width: 40px; height: 40px; }
-}
-.vzp__range:focus-visible ~ .vzp__handle::after { outline: 3px solid var(--focus); }
-.vzp__tag {
-  position: absolute;
-  top: 0.9rem;
-  z-index: 2;
-  padding: 0.3rem 0.7rem;
-  border-radius: var(--r-pill);
-  background: rgba(16, 18, 19, 0.7);
-  color: #fff;
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-.vzp__tag--before { left: 0.9rem; }
-.vzp__tag--after { right: 0.9rem; }
-.vzp[data-ready="photo"] .vzp__tag,
-.vzp[data-ready="photo"] .vzp__handle,
-.vzp[data-ready="photo"] .vzp__range { display: none; }
-.vzp__caption { font-size: var(--fs-xs); color: var(--text-muted); }
-.vzp__chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-.vzp__chip {
-  padding: 0.45rem 0.9rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r-pill);
-  background: transparent;
-  font-size: 0.82rem;
-  color: var(--text-soft);
-  cursor: pointer;
-}
-.vzp__chip:hover { border-color: var(--line-strong); color: var(--text); }
-.vzp__chip[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); }
-
-
 
 /* Pages de rubrique : guides, tutoriels, motifs, inspiration, à propos */
 
@@ -3898,192 +2946,5 @@ body[data-drawer-open="true"] { overflow: hidden; }
 }
 @media (min-width: 40rem) and (max-width: 61.99rem) {
   .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-/* Styles du composant formulaire projet (isolés sous .project-form) */
-.project-form {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--r-block);
-  padding: clamp(1.2rem, 1rem + 2vw, 2.4rem);
-}
-
-.pf__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-4);
-  padding-bottom: var(--sp-5);
-  border-bottom: 1px solid var(--line);
-  margin-bottom: var(--sp-6);
-}
-.pf__count {
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: var(--fs-xs);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.pf__count b { color: var(--text); }
-
-.pf__dots { display: flex; gap: 0.4rem; list-style: none; margin: 0; padding: 0; }
-.pf__dot {
-  width: 2.1rem;
-  height: 4px;
-  border-radius: var(--r-pill);
-  background: var(--line);
-  transition: background var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
-  /* Le trait fait 4 px, la cible non : un pseudo-élément étend la zone
-     cliquable à 40 px de haut sans changer le dessin. */
-  position: relative;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-}
-.pf__dot::after { content: ""; position: absolute; inset: -18px 0; }
-.pf__dot:hover { transform: scaleY(1.6); }
-.pf__dot[data-state="done"] { background: var(--accent); }
-.pf__dot[data-state="current"] { background: var(--c-ink); }
-
-/*
- * Au doigt, 44 × 44 px.
- *
- * Les cinq points sont réellement interactifs : revenir en arrière est libre,
- * avancer passe par la validation de l'étape courante. Ils méritent donc une
- * cible franche, et 34 × 40 px n'en est pas une pour un pouce.
- *
- * Le dessin ne change pas d'un pixel — le trait reste à 2,1rem sur 4 px. Seule
- * la zone invisible grandit : 4 + 2 × 20 = 44 px de haut, et
- * 33,6 + 2 × 6 = 45,6 px de large. Six pixels et non cinq parce que 2,1rem
- * vaut 33,6 px : cinq auraient donné 43,6 px, c'est-à-dire juste en dessous du
- * seuil, ce qui n'est pas une cible de 44 px mais une cible qui en a l'air.
- *
- * L'écart entre les points passe en revanche de 6,4 à 12 px, et c'est
- * nécessaire, pas cosmétique : à 6,4 px d'écart, deux zones de cette largeur
- * se chevaucheraient, et un appui dans la zone commune irait au point que
- * l'ordre du DOM désigne, pas à celui que le doigt visait. Deux cibles qui se
- * disputent un appui valent moins qu'une cible un peu petite. Douze pixels
- * mettent les centres à 45,6 px, exactement la largeur d'une zone : elles se
- * touchent sans jamais se recouvrir.
- *
- * Le surcoût est de 22,4 px sur la largeur de la rangée, mesurée à 194 px pour
- * 300 px disponibles à 390 px de viewport : aucun débordement, aucun
- * changement de retour à la ligne.
- *
- * Rien de tout cela ne s'applique à la souris, où 34 × 40 px se visent très
- * bien et où le survol donne déjà un retour.
- */
-@media (pointer: coarse) {
-  .pf__dots { gap: 0.75rem; }
-  .pf__dot::after { inset: -20px -6px; }
-}
-
-.pf__step { animation: pf-in var(--dur-3) var(--ease-out) both; }
-@keyframes pf-in { from { opacity: 0; transform: translateY(10px); } }
-@media (prefers-reduced-motion: reduce) { .pf__step { animation: none; } }
-
-.pf__title { font-size: var(--fs-h4); }
-.pf__title:focus-visible { outline-offset: 6px; }
-.pf__hint { margin: var(--sp-2) 0 0; color: var(--text-muted); font-size: var(--fs-sm); }
-
-.pf__grid {
-  margin-top: var(--sp-5);
-  display: grid;
-  gap: var(--sp-5);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-.pf-field { min-width: 0; border: 0; margin: 0; padding: 0; grid-column: 1 / -1; }
-.pf-field--half { grid-column: span 1; }
-@media (max-width: 34rem) {
-  .pf__grid { grid-template-columns: 1fr; }
-  .pf-field--half { grid-column: 1 / -1; }
-}
-.pf-field legend.field__label { padding: 0; margin-bottom: 0.5rem; }
-.pf-field .choice-grid { margin-top: 0.4rem; }
-.pf-field[data-invalid="true"] .choice { border-color: #b8543a; }
-
-.pf__actions {
-  margin-top: var(--sp-6);
-  padding-top: var(--sp-5);
-  border-top: 1px solid var(--line);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-3);
-  justify-content: flex-end;
-}
-.pf__actions .btn--ghost { margin-right: auto; }
-
-.pf__status { margin: var(--sp-3) 0 0; font-size: var(--fs-sm); color: var(--text-muted); text-align: right; }
-
-.pf__success { display: grid; gap: var(--sp-3); justify-items: start; padding: var(--sp-5) 0; }
-.pf__success h2 { font-size: var(--fs-h3); }
-.pf__success p { color: var(--text-soft); max-width: 46ch; margin: 0; }
-.pf__success:focus-visible { outline: none; }
-
-@media (max-width: 30rem) {
-  .pf__actions { flex-direction: column-reverse; }
-  .pf__actions .btn { width: 100%; }
-  .pf__actions .btn--ghost { margin-right: 0; }
-}
-
-/* Reprise d'une simulation faite dans le Studio */
-.pf__from-studio {
-  margin: 0 0 var(--sp-5);
-  padding: 0.7rem 0.95rem;
-  border-radius: var(--r-sm);
-  background: var(--c-sage-pale);
-  color: var(--c-sage-deep);
-  font-size: 0.88rem;
-}
-
-/*
- * Pot de miel.
- *
- * Sorti du cadre par `position: absolute`, PAS masqué par `display: none`.
- * La différence est tout l'intérêt du piège : `display: none` est la première
- * chose qu'un robot un peu écrit vérifie, et un champ ainsi marqué lui dit de
- * ne pas y toucher. Ici le champ est, du point de vue du CSS, affiché et
- * remplissable ; il est simplement à mille pixels de l'écran.
- *
- * `aria-hidden` et `tabindex="-1"`, posés dans le gabarit, le retirent en
- * revanche du parcours clavier et de l'arbre d'accessibilité : un lecteur
- * d'écran ne l'annonce pas, une tabulation ne l'atteint pas. Aucun utilisateur
- * réel ne peut donc le remplir — un anti-spam qui écarte des humains serait
- * pire que pas d'anti-spam.
- *
- * `overflow: hidden` et la hauteur nulle empêchent la page de gagner mille
- * pixels de défilement à cause de lui.
- */
-.pf__trap {
-  position: absolute;
-  left: -9999px;
-  top: auto;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-}
-
-/* Échec d'envoi : au-dessus des actions, annoncé par role="alert". */
-.pf__failure {
-  margin: var(--sp-3) 0 0;
-  padding: 0.7rem 0.95rem;
-  border-left: 3px solid var(--c-clay, #b3462f);
-  border-radius: var(--r-sm);
-  background: rgba(179, 70, 47, 0.08);
-  color: var(--text);
-  font-size: 0.92rem;
-}
-.pf__failure:focus-visible { outline: none; }
-
-/* Référence de la demande, sur l'écran de confirmation. */
-.pf__reference {
-  margin: 0;
-  padding: 0.7rem 0.95rem;
-  border-radius: var(--r-sm);
-  background: var(--c-sage-pale);
-  color: var(--c-sage-deep);
-  font-variant-numeric: tabular-nums;
 }
 

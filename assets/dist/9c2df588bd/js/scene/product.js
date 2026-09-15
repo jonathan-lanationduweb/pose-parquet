@@ -36,6 +36,7 @@
  * Hongrie parce que le fabricant le débite. Faute d'information, on ne propose
  * que la pose droite et on le signale — jamais l'inverse.
  */
+import { lienSur } from '../utils/dom.js';
 
 /* ------------------------------------------------------------------ */
 /* Schéma                                                              */
@@ -321,7 +322,13 @@ export function normalizeProduct(raw, familles = {}) {
     // Lien vers la fiche du fabricant. N'existe que pour une vraie référence :
     // c'est ce qui permet à l'interface de ne proposer « Voir la référence »
     // que là où la référence affichée est réellement celle-là.
-    productUrl: first(raw.productUrl, raw.product_url, raw.url) || null,
+    //
+    // Filtré ici, au point d'entrée unique du catalogue, et pas au moment de
+    // l'affichage : le jour où cette valeur vient d'un export fournisseur,
+    // c'est le `href` de trois écrans qui est en jeu, et un `javascript:` y
+    // deviendrait du code au clic. Une adresse refusée vaut `null`, donc pas
+    // de lien du tout — jamais un lien mort ni un lien piégé.
+    productUrl: lienSur(first(raw.productUrl, raw.product_url, raw.url)),
     // Motif que le produit possède réellement mais que le moteur ne sait pas
     // poser — Versailles, notamment. On l'inscrit plutôt que de transformer
     // arbitrairement une dalle en pose droite.

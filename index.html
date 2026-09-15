@@ -3,21 +3,24 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Pose Parquet — Comprendre, préparer et réussir la pose de son parquet</title>
+    <title>Pose Parquet — Comprendre et réussir la pose de son parquet</title>
     <meta name="description" content="Média pratique et boîte à outils sur la pose du parquet : guides, motifs, tutoriels, inspiration et un simulateur de sens de pose gratuit." />
-    <!-- Balise robots toujours explicite, et toujours en « index, follow » :
-         les fichiers du dépôt décrivent la production. C'est le déploiement qui
-         la remplace par « noindex, nofollow » tant que le site est servi sur une
-         adresse de préproduction — voir .github/workflows/deploy-pages.yml et
-         docs/seo-environnements.md. Un noindex écrit ici finirait tôt ou tard
-         copié en production. -->
+    <!-- Balise robots toujours explicite. Sa valeur par défaut est « index,
+         follow » : les fichiers du dépôt décrivent la production, et c'est le
+         déploiement qui marque une préproduction — voir
+         .github/workflows/deploy-pages.yml et docs/seo-environnements.md. Un
+         noindex écrit ici par prudence finirait tôt ou tard copié en production.
+
+         Une page peut cependant demander autre chose par « page.robots », et
+         une seule le fait : la 404. Elle n'est pas une préproduction, elle n'a
+         simplement rien à indexer — c'est un état d'erreur, pas un contenu. -->
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://pose-parquet.com/" />
     <meta name="theme-color" content="#f2efe8" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Pose Parquet" />
     <meta property="og:locale" content="fr_FR" />
-    <meta property="og:title" content="Pose Parquet — Comprendre, préparer et réussir la pose de son parquet" />
+    <meta property="og:title" content="Pose Parquet — Comprendre et réussir la pose de son parquet" />
     <meta property="og:description" content="Média pratique et boîte à outils sur la pose du parquet : guides, motifs, tutoriels, inspiration et un simulateur de sens de pose gratuit." />
     <meta property="og:url" content="https://pose-parquet.com/" />
     <meta property="og:image" content="https://pose-parquet.com/assets/images/hero-wide.jpg" />
@@ -29,8 +32,9 @@
     <link rel="manifest" href="site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-400-1.woff2" crossorigin />
-    <link rel="stylesheet" href="assets/dist/site.94531f4bb7.css" />
-    <script type="module" src="assets/dist/01b4cee106/js/main.js"></script>
+    <link rel="stylesheet" href="assets/dist/site.eebc748a4b.css" />
+    <link rel="stylesheet" href="assets/dist/scene.186f9313a8.css" />
+    <script type="module" src="assets/dist/9c2df588bd/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Pose Parquet","url":"https://pose-parquet.com","inLanguage":"fr-FR","description":"Comprendre, préparer, visualiser et réussir la pose de son parquet."}</script>
   </head>
   <body class="page">
@@ -210,17 +214,54 @@
             <div>
               <p class="lead">Importez une photo, choisissez un parquet et comparez plusieurs rendus. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée ni conservée.</p>
               <p class="u-mt-5 u-actions">
-                <a class="btn" href="outils/studio.html"><span>Visualiser mon parquet</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+                <!-- « data-vz-open » : js/scene/preview.js enrichit ce lien avec la
+                     configuration affichée dans l'aperçu, pour que le Studio
+                     s'ouvre sur ce que le visiteur regarde et non sur un état par
+                     défaut. L'adresse ci-dessous reste valable telle quelle si le
+                     script ne s'exécute pas — le lien n'est jamais cassé. -->
+                <a class="btn" href="outils/studio.html" data-vz-open><span>Visualiser mon parquet</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
                 <a class="link-arrow" href="outils/simulateur-pose.html">Étudier le sens de pose <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
               </p>
             </div>
           </div>
-          <!-- Scène de l'avant/après : uniquement une scène VALIDÉE sur les cinq
-               critères de _calibrage/scene-review.html. « chambre » est la seule à
-               l'être — géométrie mesurée sur trois murs, recoupée par un contrôle
-               d'invariance. « sejour » reste à « correct » : la brillance du sol
-               d'origine n'est pas restituée. -->
-          <div data-vz-preview data-room="chambre" data-base="" data-reveal></div>
+          <!-- Scène de l'avant/après : une scène VALIDÉE sur les cinq critères de
+               _calibrage/scene-review.html, et la mieux placée pour une première
+               impression.
+
+               « chambre » tenait ce rôle à l'époque où elle était la seule
+               validée. Elle ne l'est plus : au manifeste, « sejour » est passée
+               validated en géométrie ET en visuel. Le choix se joue donc
+               maintenant sur ce que la photo montre, et « sejour » gagne sur les
+               trois points qui comptent ici — un séjour plutôt qu'une pièce aux
+               murs bleus, une lumière chaude plutôt que froide, et 35,4 % de
+               l'image en sol contre 26,3 %.
+
+               Elle a surtout **deux zones de sol** : le séjour et la salle à
+               manger derrière l'ouverture changent ensemble. C'est la meilleure
+               démonstration possible que le rendu est calculé, et non une image
+               retouchée d'avance. -->
+          <div class="vzp" data-vz-preview data-room="sejour" data-base="" data-reveal>
+            <figure class="vzp__figure">
+              <div class="vzp__stage" data-stage>
+                <img class="vzp__photo" data-photo loading="lazy" decoding="async"
+                  width="1600" height="1067"
+                  src="assets/images/room-sejour.jpg" alt="Séjour vide et lumineux ouvert sur une salle à manger" />
+                <!-- Couche visuelle d'une figure qui porte deja sa description
+                     dans la legende : rien a annoncer une seconde fois. -->
+                <canvas class="vzp__canvas" data-canvas aria-hidden="true"></canvas>
+                <span class="vzp__tag vzp__tag--before">Avant</span>
+                <span class="vzp__tag vzp__tag--after">Après</span>
+                <input class="vzp__range" type="range" min="3" max="97" value="52"
+                  aria-label="Curseur de comparaison entre la pièce d’origine et le parquet simulé" data-range />
+                <span class="vzp__handle" aria-hidden="true"></span>
+              </div>
+              <figcaption class="vzp__caption">
+                <span data-caption>Chêne naturel, lames droites</span> — rendu calculé dans votre navigateur.
+                <span data-credit>Photo : Curtis Adams / Pexels.</span>
+              </figcaption>
+            </figure>
+            <div class="vzp__chips" role="group" aria-label="Aperçu d’autres finitions" data-chips></div>
+          </div>
         </div>
       </section>
 
