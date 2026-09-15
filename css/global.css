@@ -54,6 +54,12 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 
 .section { padding-block: var(--section-y); position: relative; }
 .section--flush-top { padding-top: 0; }
+/* Première section d'une page, sans hero ni fil d'Ariane devant elle pour
+   dégager l'en-tête fixe. Seule la 404 est dans ce cas, et son « Erreur 404 »
+   passait dessous sur 9 formats sur 11. On ajoute la hauteur de l'en-tête au
+   rythme normal, rien de plus : l'écart visible vaut alors `--section-y`, comme
+   entre deux sections ailleurs. */
+.section--below-header { padding-top: calc(var(--header-h) + var(--section-y)); }
 .section--tight { padding-block: clamp(3rem, 1.5rem + 5vw, 6rem); }
 /**
  * Trois poids de section, pas un seul.
