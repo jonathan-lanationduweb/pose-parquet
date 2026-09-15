@@ -1,7 +1,7 @@
 /* Nouvelle page d'accueil — composition éditoriale plein cadre. */
 const { SITE } = require('./layout');
 const { picture } = require('./responsive');
-const { NB_PIECES } = require('./scenes');
+const { NB_PIECES, scene } = require('./scenes');
 
 const ICON = {
   arrow:
@@ -161,19 +161,87 @@ function simulatorSection() {
             <div>
               <p class="lead">Importez une photo, choisissez un parquet et comparez plusieurs rendus. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée ni conservée.</p>
               <p class="u-mt-5 u-actions">
-                <a class="btn" href="outils/studio.html"><span>Visualiser mon parquet</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+                <!-- « data-vz-open » : js/scene/preview.js enrichit ce lien avec la
+                     configuration affichée dans l'aperçu, pour que le Studio
+                     s'ouvre sur ce que le visiteur regarde et non sur un état par
+                     défaut. L'adresse ci-dessous reste valable telle quelle si le
+                     script ne s'exécute pas — le lien n'est jamais cassé. -->
+                <a class="btn" href="outils/studio.html" data-vz-open><span>Visualiser mon parquet</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
                 <a class="link-arrow" href="outils/simulateur-pose.html">Étudier le sens de pose ${ICON.arrow}</a>
               </p>
             </div>
           </div>
-          <!-- Scène de l'avant/après : uniquement une scène VALIDÉE sur les cinq
-               critères de _calibrage/scene-review.html. « chambre » est la seule à
-               l'être — géométrie mesurée sur trois murs, recoupée par un contrôle
-               d'invariance. « sejour » reste à « correct » : la brillance du sol
-               d'origine n'est pas restituée. -->
-          <div data-vz-preview data-room="chambre" data-base="" data-reveal></div>
+          <!-- Scène de l'avant/après : une scène VALIDÉE sur les cinq critères de
+               _calibrage/scene-review.html, et la mieux placée pour une première
+               impression.
+
+               « chambre » tenait ce rôle à l'époque où elle était la seule
+               validée. Elle ne l'est plus : au manifeste, « sejour » est passée
+               validated en géométrie ET en visuel. Le choix se joue donc
+               maintenant sur ce que la photo montre, et « sejour » gagne sur les
+               trois points qui comptent ici — un séjour plutôt qu'une pièce aux
+               murs bleus, une lumière chaude plutôt que froide, et 35,4 % de
+               l'image en sol contre 26,3 %.
+
+               Elle a surtout **deux zones de sol** : le séjour et la salle à
+               manger derrière l'ouverture changent ensemble. C'est la meilleure
+               démonstration possible que le rendu est calculé, et non une image
+               retouchée d'avance. -->
+          ${apercuSquelette('sejour')}
         </div>
       </section>`;
+}
+
+/**
+ * Le squelette de l'aperçu, écrit dans le HTML plutôt que par le JavaScript.
+ *
+ * Mesuré avant correction : l'hôte `data-vz-preview` faisait 0 px de haut
+ * jusqu'à l'exécution de `js/scene/preview.js`, qui y injectait d'un coup
+ * 317 px de composant — le document passait de 9 535 à 9 853 px et tout ce qui
+ * suivait la section descendait sous les yeux du visiteur.
+ *
+ * La place est donc réservée ici, par la même structure que le module produira.
+ * Elle ne coûte rien : le rapport de forme du cadre est déjà porté par
+ * `.vzp__stage` dans la feuille de style, et la photo est en `loading="lazy"`
+ * — le navigateur connaît ses dimensions par `width`/`height` et tient la boîte
+ * sans avoir téléchargé un octet.
+ *
+ * Ce n'est pas une image d'illustration : c'est la photo « avant » de la scène,
+ * celle-là même que le composant affiche sous le rendu. Aucun parquet n'est
+ * montré tant qu'il n'a pas été calculé.
+ *
+ * `preview.js` réutilise ce squelette s'il le trouve complet, et le recrée
+ * sinon : les deux chemins restent valides, et une divergence se répare seule.
+ */
+function apercuSquelette(id) {
+  const piece = scene(id);
+  const img = piece.image;
+  const credit = img.credit ? `Photo : ${img.credit}.` : '';
+  // La classe « vzp » est posée ici et non par le script : elle porte
+  // `display: grid` et sa gouttière, soit 16 px qui apparaissaient au montage.
+  // Réserver le cadre sans réserver la gouttière laissait un dernier sursaut.
+  return `<div class="vzp" data-vz-preview data-room="${id}" data-base="" data-reveal>
+            <figure class="vzp__figure">
+              <div class="vzp__stage" data-stage>
+                <img class="vzp__photo" data-photo loading="lazy" decoding="async"
+                  width="${img.width}" height="${img.height}"
+                  src="assets/images/${img.file}" alt="${img.alt}" />
+                <!-- Couche visuelle d'une figure qui porte deja sa description
+                     dans la legende : rien a annoncer une seconde fois. -->
+                <canvas class="vzp__canvas" data-canvas aria-hidden="true"></canvas>
+                <span class="vzp__tag vzp__tag--before">Avant</span>
+                <span class="vzp__tag vzp__tag--after">Après</span>
+                <input class="vzp__range" type="range" min="3" max="97" value="52"
+                  aria-label="Curseur de comparaison entre la pièce d’origine et le parquet simulé" data-range />
+                <span class="vzp__handle" aria-hidden="true"></span>
+              </div>
+              <figcaption class="vzp__caption">
+                <span data-caption>Chêne naturel, lames droites</span> — rendu calculé dans votre navigateur.
+                <span data-credit>${credit}</span>
+              </figcaption>
+            </figure>
+            <div class="vzp__chips" role="group" aria-label="Aperçu d’autres finitions" data-chips></div>
+          </div>`;
 }
 
 function carouselEditorial(guides) {
