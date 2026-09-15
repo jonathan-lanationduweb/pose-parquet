@@ -394,9 +394,9 @@ function buildGuides() {
   write(
     'guides/index.html',
     layout({
-      title: 'Guides de pose du parquet : choisir, préparer, poser | Pose Parquet',
+      title: 'Guides de pose du parquet : préparer et poser | Pose Parquet',
       description:
-        "Tous les guides Pose Parquet : sens de pose, préparation du support, motifs, massif ou contrecollé, erreurs à éviter. Des repères concrets pour réussir votre chantier.",
+        "Sens de pose, préparation du support, motifs, massif ou contrecollé, erreurs à éviter : des repères concrets pour réussir votre chantier.",
       path: 'guides/index.html',
       depth: 1,
       css: ['css/pages/listing.css'],
@@ -498,7 +498,7 @@ function buildMotifs() {
   write(
     'motifs/index.html',
     layout({
-      title: 'Motifs de pose du parquet : droite, diagonale, chevrons | Pose Parquet',
+      title: 'Motifs de pose du parquet : lesquels choisir | Pose Parquet',
       description:
         "Pose droite, dans la longueur, dans la largeur, diagonale, Point de Hongrie, bâton rompu : rendu, chutes, difficulté et pièces adaptées pour chaque motif.",
       path: 'motifs/index.html',
@@ -788,7 +788,7 @@ function buildInspiration() {
   write(
     'inspiration/index.html',
     layout({
-      title: 'Inspiration parquet : motifs, sens de pose et ambiances | Pose Parquet',
+      title: 'Inspiration parquet : motifs et ambiances | Pose Parquet',
       description:
         "Galerie d'inspiration : pose droite, diagonale, Point de Hongrie et bâton rompu dans des séjours, chambres, cuisines et couloirs.",
       path: 'inspiration/index.html',
@@ -888,7 +888,7 @@ function buildTools() {
   write(
     'outils/index.html',
     layout({
-      title: 'Outils parquet : simulateur de pose et calculateurs | Pose Parquet',
+      title: 'Outils parquet : simulateur et calculateurs | Pose Parquet',
       description:
         "Les outils Pose Parquet : simulateur de sens de pose, et prochainement calculateur de surface, calepinage, checklist avant pose et diagnostic du support.",
       path: 'outils/index.html',
@@ -1125,7 +1125,7 @@ function buildApropos() {
   write(
     'a-propos/index.html',
     layout({
-      title: 'À propos de Pose Parquet | Média pratique sur la pose du parquet',
+      title: 'À propos de Pose Parquet, média sur la pose du parquet',
       description:
         "Pose Parquet est un média indépendant consacré à la pose du parquet : guides, motifs, tutoriels et outils de visualisation. Aucune vente, aucune publicité.",
       path: 'a-propos/index.html',
@@ -1218,7 +1218,7 @@ function buildHome() {
   write(
     'index.html',
     layout({
-      title: 'Pose Parquet — Comprendre, préparer et réussir la pose de son parquet',
+      title: 'Pose Parquet — Comprendre et réussir la pose de son parquet',
       description:
         "Média pratique et boîte à outils sur la pose du parquet : guides, motifs, tutoriels, inspiration et un simulateur de sens de pose gratuit.",
       path: 'index.html',
@@ -1260,6 +1260,13 @@ function build404() {
       description: 'La page demandée est introuvable. Retrouvez les guides, les motifs et le simulateur de pose.',
       path: '404.html',
       depth: 0,
+      /*
+       * `noindex, follow` : une page d'erreur n'a aucune raison de figurer dans
+       * les résultats de recherche, mais ses liens vers l'accueil, les guides
+       * et le simulateur restent de vrais liens qu'un moteur peut suivre.
+       * `nofollow` les gaspillerait sans rien protéger.
+       */
+      robots: 'noindex, follow',
       body,
     })
   );
