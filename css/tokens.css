@@ -144,8 +144,18 @@
   --dur-3: 520ms;
   --dur-4: 900ms;
 
+  /* ---- En-tête ----
+   * Hauteur calculée, pas estimée. `--header-h` valait 76px en dur ; mesuré, le
+   * header fait 72,8 px à 320 de large et 89,6 px au-delà de 1600. Il se
+   * décompose exactement en `contenu + 2 × padding` : le contenu est constant
+   * (44 à 44,75 px), le padding est fluide et fait toute la variation. On nomme
+   * donc le padding, `.site-header` l'utilise, et la hauteur s'en déduit — les
+   * deux ne peuvent plus diverger. 2,8rem = la mesure arrondie au-dessus, pour
+   * que le dégagement ne soit jamais court (marge : 0,8 px au pire). */
+  --header-pad: clamp(0.9rem, 0.6rem + 0.8vw, 1.4rem);
+  --header-h: calc(2.8rem + 2 * var(--header-pad));
+
   /* ---- Divers ---- */
-  --header-h: 76px;
   --z-header: 100;
   --z-drawer: 200;
   --z-modal: 300;

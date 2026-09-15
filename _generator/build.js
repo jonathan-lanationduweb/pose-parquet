@@ -1241,7 +1241,13 @@ function buildHome() {
 }
 
 function build404() {
-  const body = `      <section class="section">
+  /*
+   * `section--below-header` : la 404 est la seule page dont le <main> commence
+   * par une section nue, sans fil d'Ariane ni hero pour dégager l'en-tête fixe.
+   * Le modificateur vit dans css/global.css, avec les autres poids de section —
+   * pas une marge écrite ici pour cette page seule.
+   */
+  const body = `      <section class="section section--below-header">
         <div class="wrap-text u-center">
           <p class="eyebrow">Erreur 404</p>
           <h1>Cette lame n'est pas au bon endroit.</h1>

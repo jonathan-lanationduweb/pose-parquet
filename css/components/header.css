@@ -3,7 +3,8 @@
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: var(--z-header);
-  padding-block: clamp(0.9rem, 0.6rem + 0.8vw, 1.4rem);
+  /* Le jeton dont `--header-h` se déduit : voir tokens.css. */
+  padding-block: var(--header-pad);
   color: var(--text);
   transition: background var(--dur-3) var(--ease-out), color var(--dur-3) var(--ease-out),
               box-shadow var(--dur-3) var(--ease-out), padding var(--dur-3) var(--ease-out);
