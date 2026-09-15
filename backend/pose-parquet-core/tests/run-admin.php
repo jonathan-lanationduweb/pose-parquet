@@ -158,7 +158,7 @@ $nettoie();
 /* ================================================================== */
 $section( 'Pré-requis' );
 
-$verifie( 'plugin en version 0.4.1', POSE_PARQUET_VERSION === '0.4.1', POSE_PARQUET_VERSION );
+$verifie( 'plugin en version 0.4.2', POSE_PARQUET_VERSION === '0.4.2', POSE_PARQUET_VERSION );
 $verifie( 'schéma de base inchangé (3)', POSE_PARQUET_DB_VERSION === 3, (string) POSE_PARQUET_DB_VERSION );
 $verifie( 'table des notes présente', ( Schema::status()['notes'] ?? false ) === true );
 $verifie( 'classes du lot chargées', class_exists( ProjectsPage::class ) && class_exists( Actions::class ) && class_exists( Notes::class ) && class_exists( StatusService::class ) );
@@ -618,7 +618,13 @@ $poste( [
 ] );
 $code = $appelle( [ Actions::class, 'update_status' ] );
 $verifie( 'gestionnaire : autorisé à changer le statut', $code === Notices::STATUS_UPDATED, $code );
-$verifie( 'et signé à son nom', (int) end( $repo->history_of( $prg ) )['user_id'] === $gestionnaire );
+// `end()` attend une variable par référence : lui passer directement le retour
+// de `history_of()` produit une notice « Only variables should be passed by
+// reference ». La variable intermédiaire ne change rien au test, elle rend
+// seulement l’appel légal.
+$historique = $repo->history_of( $prg );
+$dernier    = end( $historique );
+$verifie( 'et signé à son nom', (int) $dernier['user_id'] === $gestionnaire );
 
 $_POST    = [];
 $_REQUEST = [];

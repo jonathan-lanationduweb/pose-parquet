@@ -32,6 +32,7 @@ use PoseParquet\Core\Antispam\FormToken;
 use PoseParquet\Core\Antispam\RateLimiter;
 use PoseParquet\Core\Database\Installer;
 use PoseParquet\Core\Database\Schema;
+use PoseParquet\Core\Mail\Diagnostics;
 use PoseParquet\Core\Projects\Repository;
 use PoseParquet\Core\Projects\Status;
 use PoseParquet\Core\Rest\Routes;
@@ -46,6 +47,11 @@ final class Menu {
 
 	public const SLUG        = Projects::PAGE;
 	public const STATUS_PAGE = 'pose-parquet-status';
+
+	/** URL de la page « État ». Une seule définition, pour une seule page. */
+	public static function status_url(): string {
+		return admin_url( 'admin.php?page=' . self::STATUS_PAGE );
+	}
 
 	public static function register(): void {
 		add_action( 'admin_menu', [ self::class, 'add_pages' ] );
@@ -156,6 +162,13 @@ final class Menu {
 			'settings_url'     => admin_url( 'admin.php?page=' . Settings::PAGE ),
 			'mail_configured'  => Settings::is_configured(),
 			'visitor_mail'     => Settings::visitor_confirmation_enabled(),
+			// Le détail honnête de l'acheminement : adresse choisie ou héritée,
+			// domaine réellement joignable, transport déclaré ou non.
+			'mail'             => Diagnostics::report(),
+			'mail_counts'      => $repo->counts_by_mail_status(),
+			'caps_missing'     => Capabilities::missing(),
+			'repair_url'       => admin_url( 'admin-post.php' ),
+			'repair_action'    => Actions::REPAIR_CAPS,
 			'rate_limits'      => RateLimiter::limits(),
 			'token_min_age'    => FormToken::MIN_AGE,
 			'token_max_age'    => FormToken::MAX_AGE,
