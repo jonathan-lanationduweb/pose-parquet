@@ -249,7 +249,10 @@
   background: var(--surface);
 }
 .visualizer__readout dt {
-  font-size: 0.66rem;
+  /* 0,75rem et non 0,66 : « Surface » et « Chutes estimées » ne sont pas de la
+     métadonnée décorative, ce sont les chiffres qu'on vient lire. Sous 12 px
+     un contenu utile devient un effort. */
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-muted);
@@ -305,7 +308,8 @@
   /* Quatre repères en deux fois deux : aucune carte orpheline. */
   .visualizer__readout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .visualizer__readout > div { padding: 0.45rem 0.55rem; }
-  .visualizer__readout dt { font-size: 0.64rem; }
+  /* Même règle sur téléphone : la carte se resserre, pas son libellé. */
+  .visualizer__readout dt { font-size: 0.75rem; letter-spacing: 0.04em; }
 }
 @media (max-width: 26rem) {
   .visualizer__panel { padding: var(--sp-4); }
