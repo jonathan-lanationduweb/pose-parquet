@@ -8,7 +8,7 @@ HTML/CSS/JS appelle. Le front reste dans le dépôt, indépendant, déployé à 
 front (statique)  →  REST /wp-json/pose-parquet/v1/…  →  ce plugin  →  tables pp_*
 ```
 
-## Ce que contient la version 0.4.1
+## Ce que contient la version 0.4.2
 
 Fondation (0.1.0) :
 
@@ -86,6 +86,28 @@ Libellés du Visualiseur (0.4.1) — **schéma inchangé (3)** :
   refusé en 422 plutôt que tronqué en silence — le plafond de 4 Ko reste ;
 - aucune migration, aucune demande existante modifiée.
 
+Correctifs de sécurité (0.4.2) — **schéma inchangé (3)** :
+
+- `POST /projects` exige `application/json` et répond **415** sinon, avant
+  toute lecture du corps. C'est ce qui ferme la soumission inter-origines
+  « simple » : en `text/plain`, le navigateur n'émet aucun préflight, un site
+  tiers pouvait donc faire créer une demande depuis le navigateur d'un
+  visiteur, à son insu et depuis son adresse. Les en-têtes CORS ne
+  l'empêchaient pas — ils ne sont qu'une réponse ;
+- le **jeton de formulaire ne sert plus qu'une fois**. Son `nonce` existait
+  depuis le début mais n'était jamais consommé : un jeton obtenu une fois
+  valait deux heures de soumissions illimitées. La réservation est prise juste
+  avant l'écriture et relâchée si l'écriture n'a pas eu lieu — corriger un
+  champ refusé ne coûte donc pas le jeton. Ce qui est stocké est un HMAC du
+  nonce, jamais le jeton, sans aucune donnée personnelle, pour la durée de vie
+  restante ;
+- `http://localhost:5180` **n'est plus une origine CORS par défaut**. Il
+  l'était sur toute installation sans `POSE_PARQUET_ALLOWED_ORIGINS`,
+  production comprise. Les origines de développement s'ajoutent quand le site
+  se déclare `local` ou `development` ;
+- aucune migration, aucune demande existante modifiée, format du jeton
+  inchangé, codes d'erreur existants inchangés.
+
 Pas encore : renvoi d'un email, suppression de demande, Turnstile. Voir
 `docs/backend/roadmap.md` à la racine du dépôt.
 
@@ -100,9 +122,12 @@ Copier (ou lier) ce dossier dans `wp-content/plugins/pose-parquet-core/`, puis
 activer « Pose Parquet » dans Extensions. L'activation crée les tables et pose
 les droits. Vérifier sur *Pose Parquet → État* ou sur `/wp-json/pose-parquet/v1/health`.
 
-Origines CORS : par défaut `http://localhost:5180`,
-`https://jonathan-lanationduweb.github.io`, `https://pose-parquet.com`,
-`https://www.pose-parquet.com`. Pour les remplacer, dans `wp-config.php` :
+Origines CORS : par défaut `https://jonathan-lanationduweb.github.io`,
+`https://pose-parquet.com`, `https://www.pose-parquet.com`. Le poste de
+développement (`http://localhost:5180`) n'y est plus : sur une installation de
+recette, ajouter `define( 'WP_ENVIRONMENT_TYPE', 'local' );` — ce qui autorise
+`localhost:5180` et `127.0.0.1:5180` — ou déclarer la liste complète. Pour les
+remplacer, dans `wp-config.php` :
 
 ```php
 define( 'POSE_PARQUET_ALLOWED_ORIGINS', [ 'https://pose-parquet.com', 'https://www.pose-parquet.com' ] );
