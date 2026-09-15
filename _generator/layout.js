@@ -187,6 +187,7 @@ function breadcrumb(p, trail) {
  * @param {string} page.body        contenu HTML du <main>
  * @param {string[]} [page.css]     feuilles additionnelles, relatives à la racine
  * @param {object[]} [page.jsonld]  données structurées
+ * @param {boolean} [page.runtimeConfig] charge config.js (adresse du backend)
  */
 function layout(page) {
   const p = page.depth === 0 ? '' : '../';

@@ -184,3 +184,28 @@
   color: var(--c-sage-deep);
   font-variant-numeric: tabular-nums;
 }
+
+/*
+ * Bandeau d'indisponibilite, en tete du formulaire.
+ *
+ * Il est volontairement calme : ni rouge d'erreur, ni icone d'alarme. Rien
+ * n'est casse, et le visiteur n'a rien fait de mal — c'est le service qui
+ * n'est pas encore branche. Le ton est celui d'une information, et l'action
+ * qui marche (ecrire) est le seul bouton plein de la zone.
+ */
+.pf__offline {
+  margin: 0 0 var(--sp-5);
+  padding: clamp(0.95rem, 0.7rem + 0.8vw, 1.4rem);
+  border: 1px solid var(--line-strong);
+  border-left: 3px solid var(--c-clay, #b3462f);
+  border-radius: var(--r-block);
+  background: var(--bg-soft, #f6f3ec);
+  display: grid;
+  gap: 0.55rem;
+}
+.pf__offline p { margin: 0; font-size: 0.95rem; color: var(--text-soft); }
+.pf__offline-title { font-weight: 500; color: var(--text) !important; font-size: 1rem !important; }
+.pf__offline .btn { margin-top: 0.2rem; }
+
+/* Le bouton d'envoi desactive doit avoir l'air desactive, pas casse. */
+.pf [data-submit]:disabled { opacity: 0.45; cursor: not-allowed; }
