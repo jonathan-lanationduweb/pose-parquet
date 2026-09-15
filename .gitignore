@@ -6,6 +6,7 @@ desktop.ini
 # Editeurs
 .vscode/
 .idea/
+.claude/
 *.swp
 _calibrage/_candidates/
 
