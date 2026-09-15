@@ -30,6 +30,55 @@ elle est respectée : le front n'a aucun secret. Le jeton anti-spam est public
 par construction, à usage unique et de courte durée, et ne quitte jamais la
 mémoire du navigateur.
 
+## Définir l'API au déploiement, sans toucher au code (14/09/2026)
+
+Le tableau ci-dessus reste le défaut, mais il n'est plus le seul chemin — et ce
+n'était pas tenable : l'adresse du backend est une donnée d'environnement, et
+elle demandait jusqu'ici un commit dans `js/forms/api-config.js`, c'est-à-dire
+une modification de code métier pour une valeur de configuration.
+
+Le générateur écrit désormais un fichier `config.js` à la racine, **neutre** :
+
+```js
+window.POSE_PARQUET_CONFIG = window.POSE_PARQUET_CONFIG || {};
+```
+
+Aucune adresse n'y est posée, donc le tableau des hôtes décide seul, exactement
+comme avant. Seule la page `projet/index.html` le charge — c'est la seule qui
+parle au backend — et en script classique, donc avant les modules.
+
+Au déploiement, si la variable de dépôt `API_BASE_URL` est définie, le workflow
+remplace **ce seul fichier** :
+
+```js
+window.POSE_PARQUET_CONFIG.apiBaseUrl = "https://admin.pose-parquet.com/wp-json/pose-parquet/v1";
+```
+
+Le workflow refuse une adresse qui n'est pas en HTTPS, et vérifie que le fichier
+a bien été écrit. Rien d'autre n'est réécrit : le code métier n'est jamais
+touché par un déploiement.
+
+Conséquence pratique : brancher le formulaire sur le backend, le jour venu, ne
+demandera **ni commit ni reconstruction** — seulement de renseigner une variable
+et de relancer le déploiement. Et le débrancher, en cas de problème, est aussi
+rapide.
+
+## L'indisponibilité se dit maintenant AVANT la saisie (14/09/2026)
+
+Le message existait déjà, et il était honnête. Il arrivait seulement trop tard :
+le visiteur remplissait cinq étapes, cliquait « Envoyer », et apprenait à ce
+moment-là que rien ne partirait.
+
+Quand aucun backend n'est configuré pour l'hôte, le formulaire affiche
+maintenant, **au-dessus de la première étape**, un bandeau qui dit ce qu'il en
+est et donne l'adresse email qui, elle, fonctionne. Le bouton d'envoi est
+désactivé — un bouton actif au bout de cinq étapes est une promesse, et
+celle-là ne serait pas tenue. Les étapes restent navigables : elles servent
+aussi à préparer ce qu'on va écrire.
+
+Le bandeau disparaît de lui-même le jour où un backend est configuré. C'est un
+état, pas une décision de conception, et rien n'est à défaire.
+
 ## Ce qu'il faut avant le lancement
 
 ### 1. Héberger le backend

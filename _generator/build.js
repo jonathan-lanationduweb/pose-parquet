@@ -1025,6 +1025,8 @@ function buildProjet() {
       depth: 1,
       css: ['css/pages/project.css', 'components/project-form/project-form.css'],
       jsonld: [crumbs.jsonld],
+      // Seule page qui parle au backend : seule page qui charge config.js.
+      runtimeConfig: true,
       body,
     })
   );
@@ -1327,6 +1329,48 @@ Sitemap: ${SITE.domain}/sitemap.xml
 `
   );
 
+  buildRuntimeConfig();
+}
+
+/**
+ * `config.js` — le seul fichier que le déploiement a le droit de réécrire.
+ *
+ * Le problème qu'il résout : l'adresse du backend n'est pas la même en
+ * développement, en préproduction et en production, et elle n'est pas encore
+ * connue pour les deux dernières. Jusqu'ici la seule façon de la définir était
+ * `js/forms/api-config.js`, c'est-à-dire du code métier — donc un commit, une
+ * relecture et une reconstruction pour ce qui est une donnée d'environnement.
+ *
+ * Ce fichier est volontairement NEUTRE dans le dépôt : il crée l'objet de
+ * configuration sans y poser `apiBaseUrl`. L'absence de la clé laisse
+ * `api-config.js` décider par son tableau d'hôtes, exactement comme avant. Le
+ * déploiement, lui, remplace ce seul fichier quand la variable
+ * `API_BASE_URL` est définie — voir .github/workflows/deploy-pages.yml.
+ *
+ * Il est chargé uniquement par la page qui en a besoin (le formulaire projet),
+ * en script classique donc avant les modules, et sans empreinte dans son nom :
+ * un nom stable est précisément ce qui permet de le remplacer au déploiement.
+ */
+function buildRuntimeConfig() {
+  write(
+    'config.js',
+    `/*
+ * Configuration d'environnement — généré par _generator/build.js.
+ *
+ * Neutre par défaut : aucune adresse d'API n'est posée ici, et c'est voulu.
+ * Le tableau des hôtes de js/forms/api-config.js décide alors seul, et un
+ * environnement sans backend affiche honnêtement son indisponibilité.
+ *
+ * Le déploiement remplace ce fichier — et lui seul — pour brancher l'API :
+ *
+ *   window.POSE_PARQUET_CONFIG.apiBaseUrl =
+ *     'https://admin.pose-parquet.com/wp-json/pose-parquet/v1';
+ *
+ * Ne rien écrire ici à la main : la prochaine construction l'effacerait.
+ */
+window.POSE_PARQUET_CONFIG = window.POSE_PARQUET_CONFIG || {};
+`
+  );
 }
 
 /* ------------------------------------------------------------------ */

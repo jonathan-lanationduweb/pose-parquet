@@ -203,6 +203,25 @@ export function mountProjectForm(root, options = {}) {
 
   root.classList.add('project-form');
   root.innerHTML = `
+    <!--
+      Indisponibilité annoncée AVANT la saisie.
+
+      Le message existait déjà, mais il arrivait à la fin : le visiteur
+      remplissait cinq étapes, cliquait « Envoyer », et apprenait à ce
+      moment-là que rien ne partirait. C'était honnête et c'était quand même
+      une perte de temps. Ce bandeau dit la même chose au premier écran, et
+      donne tout de suite le chemin qui, lui, fonctionne.
+
+      Il ne s'affiche que si aucun backend n'est configuré pour cet hôte, et
+      disparaît de lui-même le jour où il y en a un : c'est un état, pas une
+      décision de conception.
+    -->
+    <div class="pf__offline" role="status" hidden>
+      <p class="pf__offline-title">Ce formulaire ne peut pas encore envoyer votre demande.</p>
+      <p>Le service qui reçoit les projets n’est pas relié à cette version du site. Pour nous décrire votre chantier dès maintenant, écrivez-nous — nous répondons à chaque message.</p>
+      <p><a class="btn btn--accent btn--sm" href="mailto:projet@pose-parquet.com">Écrire à projet@pose-parquet.com</a></p>
+    </div>
+
     <form class="pf" novalidate>
       <div class="pf__head">
         <p class="pf__count" aria-live="polite">Étape <b>1</b> sur ${config.steps.length}</p>
@@ -311,6 +330,20 @@ export function mountProjectForm(root, options = {}) {
     // Prévenir au chargement d'une page qu'on vient peut-être seulement de
     // parcourir serait bruyant pour rien.
     tokenPromise = renewToken().catch(() => {});
+  } else {
+    /*
+     * Aucun backend pour cet hôte. On le dit au premier écran, et on retire
+     * l'action qui ne peut pas aboutir : un bouton « Envoyer » actif au bout
+     * de cinq étapes est une promesse, et celle-là ne serait pas tenue.
+     *
+     * Le reste du formulaire continue de fonctionner. Ce n'est pas de
+     * l'entêtement : les étapes servent aussi à préparer ce qu'on va écrire,
+     * et le bandeau donne l'adresse pour l'envoyer vraiment.
+     */
+    const bandeau = root.querySelector('.pf__offline');
+    if (bandeau) bandeau.hidden = false;
+    submitBtn.disabled = true;
+    submitBtn.title = 'Envoi indisponible sur cette version du site';
   }
 
   /** Vrai tant qu'une requête d'envoi est en vol. */
