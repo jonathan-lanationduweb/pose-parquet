@@ -72,7 +72,9 @@ body.app--product {
 .pv__brand { display: flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; margin-right: auto; }
 .pv__mark { width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-size: 13px; }
 .pv__name b { display: block; font: 500 18px/1 var(--font-display); letter-spacing: -0.01em; }
-.pv__name small { display: block; font-size: 11px; color: var(--ink-3); margin-top: 3px; letter-spacing: 0.01em; }
+/* 0,75rem plutôt que 11px : un pixel en dur ignore le réglage de taille de
+   texte du navigateur, et cette ligne se lit — ce n'est pas un ornement. */
+.pv__name small { display: block; font-size: 0.75rem; color: var(--ink-3); margin-top: 3px; letter-spacing: 0.01em; }
 .hbtn {
   display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px;
   border-radius: 10px; font-size: 14px; color: var(--ink-2);
@@ -80,7 +82,9 @@ body.app--product {
 }
 .hbtn:hover { background: rgba(28, 28, 26, 0.05); color: var(--ink); }
 .hbtn--icon { width: 36px; padding: 0; justify-content: center; }
-.hbtn .cnt { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent); color: #fff; font-size: 11px; display: grid; place-items: center; }
+/* Pastille de comptage : elle reste petite — elle tient dans 18 px — mais en
+   rem, donc elle suit le réglage du navigateur au lieu de l'ignorer. */
+.hbtn .cnt { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent); color: #fff; font-size: 0.6875rem; display: grid; place-items: center; }
 .hbtn[aria-pressed="true"] { color: var(--accent); }
 
 /* ---------------- Scène ---------------- */
