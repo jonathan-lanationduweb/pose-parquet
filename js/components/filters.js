@@ -17,6 +17,16 @@ export function initFilters(root) {
       if (match) visible += 1;
     });
     if (empty) empty.hidden = visible > 0;
+    /*
+     * Le filtre ne sait pas ce qu'il filtre — une grille, un carrousel,
+     * autre chose demain. Il annonce donc son passage et laisse celui que
+     * cela concerne se remettre à jour. Sur la page Inspiration, c'est le
+     * carrousel qui écoute : sans cela, son compteur continuerait d'annoncer
+     * huit ambiances alors que trois seulement sont montrables.
+     */
+    container.dispatchEvent(
+      new CustomEvent('filtres:appliques', { bubbles: true, detail: { valeur: value, visibles: visible } })
+    );
   };
 
   chips.forEach((chip) => {

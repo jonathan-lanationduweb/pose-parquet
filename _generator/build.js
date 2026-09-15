@@ -663,34 +663,58 @@ function lienStudio(item) {
  * vignette, et deux arrets de tabulation pour une seule destination sont une
  * gene au clavier, pas une aide.
  */
-function carteInspiration(item) {
+/**
+ * Une ambiance, en pleins feux.
+ *
+ * La photographie porte le texte plutôt que de le précéder : c'est elle qu'on
+ * regarde, et le titre n'a pas à lui disputer de la place. Toute la carte est
+ * la cible — le lien enveloppe l'image et sa légende, il n'y a donc pas de
+ * petite pastille à viser.
+ *
+ * Le partage des rôles ne change pas : une pièce calibrée ouvre le Studio sur
+ * cette photographie même, une ambiance sans pièce s'agrandit. Ce qui est
+ * interdit, c'est de promettre un essai qu'on ne peut pas tenir — le contrôle
+ * de _generator/check-inspiration.js fait échouer le build dans ce cas.
+ *
+ * Seule la première image est prioritaire : les sept autres sont hors écran,
+ * horizontalement, et le navigateur les charge quand on s'en approche. Sur un
+ * téléphone, la page ne descend donc qu'une photographie.
+ */
+function diapositiveInspiration(item, index) {
   const href = lienStudio(item);
-  const sizes = '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw';
-  const vignette = picture(item.image, { base: '../', alt: item.alt, sizes });
+  const sizes =
+    '(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw';
+  const vue = picture(item.image, { base: '../', alt: item.alt, sizes, priority: index === 0 });
+
+  const legende = `<figcaption class="spot__cap">
+                  <span class="spot__title">${item.title}</span>
+                  <span class="spot__meta">${item.meta}</span>
+                  ${
+                    href
+                      ? `<span class="spot__try">Essayer cette ambiance ${ICON.arrow}</span>`
+                      : `<span class="spot__credit">Photographie ${item.credit}</span>`
+                  }
+                </figcaption>`;
+
   const surface = href
-    ? `<a class="gallery__open" href="${href}" aria-label="Essayer cette ambiance dans le Studio : ${item.title}">
-                ${vignette}
+    ? `<a class="spot__surface" href="${href}" aria-label="Essayer cette ambiance dans le Studio : ${item.title}, ${item.meta}">
+                <span class="spot__media">${vue}</span>
+                ${legende}
               </a>`
-    : `<button class="gallery__zoom" type="button"
+    : `<button class="spot__surface" type="button"
                 data-lightbox-trigger="${item.title} — ${item.meta}" aria-label="Agrandir : ${item.title}">
-                ${vignette}
+                <span class="spot__media">${vue}</span>
+                ${legende}
               </button>`;
-  const pastille = href
-    ? `
-                <a class="gallery__try" href="${href}" tabindex="-1">Essayer cette ambiance ${ICON.arrow}</a>`
-    : '';
-  return `<figure class="gallery__item${href ? ' gallery__item--try' : ''}" data-tags="${item.tags}">
+
+  return `<figure class="carousel__slide spot" data-tags="${item.tags}">
               ${surface}
-              <figcaption class="gallery__caption">
-                <span>${item.title}</span>
-                <span class="mono">${item.meta}</span>${pastille}
-              </figcaption>
             </figure>`;
 }
 
 function buildInspiration() {
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'Inspiration' }]);
-  const gallery = INSPIRATIONS.map(carteInspiration).join('\n            ');
+  const diapositives = INSPIRATIONS.map(diapositiveInspiration).join('\n            ');
 
   // Filtres limités aux motifs réellement visibles dans les photographies.
   const filters = [
@@ -712,8 +736,22 @@ function buildInspiration() {
         </div>
       </header>
 
-      <section class="section section--flush-top">
+      <section class="section spotlight section--flush-top" data-carousel aria-labelledby="inspi-title">
         <div class="wrap-wide">
+          <div class="spotlight__head">
+            <div>
+              <p class="eyebrow">Ambiances</p>
+              <h2 id="inspi-title">Voir avant de choisir.</h2>
+            </div>
+            <!-- Les commandes n'apparaissent qu'avec JavaScript : sans lui, la
+                 piste se fait défiler au doigt ou à la barre de défilement, et
+                 deux boutons morts ne serviraient qu'à décevoir. -->
+            <div class="spotlight__nav" data-carousel-nav hidden>
+              <span class="spotlight__count" data-carousel-count>01 / ${String(INSPIRATIONS.length).padStart(2, '0')}</span>
+              <button class="spotlight__btn" type="button" data-carousel-prev aria-label="Ambiance précédente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H6"/><path d="m12 19-7-7 7-7"/></svg></button>
+              <button class="spotlight__btn" type="button" data-carousel-next aria-label="Ambiance suivante">${ICON.arrow}</button>
+            </div>
+          </div>
           <div class="filter-bar" data-filters="galerie" role="group" aria-label="Filtrer par motif">
             ${filters
               .map(
@@ -722,10 +760,18 @@ function buildInspiration() {
               )
               .join('\n            ')}
           </div>
-          <div class="gallery" id="galerie">
-            ${gallery}
+        </div>
+        <div class="carousel spotlight__rail">
+          <div class="carousel__viewport" id="galerie" data-carousel-viewport tabindex="0" role="region"
+            aria-label="Ambiances, ${INSPIRATIONS.length} au total — flèches gauche et droite du clavier pour naviguer">
+            ${diapositives}
           </div>
-          <p class="filter-empty" data-filters-empty="galerie" hidden>Aucune ambiance pour ce motif pour l’instant.</p>
+          <div class="wrap-wide">
+            <p class="filter-empty" data-filters-empty="galerie" hidden>Aucune ambiance pour ce motif pour l’instant.</p>
+            <div class="carousel__progress"><span data-carousel-progress></span></div>
+          </div>
+        </div>
+        <div class="wrap-wide">
           <p class="note-inline u-mt-5">${ICON.bulb.replace('<svg', '<svg width="18" height="18"')}<span>Photographies publiées sur Pexels sous <a href="https://www.pexels.com/license/" rel="noopener">licence Pexels</a>, qui autorise l’usage sur un site. Auteurs et liens sources dans <code>assets/images/CREDITS.md</code>.</span></p>
         </div>
       </section>

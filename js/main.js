@@ -35,6 +35,19 @@ async function boot() {
     const { initCarousel } = await import('./components/carousel.js');
     const instances = qsa('[data-carousel]').map((el) => ({ el, api: initCarousel(el) }));
 
+    instances.forEach(({ el, api }) => {
+      if (!api) return;
+      // Les commandes n'existent visuellement qu'une fois le carrousel vivant.
+      const nav = qs('[data-carousel-nav]', el);
+      if (nav) nav.hidden = false;
+      // Un filtre vient de masquer des diapositives : on revient au début et
+      // on recompte, sinon le curseur pointe une ambiance qui n'est plus là.
+      el.addEventListener('filtres:appliques', () => {
+        api.viewport.scrollLeft = 0;
+        api.update();
+      });
+    });
+
     const scrollDriven = instances.filter(({ el }) => el.hasAttribute('data-scroll-carousel'));
     if (scrollDriven.length) {
       const { initScrollCarousel } = await import('./components/scroll-carousel.js');

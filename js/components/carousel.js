@@ -23,12 +23,26 @@ export function initCarousel(root) {
   const count = qs('[data-carousel-count]', root);
   if (!slides.length) return null;
 
+  /**
+   * Les diapositives réellement présentes à l'écran.
+   *
+   * Sur la page Inspiration, les filtres masquent des diapositives avec
+   * l'attribut `hidden`. Compter la liste figée du départ afficherait alors
+   * « 01 / 08 » sur un carrousel qui n'en montre plus que trois, et la largeur
+   * d'un pas se calculerait sur une diapositive invisible, donc large de zéro.
+   * Ailleurs — le carrousel des guides, par exemple — rien n'est masqué et
+   * cette fonction rend exactement la liste d'origine.
+   */
+  const presentes = () => slides.filter((s) => !s.hidden && s.getBoundingClientRect().width > 0);
+
   let mode = 'free';
   let onNavigate = null;
 
   const step = () => {
     const gap = parseFloat(getComputedStyle(viewport).columnGap || '0') || 0;
-    return slides[0].getBoundingClientRect().width + gap;
+    const vues = presentes();
+    if (!vues.length) return 0;
+    return vues[0].getBoundingClientRect().width + gap;
   };
 
   const maxScroll = () => viewport.scrollWidth - viewport.clientWidth;
@@ -50,8 +64,15 @@ export function initCarousel(root) {
       bar.style.transform = `translateX(${ratio * (100 / Math.max(visible, 0.1) - 100)}%)`;
     }
     if (count) {
-      const index = Math.min(currentIndex() + 1, slides.length);
-      count.textContent = `${String(index).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+      const total = presentes().length || slides.length;
+      /*
+       * En bout de piste, la dernière diapositive est à l'écran sans que son
+       * bord gauche puisse atteindre celui de la fenêtre : le calcul par
+       * division annonçait alors « 07 / 08 » devant la huitième. Quand il n'y
+       * a plus rien à faire défiler, c'est la dernière, sans discussion.
+       */
+      const index = max > 4 && viewport.scrollLeft >= max - 8 ? total : Math.min(currentIndex() + 1, total);
+      count.textContent = `${String(index).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
     }
   };
 
@@ -177,6 +198,8 @@ export function initCarousel(root) {
     root,
     viewport,
     slides,
+    /** Diapositives visibles a l'instant t — les filtres s'en servent. */
+    presentes,
     step,
     maxScroll,
     update,
