@@ -144,3 +144,19 @@
 .icon-btn:disabled { opacity: 0.3; cursor: default; }
 .icon-btn--light { border-color: rgba(255,255,255,0.4); color: #fff; }
 .icon-btn--light:hover:not(:disabled) { background: #fff; color: var(--c-ink); border-color: #fff; }
+
+/**
+ * Cible tactile du petit bouton.
+ *
+ * `.btn--sm` mesure 37 px de haut, ce qui est juste au bureau et trop court au
+ * doigt. Les autres commandes du site avaient deja leur regle sous
+ * `pointer: coarse` — le rail de motifs, les segments, les pastilles de teinte,
+ * les puces du formulaire — mais pas celle-ci, releve le 14/09/2026 sur
+ * l'accueil et le Mode Plan.
+ *
+ * 44 px : la cible de reference, et la meme valeur que partout ailleurs. Rien
+ * ne change au pointeur fin, ou 37 px se visent tres bien.
+ */
+@media (pointer: coarse) {
+  .btn--sm { min-height: 44px; }
+}

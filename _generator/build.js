@@ -13,7 +13,7 @@ const { buildHomeBody } = require('./home');
 const { buildVisualiseurPage } = require('./visualiseur');
 const { resolveSources } = require('./sources');
 const { NB_PIECES, PIECES } = require('./scenes');
-const { buildAssets } = require('./assets');
+const { buildAssets, verifierRattachements } = require('./assets');
 const { ecrireTexte } = require('./eol');
 const { picture } = require('./responsive');
 
@@ -1356,7 +1356,20 @@ const build = buildAssets(ROOT, {
     'css/pages/tools.css',
     'css/pages/project.css',
     'css/pages/home.css',
-    'components/project-form/project-form.css',
+    /*
+     * `components/project-form/project-form.css` N'EST PLUS ici.
+     *
+     * Elle y était restée quand la feuille est devenue un paquet de page
+     * (BUNDLES_PAGE, entrée « formulaire »). Elle partait donc deux fois : dans
+     * le paquet global servi aux 32 pages, et dans le paquet dédié servi à
+     * /projet/. Les 7,5 Ko que le découpage devait retirer étaient toujours
+     * payés par tout le site, et la seule page qui s'en sert les téléchargeait
+     * en double.
+     *
+     * Les feuilles qui restent dans cette liste sont celles qu'aucun marqueur
+     * ne peut rattacher : elles s'appliquent à des familles de pages entières
+     * (listing, article, outils, projet, accueil) et non à un composant.
+     */
   ],
 });
 
@@ -1420,5 +1433,40 @@ function ecrireSignature() {
 }
 ecrireSignature();
 
+/*
+ * Le découpage du CSS ne vaut que s'il est vérifié.
+ *
+ * On relit les pages écrites et on compare, pour chaque feuille rattachée, la
+ * présence du marqueur et celle du lien. Une divergence arrête la
+ * construction : mieux vaut ne rien publier qu'une page dont le composant
+ * principal est sans style.
+ */
+const pagesEcrites = (function lister(dossier, prefixe) {
+  const out = [];
+  for (const entree of fs.readdirSync(dossier, { withFileTypes: true })) {
+    if (entree.isDirectory()) {
+      if (['assets', 'node_modules', '.git', '_generator', '_calibrage', 'backend', 'docs', 'design', 'components'].includes(entree.name)) continue;
+      out.push(...lister(path.join(dossier, entree.name), `${prefixe}${entree.name}/`));
+    } else if (entree.name.endsWith('.html')) {
+      out.push(`${prefixe}${entree.name}`);
+    }
+  }
+  return out;
+})(ROOT, '');
+
+const anomalies = verifierRattachements(ROOT, pagesEcrites);
+if (anomalies.length) {
+  console.error('\nRattachement des feuilles de style incohérent :');
+  anomalies.forEach((a) => console.error('  ' + a));
+  process.exit(1);
+}
+
 console.log('Site généré dans', ROOT);
 console.log(`Assets : ${build.css} (${Math.round(build.sizes.css / 1024)} Ko), ${build.js} (${build.sizes.js} modules)`);
+console.log(
+  'Feuilles par page : ' +
+    build.pageBundles
+      .map((b) => `${b.nom} ${Math.round(fs.statSync(path.join(ROOT, b.url)).size / 1024)} Ko`)
+      .join(', ')
+);
+console.log(`${pagesEcrites.length} pages vérifiées : marqueur et feuille concordent.`);

@@ -235,7 +235,29 @@ function layout(page) {
     <link rel="manifest" href="${p}site.webmanifest?v=${build.icons}" />
     <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/inter-400-1.woff2" crossorigin />
-    <link rel="stylesheet" href="${p}${build.css}" />
+    <link rel="stylesheet" href="${p}${build.css}" />${
+      /*
+       * Feuilles rattachées par marqueur.
+       *
+       * On regarde ce que la page CONTIENT, pas ce qu'elle a déclaré. Une
+       * déclaration s'oublie ; un marqueur est l'attribut de montage du
+       * composant lui-même, et il ne peut pas manquer sans que le composant
+       * manque aussi. Voir BUNDLES_PAGE dans assets.js.
+       */
+      (build.pageBundles || [])
+        .filter((bundle) => page.body.includes(bundle.marqueur))
+        .map((bundle) => `\n    <link rel="stylesheet" href="${p}${bundle.url}" />`)
+        .join('')
+    }${
+      page.runtimeConfig
+        ? `
+    <!-- Adresse du backend, définissable au déploiement sans toucher au code.
+         Script classique et non module : il s'exécute avant les modules, donc
+         avant que api-config.js ne lise window.POSE_PARQUET_CONFIG. Pas
+         d'empreinte dans le nom — c'est ce qui permet de le remplacer. -->
+    <script src="${p}config.js"></script>`
+        : ''
+    }
     <script type="module" src="${p}${build.js}"></script>${jsonld}
   </head>
   <body class="page">
