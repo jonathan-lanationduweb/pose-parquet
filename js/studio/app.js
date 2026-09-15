@@ -113,7 +113,22 @@ export async function mountStudio(root) {
       <div class="studio__stage" data-stage>
         <div class="stage__media" data-media>
           <img class="stage__photo" alt="" data-photo />
-          <canvas class="stage__canvas" data-canvas></canvas>
+          <!--
+            Le canevas est la SORTIE de l'outil, et il n'en disait rien.
+
+            Un canevas est opaque à l'assistance technique : il n'a ni texte, ni
+            structure, ni rôle par défaut. Sans libellé, tout le travail du
+            visualiseur — la pièce, le parquet, le motif — n'existait tout
+            simplement pas pour qui n'utilise pas ses yeux.
+
+            « role=img » parce que c'est ce que ce canevas EST du point de vue de
+            la restitution : une image produite, pas une zone interactive (les
+            commandes, elles, sont de vrais boutons à côté). Le libellé est
+            réécrit quand la configuration utile change — jamais à chaque rendu,
+            ce qui bavarderait sans rien apprendre.
+          -->
+          <canvas class="stage__canvas" data-canvas role="img"
+            aria-label="Aperçu du parquet : aucune pièce ouverte pour l’instant."></canvas>
           <div class="stage__ba" data-ba hidden>
             <span class="stage__tag stage__tag--a">Avant</span>
             <span class="stage__tag stage__tag--b">Après</span>
@@ -128,7 +143,7 @@ export async function mountStudio(root) {
         </button>
       </div>
 
-      <aside class="studio__panel">
+      <aside class="studio__panel" id="studio-panneau">
         <button class="panel__grab" type="button" data-sheet-toggle aria-label="Agrandir ou réduire le panneau"></button>
         <div class="panel__head">
           <p class="panel__title" data-panel-title>Choisir un parquet</p>
@@ -291,6 +306,36 @@ export async function mountStudio(root) {
    */
   const apresRendu = new Set();
 
+  /**
+   * Ce que le canevas montre, en une phrase.
+   *
+   * Écrit dans `aria-label`, donc lu uniquement quand quelqu'un atteint le
+   * canevas — ce n'est pas une région vivante et rien n'est annoncé
+   * spontanément. Le garde-fou est l'égalité : on ne réécrit l'attribut que si
+   * la phrase a changé, sinon certains lecteurs d'écran relisent l'élément à
+   * chaque rendu, et un outil qui répète « Chêne fumé en point de Hongrie »
+   * trente fois par minute est pire que muet.
+   */
+  let derniereDescription = '';
+  function decrireCanvas() {
+    const item = material();
+    if (!item) return;
+    const motif = catalog.patterns.find((p) => p.id === config.pattern);
+    const parties = [
+      `Aperçu du parquet ${item.name}`,
+      motif ? `en ${motif.label}` : null,
+      sceneLabel ? `dans ${sceneLabel}` : null,
+    ].filter(Boolean);
+    // L'orientation ne se dit que si elle a été changée : « à 0 degré » sur une
+    // pose que personne n'a tournée est du bruit.
+    const phrase = config.angle
+      ? `${parties.join(' ')}, lames orientées à ${config.angle} degrés.`
+      : `${parties.join(' ')}.`;
+    if (phrase === derniereDescription) return;
+    derniereDescription = phrase;
+    canvas.setAttribute('aria-label', phrase);
+  }
+
   function paint() {
     pending = false;
     if (!renderer.ready) return;
@@ -308,6 +353,7 @@ export async function mountStudio(root) {
     }
     setStatus('');
     desarmerTemoin();
+    decrireCanvas();
     mark('app:paint:fin');
     // Cet ordre n'est pas indifférent : `mesure` vide le repère de fin
     // derrière elle pour ne pas saturer le tampon du navigateur. La mesure du
@@ -441,6 +487,15 @@ const REGROUPEMENT_MS = 70;
     button.className = 'context-btn';
     button.dataset.context = entry.id;
     button.setAttribute('aria-pressed', 'false');
+    /*
+     * `aria-controls` : « ce bouton commande CE panneau ».
+     *
+     * `aria-pressed` disait déjà lequel est actif, mais pas ce qu'il ouvre. Le
+     * panneau change de contenu sans changer de place ni de titre annoncé : la
+     * relation entre le bouton et la zone qui vient de se remplir n'était donc
+     * déductible que visuellement.
+     */
+    button.setAttribute('aria-controls', 'studio-panneau');
     button.textContent = entry.label;
     button.addEventListener('click', () => setContext(entry.id));
     contextsHost.appendChild(button);
