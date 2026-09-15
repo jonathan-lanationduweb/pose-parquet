@@ -126,7 +126,10 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 .mono { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; }
 
 /* En-tête de section : titre large + accroche décalée */
-.section-head { margin-bottom: clamp(2.5rem, 1.5rem + 3vw, 4.5rem); }
+/* 72 px séparaient un titre de section de son contenu à 1920. Ajoutés aux
+   deux marges de section, ils portaient le vide entre deux sections à près de
+   400 px. L'en-tête doit annoncer ce qui suit, pas s'en éloigner. */
+.section-head { margin-bottom: clamp(1.75rem, 1.1rem + 2vw, 3rem); }
 .section-head__row {
   display: grid;
   gap: var(--sp-5);
