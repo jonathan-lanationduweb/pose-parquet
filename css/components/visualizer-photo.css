@@ -468,7 +468,18 @@
 .vzp[data-ready="photo"] .vzp__handle,
 .vzp[data-ready="photo"] .vzp__range { display: none; }
 .vzp__caption { font-size: var(--fs-xs); color: var(--text-muted); }
-.vzp__chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+/**
+ * Les pastilles n'existent qu'une fois le catalogue chargé : leurs libellés
+ * viennent de `data/parquets.json` et les écrire en dur ici, c'est accepter
+ * qu'ils mentent le jour où le catalogue change. La ligne est donc vide au
+ * départ — mais sa hauteur, elle, est connue d'avance et réservée. C'est la
+ * même idée que le cadre de la scène : on ne sait pas encore quoi afficher,
+ * on sait déjà quelle place cela prendra.
+ *
+ * 2,4 rem = une pastille (0,45 rem de marge haute et basse + 1 ligne de 0,82 rem
+ * à interligne normal + 2 px de bordure), arrondi au dixième supérieur.
+ */
+.vzp__chips { display: flex; flex-wrap: wrap; gap: 0.4rem; min-height: 2.4rem; }
 .vzp__chip {
   padding: 0.45rem 0.9rem;
   border: 1px solid var(--line);

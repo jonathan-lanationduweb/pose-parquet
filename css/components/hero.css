@@ -40,7 +40,15 @@
 
 .hero__inner {
   width: 100%;
-  padding-block: clamp(2.5rem, 1rem + 6vw, 6rem) clamp(2.5rem, 1rem + 4vw, 4.5rem);
+  /*
+   * Le `max()` en tête n'est pas une précaution de style : mesuré à 320 et
+   * 360 px de large, la ligne « Guides · Motifs · Outils » commençait à 64 px
+   * du haut alors que l'en-tête fixe descend à 73 — ses neuf premiers pixels
+   * passaient dessous. La marge du haut ne peut donc pas dépendre seulement
+   * d'une part de la largeur : elle doit d'abord dégager la hauteur de
+   * l'en-tête, quelle que soit la fenêtre.
+   */
+  padding-block: max(clamp(2.5rem, 1rem + 6vw, 6rem), calc(var(--header-h) + 1.5rem)) clamp(2.5rem, 1rem + 4vw, 4.5rem);
   display: grid;
   gap: clamp(1.75rem, 1rem + 2.5vw, 3rem);
 }

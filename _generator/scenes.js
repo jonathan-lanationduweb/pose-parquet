@@ -23,4 +23,28 @@ const PIECES = scenesValidees();
 const NB_PIECES = PIECES.length;
 const NB_PIECES_LETTRES = EN_LETTRES[NB_PIECES] || String(NB_PIECES);
 
-module.exports = { PIECES, NB_PIECES, NB_PIECES_LETTRES };
+/**
+ * La fiche complète d'une scène, lue dans son fichier.
+ *
+ * Le manifeste ne porte que l'identité et les statuts ; les dimensions de la
+ * photo, son texte alternatif et son crédit vivent dans le fichier de la
+ * scène. L'accueil en a besoin pour réserver la place de l'aperçu AVANT que
+ * le JavaScript ne s'exécute — sans quoi le composant apparaît d'un coup et
+ * pousse tout ce qui le suit.
+ *
+ * @param {string} id identifiant de scène, ex. 'sejour'
+ * @returns {{id:string,label:string,image:{file:string,width:number,height:number,alt:string,credit?:string}}}
+ */
+function scene(id) {
+  const fichier = path.join(__dirname, '..', 'data', 'scenes', `${id}.json`);
+  if (!fs.existsSync(fichier)) {
+    throw new Error(`Scène inconnue : ${id} (attendu ${fichier})`);
+  }
+  const donnees = JSON.parse(fs.readFileSync(fichier, 'utf8'));
+  if (!donnees.image || !donnees.image.width || !donnees.image.height) {
+    throw new Error(`Scène ${id} : dimensions de photo absentes, la place ne peut pas être réservée.`);
+  }
+  return donnees;
+}
+
+module.exports = { PIECES, NB_PIECES, NB_PIECES_LETTRES, scene };

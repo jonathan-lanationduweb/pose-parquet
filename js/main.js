@@ -77,8 +77,47 @@ async function boot() {
   }
 
   if (has('[data-vz-preview]')) {
-    const { mountPreview } = await import('./scene/preview.js');
-    mountAll('[data-vz-preview]', mountPreview);
+    /*
+     * Le moteur ne descend qu'à l'approche de la section.
+     *
+     * `preview.js` porte bien un IntersectionObserver, mais il ne sert à rien
+     * tant que l'import, lui, part tout de suite : importer le module tire
+     * tout son graphe — analyzer, renderer GL et Canvas, material, texture,
+     * product, catalog. Mesuré sur l'accueil : 16 modules, 191 Ko, à partir de
+     * la 210e milliseconde, pour une démonstration que beaucoup de visiteurs
+     * n'atteignent jamais.
+     *
+     * L'observateur est donc remonté d'un cran, devant l'import. Deux
+     * déclencheurs, comme pour toute section différée : l'approche à l'écran,
+     * et l'arrivée du focus — quelqu'un qui tabule jusqu'aux commandes doit
+     * les trouver vivantes avant que le défilement ne les amène.
+     */
+    const demarrer = (() => {
+      let fait = false;
+      return async () => {
+        if (fait) return;
+        fait = true;
+        const { mountPreview } = await import('./scene/preview.js');
+        mountAll('[data-vz-preview]', mountPreview);
+      };
+    })();
+
+    const cibles = qsa('[data-vz-preview]');
+    if (typeof IntersectionObserver === 'function') {
+      const observateur = new IntersectionObserver(
+        (entrees) => {
+          if (entrees.some((e) => e.isIntersecting)) {
+            observateur.disconnect();
+            demarrer();
+          }
+        },
+        { rootMargin: '400px' }
+      );
+      cibles.forEach((el) => observateur.observe(el));
+      cibles.forEach((el) => el.addEventListener('focusin', () => { observateur.disconnect(); demarrer(); }, { once: true }));
+    } else {
+      demarrer();
+    }
   }
 
   if (has('[data-visualizer]')) {
