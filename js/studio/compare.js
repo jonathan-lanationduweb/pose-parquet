@@ -8,6 +8,7 @@
  * À ne pas confondre avec « Avant / après », qui oppose la photo d'origine au
  * parquet posé. Ici, on compare des parquets entre eux — sur la même scène.
  */
+import { echapper } from '../utils/dom.js';
 const PATTERN_LABELS = {
   lames: 'Lames droites',
   'point-de-hongrie': 'Point de Hongrie',
@@ -121,7 +122,7 @@ export function createCompare(host, { renderer, catalog, paintConfig, onUse, pro
       const item = document.createElement('div');
       item.className = 'cmp__action';
       const info = label(variant);
-      item.innerHTML = `<strong>${info.name}</strong><span>${info.pattern}</span>`;
+      item.innerHTML = `<strong>${echapper(info.name)}</strong><span>${echapper(info.pattern)}</span>`;
       item.appendChild(useButton(variant));
       actions.appendChild(item);
     });
@@ -141,7 +142,7 @@ export function createCompare(host, { renderer, catalog, paintConfig, onUse, pro
       const info = label(variant);
       const caption = document.createElement('figcaption');
       caption.className = 'cmp__caption';
-      caption.innerHTML = `<strong>${info.name}</strong><span>${info.pattern}</span>`;
+      caption.innerHTML = `<strong>${echapper(info.name)}</strong><span>${echapper(info.pattern)}</span>`;
       caption.appendChild(useButton(variant));
       cell.appendChild(caption);
       grid.appendChild(cell);
