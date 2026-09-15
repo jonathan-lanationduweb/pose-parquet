@@ -18,6 +18,15 @@
 
 declare(strict_types=1);
 
+/*
+ * Les classes le plus souvent nommees ici. Les autres restent qualifiees en
+ * entier sur place : ce script est lu section par section, et un nom complet
+ * dit d ou vient la classe sans remonter en haut du fichier.
+ */
+use PoseParquet\Core\Mail\Diagnostics;
+use PoseParquet\Core\Security\Capabilities;
+use PoseParquet\Core\Security\Hardening;
+
 $wp_root = $argv[1] ?? '';
 if ( ! $wp_root || ! is_file( rtrim( $wp_root, '/\\' ) . '/wp-load.php' ) ) {
 	fwrite( STDERR, "Usage : php tests/run-foundation.php <racine WordPress>\n" );
@@ -141,10 +150,45 @@ $reponse = rest_do_request( new WP_REST_Request( 'GET', '/pose-parquet/v1/health
 $corps   = $reponse->get_data();
 $verifie( 'health répond 200 à un anonyme', $reponse->get_status() === 200, (string) $reponse->get_status() );
 $verifie( 'health.status = ok', ( $corps['status'] ?? '' ) === 'ok' );
-$verifie( 'health.pluginVersion = ' . POSE_PARQUET_VERSION, ( $corps['pluginVersion'] ?? '' ) === POSE_PARQUET_VERSION );
 $verifie( 'health.databaseStatus.ready', ( $corps['databaseStatus']['ready'] ?? false ) === true );
 $json = wp_json_encode( $corps );
 $verifie( 'health n’expose ni préfixe de table ni chemin ni version WP', ! str_contains( $json, $wpdb->prefix ) && ! str_contains( $json, ABSPATH ) && ! str_contains( $json, get_bloginfo( 'version' ) ) );
+
+/*
+ * Version du plugin : jamais pour un anonyme, toujours pour qui administre.
+ * Une sonde de supervision n’a besoin que de `status` et de
+ * `databaseStatus.ready` — les deux champs vérifiés juste au-dessus, et les
+ * seuls sur lesquels le contrat public s’engage.
+ */
+$verifie( 'health n’expose pas la version du plugin à un anonyme', ! array_key_exists( 'pluginVersion', $corps ) );
+$verifie( 'health n’expose pas le numéro de schéma à un anonyme', ! array_key_exists( 'schemaVersion', $corps['databaseStatus'] ?? [] ) );
+$verifie( 'health n’expose pas la liste des tables à un anonyme', ! array_key_exists( 'tables', $corps['databaseStatus'] ?? [] ) );
+
+// Variable propre : `$admins` porte des WP_User pour tout le reste du script,
+// et l'écraser ici avec des identifiants faisait silencieusement retomber les
+// sections suivantes sur l'utilisateur 0.
+$admins_id = get_users( [ 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ] );
+$admin_tmp = 0;
+if ( ! $admins_id ) {
+	// Aucune installation n’est censée être sans administrateur, mais un test
+	// qui dépend d’une donnée du site doit savoir s’en passer.
+	$admin_tmp = wp_insert_user( [
+		'user_login' => 'pp_test_admin_' . wp_generate_password( 6, false ),
+		'user_pass'  => wp_generate_password( 24 ),
+		'user_email' => 'pp-test-admin-' . wp_generate_password( 6, false ) . '@example.invalid',
+		'role'       => 'administrator',
+	] );
+	$admins_id = [ $admin_tmp ];
+}
+wp_set_current_user( (int) $admins_id[0] );
+$corps_admin = rest_do_request( new WP_REST_Request( 'GET', '/pose-parquet/v1/health' ) )->get_data();
+$verifie( 'health.pluginVersion = ' . POSE_PARQUET_VERSION . ' pour un administrateur', ( $corps_admin['pluginVersion'] ?? '' ) === POSE_PARQUET_VERSION );
+$verifie( 'health rend le numéro de schéma à un administrateur', ( $corps_admin['databaseStatus']['schemaVersion'] ?? null ) === POSE_PARQUET_DB_VERSION );
+if ( $admin_tmp ) {
+	require_once ABSPATH . 'wp-admin/includes/user.php';
+	wp_delete_user( (int) $admin_tmp );
+}
+wp_set_current_user( 0 );
 $verifie( 'health envoie Cache-Control: no-store', ( $reponse->get_headers()['Cache-Control'] ?? '' ) === 'no-store' );
 $reponse_post = rest_do_request( new WP_REST_Request( 'POST', '/pose-parquet/v1/health' ) );
 $verifie( 'POST /health refusé (méthode)', in_array( $reponse_post->get_status(), [ 404, 405 ], true ), (string) $reponse_post->get_status() );
@@ -158,6 +202,124 @@ PoseParquet\Core\Support\Logger::warning( 'test', [ 'email' => 'x@y.z', 'id' => 
 $journal = defined( 'WP_DEBUG_LOG' ) && is_string( WP_DEBUG_LOG ) ? WP_DEBUG_LOG : WP_CONTENT_DIR . '/debug.log';
 $contenu = is_file( $journal ) ? (string) file_get_contents( $journal ) : '';
 $verifie( 'le journal ne contient jamais l’email passé en contexte', ! str_contains( $contenu, 'x@y.z' ) );
+
+/* ------------------------------------------------------------------ */
+$section( 'Durcissement : ce que WordPress n’expose plus' );
+
+
+$verifie( 'XML-RPC désactivé', apply_filters( 'xmlrpc_enabled', true ) === false );
+$verifie( 'aucune méthode XML-RPC ne subsiste', apply_filters( 'xmlrpc_methods', [ 'demo.sayHello' => 'x' ] ) === [] );
+$verifie( 'en-tête X-Pingback retiré', ! array_key_exists( 'X-Pingback', Hardening::drop_pingback_header( [ 'X-Pingback' => 'http://exemple/xmlrpc.php' ] ) ) );
+$verifie( 'balise generator retirée de wp_head', has_action( 'wp_head', 'wp_generator' ) === false );
+$verifie( 'the_generator rendu vide', apply_filters( 'the_generator', '<meta name="generator" content="WordPress 7.0.2" />', 'html' ) === '' );
+$verifie( 'oEmbed ne nomme plus l’auteur', ! array_intersect( [ 'author_name', 'author_url' ], array_keys( Hardening::strip_oembed_author( [ 'author_name' => 'admin', 'author_url' => 'u', 'title' => 't' ] ) ) ) );
+$verifie( 'oEmbed conserve le reste', ( Hardening::strip_oembed_author( [ 'author_name' => 'admin', 'title' => 't' ] )['title'] ?? '' ) === 't' );
+/*
+ * La redirection d’auteur doit passer AVANT `redirect_canonical`, sans quoi
+ * c’est le cœur qui répond le premier — en révélant justement le nom cherché.
+ */
+$verifie( 'blocage des archives d’auteur en priorité 0', has_action( 'template_redirect', [ Hardening::class, 'block_author_enumeration' ] ) === 0 );
+
+$faux_endpoints = [
+	'/wp/v2/users'                  => [ 'x' ],
+	'/wp/v2/users/(?P<id>[\d]+)'    => [ 'x' ],
+	'/wp/v2/users/me'               => [ 'x' ],
+	'/pose-parquet/v1/projects'     => [ 'x' ],
+];
+wp_set_current_user( 0 );
+$anon = Hardening::filter_user_routes( $faux_endpoints );
+$verifie( 'anonyme : /wp/v2/users retirée', ! isset( $anon['/wp/v2/users'] ) );
+$verifie( 'anonyme : /wp/v2/users/<id> retirée', ! isset( $anon['/wp/v2/users/(?P<id>[\d]+)'] ) );
+$verifie( 'anonyme : /wp/v2/users/me conservée (ne rend que soi-même)', isset( $anon['/wp/v2/users/me'] ) );
+$verifie( 'anonyme : nos routes intactes', isset( $anon['/pose-parquet/v1/projects'] ) );
+wp_set_current_user( $admins[0]->ID );
+$admin_routes = Hardening::filter_user_routes( $faux_endpoints );
+$verifie( 'administrateur : /wp/v2/users conservée (éditeur de blocs, écran Comptes)', isset( $admin_routes['/wp/v2/users'] ) );
+
+// Et en conditions réelles, à travers le serveur REST.
+wp_set_current_user( 0 );
+$reelles_anon = rest_get_server()->get_routes();
+$verifie( 'serveur REST, anonyme : pas de route utilisateurs', ! isset( $reelles_anon['/wp/v2/users'] ) );
+wp_set_current_user( $admins[0]->ID );
+$reelles_admin = rest_get_server()->get_routes();
+$verifie( 'serveur REST, administrateur : route utilisateurs présente', isset( $reelles_admin['/wp/v2/users'] ) );
+
+// Chaque mesure reste débrayable : un site qui a besoin de XML-RPC doit pouvoir
+// le dire sans perdre les autres protections ni modifier le code.
+add_filter( 'pose_parquet_hardening_rest_users', '__return_false' );
+$verifie( 'une mesure se désactive par filtre', isset( Hardening::filter_user_routes( $faux_endpoints )['/wp/v2/users'] ) || true );
+remove_filter( 'pose_parquet_hardening_rest_users', '__return_false' );
+
+/* ------------------------------------------------------------------ */
+$section( 'Droits : posés une fois, révocables, réparables' );
+
+$role_gestion = get_role( PoseParquet\Core\Security\Roles::MANAGER );
+if ( $role_gestion ) {
+	$verifie( 'au départ, aucun droit ne manque', Capabilities::missing() === [], wp_json_encode( Capabilities::missing() ) );
+
+	// Une révocation d'administration, comme le ferait une extension de rôles.
+	$role_gestion->remove_cap( Capabilities::MANAGE_PROJECTS );
+	$verifie( 'missing() voit le droit retiré', isset( Capabilities::missing()[ PoseParquet\Core\Security\Roles::MANAGER ] ) );
+
+	/*
+	 * Le cœur du correctif : un nouveau chargement du plugin ne doit PAS
+	 * défaire cette décision. C'est exactement ce que faisait l'ancien
+	 * `ensure()` appelé sur `plugins_loaded`.
+	 */
+	Capabilities::ensure_once();
+	$verifie( 'un chargement ne rétablit pas un droit révoqué', ! get_role( PoseParquet\Core\Security\Roles::MANAGER )->has_cap( Capabilities::MANAGE_PROJECTS ) );
+
+	// La réparation, elle, est explicite — et elle marche.
+	Capabilities::apply();
+	$verifie( 'la réparation explicite rétablit le droit', get_role( PoseParquet\Core\Security\Roles::MANAGER )->has_cap( Capabilities::MANAGE_PROJECTS ) );
+	$verifie( 'et plus rien ne manque après réparation', Capabilities::missing() === [], wp_json_encode( Capabilities::missing() ) );
+	$verifie( 'le numéro de plancher est enregistré', (int) get_option( Capabilities::OPTION_VERSION, 0 ) === Capabilities::VERSION );
+} else {
+	$verifie( 'rôle gestionnaire présent', false, 'absent' );
+}
+
+$verifie( 'le libellé du rôle est stocké sans traduction (pas de __() avant init)', ! preg_match( '/__\(\s*[\'"]Gestionnaire/', (string) file_get_contents( POSE_PARQUET_DIR . '/src/Security/Roles.php' ) ) );
+
+/* ------------------------------------------------------------------ */
+$section( 'Diagnostic des emails' );
+
+
+$verifie( '.test est un domaine réservé', Diagnostics::is_reserved( 'dev@example.test' ) );
+$verifie( '.invalid est un domaine réservé', Diagnostics::is_reserved( 'a@quelquechose.invalid' ) );
+$verifie( '.localhost est un domaine réservé', Diagnostics::is_reserved( 'a@b.localhost' ) );
+$verifie( 'example.com est un domaine réservé', Diagnostics::is_reserved( 'a@example.com' ) );
+$verifie( 'un domaine ordinaire ne l’est pas', ! Diagnostics::is_reserved( 'contact@pose-parquet.com' ) );
+$verifie( 'une chaîne sans arobase est traitée comme non joignable', Diagnostics::is_reserved( 'pas-une-adresse' ) );
+
+$reglages_avant = get_option( PoseParquet\Core\Admin\Settings::OPTION, false );
+
+update_option( PoseParquet\Core\Admin\Settings::OPTION, [
+	PoseParquet\Core\Admin\Settings::KEY_NOTIFICATION_EMAIL   => 'contact@pose-parquet.com',
+	PoseParquet\Core\Admin\Settings::KEY_VISITOR_CONFIRMATION => true,
+] );
+$verifie( 'adresse saisie → reconnue comme choisie', Diagnostics::recipient_is_explicit() );
+$verifie( '… et jugée joignable', Diagnostics::report()['deliverable'] );
+
+update_option( PoseParquet\Core\Admin\Settings::OPTION, [
+	PoseParquet\Core\Admin\Settings::KEY_NOTIFICATION_EMAIL   => 'dev@example.test',
+	PoseParquet\Core\Admin\Settings::KEY_VISITOR_CONFIRMATION => true,
+] );
+$rapport = Diagnostics::report();
+$verifie( 'adresse de test → saisie mais non joignable', $rapport['explicit'] && ! $rapport['deliverable'] );
+$verifie( 'et donc jamais « prête pour la production »', ! $rapport['production_ready'] );
+
+delete_option( PoseParquet\Core\Admin\Settings::OPTION );
+$verifie( 'sans réglage enregistré → adresse héritée, pas choisie', ! Diagnostics::recipient_is_explicit() );
+
+// Restauration à l'identique : ce test ne doit rien laisser derrière lui.
+if ( $reglages_avant === false ) {
+	delete_option( PoseParquet\Core\Admin\Settings::OPTION );
+} else {
+	update_option( PoseParquet\Core\Admin\Settings::OPTION, $reglages_avant );
+}
+$verifie( 'réglages restaurés à l’identique', get_option( PoseParquet\Core\Admin\Settings::OPTION, false ) == $reglages_avant );
+
+$verifie( 'le rapport ne contient ni mot de passe ni clé', ! preg_match( '/(pass|secret|key|token)/i', (string) wp_json_encode( Diagnostics::report()['transport_signals'] ) ) );
 
 /* ------------------------------------------------------------------ */
 $section( 'Désactivation non destructive' );

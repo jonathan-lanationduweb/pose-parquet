@@ -34,6 +34,8 @@ final class Notices {
 	public const NOTE_TOO_LONG    = 'note_too_long';
 	public const SAVE_FAILED      = 'save_failed';
 	public const NOT_FOUND        = 'not_found';
+	public const CAPS_REPAIRED    = 'caps_repaired';
+	public const CAPS_INCOMPLETE  = 'caps_incomplete';
 
 	/**
 	 * Code → [ type, message ]. Le type est celui des classes WordPress
@@ -52,6 +54,8 @@ final class Notices {
 			self::NOTE_TOO_LONG    => [ 'error', sprintf( __( 'La note dépasse %s caractères : rien n’a été enregistré.', 'pose-parquet-core' ), number_format_i18n( \PoseParquet\Core\Projects\Notes::MAX_LENGTH ) ) ],
 			self::SAVE_FAILED      => [ 'error', __( 'Impossible d’enregistrer la modification.', 'pose-parquet-core' ) ],
 			self::NOT_FOUND        => [ 'error', __( 'Cette demande n’existe pas ou n’existe plus.', 'pose-parquet-core' ) ],
+			self::CAPS_REPAIRED    => [ 'success', __( 'Les droits du plugin ont été réappliqués.', 'pose-parquet-core' ) ],
+			self::CAPS_INCOMPLETE  => [ 'error', __( 'Des droits manquent encore après la réparation : le rôle concerné a peut-être été supprimé par une autre extension.', 'pose-parquet-core' ) ],
 		];
 	}
 

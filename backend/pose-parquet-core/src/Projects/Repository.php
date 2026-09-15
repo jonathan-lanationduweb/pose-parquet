@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace PoseParquet\Core\Projects;
 
 use PoseParquet\Core\Database\Schema;
+use PoseParquet\Core\Mail\Notifier;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -321,6 +322,37 @@ final class Repository {
 			}
 		}
 		$counts['all'] = $total;
+
+		return $counts;
+	}
+
+	/**
+	 * Où en sont les notifications, tous types confondus.
+	 *
+	 * Un compteur par état et par type d'email, lu au moment de l'affichage.
+	 * C'est le seul indicateur honnête dont dispose la page « État » : le plugin
+	 * ne connaît pas le transport et ne peut pas affirmer qu'un email est
+	 * arrivé. Il sait seulement ce que `wp_mail()` lui a répondu, et c'est
+	 * exactement ce que ces colonnes conservent.
+	 *
+	 * @return array<string,array<string,int>> type → état → nombre
+	 */
+	public function counts_by_mail_status(): array {
+		global $wpdb;
+
+		$table  = Schema::table( 'projects' );
+		$counts = [
+			Notifier::TYPE_INTERNAL => [],
+			Notifier::TYPE_VISITOR  => [],
+		];
+
+		foreach ( [ Notifier::TYPE_INTERNAL => 'internal_mail_status', Notifier::TYPE_VISITOR => 'visitor_mail_status' ] as $type => $colonne ) {
+			// Nom de colonne issu d'une liste écrite ici, jamais d'une entrée.
+			$rows = $wpdb->get_results( "SELECT {$colonne} AS s, COUNT(*) AS n FROM {$table} GROUP BY {$colonne}", ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			foreach ( $rows ?: [] as $row ) {
+				$counts[ $type ][ (string) $row['s'] ] = (int) $row['n'];
+			}
+		}
 
 		return $counts;
 	}

@@ -40,6 +40,7 @@ final class Actions {
 
 	public const UPDATE_STATUS = 'pp_update_status';
 	public const ADD_NOTE      = 'pp_add_note';
+	public const REPAIR_CAPS   = 'pp_repair_caps';
 
 	public static function register(): void {
 		// `admin_post_` (sans `nopriv`) : la poignée n'existe pas pour un
@@ -47,6 +48,40 @@ final class Actions {
 		// charge » de WordPress sans qu'aucun de nos codes ne tourne.
 		add_action( 'admin_post_' . self::UPDATE_STATUS, [ self::class, 'update_status' ] );
 		add_action( 'admin_post_' . self::ADD_NOTE, [ self::class, 'add_note' ] );
+		add_action( 'admin_post_' . self::REPAIR_CAPS, [ self::class, 'repair_caps' ] );
+	}
+
+	/**
+	 * Repose le plancher de droits, à la demande.
+	 *
+	 * Le plugin ne réécrit plus les capabilities à chaque chargement — voir
+	 * `Capabilities::ensure_once()` et la raison qui y est donnée. Il fallait
+	 * donc un chemin de réparation, sinon un droit perdu l'aurait été pour de
+	 * bon. Ce chemin est un POST, protégé par capability puis nonce comme les
+	 * deux autres, et il ne fait rien d'autre qu'ajouter ce qui manque.
+	 */
+	public static function repair_caps(): void {
+		self::require_can( Capabilities::MANAGE_SETTINGS );
+		check_admin_referer( self::REPAIR_CAPS );
+
+		$avant = Capabilities::missing();
+		Capabilities::apply();
+
+		Logger::info( 'droits réappliqués', [
+			'user_id' => get_current_user_id(),
+			'action'  => 'repair_caps',
+			// Des noms de droits, pas de personnes : rien de nominatif au journal.
+			'missing' => array_map( 'count', $avant ),
+		] );
+
+		wp_safe_redirect(
+			add_query_arg(
+				Notices::ARG,
+				Capabilities::missing() ? Notices::CAPS_INCOMPLETE : Notices::CAPS_REPAIRED,
+				Menu::status_url()
+			)
+		);
+		exit;
 	}
 
 	/** Nom du champ de nonce, et action du nonce, propres à une demande. */
