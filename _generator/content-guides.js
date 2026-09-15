@@ -105,7 +105,7 @@ const GUIDES = [
     title: 'Poser un parquet dans le sens de la lumière | Pose Parquet',
     h1: 'Poser un parquet dans le sens de la lumière',
     description:
-      "Pourquoi la règle du sens de la lumière fonctionne, dans quels cas elle ne s'applique pas, et comment repérer la bonne direction dans une pièce à plusieurs ouvertures.",
+      "Pourquoi la règle du sens de la lumière fonctionne, quand elle ne s'applique pas, et comment trancher dans une pièce à plusieurs ouvertures.",
     category: 'Sens de pose',
     tags: ['sens-de-pose', 'comprendre'],
     date: '2026-08-20',
@@ -188,10 +188,10 @@ const GUIDES = [
 
   {
     slug: 'preparer-son-sol-avant-la-pose',
-    title: 'Comment préparer un sol avant la pose d’un parquet ? | Pose Parquet',
+    title: 'Préparer son sol avant la pose d’un parquet | Pose Parquet',
     h1: 'Comment préparer un sol avant la pose ?',
     description:
-      "Planéité, humidité, propreté, ragréage, sous-couche : les contrôles et les travaux à mener sur le support avant de poser un parquet, avec les seuils à respecter.",
+      "Planéité, humidité, ragréage, sous-couche : les contrôles à mener sur le support avant de poser un parquet, avec les seuils à respecter.",
     category: 'Préparation',
     tags: ['preparation', 'poser'],
     date: '2026-08-18',
@@ -267,7 +267,7 @@ const GUIDES = [
 
   {
     slug: 'point-de-hongrie-ou-baton-rompu',
-    title: 'Point de Hongrie ou bâton rompu : quelles différences ? | Pose Parquet',
+    title: 'Point de Hongrie ou bâton rompu ? | Pose Parquet',
     h1: 'Point de Hongrie ou bâton rompu ?',
     description:
       "Deux motifs souvent confondus. Coupe, rendu, contraintes de pose, coût et pièces adaptées : le comparatif complet, illustré par un simulateur.",
@@ -336,7 +336,7 @@ const GUIDES = [
 
   {
     slug: 'erreurs-a-eviter-avant-de-poser',
-    title: 'Les erreurs à éviter avant de poser un parquet | Pose Parquet',
+    title: 'Erreurs à éviter avant de poser un parquet | Pose Parquet',
     h1: 'Les erreurs à éviter avant de poser un parquet',
     description:
       "Acclimatation oubliée, joints périphériques trop justes, support mal mesuré, commande sans marge : les huit erreurs les plus fréquentes et comment les éviter.",
@@ -397,10 +397,10 @@ const GUIDES = [
 
   {
     slug: 'parquet-massif-ou-contrecolle',
-    title: 'Parquet massif ou contrecollé : ce qui change à la pose | Pose Parquet',
+    title: 'Parquet massif ou contrecollé à la pose | Pose Parquet',
     h1: 'Parquet massif ou contrecollé : quelles différences pour la pose ?',
     description:
-      "Structure, stabilité, types de pose compatibles, rénovation, chauffage au sol : ce qui distingue vraiment un parquet massif d'un contrecollé au moment de la pose.",
+      "Structure, stabilité, rénovation, chauffage au sol : ce qui distingue vraiment un parquet massif d'un contrecollé au moment de la pose.",
     category: 'Comprendre',
     tags: ['comprendre', 'choisir'],
     date: '2026-08-06',

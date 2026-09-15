@@ -4,7 +4,7 @@ const MOTIFS = [
   {
     slug: 'pose-droite',
     pattern: 'longueur',
-    title: 'Pose droite du parquet : principe et mise en œuvre | Pose Parquet',
+    title: 'Pose droite du parquet : principe et méthode | Pose Parquet',
     h1: 'La pose droite',
     description:
       "La pose droite reste la référence : lames parallèles aux murs, joints décalés. Principe, variantes en longueur ou en largeur, chutes et mise en œuvre.",
@@ -48,7 +48,7 @@ const MOTIFS = [
   {
     slug: 'pose-longueur',
     pattern: 'longueur',
-    title: 'Poser un parquet dans la longueur : effets et limites | Pose Parquet',
+    title: 'Poser un parquet dans la longueur | Pose Parquet',
     h1: 'La pose dans la longueur',
     description:
       "Lames parallèles au grand côté de la pièce : l'orientation la plus courante. Effets visuels, cas favorables, limites et chutes attendues.",
@@ -89,7 +89,7 @@ const MOTIFS = [
   {
     slug: 'pose-largeur',
     pattern: 'largeur',
-    title: 'Poser un parquet dans la largeur : quand et pourquoi | Pose Parquet',
+    title: 'Poser un parquet dans la largeur | Pose Parquet',
     h1: 'La pose dans la largeur',
     description:
       "Lames perpendiculaires au grand côté : une correction visuelle efficace pour les pièces allongées, à condition d'accepter davantage de coupes.",
@@ -123,7 +123,7 @@ const MOTIFS = [
   {
     slug: 'pose-diagonale',
     pattern: 'diagonale',
-    title: 'Pose en diagonale du parquet : rendu et mise en œuvre | Pose Parquet',
+    title: 'Parquet en diagonale : rendu et méthode | Pose Parquet',
     h1: 'La pose en diagonale',
     description:
       "Lames à 45° des murs : un motif dynamique qui agrandit les petits volumes et rattrape les murs non parallèles. Chutes, traçage et précautions.",
@@ -162,7 +162,7 @@ const MOTIFS = [
   {
     slug: 'point-de-hongrie',
     pattern: 'point-de-hongrie',
-    title: 'Point de Hongrie : le motif, sa pose et ses contraintes | Pose Parquet',
+    title: 'Point de Hongrie : le motif et sa pose | Pose Parquet',
     h1: 'Le Point de Hongrie',
     description:
       "Lames coupées à l'onglet formant une pointe continue : origine, rendu, approvisionnement, traçage et budget du Point de Hongrie.",
@@ -209,7 +209,7 @@ const MOTIFS = [
   {
     slug: 'baton-rompu',
     pattern: 'baton-rompu',
-    title: 'Bâton rompu : le motif, sa pose et ses atouts | Pose Parquet',
+    title: 'Bâton rompu : le motif et sa pose | Pose Parquet',
     h1: 'Le bâton rompu',
     description:
       "Lames droites assemblées à angle droit : le motif à chevrons le plus accessible. Rendu, formats, traçage et différences avec le Point de Hongrie.",

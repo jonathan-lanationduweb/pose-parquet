@@ -199,7 +199,7 @@ function buildVisualiseurPage(write) {
     layout({
       title: 'Visualiser un parquet dans sa pièce | Pose Parquet',
       description:
-        'Essayez un parquet dans votre pièce : importez une photo, choisissez une matière et un motif, comparez. Tout se calcule dans votre navigateur, rien n’est envoyé.',
+        'Essayez un parquet dans votre pièce : importez une photo, choisissez une matière et un motif. Tout se calcule dans votre navigateur, rien n’est envoyé.',
       path: 'outils/visualiseur.html',
       depth: 1,
       css: ['css/pages/tools.css'],

@@ -208,13 +208,16 @@ function layout(page) {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>${page.title}</title>
     <meta name="description" content="${page.description}" />
-    <!-- Balise robots toujours explicite, et toujours en « index, follow » :
-         les fichiers du dépôt décrivent la production. C'est le déploiement qui
-         la remplace par « noindex, nofollow » tant que le site est servi sur une
-         adresse de préproduction — voir .github/workflows/deploy-pages.yml et
-         docs/seo-environnements.md. Un noindex écrit ici finirait tôt ou tard
-         copié en production. -->
-    <meta name="robots" content="index, follow" />
+    <!-- Balise robots toujours explicite. Sa valeur par défaut est « index,
+         follow » : les fichiers du dépôt décrivent la production, et c'est le
+         déploiement qui marque une préproduction — voir
+         .github/workflows/deploy-pages.yml et docs/seo-environnements.md. Un
+         noindex écrit ici par prudence finirait tôt ou tard copié en production.
+
+         Une page peut cependant demander autre chose par « page.robots », et
+         une seule le fait : la 404. Elle n'est pas une préproduction, elle n'a
+         simplement rien à indexer — c'est un état d'erreur, pas un contenu. -->
+    <meta name="robots" content="${page.robots || 'index, follow'}" />
     <link rel="canonical" href="${canonical}" />
     <meta name="theme-color" content="#f2efe8" />
     <meta property="og:type" content="${page.ogType || 'website'}" />

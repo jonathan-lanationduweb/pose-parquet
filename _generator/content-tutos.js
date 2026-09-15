@@ -3,7 +3,7 @@ const { tip, warn, key, steps, table } = require('./ui');
 const TUTOS = [
   {
     slug: 'poser-un-parquet-flottant',
-    title: 'Poser un parquet flottant : tutoriel pas à pas | Pose Parquet',
+    title: 'Poser un parquet flottant : le tutoriel | Pose Parquet',
     h1: 'Poser un parquet flottant, étape par étape',
     description:
       "Sous-couche, calepinage, première rangée, coupes de rive, plinthes : le déroulé complet d'une pose flottante réussie, avec les points de contrôle.",
@@ -51,7 +51,7 @@ const TUTOS = [
 
   {
     slug: 'coller-un-parquet-contrecolle',
-    title: 'Coller un parquet contrecollé : méthode pas à pas | Pose Parquet',
+    title: 'Coller un parquet contrecollé : la méthode | Pose Parquet',
     h1: 'Coller un parquet contrecollé',
     description:
       "Primaire, choix de la colle, encollage à la spatule crantée, temps ouvert, marouflage : la méthode de pose collée en plein, étape par étape.",

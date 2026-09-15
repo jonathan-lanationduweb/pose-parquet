@@ -36,18 +36,43 @@ Les fichiers du dépôt décrivent **toujours la production** :
 - `sitemap.xml` avec les URL définitives.
 
 C'est le **déploiement** qui marque la préproduction, dans
-`.github/workflows/deploy-pages.yml`. Le signal est la présence d'un fichier
-`CNAME` à la racine :
+`.github/workflows/deploy-pages.yml`. Le signal est une variable de dépôt
+déclarée (Settings → Secrets and variables → Actions → Variables) :
 
-| CNAME | interprétation | ce que fait le workflow |
-| --- | --- | --- |
-| absent | GitHub Pages sert sur `*.github.io` — ce n'est pas l'adresse finale | `robots.txt` en `Disallow: /`, suppression du `sitemap.xml`, remplacement de la balise robots par `noindex, nofollow` dans toutes les pages de l'artefact |
-| présent | le domaine définitif est en place | rien ; une vérification échoue si l'accueil n'est pas indexable |
+| `SITE_ENVIRONMENT` | ce que fait le workflow |
+| --- | --- |
+| absente, ou toute valeur autre que `production` | `robots.txt` en `Disallow: /`, suppression du `sitemap.xml`, remplacement de la balise robots par `noindex, nofollow` dans **toutes** les pages, puis vérification que chacune la porte — et échec du déploiement s'il en manque une |
+| `production` | rien ; trois vérifications échouent si l'accueil n'est pas indexable, si la 404 l'est, ou si le sitemap manque |
 
-Le basculement est donc **automatique** : le jour où les DNS sont repointés et
-le CNAME ajouté, l'indexation reprend sans qu'il faille se rappeler de quoi que
-ce soit. Et à l'inverse, aucun `noindex` ne peut se retrouver en production,
-puisqu'il n'existe dans aucun fichier versionné.
+Le défaut est donc **la préproduction**, et c'est voulu : se tromper dans ce
+sens retarde un référencement, se tromper dans l'autre met une préproduction
+dans l'index — et désindexer prend des semaines.
+
+### Pourquoi ce n'est plus le CNAME
+
+Le signal était auparavant la **présence d'un fichier `CNAME`**. Il mélangeait
+deux choses sans rapport : « ce site a un nom de domaine » et « ce site est la
+production ». Une préproduction peut parfaitement porter un domaine
+(`staging.pose-parquet.com`), et une production peut tourner quelque temps sans.
+L'environnement se déclare maintenant ; le CNAME n'est plus qu'un contrôle de
+cohérence, qui émet un avertissement — pas une erreur — si `production` est
+déclaré sans domaine.
+
+### Et la preuve, qui n'en était pas une
+
+L'étape de marquage se terminait par un décompte des pages contenant la chaîne
+« noindex, nofollow ». Or le gabarit porte un **commentaire HTML** qui contient
+exactement ces mots : le décompte valait donc le nombre total de pages que la
+substitution ait fonctionné ou non. Une vérification qui ne peut pas échouer ne
+vérifie rien. Le contrôle porte désormais sur la balise entière
+(`<meta name="robots" content="noindex, nofollow" />`), il compare le compte au
+nombre de pages, et il **fait échouer le déploiement** s'il en manque une seule.
+
+Et à l'inverse, aucun `noindex` ne peut se retrouver en production, puisqu'il
+n'existe dans aucun fichier versionné — à une exception près, assumée : la page
+404, qui porte `noindex, follow` dans les sources. Elle n'est pas une
+préproduction, elle n'a simplement rien à indexer ; ses liens, eux, restent
+suivables.
 
 ## L'application, elle, n'est jamais indexée
 
@@ -83,10 +108,11 @@ grep 'name="robots"' index.html
 1. Repointer les DNS de `pose-parquet.com` vers GitHub Pages (voir
    [hebergement.md](hebergement.md)).
 2. Ajouter le fichier `CNAME` contenant `pose-parquet.com`.
-3. Pousser. Le workflow détecte le CNAME, ne marque plus rien, et vérifie que
-   l'accueil est indexable.
-4. Vérifier `robots.txt` et le sitemap sur le domaine final.
-5. Demander l'indexation dans la Search Console.
+3. Déclarer la variable de dépôt `SITE_ENVIRONMENT = production`.
+4. Pousser. Le workflow ne marque plus rien et vérifie que l'accueil est
+   indexable, que la 404 ne l'est pas, et que le sitemap est présent.
+5. Vérifier `robots.txt` et le sitemap sur le domaine final.
+6. Demander l'indexation dans la Search Console.
 
 **Ne pas faire les étapes 1 et 2 dans l'ordre inverse** : un CNAME posé avant le
 repointage des DNS casse l'adresse `github.io` sans que le domaine fonctionne.
