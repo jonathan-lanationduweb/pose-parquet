@@ -23,7 +23,7 @@
  * `paintChrome()` et `schedule()` en déduisent l'écran. Aucun état n'est lu
  * dans le DOM.
  */
-import { qs, on } from '../utils/dom.js';
+import { qs, on, echapper } from '../utils/dom.js';
 import { analyzeScene, loadSceneIndex, scenesBibliotheque } from '../scene/analyzer.js';
 import { loadImage, loadFile } from '../scene/image-loader.js';
 import { createSceneRenderer } from '../scene/renderer.js';
@@ -145,8 +145,11 @@ export async function mountProduct(root) {
   /* Provenance de la pièce, et la seule question qui gouverne le rendu. */
   const importee = () => Boolean(state.room && state.room.type === 'uploaded');
   const posable = () => Boolean(state.scene);
-  /* Un nom de fichier vient de l'utilisateur : il ne devient jamais du HTML. */
-  const txt = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  /* Un nom de fichier vient de l'utilisateur, un nom de produit d'un export
+     fournisseur : ni l'un ni l'autre ne devient du HTML. `echapper` est
+     l'echappeur central de js/utils/dom.js — il traite aussi l'apostrophe,
+     ce que la version locale qui vivait ici ne faisait pas. */
+  const txt = echapper;
 
   /* ---------------- DOM ---------------- */
   root.className = 'pv';
@@ -332,25 +335,25 @@ export async function mountProduct(root) {
     if (state.comparison) {
       const b = productOf(state.comparison.b);
       return `
-        <span class="bar__side"><span class="bar__tag">A</span><span class="bar__sw" data-swatch="${m.id}"></span><span class="bar__tx"><b>${nomCourt(m)}</b><span>${PATTERNS[m.defaultPattern]} · ${widthMm(m)} mm</span></span></span>
+        <span class="bar__side"><span class="bar__tag">A</span><span class="bar__sw" data-swatch="${txt(m.id)}"></span><span class="bar__tx"><b>${txt(nomCourt(m))}</b><span>${PATTERNS[m.defaultPattern]} · ${widthMm(m)} mm</span></span></span>
         <span class="bar__vs">${svg(ICON.cmp, 16)}</span>
-        <span class="bar__side"><span class="bar__tag">B</span><span class="bar__sw" data-swatch="${b.id}"></span><span class="bar__tx"><b>${nomCourt(b)}</b><span>${PATTERNS[b.defaultPattern]} · ${widthMm(b)} mm</span></span></span>
+        <span class="bar__side"><span class="bar__tag">B</span><span class="bar__sw" data-swatch="${txt(b.id)}"></span><span class="bar__tx"><b>${txt(nomCourt(b))}</b><span>${PATTERNS[b.defaultPattern]} · ${widthMm(b)} mm</span></span></span>
         <span class="bar__acts">
           <button class="bar__btn" type="button" data-pick-b>Changer B</button>
           <button class="bar__btn quiet" type="button" data-cmp-close>Fermer</button>
         </span>`;
     }
     return `
-      <span class="bar__sw bar__sw--lg" data-swatch="${m.id}"></span>
+      <span class="bar__sw bar__sw--lg" data-swatch="${txt(m.id)}"></span>
       <span class="bar__tx">
-        <b>${nomCourt(m)}</b>
+        <b>${txt(nomCourt(m))}</b>
         ${secondaire}
-        <span class="bar__ref">${p.sku || m.id}${p.productUrl ? ` · <a href="${p.productUrl}" target="_blank" rel="noopener noreferrer" data-fiche>Voir la fiche Premibel →</a>` : ''}</span>
+        <span class="bar__ref">${txt(p.sku || m.id)}${p.productUrl ? ` · <a href="${txt(p.productUrl)}" target="_blank" rel="noopener noreferrer" data-fiche>Voir la fiche Premibel →</a>` : ''}</span>
       </span>
       <span class="bar__acts">
         <button class="bar__btn" type="button" data-open-catalog aria-pressed="${state.ui.panel === 'catalog'}">${svg(ICON.floor, 16)}<span>Choisir un parquet</span></button>
         <button class="bar__btn" type="button" data-open-custom aria-pressed="${state.ui.panel === 'custom'}">${svg(ICON.custom, 16)}<span>Personnaliser</span></button>
-        <button class="bar__fav" type="button" data-fav="${m.id}" aria-pressed="${state.favoriteIds.has(m.id)}" aria-label="Favori">${heart(state.favoriteIds.has(m.id))}</button>
+        <button class="bar__fav" type="button" data-fav="${txt(m.id)}" aria-pressed="${state.favoriteIds.has(m.id)}" aria-label="Favori">${heart(state.favoriteIds.has(m.id))}</button>
       </span>`;
   }
 
@@ -419,7 +422,7 @@ export async function mountProduct(root) {
         const on = !importee() && state.room && r.id === state.room.id;
         return `<button class="gal__card" type="button" data-room="${r.id}" aria-pressed="${on}">
           <span class="gal__ph"><img alt="" src="${base}assets/images/${stem}-640.jpg" decoding="async" />${on ? `<span class="gal__tick">${svg(ICON.tick, 12)}</span>` : ''}</span>
-          <b>${r.label}</b><span>${r.highlight || ''}</span></button>`;
+          <b>${txt(r.label)}</b><span>${txt(r.highlight || '')}</span></button>`;
       }).join('')}
     </div>`;
   }
@@ -534,11 +537,11 @@ export async function mountProduct(root) {
     const avis = posable() ? '' : `<p class="grid__note">${NOTE_SANS_SOL}</p>`;
     $('[data-drawer-body]').innerHTML = `${filtres}${avis}<div class="grid" data-prods>${list.map((p) => {
       const on = p.id === state.product && !state.ui.picking;
-      return `<button class="pcard" type="button" data-id="${p.id}" aria-pressed="${on}">
-        <span class="pcard__tex" data-swatch="${p.id}"></span>
+      return `<button class="pcard" type="button" data-id="${txt(p.id)}" aria-pressed="${on}">
+        <span class="pcard__tex" data-swatch="${txt(p.id)}"></span>
         ${on ? `<span class="pcard__tick">${svg(ICON.tick, 12)}</span>` : ''}
-        <span class="pcard__hh" data-fav="${p.id}" role="button" aria-pressed="${state.favoriteIds.has(p.id)}" aria-label="Favori">${heart(state.favoriteIds.has(p.id), 16)}</span>
-        <b>${nomCourt(p)}</b>
+        <span class="pcard__hh" data-fav="${txt(p.id)}" role="button" aria-pressed="${state.favoriteIds.has(p.id)}" aria-label="Favori">${heart(state.favoriteIds.has(p.id), 16)}</span>
+        <b>${txt(nomCourt(p))}</b>
         <span>${PATTERNS[p.defaultPattern]} · ${widthMm(p)} mm</span></button>`;
     }).join('')}</div>`;
     poserSwatch($('[data-prods]'));
@@ -598,11 +601,11 @@ export async function mountProduct(root) {
         <div class="chips">${widths.map((w) => {
           const t = w === widthMm(m) ? m : otherWith((x) => widthMm(x) === w);
           return `<button class="chip" type="button" data-variant="${t ? t.id : ''}" aria-pressed="${w === widthMm(m)}" ${t ? '' : 'disabled'}>${w} mm</button>`; }).join('')}</div>
-        <p class="cus__note"><strong>${nomCourt(m)}</strong> est une référence définie — ${PATTERNS[m.defaultPattern].toLowerCase()}, ${widthMm(m)} mm. Changer de motif ou de largeur, c'est choisir une autre référence du catalogue.</p>
+        <p class="cus__note"><strong>${txt(nomCourt(m))}</strong> est une référence définie — ${PATTERNS[m.defaultPattern].toLowerCase()}, ${widthMm(m)} mm. Changer de motif ou de largeur, c'est choisir une autre référence du catalogue.</p>
       </section>
       <section class="cus__sect cus__sect--soft">
         <h3>Finition, veinage, joints</h3>
-        <p class="cus__note">${p.surfaceTreatment ? `Fiche : ${p.surfaceTreatment}${p.finish ? `, ${String(p.finish).toLowerCase()}` : ''}. ` : ''}Ils appartiennent à la matière et ne se règlent pas ici. La matière affichée est une famille de démonstration : motif et largeur exacts, teinte approchée.</p>
+        <p class="cus__note">${p.surfaceTreatment ? `Fiche : ${txt(p.surfaceTreatment)}${p.finish ? `, ${txt(String(p.finish).toLowerCase())}` : ''}. ` : ''}Ils appartiennent à la matière et ne se règlent pas ici. La matière affichée est une famille de démonstration : motif et largeur exacts, teinte approchée.</p>
       </section>
     </div>`;
   }

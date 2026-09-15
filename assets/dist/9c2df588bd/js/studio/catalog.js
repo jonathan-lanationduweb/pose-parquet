@@ -14,6 +14,7 @@ import { buildSwatch } from '../scene/texture.js';
 import { lireJson } from '../scene/product.js';
 import { createMaterial } from '../scene/material.js';
 import { loadProducts, toMaterial } from '../scene/product.js';
+import { echapper } from '../utils/dom.js';
 
 /**
  * Charge le catalogue en passant par la **couche produit**.
@@ -148,7 +149,7 @@ export function createCatalog(host, catalog, { onSelect, onVisible }) {
     // de lame sont dans l'en-tête du contexte, pas répétées douze fois.
     card.innerHTML = `
       <span class="cat__media"></span>
-      <span class="cat__label">${material.name}</span>`;
+      <span class="cat__label">${echapper(material.name)}</span>`;
     card.addEventListener('click', () => onSelect(material));
     grid.appendChild(card);
     if (observer) observer.observe(card);
