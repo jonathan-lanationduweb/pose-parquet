@@ -1590,3 +1590,101 @@ a.action--primary:hover { background: #9cb098; }
 @media (max-height: 34rem) and (min-width: 30rem) and (max-width: 47.99rem) {
   .cat__grid { grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr)); }
 }
+
+/* ================================================================== */
+/* Retour au doigt, et preferences d'affichage                        */
+/* ================================================================== */
+
+/**
+ * Ce qui manquait : la confirmation de l'appui.
+ *
+ * Les commandes du Studio repondaient au survol et a l'etat actif, mais rien
+ * ne se passait entre les deux — au moment ou le doigt touche. Sur un ecran
+ * tactile il n'y a pas de survol du tout : l'appui etait donc muet jusqu'a ce
+ * que le panneau s'ouvre, et sur un choix qui demande une fabrication de
+ * tuile, cet intervalle se compte en secondes.
+ *
+ * Le retour est volontairement minuscule — 2 % d'echelle, 60 ms — et il porte
+ * sur l'ENFONCEMENT, pas sur le relachement : attendre le relachement donne
+ * l'impression d'une interface qui reflechit avant de repondre. Ce n'est pas
+ * une animation, c'est un accuse de reception.
+ */
+.context-btn,
+.action,
+.tile-card,
+.studio__tool,
+.panel__close {
+  transition: transform 60ms var(--ease-out, ease-out), background 140ms var(--ease-out, ease-out);
+}
+.context-btn:active:not([disabled]),
+.action:active:not([disabled]),
+.studio__tool:active,
+.panel__close:active {
+  transform: scale(0.96);
+}
+/* Les vignettes sont grandes : 0,96 y serait un sursaut. */
+.tile-card:active:not([disabled]) { transform: scale(0.985); }
+.swatch:active:not([disabled]) { transform: scale(0.94); }
+
+@media (prefers-reduced-motion: reduce) {
+  .context-btn,
+  .action,
+  .tile-card,
+  .studio__tool,
+  .panel__close,
+  .swatch {
+    transition: none;
+  }
+  .context-btn:active,
+  .action:active,
+  .tile-card:active,
+  .studio__tool:active,
+  .panel__close:active,
+  .swatch:active {
+    transform: none;
+  }
+}
+
+/**
+ * Contraste renforce.
+ *
+ * `prefers-contrast: more` est demande par quelqu'un qui ne distingue pas
+ * assez les limites : on epaissit les contours et on remonte les textes
+ * secondaires vers le texte plein. On ne change NI les couleurs de marque, NI
+ * la mise en page — ce reglage doit rendre le meme ecran plus lisible, pas un
+ * autre ecran.
+ *
+ * Les valeurs visees sont celles qui manquaient : un contour de 1 px a 28 %
+ * d'opacite sur fond sombre passe a 1,5 px a 70 %, et les libelles a
+ * `--text-muted` reviennent a `--text-soft`.
+ */
+@media (prefers-contrast: more) {
+  .context-btn { border: 1.5px solid rgba(255, 255, 255, 0.7); }
+  .context-btn[aria-pressed="true"] { border-color: #fff; }
+  .action { border: 1.5px solid rgba(255, 255, 255, 0.55); }
+  .tile-card__media { box-shadow: inset 0 0 0 1.5px var(--text); }
+  .tile-card[aria-pressed="true"] .tile-card__media { box-shadow: inset 0 0 0 3px var(--c-ink); }
+  .panel__close,
+  .studio__tool { border: 1.5px solid currentColor; }
+  .drawer__hint,
+  .panel__title { color: var(--text); }
+  .stage__status { border: 1.5px solid var(--text); }
+}
+
+/**
+ * Transparence reduite.
+ *
+ * Le Studio pose plusieurs surfaces translucides au-dessus de la photo : la
+ * barre du haut, les etiquettes avant/apres, le bandeau d'etat. Sur une photo
+ * claire et chargee, ces fonds a 10 ou 18 % laissent passer assez de detail
+ * pour rendre le texte difficile. Quand le systeme demande moins de
+ * transparence, ces fonds deviennent opaques. Rien d'autre ne bouge.
+ */
+@media (prefers-reduced-transparency: reduce) {
+  .studio__bar { background: var(--c-ink); backdrop-filter: none; }
+  .stage__tag { background: var(--c-ink); color: #fff; }
+  .stage__status { background: var(--bg); color: var(--text); }
+  .studio__tool:hover,
+  .context-btn:hover,
+  .action:hover:not([disabled]) { background: #2a2d31; }
+}
