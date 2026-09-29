@@ -22,6 +22,13 @@
  */
 import { qs, on, echapper } from '../utils/dom.js';
 import { analyzeScene, loadSceneIndex, scenesBibliotheque, sceneOuvrable } from '../scene/analyzer.js';
+import {
+  motifAutorise,
+  motifParDefaut,
+  normaliserConfig,
+  raisonIndisponible,
+  messageAdaptation,
+} from '../scene/motifs-regles.js';
 import { loadImage, loadFile } from '../scene/image-loader.js';
 import { createFloorEditor } from '../scene/editor.js';
 import { composeRender, downloadCanvas } from '../scene/export.js';
@@ -71,12 +78,12 @@ const STORAGE = 'pose-parquet:studio';
  * Combien de versions on garde côte à côte.
  *
  * Exporté, et pas seulement écrit deux fois plus bas, parce que trois pages
- * l’annoncent en toutes lettres — « jusqu’à trois versions enregistrées ». Le
+ * l'annoncent en toutes lettres — « jusqu'à trois versions enregistrées ». Le
  * générateur lit cette constante pour écrire ces phrases : le jour où la
  * limite change, le texte change avec elle. Une promesse et son
  * implémentation ne devraient jamais être deux nombres différents.
  *
- * Trois est une contrainte d’affichage, pas de moteur : au-delà, la
+ * Trois est une contrainte d'affichage, pas de moteur : au-delà, la
  * comparaison côte à côte devient illisible sur un téléphone.
  */
 export const MAX_VERSIONS = 3;
@@ -237,7 +244,10 @@ export async function mountStudio(root) {
 
   let config = {
     materialId: catalog.parquets[0].id,
-    pattern: catalog.parquets[0].defaultPattern,
+    // Le motif d'ouverture passe par la regle, comme tous les autres : une
+    // reference dont le `defaultPattern` mentirait ouvrirait autrement sur un
+    // etat impossible des la premiere seconde.
+    pattern: motifParDefaut(catalog.parquets[0]),
     angle: 0,
     width: null,
     scale: 1,
@@ -308,6 +318,31 @@ export async function mountStudio(root) {
     status.hidden = !message;
   };
 
+  /*
+   * Le message qui reste quand le rendu se tait.
+   *
+   * `paint()` termine par `setStatus('')` : tout message posé avant lui
+   * disparaît dès la première image. C'est le bon comportement pour
+   * « Préparation du rendu… », qui décrit un état transitoire ; c'est le
+   * mauvais pour « le motif a été adapté », qui explique une décision prise
+   * à la place de l'utilisateur et doit rester lisible après coup.
+   *
+   * On distingue donc les deux : un message transitoire, et une NOTE de
+   * repos vers laquelle on revient. La note s'efface dès que l'utilisateur
+   * reprend la main sur le motif — il n'a plus besoin qu'on lui explique un
+   * choix qu'il vient de refaire.
+   */
+  let noteMotif = '';
+  const poserNote = (message) => {
+    noteMotif = message || '';
+    setStatus(noteMotif);
+  };
+  const effacerNote = () => {
+    if (!noteMotif) return;
+    noteMotif = '';
+    setStatus('');
+  };
+
   /* ---------------- Rendu ---------------- */
 
   /**
@@ -365,7 +400,8 @@ export async function mountStudio(root) {
       setStatus('Zone de sol invalide : reprenez-la dans « Délimiter le sol ».');
       return;
     }
-    setStatus('');
+    // Retour à la note de repos, et non au vide : voir `poserNote`.
+    setStatus(noteMotif);
     desarmerTemoin();
     decrireCanvas();
     mark('app:paint:fin');
@@ -756,10 +792,33 @@ const REGROUPEMENT_MS = 70;
     const next = catalog.get(id);
     if (!next) return;
     interaction('produit');
-    config = { ...config, materialId: id };
-    if (!next.compatiblePatterns.includes(config.pattern)) config.pattern = next.defaultPattern;
+
+    /*
+     * Changer de parquet peut rendre le motif courant impossible.
+     *
+     * Une reference vendue en lames droites ne se pose pas en point de
+     * Hongrie : garder le motif precedent produirait un etat qui n'existe
+     * pas. On bascule donc sur le motif par defaut de la nouvelle
+     * reference — et on le DIT, dans la zone de statut, parce que changer
+     * le choix de quelqu'un en silence est la pire des deux options.
+     */
+    const { config: normalise, adapte } = normaliserConfig(
+      { ...config, materialId: id },
+      next
+    );
+    config = normalise;
     catalogUi.setActive(id);
     syncSelected();
+    // La grille des motifs depend du materiau : ses cartes desactivees et son
+    // `aria-pressed` changent avec lui, panneau ouvert ou non.
+    syncPatterns();
+    if (adapte) {
+      const retenu = catalog.patterns.find((entry) => entry.id === config.pattern);
+      poserNote(messageAdaptation(next, retenu ? retenu.label : config.pattern));
+    } else {
+      // Le nouveau parquet accepte le motif courant : plus rien à expliquer.
+      effacerNote();
+    }
     demandeRendu(true);
     save();
     /*
@@ -892,14 +951,34 @@ const REGROUPEMENT_MS = 70;
     const grid = document.createElement('div');
     grid.className = 'tile-grid';
     catalog.patterns.forEach((pattern) => {
-      const allowed = !item || item.compatiblePatterns.includes(pattern.id);
+      const allowed = motifAutorise(item, pattern.id);
       const card = document.createElement('button');
       card.type = 'button';
       card.className = 'tile-card';
       card.dataset.pattern = pattern.id;
+      /*
+       * `disabled`, et pas une opacite.
+       *
+       * Une carte seulement attenuee reste cliquable a la souris, atteignable
+       * au clavier et annoncee comme un bouton ordinaire. `disabled` la retire
+       * de l'ordre de tabulation, refuse le clic et le tap, et fait dire
+       * « indisponible » aux lecteurs d'ecran — sans code de notre part.
+       *
+       * On ne la CACHE pas pour autant : le motif existe, il n'existe pas pour
+       * cette reference. Le masquer laisserait croire qu'il n'existe plus.
+       */
       card.disabled = !allowed;
       card.setAttribute('aria-pressed', String(config.pattern === pattern.id));
-      card.innerHTML = `<span class="tile-card__media"></span><span class="tile-card__label">${echapper(pattern.label)}</span>`;
+      const raison = allowed ? '' : raisonIndisponible(item, pattern.label);
+      card.innerHTML = `<span class="tile-card__media"></span><span class="tile-card__label">${echapper(pattern.label)}</span>`
+        + (allowed ? '' : `<span class="tile-card__note">Non disponible pour ce parquet</span>`);
+      if (!allowed) {
+        // Le libelle visible dit « non disponible » ; le nom accessible nomme
+        // la reference, parce qu'un lecteur d'ecran ne voit pas quel parquet
+        // est selectionne au-dessus.
+        card.setAttribute('aria-label', raison);
+        card.title = raison;
+      }
       if (item) {
         const preview = document.createElement('canvas');
         preview.width = 288;
@@ -908,7 +987,12 @@ const REGROUPEMENT_MS = 70;
         drawPatternPreview(preview, item, pattern.id);
       }
       card.addEventListener('click', () => {
+        // `disabled` suffit deja ; ce test est la ceinture. Une carte peut
+        // etre reactivee par une extension, un outil de developpement ou un
+        // script — la regle metier, elle, ne bouge pas.
+        if (!motifAutorise(material(), pattern.id)) return;
         interaction('motif');
+        effacerNote();
         config = { ...config, pattern: pattern.id };
         syncPatterns();
         demandeRendu(true);
@@ -1049,11 +1133,25 @@ const REGROUPEMENT_MS = 70;
     paintConfig,
     projectLink,
     onUse: (variant) => {
-      config = { ...variant.config };
+      /*
+       * Une version enregistree peut avoir vieilli : le catalogue change, une
+       * reference perd un motif. On revalide au moment de la reprise plutot
+       * que de faire confiance a ce qui a ete enregistre.
+       */
+      const vise = catalog.get(variant.config.materialId);
+      const { config: normalise, adapte } = normaliserConfig({ ...variant.config }, vise);
+      config = normalise;
       catalogUi.setActive(config.materialId);
       syncSelected();
+      syncPatterns();
       schedule();
       compareUi.close();
+      if (adapte) {
+        const retenu = catalog.patterns.find((entry) => entry.id === config.pattern);
+        poserNote(messageAdaptation(vise, retenu ? retenu.label : config.pattern));
+      } else {
+        effacerNote();
+      }
       save();
     },
   });
@@ -1081,11 +1179,11 @@ const REGROUPEMENT_MS = 70;
     });
     compareBtn.disabled = variants.length < 2;
     compareLabel.textContent = variants.length ? `Comparer (${variants.length})` : 'Comparer';
-    addBtn.disabled = variants.length >= 3;
+    addBtn.disabled = variants.length >= MAX_VERSIONS;
   }
 
   on(addBtn, 'click', () => {
-    if (variants.length >= 3) return;
+    if (variants.length >= MAX_VERSIONS) return;
     variants = [...variants, { id: `v${Date.now()}`, config: { ...config } }];
     syncVariants();
     save();
@@ -1452,9 +1550,10 @@ const REGROUPEMENT_MS = 70;
   });
   on(qs('[data-restart]', root), 'click', () => {
     variants = [];
+    effacerNote();
     config = {
       materialId: catalog.parquets[0].id,
-      pattern: catalog.parquets[0].defaultPattern,
+      pattern: motifParDefaut(catalog.parquets[0]),
       angle: 0,
       width: null,
       scale: 1,
@@ -1509,8 +1608,25 @@ const REGROUPEMENT_MS = 70;
   function restore() {
     try {
       const stored = JSON.parse(window.localStorage.getItem(STORAGE) || '{}');
-      if (stored.config && catalog.get(stored.config.materialId)) config = { ...config, ...stored.config };
-      if (Array.isArray(stored.variants)) variants = stored.variants.filter((v) => catalog.get(v.config.materialId));
+      /*
+       * Ce qui vient du navigateur est une donnee entrante comme une autre.
+       *
+       * Un etat enregistre la semaine derniere peut porter un couple devenu
+       * impossible : la reference existe toujours, mais le catalogue ne lui
+       * accorde plus ce motif. On normalise au lieu de restaurer tel quel.
+       */
+      if (stored.config && catalog.get(stored.config.materialId)) {
+        const fusion = { ...config, ...stored.config };
+        config = normaliserConfig(fusion, catalog.get(fusion.materialId)).config;
+      }
+      if (Array.isArray(stored.variants)) {
+        variants = stored.variants
+          .filter((v) => v && v.config && catalog.get(v.config.materialId))
+          .map((v) => ({
+            ...v,
+            config: normaliserConfig(v.config, catalog.get(v.config.materialId)).config,
+          }));
+      }
     } catch (error) {
       void error;
     }
@@ -1538,16 +1654,23 @@ const REGROUPEMENT_MS = 70;
   const wanted = params.get('parquet');
   if (wanted && catalog.get(wanted)) config.materialId = wanted;
   const motif = params.get('motif');
-  if (motif && catalog.patterns.some((p) => p.id === motif)) config.pattern = motif;
+  if (motif) config.pattern = motif;
   const orientation = Number(params.get('orientation'));
   if (Number.isFinite(orientation) && params.get('orientation') !== null) {
     config.angle = Math.max(-90, Math.min(90, orientation));
   }
-  // Un motif incompatible avec la référence demandée serait ignoré en silence :
-  // on retombe alors sur le motif par défaut du parquet.
+  /*
+   * Un motif inconnu ou incompatible avec la reference demandee ne s'applique
+   * pas : on retombe sur le motif par defaut du parquet. Meme regle que
+   * partout ailleurs, et c'est le point : une URL forgee n'ouvre pas une
+   * porte que l'interface ferme.
+   */
   const chosen = catalog.get(config.materialId);
-  if (chosen && !chosen.compatiblePatterns.includes(config.pattern)) {
-    config.pattern = chosen.defaultPattern;
+  const lien = normaliserConfig(config, chosen);
+  config = lien.config;
+  if (lien.adapte && motif) {
+    const retenu = catalog.patterns.find((entry) => entry.id === config.pattern);
+    poserNote(messageAdaptation(chosen, retenu ? retenu.label : config.pattern));
   }
 
   catalogUi.setActive(config.materialId);
@@ -1601,7 +1724,26 @@ const REGROUPEMENT_MS = 70;
          commandes ; lire l'etat interne, c'est en dependre. */
       get config() { return config; },
       selectMaterial,
-      setPattern: (id) => { interaction('motif'); config = { ...config, pattern: id }; syncPatterns(); demandeRendu(true); },
+      /**
+       * Motif de pose. Refuse ce que la reference ne propose pas.
+       *
+       * `setWidth` validait deja ses bornes ; celui-ci acceptait n'importe
+       * quelle chaine, y compris un motif inconnu, et le moteur retombait
+       * ensuite sur le defaut sans le dire. Un appelant ne pouvait donc pas
+       * savoir si sa demande avait ete honoree.
+       *
+       * @param {string} id
+       * @returns {boolean} faux si le motif est inconnu ou incompatible
+       */
+      setPattern: (id) => {
+        if (!motifAutorise(material(), id)) return false;
+        interaction('motif');
+        effacerNote();
+        config = { ...config, pattern: id };
+        syncPatterns();
+        demandeRendu(true);
+        return true;
+      },
       setAngle: (a) => { interaction('orientation'); config = { ...config, angle: a }; syncOrientation(); demandeRendu(true); },
 
       /**
