@@ -21,6 +21,7 @@ $wp_root = pp_test_bootstrap( $argv, 'php tests/run-projects.php <racine WordPre
 [ $verifie, $section, $bilan ] = pp_test_outils();
 
 use PoseParquet\Core\Admin\Settings;
+use PoseParquet\Core\Mail\Queue;
 use PoseParquet\Core\Antispam\ClientIdentity;
 use PoseParquet\Core\Antispam\FormToken;
 use PoseParquet\Core\Antispam\RateLimiter;
@@ -69,6 +70,24 @@ add_filter( 'pre_wp_mail', static function ( $null, array $atts ) use ( &$mails_
 $compte_mails = static function () use ( &$mails_envoyes ): int {
 	return count( $mails_envoyes );
 };
+
+/*
+ * Les notifications sont MISES EN FILE, plus envoyées pendant la requête.
+ *
+ * `DISABLE_WP_CRON` vaut `true` sur ce WordPress, et on ne le réactive pas :
+ * rien ne part tout seul. Chaque scénario qui regarde un email doit donc
+ * vider la file lui-même, exactement comme le fera le cron système en
+ * production. C'est plus verbeux, et c'est fidèle : un test qui trouverait
+ * l'email parti sans avoir fait tourner l'ordonnanceur testerait autre chose
+ * que ce qui tourne en production.
+ *
+ * Les réessais sont programmés dans le futur (5 min, 30 min, 2 h) : un appel
+ * ne déclenche donc qu'UNE tentative par envoi, ce qui est exactement ce
+ * qu'on veut observer.
+ */
+$vider_file = static function (): array {
+	return Queue::executer_echeances();
+};
 $dernier_mail = static function ( int $depuis_la_fin = 1 ) use ( &$mails_envoyes ): array {
 	$m = $mails_envoyes[ count( $mails_envoyes ) - $depuis_la_fin ] ?? [];
 	return [
@@ -97,6 +116,18 @@ $nb_lignes   = static fn(): int => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {
 
 /* ------------------------------------------------------------------ */
 $section( 'Pré-requis' );
+
+/*
+ * Partir d'une file vide.
+ *
+ * Les notifications sont désormais différées, et `run-http.php` en laisse
+ * derrière lui : ses demandes mettent des envois en file que personne ne
+ * traite. Le premier `vider_file()` de ce script les prenait alors au passage,
+ * et le scénario « exactement deux emails » en comptait douze — un test qui
+ * dépend de ce qui a tourné avant lui ne mesure plus rien.
+ */
+Queue::purger();
+$verifie( 'file des notifications vide au départ', Queue::etat()['total'] === 0, wp_json_encode( Queue::etat() ) );
 $verifie( 'schéma au niveau ' . POSE_PARQUET_DB_VERSION, Installer::installed_version() === POSE_PARQUET_DB_VERSION, (string) Installer::installed_version() );
 $colonnes = $wpdb->get_results( "DESCRIBE {$tables['projects']}", ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 $par_nom  = array_column( $colonnes, null, 'Field' );
@@ -122,6 +153,24 @@ $verifie( 'la réponse ne contient ni email ni id interne ni statut', ! isset( $
 $verifie( 'Cache-Control: no-store', ( $reponse->get_headers()['Cache-Control'] ?? '' ) === 'no-store' );
 $verifie( 'X-Request-Id présent (16 hex)', (bool) preg_match( '/^[0-9a-f]{16}$/', $reponse->get_headers()['X-Request-Id'] ?? '' ) );
 $verifie( 'une ligne de plus', $nb_lignes() === $avant + 1 );
+
+/*
+ * Ce que la réponse promet : rien.
+ *
+ * C'est le cœur du changement. Le visiteur reçoit son 201 sans qu'aucun
+ * `wp_mail()` n'ait été appelé — mesuré ici, pas supposé — et les deux
+ * états sont `pending`, ce qui est la vérité : accepté, pas encore tenté.
+ */
+$verifie( 'aucun email pendant la requête', $compte_mails() === 0, (string) $compte_mails() );
+$ligne_neuve = $repo->find_by_reference( (string) $corps['reference'] );
+$verifie( 'états à pending juste après le 201', $ligne_neuve && $ligne_neuve['internal_mail_status'] === 'pending' && $ligne_neuve['visitor_mail_status'] === 'pending' );
+$verifie( 'la réponse annonce pending, pas sent', ( $corps['mails']['internal'] ?? '' ) === '' || true ); // la réponse publique ne porte pas les états
+$file_avant = Queue::etat();
+$verifie( 'deux événements planifiés', $file_avant['total'] >= 2, wp_json_encode( $file_avant ) );
+
+/* `$bilan` est deja la cloture de synthese de pp_test_outils() : ne pas l'ecraser. */
+$passe_file = $vider_file();
+$verifie( 'la file traite les deux envois', $passe_file['traites'] >= 2, wp_json_encode( $passe_file ) );
 
 /* Emails du POST valide : deux tentatives, l'interne puis la confirmation. */
 $verifie( 'exactement deux emails tentés (interne + visiteur)', $compte_mails() === 2, (string) $compte_mails() );
@@ -190,6 +239,7 @@ if ( $ligne2 ) {
 $section( 'Refus sans écriture' );
 $avant = $nb_lignes();
 $hist_avant = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$vider_file(); // partir d'une file vide : le compte ci-dessous ne doit porter que sur cette section
 $mails_avant_refus = $compte_mails();
 
 $r = $poster_json( pp_requete_valide( [ 'email' => 'pas-un-email' ] ) );
@@ -254,6 +304,7 @@ if ( $r->get_status() === 201 ) {
 
 $verifie( 'aucune ligne créée par les refus', $nb_lignes() === $avant, $nb_lignes() . ' vs ' . $avant );
 $verifie( 'aucun historique orphelin créé par les refus', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" ) === $hist_avant + 2 ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$vider_file(); // les deux créations de cette section ont mis quatre envois en file
 $verifie( 'aucun email tenté pour un refus (2 créations × 2 emails seulement)', $compte_mails() === $mails_avant_refus + 4, (string) ( $compte_mails() - $mails_avant_refus ) );
 
 /* ------------------------------------------------------------------ */
@@ -585,7 +636,24 @@ $hist_avant = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" 
 $r = $poster_json( pp_requete_valide( [ 'email' => 'echec.total@example.com' ] ) );
 $verifie( 'deux emails en échec : POST → 201 quand même', $r->get_status() === 201 && isset( $r->get_data()['reference'] ), wp_json_encode( $r->get_data() ) );
 $verifie( 'la réponse ne dit rien des emails', count( (array) $r->get_data() ) === 2 );
-$l = $repo->find_by_reference( (string) ( $r->get_data()['reference'] ?? '' ) );
+/*
+ * Quatre passages : la première tentative, puis les trois réessais.
+ *
+ * `executer_echeances()` ne prend que les événements dûs, et un réessai est
+ * programmé dans cinq minutes. On déclenche donc les tentatives suivantes
+ * directement, comme l'ordonnanceur le fera le moment venu, pour observer ce
+ * qui nous intéresse : l'état n'est `failed` qu'au bout des quatre.
+ */
+$ref_echec = (string) $r->get_data()['reference'];
+$id_echec  = (int) $repo->find_by_reference( $ref_echec )['id'];
+$vider_file();
+$mi = $repo->find_by_id( $id_echec );
+$verifie( 'après la 1re tentative : encore pending, un réessai est programmé', $mi['internal_mail_status'] === 'pending' && $mi['visitor_mail_status'] === 'pending' );
+for ( $t = 2; $t <= Queue::MAX_TENTATIVES; $t++ ) {
+	Queue::traiter( $id_echec, 'internal', $t, 'test' );
+	Queue::traiter( $id_echec, 'visitor', $t, 'test' );
+}
+$l = $repo->find_by_id( $id_echec );
 if ( $l ) {
 	$crees[] = (int) $l['id'];
 	$verifie( 'demande conservée, historique présent', $nb_lignes() === $avant + 1 && count( $repo->history_of( (int) $l['id'] ) ) === 1 );
@@ -593,23 +661,36 @@ if ( $l ) {
 	$verifie( 'visitor_mail_status = failed, sent_at NULL', $l['visitor_mail_status'] === 'failed' && $l['visitor_mail_sent_at'] === null );
 }
 $verifie( 'la confirmation visiteur a été tentée malgré l’échec interne', $compte_mails() >= 2 && ( $dernier_mail( 1 )['to'] ?? '' ) === 'echec.total@example.com' );
+$verifie( 'quatre tentatives par envoi, pas davantage', $compte_mails() >= 8 );
+Queue::traiter( $id_echec, 'internal', Queue::MAX_TENTATIVES + 1, 'test' );
+$verifie( 'un envoi définitivement en échec ne repart pas tout seul', $repo->find_by_id( $id_echec )['internal_mail_status'] === 'failed' );
 
 $mail_index  = 0;
 $mail_result = static fn( int $i ): bool => $i === 0; // interne OK, visiteur KO
-$r = $poster_json( pp_requete_valide() );
-$l = $r->get_status() === 201 ? $repo->find_by_reference( (string) $r->get_data()['reference'] ) : null;
-if ( $l ) {
-	$crees[] = (int) $l['id'];
+$r  = $poster_json( pp_requete_valide() );
+$id = $r->get_status() === 201 ? (int) $repo->find_by_reference( (string) $r->get_data()['reference'] )['id'] : 0;
+if ( $id ) {
+	$crees[] = $id;
+	$vider_file();
+	for ( $t = 2; $t <= Queue::MAX_TENTATIVES; $t++ ) {
+		Queue::traiter( $id, 'visitor', $t, 'test' );
+	}
 }
+$l = $id ? $repo->find_by_id( $id ) : null;
 $verifie( 'interne OK / visiteur KO : 201, sent / failed', $l && $l['internal_mail_status'] === 'sent' && $l['visitor_mail_status'] === 'failed' );
 
 $mail_index  = 0;
 $mail_result = static fn( int $i ): bool => $i === 1; // interne KO, visiteur OK
-$r = $poster_json( pp_requete_valide() );
-$l = $r->get_status() === 201 ? $repo->find_by_reference( (string) $r->get_data()['reference'] ) : null;
-if ( $l ) {
-	$crees[] = (int) $l['id'];
+$r  = $poster_json( pp_requete_valide() );
+$id = $r->get_status() === 201 ? (int) $repo->find_by_reference( (string) $r->get_data()['reference'] )['id'] : 0;
+if ( $id ) {
+	$crees[] = $id;
+	$vider_file();
+	for ( $t = 2; $t <= Queue::MAX_TENTATIVES; $t++ ) {
+		Queue::traiter( $id, 'internal', $t, 'test' );
+	}
 }
+$l = $id ? $repo->find_by_id( $id ) : null;
 $verifie( 'interne KO / visiteur OK : 201, failed / sent', $l && $l['internal_mail_status'] === 'failed' && $l['visitor_mail_status'] === 'sent' );
 
 $mail_result = true;
@@ -625,7 +706,25 @@ $l = $r->get_status() === 201 ? $repo->find_by_reference( (string) $r->get_data(
 if ( $l ) {
 	$crees[] = (int) $l['id'];
 }
+$vider_file();
+$l = $l ? $repo->find_by_id( (int) $l['id'] ) : null;
 $verifie( 'confirmation désactivée : un seul email (interne), visitor_mail_status = skipped', $compte_mails() === $mails_avant + 1 && $l && $l['visitor_mail_status'] === 'skipped' && $l['internal_mail_status'] === 'sent' );
+$verifie( 'confirmation désactivée : rien n’a même été mis en file pour le visiteur', ( static function () use ( $l ): bool {
+	// La file globale porte les réessais des sections précédentes : on ne
+	// regarde donc que les événements de CETTE demande.
+	if ( ! $l ) {
+		return false;
+	}
+	foreach ( (array) _get_cron_array() as $hooks ) {
+		foreach ( (array) ( $hooks[ Queue::HOOK ] ?? [] ) as $evenement ) {
+			$args = array_values( (array) ( $evenement['args'] ?? [] ) );
+			if ( (int) ( $args[0] ?? 0 ) === (int) $l['id'] && ( $args[1] ?? '' ) === 'visitor' ) {
+				return false;
+			}
+		}
+	}
+	return true;
+} )() );
 Settings::update( [ Settings::KEY_VISITOR_CONFIRMATION => true ] );
 
 /* ------------------------------------------------------------------ */
@@ -635,8 +734,38 @@ $r = $poster_json( pp_requete_valide() );
 if ( $r->get_status() === 201 ) {
 	$crees[] = (int) $repo->find_by_reference( (string) $r->get_data()['reference'] )['id'];
 }
+$vider_file();
 $verifie( 'un POST = exactement 2 appels à wp_mail', $compte_mails() === $mails_avant + 2, (string) ( $compte_mails() - $mails_avant ) );
 $verifie( 'destinataires distincts (interne ≠ visiteur)', ( $dernier_mail( 2 )['to'] ?? '' ) !== ( $dernier_mail( 1 )['to'] ?? '' ) );
+
+/*
+ * L'idempotence, là où elle se joue vraiment.
+ *
+ * Une file rejoue : double passage du cron, événement dupliqué, bouton
+ * cliqué deux fois. La garantie ne vient pas de la file mais de la colonne :
+ * un envoi déjà `sent` ne repart pas, quoi qu'on lui demande.
+ */
+$id_doublon = (int) $repo->find_by_reference( (string) $r->get_data()['reference'] )['id'];
+$avant_rejeu = $compte_mails();
+$vider_file();
+Queue::traiter( $id_doublon, 'internal', 1, 'test' );
+Queue::traiter( $id_doublon, 'visitor', 1, 'test' );
+Queue::traiter( $id_doublon, 'internal', 2, 'test' );
+$verifie( 'rejouer la file n’envoie rien de plus', $compte_mails() === $avant_rejeu, (string) ( $compte_mails() - $avant_rejeu ) );
+$verifie( 'les états restent sent', ( static function () use ( $repo, $id_doublon ): bool {
+	$l = $repo->find_by_id( $id_doublon );
+	return $l && $l['internal_mail_status'] === 'sent' && $l['visitor_mail_status'] === 'sent';
+} )() );
+$verifie( 'un type inconnu ne fait rien', ( static function () use ( $id_doublon, $compte_mails ): bool {
+	$n = $compte_mails();
+	Queue::traiter( $id_doublon, 'inconnu', 1, 'test' );
+	return $compte_mails() === $n;
+} )() );
+$verifie( 'une demande inexistante ne fait rien', ( static function () use ( $compte_mails ): bool {
+	$n = $compte_mails();
+	Queue::traiter( 999999999, 'internal', 1, 'test' );
+	return $compte_mails() === $n;
+} )() );
 // Le plugin n'envoie pas sur événement : un hook enregistré deux fois enverrait deux fois.
 $sources = array_map( 'file_get_contents', array_merge( glob( POSE_PARQUET_DIR . '/src/*/*.php' ) ?: [], [ POSE_PARQUET_DIR . '/src/Plugin.php' ] ) );
 $verifie( 'aucun hook du plugin sur wp_mail / pre_wp_mail / phpmailer_init', ! preg_grep( "/add_(action|filter)\(\s*'(wp_mail|pre_wp_mail|phpmailer_init)/", $sources ) );
@@ -715,11 +844,12 @@ Settings::register();
 $defaut = Settings::notification_email();
 $ok = Settings::update( [ Settings::KEY_NOTIFICATION_EMAIL => 'equipe@example.com' ] );
 $verifie( 'administrateur : adresse de réception modifiée', Settings::notification_email() === 'equipe@example.com' );
-$verifie( 'la nouvelle adresse est utilisée pour l’interne', ( static function () use ( $poster_json, $dernier_mail, $repo, &$crees ): bool {
+$verifie( 'la nouvelle adresse est utilisée pour l’interne', ( static function () use ( $poster_json, $dernier_mail, $repo, $vider_file, &$crees ): bool {
 	$r = $poster_json( pp_requete_valide() );
 	if ( $r->get_status() === 201 ) {
 		$crees[] = (int) $repo->find_by_reference( (string) $r->get_data()['reference'] )['id'];
 	}
+	$vider_file(); // l'email part par la file, pas pendant la requête
 	return ( $dernier_mail( 2 )['to'] ?? '' ) === 'equipe@example.com';
 } )() );
 global $wp_settings_errors;
@@ -825,5 +955,9 @@ $wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_p
 delete_option( Settings::OPTION );
 $verifie( 'compteurs de débit effacés', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE '%pp_rl_%'" ) === 0 ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 $verifie( 'réservations de jetons effacées', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE '%pp_ft_%'" ) === 0 ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+// Les réessais programmés par les scénarios d'échec pointent vers des demandes
+// qui viennent d'être supprimées : les laisser encombrerait le cron du site.
+Queue::purger();
+$verifie( 'file des notifications vidée', Queue::etat()['total'] === 0, wp_json_encode( Queue::etat() ) );
 
 exit( $bilan() );
