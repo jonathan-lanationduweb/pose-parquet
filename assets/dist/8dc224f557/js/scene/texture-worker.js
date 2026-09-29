@@ -19,6 +19,9 @@
  */
 import { buildTexture, buildMips } from './texture.js';
 import { reliefFromAlbedo } from './relief.js';
+/* La meme regle des deux cotes du postMessage : le worker ne fait pas confiance
+   au message qu'il recoit, il revalide. Voir js/scene/motifs-regles.js. */
+import { motifEffectif } from './motifs-regles.js';
 
 self.onmessage = (event) => {
   const { id, material, config, kind } = event.data || {};
@@ -44,7 +47,7 @@ self.onmessage = (event) => {
      * Le worker ne décide de rien : il fabrique la taille qu'on lui demande.
      */
     const tile = buildTexture(material, {
-      pattern: config.pattern || material.defaultPattern,
+      pattern: motifEffectif(material, config.pattern),
       width: config.width || null,
       size: config.size || undefined,
     });

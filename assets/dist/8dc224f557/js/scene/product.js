@@ -489,6 +489,22 @@ export function lireJson(url) {
   return fichiers.get(url);
 }
 
+/**
+ * Cette fiche est-elle proposée au visiteur ?
+ *
+ * Nommée et exportée pour une raison précise : `_generator/catalogue.js`
+ * applique exactement ce prédicat pour écrire dans les textes du site le
+ * nombre de parquets que le Studio offre. Le site a annoncé « douze
+ * parquets » pendant que le tiroir en présentait vingt-six — un nombre écrit
+ * à la main ne se met pas à jour tout seul, et un nombre recalculé avec une
+ * AUTRE règle se trompe autrement. Une règle, un endroit.
+ *
+ * @param {{active?: boolean, id?: string, visualStatus?: string}} fiche
+ * @returns {boolean}
+ */
+export const estProposable = (fiche) =>
+  Boolean(fiche && fiche.active && fiche.id && fiche.visualStatus !== 'unavailable');
+
 export async function loadProducts(base = '') {
   const manifeste = await fetch(`${base}data/render-families.json`)
     .then((r) => (r.ok ? r.json() : {}))
@@ -506,9 +522,7 @@ export async function loadProducts(base = '') {
     brutes.forEach((r) => toutes.push(normalizeProduct({ source: s.source, ...r }, families)));
   }
   const source = sources.map((s) => s.fichier).join(' + ');
-  const products = toutes
-    .filter((f) => f.active && f.id && f.visualStatus !== 'unavailable')
-    .sort((a, b) => a.displayOrder - b.displayOrder);
+  const products = toutes.filter(estProposable).sort((a, b) => a.displayOrder - b.displayOrder);
 
   return { products, rejected: toutes.filter((f) => !products.includes(f)), families, source };
 }

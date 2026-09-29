@@ -15,6 +15,7 @@ import { analyzeScene } from './analyzer.js';
 import { createSceneRenderer } from './renderer.js';
 import { loadImage } from './image-loader.js';
 import { loadCatalog } from '../studio/catalog.js';
+import { motifEffectif } from './motifs-regles.js';
 
 const MAX_WIDTH = 1200;
 /** Trois références du catalogue, choisies pour montrer l'écart de rendu. */
@@ -122,9 +123,20 @@ export function mountPreview(root) {
     setCaption();
   }
 
+  /**
+   * Le motif réellement posé pour la puce courante.
+   *
+   * Les trois paires de `CHIPS` sont écrites à la main et valides aujourd'hui
+   * — `check-motifs.js` le vérifie à chaque construction. Si une donnée
+   * changeait sans que le contrôle soit relancé, on préfère une légende juste
+   * sur un motif de repli qu'une légende qui annonce un motif que le moteur
+   * ne pose pas.
+   */
+  const motifCourant = () => motifEffectif(catalog.get(current.material), current.pattern);
+
   function setCaption() {
     const material = catalog.get(current.material);
-    const pattern = catalog.patterns.find((item) => item.id === current.pattern);
+    const pattern = catalog.patterns.find((item) => item.id === motifCourant());
     if (material && pattern) caption.textContent = `${material.name}, ${pattern.label.toLowerCase()}`;
   }
 
@@ -153,7 +165,7 @@ export function mountPreview(root) {
       const url = new URL(lien.href, window.location.href);
       url.searchParams.set('piece', sceneId);
       url.searchParams.set('parquet', current.material);
-      url.searchParams.set('motif', current.pattern);
+      url.searchParams.set('motif', motifCourant());
       url.searchParams.set('orientation', '0');
       lien.setAttribute('href', url.pathname + url.search);
     });
@@ -162,7 +174,7 @@ export function mountPreview(root) {
   function draw() {
     if (!renderer.ready || !catalog) return;
     const material = catalog.get(current.material);
-    renderer.paint(canvas, { material, pattern: current.pattern, angle: 0, width: null, scale: 1 });
+    renderer.paint(canvas, { material, pattern: motifCourant(), angle: 0, width: null, scale: 1 });
     root.dataset.ready = 'true';
   }
 
