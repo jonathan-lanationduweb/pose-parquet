@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace PoseParquet\Core\Admin;
 
+use PoseParquet\Core\Mail\Diagnostics;
 use PoseParquet\Core\Security\Capabilities;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -68,6 +69,22 @@ final class Settings {
 					esc_attr( self::notification_email() )
 				);
 				echo '<p class="description">' . esc_html__( 'Par défaut : l’adresse d’administration du site.', 'pose-parquet-core' ) . '</p>';
+
+				/*
+				 * Le champ n'est jamais vide — il hérite de `admin_email` — donc
+				 * rien, dans ce qu'il montre, ne distingue une adresse choisie
+				 * d'une adresse jamais regardée. C'est exactement le piège qui
+				 * enverrait les demandes de production vers une adresse de
+				 * développement. On le dit ici, à l'endroit où la décision se
+				 * prend.
+				 */
+				$diagnostic = Diagnostics::report();
+				if ( ! $diagnostic['explicit'] ) {
+					echo '<p class="description" style="color:#996800"><strong>' . esc_html__( 'Cette adresse est héritée, pas choisie.', 'pose-parquet-core' ) . '</strong> ' . esc_html__( 'Enregistrez cet écran pour la confirmer, même si vous n’en changez pas.', 'pose-parquet-core' ) . '</p>';
+				}
+				if ( ! $diagnostic['deliverable'] ) {
+					echo '<p class="description" style="color:#b42318"><strong>' . esc_html__( 'Ce domaine est réservé aux tests.', 'pose-parquet-core' ) . '</strong> ' . esc_html__( 'Aucun email ne peut y être remis : les demandes seraient enregistrées sans que personne ne soit prévenu.', 'pose-parquet-core' ) . '</p>';
+				}
 			},
 			self::PAGE,
 			self::SECTION,

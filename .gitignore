@@ -17,3 +17,7 @@ _calibrage/_candidates/
 
 # Signature de build, ecrite par le generateur, jamais publiee
 assets/dev-build.json
+
+# Paquet livrable du plugin, reconstruit par backend/deploy/faire-paquet.sh.
+# C'est une sortie de build : elle se refabrique, elle ne se versionne pas.
+backend/deploy/paquet/

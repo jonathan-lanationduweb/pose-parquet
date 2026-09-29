@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace PoseParquet\Core\Projects;
 
 use PoseParquet\Core\Database\Schema;
+use PoseParquet\Core\Mail\Notifier;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -198,7 +199,7 @@ final class Repository {
 	 * la milliseconde ; le jour où le volume l'exigera, ce sera un index
 	 * FULLTEXT sur nom/email, pas un index par colonne posé à l'aveugle.
 	 *
-	 * @param array{status?:string,search?:string} $args
+	 * @param array{status?:string,search?:string,mail?:string} $args
 	 * @return array{0:string,1:array<int,mixed>} clause (sans le mot WHERE) et paramètres
 	 */
 	private function where( array $args ): array {
@@ -209,6 +210,25 @@ final class Repository {
 		if ( $status !== '' && Status::is_valid( $status ) ) {
 			$clauses[] = 'status = %s';
 			$params[]  = $status;
+		}
+
+		/*
+		 * Filtre sur le sort des notifications.
+		 *
+		 * `failed` d'un côté OU de l'autre : une demande dont seule la
+		 * confirmation visiteur a échoué mérite d'apparaître, même si la
+		 * notification interne est partie. C'est ce filtre que vise le lien
+		 * « X notification(s) en échec » de l'écran État — un lead perdu en
+		 * silence est ce qu'on cherche à rendre impossible.
+		 *
+		 * La valeur n'est pas interpolée : elle est comparée à une liste
+		 * écrite ici, et seule cette liste produit une clause.
+		 */
+		$mail = (string) ( $args['mail'] ?? '' );
+		if ( in_array( $mail, [ Notifier::STATUS_FAILED, Notifier::STATUS_PENDING ], true ) ) {
+			$clauses[] = '(internal_mail_status = %s OR visitor_mail_status = %s)';
+			$params[]  = $mail;
+			$params[]  = $mail;
 		}
 
 		$search = trim( (string) ( $args['search'] ?? '' ) );
@@ -242,7 +262,7 @@ final class Repository {
 	 * demandes arrivées dans la même seconde, et une pagination dont l'ordre
 	 * n'est pas total répète ou saute des lignes entre deux pages.
 	 *
-	 * @param array{status?:string,search?:string,page?:int,per_page?:int} $args
+	 * @param array{status?:string,search?:string,mail?:string,page?:int,per_page?:int} $args
 	 * @return array<int,array<string,mixed>>
 	 */
 	public function search( array $args = [] ): array {
@@ -270,7 +290,7 @@ final class Repository {
 	/**
 	 * Nombre de demandes répondant aux mêmes critères que `search()`.
 	 *
-	 * @param array{status?:string,search?:string} $args
+	 * @param array{status?:string,search?:string,mail?:string} $args
 	 */
 	public function count_search( array $args = [] ): int {
 		global $wpdb;
@@ -321,6 +341,37 @@ final class Repository {
 			}
 		}
 		$counts['all'] = $total;
+
+		return $counts;
+	}
+
+	/**
+	 * Où en sont les notifications, tous types confondus.
+	 *
+	 * Un compteur par état et par type d'email, lu au moment de l'affichage.
+	 * C'est le seul indicateur honnête dont dispose la page « État » : le plugin
+	 * ne connaît pas le transport et ne peut pas affirmer qu'un email est
+	 * arrivé. Il sait seulement ce que `wp_mail()` lui a répondu, et c'est
+	 * exactement ce que ces colonnes conservent.
+	 *
+	 * @return array<string,array<string,int>> type → état → nombre
+	 */
+	public function counts_by_mail_status(): array {
+		global $wpdb;
+
+		$table  = Schema::table( 'projects' );
+		$counts = [
+			Notifier::TYPE_INTERNAL => [],
+			Notifier::TYPE_VISITOR  => [],
+		];
+
+		foreach ( [ Notifier::TYPE_INTERNAL => 'internal_mail_status', Notifier::TYPE_VISITOR => 'visitor_mail_status' ] as $type => $colonne ) {
+			// Nom de colonne issu d'une liste écrite ici, jamais d'une entrée.
+			$rows = $wpdb->get_results( "SELECT {$colonne} AS s, COUNT(*) AS n FROM {$table} GROUP BY {$colonne}", ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			foreach ( $rows ?: [] as $row ) {
+				$counts[ $type ][ (string) $row['s'] ] = (int) $row['n'];
+			}
+		}
 
 		return $counts;
 	}
