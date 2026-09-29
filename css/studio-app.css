@@ -396,7 +396,7 @@ body.app {
   border-radius: var(--r-pill);
   background: rgba(16, 18, 19, 0.7);
   color: #fff;
-  font-size: 0.72rem;
+  font-size: var(--fs-xs);
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
@@ -670,7 +670,59 @@ body.app {
 .tile-card:hover .tile-card__media { box-shadow: inset 0 0 0 1px var(--line-strong); }
 .tile-card[aria-pressed="true"] .tile-card__media { box-shadow: inset 0 0 0 2px var(--c-ink); }
 .tile-card[aria-pressed="true"] .tile-card__label { font-weight: 600; }
-.tile-card[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+/*
+ * Motif indisponible pour la référence choisie.
+ *
+ * On atténue, on ne cache pas : le motif existe, il n'existe pas POUR CE
+ * PARQUET, et masquer la carte laisserait croire le contraire. L'attribut
+ * `disabled` fait déjà le travail sérieux — clic refusé, tabulation
+ * sautée, « indisponible » annoncé par les lecteurs d'écran ; ces règles
+ * ne font que le rendre visible.
+ *
+ * 0.55 et non 0.4 : la vignette et le libellé doivent rester LISIBLES. Une
+ * carte qu'on ne déchiffre plus n'informe pas, elle encombre. Le texte
+ * d'explication, lui, garde son contraste plein.
+ */
+.tile-card[disabled] { cursor: not-allowed; }
+
+/*
+ * L'atténuation porte sur la VIGNETTE et le libellé, pas sur la carte.
+ *
+ * Un `opacity` posé sur la carte entière aurait aussi pâli la phrase
+ * d'explication — exactement le seul élément qui doit rester net, puisque
+ * c'est lui qui dit pourquoi. L'opacité se propage aux descendants et ne se
+ * rattrape pas : au-dessus de 1, la valeur est simplement bornée.
+ */
+.tile-card[disabled] .tile-card__media {
+  opacity: 0.5;
+  filter: saturate(0.25);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.tile-card[disabled] .tile-card__label { opacity: 0.6; }
+.tile-card[disabled]:hover .tile-card__media { box-shadow: inset 0 0 0 1px var(--line); }
+.tile-card__note {
+  display: block;
+  padding: 0.1rem 0.1rem 0;
+  font-size: var(--fs-xs);
+  line-height: 1.3;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+/*
+ * Pas de couleur seule pour porter l'information.
+ *
+ * Quelqu'un qui distingue mal les contrastes ne verra pas « cette carte est
+ * plus pâle que les autres ». La phrase « Non disponible pour ce parquet »
+ * est donc écrite, pas suggérée — et en contraste renforcé, elle reprend
+ * tout son poids.
+ */
+@media (prefers-contrast: more) {
+  .tile-card[disabled] .tile-card__media { filter: saturate(0.1); opacity: 0.45; }
+  .tile-card[disabled] .tile-card__label { opacity: 1; }
+  .tile-card__note { font-weight: 500; color: var(--text); }
+}
 
 .orient { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; }
 .orient__item {
@@ -1468,7 +1520,7 @@ a.action--primary:hover { background: #9cb098; }
   opacity: 0.85;
 }
 .selected__ref:hover { color: var(--text); opacity: 1; }
-.selected__ref span { font-family: var(--font-mono); font-size: 0.72rem; opacity: 0.75; }
+.selected__ref span { font-family: var(--font-mono); font-size: var(--fs-xs); opacity: 0.75; }
 
 
 /* ================================================================== */

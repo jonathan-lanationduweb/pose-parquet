@@ -276,14 +276,27 @@ function controlerSource() {
     /apresRendu\.forEach\(\(cb\) => \{ try \{/.test(paint));
 
   /* Personne d autre dans le front ne dépend du point d accroche : le faire
-     évoluer ne peut donc pas casser une page publique. */
+     évoluer ne peut donc pas casser une page publique.
+
+     DEPENDRE, PAS MENTIONNER. Ce contrôle cherchait la chaîne dans le fichier
+     entier, commentaires compris : expliquer pourquoi `__studio` existe
+     suffisait à le faire échouer. Un contrôle qui punit la documentation
+     finit par obtenir du code non documenté, ce qui n est pas le but. On
+     retire donc les commentaires avant de chercher — le même durcissement
+     que pour « un seul appel à wp_mail » côté backend. */
+  const sansCommentaires = (code) =>
+    code
+      .replace(/\/\*[\s\S]*?\*\//g, ' ')
+      .replace(/^\s*\/\/.*$/gm, ' ')
+      .replace(/<!--[\s\S]*?-->/g, ' ');
+
   const dependants = [];
   for (const d of ['js', 'js/studio', 'js/scene', 'js/utils', 'js/tools', 'outils', 'components']) {
     let entrees = [];
     try { entrees = fs.readdirSync(path.join(RACINE, d)); } catch { continue; }
     for (const f of entrees) {
       if (!/\.(js|html)$/.test(f) || f === 'app.js') continue;
-      const t = fs.readFileSync(path.join(RACINE, d, f), 'utf8');
+      const t = sansCommentaires(fs.readFileSync(path.join(RACINE, d, f), 'utf8'));
       if (t.includes('__studio')) dependants.push(`${d}/${f}`);
     }
   }

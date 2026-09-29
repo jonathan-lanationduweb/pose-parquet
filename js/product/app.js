@@ -25,6 +25,7 @@
  */
 import { qs, on, echapper } from '../utils/dom.js';
 import { analyzeScene, loadSceneIndex, scenesBibliotheque } from '../scene/analyzer.js';
+import { motifParDefaut } from '../scene/motifs-regles.js';
 import { loadImage, loadFile } from '../scene/image-loader.js';
 import { createSceneRenderer } from '../scene/renderer.js';
 import { quandCartesPretes } from '../scene/material.js';
@@ -257,7 +258,11 @@ export async function mountProduct(root) {
     /* `width: null` : la largeur vient du produit lui-même — `toMaterial()`
        a fait de ses dimensions réelles le profil de son motif. Un Zeus de
        92 × 520 mm est un chevron de 92 × 520 mm, pas un réglage. */
-    return { material, materialId: productId, pattern: material.defaultPattern, angle: state.rendererSettings.angle, width: null, scale: 1 };
+    // Une reference = un motif : le visualiseur produit ne propose pas de
+    // choix libre, changer de motif y revient a changer de reference. On
+    // passe malgre tout par la regle, pour que la garantie soit la meme
+    // partout et ne depende pas de la forme de cette interface-ci.
+    return { material, materialId: productId, pattern: motifParDefaut(material), angle: state.rendererSettings.angle, width: null, scale: 1 };
   };
 
   /* Le statut ne vit plus dans une pastille à part : il n'apparaît que quand
