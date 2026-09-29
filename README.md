@@ -1,8 +1,9 @@
-# pose-parquet.com
+# Pose-Parquet
 
-Média pratique et boîte à outils autour de la pose du parquet.
+Plateforme éditoriale et d'aide au choix autour de la pose du parquet.
 Site statique en **HTML / CSS / JavaScript natif (ES Modules)**, sans framework
-ni dépendance externe.
+ni dépendance de production, généré par un outil Node ; backend métier en
+extension WordPress.
 
 Direction artistique : composition éditoriale plein cadre — photographies
 immersives, très grande typographie serif (Instrument Serif), aplats minéraux,
@@ -12,513 +13,522 @@ Dépôt : <https://github.com/jonathan-lanationduweb/pose-parquet>
 
 ---
 
+## Présentation
+
+Le site explique la pose du parquet et aide à décider. La V1 validée comprend :
+
+| domaine | contenu |
+| --- | --- |
+| Guides | 8 guides éditoriaux, dont un cluster « sens de pose » (pilier + satellites) |
+| Motifs | 6 fiches motif — droite, largeur, longueur, diagonale, point de Hongrie, bâton rompu |
+| Tutoriels | 3 tutoriels de pose (flottant, collé, calepinage) |
+| Inspirations | 8 cartes essayables, chacune ouvrant sa propre photographie dans le Studio |
+| Mode Plan | simulateur de calepinage vectoriel, 5 motifs, dimensions et lumière |
+| Visualiseur / Studio | rendu d'un parquet sur la photographie d'une pièce : 26 références, 3 motifs |
+| Import photo | la photo du visiteur, traitée dans son navigateur |
+| Comparaison | jusqu'à 3 versions enregistrées, au curseur ou côte à côte |
+| Formulaire projet | description d'un projet, envoyée au backend |
+| Backend WordPress | réception, stockage, administration et notification des demandes |
+
+32 pages au total.
+
+---
+
+## État du projet
+
+**V1 VALIDÉE — septembre 2026.**
+
+Le site est complet et vérifié : construction reproductible, 9 contrôles
+automatiques verts côté front, 812 vérifications vertes côté backend, aucun
+débordement horizontal ni contenu masqué par l'en-tête sur les neuf tailles
+d'écran de recette.
+
+Ce qui reste avant une mise en ligne publique n'est pas du code : c'est de
+l'infrastructure. Voir « Points externes restant avant production ».
+
+---
+
 ## Lancer le site en local
 
 Les modules ES ne se chargent pas via `file://` : il faut un serveur.
-Un serveur statique minimal (Node, zéro dépendance) est fourni.
 
 ```bash
+node _generator/build.js
 node serve.js
 ```
 
-Puis ouvrir <http://localhost:5180>. Pour changer de port : `node serve.js 8080`.
+Puis <http://localhost:5180>. Pour changer de port : `node serve.js 8080`.
+
+**La construction n'est pas optionnelle.** Les pages chargent leurs scripts et
+leurs feuilles depuis `assets/dist/<empreinte>/`, pas depuis `js/` et `css/`.
+Modifier une source sans reconstruire ne change rien à ce qui s'affiche.
 
 ---
 
 ## Architecture
 
+### Front
+
 ```
 pose-parquet.com/
-├── index.html              Accueil
-├── 404.html
-├── guides/                 8 guides éditoriaux + index de rubrique
-├── motifs/                 6 fiches motif + index
-├── tutoriels/              3 tutoriels + index
-├── inspiration/            Galerie + lightbox
-├── outils/                 Index des outils + simulateur-pose.html
-├── projet/                 Formulaire projet (point de montage)
-├── contact/  a-propos/
+├── index.html, 404.html          pages générées — ne pas éditer à la main
+├── a-propos/ contact/ guides/    idem (32 pages au total)
+│   inspiration/ motifs/ outils/
+│   projet/ tutoriels/
+├── config.js                     configuration d'exécution (API), réécrite au déploiement
+├── serve.js                      serveur statique de développement
+├── sitemap.xml, robots.txt       générés
+├── site.webmanifest
+│
+├── _generator/                   le générateur : 30 modules Node, aucune dépendance
+├── _calibrage/                   outils de calibrage des scènes (hors site publié)
 │
 ├── css/
-│   ├── main.css            Point d'entrée (importe fonts, tokens, reset, global, composants)
-│   ├── fonts.css           @font-face auto-hébergés (généré)
-│   ├── tokens.css          Couleurs, typographie, espacements, mouvements
-│   ├── reset.css  global.css
-│   ├── components/         Un fichier par composant du design system
-│   └── pages/              Styles spécifiques à un gabarit de page
+│   ├── tokens.css reset.css global.css main.css
+│   ├── fonts.css                 généré par _generator/fetch-fonts.js
+│   ├── product.css product-app.css studio.css studio-app.css
+│   └── components/               21 feuilles de composants
 │
 ├── js/
-│   ├── main.js             Chef d'orchestre : importe un module seulement si la page l'utilise
-│   ├── utils/              dom.js, motion.js, icons.js
-│   ├── animations/         reveal.js (apparition au scroll)
-│   ├── components/         nav (menu plein écran), carousel (drag/swipe/clavier),
-│   │                       accordion, tabs, modal/lightbox, tooltip, toc,
-│   │                       before-after, filters, hero-media
-│   ├── scene/              Le moteur du Visualiseur Parquet (voir plus bas)
-│   ├── studio/             L'interface du Visualiseur Parquet (app, catalogue, comparaison)
-│   ├── tools/              patterns.js (registre des motifs) + floor-visualizer.js (mode plan)
-│   └── forms/              submit-adapter.js (abstraction d'envoi)
+│   ├── main.js                   point d'entrée du site éditorial
+│   ├── animations/               reveal
+│   ├── components/               accordion, before-after, carousel, filters,
+│   │                             hero-media, modal, nav, scroll-carousel,
+│   │                             tabs, toc, tooltip
+│   ├── forms/                    api-config, project-payload, studio-handoff,
+│   │                             submit-adapter
+│   ├── product/                  visualiseur produit : app, main, tour, viewport
+│   ├── scene/                    moteur : analyzer, editor, export, geometry,
+│   │                             image-loader, mask, material, motifs-regles,
+│   │                             perspective, preview, product, relief,
+│   │                             renderer, renderer-canvas, renderer-gl,
+│   │                             scenes-regles, schema, shading, texture,
+│   │                             texture-worker
+│   ├── studio/                   app, catalog, compare, help, main
+│   ├── tools/                    floor-visualizer, patterns, plan-state
+│   └── utils/                    diagnostic, dom, icons, motion, perf
 │
-├── components/
-│   └── project-form/       Composant formulaire projet, autonome et remplaçable
-│
-├── assets/
-│   ├── images/             Photographies (JPEG) + schémas vectoriels + CREDITS.md
-│   ├── fonts/              Instrument Serif + Inter (woff2 auto-hébergés)
-│   ├── icons/favicon.svg
-│   └── videos/             Emplacement de la vidéo du hero (voir README dédié)
+├── components/project-form/      formulaire projet : html, css, js, config
 │
 ├── data/
-│   ├── contenus.json       Index machine des contenus (guides, motifs, tutoriels, outils)
-│   ├── parquets.json       Catalogue des parquets de démonstration
-│   └── scenes/             Pièces d'exemple calibrées à la main (index.json + une par pièce)
+│   ├── parquets.json                    catalogue du Studio
+│   ├── products.premibel-pilot.json     pilote : références Premibel réelles
+│   ├── products.premibel-exemple.json   exemple de format d'échange
+│   ├── render-families.json             familles de rendu
+│   ├── room-tours.json                  visites de pièce
+│   ├── contenus.json                    index de contenus, généré
+│   └── scenes/                          manifeste et fiches des scènes
 │
-├── docs/                   Notes d'ingénierie et contrats à venir
-├── _calibrage/             Outil interne de calibrage des scènes et banc d'essai des moteurs
-├── robots.txt  sitemap.xml
-├── serve.js                Serveur statique de développement
-└── _generator/             Générateur Node optionnel des pages HTML (voir son README)
+├── assets/
+│   ├── dist/                     sortie de construction, empreintée
+│   └── fonts/ icons/ images/ materials/ photos/ textures/ videos/
+│
+├── backend/                      extension WordPress + outils de déploiement
+├── docs/                         31 documents d'ingénierie
+└── design/                       références de direction artistique
 ```
 
-Le site livré est du HTML statique : il se modifie directement. `_generator/`
-n'est qu'un confort pour régénérer l'en-tête, le pied de page et les balises
-communes sur les 29 pages d'un coup (`node _generator/build.js`).
+### Backend
+
+```
+backend/
+├── pose-parquet-core/            l'extension WordPress (59 fichiers au dépôt)
+│   ├── pose-parquet-core.php     amorce, version, constantes
+│   ├── src/                      Admin, Antispam, Database, Mail, Projects,
+│   │                             Rest, Security, Support
+│   ├── templates/                écrans d'administration et gabarits d'email
+│   ├── tests/                    5 scripts de vérification (non livrés)
+│   └── readme.md                 fonctionnement détaillé (non livré)
+├── deploy/
+│   ├── faire-paquet.sh           construit le paquet de production (51 fichiers)
+│   └── htaccess-hardening.conf   règles serveur
+└── tools/traiter-file-mail.php   vidange manuelle de la file d'envoi
+```
+
+Base de données — trois tables, préfixées par celle du site :
+
+| table | rôle |
+| --- | --- |
+| `pp_projects` | une demande de projet, telle que remplie par le visiteur |
+| `pp_project_history` | chaque changement de statut d'une demande |
+| `pp_project_notes` | les notes internes de l'équipe sur une demande |
+
+Schéma en version **3**. Extension en version **0.5.0**.
 
 ### Règles de code
 
-- Aucun CSS ni JavaScript en ligne dans les fichiers HTML.
-- Un composant = un fichier CSS + un fichier JS.
-- Les modules JS sont importés dynamiquement selon la présence du composant dans la page.
-- `prefers-reduced-motion` est respecté (CSS et JS).
-- Toutes les images portent `width`/`height` (pas de CLS) et `loading="lazy"` hors hero.
+- Pas de framework, pas de bundler, pas de dépendance de production.
+- Les pages sont **générées** : toute correction se fait dans `_generator/`.
+- Un nombre affiché au public est lu dans sa source, jamais écrit à la main
+  (`_generator/check-chiffres.js` le vérifie).
+- Une règle métier vit à un seul endroit et se partage entre le front et le
+  générateur (`js/scene/motifs-regles.js`, `js/scene/scenes-regles.js`).
 
 ---
 
-## Simulateur de pose (mode plan)
+## Visualiseur
 
-Point de montage :
+Le Studio pose un parquet sur la photographie d'une pièce.
 
-```html
-<div data-visualizer data-base="../"></div>
-<div data-visualizer data-mode="compact" data-base="../"></div>
-```
+- **WebGL 2 écrit à la main**, avec repli sur un moteur Canvas 2D quand le
+  contexte n'est pas disponible. Le choix et ses mesures :
+  [docs/renderer-canvas-vs-webgl.md](docs/renderer-canvas-vs-webgl.md).
+- **Worker** pour le calcul des textures, avec repli synchrone si `Worker` ou
+  `OffscreenCanvas` manquent.
+- **La photo est traitée dans le navigateur.** Aucune photographie personnelle
+  n'est envoyée à un serveur : le site est statique et ne dispose d'aucun point
+  de dépôt d'image.
+- **Calibration manuelle** : la géométrie d'une pièce est relevée à la main et
+  enregistrée dans `data/scenes/`. Il n'y a pas de détection automatique du sol
+  en service — l'étude et la décision sont dans
+  [docs/segmentation-automatique.md](docs/segmentation-automatique.md), le
+  contrat d'une API d'analyse dans
+  [docs/future-ai-api-contract.md](docs/future-ai-api-contract.md). Aucune de
+  ces deux pistes n'est implémentée.
+- **Motifs** : lames droites, point de Hongrie, bâton rompu. La compatibilité
+  entre une référence et un motif vient de la donnée (`compatiblePatterns`),
+  jamais du nom du produit ; l'interface désactive ce qui n'existe pas et le
+  moteur applique la même règle en dernier ressort.
+- **Comparaison** : jusqu'à 3 versions, au curseur pour deux, côte à côte
+  au-delà.
+- **Sauvegarde** locale, dans le navigateur, et reprise à la réouverture.
 
-- `data-base` : préfixe de chemin vers la racine (`""` à la racine, `"../"` ailleurs).
-- `data-mode="compact"` : version courte, intégrée dans les articles.
-- Rendu 100 % SVG, recalculé à chaque changement d'état.
-- Paramètres : longueur, largeur, largeur de lame, position de la fenêtre,
-  position de l'entrée, teinte, motif.
-- Sorties : surface, chutes estimées, nombre de lames, conseil contextuel.
-- Mise en page : réglages à gauche (340 à 420 px), plan à droite, à partir de
-  62 rem — et dès 48 rem quand la fenêtre est basse (téléphone en paysage).
-  L'ordre du DOM reste réglages puis plan, ce qui donne la bonne séquence en
-  colonne unique.
-- Le composant écrit `--plan-ratio` sur `.visualizer__canvas` : la proportion
-  du plan dépend des dimensions saisies, et c'est elle qui borne sa hauteur
-  sans laisser de bandes vides. Voir la note dans `css/components/visualizer.css`.
+Le manifeste compte 15 scènes ; 9 sont proposées dans « Changer de pièce », les
+autres restent ouvrables par lien direct depuis leur carte d'inspiration.
 
-### Ajouter un motif
-
-Tout se passe dans `js/tools/patterns.js` : ajouter une entrée au tableau `PATTERNS`.
-
-```js
-{
-  id: 'mon-motif',
-  label: 'Mon motif',
-  short: 'Description courte.',
-  build: (ctx) => [],
-  advice: (ctx) => 'Conseil affiché sous le rendu.',
-}
-```
-
-`build(ctx)` renvoie une liste de lames `{ points: [[x, y], ...], shade: 0..1 }`.
-`ctx` fournit `length`, `width`, `plankWidth`, `plankLength` (en centimètres) et
-la configuration de la pièce. Le sélecteur, les miniatures et le rendu se mettent
-à jour automatiquement.
+Le **Mode Plan** (`js/tools/`) est un outil distinct : un plan de calepinage
+vectoriel à 5 motifs, qui ne dessine aucune référence réelle.
 
 ---
 
-## Carrousels
+## Backend / leads
 
-Deux carrousels, un seul composant (`js/components/carousel.js`) :
+Le formulaire projet (`components/project-form/`) envoie une demande à
+l'extension WordPress par son API REST.
 
-- **éditorial** (guides) : image, catégorie, titre, extrait, lien ;
-- **galerie** (inspiration) : grandes photographies, formats alternés.
+1. **Réception** — `POST /pose-parquet/v1/projects`, JSON uniquement, origine
+   contrôlée, jeton de formulaire à usage unique, pot de miel, limite de débit.
+2. **Création en base** — une ligne dans `pp_projects`, avec une référence
+   lisible, et une première entrée d'historique.
+3. **Historique** — chaque changement de statut est enregistré, avec son auteur.
+4. **File d'envoi asynchrone** — les deux courriels (confirmation au visiteur,
+   notification interne) partent d'une file portée par WP-Cron, et non de la
+   requête HTTP. Quatre tentatives au plus, espacées de 0, 5 min, 30 min et 2 h.
+   L'idempotence s'appuie sur le statut en base, et un verrou MySQL empêche deux
+   crons simultanés de doubler un envoi.
+5. **Administration WordPress** — liste des demandes, détail, statuts, notes
+   internes, filtres « notification en attente » et « notification échouée »,
+   relance manuelle d'un envoi.
+6. **Diagnostics** — un écran d'état donne l'état de la file, la prochaine
+   échéance, et avertit franchement quand `DISABLE_WP_CRON` vaut `true` sans
+   cron système déclaré.
 
-Marquage attendu :
+Détail : [docs/backend/](docs/backend/) et
+[backend/pose-parquet-core/readme.md](backend/pose-parquet-core/readme.md).
 
-```html
-<section data-carousel>
-  <button data-carousel-prev></button>
-  <button data-carousel-next></button>
-  <span data-carousel-count></span>
-  <div class="carousel carousel--editorial">
-    <div class="carousel__viewport" data-carousel-viewport tabindex="0" role="region">
-      <article class="carousel__slide">…</article>
-    </div>
-    <div class="carousel__progress"><span data-carousel-progress></span></div>
-  </div>
-</section>
+---
+
+## Environnements
+
+| environnement | front | backend |
+| --- | --- | --- |
+| Local | `node _generator/build.js` puis `node serve.js` (port 5180) | WordPress local, `http://pose-parquet-dev.local` |
+| Préproduction | GitHub Pages, `*.github.io`, marqué `noindex, nofollow` | non déployé |
+| Production | GitHub Pages sur le domaine, indexable | non déployé |
+
+Deux variables de dépôt pilotent le déploiement :
+
+- `SITE_ENVIRONMENT` — `production` ou `staging`. **Absente, elle vaut
+  `staging`** : l'artefact est alors marqué `noindex, nofollow`. C'est cette
+  variable, et elle seule, qui décide de l'indexation ; la présence d'un `CNAME`
+  ne fait l'objet que d'un avertissement de cohérence.
+- `API_BASE_URL` — racine REST du backend. Obligatoirement en HTTPS, sinon le
+  déploiement échoue. Absente, le formulaire projet affiche son indisponibilité
+  au lieu d'échouer silencieusement.
+
+Les fichiers du dépôt décrivent **toujours la production** : canoniques en
+`pose-parquet.com`, `robots` en `index, follow`, sitemap complet. Aucun
+`noindex` n'existe dans le dépôt, donc aucun ne peut fuiter en production.
+Procédure : [docs/seo-environnements.md](docs/seo-environnements.md).
+
+---
+
+## Tests
+
+### Front — 9 contrôles
+
+```bash
+node _generator/build.js
+node _generator/check-images.js
+node _generator/check-links.js
+node _generator/check-inspiration.js
+node _generator/check-reproducible.js
+node _generator/check-product-visualizer.js
+node _generator/check-studio-api.js
+node _generator/check-chiffres.js
+node _generator/check-fonts.js
+node _generator/check-motifs.js
 ```
 
-Fonctions : glisser-déposer à la souris, swipe tactile natif, boutons
-précédent / suivant, clavier (flèches, Origine, Fin), barre de progression,
-compteur, et affleurement de la slide suivante sur desktop.
+| contrôle | ce qu'il garantit |
+| --- | --- |
+| `check-images` | chaque image référencée existe, avec dimensions et texte alternatif |
+| `check-links` | aucun lien interne mort |
+| `check-inspiration` | chaque carte essayable ouvre bien sa propre photographie |
+| `check-reproducible` | mêmes empreintes sous Windows et Linux (24 vérifications) |
+| `check-product-visualizer` | contrat du visualiseur produit |
+| `check-studio-api` | contrat de l'API de pilotage du Studio |
+| `check-chiffres` | aucun nombre public écrit en dur (11 vérifications) |
+| `check-fonts` | polices dédoublonnées, préchargements valides (10 vérifications) |
+| `check-motifs` | aucune combinaison référence × motif impossible n'est posable (60 vérifications) |
 
-Le défilement programmé utilise un tween maison plutôt que
-`scrollTo({ behavior: 'smooth' })` : le `scroll-snap-type: mandatory` annule
-les animations de défilement déclenchées en JavaScript.
+Relevé du 29/09/2026 : **9 contrôles verts**, construction en code 0.
+
+### Backend — 812 vérifications
+
+```bash
+php backend/pose-parquet-core/tests/run-validator.php   <racine WordPress>
+php backend/pose-parquet-core/tests/run-foundation.php  <racine WordPress>
+php backend/pose-parquet-core/tests/run-projects.php    <racine WordPress>
+php backend/pose-parquet-core/tests/run-admin.php       <racine WordPress>
+php backend/pose-parquet-core/tests/run-http.php        <URL WordPress>
+```
+
+| suite | vérifications |
+| --- | --- |
+| `run-validator` | 166 |
+| `run-foundation` | 97 |
+| `run-projects` | 287 |
+| `run-admin` | 202 |
+| `run-http` | 60 |
+| **total** | **812**, 0 échec |
+
+`run-http` laisse des demandes de test que `run-projects` efface : le relancer
+ensuite. Rien d'autre n'est ordonné.
+
+### Recette responsive
+
+Neuf tailles — 320×568, 390×844, 568×320, 844×390, 768×1024, 1024×768,
+1440×900, 1920×1080, 2560×1440 — sur l'accueil, l'inspiration, le Studio, le
+Mode Plan, le formulaire projet et la page 404. Relevé du 29/09/2026 :
+**0 débordement horizontal, 0 contenu sous l'en-tête** sur les 54 combinaisons.
+
+---
+
+## Sécurité
+
+Côté API :
+
+- **Jeton de formulaire** à usage unique, délivré par une route dédiée, réclamé
+  de façon atomique par un verrou MySQL.
+- **Limite de débit** par identité client : 5 créations par heure par défaut,
+  réponse `429` avec `Retry-After`, sans divulguer d'identifiant ni d'adresse.
+- **Pot de miel** et contrôles de forme dans le validateur.
+- **JSON uniquement** : un `Content-Type` autre est refusé.
+- **CORS** restreint à une liste fermée d'origines, à la place du CORS permissif
+  de WordPress.
+
+Côté WordPress :
+
+- Réduction de la surface publique : énumération des utilisateurs, XML-RPC,
+  points REST superflus.
+- Capacités et rôles dédiés, vérifiés à chaque action d'administration ; nonces
+  sur les actions.
+- Le paquet de production ne contient ni `tests/` ni `readme.md` — 51 fichiers
+  livrés sur 59 au dépôt — et les règles `.htaccess` ferment ces chemins en
+  seconde barrière.
+
+Côté front :
+
+- Toute donnée externe est échappée avant insertion dans le document.
+- Les `productUrl` du catalogue sont validées avant d'être posées en lien.
+- Aucune photographie du visiteur ne quitte son navigateur.
+
+Détail : [docs/backend/security.md](docs/backend/security.md),
+[docs/backend/antispam.md](docs/backend/antispam.md).
+
+---
+
+## Déploiement
+
+GitHub Pages, par `.github/workflows/deploy-pages.yml`.
+
+1. **Construction** — `node _generator/build.js` sur le coureur.
+2. **Artefact** — le workflow recopie le SITE, et rien d'autre : `docs`,
+   `design`, `backend`, `_generator`, `_calibrage`, `.github`, `.claude`,
+   `.vscode`, `.kilo`, `README.md`, `js`, `css` et `components` sont exclus.
+   Une étape de contrôle échoue si l'un de ces chemins se retrouve dans `_site`.
+3. **Configuration** — `config.js` est réécrit avec `API_BASE_URL` (HTTPS
+   obligatoire).
+4. **Indexation** — `SITE_ENVIRONMENT != 'production'` marque l'artefact
+   `noindex, nofollow`.
+
+Le paquet du plugin WordPress se construit séparément :
+
+```bash
+bash backend/deploy/faire-paquet.sh
+```
+
+Il part d'une liste d'**inclusion** : ce qui n'est pas nommé ne part pas. Il
+échoue s'il trouve un fichier indésirable, et échoue aussi s'il manque un
+fichier indispensable.
+
+---
+
+## Points externes restant avant production
+
+Rien de ce qui suit n'est du code. Tout est encore à faire.
+
+| point | état |
+| --- | --- |
+| **SMTP réel** | aucun serveur d'envoi n'est configuré. La file fonctionne et a été vérifiée, mais aucun courriel n'a été reçu par un destinataire réel. |
+| **Cron système** | `DISABLE_WP_CRON` vaut `true` ici comme en production. Tant qu'une tâche système n'appelle pas `wp-cron.php`, la file ne se vide que manuellement. |
+| **Backend public** | l'extension ne tourne que sur l'installation locale. Aucun WordPress n'est exposé. |
+| **Hébergement** | à choisir pour le backend — [docs/hebergement.md](docs/hebergement.md). |
+| **DNS** | le domaine ne pointe pas encore sur le déploiement. |
+| **HTTPS** | à obtenir sur le backend une fois l'hébergement choisi. |
+| **En-têtes de sécurité** | CSP, HSTS et consorts restent à poser au niveau serveur. |
+| **Durée de rétention** | aucune politique de purge des demandes n'est définie ni implémentée. |
+
+---
+
+## V2 — orientation validée
+
+**La V1 est validée. La V2 ne consiste pas à refaire le site.**
+
+Pose-Parquet conserve sa valeur éditoriale et ses outils. Ce qui change, c'est
+la suite du parcours : il doit progressivement orienter les visiteurs vers les
+offres et services adaptés de **Premibel** et d'**Allure Design**.
+
+Le rôle précis d'Allure Design dans ce parcours **reste à définir**. Rien n'est
+arbitré à ce jour, et rien dans le code ne le préjuge.
+
+### Roadmap V2
+
+1. **Repositionnement commercial** — ce que le site promet, et à qui.
+2. **Parcours de conversion** — du contenu à la demande qualifiée.
+3. **Connexion du catalogue Premibel** — le pilote devient un flux ; voir
+   [docs/premibel-sync-contract.md](docs/premibel-sync-contract.md).
+4. **Intégration Allure Design** — périmètre à définir.
+5. **Qualification et routage des leads** — qui reçoit quoi, et sur quel critère.
+6. **Suivi des conversions**.
+7. **Évolution du back-office** — ce que l'administration doit montrer une fois
+   les leads qualifiés et routés.
+
+### Branches prévues
+
+Créées au moment où leur travail commence, pas avant :
+
+```
+feature/v2-commercial-positioning     (créée)
+feature/v2-premibel-catalog
+feature/v2-allure-design-routing
+feature/v2-lead-qualification
+feature/v2-conversion-tracking
+```
+
+Flux Git et rôle des branches : [docs/git-workflow.md](docs/git-workflow.md).
 
 ---
 
 ## Polices
 
-`node _generator/fetch-fonts.js` télécharge Instrument Serif (titres) et Inter
-(interface) depuis Google Fonts — licence SIL OFL — vers `assets/fonts/`, puis
-régénère `css/fonts.css`. Aucune requête externe à l'exécution du site.
+Instrument Serif pour les titres, Inter pour le texte, auto-hébergées en woff2
+dans `assets/fonts/` et déclarées par `css/fonts.css`, **généré** par
+`_generator/fetch-fonts.js`.
+
+Inter est une **police variable** : un seul binaire porte tout l'axe des
+graisses, déclaré `font-weight: 100 900`. Six fichiers au total — 4 statiques
+pour Instrument Serif, 2 variables pour Inter — soit 196 Ko. Les deux fichiers
+préchargés sont lus dans `css/fonts.css` par `_generator/polices.js` : un
+renommage ne peut pas laisser un `preload` pointer dans le vide.
 
 ---
 
-## Formulaire projet
-
-Le formulaire est un **composant indépendant** monté sur un conteneur neutre :
-
-```html
-<div data-project-form></div>
-```
-
-- `components/project-form/project-form.config.js` : toutes les étapes et tous les champs.
-- `components/project-form/project-form.js` : rendu, navigation, validation, états.
-- `components/project-form/project-form.css` : styles isolés sous `.project-form`.
-- `components/project-form/project-form.html` : bloc de montage à copier dans une page.
-
-> **État réel : le formulaire envoie pour de vrai, là où un backend existe.**
-> `js/forms/api-config.js` associe chaque hôte à sa racine REST. En
-> développement (`localhost`), le WordPress dédié reçoit les demandes et le
-> visiteur voit la référence rendue par le serveur. Sur GitHub Pages et sur le
-> domaine de production, **aucun backend n'est encore déployé** : l'entrée vaut
-> `null` et le formulaire l'annonce clairement au lieu de faire semblant
-> d'envoyer. Il n'y a plus de mode démonstration, plus de fausse réussite en
-> `localStorage` : l'écran de confirmation n'apparaît que sur un `201`
-> réellement reçu. Détail du branchement, matrice d'erreurs et actions de mise
-> en production :
-> [docs/backend/front-integration.md](docs/backend/front-integration.md).
-
-### Brancher un backend
-
-Trois modules, un seul endroit à modifier pour changer d'adresse :
-
-- `js/forms/api-config.js` : le tableau `PAR_HOTE` associe l'hôte du front à la
-  racine REST du backend. `null` signifie « pas de backend ici », et le
-  formulaire l'annonce au visiteur plutôt que de faire semblant d'envoyer.
-- `js/forms/project-payload.js` : traduction unique `FormData` → JSON du
-  contrat (`prenom` → `firstName`…), plus le contexte du Studio, sans aucune
-  photo.
-- `js/forms/submit-adapter.js` : jeton, envoi, erreurs typées, réessai unique
-  sur jeton périmé, délai de 12 s.
-
-Pour un essai ponctuel depuis un hôte absent du tableau, la page peut poser :
-
-```js
-window.POSE_PARQUET_CONFIG = { apiBaseUrl: 'https://exemple.fr/wp-json/pose-parquet/v1' };
-```
-
-### Remplacer le formulaire
-
-Aucune page ne dépend de la structure interne du composant : il suffit de ne plus
-monter `mountProjectForm` (dans `js/main.js`) et de placer le formulaire
-partenaire dans le conteneur `[data-project-form]`.
-
----
-
-## Visualiseur Parquet (`js/scene/` + `js/studio/`)
-
-Pages : `outils/visualiseur.html` (la landing) et `outils/studio.html`
-(l'application). Le nom public est **Visualiseur Parquet** ; « studio » ne
-subsiste que comme nom technique — fichiers, classes CSS, stockage local — parce
-que l'URL est indexée et qu'un identifiant interne n'a pas à porter le nom
-commercial.
-
-### Le principe : une SCÈNE, puis un rendu
-
-```
-IMAGE  →  analyzeScene()  →  SceneData  →  moteur de rendu  →  canevas
-```
-
-Le moteur de rendu **ne sait pas d'où viennent les données**. Elles arrivent
-aujourd'hui de deux endroits, et un troisième est déjà prévu :
-
-| stratégie | source | statut |
-| --- | --- | --- |
-| `precalibrated` | `data/scenes/<id>.json`, calibré à la main | en service |
-| `manual` | plan de départ que l'utilisateur ajuste | en service |
-| `remote` | service d'analyse d'image | **non implémenté**, contrat écrit |
-
-Une **scène** décrit tout ce qu'il faut savoir d'une photo pour y poser un
-parquet : plusieurs zones de sol, chacune avec son plan de perspective et son
-contour, les objets qui doivent rester devant, l'éclairement, la caméra.
-Deux zones qui partagent une `surfaceId` sont le même sol : elles reçoivent
-forcément le même bois. Deux zones qui partagent un `planeRef` sont sur le même
-plan : la trame se prolonge exactement d'une pièce à l'autre.
-
-Le schéma complet est commenté dans `js/scene/schema.js`. Le contrat de la
-future API est dans [docs/future-ai-api-contract.md](docs/future-ai-api-contract.md).
-
-### Les fichiers
-
-| Fichier | Rôle |
-| --- | --- |
-| `scene/schema.js` | Le format `SceneData` : zones, plans, surfaces, occlusions, lumière |
-| `scene/analyzer.js` | `analyzeScene()` et le registre des stratégies — le seul point de branchement |
-| `scene/texture.js` | Albedo du bois : tuile procédurale répétable, **mesurée en mètres** (4,80 m / 1280 px) |
-| `scene/material.js` | Le matériau : lame, finition, rugosité, relief ; emplacements prévus pour de vraies cartes |
-| `scene/mask.js` | Étiquettes de zones + couverture + occlusions, en deux cartes quel que soit le nombre de zones |
-| `scene/shading.js` | Éclairement basse fréquence **en couleur**, reflets, ombre de contact |
-| `scene/geometry.js` | Homographies de zone et direction de la lumière — partagé par les deux moteurs |
-| `scene/renderer.js` | Choisit le moteur, calcule une fois ce qui ne dépend que de la photo |
-| `scene/renderer-gl.js` | WebGL 2 sans bibliothèque : un quadrilatère par zone, filtrage anisotrope matériel |
-| `scene/renderer-canvas.js` | Canvas 2D : même chaîne, en tableaux typés. Recours et référence |
-| `scene/editor.js` | Correction du sol : cadre, contour, pinceau |
-| `scene/preview.js` | La démonstration avant / après de l'accueil, sur le vrai moteur |
-| `scene/export.js` | Composition et téléchargement du rendu |
-| `studio/app.js` | L'application : trois écrans, un panneau, un tiroir |
-| `studio/catalog.js` | Catalogue de parquets, échantillons dessinés à la demande |
-| `studio/compare.js` | Comparaison de deux ou trois variantes sur la même scène |
-
-### Ce que fait réellement la version en service
-
-- Les quatre pièces d'exemple sont **calibrées à la main** avec `_calibrage/`.
-  Aucune analyse d'image, aucune détection, aucune IA — et l'interface ne
-  prononce aucun de ces mots, parce que ce serait faux.
-- Sur une photo importée, l'utilisateur place le cadre du sol, affine le contour
-  et efface au pinceau ce qui doit rester devant.
-- Le motif est calculé **dans le plan du sol, en mètres**, puis projeté. Une
-  lame de 18 cm mesure 18 cm au premier plan comme au fond : elle rétrécit et
-  converge d'elle-même. Idem pour le point de Hongrie et le bâton rompu, dont
-  les chevrons appartiennent au sol.
-- L'éclairement est repris de la photo, séparé en basse et haute fréquence : on
-  garde le soleil et les ombres, on jette la trame de l'ancien revêtement.
-- La profondeur est dérivée analytiquement du plan (exacte pour les pixels de
-  sol) ; le champ `scene.depth` prévoit une carte d'image pour la suite.
-
-### Brancher une analyse automatique, plus tard
-
-Un seul point à toucher :
-
-```js
-import { registerAnalyzer } from './js/scene/analyzer.js';
-
-registerAnalyzer('remote', async ({ file }) => {
-  const body = new FormData();
-  body.append('image', file);
-  const response = await fetch(`${API}/analyze-room`, { method: 'POST', body });
-  return response.json(); // même schéma que data/scenes/*.json
-});
-```
-
-Rien d'autre ne change : ni le schéma, ni les moteurs, ni les masques, ni les
-matériaux, ni la comparaison, ni l'export. L'écran de correction ne disparaît
-pas non plus — il devient facultatif. Voir
-[docs/future-python-architecture.md](docs/future-python-architecture.md).
-
-**Contrainte tenue aujourd'hui** : les photos importées ne quittent jamais le
-navigateur — lecture par `URL.createObjectURL`, traitement en Canvas, aucun
-envoi réseau. Un service distant changerait cela : ce devra être un choix
-explicite, jamais le comportement par défaut.
-
-### Le matériau
-
-Un parquet n'est pas une teinte. `js/scene/material.js` en fait un objet complet :
-dimensions de lame, finition, rugosité et brillance déduites du libellé de
-finition, amplitude du relief — et **trois emplacements de cartes physiques**
-(`albedo`, `normal`, `roughness`).
-
-Ces cartes sont **vides aujourd'hui**, à dessein : nous n'avons pas de ressource
-photographique dont la licence autorise cet usage, et fabriquer de fausses
-normal maps n'apporterait rien. Les douze références sont donc **procédurales** —
-calculées, pas photographiées — et le relief est dérivé de la luminance de
-l'albedo : faux physiquement, mais visuellement juste sur du bois. Le modèle de
-données est prêt à recevoir de vraies cartes ; les formats attendus et les
-pièges sont dans [assets/materials/README.md](assets/materials/README.md).
-
-**Dimensions par motif.** Une largeur de lame unique pour les trois motifs n'a
-pas de sens : on ne pose pas un point de Hongrie avec des lames de 22 cm. Chaque
-référence déclare donc un profil par motif (`patternProfiles`) :
-
-```json
-"patternProfiles": {
-  "lames":            { "width": 0.18, "length": 1.8 },
-  "point-de-hongrie": { "width": 0.09, "length": 0.6, "angleDeg": 45 },
-  "baton-rompu":      { "width": 0.09, "length": 0.45 }
-}
-```
-
-**L'angle du point de Hongrie est un paramètre, pas une constante.** 45° est le
-plus répandu, mais 30° et 60° existent et changent nettement le rendu. Le moteur
-prend l'angle en entrée ; les contenus éditoriaux ne présentent plus 45° comme
-une règle.
-
-### L'interface
-
-Une seule règle de composition : **la pièce est le sujet.**
-
-- La photo n'est pas dans une carte : elle va au bord du cadre, sans rayon ni
-  marge décorative. Le pourtour est charbon — une photo d'intérieur se juge sur
-  fond sombre, et le blanc cassé du site lui vole sa clarté.
-- **Une action = un contexte.** Parquet, Motif et Orientation ne cohabitent
-  jamais empilés. Le panneau n'affiche qu'un contexte, et quand on le referme la
-  colonne passe à zéro : la pièce reprend toute la largeur.
-- Sur téléphone, une **feuille basse à trois niveaux** (32 / 58 / 86 svh) et un
-  rail horizontal de matières au niveau replié. La photo se recentre dans la
-  partie visible : on ne cache jamais la pièce.
-- Cibles tactiles à 44 px **sur pointeur grossier seulement** — les pilules
-  restent compactes à la souris.
-- En hauteur critique (paysage téléphone, zoom 200 %), l'application libère le
-  défilement au lieu d'écraser des contrôles jusqu'à les rendre inatteignables.
-
-### Calibrer une pièce
-
-```bash
-node serve.js
-```
-
-puis `http://localhost:5180/_calibrage/` — page interne, ni liée ni indexée.
-Elle affiche les contours sur la photo, propose une loupe cotée pour relever un
-point au centième, aide au relevé du bas des murs, et sert de banc d'essai entre
-les deux moteurs (temps de rendu et écart pixel à pixel). Voir
-[docs/renderer-canvas-vs-webgl.md](docs/renderer-canvas-vs-webgl.md).
-
----
-
-## Carrousels pilotés par le scroll
-
-Sur écran large (≥ 62rem) et hors « mouvement réduit », les deux grandes
-sections carrousel deviennent des sections hautes à contenu collant :
-la progression verticale dans la section est convertie en défilement
-horizontal (`js/components/scroll-carousel.js`). La molette n'est jamais
-interceptée — on lit `scrollY`, rien de plus. Dans ce mode les flèches
-déplacent la page ; le glisser est désactivé pour éviter tout conflit.
-
-En dessous de 62rem, retour au carrousel classique : scroll-snap, swipe,
-flèches et glisser.
-
----
-
-## Identité visuelle et icônes
-
-Le symbole de marque est le **Concept C** : trois lames verticales de largeurs
-inégales — 36, 36 et 19 unités — séparées par des joints et traversées par des
-ruptures diagonales décalées à deux hauteurs. Le rythme d'un parquet réduit à sa
-structure. Pas de lettre, pas de chevron, pas de maison, pas d'outil.
-
-Sa géométrie n'est pas redessinée à l'estime : elle est **relevée au pixel** sur
-la planche d'identité validée, et vit dans un seul endroit,
-`_generator/make-icons.js`. Ce fichier alimente à la fois les icônes et le SVG
-inséré dans l'interface : le symbole ne peut donc pas diverger d'un support à
-l'autre.
-
-```bash
-node _generator/make-icons.js
-```
-
-produit dans `assets/icons/` :
-
-| fichier | usage |
-| --- | --- |
-| `favicon.svg` | favicon vectoriel — fond crème, symbole charbon |
-| `favicon-16/24/32/48.png` | favicon matriciel, géométrie **accrochée à la grille de pixels** |
-| `apple-touch-icon.png` (180) | iOS |
-| `icon-192.png`, `icon-512.png` | manifeste web |
-| `maskable-512.png` | Android, fond plein, symbole dans la zone de sécurité |
-| `icon-512-dark.png` | variante dorée sur charbon, pour les surfaces sombres |
-| `symbol.svg` | symbole seul, sans fond |
-
-Deux décisions à connaître avant d'y toucher :
-
-- **Aspect optiquement corrigé aux petites tailles.** L'aspect réel du symbole
-  est 0,538 (nettement vertical). À 16 px cela donnerait un dessin large de 6 px
-  pour trois lames et deux joints : de la bouillie. On interpole donc vers un
-  aspect plus trapu en dessous de 72 px, sans jamais toucher au nombre de lames,
-  à leur inégalité ni aux ruptures.
-- **Pas de bascule en mode sombre pour le favicon.** Un carré crème se détache
-  aussi bien sur une barre d'onglets claire que sombre ; un symbole doré sur
-  charbon perd sa lisibilité à 16 px. La variante dorée existe, mais pour les
-  surfaces sombres de l'interface.
-
-Contrôle visuel : `node serve.js` puis
-`http://localhost:5180/_calibrage/icones.html` — tailles réelles sur fond clair
-et sombre, grille de pixels au ×10, simulation d'onglet Chrome.
-
-Le symbole apparaît **deux fois par page** : en-tête et pied de page. Jamais en
-motif décoratif répété — c'est sa rareté qui lui donne sa force.
-
----
-
-## Médias
-
-Les photographies proviennent de **Pexels** (licence gratuite, usage commercial
-autorisé). Elles sont téléchargées localement dans `assets/images/` : aucun appel
-à un service externe à l'exécution. Les auteurs sont listés dans
-`assets/images/CREDITS.md`.
-
-Pour changer une image : modifier son identifiant Pexels dans
-`_generator/photos.js`, puis relancer le téléchargement.
-
-```bash
-node _generator/fetch-photos.js --force
-```
-
-Sans `--force`, seules les images manquantes sont téléchargées. Il reste
-évidemment possible de déposer simplement un fichier de même nom dans
-`assets/images/`.
-
-Trois visuels restent vectoriels car ils expliquent un principe plutôt qu'ils
-n'illustrent une ambiance : `guide-sens-proportions.svg`, `lumiere-avant.svg`
-et `lumiere-apres.svg`. Ils sont produits par `node _generator/build.js`.
-
-Vidéo du hero : déposer `assets/videos/hero.mp4` puis renseigner l'attribut
-`data-src` de la balise vidéo de `index.html`. Tant qu'il est vide, l'image
-`hero-poster.jpg` sert de fallback et aucune vidéo n'est téléchargée.
-
----
-
-## Indexation : préproduction et production
-
-Les fichiers du dépôt décrivent **toujours la production** (canoniques en
-`pose-parquet.com`, `robots` en `index, follow`, sitemap complet). C'est le
-déploiement qui marque la préproduction `github.io` en `noindex, nofollow`,
-selon la présence d'un fichier `CNAME`. Aucun `noindex` n'existe donc dans le
-dépôt et aucun ne peut fuiter en production. Détail et procédure de mise en
-ligne : [docs/seo-environnements.md](docs/seo-environnements.md).
+## Identité visuelle et médias
+
+Icônes, favicons et manifeste sont produits par `_generator/make-icons.js`. Les
+photographies sont téléchargées par `_generator/fetch-photos.js`. Les formats
+attendus pour de vraies cartes de matière sont décrits dans
+[assets/materials/README.md](assets/materials/README.md).
+
+La vidéo d'en-tête est optionnelle : tant que le `data-src` de la balise vidéo
+est vide, l'image `hero-poster.jpg` sert de repli et aucune vidéo n'est
+téléchargée.
 
 ---
 
 ## SEO
 
-- `title`, `meta description`, `canonical`, Open Graph et Twitter Card sur chaque page.
-- Données structurées : `WebSite`, `Article`, `HowTo`, `FAQPage`, `BreadcrumbList`, `WebApplication`.
+- `title`, `meta description`, `canonical`, Open Graph et Twitter Card sur
+  chaque page.
+- Données structurées : `WebSite`, `Article`, `HowTo`, `FAQPage`,
+  `BreadcrumbList`, `WebApplication`.
 - Fil d'Ariane visible et balisé.
-- `sitemap.xml` et `robots.txt` à la racine (domaine à ajuster avant mise en ligne).
-- Cluster « sens de pose » : guide pilier + guides satellites + simulateur, reliés entre eux.
+- `sitemap.xml` et `robots.txt` générés à la racine.
+- Cluster « sens de pose » : guide pilier, guides satellites et simulateur,
+  reliés entre eux.
 
 ---
 
 ## Notes d'ingénierie
 
+### Front et moteur
+
 | document | sujet |
 | --- | --- |
 | [docs/renderer-canvas-vs-webgl.md](docs/renderer-canvas-vs-webgl.md) | pourquoi WebGL 2 écrit à la main, pourquoi pas Three.js, avec les mesures |
+| [docs/segmentation-automatique.md](docs/segmentation-automatique.md) | détection automatique du sol : étude et décision |
 | [docs/future-ai-api-contract.md](docs/future-ai-api-contract.md) | contrat de l'API d'analyse d'image — spécifié, non implémenté |
 | [docs/future-python-architecture.md](docs/future-python-architecture.md) | architecture Python prévue — aucune ligne écrite |
-| [docs/seo-environnements.md](docs/seo-environnements.md) | indexation préproduction / production |
-| [docs/formulaire-production.md](docs/formulaire-production.md) | état réel du formulaire, ce qu'il manque avant le lancement |
+| [docs/photo-lens-distortion.md](docs/photo-lens-distortion.md) | photos, objectifs et distorsion |
+| [docs/room-tour-protocol.md](docs/room-tour-protocol.md) | visiter une pièce — ce qu'il faut photographier |
+| [docs/inspiration-studio.md](docs/inspiration-studio.md) | inspiration → Studio : ce qui est essayable, et pourquoi pas le reste |
+| [docs/product-visualizer-integration-v1.md](docs/product-visualizer-integration-v1.md) | visualiseur produit — intégration directe |
+| [docs/front-global-audit.md](docs/front-global-audit.md) | recette globale du front |
 | [docs/benchmark-ikea-home-design.md](docs/benchmark-ikea-home-design.md) | observation d'IKEA Home Design et écarts |
+
+### Catalogue Premibel
+
+| document | sujet |
+| --- | --- |
+| [docs/premibel-integration.md](docs/premibel-integration.md) | brancher le catalogue Premibel sur le visualiseur |
+| [docs/premibel-data-audit.md](docs/premibel-data-audit.md) | audit du catalogue parquet Premibel |
+| [docs/premibel-sync-contract.md](docs/premibel-sync-contract.md) | contrat de synchronisation Premibel → visualiseur |
+| [docs/premibel-material-capture.md](docs/premibel-material-capture.md) | produire une vraie matière pour le visualiseur |
+
+### Backend
+
+| document | sujet |
+| --- | --- |
+| [docs/backend/architecture.md](docs/backend/architecture.md) | architecture de l'extension |
+| [docs/backend/wordpress-plugin.md](docs/backend/wordpress-plugin.md) | fonctionnement de `pose-parquet-core` |
+| [docs/backend/database.md](docs/backend/database.md) | base de données |
+| [docs/backend/rest-api.md](docs/backend/rest-api.md) | API REST |
+| [docs/backend/project-form-contract.md](docs/backend/project-form-contract.md) | contrat formulaire → API → base |
+| [docs/backend/front-integration.md](docs/backend/front-integration.md) | branchement du formulaire réel |
+| [docs/backend/admin-projects.md](docs/backend/admin-projects.md) | administration des demandes |
+| [docs/backend/email.md](docs/backend/email.md) | emails transactionnels |
+| [docs/backend/antispam.md](docs/backend/antispam.md) | anti-spam |
+| [docs/backend/security.md](docs/backend/security.md) | sécurité |
+| [docs/backend/production.md](docs/backend/production.md) | mise en production du backend |
+| [docs/backend/roadmap.md](docs/backend/roadmap.md) | feuille de route backend |
+
+### Exploitation
+
+| document | sujet |
+| --- | --- |
+| [docs/seo-environnements.md](docs/seo-environnements.md) | indexation préproduction / production |
 | [docs/hebergement.md](docs/hebergement.md) | hébergement et DNS |
-| [assets/materials/README.md](assets/materials/README.md) | formats attendus pour de vraies cartes de matière |
+| [docs/formulaire-production.md](docs/formulaire-production.md) | état réel du formulaire, ce qu'il manque avant le lancement |
+| [docs/migration-url-map.md](docs/migration-url-map.md) | migration de l'ancien pose-parquet.com |
+| [docs/git-workflow.md](docs/git-workflow.md) | flux Git et rôle des branches |
+| [_generator/README.md](_generator/README.md) | le générateur, module par module |
 
 ---
 
 ## Liens externes
 
-Le site est indépendant. Un unique lien éditorial vers `premibel.fr` figure dans
-le guide « Parquet massif ou contrecollé », là où il complète réellement le propos.
+Le site est indépendant. Un unique lien éditorial vers `premibel.fr` figure
+dans le guide « Parquet massif ou contrecollé », là où il complète réellement
+le propos. La V2 fera évoluer ce point — c'est précisément son objet.
