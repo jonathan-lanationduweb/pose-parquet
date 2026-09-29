@@ -26,6 +26,7 @@ declare(strict_types=1);
 
 namespace PoseParquet\Core\Admin;
 
+use PoseParquet\Core\Mail\Queue;
 use PoseParquet\Core\Projects\Notes;
 use PoseParquet\Core\Projects\Repository;
 use PoseParquet\Core\Projects\StatusService;
@@ -41,6 +42,7 @@ final class Actions {
 	public const UPDATE_STATUS = 'pp_update_status';
 	public const ADD_NOTE      = 'pp_add_note';
 	public const REPAIR_CAPS   = 'pp_repair_caps';
+	public const RUN_MAIL_QUEUE = 'pp_run_mail_queue';
 
 	public static function register(): void {
 		// `admin_post_` (sans `nopriv`) : la poignée n'existe pas pour un
@@ -49,6 +51,7 @@ final class Actions {
 		add_action( 'admin_post_' . self::UPDATE_STATUS, [ self::class, 'update_status' ] );
 		add_action( 'admin_post_' . self::ADD_NOTE, [ self::class, 'add_note' ] );
 		add_action( 'admin_post_' . self::REPAIR_CAPS, [ self::class, 'repair_caps' ] );
+		add_action( 'admin_post_' . self::RUN_MAIL_QUEUE, [ self::class, 'run_mail_queue' ] );
 	}
 
 	/**
@@ -78,6 +81,43 @@ final class Actions {
 			add_query_arg(
 				Notices::ARG,
 				Capabilities::missing() ? Notices::CAPS_INCOMPLETE : Notices::CAPS_REPAIRED,
+				Menu::status_url()
+			)
+		);
+		exit;
+	}
+
+	/**
+	 * Vide la file des notifications, maintenant.
+	 *
+	 * WP-Cron est désactivé sur ce WordPress de développement, et il doit
+	 * l’être en production aussi — au profit d’un vrai cron système. Entre les
+	 * deux il reste un cas : l’ordonnanceur qui n’a pas tourné, et des envois
+	 * qui attendent. Ce bouton les traite sans attendre le prochain passage.
+	 *
+	 * Ce n’est pas un contournement du cron : c’est le même code, appelé à la
+	 * main. Les mêmes garde-fous s’appliquent — un envoi déjà `sent` ne repart
+	 * pas, un verrou empêche deux exécutions simultanées.
+	 */
+	public static function run_mail_queue(): void {
+		self::require_can( Capabilities::MANAGE_SETTINGS );
+		check_admin_referer( self::RUN_MAIL_QUEUE );
+
+		$bilan = Queue::executer_echeances();
+
+		Logger::info( 'file des notifications traitée à la main', [
+			'user_id'  => get_current_user_id(),
+			'traites'  => $bilan['traites'],
+			'restants' => $bilan['restants'],
+		] );
+
+		wp_safe_redirect(
+			add_query_arg(
+				[
+					Notices::ARG   => $bilan['traites'] > 0 ? Notices::MAIL_QUEUE_RUN : Notices::MAIL_QUEUE_EMPTY,
+					'pp_traites'   => $bilan['traites'],
+					'pp_restants'  => $bilan['restants'],
+				],
 				Menu::status_url()
 			)
 		);

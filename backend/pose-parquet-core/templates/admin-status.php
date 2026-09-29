@@ -133,6 +133,80 @@ $oui_non = static fn( bool $ok ): string => $ok
 		</tbody>
 	</table>
 	<p class="description" style="max-width:40rem"><?php esc_html_e( 'Ces états rapportent la réponse de wp_mail(), pas la réception. Un email peut être « envoyé » et finir en indésirable.', 'pose-parquet-core' ); ?></p>
+	<?php
+	/*
+	 * Un lead perdu ne doit pas pouvoir l'être en silence.
+	 *
+	 * Les compteurs ci-dessus disent déjà combien d'envois ont échoué, mais un
+	 * nombre dans un tableau se lit quand on le cherche. Un échec définitif
+	 * mérite une alerte, et un lien direct vers les demandes concernées :
+	 * quelqu'un doit rappeler ces personnes à la main.
+	 */
+	$echecs_mail  = (int) ( $state['mail_counts']['internal']['failed'] ?? 0 ) + (int) ( $state['mail_counts']['visitor']['failed'] ?? 0 );
+	$attente_mail = (int) ( $state['mail_counts']['internal']['pending'] ?? 0 ) + (int) ( $state['mail_counts']['visitor']['pending'] ?? 0 );
+	$file         = $state['mail_queue'];
+	?>
+	<?php if ( $echecs_mail > 0 ) : ?>
+		<div class="notice notice-error inline" style="max-width:40rem;margin:1rem 0">
+			<p>
+				<strong><?php echo esc_html( sprintf(
+					/* translators: %s : nombre de notifications en échec. */
+					_n( '%s notification en échec définitif.', '%s notifications en échec définitif.', $echecs_mail, 'pose-parquet-core' ),
+					number_format_i18n( $echecs_mail )
+				) ); ?></strong>
+				<?php esc_html_e( 'La demande est enregistrée, mais personne n’a été prévenu par email : il faut rappeler ces personnes à la main.', 'pose-parquet-core' ); ?>
+				<a href="<?php echo esc_url( $state['mail_failed_url'] ); ?>"><?php esc_html_e( 'Voir les demandes concernées', 'pose-parquet-core' ); ?></a>
+			</p>
+		</div>
+	<?php endif; ?>
+
+	<h3><?php esc_html_e( 'File d’envoi', 'pose-parquet-core' ); ?></h3>
+	<p class="description" style="max-width:40rem">
+		<?php esc_html_e( 'Les emails ne partent plus pendant la requête du visiteur : ils sont mis en file et envoyés par l’ordonnanceur. Une soumission ne dépend donc plus du temps de réponse du serveur d’envoi.', 'pose-parquet-core' ); ?>
+	</p>
+	<table class="widefat striped" style="max-width:40rem">
+		<tbody>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Envois en attente', 'pose-parquet-core' ); ?></th>
+				<td>
+					<?php echo esc_html( number_format_i18n( $attente_mail ) ); ?>
+					<?php if ( $attente_mail > 0 ) : ?>
+						— <a href="<?php echo esc_url( $state['mail_pending_url'] ); ?>"><?php esc_html_e( 'voir les demandes', 'pose-parquet-core' ); ?></a>
+					<?php endif; ?>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Événements planifiés', 'pose-parquet-core' ); ?></th>
+				<td>
+					<?php echo esc_html( sprintf(
+						/* translators: %1$s : total planifié, %2$s : nombre déjà dû. */
+						__( '%1$s au total, dont %2$s déjà dû(s)', 'pose-parquet-core' ),
+						number_format_i18n( (int) $file['total'] ),
+						number_format_i18n( (int) $file['dus'] )
+					) ); ?>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Ordonnanceur', 'pose-parquet-core' ); ?></th>
+				<td>
+					<?php if ( $state['wp_cron_disabled'] ) : ?>
+						<?php echo $oui_non( false ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+						<?php esc_html_e( 'DISABLE_WP_CRON est actif : rien ne part tout seul.', 'pose-parquet-core' ); ?>
+						<p class="description"><?php esc_html_e( 'C’est le réglage attendu en production, à condition qu’un cron système appelle wp-cron.php — sinon la file ne se vide jamais.', 'pose-parquet-core' ); ?></p>
+					<?php else : ?>
+						<?php echo $oui_non( true ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+						<?php esc_html_e( 'WP-Cron s’exécute au fil des visites.', 'pose-parquet-core' ); ?>
+					<?php endif; ?>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<form method="post" action="<?php echo esc_url( $state['repair_url'] ); ?>" style="margin:.8rem 0">
+		<?php wp_nonce_field( $state['queue_action'] ); ?>
+		<input type="hidden" name="action" value="<?php echo esc_attr( $state['queue_action'] ); ?>" />
+		<?php submit_button( __( 'Traiter la file maintenant', 'pose-parquet-core' ), 'secondary', 'submit', false ); ?>
+		<span class="description"><?php esc_html_e( 'Même code que l’ordonnanceur, appelé à la main. Un envoi déjà parti ne repart pas.', 'pose-parquet-core' ); ?></span>
+	</form>
 	<p><a href="<?php echo esc_url( $state['settings_url'] ); ?>"><?php esc_html_e( 'Modifier dans Réglages', 'pose-parquet-core' ); ?></a></p>
 
 	<h2><?php esc_html_e( 'Anti-spam', 'pose-parquet-core' ); ?></h2>
