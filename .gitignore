@@ -8,3 +8,7 @@ desktop.ini
 .idea/
 *.swp
 _calibrage/_candidates/
+
+# Paquet livrable du plugin, reconstruit par backend/deploy/faire-paquet.sh.
+# C'est une sortie de build : elle se refabrique, elle ne se versionne pas.
+backend/deploy/paquet/
