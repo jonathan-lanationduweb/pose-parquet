@@ -147,7 +147,9 @@ et alors personne ne le voit.
 
 ## Ce que le pilote démontre
 
-- 14 références réelles lues, 13 utilisables, 1 écartée (dalle Versailles).
+- 15 références réelles lues, 14 utilisables, 1 écartée (dalle Versailles, VERF39004).
+  Le fichier en comptait 14 au relevé du 03/09 ; CHENF39031 (Houston) a été
+  ajoutée le 09/09 sans que ce compte soit repris — corrigé le 28/09/2026.
 - Les dimensions de la fiche pilotent le rendu : 120 / 150 / 193 mm donnent
   38,7 / 31 / 24,1 lames en travers d'un sol de 4,65 m.
 - Un point de Hongrie de 92 × 520 mm se rend en 92 × 520 mm, pas au 90 mm

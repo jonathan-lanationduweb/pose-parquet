@@ -9,7 +9,7 @@
 **Premibel est la source de vérité produit. Pose Parquet est consommateur.**
 
 `data/products.premibel-pilot.json` est un fichier **temporaire**, tenu à la
-main pour comprendre les problèmes sur 14 références. Il ne doit pas devenir un
+main pour comprendre les problèmes sur 15 références. Il ne doit pas devenir un
 catalogue parallèle : une copie manuelle divergente serait pire que pas de
 catalogue du tout, parce qu'elle aurait l'air à jour.
 
