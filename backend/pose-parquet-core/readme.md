@@ -8,7 +8,7 @@ HTML/CSS/JS appelle. Le front reste dans le dépôt, indépendant, déployé à 
 front (statique)  →  REST /wp-json/pose-parquet/v1/…  →  ce plugin  →  tables pp_*
 ```
 
-## Ce que contient la version 0.4.1
+## Ce que contient la version 0.5.0
 
 Fondation (0.1.0) :
 
@@ -86,6 +86,58 @@ Libellés du Visualiseur (0.4.1) — **schéma inchangé (3)** :
   refusé en 422 plutôt que tronqué en silence — le plafond de 4 Ko reste ;
 - aucune migration, aucune demande existante modifiée.
 
+Notifications différées (0.5.0) — **schéma inchangé (3)** :
+
+- les deux emails d'une demande ne partent plus **pendant** la requête : ils
+  sont **mis en file** (`Mail\Queue`) et envoyés par l'ordonnanceur. Mesuré le
+  28/09/2026 sur une soumission réelle : **4 300 ms côté serveur avant, 64 à
+  76 ms après**. Les 4,2 s manquantes étaient deux `wp_mail()` qui expiraient
+  faute de SMTP joignable — le visiteur attendait quatre secondes des emails
+  qui ne partaient pas ;
+- la réponse rend désormais `pending` et non `sent` : elle ne promet rien
+  qu'elle ne sache. Les états deviennent `sent`, `failed` ou `skipped` quand
+  l'envoi a réellement été tenté ;
+- **quatre tentatives** par envoi, espacées de 0 s, 5 min, 30 min puis 2 h. Le
+  numéro de tentative voyage dans les arguments de l'événement planifié :
+  aucune colonne ajoutée, aucune migration. Une adresse de réception absente
+  n'est pas réessayée, elle ne deviendra pas valide en cinq minutes ;
+- **un envoi déjà parti ne repart jamais**, quel que soit le nombre de fois où
+  l'événement est rejoué. La garantie repose sur la colonne d'état, pas sur la
+  file ; un verrou MySQL nommé empêche en plus deux exécutions simultanées ;
+- *Pose Parquet → État* affiche la file (planifiés, dûs, état de
+  `DISABLE_WP_CRON`), une **alerte** dès qu'une notification a définitivement
+  échoué, un lien vers les demandes concernées et un bouton « Traiter la file
+  maintenant » ;
+- la liste des demandes accepte `?mail=failed` et `?mail=pending`, et dit
+  qu'elle est filtrée ;
+- **un cron système devient obligatoire en production.** Sans lui, la file ne
+  se vide jamais. Voir `docs/backend/production.md` § 4 ;
+- en local, `php backend/tools/traiter-file-mail.php <racine>` vide la file à
+  la main. `DISABLE_WP_CRON` n'est pas réactivé en douce ;
+- aucune migration, aucune demande existante modifiée.
+
+Correctifs de sécurité (0.4.2) — **schéma inchangé (3)** :
+
+- `POST /projects` exige `application/json` et répond **415** sinon, avant
+  toute lecture du corps. C'est ce qui ferme la soumission inter-origines
+  « simple » : en `text/plain`, le navigateur n'émet aucun préflight, un site
+  tiers pouvait donc faire créer une demande depuis le navigateur d'un
+  visiteur, à son insu et depuis son adresse. Les en-têtes CORS ne
+  l'empêchaient pas — ils ne sont qu'une réponse ;
+- le **jeton de formulaire ne sert plus qu'une fois**. Son `nonce` existait
+  depuis le début mais n'était jamais consommé : un jeton obtenu une fois
+  valait deux heures de soumissions illimitées. La réservation est prise juste
+  avant l'écriture et relâchée si l'écriture n'a pas eu lieu — corriger un
+  champ refusé ne coûte donc pas le jeton. Ce qui est stocké est un HMAC du
+  nonce, jamais le jeton, sans aucune donnée personnelle, pour la durée de vie
+  restante ;
+- `http://localhost:5180` **n'est plus une origine CORS par défaut**. Il
+  l'était sur toute installation sans `POSE_PARQUET_ALLOWED_ORIGINS`,
+  production comprise. Les origines de développement s'ajoutent quand le site
+  se déclare `local` ou `development` ;
+- aucune migration, aucune demande existante modifiée, format du jeton
+  inchangé, codes d'erreur existants inchangés.
+
 Pas encore : renvoi d'un email, suppression de demande, Turnstile. Voir
 `docs/backend/roadmap.md` à la racine du dépôt.
 
@@ -100,9 +152,12 @@ Copier (ou lier) ce dossier dans `wp-content/plugins/pose-parquet-core/`, puis
 activer « Pose Parquet » dans Extensions. L'activation crée les tables et pose
 les droits. Vérifier sur *Pose Parquet → État* ou sur `/wp-json/pose-parquet/v1/health`.
 
-Origines CORS : par défaut `http://localhost:5180`,
-`https://jonathan-lanationduweb.github.io`, `https://pose-parquet.com`,
-`https://www.pose-parquet.com`. Pour les remplacer, dans `wp-config.php` :
+Origines CORS : par défaut `https://jonathan-lanationduweb.github.io`,
+`https://pose-parquet.com`, `https://www.pose-parquet.com`. Le poste de
+développement (`http://localhost:5180`) n'y est plus : sur une installation de
+recette, ajouter `define( 'WP_ENVIRONMENT_TYPE', 'local' );` — ce qui autorise
+`localhost:5180` et `127.0.0.1:5180` — ou déclarer la liste complète. Pour les
+remplacer, dans `wp-config.php` :
 
 ```php
 define( 'POSE_PARQUET_ALLOWED_ORIGINS', [ 'https://pose-parquet.com', 'https://www.pose-parquet.com' ] );

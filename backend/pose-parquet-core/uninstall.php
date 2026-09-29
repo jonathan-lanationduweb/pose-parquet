@@ -38,6 +38,10 @@ PoseParquet\Core\Security\Roles::remove();
 
 delete_option( PoseParquet\Core\Database\Installer::OPTION_DB_VERSION );
 delete_option( PoseParquet\Core\Database\Installer::OPTION_INSTALLED_AT );
+// Le numéro du plancher de droits. Sans cette ligne, une réinstallation
+// trouverait le numéro à jour et ne reposerait jamais les droits qui viennent
+// d'être retirés juste au-dessus.
+delete_option( PoseParquet\Core\Security\Capabilities::OPTION_VERSION );
 
 if ( defined( 'POSE_PARQUET_UNINSTALL_DROP_TABLES' ) && POSE_PARQUET_UNINSTALL_DROP_TABLES === true ) {
 	global $wpdb;

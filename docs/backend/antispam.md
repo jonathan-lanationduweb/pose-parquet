@@ -45,23 +45,55 @@ validateur métier. Ils ne peuvent donc pas atteindre `pp_projects`.
 
 Forme : `v1.<issued_at>.<nonce>.<signature>`, la signature étant un
 HMAC-SHA256 du préfixe avec un secret dérivé de `wp_salt('nonce')`. Le jeton
-ne contient aucun secret et se vérifie **sans stockage** : ni table, ni
-transient, ni session. Le navigateur le demande au chargement du formulaire et
-le renvoie dans `formToken`.
+ne contient aucun secret. Le navigateur le demande au chargement du formulaire
+et le renvoie dans `formToken`.
 
 | Règle | Valeur | Où |
 |---|---|---|
 | Âge minimum | 2 s | `FormToken::MIN_AGE` |
 | Durée de validité | 7 200 s (2 h) | `FormToken::MAX_AGE` |
+| Emplois | 1 | `FormToken::consume()` |
 
-Les deux valeurs vivent là et nulle part ailleurs ; la route et la page
+Les deux durées vivent là et nulle part ailleurs ; la route et la page
 « État » les lisent.
+
+**Usage unique.** La signature et l'âge se vérifient sans rien stocker, mais
+ils ne disaient rien du nombre d'emplois : un jeton obtenu une fois valait
+deux heures de soumissions, autant de fois qu'on voulait, depuis n'importe
+où — le `nonce` était présent dans le jeton et n'était jamais consommé. Il
+l'est désormais. Ce qui est stocké est un HMAC du nonce, sous une clé
+`pp_ft_…`, pour la durée de vie restante du jeton : ni le jeton, ni le nonce
+en clair, ni rien qui désigne une personne. Rien à purger — la clé expire avec
+le jeton qu'elle protège.
+
+*Quand la réservation a lieu, et pourquoi là.* Juste avant l'écriture, et
+relâchée si l'écriture n'a pas eu lieu. Après l'écriture, deux requêtes
+simultanées auraient déjà créé deux demandes ; trop tôt, un code postal mal
+saisi tuerait le jeton et obligerait à recharger la page pour corriger un
+champ. Un jeton n'est donc perdu que lorsqu'une demande existe.
+
+*Concurrence.* Avec un cache objet externe (Redis, Memcached), la réservation
+passe par `wp_cache_add`, atomique par nature. Sans cache objet, lire puis
+écrire un transient ne suffit pas : mesuré en HTTP réel, quatre requêtes
+simultanées portant le même jeton créaient **deux** demandes une fois sur
+deux. La réservation prend donc d'abord un verrou nommé MySQL
+(`GET_LOCK(<clé>, 0)`, relâché dans un `finally`) : pas de table, pas
+d'extension, pas de service à installer, et la base est déjà là. Repris en
+mesure : cinq essais de quatre requêtes simultanées, une seule création à
+chaque fois. Le contrôle vit dans `tests/run-http.php`.
+
+*Limite restante.* Si `GET_LOCK` est indisponible — des hébergeurs mutualisés
+en restreignent le droit —, la fonction rend `NULL` et la réservation retombe
+sur la lecture-écriture simple : la fenêtre se rouvre, sans jamais bloquer la
+soumission. Ce repli est délibéré : un formulaire qui refuse de fonctionner
+serait pire que deux demandes en double sur une collision à la milliseconde.
 
 Refus, tous en `422` avec le code `form_token_invalid` et un `fields.formToken`
 qui dit lequel : absent, invalide (signature fausse, tronqué, date modifiée
-sans re-signature, version inconnue), expiré, trop récent. La réponse ne
-contient ni le jeton, ni son contenu signé, ni le secret. `formToken`
-n'apparaît jamais dans le journal.
+sans re-signature, version inconnue), expiré, trop récent, déjà utilisé. La
+réponse ne contient ni le jeton, ni son contenu signé, ni le secret.
+`formToken` n'apparaît jamais dans le journal. Le front traite tous ces refus
+de la même façon : un jeton neuf, un seul réessai.
 
 **Ce n'est pas un CAPTCHA.** Un robot patient demande un jeton, attend deux
 secondes, soumet — et passe. Il élimine les scripts naïfs qui postent

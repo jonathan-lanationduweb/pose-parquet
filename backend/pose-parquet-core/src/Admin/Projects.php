@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace PoseParquet\Core\Admin;
 
+use PoseParquet\Core\Mail\Notifier;
 use PoseParquet\Core\Projects\Repository;
 use PoseParquet\Core\Projects\Status;
 use PoseParquet\Core\Security\Capabilities;
@@ -72,7 +73,12 @@ final class Projects {
 		$statut = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : '';
 		$terme  = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 		$page   = isset( $_GET['paged'] ) ? max( 1, absint( wp_unslash( $_GET['paged'] ) ) ) : 1;
+		// Sort des notifications : `failed` ou `pending`, rien d'autre ne filtre.
+		$mail   = isset( $_GET['mail'] ) ? sanitize_key( wp_unslash( $_GET['mail'] ) ) : '';
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		if ( ! in_array( $mail, [ Notifier::STATUS_FAILED, Notifier::STATUS_PENDING ], true ) ) {
+			$mail = '';
+		}
 
 		// Un statut inventé dans l'URL ne filtre rien plutôt que de ne rien rendre.
 		if ( $statut !== '' && ! Status::is_valid( $statut ) ) {
@@ -81,7 +87,7 @@ final class Projects {
 		$terme = mb_substr( trim( $terme ), 0, Repository::SEARCH_MAX );
 
 		$repo   = new Repository();
-		$args   = [ 'status' => $statut, 'search' => $terme ];
+		$args   = [ 'status' => $statut, 'search' => $terme, 'mail' => $mail ];
 		$total  = $repo->count_search( $args );
 		$pages  = (int) ceil( $total / Repository::PER_PAGE );
 
@@ -103,6 +109,7 @@ final class Projects {
 			'per_page' => Repository::PER_PAGE,
 			'status'   => $statut,
 			'search'   => $terme,
+			'mail'     => $mail,
 			'statuses' => Status::labels(),
 			'notice'   => Notices::pending(),
 			'can_edit' => current_user_can( Capabilities::MANAGE_PROJECTS ),

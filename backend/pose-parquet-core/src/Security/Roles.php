@@ -40,6 +40,29 @@ final class Roles {
 
 	public const MANAGER = 'pose_parquet_manager';
 
+	/**
+	 * Libellé du rôle, stocké tel quel — volontairement sans `__()`.
+	 *
+	 * Un nom de rôle vit en base, écrit une fois à la création : le traduire au
+	 * moment de l'écriture figerait la langue de l'installation dans la table
+	 * des options, et surtout obligeait à charger le domaine de traduction sur
+	 * `plugins_loaded`, c'est-à-dire avant `init`. WordPress 6.7 le signale
+	 * désormais par un `_load_textdomain_just_in_time` — cinq de ces notices
+	 * figuraient au journal local, toutes dues à cette seule ligne.
+	 *
+	 * L'usage de WordPress est de stocker le libellé brut et de le traduire à
+	 * l'affichage, par `translate_user_role()` : c'est ce que fait le cœur pour
+	 * « Administrator » ou « Subscriber », et les écrans d'administration
+	 * appliquent déjà cette fonction aux rôles personnalisés.
+	 *
+	 * Conséquence assumée : ce libellé s'affiche en français quelle que soit la
+	 * langue de l'administration. Le site est francophone, son unique rôle
+	 * métier porte un nom français, et personne n'a demandé autre chose. Le jour
+	 * où ce serait le cas, la traduction se branchera sur le filtre
+	 * `translate_user_role` — c'est-à-dire à l'affichage, jamais à l'écriture.
+	 */
+	public const MANAGER_LABEL = 'Gestionnaire Pose Parquet';
+
 	/** @return array<string,bool> capabilities du rôle gestionnaire */
 	public static function manager_caps(): array {
 		return [
@@ -52,9 +75,10 @@ final class Roles {
 	/**
 	 * Crée le rôle s'il manque, et complète ses droits s'il existe déjà.
 	 *
-	 * Idempotent, et appelé à chaque chargement comme `Capabilities::ensure()` :
-	 * les rôles vivent en base, un plugin de gestion de rôles ou une
-	 * restauration peut les avoir amputés. On n'écrit que ce qui manque.
+	 * Idempotent, mais plus appelé à chaque chargement : la pose passe par
+	 * `Capabilities::ensure_once()`, qui ne rejoue qu'à l'activation, à la
+	 * migration, ou sur réparation explicite depuis la page « État ». On n'écrit
+	 * que ce qui manque.
 	 *
 	 * Ce qu'on ne fait PAS : retirer un droit qu'un administrateur aurait
 	 * volontairement ajouté à ce rôle. Le plugin garantit un plancher, il
@@ -64,11 +88,7 @@ final class Roles {
 		$role = get_role( self::MANAGER );
 
 		if ( ! $role ) {
-			add_role(
-				self::MANAGER,
-				__( 'Gestionnaire Pose Parquet', 'pose-parquet-core' ),
-				self::manager_caps()
-			);
+			add_role( self::MANAGER, self::MANAGER_LABEL, self::manager_caps() );
 
 			return;
 		}

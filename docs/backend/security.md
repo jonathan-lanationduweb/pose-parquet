@@ -76,16 +76,29 @@
 
 ## CORS n'est pas une authentification
 
-`Rest\Cors` restreint `Access-Control-Allow-Origin` à quatre origines sur
-`/pose-parquet/v1/*`, sans jamais répondre `*`, et retire les en-têtes
-permissifs que WordPress pose par défaut. Ce que cela fait : empêcher qu'un
-site tiers utilise le navigateur d'un visiteur pour poster sur l'API à son
-insu, et empêcher un script d'une autre origine de lire la réponse. Ce que
-cela ne fait pas : arrêter un `curl`, un robot, ou quiconque forge la requête
-sans navigateur — le test HTTP le montre, un POST depuis une origine inconnue
-est traité (201) mais sans en-tête CORS. La protection de la route, ce sont
-la validation, les bornes, et l'anti-spam — **un bot serveur n'est pas soumis
-à CORS**, et CORS ne remplace donc jamais l'anti-spam.
+`Rest\Cors` restreint `Access-Control-Allow-Origin` à trois origines sur
+`/pose-parquet/v1/*` — plus celles du poste de développement quand le site se
+déclare `local` —, sans jamais répondre `*`, et retire les en-têtes permissifs
+que WordPress pose par défaut. Ce que cela fait : empêcher un script d'une
+autre origine de lire la réponse. Ce que cela ne fait pas : arrêter un `curl`,
+un robot, ou quiconque forge la requête sans navigateur — le test HTTP le
+montre, un POST depuis une origine inconnue est traité (201) mais sans en-tête
+CORS. La protection de la route, ce sont la validation, les bornes, et
+l'anti-spam — **un bot serveur n'est pas soumis à CORS**, et CORS ne remplace
+donc jamais l'anti-spam.
+
+**Et ces en-têtes ne bloquent rien par eux-mêmes.** Ils sont une réponse : le
+navigateur les lit après coup. Il ne demande la permission *avant* d'envoyer
+— le préflight — que si la requête sort du cadre des requêtes dites simples,
+et `text/plain` y reste. Un site tiers pouvait donc poster le même JSON avec
+ce type depuis le navigateur d'un visiteur : la réponse lui était illisible,
+mais la demande était bel et bien créée, depuis l'adresse du visiteur, et
+partait en courrier. C'est pourquoi `POST /projects` exige désormais
+`application/json` et répond `415` sinon : c'est cette exigence qui rend le
+préflight obligatoire, et donc qui donne à CORS le pouvoir qu'on lui prêtait
+ici. L'affirmation « empêcher qu'un site tiers utilise le navigateur d'un
+visiteur pour poster à son insu » était fausse avant cette correction ; elle
+est vraie depuis.
 
 Le reste de l'API WordPress (`/wp/v2/*`) garde le CORS par défaut de
 WordPress : hors périmètre du plugin, et à traiter au niveau du site en

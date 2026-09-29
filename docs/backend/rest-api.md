@@ -18,18 +18,42 @@ sont posés par `Rest\Cors` (voir plus bas et `security.md`).
 Réponse `200` si le plugin est prêt, `503` sinon (`status: degraded`), toujours
 avec `Cache-Control: no-store`.
 
+Deux niveaux de détail depuis le 14/09/2026. Pour un appelant **anonyme** —
+c'est-à-dire pour une sonde de supervision, qui est le seul usage prévu :
+
 ```json
 {
   "status": "ok",
-  "pluginVersion": "0.3.0",
+  "databaseStatus": { "ready": true }
+}
+```
+
+Pour un appelant **authentifié possédant `pp_manage_settings`**, le détail
+s'ajoute :
+
+```json
+{
+  "status": "ok",
   "databaseStatus": {
     "ready": true,
     "schemaVersion": 3,
     "expectedVersion": 3,
     "tables": { "projects": true, "history": true, "notes": true }
-  }
+  },
+  "pluginVersion": "0.4.2"
 }
 ```
+
+**Pourquoi ce changement.** La version exacte du plugin sortait sans
+authentification. Une sonde n'en a pas besoin — elle veut savoir si le service
+répond — alors qu'un numéro de version précis dit à qui le lit quelles
+corrections ne sont pas encore appliquées. Ce n'est pas une faille, c'est du
+renseignement offert sans contrepartie, et c'est la définition d'une surface à
+réduire.
+
+**Ce sur quoi une supervision peut s'appuyer** : le code HTTP, `status`, et
+`databaseStatus.ready`. Ces trois-là sont présents dans les deux cas et ne
+bougeront pas. Le reste est un confort d'administration.
 
 Elle ne dit ni version de WordPress, ni chemin, ni nom de base ou préfixe.
 
@@ -105,11 +129,12 @@ trace, ni de donnée saisie (l'email en particulier n'est jamais renvoyé).
 | HTTP | `code` | Quand |
 |---|---|---|
 | 400 | `empty_body` | corps vide |
-| 400 | `invalid_json` | JSON illisible (corps non déclaré `application/json`) |
+| 400 | `invalid_json` | JSON illisible |
 | 400 | `rest_invalid_json` | JSON illisible, corps déclaré `application/json` — intercepté par WordPress avant le plugin ; format WordPress (`code`, `message`, `data.status`), sans `fields` |
 | 413 | `payload_too_large` | corps > 16 384 octets, refusé avant lecture |
+| 415 | `unsupported_media_type` | `Content-Type` absent ou autre que `application/json` (le paramètre `charset` est ignoré). Refusé avant toute lecture du corps : aucune demande, aucun historique, aucun courrier |
 | 422 | `validation_failed` | au moins un champ invalide ; `fields` nomme **tous** les champs en cause et distingue : « Champ obligatoire absent. », « Type invalide : … attendu. », « Valeur hors de la liste autorisée. », « Longueur maximale dépassée (N caractères). », « Hors plage : entre 1 et 2000 m². », « Champ inconnu. », « Champ réservé au serveur : … » |
-| 422 | `form_token_invalid` | jeton absent, invalide, expiré, ou soumission trop rapide ; `fields.formToken` dit lequel, sans révéler le contenu signé |
+| 422 | `form_token_invalid` | jeton absent, invalide, expiré, déjà utilisé, ou soumission trop rapide ; `fields.formToken` dit lequel, sans révéler le contenu signé |
 | 422 | `submission_rejected` | pot de miel rempli. Refus générique : ni le motif, ni le nom du champ |
 | 429 | `rate_limited` | limite de débit atteinte ; en-tête `Retry-After` en secondes |
 | 500 | `storage_failed` | écriture impossible ; la transaction a été annulée |
@@ -159,11 +184,23 @@ WordPress (qui renvoie à toute origine l'origine demandeuse) :
 - origine absente ou inconnue → aucun en-tête `Access-Control-*` ;
 - jamais `*`, même via le filtre.
 
-Liste par défaut : `http://localhost:5180`, `https://jonathan-lanationduweb.github.io`,
+Liste par défaut : `https://jonathan-lanationduweb.github.io`,
 `https://pose-parquet.com`, `https://www.pose-parquet.com`. Remplaçable par la
 constante `POSE_PARQUET_ALLOWED_ORIGINS` (tableau, `wp-config.php`), ajustable
 par le filtre `pose_parquet_allowed_origins`. Preflight `OPTIONS` testé en
 HTTP réel (`tests/run-http.php`).
+
+Le poste de développement (`http://localhost:5180`, `http://127.0.0.1:5180`)
+n'est **pas** dans cette liste : il l'était, et se trouvait donc autorisé sur
+toute installation déployée sans la constante. Ces deux origines s'ajoutent
+quand le site se déclare de développement — `define( 'WP_ENVIRONMENT_TYPE',
+'local' )` dans son `wp-config.php`, ou `POSE_PARQUET_ALLOWED_ORIGINS` qui les
+liste explicitement.
+
+Ces en-têtes ne valent que parce que `POST /projects` exige
+`application/json` : sans cette exigence, un site tiers postait le même corps
+en `text/plain`, un type pour lequel le navigateur n'envoie aucun préflight —
+la réponse lui était illisible, mais la demande était créée. Voir le 415.
 
 ## Routes prévues
 

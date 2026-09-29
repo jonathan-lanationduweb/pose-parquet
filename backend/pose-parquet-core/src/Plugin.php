@@ -17,10 +17,11 @@ use PoseParquet\Core\Admin\Actions;
 use PoseParquet\Core\Admin\Menu;
 use PoseParquet\Core\Admin\Settings;
 use PoseParquet\Core\Database\Installer;
+use PoseParquet\Core\Mail\Queue;
 use PoseParquet\Core\Rest\Cors;
 use PoseParquet\Core\Rest\Routes;
 use PoseParquet\Core\Security\Capabilities;
-use PoseParquet\Core\Security\Roles;
+use PoseParquet\Core\Security\Hardening;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -40,15 +41,39 @@ final class Plugin {
 		 */
 		Installer::maybe_upgrade();
 
-		// Les droits doivent exister avant que l'admin ou le REST ne les testent.
-		Capabilities::ensure();
-		// Le rôle gestionnaire, pour la même raison : il vit en base et peut avoir
-		// été effacé par un plugin de gestion de rôles ou une restauration.
-		Roles::ensure();
+		/*
+		 * Droits et rôle : posés une fois, pas à chaque requête.
+		 *
+		 * Ils l'étaient auparavant à chaque chargement, au nom de
+		 * l'auto-réparation. Le prix était caché et réel : un administrateur qui
+		 * retirait volontairement `pp_manage_projects` au rôle gestionnaire le
+		 * voyait revenir à la requête suivante, sans message ni trace. Une
+		 * décision d'administration ne doit pas être défaite par le code qu'elle
+		 * administre. La pose est donc versionnée, comme le schéma de base : elle
+		 * ne rejoue qu'à l'activation, à la migration, ou quand le plancher de
+		 * droits change dans le code.
+		 *
+		 * L'auto-réparation n'est pas perdue, elle devient explicite : la page
+		 * « État » montre chaque droit manquant et propose de les réappliquer.
+		 */
+		Capabilities::ensure_once();
+
+		// Ce que WordPress expose de lui-même et dont ce site n'a pas l'usage.
+		Hardening::register();
 
 		add_action( 'rest_api_init', [ Routes::class, 'register' ] );
 		// Liste fermée d'origines pour notre espace REST, à la place du CORS permissif de WordPress.
 		Cors::register();
+
+		/*
+		 * La file des notifications, branchée sur toutes les requêtes.
+		 *
+		 * Pas seulement en administration : c'est wp-cron.php qui déclenchera
+		 * le hook, et wp-cron.php n'est ni un écran d'admin ni une route REST.
+		 * Le coût d'un `add_action` sur une requête publique est nul tant que
+		 * l'événement ne se produit pas.
+		 */
+		Queue::register();
 
 		if ( is_admin() ) {
 			Menu::register();
@@ -69,8 +94,14 @@ final class Plugin {
 	 * Ni tables, ni options, ni droits ne sont retirés. Un site qui désactive le
 	 * plugin pour diagnostiquer un conflit doit le retrouver intact en le
 	 * réactivant. Voir uninstall.php pour la suppression, elle aussi prudente.
+	 *
+	 * Une seule chose est retirée, et elle n'est pas de la donnée : les
+	 * événements planifiés. Plus personne n'écoute leur hook une fois le
+	 * plugin désactivé ; les laisser encombrerait le cron du site d'entrées
+	 * qui n'enverraient rien. Les états `pending` en base, eux, restent — ils
+	 * disent la vérité, et une réactivation les reprendra.
 	 */
 	public static function deactivate(): void {
-		// Volontairement vide, et documenté comme tel.
+		Queue::purger();
 	}
 }
