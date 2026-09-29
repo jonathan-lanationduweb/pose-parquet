@@ -74,6 +74,33 @@ le serveur local, Apache l'exécutait au lieu d'en servir la source, ce qui a
 masqué le problème ; sur un serveur ordinaire, elle rend le mot de passe de la
 base en clair.
 
+### Ce qu'on livre, et ce qu'on ne livre pas
+
+Relevé du 28/09/2026 sur l'installation locale :
+
+```
+/wp-content/plugins/pose-parquet-core/readme.md            200   11 422 o
+/wp-content/plugins/pose-parquet-core/tests/run-http.php   200   exécuté,
+                                                           chemin absolu divulgué
+```
+
+Les règles ci-dessus les ferment désormais (403). Mais fermer une porte est
+une seconde barrière : **ce qui n'est pas livré n'a pas de porte.** Le paquet
+de production se construit avec
+
+```
+bash backend/deploy/faire-paquet.sh
+```
+
+qui recopie le code qui tourne — `pose-parquet-core.php`, `uninstall.php`,
+`src/`, `templates/`, `assets/` — et laisse au dépôt `tests/`, `readme.md` et
+l'outillage. Le script échoue s'il trouve un fichier indésirable dans le
+paquet, et échoue aussi s'il manque un fichier indispensable : un paquet
+propre et inutilisable serait un progrès discutable.
+
+Les 812 vérifications restent exécutables depuis le dépôt, qui est leur place.
+Elles n'ont jamais eu besoin d'être sur le serveur.
+
 ## 3. En-têtes de sécurité
 
 À poser sur l'hébergement du backend **et** sur celui du site public. Aucun
@@ -158,13 +185,62 @@ fournisseur sans toucher au code métier.
 Tant que ces sept points ne sont pas tous vérifiés, **le SMTP de production
 n'est pas fonctionnel**, quoi qu'en dise n'importe quel écran.
 
+### Les emails ne partent pas pendant la requête — un cron est donc **obligatoire**
+
+Mesuré le 28/09/2026 : une soumission réelle prenait **5 007 ms** dans le
+navigateur, dont **4 300 ms** côté serveur. L'écriture en base en consommait
+une trentaine ; tout le reste était deux `wp_mail()` qui échouaient au bout de
+~2,1 s chacun, faute de SMTP joignable. Le visiteur attendait quatre secondes
+des emails qui ne partaient pas.
+
+Les notifications sont donc **mises en file** (`Mail\Queue`) et envoyées par
+l'ordonnanceur. Après correction, la même soumission : **64 à 76 ms** côté
+serveur.
+
+Cela déplace une responsabilité vers l'hébergement, et il faut la prendre :
+
+```
+# wp-config.php — l'ordonnanceur ne doit pas dépendre du trafic
+define( 'DISABLE_WP_CRON', true );
+```
+
+```cron
+# crontab — une fois par minute
+* * * * * curl -fsS https://admin.exemple.fr/wp-cron.php?doing_wp_cron >/dev/null 2>&1
+```
+
+**Sans ce cron, la file ne se vide jamais et aucune notification ne part.**
+C'est le seul point où la correction a un coût, et il est explicite : l'écran
+*Pose Parquet → État* affiche le nombre d'événements planifiés, le nombre déjà
+dû et l'état de `DISABLE_WP_CRON`. Une file qui grossit sans se vider s'y voit
+en un coup d'œil, et un bouton « Traiter la file maintenant » permet de la
+débloquer à la main.
+
+Réessais : quatre tentatives par envoi, espacées de 0 s, 5 min, 30 min puis
+2 h. Au-delà, l'état passe à `failed` et l'écran État affiche une alerte avec
+un lien vers les demandes concernées — **un lead ne peut pas être perdu en
+silence**. Une adresse de réception absente n'est pas réessayée : elle ne
+deviendra pas valide en cinq minutes.
+
+Un envoi déjà `sent` ne repart jamais, quel que soit le nombre de fois où
+l'événement est rejoué : la garantie repose sur la colonne d'état, pas sur la
+file.
+
 ### Comportement local, et pourquoi il est acceptable
 
 Sur WAMP, `sendmail_path` est vide et aucun serveur n'écoute sur le port 25 :
 `wp_mail()` rend `false`. Le plugin enregistre alors `failed` dans les colonnes
-d'état et écrit une ligne de journal **sans aucune donnée personnelle** — et il
-ne défait jamais la demande. Une demande reçue et non notifiée reste une
-demande reçue. C'est le comportement voulu, et il est couvert par les tests.
+d'état après la dernière tentative, et écrit une ligne de journal **sans
+aucune donnée personnelle** — et il ne défait jamais la demande. Une demande
+reçue et non notifiée reste une demande reçue. C'est le comportement voulu, et
+il est couvert par les tests.
+
+`DISABLE_WP_CRON` vaut `true` en local aussi, et on ne le réactive pas : la
+file s'y vide à la main, par le bouton de l'écran État ou par
+
+```
+php backend/tools/traiter-file-mail.php C:/wamp64/www/pose-parquet-dev
+```
 
 ## 5. Rétention des demandes
 

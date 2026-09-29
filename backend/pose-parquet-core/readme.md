@@ -8,7 +8,7 @@ HTML/CSS/JS appelle. Le front reste dans le dépôt, indépendant, déployé à 
 front (statique)  →  REST /wp-json/pose-parquet/v1/…  →  ce plugin  →  tables pp_*
 ```
 
-## Ce que contient la version 0.4.2
+## Ce que contient la version 0.5.0
 
 Fondation (0.1.0) :
 
@@ -84,6 +84,36 @@ Libellés du Visualiseur (0.4.1) — **schéma inchangé (3)** :
   120 caractères par chaîne et par nom de champ, trois niveaux d'imbrication,
   `sanitize_text_field()` sur chaque valeur et chaque clé. Ce qui dépasse est
   refusé en 422 plutôt que tronqué en silence — le plafond de 4 Ko reste ;
+- aucune migration, aucune demande existante modifiée.
+
+Notifications différées (0.5.0) — **schéma inchangé (3)** :
+
+- les deux emails d'une demande ne partent plus **pendant** la requête : ils
+  sont **mis en file** (`Mail\Queue`) et envoyés par l'ordonnanceur. Mesuré le
+  28/09/2026 sur une soumission réelle : **4 300 ms côté serveur avant, 64 à
+  76 ms après**. Les 4,2 s manquantes étaient deux `wp_mail()` qui expiraient
+  faute de SMTP joignable — le visiteur attendait quatre secondes des emails
+  qui ne partaient pas ;
+- la réponse rend désormais `pending` et non `sent` : elle ne promet rien
+  qu'elle ne sache. Les états deviennent `sent`, `failed` ou `skipped` quand
+  l'envoi a réellement été tenté ;
+- **quatre tentatives** par envoi, espacées de 0 s, 5 min, 30 min puis 2 h. Le
+  numéro de tentative voyage dans les arguments de l'événement planifié :
+  aucune colonne ajoutée, aucune migration. Une adresse de réception absente
+  n'est pas réessayée, elle ne deviendra pas valide en cinq minutes ;
+- **un envoi déjà parti ne repart jamais**, quel que soit le nombre de fois où
+  l'événement est rejoué. La garantie repose sur la colonne d'état, pas sur la
+  file ; un verrou MySQL nommé empêche en plus deux exécutions simultanées ;
+- *Pose Parquet → État* affiche la file (planifiés, dûs, état de
+  `DISABLE_WP_CRON`), une **alerte** dès qu'une notification a définitivement
+  échoué, un lien vers les demandes concernées et un bouton « Traiter la file
+  maintenant » ;
+- la liste des demandes accepte `?mail=failed` et `?mail=pending`, et dit
+  qu'elle est filtrée ;
+- **un cron système devient obligatoire en production.** Sans lui, la file ne
+  se vide jamais. Voir `docs/backend/production.md` § 4 ;
+- en local, `php backend/tools/traiter-file-mail.php <racine>` vide la file à
+  la main. `DISABLE_WP_CRON` n'est pas réactivé en douce ;
 - aucune migration, aucune demande existante modifiée.
 
 Correctifs de sécurité (0.4.2) — **schéma inchangé (3)** :
