@@ -25,6 +25,7 @@
 import { buildTexture, buildMips, etendreMips, TILE, TILE_METERS } from './texture.js';
 import { reliefFromAlbedo } from './relief.js';
 import { chrono } from '../utils/perf.js';
+import { motifEffectif } from './motifs-regles.js';
 
 /** Rugosité de référence par finition : ce qui distingue mat, satiné, verni. */
 const FINISH = {
@@ -106,8 +107,16 @@ const cache = new Map();
 const MAX_CACHE = 12;
 /** Niveaux de la pyramide attendus par le moteur logiciel. */
 const NIVEAUX = 5;
+/*
+ * La cle porte le motif EFFECTIF, pas celui demande.
+ *
+ * Sans cela, demander un motif que la reference n'accepte pas creerait une
+ * entree de cache distincte pour une tuile identique a celle du motif par
+ * defaut : deux cles, un seul contenu, et deux secondes de dessin payees
+ * deux fois. Voir js/scene/motifs-regles.js.
+ */
 const key = (material, config) =>
-  `${material.id}|${config.pattern}|${config.width || 'auto'}|${config.plankLength || 'auto'}`;
+  `${material.id}|${motifEffectif(material, config.pattern)}|${config.width || 'auto'}|${config.plankLength || 'auto'}`;
 
 /**
  * Ébauche : la même tuile, en 320 px, livrée avant la définitive.
@@ -314,7 +323,7 @@ export function materialMapsAsync(material, config = {}) {
    * ferait attendre l'ébauche derrière deux secondes de dessin, c'est-à-dire
    * exactement l'attente qu'elle est censée supprimer.
    */
-  if (MOTIFS_LENTS.has(config.pattern || material.defaultPattern)) {
+  if (MOTIFS_LENTS.has(motifEffectif(material, config.pattern))) {
     posterTuile(w, material, config, true);
   }
   return posterTuile(w, material, config, false);
@@ -343,7 +352,7 @@ function posterTuile(w, material, config, ebauche) {
     id,
     material: JSON.parse(JSON.stringify(material)),
     config: {
-      pattern: config.pattern || material.defaultPattern,
+      pattern: motifEffectif(material, config.pattern),
       width: config.width || null,
       size: ebauche ? EBAUCHE : undefined,
     },
@@ -425,7 +434,7 @@ export function materialMaps(material, config = {}) {
   // quoi on court-circuiterait le choix de largeur propre au motif (une lame
   // droite de 18 cm, un chevron de 9 cm).
   const tile = chrono('texture.tuile', () => buildTexture(material, {
-    pattern: config.pattern || material.defaultPattern,
+    pattern: motifEffectif(material, config.pattern),
     width: config.width || null,
   }));
   // Niveau 0 seulement : les réductions ne servent qu'au moteur logiciel, et
