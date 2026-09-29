@@ -14,6 +14,8 @@
  */
 const { SITE, layout, appLayout, breadcrumb } = require('./layout');
 const { NB_PIECES_LETTRES } = require('./scenes');
+const { NB_PARQUETS, NB_MOTIFS, NB_DEMONSTRATION, NB_REELS, enLettres } = require('./catalogue');
+const { MAX_VERSIONS } = require('../js/studio/app.js');
 /** « cinq » devient « Cinq » : ce nombre ouvre une phrase. */
 const MAJ_PIECES = NB_PIECES_LETTRES.charAt(0).toUpperCase() + NB_PIECES_LETTRES.slice(1);
 const { faq, faqJsonLd, tip } = require('./ui');
@@ -74,11 +76,22 @@ function buildVisualiseurPage(write) {
     },
     {
       q: 'Les parquets proposés existent-ils vraiment ?',
-      a: "Ce sont douze références de démonstration. Chacune a son propre veinage, ses nœuds, son contraste et sa largeur de lame, mais elles ne correspondent pas à un produit commercial précis. Le visualiseur sert à choisir une direction — une teinte, un motif, un sens de pose — pas à valider une commande.",
+      /*
+       * Cette réponse disait « douze références de démonstration » alors que
+       * le catalogue en compte vingt-six, dont quatorze relevées sur des
+       * fiches produit réelles. Fausse sur le nombre et sur la nature — et
+       * reprise telle quelle dans les données structurées FAQPage, donc
+       * susceptible d'être citée par un moteur de recherche.
+       *
+       * Les deux moitiés sont maintenant comptées séparément, et la réserve
+       * qui compte — le rendu approche la teinte, il ne remplace pas un
+       * échantillon — est dite pour les deux.
+       */
+      a: `Les deux à la fois, et la distinction vaut d’être connue : ${NB_DEMONSTRATION} sont des références de démonstration, calculées par le moteur, qui ne correspondent à aucun produit commercial précis ; ${NB_REELS} sont relevées sur des fiches produit réelles et renvoient vers elles. Dans les deux cas le rendu approche la teinte et le veinage : il sert à choisir une direction — une teinte, un motif, un sens de pose — pas à valider une commande sans avoir vu un échantillon.`,
     },
     {
       q: 'Puis-je comparer plusieurs parquets ?',
-      a: "Oui. Vous enregistrez jusqu'à trois versions, puis vous les comparez sur la même photo, au même cadrage : au curseur pour deux, en vues côte à côte pour trois. Un bouton permet de repartir de celle que vous préférez.",
+      a: `Oui. Vous enregistrez jusqu'à ${enLettres(MAX_VERSIONS)} versions, puis vous les comparez sur la même photo, au même cadrage : au curseur pour deux, en vues côte à côte au-delà. Un bouton permet de repartir de celle que vous préférez.`,
     },
     {
       q: 'Pourquoi le parquet suit-il la perspective ?',
@@ -95,12 +108,12 @@ function buildVisualiseurPage(write) {
     {
       num: '(02)',
       title: 'Essayez les parquets',
-      text: 'Douze références, chacune avec son veinage et sa largeur de lame. Un clic, tout le sol change.',
+      text: `${NB_PARQUETS} références, chacune avec son veinage et sa largeur de lame. Un clic, tout le sol change.`,
     },
     {
       num: '(03)',
       title: 'Comparez',
-      text: 'Enregistrez jusqu’à trois versions et regardez-les côte à côte, sur la même photo.',
+      text: `Enregistrez jusqu’à ${enLettres(MAX_VERSIONS)} versions et regardez-les côte à côte, sur la même photo.`,
     },
   ];
 
@@ -116,8 +129,8 @@ function buildVisualiseurPage(write) {
               <a class="link-arrow" href="simulateur-pose.html">Étudier le sens de pose ${ICON.arrow}</a>
             </div>
             <ul class="landing-hero__facts">
-              <li><b>12</b> parquets de démonstration</li>
-              <li><b>3</b> motifs</li>
+              <li><b>${NB_PARQUETS}</b> parquets à essayer</li>
+              <li><b>${NB_MOTIFS}</b> motifs</li>
               <li><b>0</b> envoi de photo</li>
             </ul>
           </div>
