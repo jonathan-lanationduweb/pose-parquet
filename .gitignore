@@ -7,6 +7,11 @@ desktop.ini
 .vscode/
 .idea/
 .claude/
+# Kilo pose ici un arbre de travail Git complet (~35 Mo) : c'est son espace,
+# pas le notre. Il n'etait pas suivi — un worktree ne l'est jamais — mais rien
+# ne l'ignorait non plus, et le jour ou l'enregistrement du worktree disparait,
+# un `git add -A` emporterait tout le dossier.
+.kilo/
 *.swp
 _calibrage/_candidates/
 

@@ -14,6 +14,7 @@ const { buildVisualiseurPage } = require('./visualiseur');
 const { resolveSources } = require('./sources');
 const { NB_PIECES, PIECES } = require('./scenes');
 const { buildAssets, verifierRattachements } = require('./assets');
+const { exclusions } = require('./arborescence');
 const { ecrireTexte } = require('./eol');
 const { picture } = require('./responsive');
 
@@ -1485,11 +1486,12 @@ ecrireSignature();
  * construction : mieux vaut ne rien publier qu'une page dont le composant
  * principal est sans style.
  */
+const horsParcours = exclusions(['assets', 'backend', 'docs', 'design', 'components']);
 const pagesEcrites = (function lister(dossier, prefixe) {
   const out = [];
   for (const entree of fs.readdirSync(dossier, { withFileTypes: true })) {
     if (entree.isDirectory()) {
-      if (['assets', 'node_modules', '.git', '_generator', '_calibrage', 'backend', 'docs', 'design', 'components'].includes(entree.name)) continue;
+      if (horsParcours(entree.name)) continue;
       out.push(...lister(path.join(dossier, entree.name), `${prefixe}${entree.name}/`));
     } else if (entree.name.endsWith('.html')) {
       out.push(`${prefixe}${entree.name}`);

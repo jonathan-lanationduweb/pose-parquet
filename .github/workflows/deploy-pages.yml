@@ -59,6 +59,12 @@ jobs:
           mkdir _site
           # Ce qui est publié est le SITE, et rien d'autre.
           #
+          # `.kilo/` n'a jamais pu suivre — c'est un arbre de travail Git, que
+          # `checkout` ne restitue pas. Il est exclu et contrôlé quand même :
+          # une exclusion ne coûte rien, et un artefact fabriqué ailleurs qu'ici
+          # (rsync depuis un poste, par exemple) emporterait 35 Mo d'une vieille
+          # copie du site.
+          #
           # Étaient publiés jusqu'ici, sans que ce soit voulu : docs/ (348 Ko de
           # documentation interne, dont l'architecture de sécurité et les seuils
           # d'anti-spam), design/, .claude/, .vscode/ et le README. Aucune page
@@ -87,6 +93,7 @@ jobs:
                 --exclude '.github' \
                 --exclude '.claude' \
                 --exclude '.vscode' \
+                --exclude '.kilo' \
                 --exclude '_generator' \
                 --exclude '_calibrage' \
                 --exclude '_site' \
@@ -107,7 +114,7 @@ jobs:
         run: |
           # Une exclusion oubliée ne doit pas se découvrir en production.
           fuites=0
-          for interdit in docs design backend _generator _calibrage .claude .vscode README.md js css components; do
+          for interdit in docs design backend _generator _calibrage .claude .vscode .kilo README.md js css components; do
             if [ -e "_site/$interdit" ]; then
               echo "::error::_site/$interdit ne devrait pas être publié"
               fuites=$((fuites + 1))

@@ -18,17 +18,21 @@
 const fs = require('fs');
 const path = require('path');
 
+const { exclusions } = require('./arborescence');
+
 const RACINE = path.resolve(__dirname, '..');
-/** Dossiers qui ne sont pas du site publié. */
-const IGNORES = new Set(['node_modules', '.git', '_generator', '_calibrage', 'assets', 'docs', 'data', 'js', 'css']);
+/** Dossiers qui ne sont pas du site publié : le plancher commun, plus les
+    dossiers de ressources où aucune page ne vit. */
+const IGNORES = exclusions(['assets', 'docs', 'data', 'js', 'css']);
 
 function pagesHtml(dossier = RACINE, trouvees = []) {
   for (const nom of fs.readdirSync(dossier)) {
-    if (IGNORES.has(nom)) continue;
     const complet = path.join(dossier, nom);
     const stat = fs.statSync(complet);
-    if (stat.isDirectory()) pagesHtml(complet, trouvees);
-    else if (nom.endsWith('.html')) trouvees.push(complet);
+    if (stat.isDirectory()) {
+      if (IGNORES(nom)) continue;
+      pagesHtml(complet, trouvees);
+    } else if (nom.endsWith('.html')) trouvees.push(complet);
   }
   return trouvees;
 }
