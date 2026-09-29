@@ -2,6 +2,23 @@
 const { SITE } = require('./layout');
 const { picture } = require('./responsive');
 const { NB_PIECES, scene } = require('./scenes');
+const { NB_PARQUETS, NB_MOTIFS, enLettres } = require('./catalogue');
+const { GUIDES } = require('./content-guides');
+const { MOTIFS } = require('./content-motifs');
+
+/*
+ * Les chiffres de cette page ne sont plus écrits à la main.
+ *
+ * Chacun d'eux décrivait une donnée technique — combien de pièces, de
+ * parquets, de motifs, de guides — et chacun se périmait en silence dès que
+ * la donnée bougeait. Deux l'avaient déjà fait : « dix pièces d'exemple »
+ * quand le Studio en proposait neuf, « douze parquets » quand le tiroir en
+ * présentait vingt-six.
+ *
+ * Ils viennent donc tous de la source qui les détermine, et `check-chiffres`
+ * échoue si un nombre réapparaît en dur dans une de ces phrases.
+ */
+const NB_MOTIFS_PLAN = require('../js/tools/patterns.js').PATTERNS.length;
 
 const ICON = {
   arrow:
@@ -51,7 +68,13 @@ const TILES = [
   {
     num: '(03)',
     title: 'Je choisis mon motif',
-    text: 'Droite, diagonale, Point de Hongrie, bâton rompu : six écritures au sol.',
+    /*
+     * L'énumération donnait quatre motifs puis annonçait « six », et le
+     * lecteur y voyait une faute. Les deux étaient pourtant justes : quatre
+     * exemples, six fiches derrière le lien. Les points de suspension disent
+     * que la liste est ouverte, et le nombre vient désormais des fiches.
+     */
+    text: `Droite, diagonale, Point de Hongrie, bâton rompu… ${enLettres(MOTIFS.length)} écritures au sol.`,
     href: 'motifs/',
     tone: 'slate',
     media: 'tile-motif',
@@ -100,8 +123,8 @@ function heroSection() {
               </div>
             </div>
             <ul class="hero__meta">
-              <li><b>5</b> motifs simulés</li>
-              <li><b>8</b> guides pratiques</li>
+              <li><b>${NB_MOTIFS_PLAN}</b> motifs simulés</li>
+              <li><b>${GUIDES.length}</b> guides pratiques</li>
               <li><b>${NB_PIECES}</b> pièces d’exemple</li>
             </ul>
           </div>
@@ -433,12 +456,12 @@ function toolsSection() {
           <div class="grid grid--3">
             <div class="tool-card" data-reveal>
               <div class="tool-card__head"><h3>Visualiser ma pièce</h3><span class="badge badge--sage">Nouveau</span></div>
-              <p>Douze parquets, trois motifs, votre photo. Le sol change à chaque clic.</p>
+              <p>${NB_PARQUETS} parquets, ${enLettres(NB_MOTIFS)} motifs, votre photo. Le sol change à chaque clic.</p>
               <a class="btn btn--sm" href="outils/studio.html"><span>Ouvrir</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
             </div>
             <div class="tool-card" data-reveal data-reveal-delay="70">
               <div class="tool-card__head"><h3>Mode plan</h3><span class="badge badge--sage">Disponible</span></div>
-              <p>Cinq motifs, vos dimensions, la lumière au bon endroit.</p>
+              <p>${enLettres(NB_MOTIFS_PLAN).replace(/^./, (c) => c.toUpperCase())} motifs, vos dimensions, la lumière au bon endroit.</p>
               <a class="btn btn--sm btn--ghost" href="outils/simulateur-pose.html"><span>Ouvrir</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
             </div>
             <div class="tool-card tool-card--soon" data-reveal data-reveal-delay="140">

@@ -13,6 +13,10 @@ const { buildHomeBody } = require('./home');
 const { buildVisualiseurPage } = require('./visualiseur');
 const { resolveSources } = require('./sources');
 const { NB_PIECES, PIECES } = require('./scenes');
+const { NB_PARQUETS, enLettres } = require('./catalogue');
+const { MAX_VERSIONS } = require('../js/studio/app.js');
+/* Les motifs du Mode Plan viennent de la liste que l'outil lui-même déroule. */
+const NB_MOTIFS_PLAN = require('../js/tools/patterns.js').PATTERNS.length;
 const { buildAssets, verifierRattachements } = require('./assets');
 const { exclusions } = require('./arborescence');
 const { ecrireTexte } = require('./eol');
@@ -834,9 +838,9 @@ function buildTools() {
               <h2 class="tool-block__title">Visualiseur Parquet</h2>
               <p class="lead">Une application dédiée : votre pièce occupe l’écran, le catalogue se range sur le côté, et le sol change à chaque clic. Une photo peut contenir plusieurs sols visibles — le parquet choisi les change tous.</p>
               <ul class="tool-block__points">
-                <li>Douze parquets de démonstration, chacun avec son veinage et sa largeur de lame.</li>
+                <li>${NB_PARQUETS} parquets à essayer, chacun avec son veinage et sa largeur de lame.</li>
                 <li>Le pinceau garde vos meubles, vos tapis et vos plinthes visibles.</li>
-                <li>Jusqu’à trois versions enregistrées, comparées sur la même photo.</li>
+                <li>Jusqu’à ${enLettres(MAX_VERSIONS)} versions enregistrées, comparées sur la même photo.</li>
                 <li>Tout est calculé dans le navigateur : la photo n’est ni envoyée ni conservée.</li>
               </ul>
               <div class="cluster">
@@ -1116,7 +1120,7 @@ function buildApropos() {
               ${picture('apropos-studio', { base: '../', alt: 'Comparaison d’échantillons de bois et de matières sur un plan de travail', sizes: '(min-width: 60rem) 45rem, 94vw', attrs: 'class="aside-image"' })}
               <div class="figures">
                 <div class="figure-item"><strong>${GUIDES.length + MOTIFS.length + TUTOS.length}</strong><span>contenus publiés</span></div>
-                <div class="figure-item"><strong>5</strong><span>motifs simulés</span></div>
+                <div class="figure-item"><strong>${NB_MOTIFS_PLAN}</strong><span>motifs simulés</span></div>
                 <div class="figure-item"><strong>${NB_PIECES}</strong><span>pièces d’exemple</span></div>
               </div>
             </div>

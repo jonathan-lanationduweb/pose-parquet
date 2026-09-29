@@ -67,6 +67,20 @@ const ICONS = {
 
 const STORAGE = 'pose-parquet:studio';
 
+/**
+ * Combien de versions on garde côte à côte.
+ *
+ * Exporté, et pas seulement écrit deux fois plus bas, parce que trois pages
+ * l’annoncent en toutes lettres — « jusqu’à trois versions enregistrées ». Le
+ * générateur lit cette constante pour écrire ces phrases : le jour où la
+ * limite change, le texte change avec elle. Une promesse et son
+ * implémentation ne devraient jamais être deux nombres différents.
+ *
+ * Trois est une contrainte d’affichage, pas de moteur : au-delà, la
+ * comparaison côte à côte devient illisible sur un téléphone.
+ */
+export const MAX_VERSIONS = 3;
+
 export async function mountStudio(root) {
   const base = root.dataset.base || '../';
 
