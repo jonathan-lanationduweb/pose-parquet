@@ -15,6 +15,7 @@ import { lireJson } from '../scene/product.js';
 import { createMaterial } from '../scene/material.js';
 import { loadProducts, toMaterial } from '../scene/product.js';
 import { echapper } from '../utils/dom.js';
+import { avertir } from '../utils/diagnostic.js';
 
 /**
  * Charge le catalogue en passant par la **couche produit**.
@@ -43,10 +44,17 @@ export async function loadCatalog(base = '') {
 
   const incomplets = products.filter((f) => f.warnings.length);
   if (incomplets.length) {
-    // Une fiche incomplète ne doit pas faire tomber la page, mais elle ne doit
-    // pas passer inaperçue non plus : le jour où le catalogue vient d'un ERP,
-    // c'est ici qu'on verra les trous.
-    console.warn(
+    /*
+     * Une fiche incomplète ne doit pas faire tomber la page, mais elle ne doit
+     * pas passer inaperçue non plus : le jour où le catalogue vient d'un ERP,
+     * c'est ici qu'on verra les trous.
+     *
+     * En diagnostic seulement, depuis le 28/09/2026 : ce message nommait une
+     * référence interne et le détail d'une règle de validation dans la console
+     * de chaque visiteur. Il s'adresse à qui peut corriger la donnée, pas à
+     * qui regarde un parquet.
+     */
+    avertir(
       '[catalogue] fiches incomplètes :',
       incomplets.map((f) => `${f.id} (${f.warnings.join(', ')})`).join(' · ')
     );

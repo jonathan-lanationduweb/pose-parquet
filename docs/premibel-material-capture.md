@@ -3,7 +3,7 @@
 Ce document dit **ce qu'il faut photographier et comment**, pour qu'une
 référence passe de `approximate` à `ready`.
 
-Aujourd'hui, aucune des 14 références pilotes n'a de matière réelle : toutes
+Aujourd'hui, aucune des 15 références pilotes n'a de matière réelle : toutes
 sont rendues par une famille de démonstration. Le rendu est donc **indicatif**,
 et le visualiseur le dit.
 
