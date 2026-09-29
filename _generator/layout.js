@@ -1,5 +1,14 @@
 /* Gabarit HTML commun : head, header, footer. Génère des fichiers statiques. */
 const { assets } = require('./assets');
+const { aPrecharger } = require('./polices');
+
+/*
+ * Les deux polices prechargees, lues dans css/fonts.css au lieu d'etre
+ * nommees ici. Un renommage de fichier ne peut plus laisser un <link
+ * rel="preload"> pointer dans le vide. Voir _generator/polices.js.
+ */
+const POLICE_TITRE = aPrecharger('Instrument Serif');
+const POLICE_TEXTE = aPrecharger('Inter');
 const SITE = {
   name: 'Pose Parquet',
   domain: 'https://pose-parquet.com',
@@ -234,8 +243,8 @@ function layout(page) {
     <link rel="icon" href="${p}assets/icons/favicon-16.png?v=${build.icons}" sizes="16x16" type="image/png" />
     <link rel="apple-touch-icon" href="${p}assets/icons/apple-touch-icon.png?v=${build.icons}" />
     <link rel="manifest" href="${p}site.webmanifest?v=${build.icons}" />
-    <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/instrument-serif-400-3.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/inter-400-1.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/${POLICE_TITRE}" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/${POLICE_TEXTE}" crossorigin />
     <link rel="stylesheet" href="${p}${build.css}" />${
       /*
        * Feuilles rattachées par marqueur.
@@ -317,7 +326,7 @@ function appLayout(page) {
     <link rel="icon" href="${p}assets/icons/favicon-16.png?v=${build.icons}" sizes="16x16" type="image/png" />
     <link rel="apple-touch-icon" href="${p}assets/icons/apple-touch-icon.png?v=${build.icons}" />
     <link rel="manifest" href="${p}site.webmanifest?v=${build.icons}" />
-    <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/inter-400-1.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/${POLICE_TEXTE}" crossorigin />
     <link rel="preload" as="fetch" href="${p}data/parquets.json" crossorigin />
     <link rel="stylesheet" href="${p}${css}" />
     <script type="module" src="${p}${js}"></script>
