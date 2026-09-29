@@ -1,42 +1,87 @@
-# Générateur de pages (optionnel)
+# Générateur de pages
 
-Le site livré est **du HTML statique pur** : il fonctionne et se modifie
-directement, sans outil.
-
-Ce dossier contient le petit générateur Node (zéro dépendance) qui a produit ces
-pages. Il évite de répéter à la main l'en-tête, le pied de page, le fil d'Ariane
-et les balises SEO sur 29 pages.
-
-## Quand l'utiliser
-
-- Ajouter un guide, un motif ou un tutoriel.
-- Modifier la navigation, le pied de page ou les balises communes.
-- Régénérer les visuels SVG placeholders.
-
-## Comment
+Le site est **généré**. Ce dossier contient le générateur Node (zéro
+dépendance) qui produit les 32 pages, leurs visuels, `sitemap.xml`,
+`data/contenus.json`, et surtout les **assets empreintés** de `assets/dist/`.
 
 ```bash
 node _generator/build.js
 ```
 
-Le script réécrit les fichiers HTML, les visuels de `assets/images/`,
-`data/contenus.json`, `sitemap.xml` et `robots.txt`.
-Il ne touche **jamais** à `css/`, `js/`, `components/` ni `serve.js`.
+Ce n'est pas un confort. Les pages chargent leurs scripts et leurs feuilles
+depuis `assets/dist/<empreinte>/`, pas depuis `js/` et `css/` : **modifier une
+source sans reconstruire ne change rien à ce que le navigateur exécute.**
+`check-studio-api.js` et `check-reproducible.js` le vérifient chacun à leur
+manière.
 
-## Fichiers
+Le script réécrit les fichiers HTML, les visuels de `assets/images/`,
+`data/contenus.json`, `sitemap.xml` et `assets/dist/`. Il ne touche jamais aux
+sources `css/`, `js/`, `components/` ni à `serve.js`.
+
+## Quand l'utiliser
+
+- Après toute modification de `css/`, `js/` ou `components/` — sans quoi elle
+  n'atteint pas le navigateur.
+- Ajouter un guide, un motif ou un tutoriel.
+- Modifier la navigation, le pied de page ou les balises communes.
+- Régénérer les visuels SVG.
+
+## Les modules
+
+### Assemblage
 
 | Fichier | Rôle |
 | --- | --- |
-| `build.js` | Assemblage des pages, listes, accueil, sitemap |
-| `layout.js` | Gabarit HTML commun : `<head>`, en-tête, pied de page, fil d'Ariane |
-| `ui.js` | Fragments éditoriaux : encadrés, tableaux, étapes, FAQ, avant/après |
-| `content-guides.js` | Contenu des 8 guides |
-| `content-motifs.js` | Contenu des 6 fiches motif |
-| `content-tutos.js` | Contenu des 3 tutoriels |
-| `images.js` | Génération des visuels SVG placeholders |
-| `eol.js` | Fins de ligne, types texte/binaire, empreintes — voir ci-dessous |
-| `check-reproducible.js` | Contrôle que le build est reproductible entre systèmes |
-| `check-studio-api.js` | Contrôle le contrat de pilotage `window.__studio` — voir ci-dessous |
+| `build.js` | assemblage des pages, listes, sitemap ; point d'entrée |
+| `layout.js` | gabarit HTML commun : `<head>`, en-tête, pied de page, fil d'Ariane |
+| `home.js` | composition de la page d'accueil |
+| `visualiseur.js` | les deux pages du Visualiseur : présentation et application |
+| `ui.js` | fragments éditoriaux : encadrés, tableaux, étapes, FAQ, avant/après |
+| `assets.js` | chaîne d'assets : un seul CSS, un seul arbre JS, et une empreinte qui change avec le contenu |
+| `arborescence.js` | ce qui, à la racine du dépôt, n'est jamais une page du site |
+| `eol.js` | fins de ligne, types texte/binaire, empreintes — voir plus bas |
+
+### Contenu
+
+| Fichier | Rôle |
+| --- | --- |
+| `content-guides.js` | contenu des 8 guides |
+| `content-motifs.js` | contenu des 6 fiches motif |
+| `content-tutos.js` | contenu des 3 tutoriels |
+| `sources.js` | références citées en bas d'article |
+| `photos.js` | photographies du site et leurs crédits |
+| `scenes.js` | les pièces d'exemple réellement proposées, avec la règle du front |
+| `catalogue.js` | combien de parquets le Studio propose vraiment, avec le prédicat du front |
+| `polices.js` | ce que `css/fonts.css` déclare vraiment, lisible depuis le générateur |
+
+### Visuels et ressources
+
+| Fichier | Rôle |
+| --- | --- |
+| `images.js` | visuels SVG : compositions d'intérieur abstraites |
+| `responsive.js` | images réactives (`<picture>`, `srcset`, `sizes`) |
+| `make-icons.js` | icônes, favicons et manifeste, à partir du symbole d'identité |
+| `fetch-fonts.js` | télécharge et auto-héberge les polices, écrit `css/fonts.css` |
+| `fetch-photos.js` | télécharge les photographies depuis Pexels |
+
+### Contrôles
+
+Neuf, tous exécutables séparément, tous en code 0 quand ils passent.
+
+| Fichier | Ce qu'il garantit |
+| --- | --- |
+| `check-images.js` | chaque image référencée existe, avec dimensions et texte alternatif |
+| `check-links.js` | aucun lien interne mort |
+| `check-inspiration.js` | chaque carte essayable ouvre bien sa propre photographie |
+| `check-reproducible.js` | mêmes empreintes sous Windows et Linux |
+| `check-product-visualizer.js` | contrat du Visualiseur produit (`js/product/`) |
+| `check-studio-api.js` | contrat de pilotage `window.__studio` (apiVersion 1) |
+| `check-chiffres.js` | aucun nombre public écrit en dur |
+| `check-fonts.js` | polices auto-hébergées uniques et utiles, préchargements valides |
+| `check-motifs.js` | aucune combinaison référence × motif impossible n'est posable |
+
+`fetch-fonts.js` et `fetch-photos.js` sortent sur le réseau : ils ne font pas
+partie de la construction et ne se lancent qu'à la demande.
 
 ## `sitemap.xml` : `lastmod` et date de build
 
@@ -103,11 +148,15 @@ category, tags, date, reading, excerpt, cover, lead, body, faq, related) puis
 relancer le script. La page, la liste de rubrique, le sitemap, les liens
 « À lire ensuite » et l'index JSON se mettent à jour.
 
-## Ne pas utiliser le générateur
+## Éditer le HTML à la main
 
-C'est possible : éditez directement les fichiers HTML. Pensez alors à supprimer
-ce dossier, ou à ne plus lancer le script, sous peine d'écraser vos
-modifications.
+À éviter, et ce n'est plus seulement une question de discipline : une page
+modifiée à la main ne porte plus l'empreinte que `assets.js` attend, et
+`verifierRattachements()` fait échouer la construction suivante. La page et
+ses assets sont solidaires — c'est ce qui garantit qu'aucune page n'est
+publiée sans sa feuille de style.
+
+La correction se fait donc dans `_generator/`, puis `node _generator/build.js`.
 
 ## Le contrat de pilotage du Visualiseur
 
