@@ -14,14 +14,18 @@
 const fs = require('fs');
 const path = require('path');
 
+const { exclusions } = require('./arborescence');
+
 const ROOT = path.join(__dirname, '..');
-const IGNORER = ['_calibrage', '_site', 'node_modules', 'assets', '_generator', '.git', 'components', 'design', 'backend'];
+/* Le plancher commun (dossiers en point, outillage) vient d'arborescence.js ;
+   ici s'y ajoute ce qui n'est pas une page du site. */
+const IGNORER = exclusions(['assets', 'components', 'design', 'backend', 'docs']);
 
 function pages(dir = ROOT, out = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, e.name);
     if (e.isDirectory()) {
-      if (IGNORER.includes(e.name)) continue;
+      if (IGNORER(e.name)) continue;
       pages(p, out);
     } else if (e.name.endsWith('.html')) out.push(p);
   }
