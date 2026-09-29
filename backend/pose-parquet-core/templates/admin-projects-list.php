@@ -7,7 +7,7 @@
  * que ce sont les quatre qui permettent de reconnaître une demande et de la
  * traiter. La référence est le lien vers la fiche.
  *
- * @var array{rows:array,counts:array,total:int,page:int,pages:int,per_page:int,status:string,search:string,statuses:array,notice:?array,can_edit:bool} $view
+ * @var array{rows:array,counts:array,total:int,page:int,pages:int,per_page:int,status:string,search:string,mail:string,statuses:array,notice:?array,can_edit:bool} $view
  * @package PoseParquet\Core
  */
 
@@ -26,6 +26,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<?php Notices::output( $view['notice'] ); ?>
 
+	<?php
+	/*
+	 * Une liste filtrée doit dire qu'elle l'est.
+	 *
+	 * On arrive ici depuis l'écran « État », par le lien d'une alerte, et sans
+	 * ce bandeau la page ressemblerait à la liste complète amputée sans raison.
+	 * Le filtre porte sur le sort des notifications, pas sur le statut de la
+	 * demande : les deux se cumulent, et les onglets ci-dessus le conservent.
+	 */
+	if ( ( $view['mail'] ?? '' ) !== '' ) :
+		$libelle_mail = $view['mail'] === 'failed'
+			? __( 'Demandes dont une notification a définitivement échoué.', 'pose-parquet-core' )
+			: __( 'Demandes dont une notification attend encore son envoi.', 'pose-parquet-core' );
+		?>
+		<div class="notice notice-warning inline" style="margin:1rem 0">
+			<p>
+				<strong><?php echo esc_html( $libelle_mail ); ?></strong>
+				<a href="<?php echo esc_url( View::list_url( [ 'status' => $view['status'], 's' => $view['search'] ] ) ); ?>"><?php esc_html_e( 'Retirer ce filtre', 'pose-parquet-core' ); ?></a>
+			</p>
+		</div>
+	<?php endif; ?>
+
 	<ul class="subsubsub pp-filters">
 		<?php
 		$onglets = [ '' => __( 'Tous', 'pose-parquet-core' ) ] + $view['statuses'];
@@ -33,7 +55,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		foreach ( $onglets as $valeur => $libelle ) :
 			$nombre = $valeur === '' ? (int) $view['counts']['all'] : (int) ( $view['counts'][ $valeur ] ?? 0 );
 			$actif  = $view['status'] === $valeur;
-			$url    = View::list_url( [ 'status' => $valeur, 's' => $view['search'] ] );
+			$url    = View::list_url( [ 'status' => $valeur, 's' => $view['search'], 'mail' => $view['mail'] ?? '' ] );
 			?>
 			<li>
 				<a href="<?php echo esc_url( $url ); ?>"<?php echo $actif ? ' class="current" aria-current="page"' : ''; ?>>
@@ -48,6 +70,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<input type="hidden" name="page" value="<?php echo esc_attr( \PoseParquet\Core\Admin\Projects::PAGE ); ?>" />
 		<?php if ( $view['status'] !== '' ) : ?>
 			<input type="hidden" name="status" value="<?php echo esc_attr( $view['status'] ); ?>" />
+		<?php endif; ?>
+		<?php if ( ( $view['mail'] ?? '' ) !== '' ) : ?>
+			<input type="hidden" name="mail" value="<?php echo esc_attr( $view['mail'] ); ?>" />
 		<?php endif; ?>
 		<label class="screen-reader-text" for="pp-search-input"><?php esc_html_e( 'Rechercher une demande', 'pose-parquet-core' ); ?></label>
 		<input

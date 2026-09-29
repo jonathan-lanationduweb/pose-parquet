@@ -35,6 +35,8 @@ final class Notices {
 	public const SAVE_FAILED      = 'save_failed';
 	public const NOT_FOUND        = 'not_found';
 	public const CAPS_REPAIRED    = 'caps_repaired';
+	public const MAIL_QUEUE_RUN   = 'mail_queue_run';
+	public const MAIL_QUEUE_EMPTY = 'mail_queue_empty';
 	public const CAPS_INCOMPLETE  = 'caps_incomplete';
 
 	/**
@@ -55,8 +57,22 @@ final class Notices {
 			self::SAVE_FAILED      => [ 'error', __( 'Impossible d’enregistrer la modification.', 'pose-parquet-core' ) ],
 			self::NOT_FOUND        => [ 'error', __( 'Cette demande n’existe pas ou n’existe plus.', 'pose-parquet-core' ) ],
 			self::CAPS_REPAIRED    => [ 'success', __( 'Les droits du plugin ont été réappliqués.', 'pose-parquet-core' ) ],
+			/* translators: %1$s : nombre d’envois traités, %2$s : nombre restant en file. */
+			self::MAIL_QUEUE_RUN   => [ 'success', sprintf( __( 'File des notifications : %1$s envoi(s) traité(s), %2$s en attente.', 'pose-parquet-core' ), number_format_i18n( self::compteur( 'pp_traites' ) ), number_format_i18n( self::compteur( 'pp_restants' ) ) ) ],
+			self::MAIL_QUEUE_EMPTY => [ 'info', __( 'Aucun envoi n’était dû : la file est à jour.', 'pose-parquet-core' ) ],
 			self::CAPS_INCOMPLETE  => [ 'error', __( 'Des droits manquent encore après la réparation : le rôle concerné a peut-être été supprimé par une autre extension.', 'pose-parquet-core' ) ],
 		];
+	}
+
+	/**
+	 * Un compteur posé dans l'URL par une redirection de `Actions`.
+	 *
+	 * Borné et converti en entier : ce qui sort d'ici ne peut être qu'un
+	 * nombre, et un nombre ne s'échappe pas de travers dans une phrase.
+	 */
+	private static function compteur( string $cle ): int {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nombre d'affichage, sans effet.
+		return isset( $_GET[ $cle ] ) ? max( 0, absint( wp_unslash( $_GET[ $cle ] ) ) ) : 0;
 	}
 
 	/**
