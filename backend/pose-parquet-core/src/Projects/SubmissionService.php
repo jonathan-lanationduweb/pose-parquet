@@ -4,11 +4,14 @@
  *
  *   identité réseau → limite de tentatives → pot de miel → jeton
  *   → limite de créations → réservation du jeton → validation + écriture
- *   (Service, transaction) → compteur de créations → emails (Notifier).
+ *   (Service, transaction) → compteur de créations → mise en file (Queue).
  *
  * Tout ce qui précède l'écriture ne touche pas la base. Tout ce qui la suit
- * ne peut pas l'annuler : les emails partent après COMMIT et leur échec
- * n'est qu'un état enregistré. Le contrôleur ne connaît que ce service ;
+ * ne peut pas l'annuler : les emails sont MIS EN FILE après COMMIT, partent
+ * plus tard, et leur échec n'est qu'un état enregistré. La réponse rend donc
+ * `pending`, jamais `sent` : elle ne promet rien qu'elle ne sache. Et le
+ * visiteur n'attend plus le SMTP — 4,3 s mesurées avant, le temps d'une
+ * écriture après. Le contrôleur ne connaît que ce service ;
  * Service (validation + écriture) reste tel qu'au lot 2.
  *
  * OÙ LE JETON EST CONSOMMÉ, ET POURQUOI LÀ. La réservation doit précéder
@@ -32,6 +35,7 @@ use PoseParquet\Core\Antispam\ClientIdentity;
 use PoseParquet\Core\Antispam\FormToken;
 use PoseParquet\Core\Antispam\Guard;
 use PoseParquet\Core\Mail\Notifier;
+use PoseParquet\Core\Mail\Queue;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -98,7 +102,19 @@ final class SubmissionService {
 
 		// À partir d'ici la demande existe : plus rien ne peut la défaire.
 		$this->guard->count_creation( $client );
-		$mails = $this->notifier->notify( (int) $resultat['id'], $request_id );
+
+		/*
+		 * Les emails sont MIS EN FILE, pas envoyés.
+		 *
+		 * Ils partaient ici même, en séquence, et le visiteur les attendait :
+		 * 4,3 s mesurées côté serveur sur une soumission réelle, dont 4,2 s
+		 * dans deux `wp_mail()` qui échouaient. La remise d'un email n'a rien
+		 * à faire dans le chemin d'une requête — voir Mail\Queue.
+		 *
+		 * Les états rendus sont donc `pending`, et c'est exact : la réponse ne
+		 * prétend pas qu'un email est parti.
+		 */
+		$mails = Queue::enfiler( (int) $resultat['id'], $request_id, $this->notifier );
 
 		return [ 'ok' => true, 'status' => 201, 'reference' => $resultat['reference'], 'id' => (int) $resultat['id'], 'mails' => $mails ];
 	}

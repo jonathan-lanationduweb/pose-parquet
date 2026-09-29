@@ -199,7 +199,7 @@ final class Repository {
 	 * la milliseconde ; le jour où le volume l'exigera, ce sera un index
 	 * FULLTEXT sur nom/email, pas un index par colonne posé à l'aveugle.
 	 *
-	 * @param array{status?:string,search?:string} $args
+	 * @param array{status?:string,search?:string,mail?:string} $args
 	 * @return array{0:string,1:array<int,mixed>} clause (sans le mot WHERE) et paramètres
 	 */
 	private function where( array $args ): array {
@@ -210,6 +210,25 @@ final class Repository {
 		if ( $status !== '' && Status::is_valid( $status ) ) {
 			$clauses[] = 'status = %s';
 			$params[]  = $status;
+		}
+
+		/*
+		 * Filtre sur le sort des notifications.
+		 *
+		 * `failed` d'un côté OU de l'autre : une demande dont seule la
+		 * confirmation visiteur a échoué mérite d'apparaître, même si la
+		 * notification interne est partie. C'est ce filtre que vise le lien
+		 * « X notification(s) en échec » de l'écran État — un lead perdu en
+		 * silence est ce qu'on cherche à rendre impossible.
+		 *
+		 * La valeur n'est pas interpolée : elle est comparée à une liste
+		 * écrite ici, et seule cette liste produit une clause.
+		 */
+		$mail = (string) ( $args['mail'] ?? '' );
+		if ( in_array( $mail, [ Notifier::STATUS_FAILED, Notifier::STATUS_PENDING ], true ) ) {
+			$clauses[] = '(internal_mail_status = %s OR visitor_mail_status = %s)';
+			$params[]  = $mail;
+			$params[]  = $mail;
 		}
 
 		$search = trim( (string) ( $args['search'] ?? '' ) );
@@ -243,7 +262,7 @@ final class Repository {
 	 * demandes arrivées dans la même seconde, et une pagination dont l'ordre
 	 * n'est pas total répète ou saute des lignes entre deux pages.
 	 *
-	 * @param array{status?:string,search?:string,page?:int,per_page?:int} $args
+	 * @param array{status?:string,search?:string,mail?:string,page?:int,per_page?:int} $args
 	 * @return array<int,array<string,mixed>>
 	 */
 	public function search( array $args = [] ): array {
@@ -271,7 +290,7 @@ final class Repository {
 	/**
 	 * Nombre de demandes répondant aux mêmes critères que `search()`.
 	 *
-	 * @param array{status?:string,search?:string} $args
+	 * @param array{status?:string,search?:string,mail?:string} $args
 	 */
 	public function count_search( array $args = [] ): int {
 		global $wpdb;

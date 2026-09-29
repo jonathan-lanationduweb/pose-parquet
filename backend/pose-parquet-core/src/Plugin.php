@@ -17,6 +17,7 @@ use PoseParquet\Core\Admin\Actions;
 use PoseParquet\Core\Admin\Menu;
 use PoseParquet\Core\Admin\Settings;
 use PoseParquet\Core\Database\Installer;
+use PoseParquet\Core\Mail\Queue;
 use PoseParquet\Core\Rest\Cors;
 use PoseParquet\Core\Rest\Routes;
 use PoseParquet\Core\Security\Capabilities;
@@ -64,6 +65,16 @@ final class Plugin {
 		// Liste fermée d'origines pour notre espace REST, à la place du CORS permissif de WordPress.
 		Cors::register();
 
+		/*
+		 * La file des notifications, branchée sur toutes les requêtes.
+		 *
+		 * Pas seulement en administration : c'est wp-cron.php qui déclenchera
+		 * le hook, et wp-cron.php n'est ni un écran d'admin ni une route REST.
+		 * Le coût d'un `add_action` sur une requête publique est nul tant que
+		 * l'événement ne se produit pas.
+		 */
+		Queue::register();
+
 		if ( is_admin() ) {
 			Menu::register();
 			Settings::register();
@@ -83,8 +94,14 @@ final class Plugin {
 	 * Ni tables, ni options, ni droits ne sont retirés. Un site qui désactive le
 	 * plugin pour diagnostiquer un conflit doit le retrouver intact en le
 	 * réactivant. Voir uninstall.php pour la suppression, elle aussi prudente.
+	 *
+	 * Une seule chose est retirée, et elle n'est pas de la donnée : les
+	 * événements planifiés. Plus personne n'écoute leur hook une fois le
+	 * plugin désactivé ; les laisser encombrerait le cron du site d'entrées
+	 * qui n'enverraient rien. Les états `pending` en base, eux, restent — ils
+	 * disent la vérité, et une réactivation les reprendra.
 	 */
 	public static function deactivate(): void {
-		// Volontairement vide, et documenté comme tel.
+		Queue::purger();
 	}
 }
