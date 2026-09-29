@@ -132,7 +132,27 @@ export class FloorVisualizer {
     this.readout = document.createElement('dl');
     this.readout.className = 'visualizer__readout';
 
-    this.stage.append(this.canvas, this.readout);
+    /*
+     * Ce que le relève dit à qui ne le voit pas.
+     *
+     * Les quatre chiffres se recalculent à chaque mouvement de curseur. Une
+     * région `aria-live` posée sur la liste elle-même lirait donc chaque
+     * pixel de glissement : insupportable, et vite coupé par l'utilisateur.
+     *
+     * On annonce donc une PHRASE, une seule, et seulement quand la main
+     * s'arrête. `polite` attend une pause dans la lecture ; `aria-atomic`
+     * fait relire l'ensemble plutôt que le seul mot qui a changé.
+     *
+     * La liste de définitions, elle, reste muette et consultable repère par
+     * repère : les deux usages ne se gênent pas.
+     */
+    this.annonce = document.createElement('p');
+    this.annonce.className = 'visually-hidden';
+    this.annonce.setAttribute('role', 'status');
+    this.annonce.setAttribute('aria-live', 'polite');
+    this.annonce.setAttribute('aria-atomic', 'true');
+
+    this.stage.append(this.canvas, this.readout, this.annonce);
 
     if (!this.compact) {
       this.advice = document.createElement('div');
@@ -672,6 +692,28 @@ export class FloorVisualizer {
     if (this.advice) {
       this.advice.querySelector('p').textContent = pattern.advice({ ...this.state });
     }
+
+    this.annoncer(
+      `${pattern.label} : ${fr(surface, 1)} m², environ ${planks} lames, ${loss} % de chutes.`
+    );
+  }
+
+  /**
+   * Annonce différée du relevé.
+   *
+   * 700 ms après le dernier changement : assez pour qu'un glissement de
+   * curseur ne produise qu'une phrase, assez peu pour qu'un clic sur un motif
+   * soit confirmé sans attente perçue. Une annonce identique à la
+   * précédente n'est pas réécrite : certains lecteurs d'écran relisent une
+   * région dès qu'on y touche, même pour y remettre le même texte.
+   */
+  annoncer(phrase) {
+    if (!this.annonce || phrase === this.derniereAnnonce) return;
+    clearTimeout(this.minuteurAnnonce);
+    this.minuteurAnnonce = setTimeout(() => {
+      this.derniereAnnonce = phrase;
+      this.annonce.textContent = phrase;
+    }, 700);
   }
 }
 
