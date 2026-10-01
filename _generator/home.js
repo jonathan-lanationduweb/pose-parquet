@@ -89,15 +89,29 @@ const TILES = [
   },
 ];
 
+/*
+ * Légendes du carrousel : ce que la photographie montre, rien de plus.
+ *
+ * Elles décrivaient l'ANCIEN jeu d'images. Les photographies avaient été
+ * remplacées dans `photos.js` sans que les fichiers `inspi-N` soient
+ * retéléchargés — `fetch-photos.js` ne prend que ce qui manque — et les
+ * légendes étaient restées avec les anciennes. Cinq des huit annonçaient
+ * donc autre chose que ce qu'on voyait : des combles pour une pièce à
+ * arcades, un bâton rompu pour des lames droites, une diagonale pour un
+ * parquet posé droit, une frise périphérique inexistante, et des lames dans
+ * l'axe pour un point de Hongrie.
+ *
+ * Chaque légende ci-dessous a été écrite en regardant le fichier.
+ */
 const GALLERY = [
-  { img: 'inspi-1', cat: 'Séjour', title: 'Traversant, pose droite' },
+  { img: 'inspi-1', cat: 'Séjour', title: 'Traversant, lames droites' },
   { img: 'inspi-2', cat: 'Chambre', title: 'Point de Hongrie' },
-  { img: 'inspi-6', cat: 'Salon', title: 'Diagonale, chêne blond' },
-  { img: 'inspi-3', cat: 'Cuisine', title: 'Contrecollé collé' },
-  { img: 'inspi-5', cat: 'Bureau', title: 'Bâton rompu fumé' },
-  { img: 'inspi-4', cat: 'Couloir', title: 'Lames étroites dans l’axe' },
-  { img: 'inspi-7', cat: 'Combles', title: 'Parquet clair, lames larges' },
-  { img: 'inspi-8', cat: 'Entrée', title: 'Frise périphérique' },
+  { img: 'inspi-6', cat: 'Salon', title: 'Pièce en angle, lames de noyer' },
+  { img: 'inspi-3', cat: 'Cuisine', title: 'Ouverte, lames larges' },
+  { img: 'inspi-5', cat: 'Chambre', title: 'Lames droites, chêne foncé' },
+  { img: 'inspi-4', cat: 'Couloir', title: 'Point de Hongrie dans l’axe' },
+  { img: 'inspi-7', cat: 'Pièce à arcades', title: 'Bâton rompu' },
+  { img: 'inspi-8', cat: 'Entrée', title: 'Lames dans l’axe' },
 ];
 
 const MARQUEE = [
@@ -267,6 +281,18 @@ function apercuSquelette(id) {
           </div>`;
 }
 
+/*
+ * `data-scroll-factor` — combien de défilement vertical coûte le carrousel.
+ *
+ * Au-dessus de 62 rem, la section se fige et le carrousel avance avec la
+ * molette : sa hauteur vaut donc la hauteur du bloc collant PLUS la course
+ * horizontale multipliée par ce facteur. À 0,9 et 0,85, les deux carrousels
+ * pesaient 4 783 px sur 11 249 — 43 % de l'accueil pour onze fiches.
+ *
+ * À 0,65, le contenu est identique, la lecture reste confortable, et la page
+ * raccourcit de près de 800 px sans qu'une seule fiche disparaisse. Sous
+ * 62 rem le facteur ne sert pas : le carrousel y défile au doigt.
+ */
 function carouselEditorial(guides) {
   const slides = guides
     .map(
@@ -289,7 +315,7 @@ function carouselEditorial(guides) {
     )
     .join('\n            ');
 
-  return `      <section class="section scroll-track" data-carousel data-scroll-carousel data-scroll-factor="0.9" aria-labelledby="guides-title">
+  return `      <section class="section scroll-track" data-carousel data-scroll-carousel data-scroll-factor="0.65" aria-labelledby="guides-title">
         <div class="scroll-track__sticky" data-scroll-sticky>
         <div class="wrap-wide">
           <div class="section-head section-head__row section-head__row--tight">
@@ -359,7 +385,13 @@ function immersiveSection() {
   return `      <section class="dossier" aria-labelledby="focus-title">
         <div class="dossier__bg">
           ${picture('immersive-hongrie', {
-            alt: 'Lumière rasante sur un parquet posé en Point de Hongrie',
+            /*
+             * L'alt est ecrit ici, et non repris de photos.js : cette section
+             * est la seule a utiliser la cle, et le texte qui l'entoure parle
+             * du motif. Les deux doivent rester d'accord — si l'image change,
+             * cette phrase change avec elle.
+             */
+            alt: 'Pièce aux murs bleus ouverte sur un jardin, sol en point de Hongrie filant vers la baie',
             sizes: '100vw',
           })}
         </div>
@@ -389,7 +421,7 @@ function carouselGallery() {
             </div>`
   ).join('\n            ');
 
-  return `      <section class="section section--dark scroll-track" data-carousel data-scroll-carousel data-scroll-factor="0.85" aria-labelledby="inspi-title">
+  return `      <section class="section section--dark scroll-track" data-carousel data-scroll-carousel data-scroll-factor="0.65" aria-labelledby="inspi-title">
         <div class="scroll-track__sticky" data-scroll-sticky>
         <div class="wrap-wide">
           <div class="section-head section-head__row section-head__row--tight">
@@ -415,29 +447,68 @@ function carouselGallery() {
       </section>`;
 }
 
-function tutorialsSection(tutos) {
-  const rows = tutos
-    .map(
-      (tuto, index) => `<a class="list-row" href="tutoriels/${tuto.slug}.html">
-              <span class="list-row__num">(0${index + 1})</span>
-              <span class="list-row__title">${tuto.h1}</span>
-              <span class="list-row__meta">${tuto.level} · ${tuto.duration}</span>
-              <p class="list-row__text">${tuto.excerpt}</p>
-            </a>`
-    )
-    .join('\n            ');
+/**
+ * Comprendre, puis poser — les deux colonnes éditoriales de l'accueil.
+ *
+ * C'ÉTAIT DEUX SECTIONS. « Passer au geste » (les tutoriels) et « Le sens de
+ * pose, de A à Z » (le dossier) portaient exactement le même balisage : un
+ * chapeau de section, puis des `list-row`. Elles se suivaient à trois blocs
+ * d'intervalle et produisaient deux fois la même impression de lecture, pour
+ * deux fois la hauteur. Sur téléphone, 1 630 px à elles deux.
+ *
+ * CE QUI EST CONSERVÉ. Les sept liens, leurs intitulés, leurs résumés, leurs
+ * durées, et les deux liens de rubrique — vers `tutoriels/` et vers le
+ * simulateur. Rien n'est retiré du maillage : les deux anciens titres restent
+ * mot pour mot, en `h3`, sous un `h2` qui les relie.
+ *
+ * L'ORDRE. Le raisonnement d'abord, le geste ensuite : on choisit un sens de
+ * pose avant de poser la première lame, et le dossier alimente le simulateur
+ * quand le tutoriel alimente le chantier.
+ */
+function editorialSection(tutos, guides) {
+  const ligne = (href, num, titre, meta, texte) => `<a class="list-row" href="${href}">
+                <span class="list-row__num">(0${num})</span>
+                <span class="list-row__title">${titre}</span>
+                <span class="list-row__meta">${meta}</span>
+                <p class="list-row__text">${texte}</p>
+              </a>`;
 
-  return `      <section class="section section--compact" aria-labelledby="tuto-title">
+  const dossier = guides
+    .filter((guide) => guide.tags.includes('sens-de-pose'))
+    .map((guide, index) => ligne(`guides/${guide.slug}.html`, index + 1, guide.h1, guide.reading, guide.excerpt))
+    .join('\n              ');
+
+  const gestes = tutos
+    .map((tuto, index) => ligne(`tutoriels/${tuto.slug}.html`, index + 1, tuto.h1, `${tuto.level} · ${tuto.duration}`, tuto.excerpt))
+    .join('\n              ');
+
+  return `      <section class="section section--compact" aria-labelledby="editorial-title">
         <div class="wrap-wide">
           <div class="section-head section-head__row section-head__row--tight">
             <div>
-              <p class="eyebrow">Tutoriels</p>
-              <h2 id="tuto-title">Passer au geste.</h2>
+              <p class="eyebrow">Guides et tutoriels</p>
+              <h2 id="editorial-title">Comprendre, puis poser.</h2>
             </div>
-            <a class="link-arrow" href="tutoriels/">Tous les tutoriels ${ICON.arrow}</a>
           </div>
-          <div class="list-rows">
-            ${rows}
+          <div class="duo-rows">
+            <div class="duo-rows__col">
+              <div class="duo-rows__head">
+                <h3 id="cluster-title">Le sens de pose, de A à Z</h3>
+                <a class="link-arrow" href="outils/simulateur-pose.html">Simulateur de sens de pose ${ICON.arrow}</a>
+              </div>
+              <div class="list-rows">
+              ${dossier}
+              </div>
+            </div>
+            <div class="duo-rows__col">
+              <div class="duo-rows__head">
+                <h3 id="tuto-title">Passer au geste</h3>
+                <a class="link-arrow" href="tutoriels/">Tous les tutoriels ${ICON.arrow}</a>
+              </div>
+              <div class="list-rows">
+              ${gestes}
+              </div>
+            </div>
           </div>
         </div>
       </section>`;
@@ -498,35 +569,18 @@ function projectSection() {
       </section>`;
 }
 
-function clusterSection(guides) {
-  const rows = guides
-    .filter((guide) => guide.tags.includes('sens-de-pose'))
-    .map(
-      (guide, index) => `<a class="list-row" href="guides/${guide.slug}.html">
-              <span class="list-row__num">(0${index + 1})</span>
-              <span class="list-row__title">${guide.h1}</span>
-              <span class="list-row__meta">${guide.reading}</span>
-              <p class="list-row__text">${guide.excerpt}</p>
-            </a>`
-    )
-    .join('\n            ');
-
-  return `      <section class="section section--flush-top section--compact" aria-labelledby="cluster-title">
-        <div class="wrap-wide">
-          <div class="section-head section-head__row section-head__row--tight">
-            <div>
-              <p class="eyebrow">Dossier</p>
-              <h2 id="cluster-title">Le sens de pose, de A à Z.</h2>
-            </div>
-            <a class="link-arrow" href="outils/simulateur-pose.html">Simulateur de sens de pose ${ICON.arrow}</a>
-          </div>
-          <div class="list-rows">
-            ${rows}
-          </div>
-        </div>
-      </section>`;
-}
-
+/*
+ * L'ORDRE DE L'ACCUEIL.
+ *
+ * Il se terminait sur une liste de guides, placée APRÈS l'appel à décrire son
+ * projet : on demandait au visiteur de se décider, puis on lui redonnait à
+ * lire. La page s'achève désormais sur ce qu'elle veut obtenir.
+ *
+ * La progression : ce que je viens chercher (les quatre entrées) → je
+ * l'essaie (le simulateur) → je comprends (les guides) → j'ai envie (le
+ * motif, puis les ambiances) → je lis pour agir (comprendre, puis poser) →
+ * j'ai les outils → je décris ma pièce.
+ */
 function buildHomeBody({ GUIDES, TUTOS }) {
   const carouselGuides = GUIDES.slice(0, 6);
   return [
@@ -536,10 +590,9 @@ function buildHomeBody({ GUIDES, TUTOS }) {
     carouselEditorial(carouselGuides),
     immersiveSection(),
     carouselGallery(),
-    tutorialsSection(TUTOS),
+    editorialSection(TUTOS, GUIDES),
     toolsSection(),
     projectSection(),
-    clusterSection(GUIDES),
   ].join('\n\n');
 }
 
