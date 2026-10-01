@@ -980,6 +980,57 @@ body.app {
   background: var(--c-mineral) center / cover no-repeat;
 }
 
+/*
+ * Le lien vers la fiche du parquet regardé.
+ *
+ * En haut à DROITE, en face du sélecteur de pièce : les deux disent ce qu'on
+ * regarde — cette pièce-ci, ce parquet-là — quand la barre du bas dit ce qu'on
+ * en fait. La symétrie n'est pas décorative, elle range deux informations de
+ * même nature au même niveau.
+ *
+ * Une pastille sobre et non un bouton plein : c'est une sortie du site, pas
+ * l'action que le Studio attend de vous. Elle se lit, elle ne réclame pas.
+ *
+ * `max-width` la borne au tiers de l'image : « Voir ce parquet chez Premibel »
+ * tient sur une ligne à 390 px, et un libellé plus long se coupe proprement
+ * au lieu de traverser la photographie.
+ */
+.stage__product {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 8;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch);
+  max-width: min(60%, 20rem);
+  padding: 0.3rem 0.95rem;
+  border-radius: var(--r-pill);
+  background: rgba(16, 18, 19, 0.66);
+  color: #fff;
+  font-size: 0.88rem;
+  line-height: 1.25;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+}
+.stage__product:hover,
+.stage__product:focus-visible { background: rgba(16, 18, 19, 0.9); }
+.stage__product[hidden] { display: none; }
+
+/*
+ * Sous 560 px, le sélecteur de pièce et la fiche ne tiennent plus côte à côte
+ * sans se chevaucher. La fiche passe dessous, alignée à gauche comme lui :
+ * deux lignes empilées plutôt que deux pastilles qui se marchent dessus.
+ */
+@media (max-width: 559px) {
+  .stage__product {
+    top: calc(0.75rem + var(--touch) + 0.4rem);
+    right: auto;
+    left: 0.75rem;
+    max-width: calc(100% - 1.5rem);
+  }
+}
+
 /* ================================================================== */
 /* Panneau contextuel                                                 */
 /* ================================================================== */

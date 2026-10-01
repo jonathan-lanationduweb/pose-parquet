@@ -32,8 +32,8 @@
     <link rel="manifest" href="../site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../assets/dist/site.e632bbd93e.css" />
-    <script type="module" src="../assets/dist/8dc224f557/js/main.js"></script>
+    <link rel="stylesheet" href="../assets/dist/site.923a9d93e9.css" />
+    <script type="module" src="../assets/dist/ba77d05fce/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/index.html"},{"@type":"ListItem","position":2,"name":"Tutoriels","item":"https://pose-parquet.com/tutoriels/"},{"@type":"ListItem","position":3,"name":"Coller un parquet contrecollé","item":"https://pose-parquet.com/"}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","headline":"Coller un parquet contrecollé","description":"Primaire, choix de la colle, encollage à la spatule crantée, temps ouvert, marouflage : la méthode de pose collée en plein, étape par étape.","inLanguage":"fr-FR","datePublished":"2026-08-16","dateModified":"2026-08-16","author":{"@type":"Organization","name":"Pose Parquet","url":"https://pose-parquet.com/a-propos/"},"publisher":{"@type":"Organization","name":"Pose Parquet"},"mainEntityOfPage":"https://pose-parquet.com/tutoriels/coller-un-parquet-contrecolle.html"}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Faut-il laisser un jeu périphérique en pose collée ?","acceptedAnswer":{"@type":"Answer","text":"Oui, plus réduit qu'en flottant : 5 à 8 mm suffisent, mais le jeu reste nécessaire."}},{"@type":"Question","name":"Quand mettre en chauffe un plancher chauffant ?","acceptedAnswer":{"@type":"Answer","text":"Après le durcissement complet de la colle, avec une montée progressive de la température, généralement 5 °C par jour."}}]}</script>
@@ -107,13 +107,7 @@
       </header>
 
       <div class="wrap-wide">
-        <div class="article-cover" data-reveal>
-          <picture>
-              <source type="image/webp" srcset="../assets/images/cover-coller-un-parquet-contrecolle-560.webp 560w, ../assets/images/cover-coller-un-parquet-contrecolle-980.webp 980w, ../assets/images/cover-coller-un-parquet-contrecolle-1400.webp 1400w" sizes="(min-width: 75rem) 68rem, 94vw" />
-              <img src="../assets/images/cover-coller-un-parquet-contrecolle.jpg" srcset="../assets/images/cover-coller-un-parquet-contrecolle-560.jpg 560w, ../assets/images/cover-coller-un-parquet-contrecolle-980.jpg 980w, ../assets/images/cover-coller-un-parquet-contrecolle-1400.jpg 1400w" sizes="(min-width: 75rem) 68rem, 94vw" alt="Poseur mettant en place une lame de parquet contrecollé"
-                width="1400" height="875" fetchpriority="high" decoding="async"  />
-            </picture>
-        </div>
+        
 
         <div class="article-layout">
           <article class="prose" id="article-content">
@@ -186,6 +180,28 @@
               <h3>Avant de commencer</h3>
               <p>Vérifiez la planéité et l'humidité du support : c'est la cause de la majorité des désordres.</p>
               <a class="btn btn--ghost btn--sm" href="../guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a>
+            </div>
+            <!--
+              La sortie chantier, sur les tutoriels et nulle part ailleurs.
+
+              Un tutoriel de pose est le seul endroit du site où quelqu'un
+              peut légitimement changer d'avis en lisant : découvrir le nombre
+              d'étapes, l'outillage, les points de contrôle, et décider que ce
+              n'est pas pour lui. Lui proposer là de confier le chantier
+              répond à une question qu'il vient de se poser.
+
+              Dans un guide de décision — « quel sens de pose ? » — la même
+              proposition serait hors sujet : on y cherche à comprendre, pas à
+              déléguer.
+
+              Le lien mène au formulaire, pas chez le poseur : c'est ce qui
+              permet de qualifier le besoin et la zone avant d'orienter. Voir
+              js/commerce/allure.js.
+            -->
+            <div class="aside-box">
+              <h3>Vous préférez confier la pose ?</h3>
+              <p>Décrivez votre projet : nous orientons vers un poseur selon votre région. En Île-de-France, la pose et la rénovation sont assurées par Allure Design.</p>
+              <a class="btn btn--ghost btn--sm" href="../projet/?besoin=pose">Faire poser mon parquet</a>
             </div>
           </aside>
         </div>
@@ -293,7 +309,28 @@
           </nav>
         </div>
         <div class="footer__bottom">
-          <p>&copy; 2026 Pose Parquet — média indépendant, aucune vente en ligne.</p>
+          <!--
+            « Média indépendant, aucune vente en ligne » figurait ici.
+
+            La première moitié n'est plus exacte : le site oriente vers les
+            références de Premibel quand elles existent, et un lecteur qui
+            découvrirait ce lien après coup aurait raison de se sentir trompé.
+            La seconde reste vraie — rien ne se vend ni ne se paie ici — mais
+            énoncée seule elle laissait entendre la première.
+
+            Le pied de page ne développe pas : il renvoie à la page qui le
+            fait, une fois, sobrement.
+          -->
+          <p>&copy; 2026 Pose Parquet — guides et outils pour préparer son projet.</p>
+          <!--
+            Deux destinations nommées, une ligne, pas de logo.
+
+            Le pied de page dit vers QUI l'on oriente et pour QUOI ; le détail
+            — la zone, ce que la relation ne change pas — est à la page qui
+            l'explique. Écrire trois phrases ici en ferait une réclame en bas
+            de 32 pages.
+          -->
+          <p class="footer__orientation">Selon le besoin, ce site oriente vers <strong>Premibel</strong> pour les références de parquet et vers <strong>Allure&nbsp;Design</strong> pour la pose et les travaux en Île-de-France. <a href="../a-propos/#liens-commerciaux">En savoir plus</a></p>
           <p>Photographies sous licence Pexels</p>
         </div>
       </div>

@@ -17,38 +17,22 @@ export const projectFormConfig = {
       title: 'Où se situe le projet ?',
       hint: 'Ces informations permettent de situer le chantier et ses contraintes.',
       fields: [
-        {
-          name: 'zone',
-          label: 'Zone',
-          type: 'radio',
-          required: true,
-          options: [
-            { value: 'idf', label: 'Île-de-France' },
-            { value: 'autre', label: 'Autre région' },
-          ],
-        },
-        {
-          name: 'region',
-          label: 'Région',
-          type: 'select',
-          required: true,
-          visibleIf: { field: 'zone', equals: 'autre' },
-          options: [
-            'Auvergne-Rhône-Alpes',
-            'Bourgogne-Franche-Comté',
-            'Bretagne',
-            'Centre-Val de Loire',
-            'Corse',
-            'Grand Est',
-            'Hauts-de-France',
-            'Normandie',
-            'Nouvelle-Aquitaine',
-            'Occitanie',
-            'Pays de la Loire',
-            "Provence-Alpes-Côte d'Azur",
-            'Outre-mer',
-          ].map((label) => ({ value: label, label })),
-        },
+        /*
+         * ZONE ET RÉGION ONT DISPARU DE LA SAISIE.
+         *
+         * Elles demandaient trois fois la même chose : une zone, puis une
+         * région, puis un département. Trois réponses possibles pour un seul
+         * fait — « hors Île-de-France » avec un 75 était une combinaison
+         * parfaitement saisissable — et l'orientation commerciale dépendait
+         * alors de celui des trois champs qu'on décidait de croire.
+         *
+         * Le département suffit et ne se contredit pas : la région s'en
+         * déduit, côté front pour l'orientation et côté serveur pour le
+         * stockage. Voir js/forms/departements.js.
+         *
+         * Deux champs de moins, aucune étape de moins : cette étape en garde
+         * deux, et le parcours ses cinq.
+         */
         {
           name: 'departement',
           label: 'Département',
@@ -57,6 +41,7 @@ export const projectFormConfig = {
           placeholder: '75, 92, 44…',
           pattern: '^(0[1-9]|[1-8][0-9]|9[0-5]|2[AB]|97[1-6])$',
           errorMessage: 'Indiquez un numéro de département valide (ex. 75, 2A, 974).',
+          hint: 'La région en est déduite : inutile de la saisir.',
           width: 'half',
         },
         {
@@ -175,9 +160,41 @@ export const projectFormConfig = {
     },
     {
       id: 'delai',
-      title: 'Quand souhaitez-vous réaliser ce projet ?',
-      hint: 'Une estimation suffit : elle nous aide à organiser la réponse.',
+      title: 'De quoi avez-vous besoin, et pour quand ?',
+      hint: 'Une estimation suffit : elle nous aide à orienter et à organiser la réponse.',
       fields: [
+        /*
+         * La question qui décide de l'orientation.
+         *
+         * Elle a sa place ICI et non dans une sixième étape. Cette étape-ci
+         * n'en portait qu'une, le délai : c'était la plus maigre du parcours,
+         * et une étape entière pour un seul bouton radio se traverse comme
+         * une formalité. Deux questions courtes la remettent au niveau des
+         * quatre autres, et le parcours compte toujours cinq étapes.
+         *
+         * Obligatoire, comme les autres boutons radio du formulaire. C'est un
+         * seul geste, et c'est le seul champ dont dépend l'orientation : le
+         * déduire du reste donnait une réponse juste environ une fois sur
+         * deux — quelqu'un qui a regardé un parquet dans le Visualiseur
+         * cherche parfois un poseur, pas une référence.
+         *
+         * L'ordre des réponses n'est pas neutre : du plus simple au plus
+         * large, et « je ne sais pas encore » en dernier pour qu'il soit une
+         * sortie et non le premier réflexe.
+         */
+        {
+          name: 'besoin',
+          label: 'De quoi avez-vous besoin ?',
+          type: 'radio',
+          required: true,
+          options: [
+            { value: 'produit', label: 'Trouver mon parquet' },
+            { value: 'pose', label: 'Faire poser mon parquet' },
+            { value: 'produit-pose', label: 'Le parquet et la pose' },
+            { value: 'renovation', label: 'Rénover ou aménager mon intérieur' },
+            { value: 'indetermine', label: 'Je ne sais pas encore' },
+          ],
+        },
         {
           name: 'delai',
           label: 'Délai envisagé',
