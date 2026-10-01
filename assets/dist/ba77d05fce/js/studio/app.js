@@ -38,6 +38,8 @@ import { addZone, removeZone } from '../scene/schema.js';
 import { loadCatalog, createCatalog, swatchFor } from './catalog.js';
 import { createCompare } from './compare.js';
 import { buildHandoffParams } from '../forms/studio-handoff.js';
+import { ficheProduit, suivreClic, estReferencePremibel } from '../commerce/premibel.js';
+import { emettre } from '../analytics/events.js';
 import { mark, mesure, perfActif } from '../utils/perf.js';
 
 const ORIENTATIONS = [
@@ -158,6 +160,19 @@ export async function mountStudio(root) {
           </div>
         </div>
         <p class="stage__status" data-status role="status" hidden></p>
+        <!--
+          La fiche du produit regardé.
+
+          Ici, et non dans la barre d'actions : la barre porte ce qu'on FAIT de
+          la simulation — comparer, enregistrer, décrire son projet — et ce lien
+          parle de ce qu'on REGARDE. Un cinquième bouton y aurait aussi donné,
+          sur un téléphone, une quatrième cible empilée sous l'image.
+
+          Il n'apparaît que pour une référence qui a réellement une fiche. Les
+          douze parquets de démonstration n'en ont pas et n'en auront pas :
+          voir js/commerce/premibel.js.
+        -->
+        <a class="stage__product" data-product-link hidden target="_blank" rel="noopener"></a>
         <button class="stage__room" type="button" data-change-room>
           <span class="stage__room-thumb" data-room-thumb></span>
           <span>Changer de pièce</span>
@@ -220,6 +235,7 @@ export async function mountStudio(root) {
   const variantsHost = qs('[data-variants]', root);
   const addBtn = qs('[data-add]', root);
   const projectCta = qs('[data-project-cta]', root);
+  const productLink = qs('[data-product-link]', root);
   const compareBtn = qs('[data-compare]', root);
   const compareLabel = qs('[data-compare-label]', root);
   const panelTitle = qs('[data-panel-title]', root);
@@ -819,6 +835,20 @@ const REGROUPEMENT_MS = 70;
       // Le nouveau parquet accepte le motif courant : plus rien à expliquer.
       effacerNote();
     }
+    syncProductLink();
+    emettre('select_product', { productId: id, pattern: config.pattern || '' });
+    /*
+     * `view_product` en plus, et seulement pour une reference reelle.
+     *
+     * « A choisi un parquet » et « a vu un produit qui existe » ne sont pas
+     * la meme chose : les douze references de demonstration ne s'achetent
+     * nulle part. Compter les deux ensemble donnerait un chiffre qui ne veut
+     * rien dire, exactement au moment ou l'on voudrait savoir si le
+     * Visualiseur amene vers du produit.
+     */
+    if (estReferencePremibel(next && next.product)) {
+      emettre('view_product', { productId: id, contexte: 'studio' });
+    }
     demandeRendu(true);
     save();
     /*
@@ -992,6 +1022,7 @@ const REGROUPEMENT_MS = 70;
         // script — la regle metier, elle, ne bouge pas.
         if (!motifAutorise(material(), pattern.id)) return;
         interaction('motif');
+        emettre('select_pattern', { pattern: pattern.id, productId: config.materialId || '' });
         effacerNote();
         config = { ...config, pattern: pattern.id };
         syncPatterns();
@@ -1110,6 +1141,9 @@ const REGROUPEMENT_MS = 70;
       productLabel: item ? item.name : null,
       pattern: source.pattern,
       angle: source.angle,
+      // Le Studio sait ce que le formulaire ne peut pas savoir : si cette
+      // référence a une vraie fiche produit. Voir studio-handoff.js.
+      ficheProduit: estReferencePremibel(item && item.product),
     });
 
     return `${base}projet/?${query.toString()}`;
@@ -1126,6 +1160,54 @@ const REGROUPEMENT_MS = 70;
     if (!projectCta) return;
     projectCta.href = projectLink();
   }
+
+  /**
+   * Affiche, ou retire, le lien vers la fiche du parquet regardé.
+   *
+   * Retirer et non désactiver : un lien mort ou grisé laisserait croire qu'une
+   * fiche existe et qu'elle est momentanément indisponible. Pour une référence
+   * de démonstration, il n'y a pas de fiche du tout, et l'absence est
+   * l'information juste.
+   */
+  function syncProductLink() {
+    if (!productLink) return;
+    /*
+     * `material().product` et non `material()`.
+     *
+     * Un materiau du Studio est ce que le MOTEUR consomme : identifiant,
+     * teinte, largeur de lame, cartes de texture. La fiche commerciale —
+     * reference, adresse, provenance — vit a cote, sous `product`, parce que
+     * le renderer n'a que faire de savoir ou s'achete un parquet. Chercher
+     * `productUrl` a la racine ne trouvait rien et le lien ne s'affichait
+     * jamais, y compris pour les quatorze references qui en ont une.
+     */
+    const fiche = ficheProduit(material() && material().product);
+    if (!fiche) {
+      productLink.hidden = true;
+      productLink.removeAttribute('href');
+      return;
+    }
+    productLink.href = fiche.url;
+    productLink.textContent = fiche.libelle;
+    productLink.hidden = false;
+  }
+
+  on(productLink, 'click', () => suivreClic(material() && material().product, 'studio'));
+
+  /*
+   * Le depart vers le formulaire.
+   *
+   * `start_project` et non `submit_project` : on sait que la personne quitte
+   * le Studio pour decrire son projet, pas qu'elle ira au bout. Les deux
+   * evenements existent, et c'est leur ecart qui dira un jour quelque chose.
+   */
+  on(projectCta, 'click', () => {
+    emettre('start_project', {
+      contexte: 'studio',
+      productId: config.materialId || '',
+      pattern: config.pattern || '',
+    });
+  });
 
   const compareUi = createCompare(root, {
     renderer,
@@ -1597,6 +1679,7 @@ const REGROUPEMENT_MS = 70;
      * decrit l avant-derniere simulation.
      */
     syncProjectCta();
+    syncProductLink();
 
     try {
       window.localStorage.setItem(STORAGE, JSON.stringify({ config, variants, sceneId }));
@@ -1677,6 +1760,7 @@ const REGROUPEMENT_MS = 70;
   syncSelected();
   syncVariants();
   syncProjectCta();
+  syncProductLink();
 
   const requested = params.get('piece');
   // Un lien direct ouvre aussi une scène expérimentale : c'est ce qui permet de

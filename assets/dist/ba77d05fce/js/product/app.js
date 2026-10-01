@@ -26,6 +26,8 @@
 import { qs, on, echapper } from '../utils/dom.js';
 import { analyzeScene, loadSceneIndex, scenesBibliotheque } from '../scene/analyzer.js';
 import { motifParDefaut } from '../scene/motifs-regles.js';
+import { ficheProduit, suivreClic } from '../commerce/premibel.js';
+import { emettre } from '../analytics/events.js';
 import { loadImage, loadFile } from '../scene/image-loader.js';
 import { createSceneRenderer } from '../scene/renderer.js';
 import { quandCartesPretes } from '../scene/material.js';
@@ -204,7 +206,9 @@ export async function mountProduct(root) {
         <div class="pv-drawer__head">
           <h2 data-drawer-title></h2>
           <span class="pv-drawer__count" data-drawer-count></span>
-          <a class="pv-drawer__link" data-drawer-link hidden target="_blank" rel="noopener noreferrer">Voir la fiche Premibel ${svg(ICON.arrow, 14)}</a>
+          <!-- Le libellé est posé par `drawerHead` : il nomme Premibel quand
+               l'adresse est bien celle de Premibel, et reste neutre sinon. -->
+          <a class="pv-drawer__link" data-drawer-link hidden target="_blank" rel="noopener noreferrer"><span data-drawer-link-label></span> ${svg(ICON.arrow, 14)}</a>
           <button class="pv-drawer__close" type="button" data-close aria-label="Fermer">${svg(ICON.close)}</button>
         </div>
         <div class="pv-drawer__body" data-drawer-body></div>
@@ -353,7 +357,7 @@ export async function mountProduct(root) {
       <span class="bar__tx">
         <b>${txt(nomCourt(m))}</b>
         ${secondaire}
-        <span class="bar__ref">${txt(p.sku || m.id)}${p.productUrl ? ` · <a href="${txt(p.productUrl)}" target="_blank" rel="noopener noreferrer" data-fiche>Voir la fiche Premibel →</a>` : ''}</span>
+        <span class="bar__ref">${txt(p.sku || m.id)}${ficheBarre(m)}</span>
       </span>
       <span class="bar__acts">
         <button class="bar__btn" type="button" data-open-catalog aria-pressed="${state.ui.panel === 'catalog'}">${svg(ICON.floor, 16)}<span>Choisir un parquet</span></button>
@@ -409,12 +413,42 @@ export async function mountProduct(root) {
     if (state.ui.panel === 'custom') paintCustom();
   }
 
-  function drawerHead(title, count, link) {
+  /**
+   * @param {string} title
+   * @param {string} count
+   * @param {object|null} material la référence dont on montre la fiche, s'il y en a une
+   */
+  /**
+   * Le lien vers la fiche, en fin de ligne de référence dans la barre.
+   *
+   * Rend une chaîne vide quand la référence n'a pas de fiche : les douze
+   * parquets de démonstration ne renvoient nulle part, et il vaut mieux une
+   * ligne plus courte qu'un lien inventé.
+   */
+  function ficheBarre(m) {
+    const f = ficheProduit(fiche(m));
+    if (!f) return '';
+    return ` · <a href="${txt(f.url)}" target="_blank" rel="noopener noreferrer" data-fiche>${txt(f.libelle)} →</a>`;
+  }
+
+  function drawerHead(title, count, material) {
     $('[data-drawer-title]').textContent = title;
     $('[data-drawer-count]').textContent = count || '';
     const a = $('[data-drawer-link]');
-    a.hidden = !link;
-    if (link) a.href = link;
+    /*
+     * Le nom de l'entreprise n'est pas écrit dans le gabarit.
+     *
+     * « Voir la fiche Premibel » affirme chez qui l'on envoie le visiteur. Le
+     * catalogue est un fichier de données : le jour où il vient d'un export,
+     * rien ne garantit que toutes les fiches soient au même domaine. C'est
+     * donc l'adresse qui décide du libellé — voir js/commerce/premibel.js.
+     */
+    const fiche = ficheProduit(material);
+    a.hidden = !fiche;
+    if (fiche) {
+      a.href = fiche.url;
+      $('[data-drawer-link-label]').textContent = fiche.libelle;
+    }
   }
 
   /* ---------------- Pièces ---------------- */
@@ -531,7 +565,7 @@ export async function mountProduct(root) {
     drawerHead(
       state.ui.picking ? 'Choisir la version B' : favs ? 'Vos favoris' : 'Choisir un parquet',
       favs ? `${list.length} référence${list.length > 1 ? 's' : ''}` : '',
-      fiche(m).productUrl || null
+      fiche(m)
     );
     const filtres = favs ? '' : `<div class="chips" data-cat-filters>
         <button class="chip" type="button" data-filter="" aria-pressed="${!state.ui.patternFilter}">Tous</button>
@@ -555,6 +589,7 @@ export async function mountProduct(root) {
   function select(id) {
     const material = productOf(id);
     if (!material) return;
+    emettre('select_product', { productId: id, contexte: 'visualiseur-produit' });
     /* Pas de masque réel : le choix est retenu, aucun parquet n'est inventé. */
     if (!posable()) {
       state.product = id;
@@ -589,7 +624,7 @@ export async function mountProduct(root) {
     const m = productOf(state.product);
     const p = fiche(m);
     const widths = [...new Set(products.map(widthMm))].sort((a, b) => a - b);
-    drawerHead('Personnaliser votre parquet', `${nomCourt(m)} · ${p.sku || m.id}`, p.productUrl || null);
+    drawerHead('Personnaliser votre parquet', `${nomCourt(m)} · ${p.sku || m.id}`, p);
     $('[data-drawer-body]').innerHTML = `<div class="cus">
       <section class="cus__sect">
         <h3>Sens de pose</h3>
@@ -786,6 +821,16 @@ export async function mountProduct(root) {
 
   on(root, 'click', (e) => {
     const t = e.target;
+    /*
+     * Le départ vers une fiche produit.
+     *
+     * Avant les autres cas et sans `return` : le lien doit suivre son cours
+     * normalement — nouvel onglet, clic milieu, ouverture au clavier — on ne
+     * fait qu'en prendre note au passage.
+     */
+    if (t.closest('[data-fiche], [data-drawer-link]')) {
+      suivreClic(fiche(productOf(state.product)), 'visualiseur-produit');
+    }
     if (t.closest('[data-import]')) { fileInput.click(); return; }
     const room = t.closest('[data-room]'); if (room) { openRoom(room.dataset.room); return; }
     const fav = t.closest('[data-fav]'); if (fav) { e.stopPropagation(); toggleFav(fav.dataset.fav); return; }
