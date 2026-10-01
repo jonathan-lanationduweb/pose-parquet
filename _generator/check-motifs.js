@@ -307,6 +307,121 @@ verifier(
 );
 
 /* ------------------------------------------------------------------ */
+/* §7 — Les passages d'un outil à l'autre                              */
+/* ------------------------------------------------------------------ */
+
+titre('Passages : Mode Plan, formulaire, fiches motif');
+
+const PLAN = require('../js/tools/patterns.js');
+const HANDOFF_PLAN = require('../js/forms/plan-handoff.js');
+const HANDOFF_STUDIO = require('../js/forms/studio-handoff.js');
+const CONFIG_FORMULAIRE = require('../components/project-form/project-form.config.js');
+
+const posesPlan = PLAN.PATTERNS.map((m) => m.id);
+
+/*
+ * Le Mode Plan et le formulaire doivent nommer les sens de pose pareil.
+ *
+ * `plan-handoff.js` recopie cette liste au lieu d'importer l'outil — le
+ * formulaire n'a aucune raison de charger le calepinage pour valider deux
+ * chaînes. Une copie se périme ; ce contrôle est ce qui l'en empêche.
+ */
+verifier(
+  'plan-handoff connaît exactement les motifs du Mode Plan',
+  JSON.stringify(HANDOFF_PLAN.POSES) === JSON.stringify(posesPlan),
+  `${HANDOFF_PLAN.POSES.join(', ')} vs ${posesPlan.join(', ')}`
+);
+
+const champOrientation = CONFIG_FORMULAIRE.projectFormConfig.steps
+  .flatMap((e) => e.fields)
+  .find((c) => c.name === 'orientation');
+const valeursFormulaire = champOrientation ? champOrientation.options.map((o) => o.value) : [];
+
+verifier(
+  'le formulaire propose ces cinq poses, puis « inconnu »',
+  JSON.stringify(valeursFormulaire) === JSON.stringify([...posesPlan, 'inconnu']),
+  valeursFormulaire.join(', ')
+);
+
+/*
+ * LA COLLISION QU'ON NE VEUT PLUS.
+ *
+ * Le Studio appelle `orientation` son ANGLE DE RENDU, en degrés. Le Mode Plan
+ * a longtemps écrit `orientation=diagonale` dans le même paramètre : le
+ * formulaire lisait un nombre là où arrivait un mot, n'en tirait rien, et le
+ * sens de pose se perdait sans un message d'erreur.
+ *
+ * Les deux conventions doivent donc rester disjointes, nom par nom.
+ */
+const nomsStudio = Object.values(HANDOFF_STUDIO.PARAMS);
+const nomsPlan = Object.values(HANDOFF_PLAN.PARAMS);
+const collisions = nomsPlan.filter((n) => nomsStudio.includes(n));
+verifier(
+  'aucun paramètre partagé entre le Studio et le Mode Plan',
+  collisions.length === 0,
+  collisions.length ? `partagé(s) : ${collisions.join(', ')}` : ''
+);
+verifier(
+  'le Mode Plan n’écrit pas dans « orientation », qui est l’angle du Studio',
+  !nomsPlan.includes('orientation')
+);
+
+/*
+ * Les fiches motif ouvrent le Visualiseur sur un motif qu'il sait poser.
+ *
+ * Six fiches éditoriales, trois motifs rendus : la table de passage de
+ * build.js ne doit produire que des valeurs connues du moteur, sans quoi le
+ * lien ouvrirait le Studio sur un motif qui n'existe pas et celui-ci
+ * retomberait en silence sur son motif par défaut.
+ */
+const sourceBuild = lire('_generator/build.js');
+const tableMotifs = sourceBuild.slice(
+  sourceBuild.indexOf('const MOTIF_VERS_STUDIO'),
+  sourceBuild.indexOf('function buildMotifs')
+);
+const cibles = [...tableMotifs.matchAll(/:\s*'([a-z-]+)'/g)].map((m) => m[1]);
+verifier('la table des fiches motif est présente', cibles.length === 5, `${cibles.length} entrée(s)`);
+verifier(
+  'elle ne vise que des motifs que le moteur sait poser',
+  cibles.every((c) => REGLES.MOTIFS_CONNUS.includes(c)),
+  cibles.filter((c) => !REGLES.MOTIFS_CONNUS.includes(c)).join(', ')
+);
+
+/* Et les liens écrits dans les pages tiennent la même promesse. */
+const liensMotifs = [];
+for (const fichier of fs.readdirSync(path.join(RACINE, 'motifs'))) {
+  if (!fichier.endsWith('.html') || fichier === 'index.html') continue;
+  const html = lire(`motifs/${fichier}`);
+  for (const m of html.matchAll(/studio\.html\?motif=([a-z-]+)/g)) liensMotifs.push([fichier, m[1]]);
+}
+verifier('chaque fiche motif ouvre le Visualiseur', liensMotifs.length === 6, `${liensMotifs.length} lien(s)`);
+verifier(
+  'aucun de ces liens ne demande un motif inconnu',
+  liensMotifs.every(([, motif]) => REGLES.MOTIFS_CONNUS.includes(motif)),
+  liensMotifs.filter(([, m]) => !REGLES.MOTIFS_CONNUS.includes(m)).map(([f, m]) => `${f}:${m}`).join(', ')
+);
+
+/*
+ * Les identifiants du catalogue passent la regle du passage.
+ *
+ * Quatorze references portent leur reference fournisseur, en MAJUSCULES. La
+ * regle du front n'acceptait que les minuscules : `parquet=CHENF36006` etait
+ * silencieusement ecarte, et la seule moitie du catalogue qui designe un
+ * produit achetable arrivait au formulaire sans identifiant. Le serveur, lui,
+ * acceptait les deux casses depuis toujours.
+ */
+const identifiantsRefuses = proposees.filter((p) => !HANDOFF_STUDIO.estIdentifiant(p.id));
+verifier(
+  'chaque reference du catalogue passe la regle d identifiant du passage',
+  identifiantsRefuses.length === 0,
+  identifiantsRefuses.map((p) => p.id).join(', ')
+);
+verifier(
+  'un libelle commercial ne passe toujours pas pour un identifiant',
+  !HANDOFF_STUDIO.estIdentifiant('Chêne Fumé') && !HANDOFF_STUDIO.estIdentifiant('a b')
+);
+
+/* ------------------------------------------------------------------ */
 console.log('');
 if (echecs.length) {
   console.log(`${reussis} vérification(s) réussie(s), ${echecs.length} échec(s) :`);

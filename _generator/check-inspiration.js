@@ -44,7 +44,7 @@
  */
 const fs = require('fs');
 const path = require('path');
-const { INSPIRATION_PHOTOS } = require('./photos');
+const { PHOTOS, INSPIRATION_PHOTOS } = require('./photos');
 const { widthsFor } = require('./responsive');
 
 const RACINE = path.join(__dirname, '..');
@@ -145,6 +145,37 @@ function verifie() {
       erreurs.push(`${nom} : aucun champ \`image\`.`);
       continue;
     }
+    /*
+     * La carte et sa photographie doivent désigner le même cliché.
+     *
+     * POURQUOI. Deux cartes avaient gardé l'identifiant Pexels de l'image
+     * précédente après un remplacement — le champ `image` avait changé, le
+     * champ `id` non. Personne ne l'a vu, parce que la page d'inspiration
+     * affiche `image` : elle était juste. Mais `fetch-photos.js` téléchargeait
+     * la vignette `inspi-N` d'après `id`, et le carrousel de l'accueil montrait
+     * donc une autre pièce que la carte, sous la légende de la carte. Le
+     * crédit publié dans CREDITS.md était celui du mauvais photographe.
+     *
+     * Le contrôle est bête et suffit : les deux champs doivent concorder.
+     */
+    const source = PHOTOS[carte.image];
+    if (!source) {
+      erreurs.push(`${nom} : \`image\` vaut « ${carte.image} », absent de PHOTOS.`);
+    } else {
+      if (source.id !== carte.id) {
+        erreurs.push(
+          `${nom} : la carte annonce Pexels ${carte.id}, mais sa photo `
+            + `« ${carte.image} » est Pexels ${source.id}.`
+        );
+      }
+      if (source.credit !== carte.credit) {
+        erreurs.push(
+          `${nom} : crédit « ${carte.credit} » sur la carte, `
+            + `« ${source.credit} » sur sa photo « ${carte.image} ».`
+        );
+      }
+    }
+
     // Toute carte, essayable ou non, doit afficher un fichier qui existe —
     // l'original et chacune des largeurs annoncées dans le srcset.
     const fichiers = [`${carte.image}.jpg`, ...widthsFor(carte.image).map((w) => `${carte.image}-${w}.jpg`)];

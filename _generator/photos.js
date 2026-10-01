@@ -13,9 +13,26 @@
 
 const PHOTOS = {
   // --- Guides -------------------------------------------------------------
+  /*
+   * SOURCE — Pexels 9826455, Gustavo Galeano Maz.
+   *
+   * Cette couverture partageait sa photographie (Pexels 3935327) avec la
+   * fiche motif « pose droite » : deux pages differentes, la meme image.
+   * La fiche garde la photo, dont les lames filent droit vers le fond — son
+   * sujet exact.
+   *
+   * Le guide prend ce couloir d'appartement ancien : les lames filent dans
+   * l'axe de circulation, et par la porte de gauche on voit celles de la
+   * piece voisine partir dans l'autre sens. La question du guide est posee
+   * par l'image elle-meme, et la reponse s'y lit.
+   *
+   * La piece en angle (9826455) avait d'abord ete retenue, puis ecartee :
+   * c'est la photo de la carte d'inspiration « Salon d'angle », et la
+   * reprendre ici aurait recree le doublon qu'on venait de defaire.
+   */
   'cover-quel-sens-de-pose-choisir': {
-    id: 3935327, w: 1400, h: 875, credit: 'Curtis Adams',
-    alt: "Pièce vide et lumineuse au parquet clair, éclairée par de grandes fenêtres",
+    id: 8583672, w: 1400, h: 875, credit: 'Curtis Adams',
+    alt: 'Couloir d’appartement ancien aux lames patinées filant dans l’axe, ouvert sur une pièce où elles partent en travers',
   },
   'cover-poser-parquet-sens-de-la-lumiere': {
     id: 18707513, w: 1400, h: 875, credit: 'sanket mahind',
@@ -27,11 +44,27 @@ const PHOTOS = {
   },
   'cover-point-de-hongrie-ou-baton-rompu': {
     id: 15066939, w: 1400, h: 875, credit: 'Magda Ehlers',
-    alt: 'Parquet en chevrons, motif de bois chaud vu de dessus',
+    // Regarde sur le fichier : bouts de lames CARRES, jonction en escalier.
+    // C'est un baton rompu. La page compare les deux motifs, l'image en
+    // montre un : l'alt doit dire lequel.
+    alt: 'Gros plan sur un parquet de chêne ancien posé en bâton rompu, lames à bouts carrés',
   },
+  /*
+   * SOURCE — Pexels 11126101.
+   *
+   * Cette couverture partageait sa photographie (Pexels 4263067) avec le
+   * tutoriel « Coller un parquet contrecolle ». Elle montrait une pose en
+   * cours ; ce guide parle de ce qui se joue AVANT la premiere lame. Le
+   * vieux plancher a joints ouverts dit mieux le sujet : c'est le support
+   * qu'il faut juger avant de poser quoi que ce soit dessus.
+   *
+   * Meme cliche que la tuile d'accueil `tile-renover`, a un cadrage et une
+   * echelle differents. Un recoupement tuile / couverture, pas deux
+   * couvertures identiques.
+   */
   'cover-erreurs-a-eviter-avant-de-poser': {
-    id: 4263067, w: 1400, h: 875, credit: 'K',
-    alt: 'Poseur assemblant des lames de parquet à la cale à frapper',
+    id: 11126101, w: 1400, h: 875, credit: 'Pexels',
+    alt: 'Vieux plancher de bois patiné aux joints ouverts, vu en perspective',
   },
   'cover-parquet-massif-ou-contrecolle': {
     id: 6568684, w: 1400, h: 875, credit: 'cottonbro studio',
@@ -63,47 +96,134 @@ const PHOTOS = {
     id: 8146337, w: 1400, h: 875, credit: 'Max Vakhtbovych',
     alt: 'Pièce vide et minimaliste dont les lames traversent la largeur',
   },
-  // Visuel **produit pour le site**, et non photographié.
-  //
-  // L'image précédente (James Frid, 8918712) montrait des pavés de bois usés
-  // vus de dessus : aucune pose en diagonale, aucun rapport avec le sujet de
-  // la page. Son texte alternatif — « motif géométrique orienté » — le
-  // trahissait déjà.
-  //
-  // Aucune photothèque à notre disposition ne propose de pose réellement
-  // diagonale, et une photo approchante serait à nouveau fausse. Le visuel est
-  // donc calculé par le moteur du visualiseur sur la scène « chambre », lames
-  // à −45° : c'est le motif exact dont parle la page. `local: true` empêche
-  // `fetch-photos.js` de le remplacer par un téléchargement.
+  /*
+   * Visuel PRODUIT POUR LE SITE, et non photographie.
+   *
+   * Aucune photothèque à notre disposition ne propose de pose réellement
+   * diagonale : la première image du dépôt (James Frid, 8918712) montrait des
+   * pavés de bois vus de dessus, sans rapport avec le sujet. Le visuel est
+   * donc calculé par le moteur du Visualiseur, sur une scène réelle, lames à
+   * −45°. `local: true` empêche `fetch-photos.js` de le remplacer par un
+   * téléchargement.
+   *
+   * SCÈNE — `entree-cadree` (Pexels 7865621), murs blancs et plinthes bois,
+   * vue axiale. Le rendu précédent utilisait la scène « chambre » (Pexels
+   * 7587859) : encore la chambre bleue, déjà très présente ailleurs, et dont
+   * la vue de trois quarts rendait la diagonale presque illisible — les lames
+   * y paraissaient parallèles au mur de gauche.
+   *
+   * ANGLE — −45° plutôt que +45°. Les deux ont été rendus et comparés côte à
+   * côte : à +45° les lames suivent à peu près la fuite de la pièce et se
+   * lisent comme une pose droite ; à −45° elles coupent les deux plinthes en
+   * oblique franche, et les joints de rangs traversent le cadre. C'est le
+   * motif que la page décrit, et il se voit.
+   *
+   * REFAIRE CE RENDU — ouvrir /outils/studio.html?perf=1&piece=entree-cadree
+   * &motif=lames&orientation=-45 dans une fenêtre assez large pour que le
+   * canevas atteigne la taille de la photo de scène (1600 px), puis composer
+   * la photo et le canevas dans un cadre 1400 x 875 aligné en bas — le sol
+   * doit rester entier. Le pilotage passe par `window.__studio`, derrière
+   * `?perf=1`.
+   */
   'cover-pose-diagonale': {
     local: true, w: 1400, h: 875, credit: 'Rendu du Visualiseur Parquet',
-    alt: 'Parquet clair posé en diagonale dans une chambre aux murs bleus',
+    alt: 'Simulation : entrée aux murs blancs dont les lames traversent le sol en diagonale, coupant les plinthes en oblique',
   },
+  /*
+   * SOURCE — Pexels 7587872, Max Vakhtbovych, https://www.pexels.com/photo/7587872/
+   * Original 7360 x 4912. Licence Pexels, usage commercial autorise, credit
+   * porte dans assets/images/CREDITS.md.
+   *
+   * POURQUOI CETTE PHOTO. L'audit visuel a montre que la precedente
+   * (Pexels 37341468) illustrait la fiche « Point de Hongrie » avec un BATON
+   * ROMPU : bouts de lames carres, jonction en escalier. Celle-ci a ete
+   * verifiee a l'oeil, sur le fichier : les lames sont coupees en biais et
+   * se rejoignent en pointe le long d'un joint central continu. C'est bien
+   * un point de Hongrie.
+   *
+   * POURQUOI CE CADRAGE. 1400 x 613, soit 16/7 : le rapport exact de
+   * `.article-cover`, le seul conteneur qui affiche cette cle (verifie :
+   * aucune carte 4/3 ne l'utilise). Le navigateur n'a donc plus rien a
+   * recouper, et ce que l'on choisit ici est ce que le lecteur voit. Avec
+   * `crop: 'bottom'`, le sol occupe plus de la moitie du cadre, le joint
+   * central file vers le fond et les biseaux se lisent au premier plan.
+   *
+   * Cadrage DIFFERENT de celui de l'accueil (`immersive-hongrie`, 16/9, meme
+   * source) : ici le motif, la-bas l'ambiance.
+   */
   'cover-point-de-hongrie': {
-    id: 37341468, w: 1400, h: 875, credit: 'Diana',
-    alt: 'Gros plan sur un parquet en Point de Hongrie',
+    id: 7587872, w: 1400, h: 613, crop: 'bottom', credit: 'Max Vakhtbovych',
+    alt: 'Parquet de frêne clair en point de Hongrie, lames biseautées se rejoignant en pointe le long d’un joint central',
   },
+  /*
+   * « Chevrons » designe le POINT DE HONGRIE en francais : des lames coupees
+   * en biais qui se rejoignent en pointe, joint continu. Cette photo montre
+   * l'autre motif — des lames a bouts carres dont la jonction fait un
+   * escalier. C'est un baton rompu, et l'alt le disait a l'envers.
+   */
   'cover-baton-rompu': {
     id: 16101859, w: 1400, h: 875, credit: 'Francesca Cruccu',
-    alt: 'Lumière rasante sur un parquet posé en chevrons',
+    alt: 'Lumière rasante sur un parquet ancien posé en bâton rompu',
   },
 
   // --- Tutoriels ----------------------------------------------------------
+  /*
+   * SOURCE — Pexels 4263067, « K ».
+   *
+   * La precedente (Pexels 4981802) montrait un artisan percant un MUR
+   * autour d'un boitier electrique : ni sol, ni lame, ni parquet, pour le
+   * tutoriel de pose flottante.
+   *
+   * Celle-ci a ete regardee sur le fichier : une lame sombre en cours de
+   * mise en place, une cale a frapper, un maillet, et surtout la sous-couche
+   * mousse grise visible au ras du sol. C'est exactement une pose FLOTTANTE,
+   * et le tutoriel annonce « de la sous-couche aux plinthes ».
+   *
+   * C'est la seule photographie du depot qui montre une pose reelle. Elle
+   * revient donc ici, et quitte les deux couvertures qui se la partageaient
+   * — dont le tutoriel de COLLAGE, ou elle etait factuellement fausse.
+   */
   'cover-poser-un-parquet-flottant': {
-    id: 4981802, w: 1400, h: 875, credit: 'Antoni Shkraba',
-    alt: 'Artisan en chantier, visseuse en main, au-dessus d’un plancher bois',
-  },
-  'cover-coller-un-parquet-contrecolle': {
     id: 4263067, w: 1400, h: 875, credit: 'K',
-    alt: 'Poseur mettant en place une lame de parquet contrecollé',
+    alt: 'Lame de parquet mise en place à la cale à frapper, au-dessus d’une sous-couche mousse',
   },
-  'cover-reussir-le-calepinage': {
-    id: 7258193, w: 1400, h: 875, credit: 'Thirdman',
-    alt: 'Outils de chantier posés sur un parquet en cours de pose',
-  },
-  'tile-poser-un-parquet-flottant': { id: 4981802, w: 300, h: 300, credit: 'Antoni Shkraba', alt: '' },
-  'tile-coller-un-parquet-contrecolle': { id: 4263067, w: 300, h: 300, credit: 'K', alt: '' },
-  'tile-reussir-le-calepinage': { id: 7258193, w: 300, h: 300, credit: 'Thirdman', alt: '' },
+  /*
+   * IMAGE_REQUIRED — « Coller un parquet contrecolle ».
+   *
+   * Ce qu'il faudrait : une pose COLLEE. Colle en cordons ou peignee a la
+   * spatule crantee, lame plaquee dessus, pas de sous-couche mousse.
+   *
+   * Ce qu'il y avait : Pexels 4263067, c'est-a-dire une pose flottante sur
+   * sous-couche mousse, avec cale a frapper. La technique montree n'etait
+   * pas celle du tutoriel, et le meme cliche servait deja deux autres pages.
+   *
+   * Aucune ressource locale ne montre un encollage. Plutot qu'une image qui
+   * enseigne le geste inverse, la page se passe de couverture : le gabarit
+   * s'en apercoit tout seul (voir `aUneCouverture` dans build.js).
+   */
+  /*
+   * IMAGE_REQUIRED — « Reussir son calepinage ».
+   *
+   * Ce qu'il faudrait : un tracage. Cordeau, metre, lignes de reference au
+   * sol, plan de calepinage, lames posees a blanc avant fixation.
+   *
+   * Ce qu'il y avait : Pexels 7258193, un masque de protection et des gants
+   * poses sur une chaise, au-dessus d'un parquet deja pose. Ni tracage, ni
+   * calepinage — et le sol du fond est un baton rompu, alors que le
+   * tutoriel ne parle pas de ce motif.
+   *
+   * Aucune ressource locale ne montre un tracage. Le depot ne contient que
+   * du ragreage, une chape lissee et une pose flottante : presenter l'un
+   * des trois comme du calepinage serait la meme faute, deplacee. La page se
+   * passe donc de couverture.
+   */
+  /*
+   * Les trois tuiles ci-dessous sont declarees mais AUCUNE page ne les
+   * affiche (verifie sur les 34 pages construites). Elles restent alignees
+   * sur leur couverture pour que le depot ne se contredise pas, et sont
+   * signalees ici plutot que supprimees en silence.
+   */
+  'tile-poser-un-parquet-flottant': { id: 4263067, w: 300, h: 300, credit: 'K', alt: '' },
 
   // --- Illustrations d'article --------------------------------------------
   'preparation-ragreage': {
@@ -114,6 +234,14 @@ const PHOTOS = {
     id: 7504591, w: 1400, h: 875, credit: 'cottonbro studio',
     alt: 'Présentoir d’échantillons de lames de bois de différentes essences',
   },
+  /*
+   * PLUS AFFICHEE NULLE PART depuis la refonte de /a-propos/ (verifie sur les
+   * 34 pages construites). C'etait une photo de stock d'echantillons, posee
+   * a cote du texte pour l'aerer ; la page respire desormais par un encadre
+   * et deux tableaux, qui disent quelque chose. L'entree reste declaree —
+   * les fichiers existent, la source est tracee — plutot que supprimee en
+   * silence : si une page a besoin d'une image d'echantillons, elle est la.
+   */
   'apropos-studio': {
     id: 6583355, w: 1400, h: 875, credit: 'cottonbro studio',
     alt: 'Comparaison d’échantillons de bois et de matières sur un plan de travail',
@@ -125,9 +253,30 @@ const PHOTOS = {
     id: 13702811, w: 2200, h: 1300, credit: 'Curtis Adams',
     alt: 'Grande pièce vide au parquet clair, arches et lumière naturelle',
   },
+  /*
+   * SOURCE — Pexels 7587872, Max Vakhtbovych, https://www.pexels.com/photo/7587872/
+   * Original 7360 x 4912. Meme cliche que `cover-point-de-hongrie` et que
+   * `room-chambre-parisienne`, a trois cadrages distincts.
+   *
+   * POURQUOI CETTE PHOTO. La precedente (Pexels 16101859) etait la meme
+   * image que `cover-baton-rompu`, a la taille pres, et montrait un baton
+   * rompu — sous un dossier intitule « Le Point de Hongrie » dont le texte
+   * explique que les lames sont « coupees en biais a leurs extremites ».
+   * Le texte etait juste, l'image le dementait, sur la section la plus vue
+   * du site pour ce motif.
+   *
+   * POURQUOI CE CADRAGE. 2000 x 1125, soit 16/9, avec `crop: 'bottom'`.
+   * `.dossier__bg` couvre toute la section en `object-fit: cover` ; un
+   * rapport plus large que celui de la section fait rogner les COTES, jamais
+   * le bas — le sol reste donc entier quelle que soit la hauteur du bloc.
+   * Un 4/3, lui, se serait fait couper par le bas, la ou se trouve le motif.
+   *
+   * Role : ambiance et impact, pas demonstration. Le gros plan sur le motif
+   * est reserve a la fiche (`cover-point-de-hongrie`, 16/7).
+   */
   'immersive-hongrie': {
-    id: 16101859, w: 2000, h: 1500, credit: 'Francesca Cruccu',
-    alt: 'Lumière rasante dessinant les chevrons d un parquet en Point de Hongrie',
+    id: 7587872, w: 2000, h: 1125, crop: 'bottom', credit: 'Max Vakhtbovych',
+    alt: 'Pièce aux murs bleus ouverte sur un jardin, sol en point de Hongrie filant vers la baie',
   },
   'immersive-parcours': {
     id: 18707513, w: 2000, h: 1400, credit: 'sanket mahind',
@@ -143,7 +292,7 @@ const PHOTOS = {
   },
   'tile-motif': {
     id: 15066939, w: 1000, h: 900, credit: 'Magda Ehlers',
-    alt: 'Parquet en chevrons vu de dessus',
+    alt: 'Parquet de chêne ancien posé en bâton rompu, vu de dessus',
   },
   'tile-renover': {
     id: 11126101, w: 1000, h: 900, credit: 'Pexels',
@@ -227,7 +376,7 @@ const PHOTOS = {
    */
   'room-chambre-parisienne': {
     id: 7587872, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
-    alt: 'Pièce aux murs bleus et parquet en chevrons',
+    alt: 'Pièce aux murs bleus et parquet en point de Hongrie',
   },
   /*
    * Deux photographies retenues pour les cartes qui n'avaient pas de scène.
@@ -250,7 +399,7 @@ const PHOTOS = {
    */
   'room-couloir-bleu': {
     id: 7587868, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
-    alt: 'Couloir aux murs bleu nuit à moulures, parquet en chevrons dans l axe',
+    alt: 'Couloir aux murs bleu nuit à moulures, parquet en point de Hongrie dans l axe',
   },
   /*
    * Les trois pièces de la dernière passe. Elles ont été choisies sur MESURE
@@ -271,7 +420,7 @@ const PHOTOS = {
   },
   'room-piece-arcades': {
     id: 13702811, w: 1600, h: 1067, credit: 'Daniel Tanque',
-    alt: 'Grande pièce vide à arcades, murs crème et parquet en point de Hongrie',
+    alt: 'Grande pièce vide à arcades, murs crème et parquet en bâton rompu',
   },
   'room-cuisine-ouverte': {
     id: 8146149, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
@@ -356,15 +505,28 @@ const PHOTOS = {
  * encombrer la bibliothèque principale.
  */
 const INSPIRATION_PHOTOS = [
-  { id: 3935327, tags: 'hongrie sejour', credit: 'Curtis Adams', title: 'Séjour traversant', meta: 'Chevrons · chêne fumé', size: 'wide',
+  /*
+   * « Chevrons » designe le point de Hongrie en francais courant, mais le
+   * site enseigne la distinction entre les deux motifs en V : le mot est
+   * donc ecarte partout ou il tient lieu de nom de motif. Ici comme
+   * ailleurs, on ecrit « Point de Hongrie » ou « baton rompu ».
+   */
+  { id: 3935327, tags: 'hongrie sejour', credit: 'Curtis Adams', title: 'Séjour traversant', meta: 'Point de Hongrie · chêne fumé', size: 'wide',
     alt: 'Séjour vide et lumineux aux grandes fenêtres, sol clair',
     image: 'room-sejour', sceneId: 'sejour', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-fume', pattern: 'point-de-hongrie', orientation: 0 } },
   { id: 7587872, tags: 'hongrie chambre', credit: 'Max Vakhtbovych', title: 'Chambre parisienne', meta: 'Point de Hongrie · chêne naturel', size: 'md',
-    alt: 'Pièce aux murs bleus et parquet en chevrons',
+    alt: 'Pièce aux murs bleus et parquet en point de Hongrie',
     image: 'room-chambre-parisienne', sceneId: 'chambre-parisienne', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-naturel', pattern: 'point-de-hongrie', orientation: 0 } },
-  { id: 7060823, tags: 'droite cuisine', credit: 'Max Vakhtbovych', title: 'Cuisine ouverte', meta: 'Lames larges · chêne gris', size: 'sm',
+  /*
+   * `id` et `credit` doivent designer la MEME photographie que `image`.
+   * Ils etaient restes sur l'ancienne (7060823) apres le remplacement decrit
+   * plus bas : le fichier `inspi-3.jpg`, telecharge d'apres `id`, montrait
+   * donc une autre piece que la carte. `check-inspiration` le verifie
+   * desormais, et `fetch-photos` telecharge d'apres `image`.
+   */
+  { id: 8146149, tags: 'droite cuisine', credit: 'Max Vakhtbovych', title: 'Cuisine ouverte', meta: 'Lames larges · chêne gris', size: 'sm',
     alt: 'Cuisine ouverte sur un grand séjour vide, sol en lames foncées',
     // Photo remplacée : l'ancienne (room-cuisine, 7060823) avait un grand tapis
     // au centre du sol et six chaises à pieds de 4 px. La nouvelle a le sol le
@@ -372,7 +534,7 @@ const INSPIRATION_PHOTOS = [
     image: 'room-cuisine-ouverte', sceneId: 'cuisine-ouverte', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-gris', pattern: 'lames', orientation: 0 } },
   { id: 7587868, tags: 'hongrie couloir', credit: 'Max Vakhtbovych', title: 'Couloir en enfilade', meta: 'Point de Hongrie · chêne naturel', size: 'sm',
-    alt: 'Couloir aux murs bleu nuit à moulures, parquet en chevrons dans l’axe',
+    alt: 'Couloir aux murs bleu nuit à moulures, parquet en point de Hongrie dans l’axe',
     // Photo remplacée, puis calibrée à la QUATRIÈME tentative. Les rejets :
     // room-couloir (7587374), bois clair sur bois clair, aucune marche sur
     // AUCUNE colonne ; deux autres couloirs (19899087, 7005286) sans frontière
@@ -411,7 +573,9 @@ const INSPIRATION_PHOTOS = [
     // concordent à 4,2 px. Voir data/scenes/chambre-claire.json.
     image: 'room-chambre-claire', sceneId: 'chambre-claire', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-brun', pattern: 'lames', orientation: 0 } },
-  { id: 7045700, tags: 'droite sejour', credit: 'Max Vakhtbovych', title: 'Salon d’angle', meta: 'Lames droites · chêne foncé', size: 'wide',
+  /* Meme derive que la carte « Cuisine ouverte » : l'identifiant etait reste
+   * sur l'ancienne photo (7045700, `room-grande-piece`). */
+  { id: 9826455, tags: 'droite sejour', credit: 'Gustavo Galeano Maz', title: 'Salon d’angle', meta: 'Lames droites · chêne foncé', size: 'wide',
     alt: 'Grande pièce vide formant un angle, sol en lames de noyer et plinthes bois',
     // Photo remplacée : l'ancienne (room-grande-piece, 7045700) avait un sol
     // sombre et miroitant dont le champ d'orientation ne donnait aucune fuite
@@ -419,8 +583,8 @@ const INSPIRATION_PHOTOS = [
     // deux frontières horizontales à deux profondeurs.
     image: 'room-salon-angle', sceneId: 'salon-angle', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-tabac', pattern: 'lames', orientation: 0 } },
-  { id: 13702811, tags: 'hongrie sejour', credit: 'Daniel Tanque', title: 'Pièce aux arcades', meta: 'Point de Hongrie · chêne fumé', size: 'sm',
-    alt: 'Grande pièce vide à arcades, murs crème et parquet en point de Hongrie',
+  { id: 13702811, tags: 'baton-rompu sejour', credit: 'Daniel Tanque', title: 'Pièce aux arcades', meta: 'Bâton rompu · chêne fumé', size: 'sm',
+    alt: 'Grande pièce vide à arcades, murs crème et parquet en bâton rompu',
     // Photo remplacée, et le titre suit la photo. L'ancienne
     // (room-sous-les-toits, 8082327) avait un sol presque vide, mais sa moitié
     // gauche n'était pas mesurable — onze colonnes, onze hauteurs sans
@@ -436,8 +600,19 @@ const INSPIRATION_PHOTOS = [
     // connues — porte, hauteur sous corniche, plinthe, largeur de porte — ce
     // qui n'était jamais arrivé. Son sol est en bâton rompu et occupe près de
     // la moitié du cadre. Voir data/scenes/piece-arcades.json.
+    /*
+     * PRIORITE 13 — le motif propose est celui que la photo montre.
+     *
+     * La carte ouvrait le Visualiseur sur un POINT DE HONGRIE alors que le
+     * sol photographie est un BATON ROMPU, et que ce sol occupe pres de la
+     * moitie du cadre. Le visiteur voyait un motif, en obtenait un autre, et
+     * n'avait aucun moyen de savoir lequel des deux la page lui nommait.
+     *
+     * `chene-fume` accepte les trois motifs (`compatiblePatterns` dans
+     * data/parquets.json) : la configuration suit donc la photo.
+     */
     image: 'room-piece-arcades', sceneId: 'piece-arcades', visualizerAvailable: true, showInRoomLibrary: true,
-    config: { productId: 'chene-fume', pattern: 'point-de-hongrie', orientation: 0 } },
+    config: { productId: 'chene-fume', pattern: 'baton-rompu', orientation: 0 } },
   { id: 7865621, tags: 'droite couloir', credit: 'Gustavo Galeano Maz', title: 'Entrée cadrée', meta: 'Lames dans l’axe · chêne miel', size: 'md',
     alt: 'Entrée vide aux murs blancs et plinthes bois, parquet miel, portes en enfilade au fond',
     // Quatrième photo pour cette carte, et les trois refus ont tous la même
@@ -456,11 +631,23 @@ const INSPIRATION_PHOTOS = [
     config: { productId: 'chene-miel', pattern: 'lames', orientation: 0 } },
 ];
 
-/** `fm: 'webp'` demande la version WebP au CDN Pexels. */
-const pexelsUrl = ({ id, w, h, fm }) =>
+/**
+ * URL de telechargement d'une photographie, aux dimensions demandees.
+ *
+ * `fm: 'webp'` demande la version WebP au CDN Pexels.
+ *
+ * `crop` place le cadre quand le rapport demande differe de celui de la
+ * source : `bottom` garde le bas, `top` le haut, et l'absence de valeur
+ * centre. C'est le seul levier de cadrage que ce CDN honore reellement --
+ * `rect` et le zoom par point focal (`fp-z`) sont ignores, verifie sur la
+ * photo 7587872 : les reponses etaient identiques, octet pour octet, a un
+ * recadrage centre. Une vue rapprochee ne s'obtient donc qu'en demandant un
+ * rapport plus large, pas un facteur d'agrandissement.
+ */
+const pexelsUrl = ({ id, w, h, fm, crop }) =>
   `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb${
     fm ? `&fm=${fm}` : ''
-  }&fit=crop&w=${w}&h=${h}`;
+  }${crop ? `&crop=${crop}` : ''}&fit=crop&w=${w}&h=${h}`;
 
 const photoPage = (id) => `https://www.pexels.com/photo/${id}/`;
 
