@@ -102,6 +102,7 @@ jobs:
                 --exclude 'design' \
                 --exclude 'node_modules' \
                 --exclude 'serve.js' \
+                --exclude '.*.tmp' \
                 --exclude 'README.md' \
                 --exclude 'CREDITS.md' \
                 --exclude '/js' \
@@ -114,6 +115,17 @@ jobs:
         run: |
           # Une exclusion oubliée ne doit pas se découvrir en production.
           fuites=0
+
+          # Temporaires de l'ecriture atomique du generateur : retires apres
+          # chaque ecriture, mais une construction interrompue peut en laisser
+          # un, et cela n'a rien a faire dans un artefact public.
+          temporaires=$(find _site -name '.*.tmp' | head -5)
+          if [ -n "$temporaires" ]; then
+            echo "::error::des fichiers temporaires du generateur sont dans l'artefact :"
+            echo "$temporaires"
+            fuites=1
+          fi
+
           for interdit in docs design backend _generator _calibrage .claude .vscode .kilo README.md js css components; do
             if [ -e "_site/$interdit" ]; then
               echo "::error::_site/$interdit ne devrait pas être publié"

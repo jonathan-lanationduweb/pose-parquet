@@ -278,7 +278,131 @@ try {
 }
 
 /* ------------------------------------------------------------------ */
-/* §11 — Double construction                                           */
+/* §11 — Écriture atomique et reprise des verrous                      */
+/* ------------------------------------------------------------------ */
+
+titre('Écriture : atomique, et patiente avec Windows');
+
+/*
+ * POURQUOI CETTE SECTION.
+ *
+ * Mesure avant correction : 4 constructions sur 25 échouaient, toujours de la
+ * même façon — `UNKNOWN` sur `open`, toujours sur un fichier qui venait
+ * d'être réécrit. Le générateur écrit désormais à côté puis renomme, et
+ * réessaie les verrous transitoires.
+ *
+ * Une reprise que rien n'éprouve ne vaut rien : elle ne s'exécute qu'un jour
+ * sur dix, et le jour où elle se trompe personne ne le sait. On lui donne
+ * donc ici les cas qu'elle doit traiter, et surtout ceux qu'elle ne doit PAS
+ * traiter — masquer un ENOENT serait pire que l'échec d'origine.
+ */
+
+const bacEcriture = fs.mkdtempSync(path.join(os.tmpdir(), 'pp-ecriture-'));
+try {
+  /* Le cas nominal : le contenu arrive, et rien ne traîne. */
+  const cible = path.join(bacEcriture, 'page.html');
+  eol.ecrireTexte(cible, 'Bonjour\r\nmonde');
+  verifier('le contenu est écrit', fs.readFileSync(cible, 'utf8') === 'Bonjour\nmonde');
+  verifier(
+    'aucun temporaire ne subsiste après un succès',
+    fs.readdirSync(bacEcriture).filter((n) => n.endsWith('.tmp')).length === 0,
+    fs.readdirSync(bacEcriture).join(', ')
+  );
+
+  /* Un fichier déjà présent est remplacé, pas complété. */
+  eol.ecrireTexte(cible, 'court');
+  verifier('une réécriture remplace entièrement', fs.readFileSync(cible, 'utf8') === 'court');
+
+  /* Le dossier manquant est créé. */
+  const profond = path.join(bacEcriture, 'a', 'b', 'c.html');
+  eol.ecrireTexte(profond, 'x');
+  verifier('les dossiers intermédiaires sont créés', fs.existsSync(profond));
+
+  /* ---- La reprise, cas par cas ---- */
+
+  const erreur = (code) => Object.assign(new Error(`faux ${code}`), { code });
+
+  let appels = 0;
+  const resultat = eol.avecReprises(() => {
+    appels += 1;
+    if (appels < 3) throw erreur('UNKNOWN');
+    return 'abouti';
+  }, 'essai');
+  verifier('un verrou transitoire est réessayé jusqu’au succès', resultat === 'abouti' && appels === 3, `${appels} tentative(s)`);
+
+  for (const code of [...eol.CODES_TRANSITOIRES]) {
+    let n = 0;
+    let vu = null;
+    try {
+      eol.avecReprises(() => { n += 1; throw erreur(code); }, 'essai');
+    } catch (e) {
+      vu = e;
+    }
+    verifier(
+      `${code} : ${eol.ATTENTES_MS.length + 1} tentatives puis échec réel`,
+      n === eol.ATTENTES_MS.length + 1 && vu !== null && vu.code === code,
+      `${n} tentative(s)`
+    );
+    verifier(`${code} : le message dit que l’abandon est délibéré`, /abandon après/.test(vu.message));
+  }
+
+  /*
+   * CE QU'ON NE RÉESSAIE JAMAIS.
+   *
+   * Un dossier absent, un droit refusé pour de bon, un disque plein : attendre
+   * 250 ms n'arrange rien et brouille le diagnostic. Ces erreurs remontent à
+   * la première tentative, telles quelles.
+   */
+  for (const code of ['ENOENT', 'EISDIR', 'ENOSPC', 'EROFS', 'EMFILE']) {
+    let n = 0;
+    let vu = null;
+    try {
+      eol.avecReprises(() => { n += 1; throw erreur(code); }, 'essai');
+    } catch (e) {
+      vu = e;
+    }
+    verifier(`${code} : remonte immédiatement, sans reprise`, n === 1 && vu.code === code, `${n} tentative(s)`);
+    verifier(`${code} : le message n’est pas maquillé`, !/abandon après/.test(vu.message));
+  }
+
+  /* Une erreur sans code — une exception de génération — passe aussi tout droit. */
+  let sansCode = 0;
+  try {
+    eol.avecReprises(() => { sansCode += 1; throw new Error('gabarit invalide'); }, 'essai');
+  } catch { /* attendu */ }
+  verifier('une erreur sans code n’est pas réessayée', sansCode === 1, `${sansCode} tentative(s)`);
+
+  /* Les attentes sont bornées et réellement respectées. */
+  const debut = Date.now();
+  try {
+    eol.avecReprises(() => { throw erreur('EBUSY'); }, 'essai');
+  } catch { /* attendu */ }
+  const duree = Date.now() - debut;
+  const somme = eol.ATTENTES_MS.reduce((a, b) => a + b, 0);
+  verifier(
+    `l’attente cumulée vaut ${somme} ms et reste bornée`,
+    duree >= somme - 15 && duree < somme + 400,
+    `${duree} ms`
+  );
+
+  /*
+   * Le nom du temporaire ne peut pas être pris pour une page.
+   *
+   * Les parcours du générateur ne collectent que les `.html` : un nom qui
+   * finit par `.tmp` leur est invisible. Le point initial l'écarte en plus des
+   * listings, et le pid évite que deux constructions se marchent dessus.
+   */
+  const source = path.join(bacEcriture, 'source.js');
+  fs.writeFileSync(source, 'const a = 1;\n');
+  eol.copierCanonique(source, path.join(bacEcriture, 'copie.js'));
+  const restes = fs.readdirSync(bacEcriture).filter((n) => n.includes('.tmp'));
+  verifier('copierCanonique ne laisse aucun temporaire', restes.length === 0, restes.join(', '));
+} finally {
+  fs.rmSync(bacEcriture, { recursive: true, force: true });
+}
+
+/* ------------------------------------------------------------------ */
+/* §12 — Double construction                                           */
 /* ------------------------------------------------------------------ */
 
 if (!RAPIDE) {

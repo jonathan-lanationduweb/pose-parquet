@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const { SITE, layout, breadcrumb } = require('./layout');
-const { ICON, tip, key, faq, faqJsonLd, linkArrow } = require('./ui');
+const { ICON, tip, key, faq, faqJsonLd, linkArrow, table, callout } = require('./ui');
 const { GUIDES } = require('./content-guides');
 const { MOTIFS } = require('./content-motifs');
 const { TUTOS } = require('./content-tutos');
@@ -142,6 +142,21 @@ const motifName = (motif) => {
 
 const photoAlt = (name) => (PHOTOS[name] && PHOTOS[name].alt) || '';
 
+/**
+ * Cet article a-t-il une couverture fiable ?
+ *
+ * L'audit visuel a trouve des couvertures qui montraient autre chose que ce
+ * que leur page raconte — un mur perce pour un tutoriel de pose, une pose
+ * flottante pour un tutoriel de collage. Quand l'image juste n'existe pas
+ * encore, la cle est retiree de `photos.js` sous un bloc IMAGE_REQUIRED qui
+ * dit ce qu'il faudrait, et les gabarits s'en apercoivent ici.
+ *
+ * Consequences : la page se passe de couverture, la carte garde son cadre
+ * mais reste un aplat. Un vide assume vaut mieux qu'une photographie qui
+ * enseigne le geste inverse.
+ */
+const aUneCouverture = (slug) => Boolean(PHOTOS[`cover-${slug}`]);
+
 const guideBySlug = (slug) => GUIDES.find((guide) => guide.slug === slug);
 
 /* ------------------------------------------------------------------ */
@@ -150,8 +165,10 @@ const guideBySlug = (slug) => GUIDES.find((guide) => guide.slug === slug);
 
 function articleCard(item, base, hrefDir, badge) {
   return `<article class="card" data-tags="${(item.tags || []).join(' ')}" data-reveal>
-            <div class="card__media">
-              ${picture(`cover-${item.slug}`, { base, alt: '', sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw' })}
+            <div class="card__media${aUneCouverture(item.slug) ? '' : ' card__media--attente'}">
+              ${aUneCouverture(item.slug)
+                ? picture(`cover-${item.slug}`, { base, alt: '', sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw' })
+                : ''}
               <span class="badge">${badge || item.category}</span>
             </div>
             <div class="card__body">
@@ -272,9 +289,11 @@ function editorialPage(item, options) {
       </header>
 
       <div class="wrap-wide">
-        <div class="article-cover" data-reveal>
+        ${aUneCouverture(item.slug)
+          ? `<div class="article-cover" data-reveal>
           ${picture(`cover-${item.slug}`, { base, alt: photoAlt(`cover-${item.slug}`) || item.h1, sizes: '(min-width: 75rem) 68rem, 94vw', priority: true })}
-        </div>
+        </div>`
+          : ''}
 
         <div class="article-layout">
           <article class="prose" id="article-content">
@@ -360,8 +379,10 @@ function buildGuides() {
       <section class="section section--flush-top">
         <div class="wrap">
           <div class="listing-featured">
-            <article class="feature-card" data-reveal>
-              ${picture(`cover-${featured.slug}`, { base: '../', alt: '', sizes: '(min-width: 60rem) 45rem, 94vw', priority: true })}
+            <article class="feature-card${aUneCouverture(featured.slug) ? '' : ' feature-card--attente'}" data-reveal>
+              ${aUneCouverture(featured.slug)
+                ? picture(`cover-${featured.slug}`, { base: '../', alt: '', sizes: '(min-width: 60rem) 45rem, 94vw', priority: true })
+                : ''}
               <p class="eyebrow">${featured.category}</p>
               <h2><a href="${featured.slug}.html">${featured.h1}</a></h2>
               <p>${featured.excerpt}</p>
@@ -411,8 +432,45 @@ function buildGuides() {
   );
 }
 
+/*
+ * Du motif éditorial au motif que le moteur sait poser.
+ *
+ * Les six fiches décrivent six écritures au sol ; le Visualiseur n'en dessine
+ * que trois. « Dans la longueur », « dans la largeur » et « en diagonale »
+ * sont trois orientations d'une même pose à lames droites — le moteur les
+ * obtient en tournant `lames`, pas en changeant de motif.
+ *
+ * L'ANGLE N'EST PAS FORCÉ, et c'est délibéré. Dans le Studio, l'angle est
+ * relatif au plan du sol de la photographie, pas aux murs de la pièce : rien
+ * ne garantit que 0° suive la longueur de CETTE pièce-là. Envoyer
+ * `orientation=0` pour « dans la longueur » afficherait donc un rendu faux
+ * une fois sur deux. La diagonale, elle, reste diagonale quelle que soit la
+ * pièce — mais par cohérence on laisse le visiteur régler l'angle, ce que le
+ * panneau Orientation fait en un clic.
+ *
+ * Ce que le lien promet est donc seulement ce qu'il tient : ouvrir le
+ * Visualiseur sur le bon motif.
+ */
+const MOTIF_VERS_STUDIO = {
+  longueur: 'lames',
+  largeur: 'lames',
+  diagonale: 'lames',
+  'point-de-hongrie': 'point-de-hongrie',
+  'baton-rompu': 'baton-rompu',
+};
+
 function buildMotifs() {
   MOTIFS.forEach((motif) => {
+    /*
+     * La sortie produit d'une fiche motif.
+     *
+     * Elle mène au Visualiseur et non directement chez un marchand : à ce
+     * stade le visiteur cherche à voir, pas à acheter. C'est une fois le
+     * parquet posé sur sa photo que la fiche produit a du sens — et c'est là
+     * qu'elle apparaît. Griller l'étape reviendrait à répondre « achetez »
+     * à quelqu'un qui demande « à quoi ça ressemble ».
+     */
+    const motifStudio = MOTIF_VERS_STUDIO[motif.pattern];
     const aside = `<div class="aside-box">
               <h3>${motif.h1} en chiffres</h3>
               <ul class="meta-list meta-list--stack">
@@ -423,7 +481,16 @@ function buildMotifs() {
               <h3>Voir ce motif</h3>
               <div class="pattern-card__viz" data-pattern-thumb="${motif.pattern}"></div>
               <a class="btn btn--ghost btn--sm" href="../outils/simulateur-pose.html#motif=${motif.pattern}">Tester dans ma pièce</a>
-            </div>`;
+            </div>${
+              motifStudio
+                ? `
+            <div class="aside-box">
+              <h3>Des parquets dans ce motif</h3>
+              <p>Le Visualiseur pose ${NB_PARQUETS} références sur la photographie d’une pièce. Celles qui existent réellement renvoient vers leur fiche.</p>
+              <a class="btn btn--sm" href="../outils/studio.html?motif=${motifStudio}">Essayer ce motif sur une photo</a>
+            </div>`
+                : ''
+            }`;
 
     const item = {
       ...motif,
@@ -489,7 +556,7 @@ function buildMotifs() {
           <div class="section-head">
             <p class="eyebrow">Comparer</p>
             <h2>Deux motifs souvent confondus</h2>
-            <p class="lead">Point de Hongrie et bâton rompu produisent tous deux un effet de chevrons, mais ne se posent ni ne se commandent de la même façon.</p>
+            <p class="lead">Point de Hongrie et bâton rompu dessinent tous deux un sol en V, mais ne se posent ni ne se commandent de la même façon.</p>
           </div>
           <div class="grid grid--2">
             <div class="pattern-card"><div class="pattern-card__viz" data-pattern-thumb="point-de-hongrie"></div><h3>Point de Hongrie</h3><p>Coupe d'onglet, pointe continue.</p></div>
@@ -527,6 +594,28 @@ function buildTutos() {
               <h3>Avant de commencer</h3>
               <p>Vérifiez la planéité et l'humidité du support : c'est la cause de la majorité des désordres.</p>
               <a class="btn btn--ghost btn--sm" href="../guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a>
+            </div>
+            <!--
+              La sortie chantier, sur les tutoriels et nulle part ailleurs.
+
+              Un tutoriel de pose est le seul endroit du site où quelqu'un
+              peut légitimement changer d'avis en lisant : découvrir le nombre
+              d'étapes, l'outillage, les points de contrôle, et décider que ce
+              n'est pas pour lui. Lui proposer là de confier le chantier
+              répond à une question qu'il vient de se poser.
+
+              Dans un guide de décision — « quel sens de pose ? » — la même
+              proposition serait hors sujet : on y cherche à comprendre, pas à
+              déléguer.
+
+              Le lien mène au formulaire, pas chez le poseur : c'est ce qui
+              permet de qualifier le besoin et la zone avant d'orienter. Voir
+              js/commerce/allure.js.
+            -->
+            <div class="aside-box">
+              <h3>Vous préférez confier la pose ?</h3>
+              <p>Décrivez votre projet : nous orientons vers un poseur selon votre région. En Île-de-France, la pose et la rénovation sont assurées par Allure Design.</p>
+              <a class="btn btn--ghost btn--sm" href="../projet/?besoin=pose">Faire poser mon parquet</a>
             </div>`;
     const item = { ...tuto, category: 'Tutoriel', date: '2026-08-16', related: ['preparer-son-sol-avant-la-pose', 'erreurs-a-eviter-avant-de-poser', 'quel-sens-de-pose-choisir'] };
     write(
@@ -721,11 +810,21 @@ function buildInspiration() {
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'Inspiration' }]);
   const diapositives = INSPIRATIONS.map(diapositiveInspiration).join('\n            ');
 
-  // Filtres limités aux motifs réellement visibles dans les photographies.
+  /*
+   * Filtres limités aux motifs réellement visibles dans les photographies.
+   *
+   * « Chevrons » nommait le filtre du point de Hongrie. Le mot est juste en
+   * français courant, mais le site passe son temps à séparer les deux motifs
+   * en V : le laisser ici revenait à donner au visiteur le synonyme au
+   * moment précis où on lui demande de choisir. Le bâton rompu apparaît en
+   * même temps, puisqu'une photographie en montre désormais un déclaré
+   * comme tel.
+   */
   const filters = [
     ['all', 'Tout'],
     ['droite', 'Lames droites'],
-    ['hongrie', 'Chevrons'],
+    ['hongrie', 'Point de Hongrie'],
+    ['baton-rompu', 'Bâton rompu'],
     ['sejour', 'Séjours'],
     ['chambre', 'Chambres'],
   ];
@@ -1065,11 +1164,11 @@ function buildContact() {
             <div class="contact-card">
               <h2>Ce que nous ne faisons pas</h2>
               <ul class="project-points">
-                <li>${ICON.check.replace('<svg', '<svg width="18" height="18"')}<span>Aucune vente de parquet ni de matériel sur ce site.</span></li>
+                <li>${ICON.check.replace('<svg', '<svg width="18" height="18"')}<span>Aucune vente ni paiement sur ce site : nous orientons, nous ne facturons rien.</span></li>
                 <li>${ICON.check.replace('<svg', '<svg width="18" height="18"')}<span>Aucun démarchage : vos coordonnées ne sont pas revendues.</span></li>
-                <li>${ICON.check.replace('<svg', '<svg width="18" height="18"')}<span>Aucun contenu sponsorisé déguisé en guide.</span></li>
+                <li>${ICON.check.replace('<svg', '<svg width="18" height="18"')}<span>Aucun guide écrit pour vendre : un lien produit s’ajoute à un texte, il ne le commande jamais.</span></li>
               </ul>
-              ${key('<p>Les rares liens sortants sont éditoriaux : ils apparaissent lorsqu’une ressource externe complète réellement le propos.</p>')}
+              ${key('<p>Certains liens mènent vers des références de parquet réellement en vente, chez Premibel. C’est écrit <a href="../a-propos/#liens-commerciaux">à la page À propos</a>, et c’est visible sur chaque lien.</p>')}
             </div>
           </div>
         </div>
@@ -1089,6 +1188,29 @@ function buildContact() {
   );
 }
 
+/*
+ * La règle d'orientation, telle qu'elle est publiée sur /a-propos/.
+ *
+ * Elle est écrite UNE fois dans `js/forms/lead-context.js`, appliquée par le
+ * formulaire, et redite ici pour le lecteur. Deux écritures, donc un risque
+ * de divergence : `check-routage` relit ce tableau dans la page construite et
+ * le compare, case par case, à ce que rend `destinationRecommandee`. Si la
+ * règle change et que cette page ne suit pas, le contrôle échoue.
+ */
+const LIBELLE_DESTINATION = {
+  premibel: 'Premibel',
+  allure_design: 'Allure Design',
+  mixed: 'Premibel et Allure Design',
+  undetermined: 'Aucune orientation automatique',
+};
+
+const ORIENTATION = [
+  ['produit', 'Des références de parquet', 'premibel', 'premibel'],
+  ['pose', 'La pose, la rénovation intérieure', 'undetermined', 'allure_design'],
+  ['produit-pose', 'Les deux', 'premibel', 'mixed'],
+  ['renseignement', 'Un simple renseignement', 'undetermined', 'undetermined'],
+];
+
 function buildApropos() {
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'À propos' }]);
   const body = `      ${crumbs.html}
@@ -1103,27 +1225,85 @@ function buildApropos() {
       </header>
 
       <section class="section section--flush-top">
-        <div class="wrap">
-          <div class="split">
+        <div class="wrap-wide">
+          <div class="split split--wide-left split--top">
             <div class="prose">
               <h2 id="pourquoi">Pourquoi ce site</h2>
-              <p>La documentation sur le parquet se partage entre catalogues commerciaux et notices techniques. Entre les deux, il manquait un endroit pour comprendre les décisions : pourquoi ce sens plutôt qu'un autre, ce que change réellement un ragréage, ce qui distingue deux motifs à chevrons.</p>
+              <p>La documentation sur le parquet se partage entre catalogues commerciaux et notices techniques. Entre les deux, il manquait un endroit pour comprendre les décisions : pourquoi ce sens plutôt qu'un autre, ce que change réellement un ragréage, ce qui distingue deux motifs en V.</p>
               <h2 id="methode">Notre méthode</h2>
               <p>Chaque contenu part d'une question concrète et se termine par une décision possible. Les chiffres cités correspondent aux pratiques courantes du métier et aux seuils usuels des documents techniques. Lorsqu'un sujet dépend du produit, nous le disons plutôt que de généraliser.</p>
               <p><a class="link-arrow" href="methode-editoriale.html">Lire notre méthode éditoriale en détail</a></p>
               <h2 id="outils">Des outils plutôt que des promesses</h2>
               <p>Le simulateur de pose est le premier d'une série. L'objectif est simple : transformer une hésitation en visualisation, puis en décision.</p>
-              <h2 id="independance">Indépendance</h2>
-              <p>Le site ne vend rien et n'héberge aucune publicité. Quelques liens sortants pointent vers des ressources externes lorsqu'elles complètent le propos, sans contrepartie éditoriale.</p>
             </div>
             <div class="stack stack--lg">
-              ${picture('apropos-studio', { base: '../', alt: 'Comparaison d’échantillons de bois et de matières sur un plan de travail', sizes: '(min-width: 60rem) 45rem, 94vw', attrs: 'class="aside-image"' })}
               <div class="figures">
                 <div class="figure-item"><strong>${GUIDES.length + MOTIFS.length + TUTOS.length}</strong><span>contenus publiés</span></div>
                 <div class="figure-item"><strong>${NB_MOTIFS_PLAN}</strong><span>motifs simulés</span></div>
                 <div class="figure-item"><strong>${NB_PIECES}</strong><span>pièces d’exemple</span></div>
               </div>
+              ${callout('key', 'Ce que ce site ne fait pas', `<ul>
+          <li>Aucune publicité, aucun panier, aucun paiement, aucun prix.</li>
+          <li>Aucun envoi automatique : une personne relit chaque demande avant tout contact.</li>
+          <li>Aucun lien produit sur un parquet de démonstration, qui n'existe pas en vente.</li>
+          <li>Aucune revente de coordonnées.</li>
+        </ul>`)}
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--alt" aria-labelledby="liens-commerciaux">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Transparence</p>
+              <h2 id="liens-commerciaux">Nos liens commerciaux</h2>
+            </div>
+            <p class="lead">Ce site n'héberge aucune publicité et ne vend rien. Il oriente en revanche, et nous préférons l'écrire noir sur blanc que le laisser découvrir.</p>
+          </div>
+
+          <div class="prose">
+            <h3>Trois noms, trois métiers</h3>
+          </div>
+          ${table(
+              ['Qui', 'Métier', 'Ce qu’on y trouve', 'Zone'],
+              [
+                ['Pose Parquet', 'Éditorial et outils', 'Guides, fiches motif, tutoriels, Visualiseur, Mode Plan', 'Aucune : le site se lit partout'],
+                [
+                  '<a href="https://premibel.fr" rel="noopener">Premibel</a>',
+                  'Références de parquet',
+                  'Produits, fourniture, showroom',
+                  'Aucune limite : un parquet se livre',
+                ],
+                [
+                  '<a href="https://www.allure-design.com/" rel="noopener">Allure Design</a>',
+                  'Pose et rénovation intérieure',
+                  'Revêtements de sol, aménagement, second œuvre',
+                  'Paris et l’Île-de-France',
+                ],
+              ]
+            )}
+          <div class="prose">
+            <p>Nous ne décrivons aucun lien juridique entre ces trois noms, parce que nous n'en avons pas à décrire : ce tableau dit ce que chacun <em>fait</em>, pas ce que chacun <em>est</em>.</p>
+
+            <h3 id="regle-orientation">Quand nous orientons, et vers qui</h3>
+          </div>
+          ${table(
+              ['Votre besoin', 'Hors Île-de-France', 'En Île-de-France'],
+              ORIENTATION.map(([, libelle, hors, idf]) => [
+                libelle,
+                LIBELLE_DESTINATION[hors],
+                LIBELLE_DESTINATION[idf],
+              ])
+            )}
+          <div class="prose">
+            <p>La zone se déduit du département que vous indiquez, et d'aucune autre information. Hors des huit départements franciliens, aucune orientation vers un poseur n'est proposée automatiquement : nous préférons ne rien proposer plutôt que proposer quelqu'un qui ne se déplacera pas.</p>
+
+            <h3>Dans le Visualiseur</h3>
+            <p>Le Visualiseur propose deux sortes de parquets. Les uns sont des références de démonstration, calculées par le moteur, qui ne correspondent à aucun produit précis. Les autres sont relevées sur des fiches réelles de Premibel : celles-là portent un lien vers leur fiche, et le lien le dit avant qu'on clique. Un parquet de démonstration n'en a pas, et n'en aura pas — proposer d'acheter ce qui n'existe pas serait la pire chose que nous puissions faire.</p>
+            <p>Décrire un projet par le formulaire n'engage à rien et ne déclenche aucun envoi automatique : le formulaire demande de quoi vous avez besoin et où se situe le projet, une orientation est proposée, et <strong>une personne la confirme ou la corrige</strong> avant tout contact.</p>
+            ${key('<p>Ce que cette relation ne change pas : les guides, les fiches motif et les tutoriels sont écrits pour répondre à une question, pas pour amener à un produit. Un lien s’ajoute à un texte quand il l’éclaire ; il ne l’a jamais commandé.</p>')}
           </div>
         </div>
       </section>
@@ -1134,7 +1314,7 @@ function buildApropos() {
     layout({
       title: 'À propos de Pose Parquet, média sur la pose du parquet',
       description:
-        "Pose Parquet est un média indépendant consacré à la pose du parquet : guides, motifs, tutoriels et outils de visualisation. Aucune vente, aucune publicité.",
+        "Pose Parquet aide à comprendre la pose du parquet, à préparer son projet et à trouver les références adaptées : guides, motifs, tutoriels et outils de visualisation.",
       path: 'a-propos/index.html',
       depth: 1,
       css: ['css/pages/listing.css'],
@@ -1166,37 +1346,95 @@ function buildMethode() {
         <div class="wrap">
           <div class="prose">
             <h2 id="qui">Qui écrit</h2>
-            <p>Les contenus sont écrits par la rédaction de ${SITE.name}, un site éditorial indépendant. Nous ne mettons pas en avant de nom d'expert, de titre professionnel ou de certification : ce serait donner à nos textes une autorité que nous n'avons pas. Ce que nous pouvons revendiquer, c'est un travail de lecture des documents techniques de référence et un souci de dire ce que nous ne savons pas.</p>
+            <p>Les contenus sont écrits par la rédaction de ${SITE.name}. Nous ne mettons pas en avant de nom d'expert, de titre professionnel ou de certification : ce serait donner à nos textes une autorité que nous n'avons pas. Ce que nous pouvons revendiquer, c'est un travail de lecture des documents techniques de référence et un souci de dire ce que nous ne savons pas.</p>
+          </div>
+        </div>
+      </section>
 
-            <h2 id="construction">Comment un contenu est construit</h2>
-            <ol>
-              <li>Une question concrète, celle que l'on se pose réellement avant un chantier.</li>
-              <li>Les critères qui permettent de trancher, dans leur ordre d'importance.</li>
-              <li>Les cas où la réponse change : support, produit, configuration de la pièce.</li>
-              <li>Une décision possible à la fin, jamais une simple liste d'options.</li>
-            </ol>
+      <section class="section section--alt section--compact" aria-labelledby="construction">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Méthode</p>
+              <h2 id="construction">Comment un contenu est construit</h2>
+            </div>
+            <p class="lead">Quatre temps, toujours dans cet ordre. Un texte qui s'arrête au deuxième n'est pas publié.</p>
+          </div>
+          <ol class="steps-grid">
+            <li><span class="steps-grid__num">01</span><strong>Une question concrète</strong><span>Celle que l'on se pose réellement avant un chantier, pas celle qui se cherche bien.</span></li>
+            <li><span class="steps-grid__num">02</span><strong>Les critères qui tranchent</strong><span>Dans leur ordre d'importance, et non tous mis sur le même plan.</span></li>
+            <li><span class="steps-grid__num">03</span><strong>Les cas où la réponse change</strong><span>Support, produit, configuration de la pièce : ce qui renverse le conseil.</span></li>
+            <li><span class="steps-grid__num">04</span><strong>Une décision possible</strong><span>À la fin, jamais une simple liste d'options renvoyée au lecteur.</span></li>
+          </ol>
+        </div>
+      </section>
 
+      <section class="section">
+        <div class="wrap">
+          <div class="prose">
             <h2 id="verification">Ce que nous vérifions</h2>
             <p>Les seuils chiffrés (planéité, humidité, taux de chutes, jeux périphériques) sont confrontés aux documents techniques de référence — les normes NF DTU de la série 51 pour la pose des parquets — et aux pratiques courantes du métier. Lorsqu'une valeur dépend du produit ou du support, nous l'écrivons plutôt que de donner un chiffre unique rassurant mais faux.</p>
             <p>Les estimations produites par nos outils (surface, nombre de lames, chutes) sont des ordres de grandeur calculés à partir de règles simples. Elles sont présentées comme telles et ne remplacent pas un calepinage de chantier.</p>
 
             <h2 id="limites">Ce que nous ne faisons pas</h2>
-            <ul>
-              <li>Nous ne testons pas de produits et ne publions pas de comparatifs de marques.</li>
-              <li>Nous n'inventons pas de témoignages, d'avis d'artisans ni de retours de chantier.</li>
-              <li>Nous ne reproduisons pas le texte des normes : elles sont payantes et protégées. Nous y renvoyons.</li>
-              <li>Nous n'annonçons pas une fonctionnalité automatique ou « intelligente » qui n'existe pas réellement dans nos outils.</li>
-            </ul>
+            ${callout('warning', 'Quatre choses que nous ne ferons pas', `<ul>
+              <li>Tester des produits ou publier des comparatifs de marques.</li>
+              <li>Inventer des témoignages, des avis d'artisans ou des retours de chantier.</li>
+              <li>Reproduire le texte des normes : elles sont payantes et protégées. Nous y renvoyons.</li>
+              <li>Annoncer une fonctionnalité automatique ou « intelligente » qui n'existe pas réellement dans nos outils.</li>
+            </ul>`)}
 
             <h2 id="sources">Nos sources</h2>
             <p>Les références citées en bas d'article sont réelles et consultables. Elles renvoient principalement aux normes NF DTU éditées par AFNOR, au CSTB et à l'institut technologique FCBA. Nous ne citons pas une source que nous n'avons pas consultée.</p>
 
             <h2 id="images">Photographies et illustrations</h2>
             <p>Les photographies proviennent de Pexels et sont utilisées dans le cadre de la licence Pexels, qui en autorise l'usage sur un site. Auteurs et liens vers les originaux sont listés dans le fichier <code>assets/images/CREDITS.md</code> du site. Les schémas sont produits par nos soins. Les rendus du visualiseur sont des simulations, jamais des photographies de chantier.</p>
+          </div>
+        </div>
+      </section>
 
-            <h2 id="independance">Indépendance et liens sortants</h2>
-            <p>Le site ne vend rien et n'affiche aucune publicité. Quelques liens renvoient vers des sites professionnels du secteur, dont <a href="https://premibel.fr" rel="noopener">premibel.fr</a>, lorsqu'ils documentent un point précis mieux que nous. Ces liens sont visibles dans le texte et ne modifient pas nos recommandations.</p>
+      <section class="section section--alt" aria-labelledby="liens-commerciaux">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Transparence</p>
+              <h2 id="liens-commerciaux">Liens commerciaux et liens sortants</h2>
+            </div>
+            <p class="lead">Le site n'affiche aucune publicité et ne vend rien. Il comporte en revanche trois sortes de liens, et la distinction mérite d'être faite plutôt que gommée.</p>
+          </div>
+          ${table(
+            ['Type de lien', 'Ce qu’il sert à faire', 'Où il apparaît', 'Où il n’apparaît jamais'],
+            [
+              [
+                'De référence',
+                'Établir un fait : AFNOR, CSTB, FCBA',
+                'En bas d’article, dans les sources',
+                'Au milieu d’un raisonnement, en guise d’argument',
+              ],
+              [
+                'Produit',
+                'Ouvrir la fiche d’une référence réellement en vente chez <a href="https://premibel.fr" rel="noopener">Premibel</a>',
+                'Là où l’on regarde un parquet précis : le Visualiseur, la fiche du produit',
+                'Dans un texte qui explique une méthode',
+              ],
+              [
+                'Chantier',
+                'Mener au formulaire projet, qui peut orienter vers <a href="https://www.allure-design.com/" rel="noopener">Allure Design</a> pour la pose en Île-de-France',
+                'Sur les tutoriels de pose, là où l’on peut décider de ne pas poser soi-même',
+                'Dans un guide de décision',
+              ],
+            ]
+          )}
+          <div class="prose">
+            <p>Un parquet de démonstration n’a pas de lien produit, et n’en aura pas : il n’existe pas en vente. Le détail de la relation est <a href="index.html#liens-commerciaux">à la page À propos</a>.</p>
+            ${key('<p>Ce qu’aucun de ces liens ne fait : changer un contenu. Un seuil de planéité, un taux de chutes, un sens de pose conseillé ne dépendent pas de ce qui se vend quelque part, et un guide qui recommanderait un produit parce qu’il est vendu ne servirait plus à rien — ni à vous, ni à celui qui le vend.</p>')}
+          </div>
+        </div>
+      </section>
 
+      <section class="section">
+        <div class="wrap">
+          <div class="prose">
             <h2 id="corrections">Corrections et mises à jour</h2>
             <p>Chaque article affiche sa date de publication et, le cas échéant, sa date de mise à jour. Une erreur factuelle signalée est corrigée, et la date de mise à jour est modifiée en conséquence. Pour nous signaler une inexactitude, écrivez-nous depuis la <a href="../contact/">page contact</a>.</p>
           </div>
@@ -1209,7 +1447,7 @@ function buildMethode() {
     layout({
       title: 'Notre méthode éditoriale | Pose Parquet',
       description:
-        "Comment les contenus de Pose Parquet sont écrits, vérifiés et corrigés : sources, limites assumées, indépendance et politique de mise à jour.",
+        "Comment les contenus de Pose Parquet sont écrits, vérifiés et corrigés : sources, limites assumées, liens commerciaux et politique de mise à jour.",
       path: 'a-propos/methode-editoriale.html',
       depth: 1,
       css: ['css/pages/listing.css'],
