@@ -209,3 +209,13 @@
 
 /* Le bouton d'envoi desactive doit avoir l'air desactive, pas casse. */
 .pf [data-submit]:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Ce qui vient apres l'etape en cours. Discret : c'est un reperage, pas une
+   consigne. Disparait a la derniere etape, ou il n'y a plus de suite. */
+.pf__next {
+  grid-column: 1 / -1;
+  margin: var(--sp-2) 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.pf__next[hidden] { display: none; }

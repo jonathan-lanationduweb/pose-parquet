@@ -17,6 +17,24 @@
   background: var(--c-mineral);
 }
 .card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-4) var(--ease-out); }
+
+/*
+ * Cadre d'une carte dont l'article n'a pas encore de couverture juste.
+ *
+ * Retirer l'image laisserait un trou dans la grille ; en mettre une fausse
+ * tromperait le lecteur. On garde donc le cadre et on y pose un aplat rayé
+ * au pas des lames : le rythme d'un parquet, sans affirmer de motif, de
+ * pièce ni de technique.
+ */
+.card__media--attente,
+.feature-card--attente {
+  background-image: repeating-linear-gradient(
+    101deg,
+    rgba(22, 24, 26, 0.045) 0 1px,
+    transparent 1px 2.35rem
+  );
+  background-color: var(--c-mineral);
+}
 .card:hover .card__media img { transform: scale(1.05); }
 .card__media .badge {
   position: absolute;

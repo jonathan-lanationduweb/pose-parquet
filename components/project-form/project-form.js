@@ -19,6 +19,9 @@ import { apiConfigured } from '../../js/forms/api-config.js';
 import { buildProjectPayload, visualizerFromParams, frontFieldFor } from '../../js/forms/project-payload.js';
 import { fetchFormToken, submitProject, SubmitError, ERREURS } from '../../js/forms/submit-adapter.js';
 import { readHandoffParams } from '../../js/forms/studio-handoff.js';
+import { readPlanParams } from '../../js/forms/plan-handoff.js';
+import { contexteVisite, champsQualification, ouvrirVisite } from '../../js/forms/lead-context.js';
+import { emettre } from '../../js/analytics/events.js';
 
 const uid = () => Math.random().toString(36).slice(2, 8);
 
@@ -101,6 +104,18 @@ const MOTIF_LABELS = {
   'point-de-hongrie': 'Point de Hongrie',
   'baton-rompu': 'bâton rompu',
 };
+/*
+ * Les cinq réponses du champ « De quoi avez-vous besoin ? », pour la phrase
+ * de reprise. Elles reprennent les libellés de la configuration, en minuscule
+ * initiale : ils s'insèrent au milieu d'une phrase, pas en tête de bouton.
+ */
+const BESOIN_LABELS = {
+  produit: 'trouver un parquet',
+  pose: 'faire poser',
+  'produit-pose': 'parquet et pose',
+  renovation: 'rénovation ou aménagement',
+  indetermine: 'besoin à préciser',
+};
 const ANGLE_LABELS = {
   0: 'lames dans la largeur',
   90: 'lames dans la profondeur',
@@ -121,10 +136,73 @@ const ANGLE_LABELS = {
  * désormais l'identifiant — mais la reprise continue de s'afficher avec le
  * motif et l'angle : on perd un mot, pas un parcours.
  */
+/**
+ * Reprise de ce qui vient du Mode Plan.
+ *
+ * Deux champs, et deux seulement : le sens de pose et la surface. Ce sont les
+ * deux que la personne vient de décider en dessinant son plan, et les deux que
+ * le formulaire lui redemanderait mot pour mot.
+ *
+ * Aucun contexte de Visualiseur n'est écrit : le Mode Plan ne pose aucune
+ * référence réelle sur aucune photographie. Y inscrire un produit ou une scène
+ * ferait croire à une simulation qui n'a pas eu lieu.
+ *
+ * Rend vrai si quelque chose a été repris, pour que l'appelant sache s'il doit
+ * annoncer la reprise.
+ */
+function prefillFromPlan(form) {
+  const lu = readPlanParams(new URLSearchParams(window.location.search));
+  if (!lu.present) return false;
+
+  const repris = [];
+
+  /*
+   * Le besoin, quand le lien le connaît.
+   *
+   * Un tutoriel de pose qui propose de confier le chantier sait de quoi il
+   * parle : inutile de reposer la question. Ce n'est pas répondre à la place
+   * de la personne — le bouton radio est coché, visible, et se change d'un
+   * clic comme n'importe quelle autre réponse pré-remplie.
+   */
+  if (lu.besoin) {
+    const choix = form.querySelector(`input[name="besoin"][value="${lu.besoin}"]`);
+    if (choix) {
+      window.setTimeout(() => { choix.checked = true; }, 0);
+      repris.push(BESOIN_LABELS[lu.besoin] || lu.besoin);
+    }
+  }
+
+  if (lu.pose) {
+    const input = form.querySelector(`input[name="orientation"][value="${lu.pose}"]`);
+    if (input) {
+      // Même raison que pour la reprise du Studio : le navigateur restaure
+      // l'état des champs après un rechargement, on repasse donc après lui.
+      window.setTimeout(() => { input.checked = true; }, 0);
+      repris.push(MOTIF_LABELS[lu.pose] || lu.pose);
+    }
+  }
+
+  if (lu.surface !== null) {
+    const champ = form.querySelector('input[name="surface"]');
+    if (champ && !champ.value) {
+      window.setTimeout(() => { champ.value = String(lu.surface); }, 0);
+      repris.push(`${lu.surface} m²`);
+    }
+  }
+
+  if (!repris.length) return false;
+
+  const note = document.createElement('p');
+  note.className = 'pf__from-studio';
+  note.textContent = `Reprise de votre calepinage : ${repris.join(' · ')}. À corriger si besoin.`;
+  form.prepend(note);
+  return true;
+}
+
 function prefillFromStudio(form) {
   const params = new URLSearchParams(window.location.search);
   const lu = readHandoffParams(params);
-  if (!lu.present) return;
+  if (!lu.present) return false;
 
   const motif = lu.pattern;
   const angle = lu.angle === null ? 0 : lu.angle;
@@ -145,8 +223,9 @@ function prefillFromStudio(form) {
   if (motif === 'lames' && ANGLE_LABELS[String(angle)]) parts.push(ANGLE_LABELS[String(angle)]);
 
   // Ni produit reconnu ni motif : il n'y a rien à annoncer, et une phrase de
-  // reprise vide serait pire que pas de phrase.
-  if (!parts.length) return;
+  // reprise vide serait pire que pas de phrase. On a tout de même pu cocher
+  // un sens de pose : c'est une reprise, et l'appelant doit le savoir.
+  if (!parts.length) return Boolean(orientation);
 
   const note = document.createElement('p');
   note.className = 'pf__from-studio';
@@ -155,25 +234,29 @@ function prefillFromStudio(form) {
 
   const message = form.querySelector('textarea[name="message"]');
   if (message && !message.value) message.value = `Simulation réalisée dans le Studio : ${parts.join(', ')}.`;
+
+  return true;
 }
 
 /**
- * Paramètres d'acquisition présents dans l'URL d'arrivée.
+ * Paramètres d'acquisition, repris de la mémoire de visite.
  *
- * Trois clés, pas une de plus, et lues une seule fois au montage : elles
- * survivent ainsi aux étapes du formulaire et à un retour en arrière, sans
- * mesure d'audience maison, sans cookie et sans rien conserver après l'envoi.
- * On ne collecte pas le référent, ni l'historique, ni les autres paramètres :
- * ce qui n'est pas prévu au contrat n'est pas ramassé.
+ * Ils étaient lus dans l'URL de CETTE page, et cela suffisait tant qu'on
+ * arrivait sur le formulaire directement depuis une campagne. Un parcours
+ * réel ne ressemble pas à cela : annonce → guide → Studio → formulaire, et à
+ * la quatrième page les `utm_*` de la première ont disparu de l'adresse
+ * depuis longtemps. La demande partait alors sans origine.
+ *
+ * `lead-context.js` les retient pour la durée de la visite, dans
+ * `sessionStorage` : pas de cookie, rien qui survive à la fermeture de
+ * l'onglet, rien qui suive quelqu'un d'un jour à l'autre. Cinq clés, celles
+ * que le contrat prévoit, et rien d'autre — ni référent, ni historique.
+ *
+ * L'URL de la page reste lue par `ouvrirVisite()` : quelqu'un qui arrive
+ * directement ici avec des `utm_*` est toujours servi.
  */
-function utmFromParams(params) {
-  const lire = (nom) => (params.get(nom) || '').trim().slice(0, 100);
-
-  return {
-    utmSource: lire('utm_source'),
-    utmMedium: lire('utm_medium'),
-    utmCampaign: lire('utm_campaign'),
-  };
+function utmDeLaVisite() {
+  return { ...contexteVisite().utm };
 }
 
 /** Phrases d'échec, par code d'erreur de l'adaptateur. */
@@ -225,6 +308,17 @@ export function mountProjectForm(root, options = {}) {
     <form class="pf" novalidate>
       <div class="pf__head">
         <p class="pf__count" aria-live="polite">Étape <b>1</b> sur ${config.steps.length}</p>
+        <!--
+          Ce qui vient après, nommé.
+          Savoir qu'il reste quatre étapes ne dit pas si elles sont longues.
+          Annoncer la suivante par son titre lève la seule question qui retient
+          vraiment avant de commencer : « qu'est-ce qu'on va encore me
+          demander ? ». L'attribut aria-hidden est voulu : les pastilles
+          portent déjà le titre de chaque étape dans leur aria-label, et le
+          compteur est aria-live —
+          répéter ici ferait un doublon à chaque changement d'étape.
+        -->
+        <p class="pf__next" aria-hidden="true"></p>
         <ol class="pf__dots">
           ${config.steps
             .map(
@@ -285,6 +379,7 @@ export function mountProjectForm(root, options = {}) {
   const steps = Array.from(root.querySelectorAll('.pf__step'));
   const dots = Array.from(root.querySelectorAll('.pf__dot'));
   const counter = root.querySelector('.pf__count b');
+  const suite = root.querySelector('.pf__next');
   const prevBtn = root.querySelector('[data-prev]');
   const nextBtn = root.querySelector('[data-next]');
   const submitBtn = root.querySelector('[data-submit]');
@@ -295,13 +390,29 @@ export function mountProjectForm(root, options = {}) {
   const fieldsByName = new Map();
   config.steps.forEach((step) => step.fields.forEach((field) => fieldsByName.set(field.name, field)));
 
-  prefillFromStudio(form);
+  /*
+   * Deux reprises possibles, jamais les deux à la fois en pratique : on
+   * arrive du Studio ou du Mode Plan, pas des deux. L'ordre donne malgré tout
+   * la priorité au Studio, qui porte l'information la plus riche.
+   */
+  if (!prefillFromStudio(form)) prefillFromPlan(form);
 
   /* ---- Contexte de la visite, lu une fois ---- */
 
   const params = new URLSearchParams(window.location.search);
-  const utm = utmFromParams(params);
+  // Si la visite commence ici — lien direct, favori, courriel — c'est le seul
+  // moment où l'on peut encore enregistrer la page d'entrée et les UTM.
+  ouvrirVisite();
+  const utm = utmDeLaVisite();
   const visualizer = visualizerFromParams(params);
+  /*
+   * Le Studio a-t-il annoncé une référence à fiche réelle ?
+   *
+   * Lu ici et pas dans `visualizer` : cet objet-là est la charge envoyée à
+   * l'API, et son contenu est fixé par le contrat du serveur. Le drapeau sert
+   * à recommander une destination, il n'a rien à faire dans la demande.
+   */
+  const ficheReelle = readHandoffParams(params).ficheProduit;
 
   /*
    * Le jeton anti-spam.
@@ -402,6 +513,9 @@ export function mountProjectForm(root, options = {}) {
       dot.setAttribute('aria-current', String(i === current));
     });
     counter.textContent = String(current + 1);
+    const suivante = config.steps[current + 1];
+    suite.textContent = suivante ? `Ensuite : ${suivante.title}` : '';
+    suite.hidden = !suivante;
     prevBtn.hidden = current === 0;
     nextBtn.hidden = current === steps.length - 1;
     submitBtn.hidden = current !== steps.length - 1;
@@ -532,19 +646,46 @@ export function mountProjectForm(root, options = {}) {
       if (!token && apiConfigured()) await renewToken();
 
       const resultat = await submitProject({
-        buildPayload: () => buildProjectPayload({
-          formData: new FormData(form),
-          formToken: token,
-          // Le serveur ne garde que le chemin ; on ne lui donne que cela.
-          sourcePath: window.location.pathname,
-          utm,
-          visualizer,
-        }),
+        buildPayload: () => {
+          const donnees = new FormData(form);
+          /*
+           * La qualification est CALCULÉE au moment de l'envoi, pas au
+           * montage : elle dépend de ce que le visiteur vient de répondre —
+           * son délai, sa surface — autant que d'où il vient.
+           *
+           * `produitPremibel` se lit dans le contexte du Studio : une
+           * référence identifiée qui porte une fiche réelle. Les parquets de
+           * démonstration n'en sont pas, et n'orientent donc rien.
+           */
+          const qualification = champsQualification({
+            besoin: String(donnees.get('besoin') || ''),
+            produitPremibel: ficheReelle,
+            timeframe: String(donnees.get('delai') || ''),
+            surface: Number(donnees.get('surface') || 0),
+            // Le département est la seule donnée géographique : la région
+            // s'en déduit, ici pour l'orientation et côté serveur pour le
+            // stockage. Il n'y a plus de zone à contredire.
+            department: String(donnees.get('departement') || ''),
+          });
+          return buildProjectPayload({
+            formData: donnees,
+            formToken: token,
+            // Le serveur ne garde que le chemin ; on ne lui donne que cela.
+            sourcePath: window.location.pathname,
+            utm,
+            visualizer,
+            qualification,
+          });
+        },
         renewToken,
         tokenIssuedAt: () => tokenIssuedAt,
       });
 
       sent = true;
+      emettre('submit_project', {
+        reference: String(resultat.reference || ''),
+        source: contexteVisite().leadSource || '',
+      });
       status.textContent = '';
 
       const refBloc = root.querySelector('[data-success-reference]');

@@ -8,6 +8,8 @@
 import { qs, qsa, ready, mountAll } from './utils/dom.js';
 import { initNav, markCurrentNav } from './components/nav.js';
 import { initReveal } from './animations/reveal.js';
+import { initContexteLead } from './forms/lead-context.js';
+import { brancherLiens as brancherAllure } from './commerce/allure.js';
 
 const has = (selector) => Boolean(qs(selector));
 
@@ -148,6 +150,26 @@ async function boot() {
 }
 
 ready(() => {
+  /*
+   * Le contexte de visite, avant `boot()` et hors de son `catch`.
+   *
+   * Hors du `catch` volontairement : ces deux lignes ne font que lire l'URL
+   * et écrire dans `sessionStorage`, et si elles échouaient c'est que le
+   * stockage est bloqué — cas déjà traité à l'intérieur du module. Les
+   * mettre dans `boot()` les aurait rendues tributaires du chargement d'un
+   * carrousel.
+   */
+  const contexteLead = initContexteLead();
+
+  /*
+   * Les departs vers Allure Design, sur toutes les pages editoriales.
+   *
+   * Un seul ecouteur delegue plutot qu'un par lien : la page A propos en
+   * porte un, un tutoriel peut en porter un autre demain, et personne
+   * n'aura a penser a le brancher.
+   */
+  brancherAllure({ source: contexteLead.leadSource || '' });
+
   boot().catch((error) => {
     // Une page doit rester lisible même si un module optionnel échoue.
     console.error('[pose-parquet] initialisation partielle', error);
