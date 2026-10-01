@@ -211,6 +211,156 @@ function empreinteDeFichiers(chemins, racine) {
   return empreinte(lignes.join('\n'));
 }
 
+/* ------------------------------------------------------------------ */
+/* Écriture : atomique, et patiente avec Windows                       */
+/* ------------------------------------------------------------------ */
+
+/*
+ * -----------------------------------------------------------------------------
+ * LE DÉFAUT MESURÉ
+ * -----------------------------------------------------------------------------
+ *
+ * Sur 25 constructions consécutives, 4 échouaient. Toujours de la même façon :
+ *
+ *   Error: UNKNOWN: unknown error, open '…\index.html'
+ *   code=UNKNOWN  syscall=open  errno=-4094
+ *   at ecrireTexte (_generator/eol.js:234)
+ *
+ * Toujours `open`, jamais `write` ni `rename`. Toujours un fichier qui venait
+ * d'être réécrit par la construction précédente. Le fichier existe, il est
+ * accessible en écriture, et la construction suivante passe.
+ *
+ * `errno -4094` est `UV_UNKNOWN` : le code Win32 reçu n'a pas d'équivalent
+ * POSIX que libuv sache traduire. C'est la signature d'un tiers qui tient le
+ * fichier ouvert avec un mode de partage qui refuse l'écriture — antivirus,
+ * indexeur, gestionnaire d'aperçu, observateur de fichiers. On ne saura pas
+ * lequel, et ce n'est pas nécessaire : ce qu'on peut faire, c'est ne pas lui
+ * offrir de fenêtre, et ne pas abandonner au premier refus.
+ *
+ * -----------------------------------------------------------------------------
+ * DEUX MESURES, ET POURQUOI LES DEUX
+ * -----------------------------------------------------------------------------
+ *
+ * 1. ÉCRITURE ATOMIQUE. `writeFileSync` ouvre la destination en troncature et
+ *    la garde ouverte pendant toute l'écriture. Pour une page de 40 Ko, cette
+ *    fenêtre dure le temps de plusieurs appels système, et le fichier y est
+ *    visible dans un état partiel. On écrit désormais à côté, sous un nom
+ *    temporaire que personne ne surveille, puis on renomme. La destination
+ *    n'est plus touchée qu'un instant, et jamais laissée à moitié écrite.
+ *
+ * 2. REPRISE CIBLÉE. Le renommage peut à son tour buter sur un verrou. Trois
+ *    reprises, 25 ms, 75 ms, 150 ms, et seulement sur des codes qui décrivent
+ *    un état transitoire. Un ENOENT, un JSON invalide, un droit refusé pour de
+ *    bon : on les laisse passer tels quels. Masquer une vraie erreur pour
+ *    rendre un contrôle vert serait échanger un défaut visible contre un
+ *    défaut invisible.
+ */
+
+/**
+ * Les codes qu'on accepte de réessayer, et eux seuls.
+ *
+ *   UNKNOWN  celui qu'on a mesuré ici
+ *   EBUSY    le fichier est utilisé par un autre processus
+ *   EPERM    Windows rend cela pour un partage refusé, pas seulement pour un droit
+ *   EACCES   même famille, selon la version de Windows et le pilote en cause
+ *
+ * Tout le reste remonte immédiatement. En particulier ENOENT — un dossier
+ * absent est un défaut de génération, pas un verrou, et attendre 250 ms
+ * n'arrangerait rien tout en brouillant le diagnostic.
+ */
+const CODES_TRANSITOIRES = new Set(['UNKNOWN', 'EBUSY', 'EPERM', 'EACCES']);
+
+/** Attentes entre deux tentatives, en millisecondes. Bornées, et courtes. */
+const ATTENTES_MS = [25, 75, 150];
+
+/**
+ * Pause bloquante dans du code synchrone.
+ *
+ * `Atomics.wait` sur un tampon que personne ne réveille : c'est la seule
+ * façon d'attendre sans boucle d'attente active depuis une fonction
+ * synchrone. Une boucle sur `Date.now()` occuperait un cœur à ne rien faire,
+ * et surtout empêcherait le système de rendre la main au processus qui tient
+ * le fichier — soit exactement le contraire de ce qu'on veut.
+ */
+function patienter(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
+/**
+ * Exécute une opération de fichier en réessayant les verrous transitoires.
+ *
+ * @param {() => any} operation
+ * @param {string} quoi description courte, pour le message si tout échoue
+ */
+function avecReprises(operation, quoi) {
+  for (let essai = 0; ; essai += 1) {
+    try {
+      return operation();
+    } catch (erreur) {
+      const transitoire = Boolean(erreur) && CODES_TRANSITOIRES.has(erreur.code);
+      if (!transitoire || essai >= ATTENTES_MS.length) {
+        if (transitoire) {
+          // On le dit : l'échec n'est pas une première tentative malheureuse.
+          erreur.message += ` — ${quoi} : abandon après ${ATTENTES_MS.length + 1} tentatives`
+            + ` (${ATTENTES_MS.join(' ms, ')} ms d'attente). Un autre programme tient ce fichier.`;
+        }
+        throw erreur;
+      }
+      patienter(ATTENTES_MS[essai]);
+    }
+  }
+}
+
+/** Compteur de noms temporaires : deux écritures du même processus ne se croisent pas. */
+let compteurTemporaire = 0;
+
+/**
+ * Nom du fichier temporaire, DANS LE DOSSIER DE LA DESTINATION.
+ *
+ * Même dossier, donc même volume : un renommage entre volumes n'est pas
+ * atomique et se dégrade en copie. Le nom est construit pour être invisible :
+ *
+ *   point initial     les parcours du générateur écartent les noms en point
+ *   suffixe .tmp      les contrôles ne collectent que les `.html`
+ *   pid + compteur    deux constructions simultanées ne se marchent pas dessus
+ *
+ * `.index.html.12345.7.tmp` ne peut être confondu avec une page publique, ni
+ * par un humain, ni par `check-links`, ni par le déploiement.
+ */
+function cheminTemporaire(destination) {
+  compteurTemporaire += 1;
+  const dossier = path.dirname(destination);
+  const nom = path.basename(destination);
+  return path.join(dossier, `.${nom}.${process.pid}.${compteurTemporaire}.tmp`);
+}
+
+/**
+ * Écrit un fichier de façon atomique : temporaire, puis renommage.
+ *
+ * Après un échec définitif, le temporaire est retiré — au mieux. Si sa
+ * suppression échoue elle aussi, on n'en fait pas une seconde erreur : celle
+ * qui compte est la première, et un `.tmp` orphelin n'est ni publié ni
+ * versionné.
+ *
+ * @param {string} destination
+ * @param {string|Buffer} donnees
+ */
+function ecrireAtomique(destination, donnees) {
+  fs.mkdirSync(path.dirname(destination), { recursive: true });
+  const temporaire = cheminTemporaire(destination);
+  try {
+    avecReprises(() => fs.writeFileSync(temporaire, donnees), `écriture de ${path.basename(destination)}`);
+    avecReprises(() => fs.renameSync(temporaire, destination), `renommage vers ${path.basename(destination)}`);
+  } catch (erreur) {
+    try {
+      fs.rmSync(temporaire, { force: true });
+    } catch {
+      /* Le temporaire reste : invisible des contrôles et du déploiement. */
+    }
+    throw erreur;
+  }
+}
+
 /**
  * Écrit un fichier texte en LF, en créant son dossier au besoin.
  *
@@ -230,8 +380,7 @@ function empreinteDeFichiers(chemins, racine) {
  * @param {string} contenu
  */
 function ecrireTexte(chemin, contenu) {
-  fs.mkdirSync(path.dirname(chemin), { recursive: true });
-  fs.writeFileSync(chemin, enLf(contenu), 'utf8');
+  ecrireAtomique(chemin, Buffer.from(enLf(contenu), 'utf8'));
 }
 
 /**
@@ -245,12 +394,24 @@ function ecrireTexte(chemin, contenu) {
  * @param {string} destination
  */
 function copierCanonique(source, destination) {
-  fs.mkdirSync(path.dirname(destination), { recursive: true });
-  if (estTexte(source)) fs.writeFileSync(destination, lireTexte(source), 'utf8');
-  else fs.copyFileSync(source, destination);
+  /*
+   * Le binaire passe aussi par l'écriture atomique, plutôt que par
+   * `copyFileSync`. Une copie ouvre la destination exactement comme une
+   * écriture, et rien ne justifie de protéger les pages sans protéger les
+   * images et les polices recopiées dans `assets/dist/`.
+   */
+  const donnees = estTexte(source)
+    ? Buffer.from(lireTexte(source), 'utf8')
+    : avecReprises(() => fs.readFileSync(source), `lecture de ${path.basename(source)}`);
+  ecrireAtomique(destination, donnees);
 }
 
 module.exports = {
+  ecrireAtomique,
+  /* Exposés pour `check-reproducible` : une reprise jamais éprouvée ne vaut rien. */
+  avecReprises,
+  CODES_TRANSITOIRES,
+  ATTENTES_MS,
   EXTENSIONS_TEXTE,
   EXTENSIONS_BINAIRES,
   NOMS_TEXTE,
