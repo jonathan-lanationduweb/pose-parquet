@@ -34,6 +34,10 @@ use PoseParquet\Core\Admin\Projects as ProjectsPage;
 use PoseParquet\Core\Admin\Settings;
 use PoseParquet\Core\Admin\View;
 use PoseParquet\Core\Database\Schema;
+use PoseParquet\Core\Mail\Labels;
+use PoseParquet\Core\Projects\Departements;
+use PoseParquet\Core\Projects\Fields;
+use PoseParquet\Core\Projects\LeadRouting;
 use PoseParquet\Core\Projects\Notes;
 use PoseParquet\Core\Projects\Repository;
 use PoseParquet\Core\Projects\Status;
@@ -158,8 +162,8 @@ $nettoie();
 /* ================================================================== */
 $section( 'Pré-requis' );
 
-$verifie( 'plugin en version 0.5.0', POSE_PARQUET_VERSION === '0.5.0', POSE_PARQUET_VERSION );
-$verifie( 'schéma de base inchangé (3)', POSE_PARQUET_DB_VERSION === 3, (string) POSE_PARQUET_DB_VERSION );
+$verifie( 'plugin en version 0.7.0', POSE_PARQUET_VERSION === '0.7.0', POSE_PARQUET_VERSION );
+$verifie( 'schéma de base en version 5', POSE_PARQUET_DB_VERSION === 5, (string) POSE_PARQUET_DB_VERSION );
 $verifie( 'table des notes présente', ( Schema::status()['notes'] ?? false ) === true );
 $verifie( 'classes du lot chargées', class_exists( ProjectsPage::class ) && class_exists( Actions::class ) && class_exists( Notes::class ) && class_exists( StatusService::class ) );
 $verifie( 'page Réglages toujours déclarée', Settings::PAGE === 'pose-parquet-settings' );
@@ -908,6 +912,268 @@ $verifie(
 $verifie(
 	'aucune note complète journalisée',
 	! str_contains( (string) file_get_contents( POSE_PARQUET_DIR . '/src/Admin/Actions.php' ), "'note' => \$brut" )
+);
+
+/* ================================================================== */
+$section( 'Qualification : schéma, filtre, arbitrage' );
+
+/* Le schéma 4 a bien posé ses colonnes. */
+global $wpdb;
+$colonnes = $wpdb->get_col( 'SHOW COLUMNS FROM ' . \PoseParquet\Core\Database\Schema::table( 'projects' ) );
+foreach ( [ 'entry_page', 'utm_content', 'utm_term', 'lead_source', 'lead_need', 'lead_destination' ] as $colonne ) {
+	$verifie( "colonne {$colonne} présente", in_array( $colonne, $colonnes, true ) );
+}
+$index = $wpdb->get_results( 'SHOW INDEX FROM ' . \PoseParquet\Core\Database\Schema::table( 'projects' ) . " WHERE Key_name = 'lead_destination'" );
+$verifie( 'index sur lead_destination', count( $index ) === 1, count( $index ) . ' index' );
+
+/* Les trois listes fermées, telles que le front les connaît. */
+$verifie(
+	'destinations : les quatre du contrat',
+	Fields::enum( 'leadDestination' ) === [ 'premibel', 'allure_design', 'mixed', 'undetermined' ]
+);
+$verifie(
+	'besoins : six valeurs, depuis que le périmètre d’Allure Design est établi',
+	Fields::enum( 'leadNeed' ) === [ 'produit', 'pose', 'produit-pose', 'renovation', 'renseignement', 'indetermine' ],
+	implode( ', ', Fields::enum( 'leadNeed' ) )
+);
+$verifie( 'origines : douze familles de pages', count( Fields::enum( 'leadSource' ) ) === 12 );
+
+/* Une demande qualifiée, et une qui ne l'est pas. */
+$qualifie = $cree( [
+	'leadSource'      => 'motif',
+	'leadNeed'        => 'produit',
+	'leadDestination' => 'premibel',
+	'entryPage'       => '/motifs/point-de-hongrie.html',
+	'utmContent'      => 'variante-b',
+	'utmTerm'         => 'parquet point de hongrie',
+] );
+$ordinaire = $cree();
+
+$ligne = $repo->find_by_id( $qualifie );
+$verifie( 'origine enregistrée', (string) $ligne['lead_source'] === 'motif', (string) $ligne['lead_source'] );
+$verifie( 'besoin enregistré', (string) $ligne['lead_need'] === 'produit' );
+$verifie( 'destination enregistrée', (string) $ligne['lead_destination'] === 'premibel' );
+$verifie( 'page d’entrée enregistrée', (string) $ligne['entry_page'] === '/motifs/point-de-hongrie.html' );
+$verifie( 'utm_content enregistré', (string) $ligne['utm_content'] === 'variante-b' );
+$verifie( 'utm_term enregistré', (string) $ligne['utm_term'] === 'parquet point de hongrie' );
+
+/*
+ * Le filtre de la liste.
+ *
+ * C'est le tri quotidien : « ce qui part chez Premibel », « ce qui reste à
+ * qualifier ». On vérifie qu'il sélectionne, et surtout qu'une valeur
+ * inventée dans l'URL ne vide pas la page — elle ne doit rien filtrer.
+ */
+$tous = $repo->count_search( [ 'search' => PP_MARQUE ] );
+$verifie(
+	'filtre destination = premibel',
+	$repo->count_search( [ 'search' => PP_MARQUE, 'destination' => 'premibel' ] ) === 1
+);
+$verifie(
+	'filtre destination = allure_design : aucune',
+	$repo->count_search( [ 'search' => PP_MARQUE, 'destination' => 'allure_design' ] ) === 0
+);
+$verifie(
+	'destination inventée : ne filtre rien plutôt que de vider la page',
+	$repo->count_search( [ 'search' => PP_MARQUE, 'destination' => 'chez-le-voisin' ] ) === $tous
+);
+
+/* La liste rapporte bien les trois colonnes : sans elles, l'écran serait vide. */
+$page = $repo->search( [ 'search' => PP_MARQUE, 'page' => 1 ] );
+$verifie(
+	'la liste ramène lead_source, lead_need et lead_destination',
+	$page !== [] && array_key_exists( 'lead_source', $page[0] )
+		&& array_key_exists( 'lead_need', $page[0] )
+		&& array_key_exists( 'lead_destination', $page[0] )
+);
+
+/*
+ * L'arbitrage humain.
+ *
+ * La recommandation vient du parcours ; la décision revient à une personne.
+ * On vérifie qu'elle peut la changer, et que le changement laisse une trace
+ * lisible dans les notes — c'est ce qui permet de savoir, trois semaines plus
+ * tard, que ce lead n'a pas été orienté par une règle mais par quelqu'un.
+ */
+wp_set_current_user( $admin_id );
+$avant_notes = count( $repo->notes_of( $qualifie ) );
+$verifie(
+	'la destination se change',
+	$repo->update_destination( $qualifie, 'mixed', current_time( 'mysql' ) )
+);
+$verifie(
+	'la base porte la nouvelle destination',
+	(string) $repo->find_by_id( $qualifie )['lead_destination'] === 'mixed'
+);
+
+Notes::add( $qualifie, 'Destination modifiée : Premibel → Les deux.' );
+$notes = $repo->notes_of( $qualifie );
+$verifie( 'une note de plus', count( $notes ) === $avant_notes + 1 );
+$verifie(
+	'la note nomme les deux destinations',
+	strpos( (string) $notes[0]['content'], 'Premibel' ) !== false
+		&& strpos( (string) $notes[0]['content'], 'Les deux' ) !== false
+);
+
+/* La demande non qualifiée reste vide : aucune valeur par défaut inventée. */
+$verifie(
+	'une demande sans qualification garde ses champs vides',
+	(string) $repo->find_by_id( $ordinaire )['lead_destination'] === ''
+		&& (string) $repo->find_by_id( $ordinaire )['lead_source'] === ''
+);
+
+/* Les libellés, ceux que l'écran et l'email emploient tous les deux. */
+$verifie( 'libellé « À qualifier » pour undetermined', Labels::of( 'lead_destination', 'undetermined' ) === 'À qualifier' );
+$verifie( 'libellé « Fiche motif » pour motif', Labels::of( 'lead_source', 'motif' ) === 'Fiche motif' );
+$verifie( 'une valeur inconnue se rend telle quelle', Labels::of( 'lead_destination', 'inconnue' ) === 'inconnue' );
+
+/* ================================================================== */
+$section( 'Routage : justification, zone, arbitrage' );
+
+/* Le schema 5 a pose la colonne de la recommandation initiale. */
+$colonnes5 = $wpdb->get_col( 'SHOW COLUMNS FROM ' . Schema::table( 'projects' ) );
+$verifie( 'colonne lead_destination_auto présente', in_array( 'lead_destination_auto', $colonnes5, true ) );
+
+/*
+ * A la creation, les deux colonnes partent egales.
+ *
+ * C'est ce qui rend `corrigee()` fiable : toute difference ne peut venir que
+ * d'un humain. Si le navigateur pouvait envoyer les deux separement, une
+ * charge fabriquee simulerait un arbitrage qui n'a jamais eu lieu.
+ */
+$route = $cree( [
+	'leadSource'      => 'mode-plan',
+	'leadNeed'        => 'pose',
+	'leadDestination' => 'allure_design',
+	'region'          => Fields::REGION_IDF_LABEL,
+	'department'      => '75',
+] );
+$ligne_route = $repo->find_by_id( $route );
+$verifie(
+	'la recommandation initiale est recopiée à la création',
+	(string) $ligne_route['lead_destination_auto'] === 'allure_design',
+	(string) $ligne_route['lead_destination_auto']
+);
+$verifie( 'aucune correction au départ', LeadRouting::corrigee( $ligne_route ) === false );
+
+/* La zone, lue depuis ce qui est stocke. */
+$verifie( 'zone : département francilien reconnu', LeadRouting::en_idf( $ligne_route ) === true );
+$verifie( 'zone : un département breton ne l’est pas', LeadRouting::en_idf( [ 'department' => '29' ] ) === false );
+/*
+ * LE DEPARTEMENT FAIT FOI, MEME CONTRE LA COLONNE REGION.
+ *
+ * Une demande enregistree avant ce lot peut porter une region qui contredit
+ * son departement. C'est le departement qui tranche : s'y fier revient a lire
+ * l'original plutot qu'une copie.
+ */
+$verifie(
+	'une région contradictoire en base ne fait pas basculer la zone',
+	LeadRouting::en_idf( [ 'region' => Fields::REGION_IDF_LABEL, 'department' => '35' ] ) === false
+);
+$verifie(
+	'et la région affichée est celle du département',
+	LeadRouting::region( [ 'region' => Fields::REGION_IDF_LABEL, 'department' => '35' ] ) === 'Bretagne'
+);
+$verifie( 'zone : huit départements franciliens', count( Departements::idf() ) === 8 );
+$verifie(
+	'la liste francilienne se déduit de la table, elle n’est pas écrite à part',
+	Departements::idf() === Departements::REGIONS[ Departements::ILE_DE_FRANCE ]
+);
+$verifie( 'la région se déduit : 69 → Auvergne-Rhône-Alpes', Departements::region( '69' ) === 'Auvergne-Rhône-Alpes' );
+$verifie( 'un numéro hors nomenclature n’a pas de région', Departements::region( '975' ) === '' && Departements::est_idf( '975' ) === false );
+
+/*
+ * La phrase d'explication.
+ *
+ * Elle doit nommer les DEUX faits sur lesquels la regle s'est appuyee — le
+ * besoin et la zone — sans quoi le gestionnaire ne peut pas la contredire en
+ * connaissance de cause.
+ */
+$raison = LeadRouting::raison( $ligne_route );
+$verifie( 'une raison est donnée', $raison !== '' );
+$verifie(
+	'la raison nomme le besoin et la zone',
+	stripos( $raison, 'pose' ) !== false && stripos( $raison, 'Île-de-France' ) !== false,
+	$raison
+);
+
+$hors = [ 'lead_need' => 'pose', 'lead_destination' => 'undetermined', 'department' => '29' ];
+$verifie(
+	'hors zone, la raison dit pourquoi personne n’est proposé',
+	stripos( LeadRouting::raison( $hors ), 'hors de la zone' ) !== false,
+	LeadRouting::raison( $hors )
+);
+
+/* La zone se lit dans le DEPARTEMENT : une region seule ne suffit plus. */
+$mixte = [ 'lead_need' => 'produit-pose', 'lead_destination' => 'mixed', 'department' => '94' ];
+$verifie(
+	'parquet + pose : la raison nomme les deux entreprises',
+	stripos( LeadRouting::raison( $mixte ), 'Premibel' ) !== false
+		&& stripos( LeadRouting::raison( $mixte ), 'Allure Design' ) !== false,
+	LeadRouting::raison( $mixte )
+);
+
+$demi = [ 'lead_need' => 'produit-pose', 'lead_destination' => 'premibel', 'department' => '35' ];
+$verifie(
+	'parquet + pose hors zone : la raison dit que la pose reste à traiter',
+	stripos( LeadRouting::raison( $demi ), 'pose' ) !== false
+		&& stripos( LeadRouting::raison( $demi ), 'reste à traiter' ) !== false,
+	LeadRouting::raison( $demi )
+);
+
+$verifie( 'aucune raison pour une demande jamais orientée', LeadRouting::raison( [] ) === '' );
+
+/*
+ * L'arbitrage humain, et sa trace.
+ *
+ * La recommandation vient du parcours ; la decision revient a une personne,
+ * et l'ecran doit montrer d'ou l'on vient.
+ */
+wp_set_current_user( $admin_id );
+$mixed_avant = $repo->count_search( [ 'search' => PP_MARQUE, 'destination' => 'mixed' ] );
+$verifie( 'la destination se corrige', $repo->update_destination( $route, 'mixed', current_time( 'mysql' ) ) );
+$apres_route = $repo->find_by_id( $route );
+$verifie( 'la destination courante a changé', (string) $apres_route['lead_destination'] === 'mixed' );
+$verifie(
+	'la recommandation initiale n’a pas bougé',
+	(string) $apres_route['lead_destination_auto'] === 'allure_design',
+	(string) $apres_route['lead_destination_auto']
+);
+$verifie( 'la correction est détectée', LeadRouting::corrigee( $apres_route ) === true );
+$verifie( 'et elle sait d’où elle vient', LeadRouting::libelle_auto( $apres_route ) === 'Allure Design' );
+
+/* Les six besoins, traduits pour l'ecran et pour l'email. */
+foreach ( [ 'produit', 'pose', 'produit-pose', 'renovation', 'renseignement', 'indetermine' ] as $b ) {
+	$verifie( "libellé du besoin « {$b} »", Labels::of( 'lead_need', $b ) !== $b, Labels::of( 'lead_need', $b ) );
+}
+$verifie( 'libellé de la destination Allure Design', Labels::of( 'lead_destination', 'allure_design' ) === 'Allure Design' );
+
+/*
+ * Le filtre de la liste marche pour les quatre destinations, pas seulement
+ * pour celle qui existait quand on l'a ecrit.
+ */
+/*
+ * On compte AVANT et APRES plutot qu'une valeur absolue.
+ *
+ * La section « Qualification » corrige deja une demande en `mixed` : figer
+ * le total a 1 faisait echouer ce test pour une raison qui n'avait rien a
+ * voir avec le filtre. Un ecart de un est ce que ce test veut mesurer.
+ */
+$verifie(
+	'la demande corrigée en mixed est retrouvée par le filtre',
+	$repo->count_search( [ 'search' => PP_MARQUE, 'destination' => 'mixed' ] ) === $mixed_avant + 1,
+	'avant ' . $mixed_avant . ', après ' . $repo->count_search( [ 'search' => PP_MARQUE, 'destination' => 'mixed' ] )
+);
+$verifie(
+	'filtre destination = allure_design : plus aucune après correction',
+	$repo->count_search( [ 'search' => PP_MARQUE, 'destination' => 'allure_design' ] ) === 0
+);
+
+/* La liste ramene de quoi lire la zone sans ouvrir chaque fiche. */
+$page_route = $repo->search( [ 'search' => PP_MARQUE, 'page' => 1 ] );
+$verifie(
+	'la liste ramène la région et le besoin',
+	$page_route !== [] && array_key_exists( 'region', $page_route[0] ) && array_key_exists( 'lead_need', $page_route[0] )
 );
 
 /* ================================================================== */

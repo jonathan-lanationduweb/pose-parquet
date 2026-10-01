@@ -42,12 +42,44 @@ $verifie( 'requête complète acceptée', $v['ok'], wp_json_encode( $v['errors']
 $verifie( 'surface normalisée en entier', ( $v['data']['surface'] ?? null ) === 32 );
 $verifie( 'consentement normalisé en booléen', ( $v['data']['consent'] ?? null ) === true );
 $verifie( 'sourceUrl réduite au chemin', ( $v['data']['sourceUrl'] ?? '' ) === '/projet/' );
-$verifie( 'aucune clé inattendue en sortie', ! array_diff( array_keys( $v['data'] ), array_keys( Fields::ROOT ) ) );
+/*
+ * `region` est une sortie sans etre une entree.
+ *
+ * Elle n'est plus un champ recevable — le contrat l'a retiree — mais le
+ * validateur la CALCULE depuis le departement et la place dans `data`, d'ou
+ * elle part en base. C'est la seule cle de sortie qui ne corresponde pas a
+ * une cle d'entree, et la nommer ici evite qu'une vraie cle inattendue passe
+ * inapercue derriere un `array_diff` trop large.
+ */
+$sorties_attendues = array_merge( array_keys( Fields::ROOT ), [ 'region' ] );
+$verifie( 'aucune clé inattendue en sortie', ! array_diff( array_keys( $v['data'] ), $sorties_attendues ), implode( ', ', array_diff( array_keys( $v['data'] ), $sorties_attendues ) ) );
 
 $minimal = pp_requete_metier( [ 'city' => null, 'style' => null, 'message' => null, 'sourceUrl' => null ] );
 $verifie( 'requête minimale (obligatoires seuls) acceptée', $accepte( $minimal ) );
-$verifie( 'zone idf sans région acceptée, région déduite', ( $valide( pp_requete_metier( [ 'zone' => 'idf', 'region' => null ] ) )['data']['region'] ?? '' ) === Fields::REGION_IDF_LABEL );
-$verifie( 'zone idf avec région fournie : Île-de-France l’emporte', ( $valide( pp_requete_metier( [ 'zone' => 'idf' ] ) )['data']['region'] ?? '' ) === Fields::REGION_IDF_LABEL );
+/*
+ * La region se deduit du departement, et ne s'envoie plus.
+ *
+ * Le contrat acceptait `zone` et `region` en plus du departement : trois
+ * champs pour un fait, et `department=35` avec `region=Île-de-France` etait
+ * une charge parfaitement recevable. Les deux ont disparu de la saisie comme
+ * du contrat.
+ */
+$verifie( 'région déduite du département', ( $valide( pp_requete_metier( [ 'department' => '75' ] ) )['data']['region'] ?? '' ) === Fields::REGION_IDF_LABEL );
+$verifie( 'région déduite hors IDF', ( $valide( pp_requete_metier( [ 'department' => '69' ] ) )['data']['region'] ?? '' ) === 'Auvergne-Rhône-Alpes' );
+$verifie( 'une région envoyée est refusée', $refuse( pp_requete_metier( [ 'region' => 'Bretagne' ] ), 'region' ) );
+$verifie( 'une zone envoyée est refusée', $refuse( pp_requete_metier( [ 'zone' => 'idf' ] ), 'zone' ) );
+
+/*
+ * LA CONTRADICTION, ET CE QU'IL EN RESTE.
+ *
+ * Une charge fabriquee qui annonce `department=35` et `region=Île-de-France`
+ * est REFUSEE — la region n'est plus un champ. Et si l'on ne garde que le
+ * departement, la region deduite est celle du departement, jamais celle qu'on
+ * aurait voulu lui faire dire.
+ */
+$contradiction = $valide( pp_requete_metier( [ 'department' => '35', 'region' => Fields::REGION_IDF_LABEL ] ) );
+$verifie( 'department=35 + region=Île-de-France : refusé', ! $contradiction['ok'] && isset( $contradiction['errors']['region'] ) );
+$verifie( 'department=35 seul : région = Bretagne', ( $valide( pp_requete_metier( [ 'department' => '35' ] ) )['data']['region'] ?? '' ) === 'Bretagne' );
 $verifie( 'surface chaîne numérique « 45 » acceptée', ( $valide( pp_requete_metier( [ 'surface' => '45' ] ) )['data']['surface'] ?? null ) === 45 );
 $verifie( 'département 2a normalisé en 2A', ( $valide( pp_requete_metier( [ 'department' => '2a' ] ) )['data']['department'] ?? '' ) === '2A' );
 $verifie( 'département 974 accepté', $accepte( pp_requete_metier( [ 'department' => '974' ] ) ) );
@@ -68,7 +100,7 @@ foreach ( Fields::ROOT as $nom => $obligatoire ) {
 	$verifie( "$nom absent → erreur sur $nom", $refuse( pp_requete_metier( [ $nom => null ] ), $nom ) );
 }
 $verifie( 'chaîne vide = absent', $refuse( pp_requete_metier( [ 'firstName' => '   ' ] ), 'firstName' ) );
-$verifie( 'zone autre sans région refusée', $refuse( pp_requete_metier( [ 'region' => null ] ), 'region' ) );
+$verifie( 'département absent → erreur', $refuse( pp_requete_metier( [ 'department' => null ] ), 'department' ) );
 $v = $valide( pp_requete_metier( [ 'email' => null, 'phone' => null ] ) );
 $verifie( 'plusieurs erreurs remontées ensemble', count( $v['errors'] ) === 2 );
 $verifie( 'message d’absence distinct', str_contains( $v['errors']['email'] ?? '', 'absent' ) );
@@ -111,14 +143,13 @@ $section( 'Listes fermées' );
 foreach ( array_keys( Fields::ENUMS ) as $nom ) {
 	$verifie( "$nom hors liste refusé", str_contains( $valide( pp_requete_metier( [ $nom => 'valeur-inventee' ] ) )['errors'][ $nom ] ?? '', 'liste' ) );
 	foreach ( Fields::enum( $nom ) as $valeur ) {
-		$extra = $nom === 'zone' && $valeur === 'idf' ? [ 'region' => null ] : [];
-		if ( ! $accepte( pp_requete_metier( [ $nom => $valeur ] + $extra ) ) ) {
+		if ( ! $accepte( pp_requete_metier( [ $nom => $valeur ] ) ) ) {
 			$verifie( "$nom = $valeur accepté", false );
 		}
 	}
 }
 $verifie( 'toutes les valeurs de chaque liste acceptées', true );
-$verifie( 'casse respectée (Bretagne ≠ bretagne)', $refuse( pp_requete_metier( [ 'region' => 'bretagne' ] ), 'region' ) );
+$verifie( 'casse du département : « 2a » normalisé, pas refusé', ( $valide( pp_requete_metier( [ 'department' => '2a' ] ) )['data']['department'] ?? '' ) === '2A' );
 
 /* ------------------------------------------------------------------ */
 $section( 'Consentement' );
@@ -158,6 +189,59 @@ $verifie( 'URL absolue réduite à son chemin', ( $valide( pp_requete_metier( [ 
 $verifie( 'sourceUrl de 600 caractères refusée', $refuse( pp_requete_metier( [ 'sourceUrl' => '/' . str_repeat( 'p', 600 ) ] ), 'sourceUrl' ) );
 $verifie( 'sourceUrl numérique → type', $refuse( pp_requete_metier( [ 'sourceUrl' => 42 ] ), 'sourceUrl' ) );
 $verifie( 'utmCampaign nettoyé', ( $valide( pp_requete_metier( [ 'utmCampaign' => ' printemps<b>2026</b> ' ] ) )['data']['utmCampaign'] ?? '' ) === 'printemps2026' );
+
+/* ------------------------------------------------------------------ */
+$section( 'Qualification commerciale' );
+
+$verifie( 'origine acceptée', $accepte( pp_requete_metier( [ 'leadSource' => 'motif' ] ) ) );
+/*
+ * Les six besoins, un par un.
+ *
+ * Le vocabulaire s'est enrichi quand le perimetre d'Allure Design a ete
+ * etabli : `projet` a laisse la place a `pose`, `produit-pose` et
+ * `renovation`. Les verifier un par un plutot qu'en echantillon, parce
+ * qu'une valeur oubliee dans la liste du serveur donne un 422 sur une
+ * reponse parfaitement legitime du formulaire — cote visiteur ca ressemble
+ * a une panne.
+ */
+foreach ( [ 'produit', 'pose', 'produit-pose', 'renovation', 'renseignement', 'indetermine' ] as $pp_b ) {
+	$verifie( "besoin « {$pp_b} » accepté", $accepte( pp_requete_metier( [ 'leadNeed' => $pp_b ] ) ) );
+}
+$verifie( '« projet » n’est plus un besoin', $refuse( pp_requete_metier( [ 'leadNeed' => 'projet' ] ), 'leadNeed' ) );
+$verifie( 'destination acceptée', $accepte( pp_requete_metier( [ 'leadDestination' => 'premibel' ] ) ) );
+
+/*
+ * Les trois listes sont fermées cote serveur aussi.
+ *
+ * Le front les respecte, mais le front n'est pas le juge : une charge
+ * fabriquee a la main pourrait sinon inscrire n'importe quel mot dans la
+ * colonne sur laquelle l'administration filtre, et le filtre ne le
+ * retrouverait plus jamais.
+ */
+$verifie( 'origine inventée refusée', $refuse( pp_requete_metier( [ 'leadSource' => 'depuis-la-lune' ] ), 'leadSource' ) );
+$verifie( 'besoin inventé refusé', $refuse( pp_requete_metier( [ 'leadNeed' => 'jacuzzi' ] ), 'leadNeed' ) );
+$verifie( 'destination inventée refusée', $refuse( pp_requete_metier( [ 'leadDestination' => 'concurrent' ] ), 'leadDestination' ) );
+
+/*
+ * La page d'entree subit le meme traitement que sourceUrl : reduite a son
+ * chemin. Une requete conservee ferait entrer en base les parametres d'une
+ * page d'arrivee, donc potentiellement un jeton ou une adresse glissee dans
+ * un lien de campagne.
+ */
+$verifie(
+	'page d’entrée réduite à son chemin',
+	( $valide( pp_requete_metier( [ 'entryPage' => 'https://pose-parquet.com/guides/x.html?token=secret#h' ] ) )['data']['entryPage'] ?? '' ) === '/guides/x.html'
+);
+$verifie( 'page d’entrée de 600 caractères refusée', $refuse( pp_requete_metier( [ 'entryPage' => '/' . str_repeat( 'p', 600 ) ] ), 'entryPage' ) );
+$verifie( 'page d’entrée numérique → type', $refuse( pp_requete_metier( [ 'entryPage' => 42 ] ), 'entryPage' ) );
+
+$verifie( 'utmContent nettoyé', ( $valide( pp_requete_metier( [ 'utmContent' => ' variante<b>b</b> ' ] ) )['data']['utmContent'] ?? '' ) === 'varianteb' );
+$verifie( 'utmTerm accepté', ( $valide( pp_requete_metier( [ 'utmTerm' => 'parquet chêne' ] ) )['data']['utmTerm'] ?? '' ) === 'parquet chêne' );
+$verifie( 'utmTerm de 200 caractères refusé', $refuse( pp_requete_metier( [ 'utmTerm' => str_repeat( 'x', 200 ) ] ), 'utmTerm' ) );
+
+/* Aucun de ces champs n'est obligatoire : une demande sans eux passe. */
+$verifie( 'qualification absente : demande valide', $accepte( pp_requete_metier() ) );
+$verifie( 'aucune valeur par défaut inventée', ! isset( $valide( pp_requete_metier() )['data']['leadDestination'] ) );
 
 /* ------------------------------------------------------------------ */
 $section( 'Visualiseur' );

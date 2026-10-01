@@ -27,9 +27,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class Fields {
 
 	/** Valeur de `zone` qui dispense de `region`. */
-	public const ZONE_IDF          = 'idf';
-	public const ZONE_AUTRE        = 'autre';
-	public const REGION_IDF_LABEL  = 'Île-de-France';
+	/**
+	 * Le libellé de l'Île-de-France.
+	 *
+	 * Conservé pour les appelants qui comparent une région stockée ; la
+	 * source reste Projects\Departements::ILE_DE_FRANCE, et cette constante
+	 * s'y aligne au lieu de porter sa propre chaîne.
+	 */
+	public const REGION_IDF_LABEL = Departements::ILE_DE_FRANCE;
 
 	/** Bornes de surface : celles du champ `surface` du formulaire (min 1, max 2000, pas 1). */
 	public const SURFACE_MIN = 1;
@@ -42,6 +47,7 @@ final class Fields {
 	public const MAX_CITY       = 120;
 	public const MAX_MESSAGE    = 4000;
 	public const MAX_SOURCE_URL = 500;
+	public const MAX_ENTRY_PAGE = 500;
 	public const MAX_UTM        = 100;
 	public const MAX_SCENE_ID   = 60;
 	public const MAX_PRODUCT_ID = 60;
@@ -73,12 +79,23 @@ final class Fields {
 
 	/** Listes fermées : nom API → valeurs acceptées. */
 	public const ENUMS = [
-		'zone'             => [ self::ZONE_IDF, self::ZONE_AUTRE ],
-		'region'           => [
-			'Auvergne-Rhône-Alpes', 'Bourgogne-Franche-Comté', 'Bretagne', 'Centre-Val de Loire', 'Corse',
-			'Grand Est', 'Hauts-de-France', 'Normandie', 'Nouvelle-Aquitaine', 'Occitanie',
-			'Pays de la Loire', "Provence-Alpes-Côte d'Azur", 'Outre-mer',
-		],
+		/*
+		 * `zone` et `region` ne sont plus des champs recevables.
+		 *
+		 * Le client en envoyait trois pour un seul fait : une zone, une
+		 * region, un departement. Rien n'empechait `department=35` avec
+		 * `region=Île-de-France`, et la fiche affichait alors une
+		 * contradiction sur laquelle un humain devait trancher.
+		 *
+		 * La region est maintenant DEDUITE du departement par
+		 * Projects\Departements, cote serveur, a partir de la seule donnee
+		 * geographique qui reste. Une region recue est refusee comme champ
+		 * inconnu plutot que silencieusement ecrasee : ecraser aurait cache
+		 * un defaut du client, refuser le signale.
+		 *
+		 * La colonne `region` reste, elle : c'est ce qu'on stocke et ce qu'on
+		 * affiche. Seule la SAISIE a disparu.
+		 */
 		'housingType'      => [ 'appartement', 'maison', 'commerce', 'bureaux', 'autre' ],
 		'roomType'         => [ 'sejour', 'chambre', 'cuisine', 'couloir', 'plusieurs', 'autre' ],
 		'supportType'      => [ 'dalle', 'chape', 'carrelage', 'parquet', 'autre', 'inconnu' ],
@@ -86,6 +103,36 @@ final class Fields {
 		'installationType' => [ 'longueur', 'largeur', 'diagonale', 'point-de-hongrie', 'baton-rompu', 'inconnu' ],
 		'style'            => [ 'clair-scandinave', 'naturel-chene', 'haussmannien', 'contemporain-fume', 'brut-atelier' ],
 		'timeframe'        => [ 'urgent', 'mois', '1-3-mois', 'plus-tard', 'renseignement' ],
+
+		/*
+		 * Qualification commerciale (schema 4).
+		 *
+		 * `leadSource` : la famille editoriale de la page d'entree, pas le
+		 * canal d'acquisition. Une meme fiche motif s'atteint par une
+		 * recherche, par une campagne ou par un lien : la page est la meme, le
+		 * canal non. Ecrire « seo-motif » dans un seul champ reviendrait a
+		 * deviner. Le canal se lit dans les `utm_*`, a cote.
+		 *
+		 * `leadNeed` : six valeurs depuis que le perimetre d'Allure Design est
+		 * etabli — pose, revetements de sol, renovation interieure, amenagement,
+		 * second oeuvre, a Paris et en Ile-de-France. La version precedente en
+		 * comptait quatre, volontairement neutres : nommer un besoin que
+		 * personne ne s'etait engage a servir aurait ete une promesse en l'air.
+		 * `projet` a disparu au profit de `pose`, `produit-pose` et
+		 * `renovation`, qui disent ce qu'il faut savoir pour orienter. Aucune
+		 * migration : la colonne est un varchar, seule la liste s'allonge.
+		 *
+		 * `leadDestination` : la regle du front les produit maintenant toutes
+		 * les quatre. Voir js/forms/lead-context.js — la regle y vit une seule
+		 * fois, et le serveur ne la reecrit pas.
+		 */
+		'leadSource'       => [
+			'accueil', 'guide', 'motif', 'tutoriel', 'inspiration',
+			'visualiseur', 'mode-plan', 'outils', 'projet', 'contact',
+			'a-propos', 'autre',
+		],
+		'leadNeed'         => [ 'produit', 'pose', 'produit-pose', 'renovation', 'renseignement', 'indetermine' ],
+		'leadDestination'  => [ 'premibel', 'allure_design', 'mixed', 'undetermined' ],
 	];
 
 	/** Motifs acceptés dans `visualizer.pattern` : ceux du moteur du Studio. */
@@ -100,8 +147,6 @@ final class Fields {
 	 * Tout nom absent de cette liste est un champ inconnu → 422.
 	 */
 	public const ROOT = [
-		'zone'             => true,
-		'region'           => false,
 		'department'       => true,
 		'city'             => false,
 		'housingType'      => true,
@@ -122,6 +167,12 @@ final class Fields {
 		'utmSource'        => false,
 		'utmMedium'        => false,
 		'utmCampaign'      => false,
+		'utmContent'       => false,
+		'utmTerm'          => false,
+		'entryPage'        => false,
+		'leadSource'       => false,
+		'leadNeed'         => false,
+		'leadDestination'  => false,
 		'visualizer'       => false,
 	];
 
@@ -157,6 +208,19 @@ final class Fields {
 		'utmSource'        => 'utm_source',
 		'utmMedium'        => 'utm_medium',
 		'utmCampaign'      => 'utm_campaign',
+		'utmContent'       => 'utm_content',
+		'utmTerm'          => 'utm_term',
+		'entryPage'        => 'entry_page',
+		'leadSource'       => 'lead_source',
+		'leadNeed'         => 'lead_need',
+		'leadDestination'  => 'lead_destination',
+		/*
+		 * `lead_destination_auto` n'est PAS ici : le navigateur ne l'envoie
+		 * pas. Repository::insert_project la recopie de `leadDestination` a la
+		 * creation, pour qu'aucune charge fabriquee ne puisse annoncer une
+		 * recommandation differente de la destination et simuler un arbitrage
+		 * humain qui n'a pas eu lieu.
+		 */
 	];
 
 	/** @return string[] */

@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 use PoseParquet\Core\Admin\Notices;
 use PoseParquet\Core\Admin\View;
+use PoseParquet\Core\Projects\LeadRouting;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -47,6 +48,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</p>
 		</div>
 	<?php endif; ?>
+
+	<?php
+	/*
+	 * Filtre « destination recommandée ».
+	 *
+	 * Sous les onglets de statut et non parmi eux : ce sont deux axes
+	 * différents. Le statut dit où en est le traitement, la destination dit à
+	 * qui la demande revient — et on veut pouvoir croiser les deux, par
+	 * exemple « nouvelles ET à qualifier ».
+	 */
+	$pp_dest_actuelle = (string) ( $view['dest'] ?? '' );
+	?>
+	<ul class="subsubsub pp-filters pp-filters--destination">
+		<li><?php esc_html_e( 'Destination :', 'pose-parquet-core' ); ?> </li>
+		<?php
+		$pp_dests   = [ '' => __( 'Toutes', 'pose-parquet-core' ) ];
+		foreach ( (array) ( $view['dests'] ?? [] ) as $pp_d ) {
+			$pp_dests[ $pp_d ] = View::label( 'lead_destination', $pp_d );
+		}
+		$pp_dernier = array_key_last( $pp_dests );
+		foreach ( $pp_dests as $pp_valeur => $pp_libelle ) :
+			$pp_actif = $pp_dest_actuelle === $pp_valeur;
+			$pp_url   = View::list_url(
+				[
+					'status'      => $view['status'],
+					's'           => $view['search'],
+					'mail'        => $view['mail'] ?? '',
+					'destination' => $pp_valeur,
+				]
+			);
+			?>
+			<li>
+				<a href="<?php echo esc_url( $pp_url ); ?>"<?php echo $pp_actif ? ' class="current" aria-current="page"' : ''; ?>>
+					<?php echo esc_html( $pp_libelle ); ?>
+				</a><?php echo $pp_valeur === $pp_dernier ? '' : ' |'; ?>
+			</li>
+		<?php endforeach; ?>
+	</ul>
 
 	<ul class="subsubsub pp-filters">
 		<?php
@@ -127,13 +166,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<th scope="col" class="pp-col-secondary"><?php esc_html_e( 'Ville', 'pose-parquet-core' ); ?></th>
 				<th scope="col" class="pp-col-secondary"><?php esc_html_e( 'Surface', 'pose-parquet-core' ); ?></th>
 				<th scope="col" class="pp-col-secondary"><?php esc_html_e( 'Projet', 'pose-parquet-core' ); ?></th>
+				<th scope="col" class="pp-col-secondary"><?php esc_html_e( 'Origine', 'pose-parquet-core' ); ?></th>
+				<th scope="col" class="pp-col-secondary"><?php esc_html_e( 'Besoin', 'pose-parquet-core' ); ?></th>
+				<th scope="col" class="pp-col-secondary"><?php esc_html_e( 'Destination', 'pose-parquet-core' ); ?></th>
 				<th scope="col" class="pp-col-status"><?php esc_html_e( 'Statut', 'pose-parquet-core' ); ?></th>
 			</tr>
 		</thead>
 		<tbody>
 			<?php if ( ! $view['rows'] ) : ?>
 				<tr>
-					<td colspan="8">
+					<td colspan="11">
 						<?php
 						echo $view['search'] !== '' || $view['status'] !== ''
 							? esc_html__( 'Aucune demande ne correspond à ce filtre.', 'pose-parquet-core' )
@@ -176,6 +218,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</td>
 					<td class="pp-col-secondary"><?php echo esc_html( View::surface( $row['surface'] ) ); ?></td>
 					<td class="pp-col-secondary"><?php echo esc_html( View::label( 'room_type', $row['room_type'] ) ); ?></td>
+					<td class="pp-col-secondary"><?php echo esc_html( View::label( 'lead_source', (string) ( $row['lead_source'] ?? '' ) ) ); ?></td>
+					<td class="pp-col-secondary"><?php echo esc_html( View::label( 'lead_need', (string) ( $row['lead_need'] ?? '' ) ) ); ?></td>
+					<td class="pp-col-secondary">
+						<?php
+						/*
+						 * Une demande d'avant le schéma 4 n'a pas de destination : sa
+						 * cellule reste vide plutôt que d'afficher « À qualifier », qui
+						 * la ferait apparaître comme une tâche qu'elle n'est pas.
+						 */
+						echo esc_html( View::label( 'lead_destination', (string) ( $row['lead_destination'] ?? '' ) ) );
+
+						/*
+						 * La zone, en second, et seulement hors Île-de-France.
+						 *
+						 * C'est la seule information qui change la lecture de la
+						 * destination : « À qualifier » pour un chantier parisien serait
+						 * une anomalie, pour un chantier breton c'est la règle. L'écrire
+						 * sur toutes les lignes noierait les quelques-unes qui comptent.
+						 */
+						if ( ( $row['lead_destination'] ?? '' ) !== '' && ! LeadRouting::en_idf( $row ) ) {
+							echo ' <span class="pp-sub">' . esc_html__( '(hors IDF)', 'pose-parquet-core' ) . '</span>';
+						}
+						?>
+					</td>
 					<td class="pp-col-status">
 						<span class="pp-status pp-status--<?php echo esc_attr( (string) $row['status'] ); ?>">
 							<?php echo esc_html( View::status( $row['status'] ) ); ?>

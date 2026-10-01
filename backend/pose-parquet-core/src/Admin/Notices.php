@@ -37,6 +37,8 @@ final class Notices {
 	public const CAPS_REPAIRED    = 'caps_repaired';
 	public const MAIL_QUEUE_RUN   = 'mail_queue_run';
 	public const MAIL_QUEUE_EMPTY = 'mail_queue_empty';
+	public const DEST_UPDATED     = 'dest_updated';
+	public const DEST_UNCHANGED   = 'dest_unchanged';
 	public const CAPS_INCOMPLETE  = 'caps_incomplete';
 
 	/**
@@ -60,6 +62,8 @@ final class Notices {
 			/* translators: %1$s : nombre d’envois traités, %2$s : nombre restant en file. */
 			self::MAIL_QUEUE_RUN   => [ 'success', sprintf( __( 'File des notifications : %1$s envoi(s) traité(s), %2$s en attente.', 'pose-parquet-core' ), number_format_i18n( self::compteur( 'pp_traites' ) ), number_format_i18n( self::compteur( 'pp_restants' ) ) ) ],
 			self::MAIL_QUEUE_EMPTY => [ 'info', __( 'Aucun envoi n’était dû : la file est à jour.', 'pose-parquet-core' ) ],
+			self::DEST_UPDATED     => [ 'success', __( 'Destination mise à jour. Une note interne en garde la trace.', 'pose-parquet-core' ) ],
+			self::DEST_UNCHANGED   => [ 'info', __( 'La destination était déjà celle-là : rien n’a changé.', 'pose-parquet-core' ) ],
 			self::CAPS_INCOMPLETE  => [ 'error', __( 'Des droits manquent encore après la réparation : le rôle concerné a peut-être été supprimé par une autre extension.', 'pose-parquet-core' ) ],
 		];
 	}

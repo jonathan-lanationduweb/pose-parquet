@@ -74,10 +74,35 @@ $appel = static function ( string $method, string $route, array $entetes = [], ?
 };
 
 $json = static fn( array $d ): string => (string) json_encode( $d, JSON_UNESCAPED_UNICODE );
+/*
+ * La requete de reference.
+ *
+ * La qualification commerciale y figure au lieu d'avoir sa propre section, et
+ * ce n'est pas de la paresse : la route limite a cinq creations par heure et
+ * par identite, et la suite compte precisement sur ce budget — la section
+ * « Limite de debit » verifie qu'elle atteint 429 apres quatre creations.
+ * Une section supplementaire qui creerait pour son compte ferait tomber en
+ * 429 tout ce qui la suit.
+ *
+ * Les valeurs sont celles relevees dans le navigateur au terme d'un parcours
+ * reel : entree sur un guide avec cinq parametres de campagne, passage par le
+ * Studio sur une reference Premibel, arrivee sur le formulaire. Chaque
+ * creation de cette suite les emporte donc, et leur acceptation se verifie a
+ * chaque 201.
+ *
+ * `productId` est en MAJUSCULES a dessein : c'est la forme des quatorze
+ * references reelles, et la regle du front l'ecartait silencieusement.
+ */
 $requete = [
-	'zone' => 'idf', 'department' => '75', 'housingType' => 'appartement', 'roomType' => 'chambre', 'surface' => 12,
+	/* Departement seul : la region s'en deduit cote serveur, Ile-de-France ici. */
+	'department' => '75', 'housingType' => 'appartement', 'roomType' => 'chambre', 'surface' => 12,
 	'supportType' => 'dalle', 'parquetType' => 'massif', 'installationType' => 'longueur', 'timeframe' => 'urgent',
 	'firstName' => 'HttpTest', 'lastName' => 'HttpTest', 'email' => 'httptest@example.com', 'phone' => '0612345678', 'consent' => true,
+	'leadSource' => 'guide', 'leadNeed' => 'produit', 'leadDestination' => 'premibel',
+	'entryPage' => '/guides/point-de-hongrie-ou-baton-rompu.html',
+	'utmSource' => 'google', 'utmMedium' => 'cpc', 'utmCampaign' => 'hongrie-2026',
+	'utmContent' => 'variante-b', 'utmTerm' => 'point de hongrie',
+	'visualizer' => [ 'sceneId' => 'sejour', 'productId' => 'CHENF36006', 'pattern' => 'lames', 'orientation' => 0 ],
 ];
 $ok_origin  = 'https://jonathan-lanationduweb.github.io';
 $bad_origin = 'https://evil.example.org';
@@ -155,6 +180,28 @@ $requete['formToken'] = $jeton();
 
 /** Corps d'une requête valide, avec un jeton neuf à chaque appel. */
 $corps = static fn( array $extra = [] ): string => $json( array_merge( $requete, [ 'formToken' => $jeton() ], $extra ) );
+
+echo "\n== Qualification commerciale ==\n";
+
+/*
+ * Trois listes fermees, verifiees au bout du fil.
+ *
+ * Aucun de ces appels ne cree : un 422 ne consomme pas le quota de creations,
+ * et la section n'entame donc pas le budget de celles qui suivent.
+ */
+foreach ( [ 'leadSource' => 'depuis-la-lune', 'leadNeed' => 'jacuzzi', 'leadDestination' => 'concurrent' ] as $champ => $valeur ) {
+	$r = $appel( 'POST', $route, [ 'Content-Type' => 'application/json' ], $corps( [ $champ => $valeur ] ) );
+	$verifie( "{$champ} hors liste → 422", $r['status'] === 422 && str_contains( $r['body'], $champ ), $r['status'] . ' ' . substr( $r['body'], 0, 160 ) );
+}
+
+$r = $appel( 'POST', $route, [ 'Content-Type' => 'application/json' ], $corps( [ 'entryPage' => 42 ] ) );
+$verifie( 'page d’entrée non textuelle → 422', $r['status'] === 422 && str_contains( $r['body'], 'entryPage' ), (string) $r['status'] );
+
+$r = $appel( 'POST', $route, [ 'Content-Type' => 'application/json' ], $corps( [ 'utmTerm' => str_repeat( 'x', 200 ) ] ) );
+$verifie( 'utmTerm de 200 caractères → 422', $r['status'] === 422 && str_contains( $r['body'], 'utmTerm' ), (string) $r['status'] );
+
+$r = $appel( 'POST', $route, [ 'Content-Type' => 'application/json' ], $corps( [ 'leadRouting' => 'premibel' ] ) );
+$verifie( 'champ de qualification inventé → 422 champ inconnu', $r['status'] === 422 && str_contains( $r['body'], 'leadRouting' ), (string) $r['status'] );
 
 echo "\n== Preflight OPTIONS ==\n";
 $r = $appel( 'OPTIONS', $route, [ 'Origin' => $ok_origin, 'Access-Control-Request-Method' => 'POST', 'Access-Control-Request-Headers' => 'content-type' ] );
