@@ -1,6 +1,6 @@
 <?php
 /**
- * Les deux écritures de l'administration : changer un statut, ajouter une note.
+ * Les écritures de l'administration : statut, note, destination, entretien.
  *
  * Toutes deux en POST vers `admin-post.php`, jamais en GET. Un changement de
  * statut atteignable par un lien serait déclenché par un prefetch de
@@ -27,6 +27,8 @@ declare(strict_types=1);
 namespace PoseParquet\Core\Admin;
 
 use PoseParquet\Core\Mail\Queue;
+use PoseParquet\Core\Mail\Labels;
+use PoseParquet\Core\Projects\Fields;
 use PoseParquet\Core\Projects\Notes;
 use PoseParquet\Core\Projects\Repository;
 use PoseParquet\Core\Projects\StatusService;
@@ -43,6 +45,7 @@ final class Actions {
 	public const ADD_NOTE      = 'pp_add_note';
 	public const REPAIR_CAPS   = 'pp_repair_caps';
 	public const RUN_MAIL_QUEUE = 'pp_run_mail_queue';
+	public const UPDATE_DESTINATION = 'pp_update_destination';
 
 	public static function register(): void {
 		// `admin_post_` (sans `nopriv`) : la poignée n'existe pas pour un
@@ -52,6 +55,7 @@ final class Actions {
 		add_action( 'admin_post_' . self::ADD_NOTE, [ self::class, 'add_note' ] );
 		add_action( 'admin_post_' . self::REPAIR_CAPS, [ self::class, 'repair_caps' ] );
 		add_action( 'admin_post_' . self::RUN_MAIL_QUEUE, [ self::class, 'run_mail_queue' ] );
+		add_action( 'admin_post_' . self::UPDATE_DESTINATION, [ self::class, 'update_destination' ] );
 	}
 
 	/**
@@ -154,6 +158,80 @@ final class Actions {
 		];
 
 		self::back( $id, $codes[ $resultat['code'] ] ?? Notices::SAVE_FAILED );
+	}
+
+	/**
+	 * Change la destination commerciale recommandée.
+	 *
+	 * La recommandation vient du front, qui la déduit de ce que le visiteur a
+	 * fait. Elle n'est qu'une recommandation : c'est ici qu'un humain tranche,
+	 * et son arbitrage prime toujours sur la règle automatique.
+	 *
+	 * Le changement écrit une NOTE INTERNE, datée et signée par WordPress.
+	 * C'est la trace, et elle est volontairement dans les notes plutôt que
+	 * dans la table d'historique : celle-ci est faite pour les transitions de
+	 * statut, ses deux colonnes de statut sont NOT NULL, et y loger un
+	 * changement de destination aurait demandé de la déformer pour un seul
+	 * usage. Une note se lit au même endroit que le reste du dossier, ce qui
+	 * est précisément là qu'on la cherche.
+	 *
+	 * Si la note échoue — cas rare, base indisponible — le changement reste
+	 * acquis et l'écran le dit quand même : perdre la trace est ennuyeux,
+	 * perdre l'arbitrage le serait davantage.
+	 */
+	public static function update_destination(): void {
+		$id = isset( $_POST['project_id'] ) ? absint( wp_unslash( $_POST['project_id'] ) ) : 0;
+
+		self::require_can( Capabilities::MANAGE_PROJECTS );
+		check_admin_referer( self::nonce_action( self::UPDATE_DESTINATION, $id ) );
+
+		if ( $id === 0 ) {
+			self::back( 0, Notices::NOT_FOUND );
+		}
+
+		$voulue = isset( $_POST['lead_destination'] ) ? sanitize_key( wp_unslash( $_POST['lead_destination'] ) ) : '';
+		if ( ! in_array( $voulue, Fields::enum( 'leadDestination' ), true ) ) {
+			self::back( $id, Notices::SAVE_FAILED );
+		}
+
+		$repo    = new Repository();
+		$demande = $repo->find( $id );
+		if ( ! $demande ) {
+			self::back( $id, Notices::NOT_FOUND );
+		}
+
+		$avant = (string) ( $demande['lead_destination'] ?? '' );
+		if ( $avant === $voulue ) {
+			self::back( $id, Notices::DEST_UNCHANGED );
+		}
+
+		if ( ! $repo->update_destination( $id, $voulue, current_time( 'mysql' ) ) ) {
+			self::back( $id, Notices::SAVE_FAILED );
+		}
+
+		/* La trace, en français, lisible par la personne qui ouvrira la fiche. */
+		$depuis = $avant === ''
+			? __( 'non renseignée', 'pose-parquet-core' )
+			: Labels::of( 'lead_destination', $avant );
+		Notes::add(
+			$id,
+			sprintf(
+				/* translators: 1 : ancienne destination, 2 : nouvelle destination. */
+				__( 'Destination modifiée : %1$s → %2$s.', 'pose-parquet-core' ),
+				$depuis,
+				Labels::of( 'lead_destination', $voulue )
+			)
+		);
+
+		Logger::info( 'destination modifiée', [
+			'project_id' => $id,
+			'user_id'    => get_current_user_id(),
+			'de'         => $avant,
+			'vers'       => $voulue,
+			'action'     => 'update_destination',
+		] );
+
+		self::back( $id, Notices::DEST_UPDATED );
 	}
 
 	public static function add_note(): void {

@@ -74,8 +74,11 @@ function pp_requete_valide( array $surcharge = [] ): array {
  */
 function pp_requete_metier( array $surcharge = [] ): array {
 	return array_replace( [
-		'zone'             => 'autre',
-		'region'           => 'Bretagne',
+		/*
+		 * Plus de `zone` ni de `region` : le contrat ne les accepte plus.
+		 * Le departement est la seule donnee geographique, et la region s'en
+		 * deduit cote serveur — ici, Bretagne.
+		 */
 		'department'       => '35',
 		'city'             => 'Rennes',
 		'housingType'      => 'appartement',

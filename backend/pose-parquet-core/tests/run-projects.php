@@ -225,8 +225,9 @@ if ( $ligne ) {
 	$verifie( 'historique : created_at = celui de la demande', ( $ev['created_at'] ?? '' ) === $ligne['created_at'] );
 }
 
-$reponse2 = $poster_json( pp_requete_valide( [ 'zone' => 'idf', 'region' => null, 'city' => null, 'style' => null, 'message' => null, 'sourceUrl' => null ] ) );
-$verifie( 'POST minimal (obligatoires seuls, zone idf) → 201', $reponse2->get_status() === 201, wp_json_encode( $reponse2->get_data() ) );
+/* Departement francilien : la region doit en etre deduite, pas recue. */
+$reponse2 = $poster_json( pp_requete_valide( [ 'department' => '75', 'city' => null, 'style' => null, 'message' => null, 'sourceUrl' => null ] ) );
+$verifie( 'POST minimal (obligatoires seuls) → 201', $reponse2->get_status() === 201, wp_json_encode( $reponse2->get_data() ) );
 $ligne2 = $repo->find_by_reference( (string) ( $reponse2->get_data()['reference'] ?? '' ) );
 if ( $ligne2 ) {
 	$crees[] = (int) $ligne2['id'];

@@ -53,6 +53,20 @@ final class Repository {
 			$formats[]      = $api === 'surface' ? '%d' : '%s';
 		}
 
+		/*
+		 * La recommandation initiale, figee a la creation.
+		 *
+		 * Recopiee de `lead_destination` plutot que recue du navigateur : une
+		 * charge fabriquee pourrait sinon annoncer une recommandation
+		 * differente de la destination, et faire croire a un arbitrage humain
+		 * qui n'a jamais eu lieu. Les deux colonnes partent forcement egales ;
+		 * seule l'administration peut ensuite les faire diverger.
+		 */
+		if ( isset( $data['leadDestination'] ) ) {
+			$row['lead_destination_auto'] = $data['leadDestination'];
+			$formats[]                    = '%s';
+		}
+
 		if ( isset( $data['visualizer'] ) ) {
 			$v = $data['visualizer'];
 			foreach ( [ 'sceneId' => 'scene_id', 'productId' => 'product_id', 'pattern' => 'pattern' ] as $k => $column ) {
@@ -184,7 +198,14 @@ final class Repository {
 
 	/** Colonnes lues par la liste. `SELECT *` y ramènerait le message et le JSON du Visualiseur pour rien. */
 	private const LIST_COLUMNS = 'id, reference, status, first_name, last_name, email, phone, city, department,'
-		. ' room_type, surface, internal_mail_status, visitor_mail_status, created_at';
+		. ' room_type, surface, internal_mail_status, visitor_mail_status, created_at,'
+		/* Qualification : trois mots courts, lus a chaque ligne de la liste. */
+		/*
+		 * `region` et `department` rejoignent la liste : la destination depend
+		 * de la zone, et une colonne « Destination » sans moyen de verifier
+		 * d'ou vient le projet oblige a ouvrir chaque fiche.
+		 */
+		. ' lead_source, lead_need, lead_destination, lead_destination_auto, region';
 
 	/**
 	 * Construit le WHERE commun à `search()` et `count_search()`.
@@ -199,7 +220,7 @@ final class Repository {
 	 * la milliseconde ; le jour où le volume l'exigera, ce sera un index
 	 * FULLTEXT sur nom/email, pas un index par colonne posé à l'aveugle.
 	 *
-	 * @param array{status?:string,search?:string,mail?:string} $args
+	 * @param array{status?:string,search?:string,mail?:string,destination?:string} $args
 	 * @return array{0:string,1:array<int,mixed>} clause (sans le mot WHERE) et paramètres
 	 */
 	private function where( array $args ): array {
@@ -229,6 +250,24 @@ final class Repository {
 			$clauses[] = '(internal_mail_status = %s OR visitor_mail_status = %s)';
 			$params[]  = $mail;
 			$params[]  = $mail;
+		}
+
+		/*
+		 * Filtre sur la destination recommandee.
+		 *
+		 * « Montre-moi ce qui part chez Premibel », « montre-moi ce qui reste a
+		 * qualifier » : c'est le tri quotidien, et c'est pour lui que la
+		 * colonne porte un index.
+		 *
+		 * Comme pour le sort des notifications, la valeur n'est jamais
+		 * interpolee : elle est confrontee a la liste fermee de Fields, et
+		 * seule une valeur de cette liste produit une clause. Une valeur
+		 * inventee dans l'URL ne filtre rien plutot que de vider la page.
+		 */
+		$destination = (string) ( $args['destination'] ?? '' );
+		if ( in_array( $destination, Fields::enum( 'leadDestination' ), true ) ) {
+			$clauses[] = 'lead_destination = %s';
+			$params[]  = $destination;
 		}
 
 		$search = trim( (string) ( $args['search'] ?? '' ) );
@@ -262,7 +301,7 @@ final class Repository {
 	 * demandes arrivées dans la même seconde, et une pagination dont l'ordre
 	 * n'est pas total répète ou saute des lignes entre deux pages.
 	 *
-	 * @param array{status?:string,search?:string,mail?:string,page?:int,per_page?:int} $args
+	 * @param array{status?:string,search?:string,mail?:string,destination?:string,page?:int,per_page?:int} $args
 	 * @return array<int,array<string,mixed>>
 	 */
 	public function search( array $args = [] ): array {
@@ -290,7 +329,7 @@ final class Repository {
 	/**
 	 * Nombre de demandes répondant aux mêmes critères que `search()`.
 	 *
-	 * @param array{status?:string,search?:string,mail?:string} $args
+	 * @param array{status?:string,search?:string,mail?:string,destination?:string} $args
 	 */
 	public function count_search( array $args = [] ): int {
 		global $wpdb;
@@ -374,6 +413,40 @@ final class Repository {
 		}
 
 		return $counts;
+	}
+
+	/**
+	 * Change la destination recommandée d'une demande.
+	 *
+	 * Pas de verrou d'optimisme ici, contrairement au statut, et c'est
+	 * délibéré. Le statut décrit une progression : l'écraser fait perdre le
+	 * travail de quelqu'un. La destination est un aiguillage, et le dernier
+	 * humain qui tranche a raison — deux gestionnaires qui la changent en même
+	 * temps ne se contredisent pas, ils sont d'accord ou le second corrige.
+	 *
+	 * La trace, elle, n'est pas perdue : l'appelant écrit une note interne,
+	 * datée et signée. La table d'historique, elle, reste réservée aux
+	 * transitions de statut — ses colonnes `old_status` / `new_status` sont
+	 * NOT NULL et y loger autre chose aurait demandé de la déformer.
+	 *
+	 * La valeur n'est pas validée ici : l'appelant l'a confrontée à
+	 * `Fields::enum( 'leadDestination' )`, et une couche de données n'a pas à
+	 * connaître les listes éditoriales.
+	 *
+	 * @return bool vrai si une ligne a bougé
+	 */
+	public function update_destination( int $id, string $destination, string $now ): bool {
+		global $wpdb;
+
+		$table   = Schema::table( 'projects' );
+		$updated = $wpdb->query( $wpdb->prepare(
+			"UPDATE {$table} SET lead_destination = %s, updated_at = %s WHERE id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$destination,
+			$now,
+			$id
+		) );
+
+		return $updated === 1;
 	}
 
 	/**
