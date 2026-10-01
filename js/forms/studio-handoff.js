@@ -19,6 +19,22 @@
  *   libelle        nom commercial, pour l'humain  Chêne Fumé
  *   motif          motif de pose                  point-de-hongrie
  *   orientation    angle du rendu, en degrés      90
+ *   fiche          la référence a une fiche réelle 1
+ *
+ * ## `fiche` : pourquoi le Studio le dit et le formulaire ne le devine pas
+ *
+ * Le formulaire ne charge pas le catalogue — il n'en a besoin pour rien
+ * d'autre, et lui faire télécharger vingt-six références pour répondre à une
+ * seule question serait payer cher une information que le Studio possède
+ * déjà. Le Studio, lui, sait si la référence ouverte porte une fiche produit
+ * réelle : il l'écrit.
+ *
+ * Cette valeur sert à RECOMMANDER une destination commerciale, jamais à
+ * déclencher quoi que ce soit. Une URL fabriquée à la main peut donc faire
+ * recommander Premibel pour un parquet de démonstration ; le pire qui puisse
+ * en résulter est une ligne mal orientée dans une liste, qu'un humain
+ * corrige d'un menu déroulant. Aucun envoi, aucune commande, aucune donnée
+ * transmise à un tiers ne dépend de ce drapeau.
  *
  * ## Pourquoi des libellés en plus des identifiants
  *
@@ -73,6 +89,7 @@ export const PARAMS = {
   label: 'libelle',
   pattern: 'motif',
   angle: 'orientation',
+  fiche: 'fiche',
 };
 
 /**
@@ -94,12 +111,28 @@ export const ANGLES = new Set([0, 90, 45, -45]);
 /**
  * Forme d'un identifiant : la même règle que celle du serveur.
  *
- * Un libellé commercial ne la passe pas — « Chêne Fumé » a une majuscule, un
- * espace et un accent — et c'est exactement le garde-fou qu'on veut : si un
- * libellé arrive là où un identifiant est attendu, il est écarté au lieu
- * d'être stocké comme s'il en était un.
+ * Un libellé commercial ne la passe pas — « Chêne Fumé » a un espace et un
+ * accent — et c'est exactement le garde-fou qu'on veut : si un libellé arrive
+ * là où un identifiant est attendu, il est écarté au lieu d'être stocké comme
+ * s'il en était un.
+ *
+ * ## Pourquoi le drapeau `i`
+ *
+ * Les identifiants de démonstration sont en minuscules — `chene-fume` — et la
+ * règle l'était aussi. Les quatorze références réelles portent leur référence
+ * fournisseur, en majuscules : `CHENF36006`. Elles échouaient donc toutes au
+ * test, et `parquet` n'était jamais écrit dans le lien vers le formulaire :
+ * la seule moitié du catalogue qui désigne un produit achetable arrivait en
+ * base sans identifiant, avec son seul libellé.
+ *
+ * Le serveur, lui, acceptait déjà les deux casses — `/^[a-z0-9][a-z0-9_\-]*$/i`
+ * dans Validator.php. C'est le front qui était plus strict que le contrat
+ * qu'il servait, et c'est le front qui se corrige.
+ *
+ * Ce que le garde-fou refuse reste identique : l'espace et l'accent ne sont
+ * dans aucune des deux casses.
  */
-const ID_VALIDE = /^[a-z0-9][a-z0-9_-]{0,59}$/;
+const ID_VALIDE = /^[a-z0-9][a-z0-9_-]{0,59}$/i;
 
 /** Vrai si cette chaîne peut être un identifiant de scène ou de produit. */
 export function estIdentifiant(valeur) {
@@ -127,9 +160,10 @@ export function estIdentifiant(valeur) {
  * @param {string|null} [etat.productLabel] nom commercial du parquet actif
  * @param {string|null} [etat.pattern]      motif de pose
  * @param {number|null} [etat.angle]        angle du rendu, en degrés
+ * @param {boolean} [etat.ficheProduit]      la référence porte une fiche réelle
  * @returns {URLSearchParams}
  */
-export function buildHandoffParams({ sceneId, sceneLabel, productId, productLabel, pattern, angle } = {}) {
+export function buildHandoffParams({ sceneId, sceneLabel, productId, productLabel, pattern, angle, ficheProduit } = {}) {
   const params = new URLSearchParams();
 
   const propre = (v) => (typeof v === 'string' ? v.trim().slice(0, MAX_LIBELLE) : '');
@@ -149,6 +183,10 @@ export function buildHandoffParams({ sceneId, sceneLabel, productId, productLabe
 
   const entier = Number(angle);
   if (Number.isInteger(entier) && ANGLES.has(entier)) params.set(PARAMS.angle, String(entier));
+
+  // Écrit seulement s'il est vrai, et seulement avec son identifiant : un
+  // drapeau sans référence ne qualifierait rien.
+  if (ficheProduit && estIdentifiant(productId)) params.set(PARAMS.fiche, '1');
 
   return params;
 }
@@ -194,6 +232,8 @@ export function readHandoffParams(params) {
     productLabel: libelle || null,
     pattern: MOTIFS.has(motif) ? motif : null,
     angle,
+    // Comme le libellé : sans identifiant valide, le drapeau ne désigne rien.
+    ficheProduit: estIdentifiant(produit) && params.get(PARAMS.fiche) === '1',
   };
 
   /*

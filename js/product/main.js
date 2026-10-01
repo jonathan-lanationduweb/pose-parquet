@@ -7,8 +7,19 @@
  */
 import { ready, qs } from '../utils/dom.js';
 import { mountProduct } from './app.js';
+import { initContexteLead } from '../forms/lead-context.js';
 
 ready(() => {
+  /*
+   * Le contexte de visite, avant tout le reste.
+   *
+   * Il enregistre la page d'entrée et les paramètres de campagne s'ils sont
+   * là, pour que la demande envoyée trois pages plus loin sache encore d'où
+   * vient la personne. Rien ne part sur le réseau : voir
+   * js/forms/lead-context.js.
+   */
+  initContexteLead();
+
   const root = qs('[data-product]');
   if (!root) return;
   mountProduct(root).catch((error) => {

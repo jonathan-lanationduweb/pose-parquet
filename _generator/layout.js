@@ -154,7 +154,28 @@ function footer(p) {
           </nav>
         </div>
         <div class="footer__bottom">
-          <p>&copy; 2026 Pose Parquet — média indépendant, aucune vente en ligne.</p>
+          <!--
+            « Média indépendant, aucune vente en ligne » figurait ici.
+
+            La première moitié n'est plus exacte : le site oriente vers les
+            références de Premibel quand elles existent, et un lecteur qui
+            découvrirait ce lien après coup aurait raison de se sentir trompé.
+            La seconde reste vraie — rien ne se vend ni ne se paie ici — mais
+            énoncée seule elle laissait entendre la première.
+
+            Le pied de page ne développe pas : il renvoie à la page qui le
+            fait, une fois, sobrement.
+          -->
+          <p>&copy; 2026 Pose Parquet — guides et outils pour préparer son projet.</p>
+          <!--
+            Deux destinations nommées, une ligne, pas de logo.
+
+            Le pied de page dit vers QUI l'on oriente et pour QUOI ; le détail
+            — la zone, ce que la relation ne change pas — est à la page qui
+            l'explique. Écrire trois phrases ici en ferait une réclame en bas
+            de 32 pages.
+          -->
+          <p class="footer__orientation">Selon le besoin, ce site oriente vers <strong>Premibel</strong> pour les références de parquet et vers <strong>Allure&nbsp;Design</strong> pour la pose et les travaux en Île-de-France. <a href="${p}a-propos/#liens-commerciaux">En savoir plus</a></p>
           <p>Photographies sous licence Pexels</p>
         </div>
       </div>

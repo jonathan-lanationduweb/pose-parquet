@@ -19,12 +19,12 @@ import { readHandoffParams } from './studio-handoff.js';
 /**
  * Nom du champ dans le formulaire → nom de la clé dans l'API.
  *
- * `zone` et `region` passent tels quels : le serveur déduit `region` de
- * `zone = idf` et ignore alors ce qu'on lui envoie.
+ * `zone` et `region` n'y figurent plus, et ne sont plus envoyés du tout : le
+ * serveur déduit la région du département et REFUSE une région reçue, parce
+ * qu'une région envoyée est une région qu'on peut contredire. Voir
+ * js/forms/departements.js et src/Projects/Departements.php.
  */
 const CHAMPS = {
-  zone: 'zone',
-  region: 'region',
   departement: 'department',
   ville: 'city',
   logement: 'housingType',
@@ -58,8 +58,15 @@ const CHAMPS = {
   message: 'message',
 };
 
-/** Champs du formulaire qui ne partent jamais tels quels. */
-const TRAITES_A_PART = new Set(['consentement', 'website', 'source']);
+/**
+ * Champs du formulaire qui ne partent jamais tels quels.
+ *
+ * `besoin` en fait partie : sa réponse ne voyage pas sous son nom de champ,
+ * elle nourrit `leadNeed` après confrontation avec le délai et le contexte du
+ * Visualiseur. L'envoyer en plus créerait deux versions du même fait, qui
+ * finiraient par diverger.
+ */
+const TRAITES_A_PART = new Set(['consentement', 'website', 'source', 'besoin']);
 
 /**
  * Clés que le serveur se réserve. Le front ne les envoie jamais ; cette liste
@@ -141,11 +148,12 @@ export function visualizerFromParams(params) {
  * @param {FormData} options.formData      les champs saisis
  * @param {string}   options.formToken     jeton obtenu de GET /form-token
  * @param {string}   [options.sourcePath]  chemin de la page (le serveur ne garde que le chemin)
- * @param {object}   [options.utm]         { utmSource, utmMedium, utmCampaign }
+ * @param {object}   [options.utm]         les cinq `utm_*` de la visite
  * @param {object}   [options.visualizer]  contexte du Studio, si présent
+ * @param {object}   [options.qualification] origine, besoin, destination recommandée
  * @returns {object}
  */
-export function buildProjectPayload({ formData, formToken, sourcePath, utm, visualizer }) {
+export function buildProjectPayload({ formData, formToken, sourcePath, utm, visualizer, qualification }) {
   const payload = {};
 
   for (const [nom, valeurBrute] of formData.entries()) {
@@ -189,13 +197,40 @@ export function buildProjectPayload({ formData, formToken, sourcePath, utm, visu
   if (sourcePath) payload.sourceUrl = sourcePath;
 
   if (utm) {
-    for (const cle of ['utmSource', 'utmMedium', 'utmCampaign']) {
+    // Cinq, et non trois. `utm_content` distingue deux créations d'une même
+    // campagne, `utm_term` le mot-clé acheté : sans eux, on sait qu'une
+    // campagne a converti, pas ce qui dans cette campagne a converti.
+    for (const cle of ['utmSource', 'utmMedium', 'utmCampaign', 'utmContent', 'utmTerm']) {
       const v = (utm[cle] || '').trim();
       if (v !== '') payload[cle] = v.slice(0, 100);
     }
   }
 
   if (visualizer) payload.visualizer = visualizer;
+
+  /*
+   * Qualification : d'où vient ce lead, ce qu'il cherche, vers qui l'orienter.
+   *
+   * Les valeurs viennent de `js/forms/lead-context.js`, qui les DÉDUIT de ce
+   * que le visiteur a réellement fait et répondu. Aucune n'est demandée au
+   * visiteur par une question de plus : le formulaire compte déjà cinq
+   * étapes, et une sixième pour lui faire dire ce qu'on peut observer serait
+   * payée par des abandons.
+   *
+   * `leadDestination` est une RECOMMANDATION. Elle s'affiche en
+   * administration, un humain la confirme ou la change, et rien ne part nulle
+   * part sur sa seule foi.
+   */
+  if (qualification) {
+    for (const cle of ['leadSource', 'leadNeed', 'leadDestination', 'entryPage']) {
+      const v = (qualification[cle] || '').trim();
+      if (v !== '') payload[cle] = v;
+    }
+    for (const cle of ['utmSource', 'utmMedium', 'utmCampaign', 'utmContent', 'utmTerm']) {
+      const v = (qualification[cle] || '').trim();
+      if (v !== '' && !payload[cle]) payload[cle] = v.slice(0, 100);
+    }
+  }
 
   return payload;
 }
