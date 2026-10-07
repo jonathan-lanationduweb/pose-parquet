@@ -90,6 +90,82 @@ function blurWeighted(channels, weight, width, height, radius, passes = 3) {
   return { channels: buffers, weight: w };
 }
 
+/** Médiane pondérée d'une liste de [valeur, poids]. */
+function medianePonderee(paires) {
+  paires.sort((a, b) => a[0] - b[0]);
+  const total = paires.reduce((s, p) => s + p[1], 0);
+  let cumul = 0;
+  for (const [valeur, poids] of paires) {
+    cumul += poids;
+    if (cumul >= total / 2) return valeur;
+  }
+  return paires.length ? paires[paires.length - 1][0] : 0;
+}
+
+/**
+ * Photo importée : ce qui, sous le cadre, n'est manifestement pas du sol.
+ *
+ * Tant que le visiteur n'a pas retiré ses meubles au pinceau, le cadre couvre
+ * un canapé, un tapis, un pied de table. L'éclairement les lisait comme de la
+ * LUMIÈRE : un canapé gris devenait une grande ombre floue sur le parquet
+ * (visible sur la recette du salon, cadre de départ), un tapis clair une
+ * tache de soleil, et la moyenne de référence en sortait faussée.
+ *
+ * Le sol est la matière majoritaire sous le cadre, et il est à peu près
+ * uniforme en teinte. On prend donc sa luminance et sa chromaticité
+ * médianes, et on retire leur poids aux cellules qui s'en écartent nettement
+ * — très sombres (< 0,5 × la médiane), d'une autre teinte (un tapis blanc,
+ * un canapé gris, une plante), ou d'une clarté que le soleil n'atteint pas
+ * (> 4 ×). Le flou pondéré qui suit comble ces trous avec la lumière du sol
+ * voisin. Les vraies ombres (0,5 à 0,9 de la médiane) et les taches de
+ * soleil, de la teinte du bois, sont gardées : un premier réglage à 2,4 ×
+ * éteignait la tache de soleil de la pièce « contraste ».
+ */
+function ecarterLesObjets(chan, weight, count) {
+  const lum = [];
+  const rn = [];
+  const gn = [];
+  for (let i = 0; i < count; i += 1) {
+    const w = weight[i];
+    if (w <= 0) continue;
+    const r = chan[0][i] / w;
+    const g = chan[1][i] / w;
+    const b = chan[2][i] / w;
+    const somme = Math.max(1, r + g + b);
+    lum.push([0.2126 * r + 0.7152 * g + 0.0722 * b, w]);
+    rn.push([r / somme, w]);
+    gn.push([g / somme, w]);
+  }
+  if (lum.length < 8) return;
+  const lMed = Math.max(4, medianePonderee(lum));
+  const rMed = medianePonderee(rn);
+  const gMed = medianePonderee(gn);
+  for (let i = 0; i < count; i += 1) {
+    const w = weight[i];
+    if (w <= 0) continue;
+    const r = chan[0][i] / w;
+    const g = chan[1][i] / w;
+    const b = chan[2][i] / w;
+    const somme = Math.max(1, r + g + b);
+    const rapport = (0.2126 * r + 0.7152 * g + 0.0722 * b) / lMed;
+    const teinte = Math.hypot(r / somme - rMed, g / somme - gMed);
+    let k = 1;
+    if (rapport < 0.5) k *= Math.max(0, (rapport - 0.3) / 0.2);
+    else if (rapport > 4) k *= Math.max(0, 1 - (rapport - 4) / 1.5);
+    // Teinte : un tapis blanc ou un canapé gris sur du chêne s'écartent
+    // d'environ 0,15 ; une ombre de jour, plus bleue, de 0,05 à 0,07 — elle
+    // doit rester (un seuil à 0,035 aplatissait les ombres de « contraste »).
+    if (teinte > 0.075) k *= Math.max(0, 1 - (teinte - 0.075) / 0.055);
+    k = Math.max(0.02, k);
+    if (k < 1) {
+      chan[0][i] *= k;
+      chan[1][i] *= k;
+      chan[2][i] *= k;
+      weight[i] *= k;
+    }
+  }
+}
+
 /**
  * Carte d'éclairement d'une scène.
  *
@@ -148,6 +224,8 @@ export function buildShadingMap(source, coverage, light) {
       weight[index] = cover;
     }
   }
+
+  if (light.robust) ecarterLesObjets(chan, weight, count);
 
   /* ---- Éclairement : basse fréquence, en couleur ---- */
 

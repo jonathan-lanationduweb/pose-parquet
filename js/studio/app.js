@@ -30,11 +30,12 @@ import {
   messageAdaptation,
 } from '../scene/motifs-regles.js';
 import { loadImage, loadFile } from '../scene/image-loader.js';
-import { createFloorEditor } from '../scene/editor.js';
+import { createFloorEditor, problemeCadre } from '../scene/editor.js';
 import { composeRender, downloadCanvas } from '../scene/export.js';
 import { createSceneRenderer } from '../scene/renderer.js';
 import { warmMaterial, enCache, quandCartesPretes, apercuAsync } from '../scene/material.js';
 import { addZone, removeZone } from '../scene/schema.js';
+import { contourDuCadre, decouperALaPhoto, cotesParalleles, dimensionsDuCadre, planDuCadre } from '../scene/cadre-photo.js';
 import { loadCatalog, createCatalog, swatchFor } from './catalog.js';
 import { createCompare } from './compare.js';
 import { buildHandoffParams } from '../forms/studio-handoff.js';
@@ -632,6 +633,9 @@ const REGROUPEMENT_MS = 70;
 
   function afterScene(name) {
     root.dataset.state = 'edit';
+    // Photo importée ou pièce d'exemple : quelques réglages d'écran diffèrent
+    // (barre d'actions pendant la délimitation, voir studio-app.css).
+    root.dataset.source = renderer.scene.source === 'manual' ? 'photo' : 'exemple';
     qs('[data-project]', root).textContent = name;
     photo.src = renderer.photo.toDataURL('image/jpeg', 0.9);
     // La zone la plus proche est celle qu'on corrige le plus souvent.
@@ -769,7 +773,7 @@ const REGROUPEMENT_MS = 70;
       mountEditor();
       root.dataset.panel = 'closed';
       openDrawer('zone');
-      setStatus('Délimitez le sol : déplacez les quatre poignées jusqu’aux angles.');
+      setStatus('Délimitez le sol : alignez les poignées sur le pied des murs.');
     } catch (error) {
       setStatus(error.message || 'Photo illisible.');
     }
@@ -900,10 +904,47 @@ const REGROUPEMENT_MS = 70;
           }</a>`
         : '';
 
+    /*
+     * Ce que vaut le rendu, dit à côté du nom. Une démonstration — ouverte par
+     * une carte Inspiration ou un ancien lien — le dit en toutes lettres :
+     * elle ne doit jamais passer pour une référence en vente.
+     */
+    const statut = fiche.source === 'premibel'
+      ? `<span class="selected__status">${fiche.visualStatus === 'ready' ? 'Rendu fidèle' : 'Rendu indicatif'} · référence Premibel</span>`
+      : '<span class="selected__status selected__status--demo">Démonstration · parquet calculé par le moteur, pas une référence en vente</span>';
+
+    /*
+     * CONFIGURATION ACTUELLE ≠ CATALOGUE PREMIBEL.
+     *
+     * Une démonstration (carte Inspiration, ancien lien) ne prend plus
+     * l'apparence d'une fiche : pas de vignette ni de cotes présentées comme
+     * celles d'un produit, mais un encadré qui dit ce qu'elle est et propose
+     * tout de suite une vraie référence. Juste dessous, le catalogue reste
+     * strictement Premibel — la démonstration n'y figure pas et n'entre dans
+     * aucun compteur.
+     */
+    const demo = fiche.source !== 'premibel';
+    selectedHost.dataset.demo = String(demo);
+    if (demo) {
+      selectedHost.innerHTML = `
+        <p class="selected__eyebrow">Configuration de démonstration</p>
+        <p class="selected__demo">« ${echapper(item.name)} » est un parquet calculé par le moteur pour cet exemple : aucune référence en vente ne lui correspond.</p>
+        <button type="button" class="btn btn--sm selected__choose" data-choisir-premibel>Choisir une référence Premibel</button>`;
+      selectedHost.querySelector('[data-choisir-premibel]').addEventListener('click', () => {
+        // Le catalogue est juste dessous : on y amène le regard et le clavier.
+        if (root.dataset.sheet === 'peek') root.dataset.sheet = 'full';
+        catalogSlot.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        const champ = catalogSlot.querySelector('input[type="search"], .cat__search input');
+        if (champ) champ.focus({ preventScroll: true });
+      });
+      return;
+    }
     selectedHost.innerHTML = `
+      <p class="selected__eyebrow">Sur le sol</p>
       <span class="selected__swatch"></span>
       <span class="selected__text">
         <strong>${echapper(item.name)}</strong>
+        ${statut}
         <span>${echapper(surface)} · ${echapper(cotes)}</span>
         ${lien}
       </span>`;
@@ -1315,36 +1356,112 @@ const REGROUPEMENT_MS = 70;
 
   const zone = () => renderer.scene.floorZones.find((item) => item.id === activeZone);
 
+  /*
+   * PERSPECTIVE et CONTOUR sont deux données distinctes : le cadre (quatre
+   * coins) donne la fuite, le contour dit où le parquet apparaît. Tant que le
+   * contour n'a jamais été touché, il suit le cadre — c'est ce qu'on attend
+   * en posant ses quatre coins. Dès qu'il a été retouché (point ajouté,
+   * déplacé, retiré), déplacer le cadre ne l'écrase plus : la version
+   * précédente ne le protégeait qu'après un coup de pinceau, et un contour
+   * patiemment ajusté le long d'une plinthe disparaissait au premier coin
+   * déplacé.
+   */
+  const contoursRetouches = new Set();
+  /** Met à jour le conseil « côtés parallèles » du tiroir, quand il est ouvert. */
+  let majConseilCadre = null;
+
   function mountEditor() {
     if (editor) {
       loadZoneIntoEditor();
       return;
     }
     editor = createFloorEditor(media, {
+      /*
+       * Partie de l'écran où une poignée reste entière et saisissable : la
+       * scène, moins le tiroir (à droite ou en bas selon l'écran) et la barre
+       * d'actions, moins une demi-zone de prise. Sert à afficher sur ce bord
+       * les coins de perspective qu'une scène pré-calibrée place hors de la
+       * photo — leur valeur, elle, ne change pas.
+       */
+      zoneVisible() {
+        const s = stage.getBoundingClientRect();
+        let left = Math.max(0, s.left);
+        let top = Math.max(0, s.top);
+        let right = Math.min(window.innerWidth, s.right);
+        let bottom = Math.min(window.innerHeight, s.bottom);
+        [drawer, qs('.studio__actions', root)].forEach((el) => {
+          if (!el || el.hidden) return;
+          const r = el.getBoundingClientRect();
+          if (!r.width || !r.height || r.right <= left || r.left >= right || r.bottom <= top || r.top >= bottom) return;
+          // Dans la moitié basse (panneau bas, barre d'actions) : il borne le
+          // bas. Dans la moitié droite (tiroir latéral) : il borne la droite.
+          if (r.top > (top + bottom) / 2) bottom = Math.min(bottom, r.top);
+          else if (r.left > (left + right) / 2) right = Math.min(right, r.left);
+        });
+        const prise = 24;
+        return { left: left + prise, top: top + prise, right: right - prise, bottom: bottom - prise };
+      },
       // Le cadre définit la perspective de la zone : on écrit directement dans
       // son plan, et le contour suit tant qu'il n'a pas été retouché.
+      //
+      // Sur une photo importée, le cadre ne donne plus que la FUITE
+      // (js/scene/cadre-photo.js) : les dimensions du plan sont relues dans
+      // sa perspective à chaque mouvement, et le contour du sol principal
+      // prolonge ses côtés jusqu'au bas de la photo. Une pièce calibrée garde
+      // ses dimensions et son contour d'origine.
       onFrameChange(next) {
         const target = zone();
-        target.plane.quad = next.map((p) => ({ ...p }));
-        if (!renderer.masks.hasStrokes()) {
-          renderer.masks.setPolygon(target.id, next);
-          editor.setPolygon(next);
+        const photoImportee = renderer.scene.source === 'manual';
+        let plan = next;
+        if (photoImportee) {
+          // Les poignées restent où le visiteur les pose (`cadre`) ; le plan
+          // est le rectangle de sol qu'elles désignent — devant parallèle au
+          // fond, reconstruit par la fuite.
+          target.cadre = next.map((p) => ({ ...p }));
+          plan = planDuCadre(next, renderer.size.width, renderer.size.height) || next;
+          const lues = dimensionsDuCadre(plan, renderer.size.width, renderer.size.height);
+          // Cadre momentanément impossible (coin au-dessus de l'horizon) :
+          // on garde les dimensions précédentes plutôt que de faire sauter
+          // l'échelle des lames pendant le geste.
+          if (lues) target.plane.meters = { width: lues.width, depth: lues.depth };
         }
+        target.plane.quad = plan.map((p) => ({ ...p }));
+        if (!contoursRetouches.has(target.id) && !renderer.masks.hasStrokes()) {
+          const principal = target === renderer.scene.floorZones[0];
+          const contour = !photoImportee ? next : principal ? contourDuCadre(plan) : decouperALaPhoto(next);
+          renderer.masks.setPolygon(target.id, contour);
+          editor.setPolygon(contour);
+        }
+        if (majConseilCadre) majConseilCadre();
         renderer.invalidateMasks();
         schedule(true);
       },
+      // Fin d'un geste sur une poignée (cadre ou contour). L'éclairement
+      // dépend du masque : il n'était relu qu'après un coup de pinceau ou à
+      // la fermeture du tiroir. Pendant toute la délimitation, le parquet
+      // gardait donc la lumière du cadre de DÉPART — neutre (gain 1) partout
+      // où le sol venait d'être agrandi : l'aplat pâle, sans modelé, des
+      // captures du 06/10/2026.
+      onGestureEnd() {
+        renderer.refreshLighting();
+        quality = 1;
+        schedule();
+      },
       onPolygonChange(next) {
+        contoursRetouches.add(activeZone);
         renderer.masks.setPolygon(activeZone, next);
         renderer.invalidateMasks();
         schedule(true);
       },
       onInsertPoint(point) {
+        contoursRetouches.add(activeZone);
         renderer.masks.insertPointNear(activeZone, point);
         editor.setPolygon(renderer.masks.getPolygon(activeZone));
         renderer.invalidateMasks();
         schedule(true);
       },
       onRemovePoint(index) {
+        contoursRetouches.add(activeZone);
         const removed = renderer.masks.removePoint(activeZone, index);
         if (removed) {
           editor.setPolygon(renderer.masks.getPolygon(activeZone));
@@ -1379,7 +1496,8 @@ const REGROUPEMENT_MS = 70;
   function loadZoneIntoEditor() {
     const target = zone();
     if (!editor || !target) return;
-    editor.setFrame(target.plane.quad);
+    // Photo importée : les poignées telles que posées, pas le plan reconstruit.
+    editor.setFrame(target.cadre || target.plane.quad);
     editor.setPolygon(renderer.masks.getPolygon(target.id));
   }
 
@@ -1418,8 +1536,17 @@ const REGROUPEMENT_MS = 70;
   function buildZoneTools() {
     if (!editor) mountEditor();
     stage.dataset.editing = 'true';
+    const photoImportee = renderer.scene.source === 'manual';
     const modes = [
-      ['frame', 'Le sol', 'Placez les quatre poignées aux angles du sol.'],
+      [
+        'frame',
+        'Le sol',
+        // Photo importée : on décrit le geste qui donne la perspective — les
+        // poignées du bas SUR le pied des murs, pas aux coins de la photo.
+        photoImportee
+          ? 'Posez les poignées du haut au pied du mur du fond, celles du bas sur le pied des murs de côté. Le parquet suit ces lignes jusqu’au bas de la photo ; un tapis ou un meuble se retire ensuite dans « Les objets ».'
+          : 'Placez les quatre poignées aux angles du sol.',
+      ],
       ['polygon', 'Le contour', 'Ajoutez des points pour suivre un mur ou une plinthe.'],
       ['brush', 'Les objets', 'Effacez ce qui doit rester devant : meubles, tapis, plinthes.'],
     ];
@@ -1439,6 +1566,24 @@ const REGROUPEMENT_MS = 70;
       <label class="drawer__range"><span class="visually-hidden">Taille du pinceau</span>
         <input type="range" min="10" max="140" step="2" value="42" data-radius /><output>42 px</output></label>`;
 
+    /*
+     * Conseil, seulement quand il sert : des côtés presque parallèles sont le
+     * signe d'un cadre tiré aux coins de la photo — la pièce paraîtra plate.
+     */
+    const conseil = document.createElement('p');
+    conseil.className = 'drawer__conseil';
+    conseil.hidden = true;
+    conseil.textContent = 'Côtés presque parallèles : la pièce paraîtra plate. Faites suivre aux poignées du bas le pied des murs, qui se rapprochent vers le fond.';
+    majConseilCadre = () => {
+      const cible = zone();
+      conseil.hidden = !(
+        photoImportee &&
+        tool.mode === 'frame' &&
+        cible &&
+        cotesParalleles(cible.cadre || cible.plane.quad, renderer.size.width, renderer.size.height)
+      );
+    };
+
     const applyMode = () => {
       editor.setMode(tool.mode);
       editor.setBrush({ mode: tool.brush, radius: tool.radius });
@@ -1448,6 +1593,7 @@ const REGROUPEMENT_MS = 70;
       );
       const found = modes.find((entry) => entry[0] === tool.mode);
       hint.textContent = found ? found[2] : '';
+      majConseilCadre();
     };
 
     /**
@@ -1462,7 +1608,13 @@ const REGROUPEMENT_MS = 70;
       const zones = renderer.scene.floorZones;
       const label = document.createElement('p');
       label.className = 'drawer__hint';
-      label.textContent = zones.length > 1 ? 'Sol en cours de réglage :' : 'Un seul sol pour l’instant.';
+      // Un seul sol : pas de sélecteur (il n'y a rien à choisir), et une
+      // phrase qui dit à quoi sert « Ajouter un sol » — l'ancien « Un seul sol
+      // pour l'instant. » laissait croire à une fonction pas encore livrée,
+      // alors que le second sol se règle et se rend réellement.
+      label.textContent = zones.length > 1
+        ? 'Sol en cours de réglage :'
+        : 'Votre photo montre un second sol (pièce voisine, couloir) ? Ajoutez-le, il recevra le même parquet.';
       const picker = document.createElement('div');
       picker.className = 'seg-tabs';
       picker.style.gridTemplateColumns = `repeat(${Math.min(3, zones.length)}, minmax(0, 1fr))`;
@@ -1518,7 +1670,8 @@ const REGROUPEMENT_MS = 70;
         });
         row.appendChild(drop);
       }
-      zonesBox.append(label, picker, row);
+      if (zones.length > 1) zonesBox.append(label, picker, row);
+      else zonesBox.append(label, row);
     };
     renderZones();
 
@@ -1571,9 +1724,41 @@ const REGROUPEMENT_MS = 70;
     done.className = 'btn btn--solid btn--sm btn--block';
     done.type = 'button';
     done.textContent = 'Terminer';
-    done.addEventListener('click', closeDrawer);
+    const alerte = document.createElement('p');
+    alerte.className = 'drawer__alert';
+    alerte.setAttribute('role', 'alert');
+    alerte.hidden = true;
+    /*
+     * Terminer n'accepte qu'un sol utilisable : un cadre convexe, non croisé,
+     * d'aire suffisante — sinon la perspective est indéfinie et le parquet
+     * part en éventail — et un contour qui couvre réellement des pixels.
+     * Sinon, une consigne, et le tiroir reste ouvert sur le bon outil.
+     */
+    done.addEventListener('click', () => {
+      const problemes = renderer.scene.floorZones.map((item) => {
+        const cadre = problemeCadre(item.cadre || item.plane.quad);
+        if (cadre) return { item, mode: 'frame', texte: cadre };
+        const boite = renderer.masks.box(item.id);
+        const aire = boite ? ((boite.x1 - boite.x0) * (boite.y1 - boite.y0)) / (renderer.size.width * renderer.size.height) : 0;
+        if (!boite || aire < 0.01) return { item, mode: 'polygon', texte: 'Le contour ne couvre presque rien : reprenez « Le contour » pour suivre le sol.' };
+        return null;
+      }).filter(Boolean);
+      if (!problemes.length) {
+        alerte.hidden = true;
+        closeDrawer();
+        return;
+      }
+      const premier = problemes[0];
+      activeZone = premier.item.id;
+      tool.mode = premier.mode;
+      loadZoneIntoEditor();
+      applyMode();
+      alerte.textContent = renderer.scene.floorZones.length > 1 ? `${premier.item.label} : ${premier.texte}` : premier.texte;
+      alerte.hidden = false;
+    });
 
-    drawerBody.append(zonesBox, seg, hint, brushBox, undo, done);
+    // Les outils d'abord, Terminer à portée ; le second sol, plus rare, en dernier.
+    drawerBody.append(seg, hint, conseil, brushBox, undo, alerte, done, zonesBox);
     applyMode();
   }
 
@@ -1670,6 +1855,27 @@ const REGROUPEMENT_MS = 70;
     openHelp(root);
   });
 
+  /**
+   * L'adresse dit ce qui est à l'écran. Ouvert par un ancien lien
+   * (`?parquet=chene-naturel`), le Studio gardait la démonstration dans la
+   * barre d'adresse après le choix d'une vraie référence : un rechargement ou
+   * un partage la ramenait. `replaceState` : aucune entrée d'historique en
+   * plus, et les autres paramètres (`perf`, `orientation`…) sont conservés.
+   */
+  function syncUrl() {
+    try {
+      const url = new URL(window.location.href);
+      if (config.materialId) url.searchParams.set('parquet', config.materialId);
+      if (config.pattern) url.searchParams.set('motif', config.pattern);
+      if (sceneId) url.searchParams.set('piece', sceneId);
+      else url.searchParams.delete('piece');
+      if (url.searchParams.has('orientation')) url.searchParams.set('orientation', String(Math.round(config.angle || 0)));
+      if (url.href !== window.location.href) window.history.replaceState(window.history.state, '', url);
+    } catch (error) {
+      void error;
+    }
+  }
+
   function save() {
     /*
      * Le lien du bouton « Decrire mon projet » est une projection du meme etat
@@ -1680,6 +1886,7 @@ const REGROUPEMENT_MS = 70;
      */
     syncProjectCta();
     syncProductLink();
+    syncUrl();
 
     try {
       window.localStorage.setItem(STORAGE, JSON.stringify({ config, variants, sceneId }));
