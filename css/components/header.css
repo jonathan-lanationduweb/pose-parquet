@@ -48,6 +48,14 @@
   align-self: center;
   flex: none;
 }
+/* Logo choisi dans WordPress (Mon site → Logo principal) : il remplace le
+   symbole et le nom, à la hauteur de la ligne d'en-tête, sans déformation. */
+.brand__logo {
+  display: block;
+  align-self: center;
+  width: auto; height: 1.75rem; max-width: 11rem;
+  object-fit: contain;
+}
 .brand strong { font-weight: 400; }
 .brand span { opacity: 0.55; }
 

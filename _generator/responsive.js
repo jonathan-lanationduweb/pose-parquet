@@ -24,6 +24,9 @@ const dimsFor = (name) => {
 function widthsFor(name) {
   const dims = dimsFor(name);
   if (!dims) return [];
+  // Image venue de WordPress : les largeurs réellement téléchargées par
+  // `node _generator/wordpress.js pull` (celles que WordPress a générées).
+  if (PHOTOS[name] && Array.isArray(PHOTOS[name].largeurs)) return PHOTOS[name].largeurs.slice().sort((a, b) => a - b);
   const list = FACTORS.map((factor) => Math.round((dims.w * factor) / 10) * 10);
   return [...new Set(list)].sort((a, b) => a - b);
 }
@@ -45,7 +48,10 @@ function variantsFor(name, photo) {
  */
 function picture(name, { base = '', alt = '', sizes = '100vw', priority = false, attrs = '' } = {}) {
   const dims = dimsFor(name);
-  const src = `${base}assets/images/${name}.jpg`;
+  // `alias` : une couverture qui reprend une autre image (choisie dans
+  // WordPress) garde son nom de clé, mais pointe vers les fichiers de l'autre.
+  const fichier = (PHOTOS[name] && PHOTOS[name].alias) || name;
+  const src = `${base}assets/images/${fichier}.jpg`;
   const loading = priority
     ? 'fetchpriority="high" decoding="async"'
     : 'loading="lazy" decoding="async"';
@@ -54,10 +60,15 @@ function picture(name, { base = '', alt = '', sizes = '100vw', priority = false,
 
   const widths = widthsFor(name);
   const srcset = (ext) =>
-    widths.map((w) => `${base}assets/images/${name}-${w}.${ext} ${w}w`).join(', ');
+    widths.map((w) => `${base}assets/images/${fichier}-${w}.${ext} ${w}w`).join(', ');
 
-  return `<picture>
-              <source type="image/webp" srcset="${srcset('webp')}" sizes="${sizes}" />
+  // Pas de WebP pour une image venue de WordPress : le générateur ne convertit
+  // rien (aucune dépendance). Le JPEG seul reste un <picture> valide.
+  const webp = PHOTOS[name] && PHOTOS[name].jpgSeulement
+    ? ''
+    : `
+              <source type="image/webp" srcset="${srcset('webp')}" sizes="${sizes}" />`;
+  return `<picture>${webp}
               <img src="${src}" srcset="${srcset('jpg')}" sizes="${sizes}" alt="${alt}"
                 width="${dims.w}" height="${dims.h}" ${loading} ${attrs} />
             </picture>`;

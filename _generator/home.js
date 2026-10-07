@@ -2,9 +2,19 @@
 const { SITE } = require('./layout');
 const { picture } = require('./responsive');
 const { NB_PIECES, scene } = require('./scenes');
-const { NB_PARQUETS, NB_MOTIFS, enLettres } = require('./catalogue');
+const { NB_PREMIBEL_VISU, NB_MOTIFS, enLettres, mentionRendu } = require('./catalogue');
 const { GUIDES } = require('./content-guides');
 const { MOTIFS } = require('./content-motifs');
+const { TUTOS } = require('./content-tutos');
+/*
+ * Les textes des sections pilotées par WordPress (hero, passerelle, projet) :
+ * des champs structurés, lus au moment du rendu (WordPress les a déjà
+ * appliqués). La structure des sections, elle, reste ici.
+ */
+const { PAGES } = require('./content-pages');
+const { REGLAGES } = require('./content-site');
+const T = require('./textes');
+const V = () => PAGES['accueil'].valeurs;
 
 /*
  * Les chiffres de cette page ne sont plus écrits à la main.
@@ -36,56 +46,46 @@ const ICON = {
 };
 
 /**
- * Les quatre entrées du parcours.
+ * Les quatre entrées du parcours : COMPRENDRE, CHOISIR, VISUALISER, PRÉPARER.
  *
- * `media` est **obligatoire** sur chacune. Il existait auparavant un repli
- * `tile__pattern` pour les cartes sans visuel — trois `<span>` sans une seule
- * règle CSS, qui s'affichaient donc en barres nues et donnaient l'impression
- * d'un squelette de chargement resté bloqué. Le repli est supprimé : quatre
- * cartes, quatre photographies, même gabarit.
+ * C'étaient quatre tuiles de 22 rem, chacune portant une photographie, pour
+ * quatre liens et 94 mots : 774 px sur grand écran, 1 174 sur téléphone. Les
+ * photos n'apprenaient rien — l'une montrait un ragréage, l'autre un bâton
+ * rompu sous le titre « Je choisis mon motif ». La section devient une
+ * navigation : quatre blocs bas, un verbe, une phrase, une destination réelle.
+ *
+ * Les quatre verbes suivent la V2 : on comprend (guides), on choisit (motifs),
+ * on visualise (Studio), on prépare son projet (formulaire, qui oriente selon
+ * le besoin). Les chiffres viennent des sources, jamais d'une saisie.
  */
-const TILES = [
+const ENTREES = [
   {
-    num: '(01)',
-    title: 'Je prépare mon sol',
-    text: 'Planéité, humidité, ragréage, sous-couche : ce qui se joue avant toute pose.',
-    href: 'guides/preparer-son-sol-avant-la-pose.html',
+    verbe: 'Comprendre',
+    texte: 'Support, sens de pose, massif ou contrecollé : ce qui se décide avant de commander.',
+    href: 'guides/',
+    meta: () => `${GUIDES.length} guides`,
     tone: 'mineral',
-    media: 'tile-preparer',
   },
   {
-    num: '(02)',
-    title: 'Je choisis ma pose',
-    text: 'Flottante, collée, clouée : le support et le produit décident plus que le goût.',
-    href: 'guides/parquet-massif-ou-contrecolle.html',
-    tone: 'sage',
-    // Cette carte portait `pattern: true` et rendait trois barres décoratives
-    // là où les trois autres rendent une photographie : elle avait l'air d'un
-    // squelette de chargement resté affiché. Le visuel `tile-poser` existait
-    // déjà en 400/700/1000 (jpg + webp) et n'était utilisé nulle part.
-    media: 'tile-poser',
-  },
-  {
-    num: '(03)',
-    title: 'Je choisis mon motif',
-    /*
-     * L'énumération donnait quatre motifs puis annonçait « six », et le
-     * lecteur y voyait une faute. Les deux étaient pourtant justes : quatre
-     * exemples, six fiches derrière le lien. Les points de suspension disent
-     * que la liste est ouverte, et le nombre vient désormais des fiches.
-     */
-    text: `Droite, diagonale, Point de Hongrie, bâton rompu… ${enLettres(MOTIFS.length)} écritures au sol.`,
+    verbe: 'Choisir',
+    texte: 'De la pose droite au Point de Hongrie : le motif fait le caractère de la pièce.',
     href: 'motifs/',
-    tone: 'slate',
-    media: 'tile-motif',
+    meta: () => `${MOTIFS.length} motifs`,
+    tone: 'sage',
   },
   {
-    num: '(04)',
-    title: 'J’ai déjà un parquet',
-    text: 'Entretien, réparation, rénovation : prolonger plutôt que remplacer.',
-    href: 'guides/erreurs-a-eviter-avant-de-poser.html',
+    verbe: 'Visualiser',
+    texte: 'Votre photo, un parquet, un motif : le sol change à chaque clic.',
+    href: 'outils/studio.html',
+    meta: () => `${NB_PREMIBEL_VISU} parquets à essayer`,
+    tone: 'slate',
+  },
+  {
+    verbe: 'Préparer mon projet',
+    texte: 'Quatre étapes courtes pour cadrer la pièce, le support et le besoin.',
+    href: 'projet/',
+    meta: () => 'Sans engagement',
     tone: 'clay',
-    media: 'tile-renover',
   },
 ];
 
@@ -126,14 +126,20 @@ function heroSection() {
           <video muted loop playsinline preload="none" data-src="" aria-hidden="true"></video>
         </div>
         <div class="wrap-wide hero__inner">
-          <p class="eyebrow">Guides · Motifs · Outils</p>
-          <h1 class="hero__title">Un parquet bien posé commence <em>avant</em> la première lame.</h1>
+          <p class="eyebrow">${T.texte(V().hero_eyebrow)}</p>
+          <h1 class="hero__title">${T.riche(V().hero_titre)}</h1>
           <div class="hero__row">
             <div>
-              <p class="hero__lead">Guides, techniques et outils pour comprendre et réussir votre projet parquet — du support au motif, du calepinage à la finition.</p>
+              <!--
+                Le chapeau porte la relation, sans logo ni bouton de plus : ce
+                que fait Pose Parquet d'abord, puis vers qui il oriente. Un
+                visiteur doit savoir avant de défiler où trouver un parquet et
+                qui peut le poser — le pied de page ne suffisait pas.
+              -->
+              <p class="hero__lead">${T.riche(V().hero_texte)}</p>
               <div class="hero__actions">
-                <a class="btn btn--light btn--lg" href="guides/"><span>Explorer les guides</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
-                <a class="btn btn--outline-light btn--lg" href="outils/studio.html"><span>Visualiser mon parquet</span></a>
+                <a class="btn btn--light btn--lg" href="guides/"><span>${T.texte(V().hero_cta_guides)}</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+                <a class="btn btn--outline-light btn--lg" href="outils/studio.html"><span>${T.texte(V().hero_cta_visualiseur)}</span></a>
               </div>
             </div>
             <ul class="hero__meta">
@@ -155,34 +161,85 @@ function heroSection() {
       </div>`;
 }
 
-function tilesSection() {
-  const tiles = TILES.map(
-    (tile, index) => `<a class="tile tile--${tile.tone}" href="${tile.href}" data-reveal data-reveal-delay="${index * 70}">
-              <div class="tile__head">
-                <h3 class="tile__title">${tile.title}</h3>
-                <span class="tile__num">${tile.num}</span>
-              </div>
-              <p class="tile__text">${tile.text}</p>
-              <span class="tile__more">Explorer ${ICON.arrow}</span>
-              <div class="tile__media">${picture(tile.media, {
-                alt: '',
-                sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw',
-              })}</div>
+function parcoursSection() {
+  const entrees = ENTREES.map(
+    (e, index) => `<a class="entry entry--${e.tone}" href="${e.href}">
+              <span class="entry__num">0${index + 1}</span>
+              <h3 class="entry__title">${e.verbe}</h3>
+              <p class="entry__text">${e.texte}</p>
+              <span class="entry__foot"><span class="entry__meta">${e.meta()}</span>${ICON.arrow}</span>
             </a>`
   ).join('\n            ');
 
-  return `      <section class="section" id="parcours" aria-labelledby="parcours-title">
+  return `      <section class="section section--compact" id="parcours" aria-labelledby="parcours-title">
         <div class="wrap-wide">
-          <div class="section-head section-head__row">
+          <div class="section-head section-head__row section-head__row--tight">
             <div>
-              <p class="eyebrow">Vous en êtes où ?</p>
-              <h2 id="parcours-title">Quatre entrées, un seul chantier.</h2>
+              <p class="eyebrow">Par où commencer</p>
+              <h2 id="parcours-title">Comprendre, choisir, visualiser, préparer.</h2>
             </div>
-            <p class="lead">Chaque étape a ses décisions et ses pièges. Commencez par celle qui vous concerne aujourd’hui.</p>
+            <p class="lead">Quatre étapes d’un même chantier. Commencez par celle qui vous concerne aujourd’hui.</p>
           </div>
-          <div class="tiles">
-            ${tiles}
+          <div class="entries">
+            ${entrees}
           </div>
+        </div>
+      </section>`;
+}
+
+/**
+ * Du choix du parquet à sa réalisation — la relation, dite tôt et sobrement.
+ *
+ * Les deux noms n'apparaissaient qu'en bas de page et dans le pied de page :
+ * un visiteur ne comprenait ni où trouver un parquet, ni qui pouvait le poser.
+ * Cette section le dit juste après « Par où commencer », avant les outils.
+ *
+ * LES TITRES SONT DES MÉTIERS, PAS DES MARQUES. « Trouver votre parquet »,
+ * « Faire poser ou rénover » ; Premibel et Allure Design ne sont que des
+ * étiquettes typographiques, sans logo ni couleur propre. Ce n'est pas un
+ * bandeau partenaire : c'est la suite du parcours.
+ *
+ * LES DESTINATIONS. Premibel : son site officiel (premibel.fr, déjà cité sur
+ * /a-propos/), faute d'une page catalogue générale vérifiée — aucune URL n'est
+ * inventée. Allure Design : le formulaire de ce site, pré-réglé sur la pose,
+ * pour que la demande soit qualifiée (besoin, département) avant toute
+ * orientation, conformément à la règle publiée sur /a-propos/. Le besoin mixte
+ * a son propre lien, que le formulaire sait déjà lire.
+ */
+function orientationSection() {
+  const v = V();
+  // Une destination désactivée dans « Mon site » perd sa carte, pas la section.
+  const routes = [
+    REGLAGES.premibel_afficher
+      ? `            <article class="route">
+              <p class="route__label">${T.texte(REGLAGES.premibel_libelle)}</p>
+              <h3 class="route__title">${T.texte(v.premibel_titre)}</h3>
+              <p class="route__text">${T.texte(v.premibel_texte)}</p>
+              <a class="link-arrow route__cta" href="${T.attribut(REGLAGES.premibel_url)}" rel="noopener">${T.texte(v.premibel_cta)} <span class="route__host">${T.texte(T.hote(REGLAGES.premibel_url))}</span> ${ICON.arrow}</a>
+            </article>`
+      : '',
+    REGLAGES.allure_afficher
+      ? `            <article class="route">
+              <p class="route__label">${T.texte(REGLAGES.allure_libelle)}</p>
+              <h3 class="route__title">${T.texte(v.allure_titre)}</h3>
+              <p class="route__text">${T.texte(v.allure_texte)}</p>
+              <a class="link-arrow route__cta" href="projet/?besoin=pose">${T.texte(v.allure_cta)} ${ICON.arrow}</a>
+            </article>`
+      : '',
+  ].filter(Boolean);
+  return `      <section class="section section--compact section--orientation" aria-labelledby="orientation-title">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row section-head__row--tight">
+            <div>
+              <p class="eyebrow">${T.texte(v.passerelle_eyebrow)}</p>
+              <h2 id="orientation-title">${T.texte(v.passerelle_titre)}</h2>
+            </div>
+            <p class="lead">${T.texte(v.passerelle_intro)}</p>
+          </div>
+          <div class="routes">
+${routes.join('\n')}
+          </div>
+          <p class="routes__mixed">${T.lien(v.mixte, 'projet/?besoin=produit-pose')} <a class="routes__why" href="a-propos/#liens-commerciaux">Comprendre nos liens commerciaux</a></p>
         </div>
       </section>`;
 }
@@ -204,7 +261,8 @@ function simulatorSection() {
                      défaut. L'adresse ci-dessous reste valable telle quelle si le
                      script ne s'exécute pas — le lien n'est jamais cassé. -->
                 <a class="btn" href="outils/studio.html" data-vz-open><span>Visualiser mon parquet</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
-                <a class="link-arrow" href="outils/simulateur-pose.html">Étudier le sens de pose ${ICON.arrow}</a>
+                <a class="link-arrow" href="outils/simulateur-pose.html">Mode Plan : comparer les sens de pose ${ICON.arrow}</a>
+                <a class="link-arrow" href="outils/">Tous les outils ${ICON.arrow}</a>
               </p>
             </div>
           </div>
@@ -250,19 +308,19 @@ function simulatorSection() {
  * `preview.js` réutilise ce squelette s'il le trouve complet, et le recrée
  * sinon : les deux chemins restent valides, et une divergence se répare seule.
  */
-function apercuSquelette(id) {
+function apercuSquelette(id, base = '') {
   const piece = scene(id);
   const img = piece.image;
   const credit = img.credit ? `Photo : ${img.credit}.` : '';
   // La classe « vzp » est posée ici et non par le script : elle porte
   // `display: grid` et sa gouttière, soit 16 px qui apparaissaient au montage.
   // Réserver le cadre sans réserver la gouttière laissait un dernier sursaut.
-  return `<div class="vzp" data-vz-preview data-room="${id}" data-base="" data-reveal>
+  return `<div class="vzp" data-vz-preview data-room="${id}" data-base="${base}" data-reveal>
             <figure class="vzp__figure">
               <div class="vzp__stage" data-stage>
                 <img class="vzp__photo" data-photo loading="lazy" decoding="async"
                   width="${img.width}" height="${img.height}"
-                  src="assets/images/${img.file}" alt="${img.alt}" />
+                  src="${base}assets/images/${img.file}" alt="${img.alt}" />
                 <!-- Couche visuelle d'une figure qui porte deja sa description
                      dans la legende : rien a annoncer une seconde fois. -->
                 <canvas class="vzp__canvas" data-canvas aria-hidden="true"></canvas>
@@ -273,7 +331,7 @@ function apercuSquelette(id) {
                 <span class="vzp__handle" aria-hidden="true"></span>
               </div>
               <figcaption class="vzp__caption">
-                <span data-caption>Chêne naturel, lames droites</span> — rendu calculé dans votre navigateur.
+                <span data-caption>Chêne naturel Houston, lames droites${mentionRendu('CHENF39031') ? ` (${mentionRendu('CHENF39031')})` : ''}</span> — rendu calculé dans votre navigateur.
                 <span data-credit>${credit}</span>
               </figcaption>
             </figure>
@@ -293,56 +351,6 @@ function apercuSquelette(id) {
  * raccourcit de près de 800 px sans qu'une seule fiche disparaisse. Sous
  * 62 rem le facteur ne sert pas : le carrousel y défile au doigt.
  */
-function carouselEditorial(guides) {
-  const slides = guides
-    .map(
-      (guide) => `<article class="carousel__slide">
-              <div class="slide-card">
-                <div class="slide-card__media">
-                  ${picture(`cover-${guide.slug}`, { alt: '', sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw' })}
-                  <span class="slide-card__cat">${guide.category}</span>
-                </div>
-                <div class="slide-card__body">
-                  <h3 class="slide-card__title"><a href="guides/${guide.slug}.html">${guide.h1}</a></h3>
-                  <p class="slide-card__text">${guide.excerpt}</p>
-                  <div class="slide-card__foot">
-                    <span class="slide-card__link">Lire le guide ${ICON.arrow}</span>
-                    <span class="slide-card__meta">${guide.reading}</span>
-                  </div>
-                </div>
-              </div>
-            </article>`
-    )
-    .join('\n            ');
-
-  return `      <section class="section scroll-track" data-carousel data-scroll-carousel data-scroll-factor="0.65" aria-labelledby="guides-title">
-        <div class="scroll-track__sticky" data-scroll-sticky>
-        <div class="wrap-wide">
-          <div class="section-head section-head__row section-head__row--tight">
-            <div>
-              <p class="eyebrow">Guides du moment</p>
-              <h2 id="guides-title">Ce qu’il faut savoir avant de commander.</h2>
-            </div>
-            <div class="carousel__controls">
-              <span class="carousel__hint">${ICON.drag}Glissez</span>
-              <span class="carousel__hint carousel__hint--scroll">${ICON.down}Défilez</span>
-              <span class="carousel__count" data-carousel-count>01 / ${String(guides.length).padStart(2, '0')}</span>
-              <button class="icon-btn" type="button" data-carousel-prev aria-label="Guides précédents">${ICON.arrowLeft}</button>
-              <button class="icon-btn" type="button" data-carousel-next aria-label="Guides suivants">${ICON.arrow}</button>
-            </div>
-          </div>
-        </div>
-        <div class="carousel carousel--editorial">
-            <div class="carousel__viewport" data-carousel-viewport tabindex="0" role="region"
-              aria-label="Carrousel de guides, utilisez les flèches du clavier">
-            ${slides}
-            </div>
-            <div class="wrap-wide"><div class="carousel__progress"><span data-carousel-progress></span></div></div>
-        </div>
-        </div>
-      </section>`;
-}
-
 /**
  * Focus motif — composition éditoriale asymétrique.
  *
@@ -399,7 +407,10 @@ function immersiveSection() {
           <div class="dossier__head" data-reveal>
             <p class="eyebrow eyebrow--plain">Focus motif · 04</p>
             <h2 id="focus-title">Le Point de Hongrie,<br />une flèche au sol.</h2>
-            <a class="btn btn--light" href="motifs/point-de-hongrie.html"><span>Découvrir le motif</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+            <div class="cluster">
+              <a class="btn btn--light" href="motifs/point-de-hongrie.html"><span>Découvrir le motif</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+              <a class="link-arrow dossier__all" href="motifs/">Les ${enLettres(MOTIFS.length)} motifs ${ICON.arrow}</a>
+            </div>
           </div>
           <ol class="dossier__notes" data-reveal data-reveal-delay="90">
               ${notes}
@@ -421,8 +432,15 @@ function carouselGallery() {
             </div>`
   ).join('\n            ');
 
-  return `      <section class="section section--dark scroll-track" data-carousel data-scroll-carousel data-scroll-factor="0.65" aria-labelledby="inspi-title">
-        <div class="scroll-track__sticky" data-scroll-sticky>
+  return `      <!--
+        Carrousel LIBRE, et non plus piloté par le défilement. Figé à l'écran
+        pendant que la molette faisait avancer les vignettes, il coûtait
+        2 228 px de page sur un écran de 1 440 pour huit images — le plus long
+        bloc de l'accueil, devant le Visualiseur. Libre, il défile au doigt,
+        à la souris et aux flèches, et la page Inspiration montre le reste.
+      -->
+      <section class="section section--dark" data-carousel aria-labelledby="inspi-title">
+        <div>
         <div class="wrap-wide">
           <div class="section-head section-head__row section-head__row--tight">
             <div>
@@ -433,6 +451,7 @@ function carouselGallery() {
               <span class="carousel__count" data-carousel-count>01 / ${String(GALLERY.length).padStart(2, '0')}</span>
               <button class="icon-btn icon-btn--light" type="button" data-carousel-prev aria-label="Visuels précédents">${ICON.arrowLeft}</button>
               <button class="icon-btn icon-btn--light" type="button" data-carousel-next aria-label="Visuels suivants">${ICON.arrow}</button>
+              <a class="link-arrow inspi-all" href="inspiration/">Les ${GALLERY.length} ambiances ${ICON.arrow}</a>
             </div>
           </div>
         </div>
@@ -448,39 +467,48 @@ function carouselGallery() {
 }
 
 /**
- * Comprendre, puis poser — les deux colonnes éditoriales de l'accueil.
+ * Comprendre, puis poser — une seule section pour lire avant d'agir.
  *
- * C'ÉTAIT DEUX SECTIONS. « Passer au geste » (les tutoriels) et « Le sens de
- * pose, de A à Z » (le dossier) portaient exactement le même balisage : un
- * chapeau de section, puis des `list-row`. Elles se suivaient à trois blocs
- * d'intervalle et produisaient deux fois la même impression de lecture, pour
- * deux fois la hauteur. Sur téléphone, 1 630 px à elles deux.
+ * TROIS BLOCS FUSIONNÉS. L'accueil empilait un carrousel de six guides piloté
+ * par le défilement (947 px), puis deux listes — « Le sens de pose, de A à Z »
+ * et « Passer au geste » — de 917 px, dont quatre guides déjà présents dans le
+ * carrousel. Trois fois la même promesse de lecture, pour 423 mots.
  *
- * CE QUI EST CONSERVÉ. Les sept liens, leurs intitulés, leurs résumés, leurs
- * durées, et les deux liens de rubrique — vers `tutoriels/` et vers le
- * simulateur. Rien n'est retiré du maillage : les deux anciens titres restent
- * mot pour mot, en `h3`, sous un `h2` qui les relie.
- *
- * L'ORDRE. Le raisonnement d'abord, le geste ensuite : on choisit un sens de
- * pose avant de poser la première lame, et le dossier alimente le simulateur
- * quand le tutoriel alimente le chantier.
+ * Ici : quatre guides choisis, ceux qui tranchent une décision d'achat, avec
+ * leur couverture en vignette ; à côté, les trois tutoriels, sans image, parce
+ * que deux n'ont pas encore de photographie juste (voir IMAGE_REQUIRED dans
+ * photos.js) et qu'un aplat vide ne vaut pas mieux qu'une fausse image. Sur
+ * téléphone, les résumés se taisent : titre et durée suffisent à choisir.
  */
-function editorialSection(tutos, guides) {
-  const ligne = (href, num, titre, meta, texte) => `<a class="list-row" href="${href}">
-                <span class="list-row__num">(0${num})</span>
-                <span class="list-row__title">${titre}</span>
-                <span class="list-row__meta">${meta}</span>
-                <p class="list-row__text">${texte}</p>
+const GUIDES_ACCUEIL = [
+  'quel-sens-de-pose-choisir',
+  'preparer-son-sol-avant-la-pose',
+  'parquet-massif-ou-contrecolle',
+  'erreurs-a-eviter-avant-de-poser',
+];
+
+function lectureSection() {
+  const guides = GUIDES_ACCUEIL.map((slug) => {
+    const g = GUIDES.find((x) => x.slug === slug);
+    if (!g) throw new Error(`Accueil : guide « ${slug} » introuvable.`);
+    return g;
+  });
+  const ligneGuide = (g) => `<a class="read-row" href="guides/${g.slug}.html">
+                <span class="read-row__media">${picture(`cover-${g.slug}`, { alt: '', sizes: '6rem' })}</span>
+                <span class="read-row__body">
+                  <span class="read-row__title">${g.h1}</span>
+                  <span class="read-row__text">${g.excerpt}</span>
+                  <span class="read-row__meta">${g.category} · ${g.reading}</span>
+                </span>
               </a>`;
-
-  const dossier = guides
-    .filter((guide) => guide.tags.includes('sens-de-pose'))
-    .map((guide, index) => ligne(`guides/${guide.slug}.html`, index + 1, guide.h1, guide.reading, guide.excerpt))
-    .join('\n              ');
-
-  const gestes = tutos
-    .map((tuto, index) => ligne(`tutoriels/${tuto.slug}.html`, index + 1, tuto.h1, `${tuto.level} · ${tuto.duration}`, tuto.excerpt))
-    .join('\n              ');
+  const ligneTuto = (tuto, index) => `<a class="read-row read-row--plain" href="tutoriels/${tuto.slug}.html">
+                <span class="read-row__num">(0${index + 1})</span>
+                <span class="read-row__body">
+                  <span class="read-row__title">${tuto.h1}</span>
+                  <span class="read-row__text">${tuto.excerpt}</span>
+                  <span class="read-row__meta">${tuto.level} · ${tuto.duration}</span>
+                </span>
+              </a>`;
 
   return `      <section class="section section--compact" aria-labelledby="editorial-title">
         <div class="wrap-wide">
@@ -489,15 +517,16 @@ function editorialSection(tutos, guides) {
               <p class="eyebrow">Guides et tutoriels</p>
               <h2 id="editorial-title">Comprendre, puis poser.</h2>
             </div>
+            <p class="lead">Les guides tranchent les décisions d’achat ; les tutoriels déroulent le chantier, outillage et contrôles compris.</p>
           </div>
           <div class="duo-rows">
             <div class="duo-rows__col">
               <div class="duo-rows__head">
-                <h3 id="cluster-title">Le sens de pose, de A à Z</h3>
-                <a class="link-arrow" href="outils/simulateur-pose.html">Simulateur de sens de pose ${ICON.arrow}</a>
+                <h3 id="cluster-title">Décider avant de commander</h3>
+                <a class="link-arrow" href="guides/">Les ${GUIDES.length} guides ${ICON.arrow}</a>
               </div>
-              <div class="list-rows">
-              ${dossier}
+              <div class="read-rows">
+              ${guides.map(ligneGuide).join('\n              ')}
               </div>
             </div>
             <div class="duo-rows__col">
@@ -505,39 +534,10 @@ function editorialSection(tutos, guides) {
                 <h3 id="tuto-title">Passer au geste</h3>
                 <a class="link-arrow" href="tutoriels/">Tous les tutoriels ${ICON.arrow}</a>
               </div>
-              <div class="list-rows">
-              ${gestes}
+              <div class="read-rows">
+              ${TUTOS.map(ligneTuto).join('\n              ')}
               </div>
-            </div>
-          </div>
-        </div>
-      </section>`;
-}
-
-function toolsSection() {
-  return `      <section class="section section--alt section--compact" aria-labelledby="outils-title">
-        <div class="wrap-wide">
-          <div class="section-head section-head__row">
-            <div>
-              <p class="eyebrow">Boîte à outils</p>
-              <h2 id="outils-title">Décider, pas seulement lire.</h2>
-            </div>
-            <p class="lead">Des outils courts, utilisables depuis un téléphone sur le chantier comme depuis un bureau au moment de trancher.</p>
-          </div>
-          <div class="grid grid--3">
-            <div class="tool-card" data-reveal>
-              <div class="tool-card__head"><h3>Visualiser ma pièce</h3><span class="badge badge--sage">Nouveau</span></div>
-              <p>${NB_PARQUETS} parquets, ${enLettres(NB_MOTIFS)} motifs, votre photo. Le sol change à chaque clic.</p>
-              <a class="btn btn--sm" href="outils/studio.html"><span>Ouvrir</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
-            </div>
-            <div class="tool-card" data-reveal data-reveal-delay="70">
-              <div class="tool-card__head"><h3>Mode plan</h3><span class="badge badge--sage">Disponible</span></div>
-              <p>${enLettres(NB_MOTIFS_PLAN).replace(/^./, (c) => c.toUpperCase())} motifs, vos dimensions, la lumière au bon endroit.</p>
-              <a class="btn btn--sm btn--ghost" href="outils/simulateur-pose.html"><span>Ouvrir</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
-            </div>
-            <div class="tool-card tool-card--soon" data-reveal data-reveal-delay="140">
-              <div class="tool-card__head"><h3>Checklist avant pose</h3><span class="badge badge--outline">Bientôt</span></div>
-              <p>Le point complet à faire la veille du chantier, support compris.</p>
+              <p class="read-rows__note">Vous préférez confier la pose ? <a href="projet/?besoin=pose">Décrivez votre projet</a>.</p>
             </div>
           </div>
         </div>
@@ -545,20 +545,19 @@ function toolsSection() {
 }
 
 function projectSection() {
-  return `      <section class="section" aria-labelledby="projet-title">
+  return `      <section class="section section--compact section--projet" aria-labelledby="projet-title">
         <div class="wrap-wide">
           <div class="feature feature--wide-media">
             <div class="feature__body">
-              <p class="eyebrow">Votre projet</p>
-              <h2 id="projet-title">Décrivez votre pièce, on s’occupe des questions utiles.</h2>
+              <p class="eyebrow">${T.texte(V().projet_eyebrow)}</p>
+              <h2 id="projet-title">${T.texte(V().projet_titre)}</h2>
+              <p class="feature__lead">${T.texte(V().projet_texte)}</p>
               <ul class="feature__list">
-                <li>${ICON.check}<span>Cinq étapes courtes, aucune question inutile.</span></li>
-                <li>${ICON.check}<span>« Je ne sais pas » est une réponse valable partout.</span></li>
-                <li>${ICON.check}<span>Aucun démarchage : vos coordonnées servent uniquement à répondre.</span></li>
+                ${T.lignes(V().projet_points).map((l) => `<li>${ICON.check}<span>${T.texte(l)}</span></li>`).join('\n                ')}
               </ul>
               <div class="cluster">
-                <a class="btn" href="projet/"><span>Décrire mon projet</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
-                <a class="link-arrow" href="outils/simulateur-pose.html">Passer d’abord par le simulateur ${ICON.arrow}</a>
+                <a class="btn" href="projet/"><span>${T.texte(V().projet_cta)}</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+                <a class="btn btn--ghost" href="outils/studio.html"><span>${T.texte(V().projet_cta2)}</span></a>
               </div>
             </div>
             <div class="feature__media" data-reveal>
@@ -570,30 +569,36 @@ function projectSection() {
 }
 
 /*
- * L'ORDRE DE L'ACCUEIL.
+ * L'ORDRE DE L'ACCUEIL — V2.
  *
- * Il se terminait sur une liste de guides, placée APRÈS l'appel à décrire son
- * projet : on demandait au visiteur de se décider, puis on lui redonnait à
- * lire. La page s'achève désormais sur ce qu'elle veut obtenir.
+ * Pose Parquet vend d'abord son utilité : on comprend, on choisit, on
+ * visualise, on prépare son projet, et l'orientation vers Premibel ou Allure
+ * Design n'arrive qu'à la fin, là où elle répond à un besoin exprimé.
  *
- * La progression : ce que je viens chercher (les quatre entrées) → je
- * l'essaie (le simulateur) → je comprends (les guides) → j'ai envie (le
- * motif, puis les ambiances) → je lis pour agir (comprendre, puis poser) →
- * j'ai les outils → je décris ma pièce.
+ *   1. Hero                 — la promesse
+ *   2. Par où commencer      — les quatre étapes, en navigation compacte
+ *   2 bis. Orientation       — Premibel pour le parquet, Allure Design pour la pose
+ *   3. Visualiseur           — l'outil principal, Mode Plan en lien
+ *   4. Inspiration           — des ambiances qui s'ouvrent dans le Studio
+ *   5. Focus motif           — le Point de Hongrie, puis les six motifs
+ *   6. Comprendre, puis poser — guides de décision et tutoriels
+ *   7. Votre projet          — la conversion, et l'orientation
+ *
+ * Retirés : le carrousel des guides (fondu dans 6) et la boîte à outils (le
+ * Visualiseur et le Mode Plan sont en 3 ; la checklist « Bientôt » n'a rien à
+ * faire sur l'accueil — elle reste annoncée sur /outils/).
  */
-function buildHomeBody({ GUIDES, TUTOS }) {
-  const carouselGuides = GUIDES.slice(0, 6);
+function buildHomeBody() {
   return [
     heroSection(),
-    tilesSection(),
+    parcoursSection(),
+    orientationSection(),
     simulatorSection(),
-    carouselEditorial(carouselGuides),
-    immersiveSection(),
     carouselGallery(),
-    editorialSection(TUTOS, GUIDES),
-    toolsSection(),
+    immersiveSection(),
+    lectureSection(),
     projectSection(),
   ].join('\n\n');
 }
 
-module.exports = { buildHomeBody, ICON, SITE };
+module.exports = { buildHomeBody, apercuSquelette, ICON, SITE };
