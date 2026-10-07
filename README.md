@@ -112,8 +112,10 @@ pose-parquet.com/
 │
 ├── data/
 │   ├── parquets.json                    catalogue du Studio
-│   ├── products.premibel-pilot.json     pilote : références Premibel réelles
+│   ├── products.premibel.json           catalogue Premibel synchronisé (node _generator/sync-premibel.js)
+│   ├── products.premibel-pilot.json     override manuel : familles de rendu, noms relus
 │   ├── products.premibel-exemple.json   exemple de format d'échange
+│   ├── material-profiles.json           profils « Rendu fidèle » validés par SKU (docs/material-profiles.md)
 │   ├── render-families.json             familles de rendu
 │   ├── room-tours.json                  visites de pièce
 │   ├── contenus.json                    index de contenus, généré

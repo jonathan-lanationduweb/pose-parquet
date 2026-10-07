@@ -141,6 +141,38 @@ Correctifs de sécurité (0.4.2) — **schéma inchangé (3)** :
 Pas encore : renvoi d'un email, suppression de demande, Turnstile. Voir
 `docs/backend/roadmap.md` à la racine du dépôt.
 
+## Orientation plutôt que demande (06/10/2026)
+
+Le formulaire public « Décrivez votre projet » ne fait plus une *demande* :
+il qualifie un projet puis **oriente** le visiteur — Premibel pour le parquet,
+Allure Design pour la pose et la rénovation en Île-de-France, les deux pour un
+projet complet. Le visiteur rejoint lui-même l'entreprise, par un lien. Aucune
+transmission n'a lieu vers Premibel ou Allure Design, et personne chez
+Pose-Parquet ne rappelle.
+
+Conséquences côté plugin :
+
+- **Coordonnées facultatives.** `firstName`, `lastName`, `email`, `phone` et
+  `consent` restent dans le contrat (validés s'ils sont fournis), mais le
+  formulaire ne les envoie plus. Sans consentement, `consent_at` reste NULL.
+- **Vocabulaire de l'administration.** « Demandes » devient « Projets » (menu,
+  liste « Projets orientés », fiche « Projet »). Les tables SQL et les statuts
+  ne changent pas. Vocabulaire proposé pour la suite : *Projet* (l'objet),
+  *orientation* (Premibel / Allure Design / les deux / à préciser), *parcours
+  qualifié* (pour les statistiques).
+- **Stockage.** Conservé pour les statistiques : besoin, destination, zone,
+  pièce, surface, motif, produit essayé, origine et UTM. L'expérience visiteur
+  n'en dépend pas : si l'API est absente ou en panne, l'orientation s'affiche
+  quand même (seul un refus de validation arrête le parcours).
+
+### État des emails
+
+| Email | État | Pourquoi |
+|---|---|---|
+| Accusé de réception au visiteur | **INACTIVE** de fait | Aucune adresse n'est demandée : l'envoi est marqué `skipped` (choix de conception, jamais `failed`). |
+| Notification interne | **À CONFIGURER** | Part vers l'adresse des Réglages (par défaut `admin_email`). Aucune équipe ne traite aujourd'hui ces projets : à désigner un destinataire opérationnel, ou à ignorer. |
+| File d'envoi (`Mail\Queue`) | **ACTIVE** | Conservée telle quelle, hors du chemin de la requête. Rien de ce que voit le visiteur ne dépend d'un envoi. |
+
 ## Prérequis
 
 WordPress 6.5+, PHP 8.2+, MySQL 8 / MariaDB 10.6+ avec InnoDB. Aucune
