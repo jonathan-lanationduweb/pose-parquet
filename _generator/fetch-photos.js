@@ -63,7 +63,8 @@ async function resolveUrl(photo) {
   const match = html.match(/https:\/\/images\.pexels\.com\/photos\/\d+\/[^"?]+\.(?:jpeg|jpg|png)/);
   if (!match) throw new Error(`Image introuvable pour la photo ${photo.id}`);
   const fm = photo.fm ? `&fm=${photo.fm}` : '';
-  return `${match[0]}?auto=compress&cs=tinysrgb${fm}&fit=crop&w=${photo.w}&h=${photo.h}`;
+  const crop = photo.crop ? `&crop=${photo.crop}` : '';
+  return `${match[0]}?auto=compress&cs=tinysrgb${fm}${crop}&fit=crop&w=${photo.w}&h=${photo.h}`;
 }
 
 /** Télécharge un fichier s'il manque ; renvoie sa taille. */
@@ -84,10 +85,23 @@ async function main() {
 
   const jobs = [
     ...Object.entries(PHOTOS).map(([name, photo]) => ({ name, photo })),
-    ...INSPIRATION_PHOTOS.map((photo, index) => ({
-      name: `inspi-${index + 1}`,
-      photo: { ...photo, w: 900, h: 700 },
-    })),
+    /*
+     * Une carte d'inspiration se telecharge d'apres SA photo, pas d'apres son
+     * champ `id`.
+     *
+     * Les deux devraient dire la meme chose ; deux cartes avaient garde
+     * l'identifiant de l'image precedente apres un remplacement, et
+     * `inspi-N.jpg` montrait alors une autre piece que la carte. On part donc
+     * de l'entree `PHOTOS[image]`, qui est celle que la page affiche, et on
+     * ne garde de la carte que le cadrage du carrousel.
+     */
+    ...INSPIRATION_PHOTOS.map((carte, index) => {
+      const source = (carte.image && PHOTOS[carte.image]) || carte;
+      return {
+        name: `inspi-${index + 1}`,
+        photo: { ...carte, id: source.id, crop: source.crop, credit: source.credit, w: 900, h: 700 },
+      };
+    }),
   ];
 
   let downloaded = 0;

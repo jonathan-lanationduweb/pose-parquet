@@ -103,3 +103,55 @@
 
 .filter-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
 .filter-empty { margin-top: var(--sp-5); color: var(--text-muted); }
+
+/* ---------- Motifs : deux familles ---------- */
+.motif-family { display: grid; gap: var(--sp-5); }
+.motif-family + .motif-family { margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem); padding-top: clamp(2rem, 1.25rem + 2vw, 3rem); border-top: 1px solid var(--line); }
+.motif-family__head { display: grid; gap: var(--sp-3); max-width: 62ch; }
+.motif-family__head h2 { margin: 0; font-size: var(--fs-h3); }
+.motif-family__head p { margin: 0; color: var(--text-soft); }
+@media (min-width: 62rem) {
+  .motif-family--v { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); align-items: start; }
+}
+
+/* ---------- Méthode : principes ---------- */
+.method-intro { display: grid; gap: var(--sp-5) var(--sp-7); }
+@media (min-width: 52rem) { .method-intro { grid-template-columns: 1fr 1fr; } }
+.method-intro h2 { font-size: var(--fs-h4); margin: 0 0 var(--sp-2); }
+.method-intro p { margin: 0; color: var(--text-soft); }
+.principles {
+  display: grid;
+  gap: clamp(0.9rem, 0.6rem + 1vw, 1.5rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  margin-bottom: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+}
+.principle {
+  display: grid;
+  gap: var(--sp-3);
+  align-content: start;
+  padding: clamp(1.1rem, 0.9rem + 0.8vw, 1.6rem);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.principle h3 { margin: 0; font-size: var(--fs-h4); }
+.principle p { margin: 0; font-size: var(--fs-sm); color: var(--text-soft); }
+.principle__ex { padding-top: var(--sp-3); border-top: 1px dashed var(--line-strong); }
+.principle__ex span {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  color: var(--text-muted);
+}
+
+/* Les deux motifs en V se comparent côte à côte, jamais empilés en grand. */
+@media (min-width: 40rem) {
+  .motif-family--v .motif-family__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.motif-family--v .pattern-card__viz { aspect-ratio: 16 / 10; }
+
+/* Colonne latérale des listings : le titre garde sa ligne, la durée passe dessous si besoin. */
+.listing-side .cluster-list a { flex-wrap: wrap; row-gap: 0.15rem; }
+.listing-side .cluster-list strong { flex: 1 1 12rem; }

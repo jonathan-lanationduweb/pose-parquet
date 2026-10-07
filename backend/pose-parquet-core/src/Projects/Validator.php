@@ -76,20 +76,37 @@ final class Validator {
 			$data[ $name ] = $value;
 		}
 
-		/* Région : obligatoire hors Île-de-France, déduite sinon. */
-		if ( isset( $data['zone'] ) ) {
-			if ( $data['zone'] === Fields::ZONE_IDF ) {
-				$data['region'] = Fields::REGION_IDF_LABEL;
-			} elseif ( ! isset( $data['region'] ) && ! isset( $errors['region'] ) ) {
-				$errors['region'] = 'Champ obligatoire absent (zone hors Île-de-France).';
-			}
-		}
-
-		/* Département : le motif du formulaire, 2A/2B en majuscules. */
+		/*
+		 * Département : la seule donnée géographique, et la source de la région.
+		 *
+		 * `Departements::normaliser()` passe d'abord : elle met « 2a » en
+		 * majuscules et « 6 » en « 06 », pour qu'une saisie correcte ne soit
+		 * pas refusée sur une question de forme.
+		 */
 		self::texte( $input, 'department', 3, $errors, $data, static function ( string $v ) {
-			$v = strtoupper( $v );
+			$v = Departements::normaliser( $v );
 			return preg_match( '/^(0[1-9]|[1-8][0-9]|9[0-5]|2[AB]|97[1-6])$/', $v ) ? $v : null;
 		}, 'Numéro de département invalide (ex. 75, 2A, 974).' );
+
+		/*
+		 * La région se DÉDUIT, elle ne se reçoit pas.
+		 *
+		 * Une région envoyée aurait été une région qu'on peut contredire :
+		 * `department=35` avec `region=Île-de-France` faisait partir un
+		 * chantier breton chez une entreprise francilienne. Le champ a
+		 * disparu du contrat — une région reçue est refusée plus haut comme
+		 * champ inconnu — et ce qui est stocké vient d'ici.
+		 *
+		 * Un numéro hors nomenclature — 975, qui passe le motif sans être un
+		 * département — ne reçoit AUCUNE région plutôt qu'une région devinée.
+		 * Vide veut dire « on ne sait pas ».
+		 */
+		if ( isset( $data['department'] ) ) {
+			$region = Departements::region( $data['department'] );
+			if ( $region !== '' ) {
+				$data['region'] = $region;
+			}
+		}
 
 		/* Textes libres, bornés. Les noms de personnes ne sont pas transformés au-delà du nettoyage. */
 		self::texte( $input, 'city', Fields::MAX_CITY, $errors, $data );
@@ -99,6 +116,8 @@ final class Validator {
 		self::texte( $input, 'utmSource', Fields::MAX_UTM, $errors, $data );
 		self::texte( $input, 'utmMedium', Fields::MAX_UTM, $errors, $data );
 		self::texte( $input, 'utmCampaign', Fields::MAX_UTM, $errors, $data );
+		self::texte( $input, 'utmContent', Fields::MAX_UTM, $errors, $data );
+		self::texte( $input, 'utmTerm', Fields::MAX_UTM, $errors, $data );
 
 		/* Email : validation WordPress, minuscules sur le domaine. */
 		if ( self::present( $input, 'email' ) ) {
@@ -176,6 +195,32 @@ final class Validator {
 					$errors['sourceUrl'] = sprintf( 'Longueur maximale dépassée (%d caractères).', Fields::MAX_SOURCE_URL );
 				} else {
 					$data['sourceUrl'] = sanitize_text_field( $path );
+				}
+			}
+		}
+
+		/*
+		 * Page d'entree : chemin seulement, comme sourceUrl.
+		 *
+		 * Le front n'envoie deja qu'un chemin, mais le serveur ne se repose pas
+		 * la-dessus : `wp_parse_url` reduit ici une URL complete a son chemin,
+		 * ce qui ecarte d'un coup l'hote, le port, la requete et le fragment.
+		 * Une requete conservee ferait entrer dans la base les parametres d'une
+		 * page d'arrivee, donc potentiellement un jeton ou une adresse glissee
+		 * dans un lien de campagne.
+		 */
+		if ( self::present( $input, 'entryPage' ) ) {
+			if ( ! is_string( $input['entryPage'] ) ) {
+				$errors['entryPage'] = 'Type invalide : chaîne attendue.';
+			} else {
+				$chemin = (string) wp_parse_url( trim( $input['entryPage'] ), PHP_URL_PATH );
+				if ( $chemin === '' ) {
+					$chemin = '/';
+				}
+				if ( strlen( $chemin ) > Fields::MAX_ENTRY_PAGE ) {
+					$errors['entryPage'] = sprintf( 'Longueur maximale dépassée (%d caractères).', Fields::MAX_ENTRY_PAGE );
+				} else {
+					$data['entryPage'] = sanitize_text_field( $chemin );
 				}
 			}
 		}

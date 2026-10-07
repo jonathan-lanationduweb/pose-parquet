@@ -1,11 +1,13 @@
 <?php
 /**
- * Gabarit de la liste des demandes. Reçoit `$view` de Admin\Projects.
+ * Gabarit de la liste des projets orientés. Reçoit `$view` de Admin\Projects.
  *
- * Huit colonnes, dont quatre disparaissent sous 900 px par la feuille de style
- * (`admin.css`) : Référence, Client, Date et Statut restent toujours, parce
- * que ce sont les quatre qui permettent de reconnaître une demande et de la
- * traiter. La référence est le lien vers la fiche.
+ * Le site public est une PASSERELLE : il ne demande plus de coordonnées. Les
+ * colonnes Client, Téléphone et Ville ont donc laissé la place à ce qui
+ * décrit un parcours : Date, Référence, Origine, Besoin, Zone, Produit,
+ * Destination (avec les liens rapides vers Premibel / Allure Design, selon la
+ * règle publique) et Statut. Les coordonnées des anciens projets restent
+ * lisibles sur leur fiche. Sous 782 px, chaque ligne s'empile (admin.css).
  *
  * @var array{rows:array,counts:array,total:int,page:int,pages:int,per_page:int,status:string,search:string,mail:string,statuses:array,notice:?array,can_edit:bool} $view
  * @package PoseParquet\Core
@@ -15,13 +17,16 @@ declare(strict_types=1);
 
 use PoseParquet\Core\Admin\Notices;
 use PoseParquet\Core\Admin\View;
+use PoseParquet\Core\Mail\Diagnostics;
+use PoseParquet\Core\Projects\LeadRouting;
+use PoseParquet\Core\Projects\Liens;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
 <div class="wrap pp-admin">
-	<h1 class="wp-heading-inline"><?php esc_html_e( 'Demandes', 'pose-parquet-core' ); ?></h1>
+	<h1 class="wp-heading-inline"><?php esc_html_e( 'Projets orientés', 'pose-parquet-core' ); ?></h1>
 	<hr class="wp-header-end" />
 
 	<?php Notices::output( $view['notice'] ); ?>
@@ -37,8 +42,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	 */
 	if ( ( $view['mail'] ?? '' ) !== '' ) :
 		$libelle_mail = $view['mail'] === 'failed'
-			? __( 'Demandes dont une notification a définitivement échoué.', 'pose-parquet-core' )
-			: __( 'Demandes dont une notification attend encore son envoi.', 'pose-parquet-core' );
+			? __( 'Projets dont une notification a définitivement échoué.', 'pose-parquet-core' )
+			: __( 'Projets dont une notification attend encore son envoi.', 'pose-parquet-core' );
 		?>
 		<div class="notice notice-warning inline" style="margin:1rem 0">
 			<p>
@@ -47,6 +52,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</p>
 		</div>
 	<?php endif; ?>
+
+	<?php
+	/*
+	 * Filtre « destination recommandée ».
+	 *
+	 * Sous les onglets de statut et non parmi eux : ce sont deux axes
+	 * différents. Le statut dit où en est le traitement, la destination dit à
+	 * qui la demande revient — et on veut pouvoir croiser les deux, par
+	 * exemple « nouvelles ET à qualifier ».
+	 */
+	$pp_dest_actuelle = (string) ( $view['dest'] ?? '' );
+	?>
+	<ul class="subsubsub pp-filters pp-filters--destination">
+		<li><?php esc_html_e( 'Destination :', 'pose-parquet-core' ); ?> </li>
+		<?php
+		$pp_dests   = [ '' => __( 'Toutes', 'pose-parquet-core' ) ];
+		foreach ( (array) ( $view['dests'] ?? [] ) as $pp_d ) {
+			$pp_dests[ $pp_d ] = View::label( 'lead_destination', $pp_d );
+		}
+		$pp_dernier = array_key_last( $pp_dests );
+		foreach ( $pp_dests as $pp_valeur => $pp_libelle ) :
+			$pp_actif = $pp_dest_actuelle === $pp_valeur;
+			$pp_url   = View::list_url(
+				[
+					'status'      => $view['status'],
+					's'           => $view['search'],
+					'mail'        => $view['mail'] ?? '',
+					'destination' => $pp_valeur,
+				]
+			);
+			?>
+			<li>
+				<a href="<?php echo esc_url( $pp_url ); ?>"<?php echo $pp_actif ? ' class="current" aria-current="page"' : ''; ?>>
+					<?php echo esc_html( $pp_libelle ); ?>
+				</a><?php echo $pp_valeur === $pp_dernier ? '' : ' |'; ?>
+			</li>
+		<?php endforeach; ?>
+	</ul>
 
 	<ul class="subsubsub pp-filters">
 		<?php
@@ -74,16 +117,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php if ( ( $view['mail'] ?? '' ) !== '' ) : ?>
 			<input type="hidden" name="mail" value="<?php echo esc_attr( $view['mail'] ); ?>" />
 		<?php endif; ?>
-		<label class="screen-reader-text" for="pp-search-input"><?php esc_html_e( 'Rechercher une demande', 'pose-parquet-core' ); ?></label>
+		<label class="screen-reader-text" for="pp-search-input"><?php esc_html_e( 'Rechercher un projet', 'pose-parquet-core' ); ?></label>
 		<input
 			type="search"
 			id="pp-search-input"
 			name="s"
 			value="<?php echo esc_attr( $view['search'] ); ?>"
 			maxlength="<?php echo (int) \PoseParquet\Core\Projects\Repository::SEARCH_MAX; ?>"
-			placeholder="<?php esc_attr_e( 'Référence, nom, email, téléphone, ville…', 'pose-parquet-core' ); ?>"
+			placeholder="<?php esc_attr_e( 'Référence, département…', 'pose-parquet-core' ); ?>"
 		/>
-		<?php submit_button( __( 'Rechercher une demande', 'pose-parquet-core' ), '', '', false ); ?>
+		<?php submit_button( __( 'Rechercher un projet', 'pose-parquet-core' ), '', '', false ); ?>
 		<?php if ( $view['search'] !== '' ) : ?>
 			<a class="button-link" href="<?php echo esc_url( View::list_url( [ 'status' => $view['status'] ] ) ); ?>"><?php esc_html_e( 'Effacer la recherche', 'pose-parquet-core' ); ?></a>
 		<?php endif; ?>
@@ -95,7 +138,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php
 				printf(
 					/* translators: %s : nombre de demandes. */
-					esc_html( _n( '%s demande', '%s demandes', (int) $view['total'], 'pose-parquet-core' ) ),
+					esc_html( _n( '%s projet', '%s projets', (int) $view['total'], 'pose-parquet-core' ) ),
 					esc_html( number_format_i18n( (int) $view['total'] ) )
 				);
 				?>
@@ -116,28 +159,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 
-	<table class="wp-list-table widefat fixed striped pp-table">
-		<caption class="screen-reader-text"><?php esc_html_e( 'Demandes de projet, la plus récente en premier', 'pose-parquet-core' ); ?></caption>
+	<?php
+	// L'email n'est un canal que s'il est réellement configuré : sinon, aucun drapeau « email en échec ».
+	$pp_email_actif = (bool) ( Diagnostics::report()['production_ready'] ?? false );
+	$pp_colonnes    = [
+		'date'        => __( 'Date', 'pose-parquet-core' ),
+		'ref'         => __( 'Référence', 'pose-parquet-core' ),
+		'origine'     => __( 'Origine', 'pose-parquet-core' ),
+		'besoin'      => __( 'Besoin', 'pose-parquet-core' ),
+		'zone'        => __( 'Zone', 'pose-parquet-core' ),
+		'produit'     => __( 'Produit', 'pose-parquet-core' ),
+		'destination' => __( 'Destination', 'pose-parquet-core' ),
+		'statut'      => __( 'Statut', 'pose-parquet-core' ),
+	];
+	?>
+	<table class="wp-list-table widefat fixed striped pp-table pp-table--projets">
+		<caption class="screen-reader-text"><?php esc_html_e( 'Projets orientés, le plus récent en premier', 'pose-parquet-core' ); ?></caption>
 		<thead>
 			<tr>
-				<th scope="col" class="pp-col-ref"><?php esc_html_e( 'Référence', 'pose-parquet-core' ); ?></th>
-				<th scope="col" class="pp-col-date"><?php esc_html_e( 'Date', 'pose-parquet-core' ); ?></th>
-				<th scope="col" class="pp-col-client"><?php esc_html_e( 'Client', 'pose-parquet-core' ); ?></th>
-				<th scope="col" class="pp-col-secondary"><?php esc_html_e( 'Téléphone', 'pose-parquet-core' ); ?></th>
-				<th scope="col" class="pp-col-secondary"><?php esc_html_e( 'Ville', 'pose-parquet-core' ); ?></th>
-				<th scope="col" class="pp-col-secondary"><?php esc_html_e( 'Surface', 'pose-parquet-core' ); ?></th>
-				<th scope="col" class="pp-col-secondary"><?php esc_html_e( 'Projet', 'pose-parquet-core' ); ?></th>
-				<th scope="col" class="pp-col-status"><?php esc_html_e( 'Statut', 'pose-parquet-core' ); ?></th>
+				<?php foreach ( $pp_colonnes as $pp_cle => $pp_libelle ) : ?>
+					<th scope="col" class="pp-col-<?php echo esc_attr( $pp_cle ); ?>"><?php echo esc_html( $pp_libelle ); ?></th>
+				<?php endforeach; ?>
 			</tr>
 		</thead>
 		<tbody>
 			<?php if ( ! $view['rows'] ) : ?>
 				<tr>
-					<td colspan="8">
+					<td colspan="<?php echo count( $pp_colonnes ); ?>">
 						<?php
 						echo $view['search'] !== '' || $view['status'] !== ''
-							? esc_html__( 'Aucune demande ne correspond à ce filtre.', 'pose-parquet-core' )
-							: esc_html__( 'Aucune demande pour le moment.', 'pose-parquet-core' );
+							? esc_html__( 'Aucun projet ne correspond à ce filtre.', 'pose-parquet-core' )
+							: esc_html__( 'Aucun projet pour le moment.', 'pose-parquet-core' );
 						?>
 					</td>
 				</tr>
@@ -147,36 +199,60 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php
 				$id        = (int) $row['id'];
 				$reference = (string) ( $row['reference'] ?? '' );
-				$nom       = trim( (string) $row['first_name'] . ' ' . (string) $row['last_name'] );
-				$ville     = (string) $row['city'];
 				$dept      = (string) $row['department'];
+				$region    = LeadRouting::region( $row );
+				$produit   = Liens::produit( $row );
 				?>
 				<tr>
-					<td class="pp-col-ref">
+					<td class="pp-col-date" data-label="<?php echo esc_attr( $pp_colonnes['date'] ); ?>"><?php echo esc_html( View::date_short( $row['created_at'] ) ); ?></td>
+					<td class="pp-col-ref" data-label="<?php echo esc_attr( $pp_colonnes['ref'] ); ?>">
 						<a href="<?php echo esc_url( View::detail_url( $id ) ); ?>" class="pp-ref">
 							<?php echo esc_html( $reference !== '' ? $reference : sprintf( '#%d', $id ) ); ?>
 						</a>
-						<?php if ( (string) $row['internal_mail_status'] === 'failed' ) : ?>
+						<?php if ( $pp_email_actif && (string) $row['internal_mail_status'] === 'failed' ) : ?>
 							<span class="pp-mail-flag" title="<?php esc_attr_e( 'La notification interne n’a pas pu être envoyée', 'pose-parquet-core' ); ?>">
 								<?php esc_html_e( 'email en échec', 'pose-parquet-core' ); ?>
 							</span>
 						<?php endif; ?>
 					</td>
-					<td class="pp-col-date"><?php echo esc_html( View::date_short( $row['created_at'] ) ); ?></td>
-					<td class="pp-col-client">
-						<?php echo esc_html( $nom !== '' ? $nom : __( '(sans nom)', 'pose-parquet-core' ) ); ?>
-						<span class="pp-sub"><?php echo esc_html( (string) $row['email'] ); ?></span>
-					</td>
-					<td class="pp-col-secondary"><?php echo esc_html( (string) $row['phone'] ); ?></td>
-					<td class="pp-col-secondary">
+					<td class="pp-col-origine" data-label="<?php echo esc_attr( $pp_colonnes['origine'] ); ?>"><?php echo esc_html( View::label( 'lead_source', (string) ( $row['lead_source'] ?? '' ) ) ?: '—' ); ?></td>
+					<td class="pp-col-besoin" data-label="<?php echo esc_attr( $pp_colonnes['besoin'] ); ?>"><?php echo esc_html( View::label( 'lead_need', (string) ( $row['lead_need'] ?? '' ) ) ?: '—' ); ?></td>
+					<td class="pp-col-zone" data-label="<?php echo esc_attr( $pp_colonnes['zone'] ); ?>">
 						<?php
-						$lieu = $ville !== '' && $dept !== '' ? $ville . ' (' . $dept . ')' : ( $ville !== '' ? $ville : $dept );
-						echo esc_html( $lieu );
+						if ( $dept === '' ) {
+							echo '—';
+						} else {
+							echo esc_html( LeadRouting::en_idf( $row ) ? sprintf( 'IDF (%s)', $dept ) : ( $region !== '' ? sprintf( '%s (%s)', $region, $dept ) : $dept ) );
+						}
 						?>
 					</td>
-					<td class="pp-col-secondary"><?php echo esc_html( View::surface( $row['surface'] ) ); ?></td>
-					<td class="pp-col-secondary"><?php echo esc_html( View::label( 'room_type', $row['room_type'] ) ); ?></td>
-					<td class="pp-col-status">
+					<td class="pp-col-produit" data-label="<?php echo esc_attr( $pp_colonnes['produit'] ); ?>"><div class="pp-cellule">
+						<?php echo esc_html( $produit !== '' ? $produit : '—' ); ?>
+						<?php if ( View::surface( $row['surface'] ) !== '' ) : ?>
+							<span class="pp-sub"><?php echo esc_html( trim( View::surface( $row['surface'] ) . ' · ' . View::label( 'room_type', $row['room_type'] ), ' ·' ) ); ?></span>
+						<?php endif; ?>
+					</div></td>
+					<td class="pp-col-destination" data-label="<?php echo esc_attr( $pp_colonnes['destination'] ); ?>"><div class="pp-cellule">
+						<?php
+						/*
+						 * Une demande d'avant le schéma 4 n'a pas de destination : sa
+						 * cellule reste vide plutôt que d'afficher « À qualifier ».
+						 */
+						echo esc_html( View::label( 'lead_destination', (string) ( $row['lead_destination'] ?? '' ) ) ?: '—' );
+						if ( ( $row['lead_destination'] ?? '' ) !== '' && $dept !== '' && ! LeadRouting::en_idf( $row ) ) {
+							echo ' <span class="pp-sub">' . esc_html__( '(hors IDF)', 'pose-parquet-core' ) . '</span>';
+						}
+						$pp_liens = Liens::de( $row );
+						if ( $pp_liens ) {
+							echo '<span class="pp-liens">';
+							foreach ( $pp_liens as $pp_lien ) {
+								echo '<a href="' . esc_url( $pp_lien['url'] ) . '" target="_blank" rel="noopener" class="pp-lien pp-lien--' . esc_attr( $pp_lien['cible'] ) . '">' . esc_html( $pp_lien['libelle'] ) . ' <span aria-hidden="true">↗</span></a>';
+							}
+							echo '</span>';
+						}
+						?>
+					</div></td>
+					<td class="pp-col-statut" data-label="<?php echo esc_attr( $pp_colonnes['statut'] ); ?>">
 						<span class="pp-status pp-status--<?php echo esc_attr( (string) $row['status'] ); ?>">
 							<?php echo esc_html( View::status( $row['status'] ) ); ?>
 						</span>

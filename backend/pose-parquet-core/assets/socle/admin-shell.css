@@ -1,0 +1,67 @@
+/*
+ * SOCLE ADMIN — le cadre (menu de gauche). Commun à nos sites WordPress.
+ *
+ * Reprise du back-office Expert Parquet (assets/admin-menu.css) : colonne
+ * presque noire, logotype en tête, entrées du module avec icône, intitulés
+ * de rubrique, entrée courante à la couleur d'accent. Seuls changent, par
+ * site, trois réglages posés par le module :
+ *
+ *   --adm-accent        couleur de l'entrée courante (une seule couleur de marque)
+ *   --adm-accent-clair  survol des entrées
+ *   --adm-logo          logotype sur fond sombre
+ *
+ * Chargée sur tout wp-admin (le menu est partout) ; rien d'autre que le menu
+ * et la barre d'administration n'est touché. Préfixe « adm- » : neutre, pour
+ * servir tel quel à chaque site.
+ */
+
+/* Colonne */
+#adminmenuback, #adminmenuwrap, #adminmenu { background: #17181A; }
+#adminmenu .wp-submenu, #adminmenu .wp-has-current-submenu .wp-submenu, #adminmenu .wp-has-current-submenu.opensub .wp-submenu { background: #1F2124; }
+
+/* Logotype en tête de colonne */
+#adminmenu::before {
+	content: "";
+	display: block;
+	height: 56px;
+	margin: 10px 12px 6px;
+	background: var(--adm-logo, none) no-repeat left center;
+	background-size: contain;
+	border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+
+/* Entrée courante : couleur d'accent du site (et non le bleu WordPress) */
+#adminmenu li.current a.menu-top,
+#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
+#adminmenu .wp-has-current-submenu .wp-submenu .wp-submenu-head,
+#adminmenu .wp-menu-arrow,
+#adminmenu .wp-menu-arrow div { background: var(--adm-accent, #2271b1); color: #fff; }
+#adminmenu .wp-submenu li.current a,
+#adminmenu .wp-submenu li.current a:hover,
+#adminmenu .wp-submenu li.current a:focus { background: var(--adm-accent, #2271b1); color: #fff; font-weight: 500; border-radius: 0; }
+#adminmenu .wp-submenu a:hover, #adminmenu .wp-submenu a:focus { color: var(--adm-accent-clair, #72aee6); }
+#adminmenu li.menu-top:hover, #adminmenu li.opensub > a.menu-top, #adminmenu li > a.menu-top:focus { color: var(--adm-accent-clair, #72aee6); }
+#adminmenu li.menu-top:hover .wp-menu-image:before, #adminmenu li.opensub > a.menu-top .wp-menu-image:before { color: var(--adm-accent-clair, #72aee6); }
+
+/* Icônes des entrées du module */
+#adminmenu .wp-submenu .adm-menu-icone { font-size: 16px; width: 16px; height: 16px; margin: -2px 8px 0 0; vertical-align: middle; opacity: .85; }
+#adminmenu .wp-submenu li.current .adm-menu-icone { opacity: 1; }
+#adminmenu .wp-submenu li a { padding: 7px 12px; font-size: 13px; }
+
+/* Intitulés de rubrique */
+#adminmenu .wp-submenu li a .adm-menu-section,
+#adminmenu .wp-submenu li .adm-menu-section {
+	display: block;
+	padding: 6px 0 2px;
+	font-size: 10px;
+	letter-spacing: .12em;
+	text-transform: uppercase;
+	color: rgba(240, 246, 252, .5);
+	cursor: default;
+}
+#adminmenu .wp-submenu li.adm-menu-section-item { margin-top: 6px; border-top: 1px solid rgba(255, 255, 255, .06); }
+#adminmenu .wp-submenu li.adm-menu-section-item > a { pointer-events: none; background: transparent !important; }
+#adminmenu .wp-submenu li.adm-menu-section-item:first-of-type { margin-top: 0; border-top: 0; }
+
+/* Barre d'administration : rappel de maintenance */
+#wpadminbar .adm-barre-maintenance > .ab-item { color: var(--adm-accent-clair, #72aee6) !important; }

@@ -50,6 +50,8 @@ const lire = (relatif) => JSON.parse(fs.readFileSync(path.join(RACINE, relatif),
 function catalogue() {
   const manifeste = lire('data/render-families.json');
   const familles = manifeste.familles || {};
+  // Les profils matière validés, lus comme le Studio les lit.
+  const profils = manifeste.profils ? lire(manifeste.profils).profils || {} : {};
   const sources = Array.isArray(manifeste.catalogues)
     ? manifeste.catalogues
     : [{ fichier: manifeste.catalogue || 'data/parquets.json', source: 'demonstration' }];
@@ -59,7 +61,7 @@ function catalogue() {
     const data = lire(s.fichier);
     const brutes = Array.isArray(data.produits) ? data.produits : data.parquets;
     if (!Array.isArray(brutes)) throw new Error(`catalogue vide ou mal formé : ${s.fichier}`);
-    brutes.forEach((r) => toutes.push(PRODUIT.normalizeProduct({ source: s.source, ...r }, familles)));
+    brutes.forEach((r) => toutes.push(PRODUIT.normalizeProduct({ source: s.source, ...r }, familles, profils)));
   }
 
   const proposes = toutes.filter(PRODUIT.estProposable);
@@ -89,6 +91,26 @@ const PAR_SOURCE = CATALOGUE.proposes.reduce((acc, f) => {
 }, {});
 const NB_DEMONSTRATION = PAR_SOURCE.demonstration || 0;
 const NB_REELS = NB_PARQUETS - NB_DEMONSTRATION;
+/*
+ * Les chiffres PUBLICS du catalogue : seulement les références Premibel actives.
+ * Les parquets de démonstration restent chargés (inspirations, liens profonds
+ * historiques) mais ne sont plus présentés comme faisant partie du catalogue.
+ */
+const NB_PREMIBEL = [...CATALOGUE.proposes, ...CATALOGUE.rejetes].filter((f) => f.source === 'premibel' && f.active).length;
+const NB_PREMIBEL_VISU = CATALOGUE.proposes.filter((f) => f.source === 'premibel').length;
+/* Parmi elles, celles dont la matière a été construite et validée pour la référence. */
+const NB_PREMIBEL_FIDELE = CATALOGUE.proposes.filter((f) => f.source === 'premibel' && f.visualStatus === 'ready').length;
+
+/**
+ * Le statut de rendu d'une référence, tel que le Studio le calcule.
+ * Sert aux textes générés (légende de l'accueil) : aucun « rendu fidèle »
+ * ni « indicatif » n'y est écrit à la main.
+ */
+const MENTION_RENDU = { ready: 'rendu fidèle', approximate: 'rendu indicatif' };
+function mentionRendu(sku) {
+  const f = [...CATALOGUE.proposes, ...CATALOGUE.rejetes].find((x) => x.sku === sku || x.id === sku);
+  return (f && MENTION_RENDU[f.visualStatus]) || null;
+}
 
 /** Les motifs de pose que le Studio sait rendre. */
 const NB_MOTIFS = PRODUIT.KNOWN_PATTERNS.length;
@@ -106,6 +128,10 @@ function enLettres(n) {
 module.exports = {
   CATALOGUE,
   NB_PARQUETS,
+  NB_PREMIBEL,
+  NB_PREMIBEL_VISU,
+  NB_PREMIBEL_FIDELE,
+  mentionRendu,
   NB_MOTIFS,
   PAR_SOURCE,
   NB_DEMONSTRATION,

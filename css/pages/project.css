@@ -6,8 +6,37 @@
 .project-points li { display: flex; gap: 0.75rem; align-items: flex-start; color: var(--text-soft); }
 .project-points svg { width: 1.15em; height: 1.15em; flex: none; margin-top: 0.24em; color: var(--accent); }
 
-.contact-grid { display: grid; gap: var(--sp-6); }
+/* Les deux cartes n'ont pas la meme quantite de texte : les etirer a la meme
+   hauteur creusait un vide sous la plus courte. Chacune s'arrete ou son
+   contenu s'arrete. */
+.contact-grid { display: grid; gap: var(--sp-6); align-items: start; }
 @media (min-width: 58rem) { .contact-grid { grid-template-columns: 1fr 1fr; gap: var(--sp-8); } }
+/* Le titre d'une carte n'est pas un titre de page : au format d'affichage il
+   entrait en concurrence avec le h1 juste au-dessus. */
+.contact-card > h2 { font-size: clamp(1.35rem, 1.15rem + 0.7vw, 1.75rem); }
+.contact-card > h3 { font-size: clamp(1.05rem, 0.98rem + 0.3vw, 1.2rem); }
 .contact-card { padding: var(--sp-6); border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface); display: grid; gap: var(--sp-4); align-content: start; }
 
 .contact-card .btn { justify-self: start; }
+
+/* ---------- Contact : trois raisons, trois chemins ---------- */
+.contact-routes {
+  display: grid;
+  gap: clamp(0.9rem, 0.6rem + 1vw, 1.5rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  margin-bottom: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+}
+.contact-route {
+  display: grid;
+  gap: var(--sp-3);
+  align-content: start;
+  padding: clamp(1.1rem, 0.9rem + 0.8vw, 1.75rem);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+}
+.contact-route h2 { margin: 0; font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.5rem); }
+.contact-route p { margin: 0; }
+.contact-route .btn, .contact-route .link-arrow { justify-self: start; }
+.contact-route--projet { background: var(--tint-sage); border-color: transparent; }
+.contact-card--note { max-width: 46rem; }

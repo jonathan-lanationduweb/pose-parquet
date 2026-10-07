@@ -32,7 +32,7 @@ const path = require('path');
 
 const { exclusions } = require('./arborescence');
 const { NB_PIECES, HORS_BIBLIOTHEQUE, REGLES, manifeste } = require('./scenes');
-const { NB_PARQUETS, NB_DEMONSTRATION, NB_REELS, CATALOGUE } = require('./catalogue');
+const { NB_PARQUETS, NB_DEMONSTRATION, NB_REELS, NB_PREMIBEL, NB_PREMIBEL_VISU, NB_PREMIBEL_FIDELE, CATALOGUE } = require('./catalogue');
 const { GUIDES } = require('./content-guides');
 const { MOTIFS } = require('./content-motifs');
 
@@ -142,10 +142,19 @@ function nombreAnnonce(libelle, attendu, nom) {
 }
 
 nombreAnnonce('pièces d[’\']exemple', NB_PIECES, 'pièces d’exemple');
-nombreAnnonce('parquets', NB_PARQUETS, 'parquets');
+nombreAnnonce('parquets à essayer', NB_PREMIBEL_VISU, 'parquets Premibel à essayer');
+/* Toute autre mention « N parquets » ne peut valoir que l'un des deux chiffres
+   publics : les démonstrations ne sont plus comptées nulle part. */
+{
+  const autres = PAGES.flatMap((p) => [...texteDe(p.html).matchAll(/(\d+)\s+parquets(?!\s+de\s+démonstration)/gi)].map((m) => ({ page: p.chemin, v: Number(m[1]) })));
+  const horsCompte = autres.filter((x) => x.v !== NB_PREMIBEL_VISU && x.v !== NB_PREMIBEL);
+  verifier(`aucune page ne compte les démonstrations (${autres.length} mention(s) « N parquets »)`, horsCompte.length === 0, horsCompte.map((x) => `${x.page} annonce ${x.v}`).join(', '));
+}
+verifier(`parquets Premibel : ${NB_PREMIBEL_VISU} à essayer sur ${NB_PREMIBEL} actifs`, NB_PREMIBEL_VISU === NB_REELS && NB_PREMIBEL >= NB_PREMIBEL_VISU && NB_PREMIBEL_VISU > 0);
 nombreAnnonce('guides pratiques', GUIDES.length, 'guides pratiques');
 nombreAnnonce('motifs simulés', NB_MOTIFS_PLAN, 'motifs simulés');
-nombreAnnonce('références, chacune', NB_PARQUETS, 'références du visualiseur');
+nombreAnnonce('références Premibel', NB_PREMIBEL_VISU, 'références Premibel du visualiseur');
+nombreAnnonce('en rendu fidèle', NB_PREMIBEL_FIDELE, 'références en rendu fidèle');
 
 /*
  * Les nombres écrits en toutes lettres : mêmes promesses, autre orthographe.
@@ -192,6 +201,7 @@ const LIBELLES_SURVEILLES = [
   'guides pratiques',
   'motifs simulés',
   'références, chacune',
+  'en rendu fidèle',
 ];
 
 const enDur = [];
@@ -220,6 +230,6 @@ if (echecs.length) {
 }
 console.log(`${reussis} vérifications réussies, 0 échec.`);
 console.log(
-  `Le site annonce ${NB_PIECES} pièces, ${NB_PARQUETS} parquets, ${GUIDES.length} guides, ` +
+  `Le site annonce ${NB_PIECES} pièces, ${NB_PREMIBEL_VISU} parquets Premibel à essayer sur ${NB_PREMIBEL}, ${GUIDES.length} guides, ` +
     `${MOTIFS.length} motifs éditoriaux, ${NB_MOTIFS_PLAN} motifs simulés — et c'est ce qu'il offre.`
 );

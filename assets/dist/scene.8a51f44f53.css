@@ -1,0 +1,504 @@
+/* Visualiseur de parquet en photo */
+.vz {
+  display: grid;
+  gap: clamp(1rem, 0.6rem + 1.4vw, 1.75rem);
+  align-items: start;
+}
+@media (min-width: 64rem) {
+  .vz { grid-template-columns: minmax(0, 1fr) clamp(19rem, 24vw, 24rem); }
+}
+
+.vz__main { display: grid; gap: var(--sp-4); min-width: 0; }
+
+.vz__stage {
+  position: relative;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: var(--c-mineral);
+  --compare: 0%;
+  --compare-a: 0%;
+  touch-action: pan-y;
+}
+.vz__stage[data-editing="true"] { cursor: crosshair; }
+
+.vz__photo,
+.vz__canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.vz__photo { position: absolute; inset: 0; height: 100%; object-fit: cover; }
+.vz__canvas { position: relative; z-index: 1; clip-path: inset(0 0 0 var(--compare-a)); }
+/* Version B superposée : même boîte que la version A, découpée au curseur */
+.vz__canvas--b {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  z-index: 2;
+  clip-path: inset(0 0 0 var(--compare));
+}
+
+.vz__status {
+  position: absolute;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  z-index: 4;
+  margin: 0;
+  padding: 0.55rem 1rem;
+  border-radius: var(--r-pill);
+  background: rgba(16, 18, 19, 0.86);
+  color: #fff;
+  font-size: var(--fs-sm);
+  text-align: center;
+  max-width: calc(100% - 2rem);
+}
+.vz__status[data-tone="warn"] { background: #8d4b34; }
+
+.vz__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3) var(--sp-5);
+  align-items: center;
+  justify-content: space-between;
+}
+.vz__credit { margin: 0; font-size: var(--fs-xs); color: var(--text-muted); }
+
+/* ---------- Avant / après ---------- */
+.vz-compare { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+.vz-compare__range {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  pointer-events: auto;
+  cursor: ew-resize;
+}
+.vz-compare__handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--compare);
+  width: 2px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18);
+}
+.vz-compare__handle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+  border-radius: var(--r-pill);
+  background: #fff;
+  box-shadow: var(--shadow-2);
+}
+.vz-compare__tag {
+  position: absolute;
+  top: 0.9rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--r-pill);
+  background: rgba(16, 18, 19, 0.7);
+  color: #fff;
+  font-size: var(--fs-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.vz-compare__tag--before { left: 0.9rem; }
+.vz-compare__tag--after { right: 0.9rem; }
+.vz-compare__range:focus-visible ~ .vz-compare__handle::after { outline: 3px solid var(--focus); }
+
+/* ---------- Panneau ---------- */
+.vz-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: clamp(1rem, 0.8rem + 0.8vw, 1.4rem);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.vz-panel__scroll { display: grid; gap: var(--sp-5); }
+@media (min-width: 64rem) {
+  .vz-panel { position: sticky; top: calc(var(--header-h) + 1rem); max-height: calc(100svh - var(--header-h) - 2rem); }
+  .vz-panel__scroll { overflow-y: auto; scrollbar-width: thin; padding-right: 0.25rem; }
+}
+
+.vz-group__title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0 0 0.6rem;
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.vz-group__title output { font-family: var(--font-mono); letter-spacing: 0; text-transform: none; }
+
+/* Pièces */
+.vz-rooms { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+.vz-room {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: none;
+  text-align: left;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  overflow: hidden;
+}
+.vz-room img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r-xs); }
+.vz-room span { padding: 0 0.15rem 0.15rem; line-height: 1.25; }
+.vz-room:hover { color: var(--text); }
+.vz-room[aria-pressed="true"] { border-color: var(--accent); color: var(--text); }
+.vz-import { display: block; margin-top: 0.6rem; }
+
+/* Teintes */
+.vz-tones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem; }
+.vz-tone {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: transparent;
+  font-size: 0.8rem;
+  text-align: left;
+  color: var(--text-soft);
+}
+.vz-tone:hover { border-color: var(--line-strong); color: var(--text); }
+.vz-tone[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); }
+.vz-tone__swatch { width: 18px; height: 18px; border-radius: var(--r-pill); flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
+
+/* Motifs */
+.vz-patterns { display: grid; gap: 0.4rem; }
+.vz-pattern {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: transparent;
+  text-align: left;
+}
+.vz-pattern strong { font-size: 0.92rem; font-weight: 600; }
+.vz-pattern span { font-size: 0.78rem; color: var(--text-muted); }
+.vz-pattern:hover { border-color: var(--line-strong); }
+.vz-pattern[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); }
+
+/* Sens */
+.vz-dirs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.4rem; }
+.vz-dir {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-soft);
+}
+.vz-dir svg { width: 20px; height: 20px; }
+.vz-dir:hover { border-color: var(--line-strong); color: var(--text); }
+.vz-dir[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); }
+
+/* Curseurs */
+.vz-range { display: flex; align-items: center; gap: 0.6rem; }
+.vz-range input[type="range"] { flex: 1; accent-color: var(--c-sage-deep); }
+.vz-range output { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--text-muted); min-width: 3.2em; text-align: right; }
+
+.vz-panel__actions { display: grid; gap: 0.4rem; }
+.vz-panel__actions .btn { width: 100%; }
+.vz-panel__actions .btn[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); }
+
+/* ---------- Plein écran ---------- */
+[data-visualiseur-shell]:fullscreen,
+[data-pseudo-fullscreen="true"] {
+  background: var(--bg);
+  padding: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+  overflow: auto;
+}
+[data-pseudo-fullscreen="true"] {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+}
+[data-visualiseur-shell]:fullscreen .vz,
+[data-pseudo-fullscreen="true"] .vz { height: 100%; }
+[data-visualiseur-shell]:fullscreen .vz__stage,
+[data-pseudo-fullscreen="true"] .vz__stage { max-height: calc(100svh - 8rem); }
+[data-visualiseur-shell]:fullscreen .vz__canvas,
+[data-pseudo-fullscreen="true"] .vz__canvas { max-height: calc(100svh - 8rem); width: auto; margin-inline: auto; }
+
+/* ---------- Mobile : panneau sous la photo ---------- */
+@media (max-width: 63.99rem) {
+  .vz-panel { position: relative; }
+  .vz-panel__scroll { gap: var(--sp-4); }
+  .vz-rooms { grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr)); }
+  .vz-tones { grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); }
+  .vz__stage { max-height: 62svh; }
+  .vz__canvas { max-height: 62svh; width: auto; max-width: 100%; margin-inline: auto; }
+  .vz__photo { object-fit: contain; background: var(--c-mineral); }
+}
+
+/* Mobile : photo pleine largeur, actions immédiatement sous l'image */
+@media (max-width: 48rem) {
+  .vz__stage {
+    margin-inline: calc(-1 * var(--gutter));
+    border-radius: 0;
+  }
+  .vz__bar .link-arrow { font-size: 0.85rem; }
+}
+@media (max-width: 63.99rem) {
+  .vz-panel__actions {
+    order: -1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.4rem;
+  }
+  .vz-panel__actions .btn { font-size: 0.78rem; padding: 0.6rem 0.4rem; text-align: center; }
+  .vz-room span {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Segments (mode de zone, pinceau, version A/B) */
+.vz-seg {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--c-mineral);
+}
+.vz-seg--pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.vz-seg__item {
+  padding: 0.5rem 0.4rem;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.vz-seg__item:hover { color: var(--text); }
+.vz-seg__item[aria-pressed="true"] { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: var(--shadow-1); }
+
+.vz-hint { margin: 0.55rem 0 0; font-size: 0.78rem; line-height: 1.45; color: var(--text-muted); }
+.vz-hint--privacy { margin-top: 0.5rem; }
+
+.vz-brush { display: grid; gap: 0.5rem; margin-top: 0.6rem; }
+.vz-zone-actions { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.7rem; }
+.vz-zone-actions .btn { flex: 1 1 auto; }
+.vz-zone-actions .btn--solid { flex-basis: 100%; }
+
+/* Barre sous la photo */
+.vz__bar-actions { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.vz__help {
+  width: 1.85rem;
+  height: 1.85rem;
+  flex: none;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.vz__help:hover { border-color: var(--accent); color: var(--text); }
+
+/* ---------- Prise en main ---------- */
+.vz-onboarding {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-items: end center;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  background: linear-gradient(to top, rgba(16, 18, 19, 0.62), rgba(16, 18, 19, 0.06));
+}
+.vz-onboarding__card {
+  width: min(100%, 30rem);
+  padding: clamp(1rem, 0.8rem + 0.8vw, 1.4rem);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-2);
+}
+.vz-onboarding__step {
+  margin: 0 0 0.35rem;
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  color: var(--text-muted);
+}
+.vz-onboarding__title { margin: 0 0 0.4rem; font-size: 1.05rem; font-weight: 600; font-family: var(--font-display); letter-spacing: var(--tracking-display); }
+.vz-onboarding__text { margin: 0; font-size: 0.88rem; line-height: 1.5; color: var(--text-soft); }
+.vz-onboarding__dots { display: flex; gap: 0.3rem; margin: 0.85rem 0 0; }
+.vz-onboarding__dot { width: 6px; height: 6px; border-radius: var(--r-pill); background: var(--line-strong); }
+.vz-onboarding__dot[data-current] { background: var(--c-sage-deep); width: 18px; }
+.vz-onboarding__actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.9rem; }
+
+/* ---------- Aperçu avant / après (accueil) ---------- */
+/**
+ * La scène ne se dimensionne plus sur le ratio intrinsèque de la photo.
+ *
+ * Elle le faisait — `.vzp__photo { width: 100%; height: auto }` — et une photo
+ * en 3/2 donnait un composant de 1280 px de haut à 1920 px de large, 1707 px à
+ * 2560 px : il chassait le reste de la page hors de l'écran.
+ *
+ * À la place : largeur plafonnée, rapport de forme choisi, hauteur bornée par
+ * la fenêtre. `object-fit: cover` recadre la photo dans ce cadre, et le canvas
+ * suit **exactement** la même règle — c'est la condition pour que le parquet
+ * reste aligné sur la pièce.
+ */
+.vzp {
+  display: grid;
+  gap: var(--sp-4);
+  /* Au-delà, la démonstration n'y gagne rien et la page se disloque. */
+  max-width: 76rem;
+  width: 100%;
+  margin-inline: auto;
+}
+.vzp__figure { margin: 0; display: grid; gap: 0.7rem; min-width: 0; }
+/* La scène garde son rapport 16/10 et sa hauteur est bornée (ci-dessous) : sur
+   grand écran elle plafonne donc à 620 × 1,6 = 992 px, moins que les 76 rem du
+   bloc — et restait collée à gauche, une bande vide à sa droite (constaté à
+   1440, 1668 et 1920 px). Le bloc prend la largeur réelle de la scène et se
+   centre : légende et références s'alignent sur elle. */
+@media (min-width: 40.01rem) {
+  .vzp { max-width: min(76rem, calc(min(70svh, 620px) * 1.6)); }
+}
+.vzp__stage {
+  position: relative;
+  --compare: 52%;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: var(--c-mineral);
+  touch-action: pan-y;
+  aspect-ratio: 16 / 10;
+  /* Écrans bas : la scène cède avant de pousser la page. */
+  max-height: min(70svh, 620px);
+}
+/* Téléphones : un cadre plus haut tient mieux la pièce dans une colonne
+   étroite qu'un panoramique où le sol ne serait qu'un bandeau. */
+@media (max-width: 40rem) {
+  .vzp__stage { aspect-ratio: 4 / 3; max-height: min(58svh, 460px); }
+}
+.vzp__photo,
+.vzp__canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.vzp__canvas { clip-path: inset(0 0 0 var(--compare)); }
+.vzp__range {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+  z-index: 3;
+}
+.vzp__handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--compare);
+  width: 2px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18);
+  z-index: 2;
+}
+/**
+ * Le bouton de la poignée.
+ *
+ * Il est centré sur le trait, donc à moitié hors cadre quand le curseur touche
+ * un bord — et l'`overflow: hidden` de la scène le coupait net. La course du
+ * curseur est bornée à 3–97 % dans `preview.js` : le trait et le découpage
+ * restent rigoureusement identiques, et le bouton reste entièrement saisissable.
+ */
+.vzp__handle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 46px;
+  height: 46px;
+  transform: translate(-50%, -50%);
+  border-radius: var(--r-pill);
+  background: #fff;
+  box-shadow: var(--shadow-2);
+}
+/* Doigts sur petit écran : la cible reste à 44 px, la pastille rétrécit à
+   peine pour ne pas manger la scène. */
+@media (max-width: 30rem) {
+  .vzp__handle::after { width: 40px; height: 40px; }
+}
+.vzp__range:focus-visible ~ .vzp__handle::after { outline: 3px solid var(--focus); }
+.vzp__tag {
+  position: absolute;
+  top: 0.9rem;
+  z-index: 2;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--r-pill);
+  background: rgba(16, 18, 19, 0.7);
+  color: #fff;
+  font-size: var(--fs-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.vzp__tag--before { left: 0.9rem; }
+.vzp__tag--after { right: 0.9rem; }
+.vzp[data-ready="photo"] .vzp__tag,
+.vzp[data-ready="photo"] .vzp__handle,
+.vzp[data-ready="photo"] .vzp__range { display: none; }
+.vzp__caption { font-size: var(--fs-xs); color: var(--text-muted); }
+/**
+ * Les pastilles n'existent qu'une fois le catalogue chargé : leurs libellés
+ * viennent de `data/parquets.json` et les écrire en dur ici, c'est accepter
+ * qu'ils mentent le jour où le catalogue change. La ligne est donc vide au
+ * départ — mais sa hauteur, elle, est connue d'avance et réservée. C'est la
+ * même idée que le cadre de la scène : on ne sait pas encore quoi afficher,
+ * on sait déjà quelle place cela prendra.
+ *
+ * 2,4 rem = une pastille (0,45 rem de marge haute et basse + 1 ligne de 0,82 rem
+ * à interligne normal + 2 px de bordure), arrondi au dixième supérieur.
+ */
+.vzp__chips { display: flex; flex-wrap: wrap; gap: 0.4rem; min-height: 2.4rem; }
+.vzp__chip {
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: transparent;
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+.vzp__chip:hover { border-color: var(--line-strong); color: var(--text); }
+.vzp__chip { display: inline-flex; align-items: center; gap: 0.45rem; }
+.vzp__chip-photo { width: 1.5rem; height: 1.5rem; border-radius: 50%; object-fit: cover; flex: none; background: #fff; box-shadow: inset 0 0 0 1px var(--line); }
+.vzp__chip[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); }
+

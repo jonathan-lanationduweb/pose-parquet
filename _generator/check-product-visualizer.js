@@ -295,7 +295,18 @@ function controlerSource() {
   ok('trois objets flottants au repos', ['pv-tools', 'pv-bar', 'pv-zoom'].every((c) => app.includes(`class="${c}"`)) && !/pv-status/.test(app));
   ok('la premiere impression est une piece, pas un accueil', /if \(rooms\.length\) openRoom\(rooms\[0\]\.id\);/.test(app) && !/pv__start/.test(app));
   ok('avant / apres est un segment a deux etats', /data-ba="off"/.test(app) && /data-ba="ba"/.test(app));
-  ok('la fiche Premibel est un lien discret', /data-fiche>Voir la fiche Premibel/.test(app) && !/VOIR LA FICHE PREMIBEL/.test(app));
+  /*
+   * La fiche produit : un lien, et un libelle qui n'est plus ecrit ici.
+   *
+   * Ce controle disait « data-fiche>Voir la fiche Premibel ». Le nom de
+   * l'entreprise etait donc ecrit en dur dans la vue, a deux endroits, et
+   * affirmait chez qui l'on envoyait le visiteur sans que rien ne le
+   * verifie. Le libelle vient desormais de js/commerce/premibel.js, qui lit
+   * le domaine de l'adresse avant de nommer qui que ce soit.
+   */
+  ok('la fiche produit est un lien, pas un bouton', /data-fiche>\$\{txt\(f\.libelle\)\}/.test(app) && !/<button[^>]*data-fiche/.test(app));
+  ok('le nom de l entreprise n est pas ecrit dans la vue', !/Voir la fiche Premibel/.test(sansCommentaires(app)));
+  ok('le libelle vient de la regle commerciale partagee', /ficheProduit\(/.test(app) && /from '\.\.\/commerce\/premibel\.js'/.test(app));
   ok('le chrome s attenue pendant un deplacement', /document\.body\.classList\.add\('panning'\)/.test(app));
   ok('aucun curseur décoratif', !/type="range"/.test(app));
 

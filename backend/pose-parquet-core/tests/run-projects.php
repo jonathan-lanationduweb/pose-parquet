@@ -225,8 +225,9 @@ if ( $ligne ) {
 	$verifie( 'historique : created_at = celui de la demande', ( $ev['created_at'] ?? '' ) === $ligne['created_at'] );
 }
 
-$reponse2 = $poster_json( pp_requete_valide( [ 'zone' => 'idf', 'region' => null, 'city' => null, 'style' => null, 'message' => null, 'sourceUrl' => null ] ) );
-$verifie( 'POST minimal (obligatoires seuls, zone idf) → 201', $reponse2->get_status() === 201, wp_json_encode( $reponse2->get_data() ) );
+/* Departement francilien : la region doit en etre deduite, pas recue. */
+$reponse2 = $poster_json( pp_requete_valide( [ 'department' => '75', 'city' => null, 'style' => null, 'message' => null, 'sourceUrl' => null ] ) );
+$verifie( 'POST minimal (obligatoires seuls) → 201', $reponse2->get_status() === 201, wp_json_encode( $reponse2->get_data() ) );
 $ligne2 = $repo->find_by_reference( (string) ( $reponse2->get_data()['reference'] ?? '' ) );
 if ( $ligne2 ) {
 	$crees[] = (int) $ligne2['id'];
@@ -248,8 +249,10 @@ $verifie( 'email invalide → 422', $r->get_status() === 422 );
 $verifie( 'format d’erreur { code, message, fields }', ( $d['code'] ?? '' ) === 'validation_failed' && isset( $d['message'], $d['fields'] ) );
 $verifie( 'fields.email renseigné', isset( ( (array) $d['fields'] )['email'] ) );
 
-$r = $poster_json( pp_requete_valide( [ 'consent' => null ] ) );
-$verifie( 'consentement absent → 422', $r->get_status() === 422 );
+// Le consentement n'est plus obligatoire (coordonnées facultatives) : le refus
+// « champ obligatoire absent » se vérifie sur le département.
+$r = $poster_json( pp_requete_valide( [ 'department' => null ] ) );
+$verifie( 'département absent → 422', $r->get_status() === 422 );
 $r = $poster_json( pp_requete_valide( [ 'consent' => false ] ) );
 $verifie( 'consentement false → 422', $r->get_status() === 422 );
 $r = $poster_json( pp_requete_valide( [ 'surface' => 5000 ] ) );
@@ -306,6 +309,30 @@ $verifie( 'aucune ligne créée par les refus', $nb_lignes() === $avant, $nb_lig
 $verifie( 'aucun historique orphelin créé par les refus', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" ) === $hist_avant + 2 ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 $vider_file(); // les deux créations de cette section ont mis quatre envois en file
 $verifie( 'aucun email tenté pour un refus (2 créations × 2 emails seulement)', $compte_mails() === $mails_avant_refus + 4, (string) ( $compte_mails() - $mails_avant_refus ) );
+
+/* ------------------------------------------------------------------ */
+$section( 'Projet sans coordonnées (formulaire « Décrivez votre projet »)' );
+/*
+ * Depuis le 06/10/2026, le formulaire public ne demande plus aucune donnée
+ * personnelle : il qualifie un projet pour orienter vers Premibel ou Allure
+ * Design. Le serveur doit l'enregistrer sans consentement inventé ni accusé
+ * de réception impossible.
+ */
+$vider_file();
+$mails_avant_anonyme = $compte_mails();
+$r = $poster_json( pp_requete_valide( [ 'firstName' => null, 'lastName' => null, 'email' => null, 'phone' => null, 'consent' => null, 'message' => null ] ) );
+$verifie( 'projet sans aucune coordonnée → 201', $r->get_status() === 201, (string) $r->get_status() . ' ' . wp_json_encode( $r->get_data() ) );
+if ( $r->get_status() === 201 ) {
+	$l = $repo->find_by_reference( (string) $r->get_data()['reference'] );
+	$crees[] = (int) $l['id'];
+	$verifie( 'aucune donnée personnelle stockée', $l['first_name'] === '' && $l['last_name'] === '' && $l['email'] === '' && $l['phone'] === '' );
+	$verifie( 'sans consentement : consent_at reste NULL', $l['consent_at'] === null, (string) $l['consent_at'] );
+	// L'état est figé à la mise en file, en base : on relit la ligne.
+	$etat_visiteur = (string) ( $repo->find_by_id( (int) $l['id'] )['visitor_mail_status'] ?? '' );
+	$verifie( 'sans adresse : accusé de réception « skipped », pas un échec', $etat_visiteur === 'skipped', $etat_visiteur );
+	$vider_file();
+	$verifie( 'seule la notification interne est tentée', $compte_mails() === $mails_avant_anonyme + 1, (string) ( $compte_mails() - $mails_avant_anonyme ) );
+}
 
 /* ------------------------------------------------------------------ */
 $section( 'Type de contenu exigé' );

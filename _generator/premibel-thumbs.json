@@ -1,0 +1,4847 @@
+{
+ "512890": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/512890-c740b60571eb-324x324.jpg",
+  "octets": 8258,
+  "w": 324,
+  "h": 324,
+  "empreinte": "ef976717e606e682e7076f12ef92cd92e5b2e5b2e5b265b265b025b0a5b40d94",
+  "couleur": [
+   95.5,
+   90.5,
+   88.3
+  ]
+ },
+ "517602": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/517602-353ab033f4a1-324x324.jpg",
+  "octets": 5080,
+  "w": 324,
+  "h": 324,
+  "empreinte": "f8e570cdf09f8007408000e600b200a230a231a241b639b627b607960ff60dec",
+  "couleur": [
+   32.6,
+   21.6,
+   14
+  ]
+ },
+ "517729": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/517729.jpg",
+  "octets": 8616,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 76431,
+  "converti": true,
+  "empreinte": "96e549ed818f2007008000e600b200a230a231a259b639b627b6079607f60dec",
+  "couleur": [
+   49.7,
+   23.2,
+   17
+  ],
+  "ecartee": {
+   "type": "bandeau-commercial",
+   "raison": "bandeau « le lot de … m² » sur la photo"
+  }
+ },
+ "CHENF36015": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/07/CHENF36015-429b1a357c28-324x324.jpg",
+  "octets": 11980,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0c9c10d911ced96ed843c6e0c0e008d808fb10ff32cfa28522955296d6d2a6d8",
+  "couleur": [
+   163,
+   143.3,
+   121.9
+  ]
+ },
+ "CHENF36014": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/07/CHENF36014-2660080b26a5-324x324.jpg",
+  "octets": 12408,
+  "w": 324,
+  "h": 324,
+  "empreinte": "cc36c837cd37dd25cd6cc878c0f0c1b4c038c0380638141524f54ad492941496",
+  "couleur": [
+   144.4,
+   104.9,
+   60.2
+  ]
+ },
+ "CHENF39031": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/11/CHENF39031-9afdd717aea6-324x324.jpg",
+  "octets": 11056,
+  "w": 324,
+  "h": 324,
+  "empreinte": "000f003f80c48354925492549274b2749114d9949967c025cc65cc01c0018103",
+  "couleur": [
+   173.7,
+   152.4,
+   127.1
+  ]
+ },
+ "POINF36005": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/07/POINF36005-724fb480a9b2-324x324.jpg",
+  "octets": 12186,
+  "w": 324,
+  "h": 324,
+  "empreinte": "013f30793921393138313231723352f332d153914cbd387c183c183d023f087f",
+  "couleur": [
+   187.3,
+   164.5,
+   133.9
+  ]
+ },
+ "POINF39026": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/07/POINF39026-04d6b733f3f4-324x324.jpg",
+  "octets": 8610,
+  "w": 324,
+  "h": 324,
+  "empreinte": "d2725a5c5a5c42d8ce5bcedacce440dc407f007c007888780c6026202cb01898",
+  "couleur": [
+   170.6,
+   132.9,
+   92.6
+  ]
+ },
+ "POINF39011": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POINF39011-3a74671946d5-324x324.jpg",
+  "octets": 11790,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0019003a4682c582c582c986ca06cb06c60719021d06ed06e002200300470243",
+  "couleur": [
+   148.3,
+   134.7,
+   118.1
+  ]
+ },
+ "POIN36015": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POIN36015-ad5dbfb89df8-324x324.jpg",
+  "octets": 20822,
+  "w": 324,
+  "h": 324,
+  "empreinte": "e4f80cf10c47361f173f069b061f063e167706dd1fee88fd8a77fe33903ba4f8",
+  "couleur": [
+   161.9,
+   149.5,
+   134.1
+  ]
+ },
+ "BTRPF39009": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/04/BTRPF39009.png",
+  "octets": 16072,
+  "w": 324,
+  "h": 324,
+  "formatSource": "PNG",
+  "octetsSource": 1543921,
+  "converti": true,
+  "empreinte": "979e870686479c1d1fbe15343d3f3d1f398f1d071f0f0f9f0f9b0ba90bed4f9e",
+  "couleur": [
+   181.1,
+   158.7,
+   135.6
+  ]
+ },
+ "BTRPF39005": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRPF39005-5cfc53464d5b-324x324.jpg",
+  "octets": 13132,
+  "w": 324,
+  "h": 324,
+  "empreinte": "d847a236261e2306037299f2ce6203c1e852c35843306f316e156c0ff81f6819",
+  "couleur": [
+   160.1,
+   151.9,
+   138.1
+  ]
+ },
+ "BTRP38006": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRP38006-38f7ab6f1b4e-324x324.jpg",
+  "octets": 9230,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c4e2cce2cce2cce2c8e2c8e6f0e6f066706e3c261fe210fe4b3fe9e38c78cedb",
+  "couleur": [
+   205.9,
+   186.8,
+   161.4
+  ]
+ },
+ "BTRP26001": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRP26001-5bc370bd8c90-324x324.jpg",
+  "octets": 10062,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3dbc253c257025702d70357c327e32fc65fc25b867e456fcd7fe93a1632207f8",
+  "couleur": [
+   195.1,
+   189.2,
+   181
+  ]
+ },
+ "VERF39004": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/VERF39004-9282f815729c-324x324.jpg",
+  "octets": 15744,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1131356c6cc609ca1348593c6c382afb4916160d3b0c39393131836944f30693",
+  "couleur": [
+   198.7,
+   162.5,
+   109.1
+  ]
+ },
+ "BAMB36122": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BAMB36122-20413c4c14f8-324x324.jpg",
+  "octets": 8904,
+  "w": 324,
+  "h": 324,
+  "empreinte": "58601c722c642c602c710f0f01e7587cb80f1c8317d871ffe077799fcc4fc733",
+  "couleur": [
+   223.1,
+   184.1,
+   131
+  ]
+ },
+ "BAMB36121": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BAMB36121-93fd881cfde0-324x324.jpg",
+  "octets": 11366,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c0d7e0d7f257c64d744ee453cd0478123a0902d402f500d914dc056c292d28a2",
+  "couleur": [
+   107.6,
+   75,
+   45.4
+  ]
+ },
+ "BAMB36103": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BAMB36103-cad8ba664e04-324x324.jpg",
+  "octets": 14592,
+  "w": 324,
+  "h": 324,
+  "empreinte": "898b31cd10749a72eb58e918ec8cdc94d042d26b5825693469322cb3e89982d8",
+  "couleur": [
+   138.9,
+   140,
+   146.2
+  ]
+ },
+ "BAMB36130": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/12/BAMB36132.jpg",
+  "octets": 13760,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 221529,
+  "converti": true,
+  "empreinte": "28337e2e762c6dac9b8e124f9e5f8e014e407c4b704e302e191e41c605e345b1",
+  "couleur": [
+   164.1,
+   135.2,
+   110.6
+  ]
+ },
+ "BAMB36132": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/12/BAMB36132.jpg",
+  "octets": 13760,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 221529,
+  "converti": true,
+  "empreinte": "28337e2e762c6dac9b8e124f9e5f8e014e407c4b704e302e191e41c605e345b1",
+  "couleur": [
+   164.1,
+   135.2,
+   110.6
+  ]
+ },
+ "BAMB36131": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/01/BAMB36131-a079efdb4d17-324x324.jpg",
+  "octets": 11372,
+  "w": 324,
+  "h": 324,
+  "empreinte": "39cf79c718c798af04c7627e447f146370e30363027b1c3f002f000f00070017",
+  "couleur": [
+   196.2,
+   173.7,
+   152.8
+  ]
+ },
+ "BAMB36133": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/12/BAMB36133.jpg",
+  "octets": 11506,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 199202,
+  "converti": true,
+  "empreinte": "a3b7f133b0f391f33693c8938ce63b6734d75687b6052d933b3b3e4f3f9e3e9e",
+  "couleur": [
+   182.2,
+   158.2,
+   137.9
+  ]
+ },
+ "BAMB36107": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BAMB36107-243fabb4a9df-324x324.jpg",
+  "octets": 15742,
+  "w": 324,
+  "h": 324,
+  "empreinte": "b59ab39ab91ab91ab11ada6f977eb57eff1fe6dbde6bff3df754f54aa56b6cad",
+  "couleur": [
+   97.2,
+   88.4,
+   78
+  ]
+ },
+ "BAMB36108": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BAMB36108-5e41c93b225e-324x324.jpg",
+  "octets": 17566,
+  "w": 324,
+  "h": 324,
+  "empreinte": "01c580c543a54ee589a5f516b3c91da80db11975396591e555e555a195b9a9b1",
+  "couleur": [
+   116.5,
+   115.3,
+   115
+  ]
+ },
+ "BAMB36135": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/02/BAMB36135.jpg",
+  "octets": 8454,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 112745,
+  "converti": true,
+  "empreinte": "6130663067394f2c74bebab2f8f4d0f8c9fc807ea07ec67fc4df523b52bb8eba",
+  "couleur": [
+   213.8,
+   204.1,
+   198.4
+  ]
+ },
+ "BAMB36129": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/02/BAMB36129.jpg",
+  "octets": 12094,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 98637,
+  "converti": true,
+  "empreinte": "d07ada7ea8f2d0b2e0b2673232328ec79ee46e00fe0406007800700000000000",
+  "couleur": [
+   158.9,
+   124.9,
+   57
+  ]
+ },
+ "BAMB36128_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/08/BAMB36128_1-2.jpg",
+  "octets": 18730,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 222752,
+  "converti": true,
+  "empreinte": "6f066e1e6d16494c484e833cb7596b0b8f1f8f796c7c6c7f6efb6f9f4de76c73",
+  "couleur": [
+   187.3,
+   151.9,
+   113.3
+  ]
+ },
+ "BAMB36134": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/02/BAMB36134.jpg",
+  "octets": 17176,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 103488,
+  "converti": true,
+  "empreinte": "07c003c613c32dcc31cc1cf11f310fe00f7e1fe70ff10ffc0e7706730639473c",
+  "couleur": [
+   152.1,
+   116.5,
+   84.1
+  ]
+ },
+ "BAMB36136": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/02/BAMB36136.jpg",
+  "octets": 9182,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 105859,
+  "converti": true,
+  "empreinte": "3131355131d3b649ec6078d0f0e373d233f337e97e263e3a3e1c3f1c3f0e9d0b",
+  "couleur": [
+   77.4,
+   72,
+   69.7
+  ]
+ },
+ "BAMB36106": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BAMB36106-03698d342346-324x324.jpg",
+  "octets": 9948,
+  "w": 324,
+  "h": 324,
+  "empreinte": "607f61cf85c3848280fe84fb270b30c738ed3cc03e0217031e951a4b0ce50cf2",
+  "couleur": [
+   98.7,
+   82.1,
+   67.8
+  ]
+ },
+ "BAMB0018": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/08/gescomo-no-image-324x324.png",
+  "octets": 79930,
+  "w": 324,
+  "h": 324,
+  "empreinte": "115f3ca53ee2049b0a650b2c0b2120f8188458c41a41b5335294369096938d49",
+  "couleur": [
+   225.8,
+   211.6,
+   200.8
+  ],
+  "ecartee": {
+   "type": "placeholder",
+   "raison": "fichier source « gescomo-no-image-324x324.png »"
+  }
+ },
+ "BAMB36115": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BAMB36115-803616f40ab8-324x324.jpg",
+  "octets": 9048,
+  "w": 324,
+  "h": 324,
+  "empreinte": "58401c702c242c602c790f0f01e75c7c380f3c83b75871dee077791fec47c733",
+  "couleur": [
+   201,
+   156.4,
+   123.8
+  ]
+ },
+ "BAMB36118": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BAMB36118-10c355a381b3-324x324.jpg",
+  "octets": 11270,
+  "w": 324,
+  "h": 324,
+  "empreinte": "093f224b7819fa38c3716767a326e326a37efa1e6b5bc4b3a6b36293d2d996c9",
+  "couleur": [
+   178.6,
+   124.3,
+   78.7
+  ]
+ },
+ "BAMB36126L_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BAMB36126L_1-dcb025b731f8-324x324.jpg",
+  "octets": 5610,
+  "w": 324,
+  "h": 324,
+  "empreinte": "6446e666ec664862496b4d67c8e788e39ae39a6388e39c613461386531663562",
+  "couleur": [
+   170.8,
+   118.6,
+   47
+  ]
+ },
+ "BAMB36120_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BAMB36120-1-324x324.jpg",
+  "octets": 21048,
+  "w": 324,
+  "h": 324,
+  "empreinte": "f10ce0049494c216626c222cce4cce4bd34bd94cc844c0041804c3006040cc20",
+  "couleur": [
+   169.6,
+   127.6,
+   84.3
+  ]
+ },
+ "BAMB36127L_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BAMB36127L_1-13e97ceefad5-324x324.png",
+  "octets": 87722,
+  "w": 324,
+  "h": 324,
+  "empreinte": "e446e466e4664a424d6b4d47c8e788e39a639a6388639c613061396535663562",
+  "couleur": [
+   190.4,
+   147.8,
+   77.8
+  ]
+ },
+ "BAMB36109": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BAMB36109-022268baf8bc-324x324.jpg",
+  "octets": 10548,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c9a6cad4cfb7c380f326f13071b8434c874627c3ef81efc1fec1fec9ff4aff49",
+  "couleur": [
+   84.1,
+   68.2,
+   54
+  ]
+ },
+ "BAMB36110": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BAMB36110-88eebec34182-324x324.jpg",
+  "octets": 12592,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0e3006088c3033322642ccc71da53929f20ae648ec48cc989c9838983938712d",
+  "couleur": [
+   156.7,
+   156.2,
+   158.4
+  ]
+ },
+ "BAMB36105": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BAMB36105-852426e42f66-324x324.jpg",
+  "octets": 17452,
+  "w": 324,
+  "h": 324,
+  "empreinte": "bcb039b22b285a727caef19981d881e491e400f8c0fc89b3a9b348f959ef91ed",
+  "couleur": [
+   51.5,
+   40.5,
+   30.9
+  ]
+ },
+ "BTRP26000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRP26000-9a6f8fa0d880-324x324.jpg",
+  "octets": 11972,
+  "w": 324,
+  "h": 324,
+  "empreinte": "b3b49324b335b3b1b3b8ba38e9cccaccbdc07cc33ce3f4e97cf07cf0f83bf8da",
+  "couleur": [
+   147.7,
+   122.8,
+   107.4
+  ]
+ },
+ "TECK26005": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/TECK26005-47386c22e25e-324x324.jpg",
+  "octets": 11824,
+  "w": 324,
+  "h": 324,
+  "empreinte": "23063549230b33a700a30131211931193380618c41c866739d8cc38927630666",
+  "couleur": [
+   183.2,
+   132.4,
+   83.9
+  ]
+ },
+ "BTRPF39002": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/09/BTRPF39002-067ff5ef24fc-324x324.jpg",
+  "octets": 11628,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3c7d3e5d72f3b6333e331e33c7a303b78367f72777b781a731c3f783c903db1e",
+  "couleur": [
+   196.3,
+   190.2,
+   187.9
+  ]
+ },
+ "BTRP36004": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRP36004-af3d78bee7fc-324x324.jpg",
+  "octets": 14350,
+  "w": 324,
+  "h": 324,
+  "empreinte": "a71fae0f2f07278b073b871b078b47bf878f86bf07dd0f4a2edf07a1277e6f4f",
+  "couleur": [
+   180.2,
+   158.1,
+   132.5
+  ]
+ },
+ "BTRPF36004": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRPF36004-0aae98c3f962-324x324.jpg",
+  "octets": 8000,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0d90ef0c7f260de1425341a1c1b1c1a9c19219c49e4cdccff11bc13c926f20cc",
+  "couleur": [
+   200.9,
+   188.6,
+   176.6
+  ]
+ },
+ "BTRP38005": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRP38005-1-324x324.jpg",
+  "octets": 18948,
+  "w": 324,
+  "h": 324,
+  "empreinte": "b336b37693879f8379f0f874863d3c393e3d863f0e33d073116d19e6658765ce",
+  "couleur": [
+   154,
+   122.5,
+   88.5
+  ]
+ },
+ "BTRP28000_2": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRP28000_2-720eb568bba2-324x324.jpg",
+  "octets": 14518,
+  "w": 324,
+  "h": 324,
+  "empreinte": "f0f94bb520ac2319c0f3c3da86ad2c6f696bc659793b25ef1e7c39b932716935",
+  "couleur": [
+   112.8,
+   78.1,
+   66.8
+  ]
+ },
+ "BTRP28000_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRP28000_1-5b7641e27aba-324x324.jpg",
+  "octets": 14500,
+  "w": 324,
+  "h": 324,
+  "empreinte": "f0f94bb520ac2339c0f3c3da86ad2c6f696bc659793b25ed1e7c39bc3a796931",
+  "couleur": [
+   112.8,
+   78,
+   66.8
+  ]
+ },
+ "BTRP28000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRP28000-59e8cb388f00-324x324.jpg",
+  "octets": 14500,
+  "w": 324,
+  "h": 324,
+  "empreinte": "f0f94bb520ae2319c0f3c3da86ad2c6f696bc659793b25ef1e7c39b932716931",
+  "couleur": [
+   112.9,
+   78.1,
+   66.8
+  ]
+ },
+ "BTRP39030_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/08/gescomo-no-image-324x324.png",
+  "octets": 79930,
+  "w": 324,
+  "h": 324,
+  "empreinte": "115f3ca53ee2049b0a650b2c0b2120f8188458c41a41b5335294369096938d49",
+  "couleur": [
+   225.8,
+   211.6,
+   200.8
+  ],
+  "ecartee": {
+   "type": "placeholder",
+   "raison": "fichier source « gescomo-no-image-324x324.png »"
+  }
+ },
+ "BTRPF36000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRPF36000-9e23e174984a-324x324.jpg",
+  "octets": 7614,
+  "w": 324,
+  "h": 324,
+  "empreinte": "12371a7713871f9f0c4f086718533d73cda3c9a379a5f93fd93bf331b473e863",
+  "couleur": [
+   224.1,
+   211.7,
+   192.8
+  ]
+ },
+ "BTRPF39007": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRPF39007-9c16b5a32785-324x324.jpg",
+  "octets": 9858,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c5cfe5c43c84cc84c884cc84ea14ec18fd3c786fc8f2f07ae0ff80e190fcd2ff",
+  "couleur": [
+   166.5,
+   158.9,
+   147.5
+  ]
+ },
+ "BTRP39001": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRP39001-3e0b8496d07e-324x324.jpg",
+  "octets": 9094,
+  "w": 324,
+  "h": 324,
+  "empreinte": "5bf03ae41acc18cdc8cccccf3ccffcef3a8f378f19c71b179adb1c9f98b338b7",
+  "couleur": [
+   180.2,
+   169.6,
+   166.7
+  ]
+ },
+ "BTRP39003": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRP39003-f8a489f3e1cb-324x324.jpg",
+  "octets": 9094,
+  "w": 324,
+  "h": 324,
+  "empreinte": "5bf03ae41acc18cdc8cccccf3ccffcef3a8f378f19c71b179adb1c9f98b338b7",
+  "couleur": [
+   180.2,
+   169.6,
+   166.7
+  ]
+ },
+ "BTRP39004": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRP39004-16973dfc8ed8-324x324.jpg",
+  "octets": 9094,
+  "w": 324,
+  "h": 324,
+  "empreinte": "5bf03ae41acc18cdc8cccccf3ccffcef3a8f378f19c71b179adb1c9f98b338b7",
+  "couleur": [
+   180.2,
+   169.6,
+   166.7
+  ]
+ },
+ "BTRP39020": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRP39020-595ddeedea67-324x324.jpg",
+  "octets": 10522,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3dbf3f9e36ccf2d272f2fa927a927a937a93fa92f3b6b58765916493f00dfc01",
+  "couleur": [
+   181,
+   168.5,
+   153.9
+  ]
+ },
+ "BTRPF39001": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/BTRPF39001-2a2fb29aa3e9-324x324.jpg",
+  "octets": 10388,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3c357c355e95dc953c3434367037f037c03fa43f303d3c3f387f107f8cdb227d",
+  "couleur": [
+   160.4,
+   130.3,
+   92
+  ]
+ },
+ "BTRP38010": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/10/BTRP38010.jpg",
+  "octets": 11394,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 80403,
+  "converti": true,
+  "empreinte": "b028271c986019e6a9e0a8e0f0e4e986f1e6b9c619861ba31ae55a66c3338320",
+  "couleur": [
+   167.2,
+   130.6,
+   99.6
+  ]
+ },
+ "CHAMP_PLAT_16000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHAMP_PLAT_16000-1-324x324.jpg",
+  "octets": 4228,
+  "w": 324,
+  "h": 324,
+  "empreinte": "41f306f51ccb03fc3ffcfffc81f493bcaefc27fca3fcfffc7ffc0ffd07d305fe",
+  "couleur": [
+   219.4,
+   203.7,
+   184.5
+  ]
+ },
+ "CHEN19027": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN19027-7dff25ffbf36-324x301.jpg",
+  "octets": 13396,
+  "w": 324,
+  "h": 301,
+  "empreinte": "7b8371cb75ca74ce76c8f8cab32761e6c1e70d67f267c33b07df61f6990d2446",
+  "couleur": [
+   155.1,
+   115.5,
+   86.3
+  ]
+ },
+ "CHEN39312": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39312-3c3dc0a56477-324x324.jpg",
+  "octets": 7744,
+  "w": 324,
+  "h": 324,
+  "empreinte": "9095b0997099988c588c58025a0258827982f91287c234d0305006080e08cc04",
+  "couleur": [
+   188.2,
+   162.2,
+   144.6
+  ]
+ },
+ "CHEN39310": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39310-f7ab757ea17b-324x324.jpg",
+  "octets": 12068,
+  "w": 324,
+  "h": 324,
+  "empreinte": "7b64ab24e341634ae702667b0bfb89fb01f9003d406f616f3bef6e656e7f1767",
+  "couleur": [
+   163,
+   121.2,
+   84.2
+  ]
+ },
+ "CHEN39255": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39255-6210fe018652-324x324.jpg",
+  "octets": 5684,
+  "w": 324,
+  "h": 324,
+  "empreinte": "297728b70cb70cb70cb74c7f6c6ac398c1cc006001f141fc05fc47f9436881b0",
+  "couleur": [
+   177.9,
+   169.9,
+   151.9
+  ]
+ },
+ "CHEN16041": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN16041-1fe21586cacb-324x324.jpg",
+  "octets": 7734,
+  "w": 324,
+  "h": 324,
+  "empreinte": "4a194a194e194e190f1d279ba7daa79ce7ffa7ff87bf00ff00ffc06fc43ec2bf",
+  "couleur": [
+   146.3,
+   131,
+   112.2
+  ]
+ },
+ "CHENF39036": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/09/CHENF39036-80501fc68151-324x324.jpg",
+  "octets": 12070,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3b352a7d2c352c356a998e739e79b7799e679e731861343d8c322cbb2cf54cf2",
+  "couleur": [
+   202,
+   172,
+   138.2
+  ]
+ },
+ "CHENF39037": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/09/CHENF39037-516bb276ade4-324x324.jpg",
+  "octets": 11942,
+  "w": 324,
+  "h": 324,
+  "empreinte": "9d9c998c0c8c8dcc8d8c2d8c21cc2aec2efc3bfc21dc28dd48de91cf81c720cb",
+  "couleur": [
+   176.5,
+   145.5,
+   110.3
+  ]
+ },
+ "CHEN38163_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/08/gescomo-no-image-324x324.png",
+  "octets": 79930,
+  "w": 324,
+  "h": 324,
+  "empreinte": "115f3ca53ee2049b0a650b2c0b2120f8188458c41a41b5335294369096938d49",
+  "couleur": [
+   225.8,
+   211.6,
+   200.8
+  ],
+  "ecartee": {
+   "type": "placeholder",
+   "raison": "fichier source « gescomo-no-image-324x324.png »"
+  }
+ },
+ "CHEN38163": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN38163-2-324x324.jpg",
+  "octets": 14894,
+  "w": 324,
+  "h": 324,
+  "empreinte": "da5c586815a1fc33dc73c6d99cb0bf30fb29f381f3914f9a9f9a979da3d9234a",
+  "couleur": [
+   114.5,
+   81.8,
+   60.6
+  ]
+ },
+ "CHEN3031": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN3031-12b9dedca133-324x324.jpg",
+  "octets": 15634,
+  "w": 324,
+  "h": 324,
+  "empreinte": "99feb97e1a7b9cfc98ce9e27938e93b893f093e8d2f0c3db016f10774c365886",
+  "couleur": [
+   121,
+   92.5,
+   73.4
+  ]
+ },
+ "CHENF2689": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2689-19b130745504-324x324.jpg",
+  "octets": 11126,
+  "w": 324,
+  "h": 324,
+  "empreinte": "b4e7a4ee84bf8ce77de7ddb735b7b13ed8edd8e406f6fee6fcecd9fe48fea0ef",
+  "couleur": [
+   166.6,
+   144.9,
+   130.7
+  ],
+  "ecartee": {
+   "type": "bandeau-commercial",
+   "raison": "bandeau « prix pour le lot » sur la photo"
+  }
+ },
+ "CHEN29291": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29291-cbe07676798e-324x324.jpg",
+  "octets": 8564,
+  "w": 324,
+  "h": 324,
+  "empreinte": "cdcb4dc31aab0d3ba73f3c1f185d107f04ef49970ad706db26190615013605df",
+  "couleur": [
+   193.4,
+   186.4,
+   179.7
+  ]
+ },
+ "CHEN29296_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29296_1-f6c497fb8a4a-324x324.jpg",
+  "octets": 8682,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0000000904f90055001d0215034d03cd4bc79e9faa41ab4173c83191f091cc59",
+  "couleur": [
+   184.3,
+   174.5,
+   164.8
+  ]
+ },
+ "CHEN29292": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29292-481a5768f337-324x324.jpg",
+  "octets": 8660,
+  "w": 324,
+  "h": 324,
+  "empreinte": "fd67ffeef4fffde77de7ddb735b7b13ed8edd8e406f6fee6fcecd9fe48fea0ef",
+  "couleur": [
+   169.1,
+   159.8,
+   144.7
+  ]
+ },
+ "CHEN29292_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29292_1-6191712ad1de-324x324.jpg",
+  "octets": 8660,
+  "w": 324,
+  "h": 324,
+  "empreinte": "fd67ffeef4fffde77de7ddb735b7b13ed8edd8e406f6fee6fcecd9fe48fea0ef",
+  "couleur": [
+   169.1,
+   159.8,
+   144.7
+  ]
+ },
+ "CHENF2672": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2672-bebc503fa20b-324x324.jpg",
+  "octets": 10804,
+  "w": 324,
+  "h": 324,
+  "empreinte": "238d2289b2adada1b2c1aa93aae1a1c78fc30fc30dc702ff013d064f0cdb1993",
+  "couleur": [
+   113.4,
+   89.5,
+   62.1
+  ]
+ },
+ "CHENF2674": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2674-c4ed9d32169b-324x324.jpg",
+  "octets": 12958,
+  "w": 324,
+  "h": 324,
+  "empreinte": "5353d319d3990198cc908d93a633c66136e6078c1bc91fe31fe31f1b0fdd0f6f",
+  "couleur": [
+   88.2,
+   71.5,
+   49.8
+  ]
+ },
+ "CHENF2697": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2697-f3ab44512f8a-324x324.jpg",
+  "octets": 11808,
+  "w": 324,
+  "h": 324,
+  "empreinte": "a2cd2269b249b6cdb2cb63946399632e633363b343fe43f007f023c1a380e18a",
+  "couleur": [
+   146.7,
+   134.1,
+   114.7
+  ]
+ },
+ "CHENF2700": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2700-526e0265d7c6-324x324.jpg",
+  "octets": 10588,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1c039e4bf648030101840194c8d8cc6ec023c148412de1a7a1df09c0738339c4",
+  "couleur": [
+   146.9,
+   134.6,
+   119.1
+  ]
+ },
+ "CHENF2698": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2698-c4054479cd14-324x324.jpg",
+  "octets": 8474,
+  "w": 324,
+  "h": 324,
+  "empreinte": "7c00fc006e003403f87ffe736c33667366618e65afe16f610e600cb109371433",
+  "couleur": [
+   184.9,
+   153.5,
+   126.9
+  ]
+ },
+ "CHENF2701": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2701-65528032c7d1-324x324.jpg",
+  "octets": 8190,
+  "w": 324,
+  "h": 324,
+  "empreinte": "9e830cc336b62db12d726fb48f1c959d1c3ffe1ff61ffc1ff81e71276426cc32",
+  "couleur": [
+   147.1,
+   119.7,
+   92.6
+  ]
+ },
+ "CHENF2699": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2699-198673d7427f-324x324.jpg",
+  "octets": 11308,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0f4f06499b1a93328d304d314dd170c370c764c8701ed92cd993c9ceabc5abd3",
+  "couleur": [
+   165.9,
+   155.7,
+   145.3
+  ]
+ },
+ "CHEN29286": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29286-96bde0707672-324x324.jpg",
+  "octets": 15648,
+  "w": 324,
+  "h": 324,
+  "empreinte": "47166922fb270727666cc6330220047f024703e307e803ef02c70ce60f9837b8",
+  "couleur": [
+   151,
+   129.5,
+   110.7
+  ]
+ },
+ "CHEN29286_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29286_1-78a941153573-324x324.jpg",
+  "octets": 15648,
+  "w": 324,
+  "h": 324,
+  "empreinte": "47166922fb270727666cc6330220047f024703e307e803ef02c70ce60f9837b8",
+  "couleur": [
+   151,
+   129.5,
+   110.7
+  ]
+ },
+ "CHENF2687": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2687-c731fb3ca06a-324x324.jpg",
+  "octets": 14898,
+  "w": 324,
+  "h": 324,
+  "empreinte": "9813c913df0edf18811c153c951a011e0f127fb0f818fe10fc38ff00e0709810",
+  "couleur": [
+   125.1,
+   137.6,
+   123.8
+  ]
+ },
+ "CHEN29282": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29282-2c31f054a505-324x324.jpg",
+  "octets": 14476,
+  "w": 324,
+  "h": 324,
+  "empreinte": "07034132eb278737666ec67d8623207c064f02e307e807ec03c70ce60dda1f98",
+  "couleur": [
+   161.9,
+   139.1,
+   115.4
+  ]
+ },
+ "CHEN29287": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29287-255b4b8f8180-324x324.jpg",
+  "octets": 14198,
+  "w": 324,
+  "h": 324,
+  "empreinte": "026c5431a7e1bfe27c636ce06ce96cf26ce449f4f160d2627373f8f170e0f8f0",
+  "couleur": [
+   178,
+   163.1,
+   150.9
+  ]
+ },
+ "CHEN29321": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29321-9ce91ff412a7-324x324.jpg",
+  "octets": 13904,
+  "w": 324,
+  "h": 324,
+  "empreinte": "18d17277f93dc4f048f1cd9ace0c5a4c18fa18fa90781070d07c10d809194619",
+  "couleur": [
+   124.3,
+   98.5,
+   77.8
+  ]
+ },
+ "CHENF314": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF314-2edfb45313e1-324x324.jpg",
+  "octets": 14946,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1bb91bd91bb91b8919871bc71bc35dc7bdc6bfe6fe67fa73581ac04bc8258826",
+  "couleur": [
+   155.4,
+   130.1,
+   107.6
+  ]
+ },
+ "CHEN3058": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN3058-acc35c01ee73-324x324.jpg",
+  "octets": 10498,
+  "w": 324,
+  "h": 324,
+  "empreinte": "387b8778c1ecc17ccc7c4cb1c891419161b9c1e9c1e181fb00fd037c0178415c",
+  "couleur": [
+   123.2,
+   104.6,
+   86.2
+  ]
+ },
+ "CHEN39367_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39367_1-ea196e864948-324x324.jpg",
+  "octets": 11040,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3c9b0201001f00ff01da075a195a991899cd6df0a1fca01cb05d201f203f819d",
+  "couleur": [
+   174.9,
+   165.9,
+   152
+  ]
+ },
+ "CHEN39367": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39367-672261414867-324x324.jpg",
+  "octets": 11040,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3c9b0201001f00ff01da075a195a991899cd6df0a1fca01cb05d201f203f819d",
+  "couleur": [
+   174.9,
+   165.9,
+   152
+  ]
+ },
+ "CHEN39367_2": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39367_2-1c2613aa8576-324x324.jpg",
+  "octets": 11040,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3c9b0201001f00ff01da075a195a991899cd6df0a1fca01cb05d201f203f819d",
+  "couleur": [
+   174.9,
+   165.9,
+   152
+  ]
+ },
+ "CHEN39278_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39278_1-2c39ae6c39d3-324x324.jpg",
+  "octets": 9402,
+  "w": 324,
+  "h": 324,
+  "empreinte": "64cd68ed686d68ec446e426c64ac64e846ee46ee64c420086008d104f58ae58b",
+  "couleur": [
+   199.9,
+   181.7,
+   163.5
+  ]
+ },
+ "CHEN39278": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39278-2250bb885859-324x324.jpg",
+  "octets": 9320,
+  "w": 324,
+  "h": 324,
+  "empreinte": "64cd686d686d68ec446e426c64ac64e846ee46ee64cc20086018d104f58ae58b",
+  "couleur": [
+   199.9,
+   181.7,
+   163.5
+  ]
+ },
+ "CHEN39309_2": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39309_2-4c136e47c8e5-324x324.jpg",
+  "octets": 6306,
+  "w": 324,
+  "h": 324,
+  "empreinte": "35a011fc1bc8c410339fb89a98da18c86dc3fc9870980098089f398ff7c77bc7",
+  "couleur": [
+   161.7,
+   150.5,
+   142.8
+  ]
+ },
+ "CHEN39361_4": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39361_4-3d550ca02985-324x324.jpg",
+  "octets": 12764,
+  "w": 324,
+  "h": 324,
+  "empreinte": "170397139f139f139b13761736173e172c471d677f97cc4fdd2cc78f0f0f1e07",
+  "couleur": [
+   190.1,
+   183.7,
+   165.5
+  ]
+ },
+ "CHEN39361_3": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39361_3-b58c978e344c-324x324.jpg",
+  "octets": 12764,
+  "w": 324,
+  "h": 324,
+  "empreinte": "170397139f139f139b13761736173e172c471d677f97cc4fdd2cc78f0f0f1e07",
+  "couleur": [
+   190.1,
+   183.7,
+   165.5
+  ]
+ },
+ "CHEN39361_2": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39361_2-153c4dbc403c-324x324.jpg",
+  "octets": 12764,
+  "w": 324,
+  "h": 324,
+  "empreinte": "170397139f139f139b13761736173e172c471d677f97cc4fdd2cc78f0f0f1e07",
+  "couleur": [
+   190.1,
+   183.7,
+   165.5
+  ]
+ },
+ "CHEN39361_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39361_1-f9faa5b639cd-324x324.jpg",
+  "octets": 12920,
+  "w": 324,
+  "h": 324,
+  "empreinte": "170397139f139f139b13761736173e172c471d677f97cc4fdd2cc78f0f0f1e07",
+  "couleur": [
+   190.1,
+   183.7,
+   165.5
+  ]
+ },
+ "CHEN39361": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39361-16be8935773f-324x324.jpg",
+  "octets": 12920,
+  "w": 324,
+  "h": 324,
+  "empreinte": "170397139f139f139b13761736173e172c471d677f97cc4fdd2cc78f0f0f1e07",
+  "couleur": [
+   190.1,
+   183.7,
+   165.5
+  ]
+ },
+ "CHEN39361_5": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39361_5-9f8830c6feaf-324x324.jpg",
+  "octets": 12920,
+  "w": 324,
+  "h": 324,
+  "empreinte": "170397139f139f139b13761736173e172c471d677f97cc4fdd2cc78f0f0f1e07",
+  "couleur": [
+   190.1,
+   183.7,
+   165.5
+  ]
+ },
+ "CHENF2665": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2665-fc8e7510f735-324x324.jpg",
+  "octets": 13594,
+  "w": 324,
+  "h": 324,
+  "empreinte": "71dc625c23dc23dc23dc3b9c339c339863d831f8d0fbe1fd11f701ff11ff31ab",
+  "couleur": [
+   125.7,
+   109.8,
+   94
+  ]
+ },
+ "CHENF2667": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2667-82e7c78ed3ec-324x324.jpg",
+  "octets": 14120,
+  "w": 324,
+  "h": 324,
+  "empreinte": "ca6cc918c86cc66dc62dc62d15b19368074b0f1007c103e9027f009504900181",
+  "couleur": [
+   134.4,
+   120.3,
+   109
+  ]
+ },
+ "CHENF2663": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2663-c02db659b9a8-324x324.jpg",
+  "octets": 11478,
+  "w": 324,
+  "h": 324,
+  "empreinte": "667366706674e6b3e6b28a66208ca4a691b401e900e700f010e840f000682534",
+  "couleur": [
+   81,
+   83.4,
+   83.7
+  ]
+ },
+ "CHENF3664": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/09/CHENF3664-0100377a7214-324x324.jpg",
+  "octets": 14730,
+  "w": 324,
+  "h": 324,
+  "empreinte": "61f762b62a7225b549a58a2724330413030f04b7133b93631c6e149eac47293b",
+  "couleur": [
+   120.6,
+   104.8,
+   90.5
+  ]
+ },
+ "CHENF2675": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/09/CHENF2675-8cd8b0a4effd-324x324.jpg",
+  "octets": 9748,
+  "w": 324,
+  "h": 324,
+  "empreinte": "00079007c00f831fc30f830dcb19cb1b2333299790db9319859425160b141a54",
+  "couleur": [
+   179.6,
+   153.7,
+   130.9
+  ]
+ },
+ "CHENF2695": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/07/CHENF2695-ca63c6b20451-324x324.jpg",
+  "octets": 13896,
+  "w": 324,
+  "h": 324,
+  "empreinte": "4e13ec36b50475404a10ea31a1e0e620a121f724e8d8c9594dabf8c3fec1dcc4",
+  "couleur": [
+   141.9,
+   128.5,
+   111.3
+  ]
+ },
+ "CHENF36024": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/06/CHENF36024-8002782c326b-324x324.jpg",
+  "octets": 7532,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0038c029906911a911a9e2219131a4ad8ced18e1312021004a10421812080608",
+  "couleur": [
+   176.3,
+   153.8,
+   130.5
+  ]
+ },
+ "CHENF36023": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/06/CHENF36023-049101848d91-324x324.jpg",
+  "octets": 12216,
+  "w": 324,
+  "h": 324,
+  "empreinte": "edbde7c8e4cc6e4e6dc949cfb80f60fe41fe01ff23ff71ef75e725b72db3699b",
+  "couleur": [
+   170,
+   128.6,
+   84.1
+  ]
+ },
+ "CHEN39299_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/06/CHEN39299_1-149326322346-324x324.jpg",
+  "octets": 9696,
+  "w": 324,
+  "h": 324,
+  "empreinte": "432f451b2b5b299b29af49a749a72b2d6b6d196e09f809b229aa01fb07db0be4",
+  "couleur": [
+   190.5,
+   188.7,
+   185.8
+  ]
+ },
+ "CHEN39289_2": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39289_2-43af89ca61a1-324x324.jpg",
+  "octets": 16032,
+  "w": 324,
+  "h": 324,
+  "empreinte": "54891748890ccd0dac4df42df40d440b1a4c322062304210ca28920812051207",
+  "couleur": [
+   172.9,
+   150.4,
+   116.5
+  ]
+ },
+ "CHEN39288_2": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39288_2-72e38316cc10-324x324.jpg",
+  "octets": 16044,
+  "w": 324,
+  "h": 324,
+  "empreinte": "54891748890ccd0dec4df42df40d440b1a4c322062304210ca38920812051203",
+  "couleur": [
+   173,
+   150.4,
+   116.6
+  ]
+ },
+ "CHEN29278_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29278_1-bab62174987d-324x324.jpg",
+  "octets": 6962,
+  "w": 324,
+  "h": 324,
+  "empreinte": "427f00ff81fec4fec3bec19ec39fc79fc71ccdfccdb3c679fc3ee59b3bcc3bcb",
+  "couleur": [
+   168,
+   162.5,
+   154.7
+  ]
+ },
+ "CHEN29278_2": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29278_2-3ef3dce46664-324x324.jpg",
+  "octets": 11068,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c559415d455d4e1d43f589758b3d971f061d051f016f016701b701b7459b059b",
+  "couleur": [
+   174.5,
+   148.4,
+   109.9
+  ]
+ },
+ "DALLE3000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/DALLE3000-5cde1a9f4ba9-324x324.jpg",
+  "octets": 7700,
+  "w": 324,
+  "h": 324,
+  "empreinte": "9f328f1ecf2e9d279b1396cb9c67d13698f79cc312939b2b9d27cf0eef86fe02",
+  "couleur": [
+   150.7,
+   139.1,
+   121.8
+  ]
+ },
+ "VERF39007": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/VERF39007-1-324x324.jpg",
+  "octets": 18674,
+  "w": 324,
+  "h": 324,
+  "empreinte": "ffecf279f132d96cc98cd8cedbed932cf64dba2b9ce6cdcbe799f334b9673c21",
+  "couleur": [
+   190.9,
+   152.7,
+   103.4
+  ]
+ },
+ "VERF39011": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/VERF39011-6cb2c865ee50-324x324.jpg",
+  "octets": 15810,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0132356c6cc609ca13c8593c6c382af34916160d3b0c19b93131836944f30693",
+  "couleur": [
+   198.9,
+   162.5,
+   109.3
+  ]
+ },
+ "VERF19000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/VERF19000-3bc365514ec2-324x324.jpg",
+  "octets": 8378,
+  "w": 324,
+  "h": 324,
+  "empreinte": "033309cc198c1b4e0f3637873387658c4a6b963709cb108f0327826592cd2943",
+  "couleur": [
+   198,
+   178.1,
+   148.6
+  ]
+ },
+ "VERF39009": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/VERF39009-1-324x324.jpg",
+  "octets": 19054,
+  "w": 324,
+  "h": 322,
+  "empreinte": "003c453d013527320b2c0b5803614b3c2d352d356d352f3d4f3ecc7eaf7e9e9c",
+  "couleur": [
+   201.1,
+   163.7,
+   116.1
+  ]
+ },
+ "VERF39010": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/VERF39010-0342749ca4f4-324x324.jpg",
+  "octets": 9384,
+  "w": 324,
+  "h": 324,
+  "empreinte": "e400e2009af87ae87ec8fef17b031e66ec62c8c2d8cc90f8c3f98479320b38c3",
+  "couleur": [
+   159.7,
+   121.3,
+   91.6
+  ]
+ },
+ "VERF39005": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/VERF39005-d8259caf4e24-324x324.jpg",
+  "octets": 15744,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1131356c6cc609ca1348593c6c382afb4916160d3b0c39393131836944f30693",
+  "couleur": [
+   198.7,
+   162.5,
+   109.1
+  ]
+ },
+ "VERF39006": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/VERF39006-65cf319e204c-324x324.jpg",
+  "octets": 14186,
+  "w": 324,
+  "h": 324,
+  "empreinte": "f6baed6e98e6a9c2e738f39aa92d9cc68cc6e139f39a6d6dbcf398678927b642",
+  "couleur": [
+   181.5,
+   154.2,
+   119.6
+  ]
+ },
+ "VERF36014": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/08/gescomo-no-image-324x324.png",
+  "octets": 79930,
+  "w": 324,
+  "h": 324,
+  "empreinte": "115f3ca53ee2049b0a650b2c0b2120f8188458c41a41b5335294369096938d49",
+  "couleur": [
+   225.8,
+   211.6,
+   200.8
+  ],
+  "ecartee": {
+   "type": "placeholder",
+   "raison": "fichier source « gescomo-no-image-324x324.png »"
+  }
+ },
+ "VERF39012": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/11/VERF39012-3dee4f321d5a-324x324.jpg",
+  "octets": 10780,
+  "w": 324,
+  "h": 324,
+  "empreinte": "425f52737233e9b7e9b7a9b799a3d9cbc663c6389a3cc00f80070007c0078006",
+  "couleur": [
+   188.2,
+   160,
+   118.4
+  ]
+ },
+ "VERF39013": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/04/VERF39013-fe887f295341-324x324.png",
+  "octets": 101616,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c60ac70fc787c7cec7cea3d3e8fb7875e07ce1f8f1eef7fecffefff6ef35f2ed",
+  "couleur": [
+   194.4,
+   156.1,
+   119.3
+  ]
+ },
+ "CHEN39323": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39323-6e820df9cb85-324x324.jpg",
+  "octets": 9872,
+  "w": 324,
+  "h": 324,
+  "empreinte": "ff39fee733f811f2a193ac939c9369b3edb190fae638f330f922b9b9fcf3f399",
+  "couleur": [
+   182,
+   162.9,
+   150.1
+  ]
+ },
+ "CHEN39331": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39331-b8767a8a6d56-324x324.jpg",
+  "octets": 9472,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0ea12e400d8a1c8b1d395d18561b5e311a1938b93c1fb07384837cd3f0476307",
+  "couleur": [
+   188.3,
+   167,
+   142.8
+  ]
+ },
+ "CHEN39330": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39330-891a6e5cc01b-324x324.jpg",
+  "octets": 7382,
+  "w": 324,
+  "h": 324,
+  "empreinte": "35e015fc1bc8c410339fb89a98da18c8edc3fc9870984098089d799ffdc77ac7",
+  "couleur": [
+   157.6,
+   142.1,
+   129.4
+  ]
+ },
+ "CHEN39330_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39330_1-cf15b0863780-324x324.jpg",
+  "octets": 7382,
+  "w": 324,
+  "h": 324,
+  "empreinte": "35e015fc1bc8c410339fb89a98da18c8edc3fc9870984098089d799ffdc77ac7",
+  "couleur": [
+   157.6,
+   142.1,
+   129.4
+  ]
+ },
+ "CHENF36021": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/02/CHENF36021-3796835b3623-324x324.jpg",
+  "octets": 12358,
+  "w": 324,
+  "h": 324,
+  "empreinte": "ce04ce94ee94ce9402a4028403441ad418613f10ec2c01c160e1820408041000",
+  "couleur": [
+   157.3,
+   132,
+   102.6
+  ]
+ },
+ "CHENF36020": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/02/CHENF36020-b58e3511e55d-324x324.jpg",
+  "octets": 6802,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c480cc01ec23f4a37421646865c81fc827f2097e089f08cc0826048104440444",
+  "couleur": [
+   135.6,
+   106.2,
+   76.3
+  ]
+ },
+ "CHEN29203": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29203-d0597d38253b-324x324.jpg",
+  "octets": 6780,
+  "w": 324,
+  "h": 324,
+  "empreinte": "8e660e6e286e302e168f04e908e549259134313501642172037112718263a2d2",
+  "couleur": [
+   164.5,
+   157.1,
+   154
+  ]
+ },
+ "F52386574": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/F52386574-31680775273e-324x324.jpg",
+  "octets": 8094,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1fc317d387cb35b2bde10bf81ff01ee22ff41ff04ff05ff03ff00ff83ef83ff8",
+  "couleur": [
+   144.6,
+   145.6,
+   145.1
+  ]
+ },
+ "CHENF2684": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2684-0c8f24b06391-324x324.jpg",
+  "octets": 16516,
+  "w": 324,
+  "h": 324,
+  "empreinte": "960d9deb9dcb958f837242b364b1e6cce3af08dd16f58fed9f691ec91c891599",
+  "couleur": [
+   112.4,
+   98.7,
+   85
+  ]
+ },
+ "CHENF3602": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF3602-bea2d1fb3591-324x324.jpg",
+  "octets": 5764,
+  "w": 324,
+  "h": 324,
+  "empreinte": "e187f02fd40ff4037a4438985c5952c9d3f0b1f8d0d81afcca58002829b4d812",
+  "couleur": [
+   146.7,
+   147.7,
+   149.1
+  ]
+ },
+ "CHENF2685": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2685-e6864dcbe722-324x324.jpg",
+  "octets": 13768,
+  "w": 324,
+  "h": 324,
+  "empreinte": "56f94720c7251d2c24ac37b43621783983066607190f2606840e200ec0268867",
+  "couleur": [
+   80.9,
+   76.4,
+   67.3
+  ]
+ },
+ "CHENF240": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF240-1ad5593841be-324x324.jpg",
+  "octets": 4922,
+  "w": 324,
+  "h": 324,
+  "empreinte": "e554ed95759457d412e422941ce5eae5b2cda2c5b645f72cfa25da4dca0d4545",
+  "couleur": [
+   122.2,
+   139.4,
+   111
+  ]
+ },
+ "CHENF2693": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2693-c33bf7b859b2-324x324.jpg",
+  "octets": 14080,
+  "w": 324,
+  "h": 324,
+  "empreinte": "68596852685f7277627a4a9ada92f0f0e07c603f0cb708951898988812951094",
+  "couleur": [
+   80.5,
+   64.7,
+   49.1
+  ]
+ },
+ "CHEN39380_2": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39380_2-a931d90347e6-324x324.jpg",
+  "octets": 6718,
+  "w": 324,
+  "h": 324,
+  "empreinte": "038170e17f617fc17f817f117f313f373f37f4374d977d9777a01f1078a543a4",
+  "couleur": [
+   192.6,
+   176.7,
+   154.1
+  ]
+ },
+ "CHEN39386": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39386-c79ebd55262d-324x324.jpg",
+  "octets": 6710,
+  "w": 324,
+  "h": 324,
+  "empreinte": "038150f17f617fc17f817f117f333f373f37f4370d977d9777a11f1078e543a4",
+  "couleur": [
+   192.5,
+   176.7,
+   154.1
+  ]
+ },
+ "CHEN39387": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39387-02c8c7582c28-324x324.jpg",
+  "octets": 6714,
+  "w": 324,
+  "h": 324,
+  "empreinte": "138150e17f617fc17f817f117f333f373f37f43705977d977fa03f1078a543a4",
+  "couleur": [
+   192.5,
+   176.7,
+   154.1
+  ]
+ },
+ "CHEN39380_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39380_1-cc99ad306d1b-324x324.jpg",
+  "octets": 6718,
+  "w": 324,
+  "h": 324,
+  "empreinte": "038170e17f617fc17f817f117f313f373f37f4374d977d9777a01f1078a543a4",
+  "couleur": [
+   192.6,
+   176.7,
+   154.1
+  ]
+ },
+ "CHENF3690": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF3690-ba6cfb3ec4eb-324x324.jpg",
+  "octets": 12562,
+  "w": 324,
+  "h": 324,
+  "empreinte": "e619f309b9816cc0c6e54667c767e76366d16d140e602fc029c8099005326d90",
+  "couleur": [
+   162.3,
+   142.6,
+   120.2
+  ]
+ },
+ "CHENF2661": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2661-34b9302e81b2-324x324.jpg",
+  "octets": 14178,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1ba759365b9c1b1c1b1c1b945b145b1432bcb8fc30f901bb1ebf37fb7f7b3bff",
+  "couleur": [
+   122.5,
+   116.4,
+   108.9
+  ]
+ },
+ "CHENF2623": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2623-b62fe685bf10-324x281.jpg",
+  "octets": 10642,
+  "w": 324,
+  "h": 281,
+  "empreinte": "09bb09bb197c29fc098929b9a1b3a9b38934c33127300fb100bb0c9b0a3917bf",
+  "couleur": [
+   188.7,
+   186.1,
+   172.2
+  ]
+ },
+ "CHENF2694": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2694-c5b3235ddd4f-324x324.jpg",
+  "octets": 13636,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c34fdb3b595b5859dcf98be473ecf0ffe0ffc077847308392b285d3c97153514",
+  "couleur": [
+   160.6,
+   147.6,
+   133.3
+  ]
+ },
+ "CHENF39019": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF39019-e462eafb7b90-324x324.jpg",
+  "octets": 9380,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3cc9394939797169297a097b0db329f101f1a1fc80fe82ff01bf40f3427180d4",
+  "couleur": [
+   144.9,
+   134.3,
+   117.9
+  ]
+ },
+ "CHEN39344_4": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39344_4-df1b27dd81b5-324x324.jpg",
+  "octets": 12670,
+  "w": 324,
+  "h": 324,
+  "empreinte": "b36b9263924f225fe273869f018f31c472de78ab71c6032397d8cee4653335f8",
+  "couleur": [
+   160,
+   137.3,
+   115.5
+  ]
+ },
+ "CHEN39344_6": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39344_6-d6881e41d6f5-324x324.jpg",
+  "octets": 12670,
+  "w": 324,
+  "h": 324,
+  "empreinte": "b36b9263924f225fe273869f018f31c472de78ab71c6032397d8cee4653335f8",
+  "couleur": [
+   160,
+   137.3,
+   115.5
+  ]
+ },
+ "CHEN39344_5": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39344_5-fa1286250643-324x324.jpg",
+  "octets": 12670,
+  "w": 324,
+  "h": 324,
+  "empreinte": "b36b9263924f225fe273869f018f31c472de78ab71c6032397d8cee4653335f8",
+  "couleur": [
+   160,
+   137.3,
+   115.5
+  ]
+ },
+ "CHEN39344": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39344-3ebf696e6c7f-324x324.jpg",
+  "octets": 12670,
+  "w": 324,
+  "h": 324,
+  "empreinte": "b36b9263924f225fe273869f018f31c472de78ab71c6032397d8cee4653335f8",
+  "couleur": [
+   160,
+   137.3,
+   115.5
+  ]
+ },
+ "CHEN39344_2": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39344_2-15a7a600839d-324x324.jpg",
+  "octets": 12670,
+  "w": 324,
+  "h": 324,
+  "empreinte": "b36b9263924f225fe273869f018f31c472de78ab71c6032397d8cee4653335f8",
+  "couleur": [
+   160,
+   137.3,
+   115.5
+  ]
+ },
+ "CHEN29247_3": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29247_3-e7c909397786-324x324.jpg",
+  "octets": 9308,
+  "w": 324,
+  "h": 324,
+  "empreinte": "009e01af031c9f351c3139c421c623c622d72725c363c030230e312e496348bd",
+  "couleur": [
+   139.9,
+   109.9,
+   83.5
+  ]
+ },
+ "CHEN29247_2": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29247_2-551e0e540c66-324x324.jpg",
+  "octets": 9260,
+  "w": 324,
+  "h": 324,
+  "empreinte": "009e01af031d8f351c3139c421c623c622d727a5c363c030030e312e49e348bf",
+  "couleur": [
+   139.9,
+   109.9,
+   83.5
+  ]
+ },
+ "CHEN29247": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29247-9e1693c9e248-324x324.jpg",
+  "octets": 11382,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c3fcc7fcc69cf298c69c479d279de1bc91bf2c1f390f765d6cdecdbd4cefa1ee",
+  "couleur": [
+   169.8,
+   130.6,
+   91.6
+  ]
+ },
+ "CHEN29247_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29247_1-0b6c36e60275-324x324.jpg",
+  "octets": 9260,
+  "w": 324,
+  "h": 324,
+  "empreinte": "009e01af031d8f351c3139c421c623c622d727a5c363c030030e312e49e348bf",
+  "couleur": [
+   139.9,
+   109.9,
+   83.5
+  ]
+ },
+ "CHEN38162": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN38162-084fe444d36f-324x324.jpg",
+  "octets": 7042,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3d360666c7264e9eca9e5a2efc1ef49e71be3a57c253c39186b195b339333363",
+  "couleur": [
+   178.7,
+   162.5,
+   130.3
+  ]
+ },
+ "CHEN39301": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39301-e5dcb383ebae-324x324.jpg",
+  "octets": 10664,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0e0005060506192e192659ad9ca24c628d26af27860019c003400088071a0a50",
+  "couleur": [
+   184.4,
+   169,
+   155.7
+  ]
+ },
+ "CHEN29198": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29198-2d4110a346a1-324x324.jpg",
+  "octets": 7112,
+  "w": 324,
+  "h": 324,
+  "empreinte": "060b36037089b099b42177034f012030222cd733dbb9c89fe4dde46ce4b6c2d2",
+  "couleur": [
+   184.4,
+   159.8,
+   132.3
+  ]
+ },
+ "CHENF39003": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF39003-9c9ab109bd36-324x324.jpg",
+  "octets": 4318,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0fff01ff01ff81fe83fe85fd877e84ce8ace8ef60d60c1ffe5facebdcc96bcdb",
+  "couleur": [
+   196.7,
+   183.5,
+   169.4
+  ]
+ },
+ "CHENF39011": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF39011-bb731b90e21c-324x324.jpg",
+  "octets": 11500,
+  "w": 324,
+  "h": 324,
+  "empreinte": "aaedba39b81ca8bebcb8ac19aa1db51db99cc41a99fc397fd879b47cf9fcb9da",
+  "couleur": [
+   192.5,
+   181.5,
+   173.3
+  ]
+ },
+ "CHENF36016_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/06/CHENF36016_1-eba1c88991f1-324x324.jpg",
+  "octets": 8572,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c8f1d1f150f163e1a3818b628962807e901fc0b971c1f9010001000020010400",
+  "couleur": [
+   173.2,
+   150.7,
+   127.1
+  ]
+ },
+ "CHEN39301_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39301_1-45d67a104425-324x324.jpg",
+  "octets": 9332,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0e0005020506192e1d2659ad9ca2cc628da6af278700198003c00088071a0a50",
+  "couleur": [
+   184.7,
+   169.2,
+   155.7
+  ]
+ },
+ "CHEN39301_2": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39301_2-0cfd9b0581d3-324x324.jpg",
+  "octets": 9332,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0e0005020506192e1d2659ad9ca2cc628da6af278700198003c00088071a0a50",
+  "couleur": [
+   184.7,
+   169.2,
+   155.7
+  ]
+ },
+ "CHEN39269": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39269-277da54c8d47-324x324.jpg",
+  "octets": 15836,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c25972593259b259d24972e562d362cc22b90011006401130099002400a78145",
+  "couleur": [
+   169.9,
+   160.6,
+   147.9
+  ]
+ },
+ "CHEN39393": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/11/CHEN39393-dd52194c478d-324x324.jpg",
+  "octets": 11200,
+  "w": 324,
+  "h": 324,
+  "empreinte": "020f000f00fc03c99e5d9c5c0c5969590c5824c520f100f900fd00791078883c",
+  "couleur": [
+   162.7,
+   154.1,
+   143.6
+  ]
+ },
+ "CHENF2641": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2641-3a4e2fe2bbcc-324x282.jpg",
+  "octets": 10536,
+  "w": 324,
+  "h": 282,
+  "empreinte": "09be04e00dba99be14de16db0cdb0be28f21cf298e611ec6c7e60fc6cfea87f0",
+  "couleur": [
+   134.8,
+   123.1,
+   108.6
+  ]
+ },
+ "CHENF36013": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/12/CHENF36013.jpg",
+  "octets": 9402,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 47966,
+  "converti": true,
+  "empreinte": "960b964b960bd8f3d9b3cf07c4033e039f030103011306430543250244021463",
+  "couleur": [
+   201.7,
+   175.4,
+   139.9
+  ]
+ },
+ "CHENF36005_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/06/CHENF36005_1-ae251fc1bc67-324x324.jpg",
+  "octets": 15164,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3f4499e17a26b65e9d4e94e6cb760f7216f28f7e8ddfa66796781b2f7193718d",
+  "couleur": [
+   165.1,
+   140.4,
+   112.2
+  ]
+ },
+ "CHENF36003": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF36003-9788e33a8560-324x324.jpg",
+  "octets": 16092,
+  "w": 324,
+  "h": 324,
+  "empreinte": "8b1c245b8c9bb69ccadd8f1707f10fe78ef7cff7a79bb7ccb363f7b9f29e52ce",
+  "couleur": [
+   152.9,
+   126.2,
+   99.4
+  ]
+ },
+ "CHENF2670": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2670-cbbfdadeba7e-324x324.jpg",
+  "octets": 11034,
+  "w": 324,
+  "h": 324,
+  "empreinte": "34f138f139eb31bfedff89ec70fee87fc07fe07f407f807f08bf08bf10bea33f",
+  "couleur": [
+   133.1,
+   121.8,
+   109.6
+  ]
+ },
+ "CHENF2669": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2669-f061e7a934f8-324x324.jpg",
+  "octets": 15460,
+  "w": 324,
+  "h": 324,
+  "empreinte": "82238442964ea74cacc6c057c05a15f835f123fc43dbd764a5367134d414911e",
+  "couleur": [
+   112.6,
+   104,
+   95.5
+  ]
+ },
+ "CHENF3672": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF3672-3c41e9e135e0-324x324.jpg",
+  "octets": 5638,
+  "w": 324,
+  "h": 324,
+  "empreinte": "00cb00cb00da00c200c200c600c700c7a4c6ebc669c7d3c7d367b6b7efb3adb3",
+  "couleur": [
+   109.8,
+   99.8,
+   89.8
+  ]
+ },
+ "CHEN39225": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39225-16bc10493884-324x324.jpg",
+  "octets": 17088,
+  "w": 324,
+  "h": 324,
+  "empreinte": "907341782952095269536913495319931932f701818101010201a20020000221",
+  "couleur": [
+   182.5,
+   162.4,
+   135.4
+  ]
+ },
+ "CHEN29238": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29238-d3e4e316daed-324x324.jpg",
+  "octets": 12874,
+  "w": 324,
+  "h": 324,
+  "empreinte": "53cd86dc4ecd4ecf226f68cf208f0c0f108f080f0013065a089b19bd026e46cc",
+  "couleur": [
+   183.4,
+   163.8,
+   152.7
+  ]
+ },
+ "CHEN29250": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29250-afba04c4ea6c-324x324.jpg",
+  "octets": 7856,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3abf3683337f398f199b33033b00538f5bc95be309d900cf0ecf05cf091f0fcf",
+  "couleur": [
+   149,
+   139.6,
+   130.1
+  ]
+ },
+ "CHEN29294": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29294-d62f7ce815c3-324x324.jpg",
+  "octets": 7534,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3abf3683337f398f199b32023b00578f5bc959e30bd9008f0ecf00cf0b1f0fcf",
+  "couleur": [
+   146.3,
+   137,
+   127.8
+  ]
+ },
+ "CHEN29259": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29259-0b2d421dd87e-324x282.jpg",
+  "octets": 10654,
+  "w": 324,
+  "h": 282,
+  "empreinte": "9f009c009d029dca9d889c99dc99c8cdda48de609a525262c0c6010222244c04",
+  "couleur": [
+   122,
+   115.8,
+   108.1
+  ]
+ },
+ "CHEN29294_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29294_1-c679888a695d-324x324.jpg",
+  "octets": 7534,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3abf3683337f398f199b32023b00578f5bc959e30bd9008f0ecf00cf0b1f0fcf",
+  "couleur": [
+   146.3,
+   137,
+   127.8
+  ]
+ },
+ "CHENF36012": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/12/CHENF36012.jpg",
+  "octets": 11274,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 53233,
+  "converti": true,
+  "empreinte": "f824f994fb8ee9cef978b3e205c6c78fc79cff7ffa9fdeb7ecb6cdb6bb33713b",
+  "couleur": [
+   96.3,
+   67.6,
+   33.1
+  ]
+ },
+ "CHEN29227": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29227-1f0894a21776-324x324.jpg",
+  "octets": 14012,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0040e84f9bffefc04dca2d41e909f8ca69c4812896f931db5c3ed47ac44ec460",
+  "couleur": [
+   137.4,
+   132.1,
+   118.8
+  ]
+ },
+ "CHEN0303": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN0303-de026de3b08a-324x324.jpg",
+  "octets": 8806,
+  "w": 324,
+  "h": 324,
+  "empreinte": "7133b913bd13391feb9fe99d7b9e6c16f0196699611bc21f881b0829082d481d",
+  "couleur": [
+   160.3,
+   130.8,
+   116.9
+  ]
+ },
+ "CHEN18013": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/08/gescomo-no-image-324x324.png",
+  "octets": 79930,
+  "w": 324,
+  "h": 324,
+  "empreinte": "115f3ca53ee2049b0a650b2c0b2120f8188458c41a41b5335294369096938d49",
+  "couleur": [
+   225.8,
+   211.6,
+   200.8
+  ],
+  "ecartee": {
+   "type": "placeholder",
+   "raison": "fichier source « gescomo-no-image-324x324.png »"
+  }
+ },
+ "VERS38000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/08/gescomo-no-image-324x324.png",
+  "octets": 79930,
+  "w": 324,
+  "h": 324,
+  "empreinte": "115f3ca53ee2049b0a650b2c0b2120f8188458c41a41b5335294369096938d49",
+  "couleur": [
+   225.8,
+   211.6,
+   200.8
+  ],
+  "ecartee": {
+   "type": "placeholder",
+   "raison": "fichier source « gescomo-no-image-324x324.png »"
+  }
+ },
+ "CHEN29271": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/09/CHEN29271-f0037da25e4f-324x324.jpg",
+  "octets": 12714,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c83bc41a561a461a461b661be66e94ffdc7bc8f9d417e407c1b31f3306330c2b",
+  "couleur": [
+   173.5,
+   163.9,
+   128.8
+  ]
+ },
+ "CHEN39276_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/06/CHEN39276_1-7e0b4bbec4ff-324x324.jpg",
+  "octets": 14632,
+  "w": 324,
+  "h": 324,
+  "empreinte": "307930792878c86890793838e0b8e538a6029004301c602d702570c131e0f1e0",
+  "couleur": [
+   166,
+   154,
+   130.3
+  ]
+ },
+ "CHEN39303": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/06/CHEN39303-36653978afae-324x324.jpg",
+  "octets": 7604,
+  "w": 324,
+  "h": 324,
+  "empreinte": "019cd0e39852d8d998cc98d6d9969192938f9987d8e6c7a6e70eed26ec25cd24",
+  "couleur": [
+   186.4,
+   178.3,
+   170.6
+  ]
+ },
+ "CHEN39396": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/08/CHEN39396-73fdb944606c-324x324.jpg",
+  "octets": 8060,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c91d6d3b6d216530652ee48f94cf008701268016803e083f04bf16ff26ff0f3f",
+  "couleur": [
+   147.2,
+   108.9,
+   75.8
+  ]
+ },
+ "CHEN39397": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/06/CHEN39397-ea1f22a9af84-324x324.jpg",
+  "octets": 7714,
+  "w": 324,
+  "h": 324,
+  "empreinte": "a9fe8c3c8e30cc386f3e6e1e67ca65ca6d3a67bfefbffbbffabbfabff2bdf696",
+  "couleur": [
+   161.7,
+   126.6,
+   82.1
+  ]
+ },
+ "CHEN39233": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/06/CHEN39233-4b324c9027a9-324x324.jpg",
+  "octets": 10700,
+  "w": 324,
+  "h": 324,
+  "empreinte": "7060fd90fd901e4080ff6df8073ad33a25e3bde7a789ec0f289319494f4178b1",
+  "couleur": [
+   183.6,
+   178.9,
+   168.9
+  ]
+ },
+ "CHEN36243": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN36243-e3a52467a173-324x324.jpg",
+  "octets": 19812,
+  "w": 324,
+  "h": 324,
+  "empreinte": "88b2f066cc681cd870d800f200b211f6a1e6e7e44ee4dde49dec6becd5ccd5cc",
+  "couleur": [
+   156.7,
+   146.9,
+   131.6
+  ]
+ },
+ "CHENF2629": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2629-b847ec6406f2-324x281.jpg",
+  "octets": 7912,
+  "w": 324,
+  "h": 281,
+  "empreinte": "7ef27f857fa97fac7f0f7fcb7f8bedf1c5c7dfe1c07cffcfffe8fe53ff17ff6e",
+  "couleur": [
+   138.8,
+   116.5,
+   101.4
+  ]
+ },
+ "CHENF2616": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2616-fb890d723918-324x281.jpg",
+  "octets": 9352,
+  "w": 324,
+  "h": 281,
+  "empreinte": "ff333dce13f219e0d593dcb3dc93adb3e5b3d0f272387330f820ddb0fde17ff1",
+  "couleur": [
+   183.1,
+   170.2,
+   160.5
+  ]
+ },
+ "CHEN39268": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39268-edd467f66262-324x324.jpg",
+  "octets": 16042,
+  "w": 324,
+  "h": 324,
+  "empreinte": "54891748890ccd0dec4df42df40d40031a4c322060304210ca18920812051207",
+  "couleur": [
+   173,
+   150.4,
+   116.4
+  ]
+ },
+ "CHENF2676": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2676-2a2c5d416660-324x281.jpg",
+  "octets": 4628,
+  "w": 324,
+  "h": 281,
+  "empreinte": "00ffe4ff6cbfecbf6cbf6cb76cb76cb76cfeec7aec35683f6c676cb36cb76437",
+  "couleur": [
+   197.9,
+   183.5,
+   172.8
+  ]
+ },
+ "CHEN29301": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29301-e0205121c751-324x324.jpg",
+  "octets": 7910,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0001000000013822d833de338c736c1dac890c672c67ee1dcc64cc44cc1efc16",
+  "couleur": [
+   194.4,
+   170,
+   148.2
+  ]
+ },
+ "CHEN29310": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29310-76a450d8213f-324x324.jpg",
+  "octets": 13896,
+  "w": 324,
+  "h": 324,
+  "empreinte": "cd69cdc9cdad4ca44cec4ea00cb034da26cab60e9d0219024b23ce7b064b04cb",
+  "couleur": [
+   195.6,
+   150.3,
+   110.5
+  ]
+ },
+ "CHEN29301_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29301_1-9622872f6cd3-324x324.jpg",
+  "octets": 7910,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0001000000013822d833de338c736c1dac890c672c67ee1dcc64cc44cc1efc16",
+  "couleur": [
+   194.4,
+   170,
+   148.2
+  ]
+ },
+ "CHEN29316": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29316-37cf2a73daf1-324x324.jpg",
+  "octets": 10762,
+  "w": 324,
+  "h": 324,
+  "empreinte": "d24f7997647af4f2f8d36c5f6cdf249f389e641d60ff70ff60ff3987707fec7b",
+  "couleur": [
+   168.1,
+   152.6,
+   122.5
+  ]
+ },
+ "CHEN29304": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29304-161e2f509aa6-324x324.jpg",
+  "octets": 11310,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3d8cfe30c8c0d8e009b881982229b8ecb0cec94f01af01bec57b23b819c61cc9",
+  "couleur": [
+   175.4,
+   151.7,
+   130.6
+  ]
+ },
+ "CHEN29322": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29322-b6f6959bc225-324x324.jpg",
+  "octets": 11510,
+  "w": 324,
+  "h": 324,
+  "empreinte": "9f288e0a9f323b3263327132f148f08fd9a367f923fe393f4c1e0e0a0a841508",
+  "couleur": [
+   149,
+   131.7,
+   103.8
+  ]
+ },
+ "CHEN29322_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29322_1-0530bb021794-324x324.jpg",
+  "octets": 11510,
+  "w": 324,
+  "h": 324,
+  "empreinte": "9f288e0a9f323b3263327132f148f08fd9a367f923fe393f4c1e0e0a0a841508",
+  "couleur": [
+   149,
+   131.7,
+   103.8
+  ]
+ },
+ "CHEN29312": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29312-a9ca4a33b501-324x324.jpg",
+  "octets": 10528,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0109020f007e00c2641ff47f350955399659b659b649f60c061b37cc391f8203",
+  "couleur": [
+   195.6,
+   182.7,
+   170.6
+  ]
+ },
+ "CHEN29311": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29311-3b77ee03f7c1-324x324.jpg",
+  "octets": 11780,
+  "w": 324,
+  "h": 324,
+  "empreinte": "36580f049b04c104c3144d845cc5e0e348e438e418c71e071c0f0c0b4c1b0413",
+  "couleur": [
+   162.6,
+   144.8,
+   124.1
+  ]
+ },
+ "CHEN29315": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29315-84461cfd4488-324x324.jpg",
+  "octets": 16096,
+  "w": 324,
+  "h": 324,
+  "empreinte": "cda9cd18453854b8c538c738cf28e5ed4f1c481c0c986702e60ea11ca33c8368",
+  "couleur": [
+   157.7,
+   141.7,
+   118.2
+  ]
+ },
+ "CHEN29308": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29308-d49651649a2b-324x324.png",
+  "octets": 98236,
+  "w": 324,
+  "h": 324,
+  "empreinte": "2c4d0c4e8ccec8cd1c5d181f9c9f9b9f5b9f1b9f99b534bf9e3f60df197fc1af",
+  "couleur": [
+   168.3,
+   144,
+   135.5
+  ]
+ },
+ "CHEN29319_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29319_1-f022436faf29-324x324.jpg",
+  "octets": 8490,
+  "w": 324,
+  "h": 324,
+  "empreinte": "49cbd3d760b3c9f3dafbf39bf30be38bd281860f786f70fc3cf838703878dc78",
+  "couleur": [
+   183.2,
+   165.4,
+   144.6
+  ]
+ },
+ "CHEN29319": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29319-dcc0c2020009-324x324.jpg",
+  "octets": 8490,
+  "w": 324,
+  "h": 324,
+  "empreinte": "49cbd3d760b3c9f3dafbf39bf30be38bd281860f786f70fc3cf838703878dc78",
+  "couleur": [
+   183.2,
+   165.4,
+   144.6
+  ]
+ },
+ "CHEN29318": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29318-a271e2220029-324x324.jpg",
+  "octets": 10196,
+  "w": 324,
+  "h": 324,
+  "empreinte": "93089b48cbc9d3a9d3b51331133617b3c4b380bb86bb463a041a149a152f1467",
+  "couleur": [
+   178.3,
+   134,
+   87.1
+  ]
+ },
+ "CHEN29309": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29309-af0063aa2e48-324x324.jpg",
+  "octets": 11234,
+  "w": 324,
+  "h": 324,
+  "empreinte": "530013a0c1968696969930df33fdff02c2010208248b09020112021a0e244c25",
+  "couleur": [
+   202,
+   175.6,
+   140.8
+  ]
+ },
+ "CHENF3663": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF3663-14356eec40a0-324x324.jpg",
+  "octets": 9908,
+  "w": 324,
+  "h": 324,
+  "empreinte": "64a36400640f33feb2a604a626a626a616269b2680ba60df00d2009600960096",
+  "couleur": [
+   171.4,
+   155.2,
+   137.8
+  ]
+ },
+ "CHEN2160": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN2160-6ebd897030dd-324x324.jpg",
+  "octets": 7694,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0000000004a900f1001d021d034d03cd0bc7869faa41ab4871d83081ccd8c44c",
+  "couleur": [
+   187.4,
+   177.1,
+   166.7
+  ]
+ },
+ "CHENF2679": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2679-bcde2aac20b5-324x324.jpg",
+  "octets": 8030,
+  "w": 324,
+  "h": 324,
+  "empreinte": "d8ac9eec8df8c5f887e0c7e0e7e0fccbda21f0236c477447608664b46cc069f0",
+  "couleur": [
+   94.7,
+   90.2,
+   92.7
+  ]
+ },
+ "CHENF228": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF228-332c4deb3cd4-320x324.jpg",
+  "octets": 11538,
+  "w": 320,
+  "h": 324,
+  "empreinte": "59b251b2419249b241af41ad51834181c085854191958498150c5126953214b6",
+  "couleur": [
+   172.9,
+   172,
+   167
+  ]
+ },
+ "CHENF238": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF238-22c4a1302634-324x324.jpg",
+  "octets": 15546,
+  "w": 324,
+  "h": 324,
+  "empreinte": "19d889aa8225e1b4382ad80e41c301e004f01b3c1a7b00bc609ec13bc1334354",
+  "couleur": [
+   119.8,
+   125.7,
+   146
+  ]
+ },
+ "CHENF231": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF231-8e3b5e8f134b-324x324.jpg",
+  "octets": 8256,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c4dcc4ddd69dd6d18451ee0d6441333a6826251b250b34cf0a1f919f91e7423b",
+  "couleur": [
+   137.5,
+   117.2,
+   102.8
+  ],
+  "ecartee": {
+   "type": "bandeau-commercial",
+   "raison": "bandeau « prix pour le lot » sur la photo"
+  }
+ },
+ "CHENF2678": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2678-03fc36cf5f8f-324x324.jpg",
+  "octets": 12606,
+  "w": 324,
+  "h": 324,
+  "empreinte": "434c464c46cc46cca48ea70cdf0e4f0b2f0df2ce6ac2ee44684c890ccd8d8bc9",
+  "couleur": [
+   125.9,
+   116.8,
+   68.6
+  ]
+ },
+ "CHENF2682": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2682-ca1e6743f64a-324x324.jpg",
+  "octets": 15290,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c1c3714b4183d18f31cac0dfc19e919b9103034f189d69b9d109825f462f887f",
+  "couleur": [
+   155.4,
+   144.2,
+   133.1
+  ]
+ },
+ "CHENF2680": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2680-f2a69a30e6cf-324x324.jpg",
+  "octets": 10006,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c9eae98a496749a348b3e5a3e5a7c1b3418b0183238f32c7a48a668bc6c584e4",
+  "couleur": [
+   92.5,
+   74.7,
+   59.2
+  ]
+ },
+ "CHENF2681": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2681-baf101d2381a-324x324.jpg",
+  "octets": 11716,
+  "w": 324,
+  "h": 324,
+  "empreinte": "e748cf482b486b486f634b4d5b6c57439f279fa53b2c3d483fa13fa54f508ff2",
+  "couleur": [
+   96.5,
+   48.3,
+   29.5
+  ]
+ },
+ "CHENF2668": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2668-bb4bd42fa7bb-324x324.jpg",
+  "octets": 12146,
+  "w": 324,
+  "h": 324,
+  "empreinte": "a4cbb674b654ab3609c4bb5f2b6f066ff35fe59c799eff0c7f357e66beeebca7",
+  "couleur": [
+   123.5,
+   108.4,
+   92.4
+  ]
+ },
+ "CHEN39374": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39374-341a6752c0b1-324x324.jpg",
+  "octets": 9728,
+  "w": 324,
+  "h": 324,
+  "empreinte": "2459583954992ce91c790c7c0cfc1cf448cbc80fc027c8378ab39b1f9b9f1a1f",
+  "couleur": [
+   170.3,
+   129,
+   96.7
+  ]
+ },
+ "CHEN39374_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39374_1-8c7c171f75ea-324x324.jpg",
+  "octets": 9728,
+  "w": 324,
+  "h": 324,
+  "empreinte": "2459583954992ce91c790c7c0cfc1cf448cbc80fc027c8378ab39b1f9b9f1a1f",
+  "couleur": [
+   170.3,
+   129,
+   96.7
+  ]
+ },
+ "CHEN39348_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39348_1-1-324x324.jpg",
+  "octets": 11142,
+  "w": 324,
+  "h": 324,
+  "empreinte": "973293629c648c488c7d8d839d329c731ce71ced1ced9c3c8f9d9dd495f487fe",
+  "couleur": [
+   183.7,
+   178.4,
+   173.2
+  ]
+ },
+ "CHEN39348_5": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39348_5-1-324x324.jpg",
+  "octets": 11142,
+  "w": 324,
+  "h": 324,
+  "empreinte": "973293629c648c488c7d8d839d329c731ce71ced1ced9c3c8f9d9dd495f487fe",
+  "couleur": [
+   183.7,
+   178.4,
+   173.2
+  ]
+ },
+ "CHEN39348_4": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39348_4-1-324x324.jpg",
+  "octets": 11142,
+  "w": 324,
+  "h": 324,
+  "empreinte": "973293629c648c488c7d8d839d329c731ce71ced1ced9c3c8f9d9dd495f487fe",
+  "couleur": [
+   183.7,
+   178.4,
+   173.2
+  ]
+ },
+ "CHEN39348": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39348-1-324x324.jpg",
+  "octets": 11142,
+  "w": 324,
+  "h": 324,
+  "empreinte": "973293629c648c488c7d8d839d329c731ce71ced1ced9c3c8f9d9dd495f487fe",
+  "couleur": [
+   183.7,
+   178.4,
+   173.2
+  ]
+ },
+ "CHEN29299_5": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29299_5-8b6547c60625-324x324.jpg",
+  "octets": 9004,
+  "w": 324,
+  "h": 324,
+  "empreinte": "11ab11eb62c96e79f08b5f1c171c93e89ca1d4c39207b0079407640f860fcc17",
+  "couleur": [
+   195.7,
+   177.9,
+   157.1
+  ]
+ },
+ "CHEN39399": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/09/CHEN39399-324x324.jpg",
+  "octets": 11762,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3855184d18fc58e2586373db1b3f1e253fe03bf03cfc3bec3ef33ce319d23db6",
+  "couleur": [
+   183.8,
+   144.3,
+   102.6
+  ]
+ },
+ "CHEN39357": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39357-f1784e5f88a4-324x324.jpg",
+  "octets": 7096,
+  "w": 324,
+  "h": 324,
+  "empreinte": "01c001c183d3c3c7e1c9a491c31123100813b413e213439003942394039243cf",
+  "couleur": [
+   168,
+   156.5,
+   143.6
+  ]
+ },
+ "CHEN39358": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39358-cf734ea19079-324x324.jpg",
+  "octets": 4450,
+  "w": 324,
+  "h": 324,
+  "empreinte": "160c178c178c978c378cb78c978c87088708b714cf90cd901c181c84149214c9",
+  "couleur": [
+   209.1,
+   192.5,
+   173.6
+  ]
+ },
+ "CHENF36022": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/05/CHENF36022-45e6e6c477db-324x324.jpg",
+  "octets": 11896,
+  "w": 324,
+  "h": 324,
+  "empreinte": "38833c032c430c5b0c0fa60e1e0f580fb8076227444389438283249349b39303",
+  "couleur": [
+   142.2,
+   110.7,
+   74.6
+  ]
+ },
+ "CHEN39373_2": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39373_2-aa104e9b25f1-324x324.jpg",
+  "octets": 7212,
+  "w": 324,
+  "h": 324,
+  "empreinte": "39fe8df0db830e1ecdc0cb49cb0cfb88eb88bf8c33cdf24ce04d7999f332f666",
+  "couleur": [
+   190.4,
+   177.9,
+   166
+  ]
+ },
+ "CHEN39373": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39373-2e031963cd6b-324x324.jpg",
+  "octets": 7152,
+  "w": 324,
+  "h": 324,
+  "empreinte": "39ff8ff0db830e1ecdc0cf49cb0cfb88eb88bf8c33cdf24ce0493999f332f666",
+  "couleur": [
+   190.2,
+   177.8,
+   165.8
+  ]
+ },
+ "CHEN39347_2": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39347_2-54e5ab37e05c-324x324.jpg",
+  "octets": 13560,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3a776fb76cbd6ccf469f64ff0f2c8f2c87bf807d04fd98efa9f9a0efb0f710f1",
+  "couleur": [
+   178.4,
+   160.1,
+   128.7
+  ]
+ },
+ "CHEN39347": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39347-64d7b726f45e-324x324.jpg",
+  "octets": 13560,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3a776fb76cbd6ccf469f64ff0f2c8f2c87bf807d04fd98efa9f9a0efb0f710f1",
+  "couleur": [
+   178.4,
+   160.1,
+   128.7
+  ]
+ },
+ "CHEN39356": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39356-74bde4fd7c08-324x324.jpg",
+  "octets": 5018,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0200b2004a00cc40c418c4064c04189080000000080610010013004c0016004e",
+  "couleur": [
+   206.8,
+   171.9,
+   111.6
+  ]
+ },
+ "CHEN39352": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39352-1-324x324.jpg",
+  "octets": 6576,
+  "w": 324,
+  "h": 324,
+  "empreinte": "05a307a707a787a707a607a607320f220c2019680f6803e8007c003c003c8027",
+  "couleur": [
+   162,
+   126.9,
+   95.4
+  ]
+ },
+ "CHEN39353": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39353-593cbab9654e-324x324.jpg",
+  "octets": 4792,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1fc00f000f800f800f048d2505a5e505e585c585c5c5c5c5838500858485849d",
+  "couleur": [
+   203.6,
+   192.5,
+   180.5
+  ]
+ },
+ "CHEN39354": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39354-e51b32245629-324x324.jpg",
+  "octets": 4858,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1fc00f000f800f800f048d0585a5e505e585c585c5c5c5c5834500858485841d",
+  "couleur": [
+   203.7,
+   192.5,
+   180.5
+  ]
+ },
+ "CHEN39355": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39355-67da4d781341-324x324.jpg",
+  "octets": 12660,
+  "w": 324,
+  "h": 324,
+  "empreinte": "db1bdb1ada1edb96da1c8bc7dbe46b8629f06060f3b60f5d1ab50ef34e1d4e1f",
+  "couleur": [
+   176.4,
+   150.9,
+   117.8
+  ]
+ },
+ "CHEN39359": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39359-f258b55f94fc-324x324.jpg",
+  "octets": 7592,
+  "w": 324,
+  "h": 324,
+  "empreinte": "f89cf8b0ecb0ecba6cbc6cbc6cbceeb43cb0843486b2328c420c5b16ddb6ddd3",
+  "couleur": [
+   177.8,
+   163.1,
+   144.6
+  ]
+ },
+ "CHEN39373_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39373_1-a335df6d92aa-324x324.jpg",
+  "octets": 7152,
+  "w": 324,
+  "h": 324,
+  "empreinte": "39ff8ff0db830e1ecdc0cf49cb0cfb88eb88bf8c33cdf24ce0493999f332f666",
+  "couleur": [
+   190.2,
+   177.8,
+   165.8
+  ]
+ },
+ "CHEN39394": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/12/CHEN39394.jpg",
+  "octets": 14230,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 211270,
+  "converti": true,
+  "empreinte": "97b1b4258c259c2594a7222d6639549f489847c682170037003b883c103f06bf",
+  "couleur": [
+   175.6,
+   149.3,
+   125.4
+  ]
+ },
+ "CHEN39389_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/07/CHEN39389_1-b65f019268bc-324x324.jpg",
+  "octets": 8166,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c91d6d3b6d216530652ef48f94cf008781268016803f087f04ff16ff26ff0f3f",
+  "couleur": [
+   147.2,
+   108.9,
+   75.9
+  ]
+ },
+ "CHENF2690": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2690-92c3375e9ba7-324x324.jpg",
+  "octets": 16358,
+  "w": 324,
+  "h": 324,
+  "empreinte": "ec83c88e686cee34891f94037c3bc81a181b7813f84600c600860106021c0634",
+  "couleur": [
+   140.7,
+   110.5,
+   68.2
+  ]
+ },
+ "CHENF315": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF315-ff57108642fa-324x324.jpg",
+  "octets": 13124,
+  "w": 324,
+  "h": 324,
+  "empreinte": "332e172e172cef22c736d326d18ec30fdf0f381f818f430e180e25084b5292d6",
+  "couleur": [
+   84.7,
+   80.4,
+   76.3
+  ]
+ },
+ "CHEN29280": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29280-5988515a5537-324x324.jpg",
+  "octets": 11996,
+  "w": 324,
+  "h": 324,
+  "empreinte": "807f817ee02742264326aca76ce74e1c1e8bf291331f37379721d4bb373d9b1b",
+  "couleur": [
+   192.9,
+   179.9,
+   168
+  ]
+ },
+ "CHENF39008": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF39008-91d21d30fd37-324x324.jpg",
+  "octets": 14768,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c3eec1fac3fee2fcd925b1fd86fc06fc06ff82ffc3ffe3dbe9e9f1b5f9b6f9b3",
+  "couleur": [
+   114,
+   74.5,
+   42.2
+  ]
+ },
+ "CHENF2664": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2664-be8207aefb75-324x324.jpg",
+  "octets": 14368,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c1bab0b6b2b2d291531547b126b125bc037e76bd7dbe1bbe539b333b323b1c2b",
+  "couleur": [
+   117.7,
+   97,
+   81.4
+  ]
+ },
+ "CHENF3621": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF3621-b91e280ace47-324x282.jpg",
+  "octets": 6922,
+  "w": 324,
+  "h": 282,
+  "empreinte": "0000000000014000b821ca27dc276c4b6c928ccf0c4fec1bcc49cc49ec3dbc3e",
+  "couleur": [
+   192.9,
+   169,
+   146.4
+  ]
+ },
+ "CHEN39405": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/09/CHEN39405-56792a443590-324x324.jpg",
+  "octets": 16556,
+  "w": 324,
+  "h": 324,
+  "empreinte": "9a3bae9b2ced2cada634b28b62ca69fe229638d7276b337a3ff63fec3f4d9f4d",
+  "couleur": [
+   180.8,
+   149.6,
+   117.2
+  ]
+ },
+ "CHEN39385_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/09/CHEN39385_1.jpg",
+  "octets": 3070,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 75267,
+  "converti": true,
+  "empreinte": "7062b8e298c68cceccdec0dec37ec13cc1b6cb36e4b5e632e4d2ec4af8e6f9e6",
+  "couleur": [
+   215,
+   200.1,
+   189.6
+  ]
+ },
+ "CHEN29324": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29324-607c04cfa699-324x324.jpg",
+  "octets": 14970,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0484020787ffbfd00a538b53db739b779355937911c8586fc905e181e049f049",
+  "couleur": [
+   153.4,
+   155.9,
+   151.9
+  ]
+ },
+ "CHENF2657": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2657-9a1d154c1ba0-324x281.jpg",
+  "octets": 9014,
+  "w": 324,
+  "h": 281,
+  "empreinte": "6e037130e5831c3f00719cb2d9301932d972a936b93af17a6132313a7938cd3c",
+  "couleur": [
+   187,
+   174.6,
+   162.5
+  ]
+ },
+ "CHENF39033": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/06/CHENF39033-243dedaf364c-324x324.jpg",
+  "octets": 13372,
+  "w": 324,
+  "h": 324,
+  "empreinte": "bb019b839c039a778ba71da739c73be619fb13b61f371b7512fd26ad4aad546d",
+  "couleur": [
+   144.6,
+   113.7,
+   86.4
+  ]
+ },
+ "CHENF39020": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/06/CHENF39020-a6e13315bf0f-324x324.jpg",
+  "octets": 10362,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1d83163e166c7ce478e87a6c9a709f1b9e8f3e05cfd0fe79e560f6d8939cb39f",
+  "couleur": [
+   146.6,
+   107.1,
+   63.7
+  ]
+ },
+ "CHENF39021": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/06/CHENF39021-1788394aa933-324x324.jpg",
+  "octets": 13900,
+  "w": 324,
+  "h": 324,
+  "empreinte": "787e7b1b7333733b39376537eb0ecc8ccfccc3be7327f36ef766e28fe6adf333",
+  "couleur": [
+   125.6,
+   97.8,
+   72
+  ]
+ },
+ "CHENF36002": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/04/CHENF36002.jpg",
+  "octets": 17386,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 80708,
+  "converti": true,
+  "empreinte": "e0319425ac6c6c46c86648260c731879517d6103030702868487888308834a21",
+  "couleur": [
+   154.1,
+   113.9,
+   64.6
+  ]
+ },
+ "CHEN29329": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29329-0d2c72a3be67-324x324.jpg",
+  "octets": 7748,
+  "w": 324,
+  "h": 324,
+  "empreinte": "001f01fe01e021cf20e62175d995394cdc9918997b9bce1b9c138867106fb8ff",
+  "couleur": [
+   193.3,
+   179.8,
+   164.3
+  ]
+ },
+ "CHENF3687": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF3687-278e73afb6a1-324x324.jpg",
+  "octets": 16352,
+  "w": 324,
+  "h": 324,
+  "empreinte": "301d386f387fb835cf3065cc35b599b699f3b07d382e6063e051f0e0c1428350",
+  "couleur": [
+   157.9,
+   130.6,
+   106.5
+  ]
+ },
+ "CHENF3684": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF3684-d1f7130be065-324x324.jpg",
+  "octets": 8154,
+  "w": 324,
+  "h": 324,
+  "empreinte": "490d324c2a484a030b221424267067356f071803a3036f036867e423f0545048",
+  "couleur": [
+   207,
+   191.5,
+   166.2
+  ]
+ },
+ "CHEN39306": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39306-bfe005feafc9-324x324.jpg",
+  "octets": 10112,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1f072801f841580408c205f061c271c6979354b856964cd26c72d230c078d17e",
+  "couleur": [
+   170.3,
+   164.4,
+   155.1
+  ]
+ },
+ "CHEN39306_2": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39306_2-3c8ad071c885-324x324.jpg",
+  "octets": 10112,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1f072801f841580408c205f061c271c6979354b856964cd26c72d230c078d17e",
+  "couleur": [
+   170.3,
+   164.4,
+   155.1
+  ]
+ },
+ "CHEN39306_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/06/CHEN39306_1-433ce3ebbd83-324x324.jpg",
+  "octets": 10112,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1f072801f841580408c205f061c271c6979354b856964cd26c72d230c078d17e",
+  "couleur": [
+   170.3,
+   164.4,
+   155.1
+  ]
+ },
+ "CHEN39271": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39271-cda578a5af13-324x324.jpg",
+  "octets": 15034,
+  "w": 324,
+  "h": 324,
+  "empreinte": "2459583914992ce91c791c7c0cfc1cf648ebc80fc067c8378ab39b1d9b1f1a1f",
+  "couleur": [
+   163.4,
+   123.1,
+   87.2
+  ]
+ },
+ "CHENF39005": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF39005-15555bdd85d4-324x324.jpg",
+  "octets": 9264,
+  "w": 324,
+  "h": 324,
+  "empreinte": "14e79ce3cce7d8e38cc334d9319933978f870ffbcfffcfdf4ed94f6e8c8e96c5",
+  "couleur": [
+   167.9,
+   144.4,
+   121.8
+  ]
+ },
+ "CHENF39012": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF39012-bf0a21304f61-324x324.jpg",
+  "octets": 9212,
+  "w": 324,
+  "h": 324,
+  "empreinte": "b3c0d821c09ae07c6e184f98d3913f91ce16481e61c761c137c8f2b8c261ea60",
+  "couleur": [
+   169.7,
+   173.5,
+   171.5
+  ]
+ },
+ "CHEN29266": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29266-50d14674de51-324x324.jpg",
+  "octets": 14428,
+  "w": 324,
+  "h": 324,
+  "empreinte": "11190a31023103710482048a00450090109394c914db3353392769061a288565",
+  "couleur": [
+   151.4,
+   150.3,
+   143.8
+  ]
+ },
+ "CHENF2686": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2686-1-324x324.jpg",
+  "octets": 13586,
+  "w": 324,
+  "h": 324,
+  "empreinte": "13fd09ff0dfd0db405a507ad31a971ab811b80970146045f0c8f098d3319c619",
+  "couleur": [
+   112.7,
+   104.7,
+   104.1
+  ]
+ },
+ "CHENF39014": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF39014-889a56fe391d-324x324.jpg",
+  "octets": 14028,
+  "w": 324,
+  "h": 324,
+  "empreinte": "03f400669b279daf9da791af518b61a70837321399180c1c86620a701dc80ca0",
+  "couleur": [
+   145.9,
+   113.7,
+   94.6
+  ]
+ },
+ "CHENF39006": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF39006-b78982707c7b-324x324.jpg",
+  "octets": 9850,
+  "w": 324,
+  "h": 324,
+  "empreinte": "323f323f332f33303a311a3b96469c0f32e73387339f33ff33ff33f73bea1dfa",
+  "couleur": [
+   139.5,
+   132.9,
+   125.2
+  ]
+ },
+ "CHEN29328": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29328-139f24e0edf5-324x324.jpg",
+  "octets": 8490,
+  "w": 324,
+  "h": 324,
+  "empreinte": "49cbd3d760b3c9f3dafbf39bf30be38bd281860f786f70fc3cf838703878dc78",
+  "couleur": [
+   183.2,
+   165.4,
+   144.6
+  ]
+ },
+ "CHEN29290": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN29290-1b326aa72dcd-324x324.jpg",
+  "octets": 8734,
+  "w": 324,
+  "h": 324,
+  "empreinte": "fd67ffeefcfffde77de7ddb735b7b13ed8edd8e406f6fee6fcecd8fe48fea0ef",
+  "couleur": [
+   173.1,
+   164,
+   148.8
+  ]
+ },
+ "CHEN39277_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39277_1-7b87330c8bc1-324x324.jpg",
+  "octets": 14636,
+  "w": 324,
+  "h": 324,
+  "empreinte": "307930792878c86890793838e0b8e538a60a9004301c602d713570c131e0f1e0",
+  "couleur": [
+   165.9,
+   154,
+   130.2
+  ]
+ },
+ "CHEN0407": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN0407-259e2ace75b6-324x324.jpg",
+  "octets": 10348,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0063801310c308424c444c424c64644318342f3c3c0e348e6cde499fc9df11cb",
+  "couleur": [
+   140.6,
+   113.7,
+   92.4
+  ]
+ },
+ "CHENF2671": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2671-e7d25c0a1c13-324x324.jpg",
+  "octets": 8610,
+  "w": 324,
+  "h": 324,
+  "empreinte": "9b96ab17a317b318a31de193618361a7c093802100904093a821498342d19299",
+  "couleur": [
+   130.3,
+   96.2,
+   71.9
+  ]
+ },
+ "CHENF2632": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2632-0a1bfedc1d59-324x281.jpg",
+  "octets": 18308,
+  "w": 324,
+  "h": 281,
+  "empreinte": "3d6e7cff3cfb3dbd3d683cce3cecbcf0bddc6dd6e9c8c54b078537fc91ff0fff",
+  "couleur": [
+   107.5,
+   98.9,
+   91.6
+  ]
+ },
+ "CHENF2628": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF2628-cb0b6d5f7385-324x324.jpg",
+  "octets": 7686,
+  "w": 324,
+  "h": 324,
+  "empreinte": "f07cf1ff747f39f93d936cd17cdb717b87e9cf59fb5127c107fc21ffe0f741ff",
+  "couleur": [
+   129.4,
+   118.3,
+   106.6
+  ]
+ },
+ "CHEN36236": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN36236-75ce58c630b3-324x324.jpg",
+  "octets": 11236,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c53398b998b498a4878ca78499c87859b7088d1a8db24cb43cb23db039dc33e0",
+  "couleur": [
+   171.5,
+   159.2,
+   147.2
+  ]
+ },
+ "CHEN38160": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN38160-9dd62a3d027a-324x324.jpg",
+  "octets": 12636,
+  "w": 324,
+  "h": 324,
+  "empreinte": "999119914b8eebcee93c65b4085f70b7f12fe053fcb179b67b727f46328c2b88",
+  "couleur": [
+   168.1,
+   126.6,
+   82.2
+  ]
+ },
+ "CHEN38158": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN38158-02f13ab9d522-324x324.jpg",
+  "octets": 15448,
+  "w": 324,
+  "h": 324,
+  "empreinte": "b24db0dd7a353d2d07be2d1e2f9f4e0e2c0e261e0e1f141f250f6b2f36212665",
+  "couleur": [
+   184.8,
+   135.7,
+   93.3
+  ]
+ },
+ "CHEN36245": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/08/gescomo-no-image-324x324.png",
+  "octets": 79930,
+  "w": 324,
+  "h": 324,
+  "empreinte": "115f3ca53ee2049b0a650b2c0b2120f8188458c41a41b5335294369096938d49",
+  "couleur": [
+   225.8,
+   211.6,
+   200.8
+  ],
+  "ecartee": {
+   "type": "placeholder",
+   "raison": "fichier source « gescomo-no-image-324x324.png »"
+  }
+ },
+ "CHEN39279_1": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHEN39279_1-3da5e951dc43-324x324.jpg",
+  "octets": 7454,
+  "w": 324,
+  "h": 324,
+  "empreinte": "a6fc277227f6d3f633f211913db897fc0fdefe9cdfbd758d3e0df80d818f05c7",
+  "couleur": [
+   214.1,
+   188.7,
+   170.1
+  ]
+ },
+ "CHENF39018": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/CHENF39018-8fb569d42ea5-324x324.jpg",
+  "octets": 8624,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1c120d2641366c4d64dd2499cd390d392e59aed9ccddccd94cd92cde2e7e6ede",
+  "couleur": [
+   150.8,
+   140.1,
+   131.4
+  ]
+ },
+ "JARF36000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/JARF36000-b9cf3fb5eb66-324x324.jpg",
+  "octets": 7798,
+  "w": 324,
+  "h": 324,
+  "empreinte": "001c001c083cd841d8ccf052c19a419a6012616988db11233a52cccb91896341",
+  "couleur": [
+   145.6,
+   107.7,
+   89.2
+  ]
+ },
+ "FRENF36011": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/FRENF36011-8d36087cfe45-324x324.jpg",
+  "octets": 5160,
+  "w": 324,
+  "h": 324,
+  "empreinte": "70e501e531e469e66a666a27802504b1168c91e6b127251a6449600c41a6c10f",
+  "couleur": [
+   210.5,
+   191.3,
+   158.5
+  ]
+ },
+ "FRENF36006": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/FRENF36006-5d27f9b4c870-324x324.jpg",
+  "octets": 8510,
+  "w": 324,
+  "h": 324,
+  "empreinte": "761b5c9c188d888ce0dee05bd8138017001700b68463cc61cc92ccb2cc92c692",
+  "couleur": [
+   190.8,
+   164.3,
+   132.5
+  ]
+ },
+ "FRENF36015": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/FRENF36015-c844d86f2d9a-324x324.jpg",
+  "octets": 7610,
+  "w": 324,
+  "h": 324,
+  "empreinte": "001e001a185ed841b848c0d949db709a25606511d99533180330666c4cc89919",
+  "couleur": [
+   191.7,
+   174.5,
+   157.2
+  ]
+ },
+ "FRENF36008": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/09/FRENF36008-ed64925f59ed-324x324.jpg",
+  "octets": 5468,
+  "w": 324,
+  "h": 324,
+  "empreinte": "06623273226702670273827006d00a6f066d074c4b678663064206468e278da7",
+  "couleur": [
+   210.6,
+   190.4,
+   165.8
+  ]
+ },
+ "HARO524689": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO524689-324x324.jpg",
+  "octets": 12030,
+  "w": 324,
+  "h": 324,
+  "empreinte": "d5d6d1ccd5e6d5e64de44e26fb02fec2977c3f5def57ca63364b1d5939d46126",
+  "couleur": [
+   188.6,
+   163.7,
+   135.5
+  ]
+ },
+ "HARO528682": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO528682-fc15b3921ac8-324x324.jpg",
+  "octets": 14152,
+  "w": 324,
+  "h": 324,
+  "empreinte": "a329a632a632623fda9d53935e1d96d59e88de88f6046e026402e0066680a600",
+  "couleur": [
+   108.2,
+   90.9,
+   72.1
+  ]
+ },
+ "HARO533032": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO533032-69c95a2524a2-324x324.jpg",
+  "octets": 8222,
+  "w": 324,
+  "h": 324,
+  "empreinte": "de41de41de40de40de43de5cda4cd776d9fc9f7a1bfafffcf7f8f9f0ff3ffe0f",
+  "couleur": [
+   140.9,
+   101.3,
+   96
+  ]
+ },
+ "HARO539203": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO539203-8fbb8c0d4aa8-324x324.jpg",
+  "octets": 12428,
+  "w": 324,
+  "h": 324,
+  "empreinte": "9dff856f9f6ed66f5365b3ce9f4b9ef1dede77ff1f7cc7d379f83ce61e434d10",
+  "couleur": [
+   166.3,
+   169.1,
+   138.8
+  ]
+ },
+ "HARO536247": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO536247-72d2ff0f041d-324x282.jpg",
+  "octets": 7034,
+  "w": 324,
+  "h": 282,
+  "empreinte": "df06df26dc669cb61c36ec06fe06fe06ffe7f067e017006c04c21119663208e4",
+  "couleur": [
+   147.1,
+   129.7,
+   109.6
+  ]
+ },
+ "HARO537262": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO537262-718ca1f14173-324x282.jpg",
+  "octets": 8254,
+  "w": 324,
+  "h": 282,
+  "empreinte": "99422b729373de37d9e5e27e248f00f18ccc8d28c698524c3aa36d51658ca686",
+  "couleur": [
+   201.1,
+   189,
+   171.8
+  ]
+ },
+ "HARO540180": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO540180-b0d43cac3c11-324x324.jpg",
+  "octets": 12302,
+  "w": 324,
+  "h": 324,
+  "empreinte": "31733d332d392c792c782c782cba2d322d32349337f913f913fb90ab00994471",
+  "couleur": [
+   155.2,
+   146.9,
+   135.9
+  ]
+ },
+ "HARO541000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO541000-9d4216f00354-324x324.jpg",
+  "octets": 7006,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c4e3c1e7c4e465e460e472e322e0c5986ec7ef707b0ee7e471f238fe383f180f",
+  "couleur": [
+   120.3,
+   113.3,
+   105.5
+  ]
+ },
+ "HARO541001": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO541001-19a45876d6a4-324x324.jpg",
+  "octets": 8196,
+  "w": 324,
+  "h": 324,
+  "empreinte": "ee132997a98bc18b098b461301bf0bb967ec61fe391f0dc784e196709ceccc67",
+  "couleur": [
+   156.7,
+   140.8,
+   122.2
+  ]
+ },
+ "HARO531679": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO531679-c91b092255df-324x324.jpg",
+  "octets": 10160,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3c266826662d36663a1cf47e306e3e417e017e077e073e07be037e037c037e23",
+  "couleur": [
+   187.4,
+   170.9,
+   150.2
+  ]
+ },
+ "HARO539697": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO539697-47b315d8c27a-324x279.jpg",
+  "octets": 7592,
+  "w": 324,
+  "h": 279,
+  "empreinte": "9182998a01c683c682d203923b12221804180018101c12181208132e030e0387",
+  "couleur": [
+   87.6,
+   65.5,
+   43.9
+  ]
+ },
+ "HARO537349": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO537349-b884c380a25b-324x324.jpg",
+  "octets": 7798,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1f10fe44710d200f4237e1973ce79e3f430d07ef1effe67c8e3e659f30cf183b",
+  "couleur": [
+   153.8,
+   120.8,
+   86.8
+  ]
+ },
+ "HARO538938": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO538938-e13f4127c590-324x318.jpg",
+  "octets": 10676,
+  "w": 324,
+  "h": 318,
+  "empreinte": "c384cb80d8c2cad9da99c4cdfc9dfe1dfcfdf79bff9f79dbffbb7f77ffefffce",
+  "couleur": [
+   135.6,
+   117.7,
+   96.9
+  ]
+ },
+ "HARO540174": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/12/HARO540174.jpg",
+  "octets": 12896,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 45679,
+  "converti": true,
+  "empreinte": "ee132d97a997898b298bce0b07931bbd0d9c4ccec0df42e7939319cc6e66a213",
+  "couleur": [
+   125.3,
+   100.9,
+   79
+  ]
+ },
+ "HARO541004": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO541004-51261d42a3c1-324x324.jpg",
+  "octets": 10602,
+  "w": 324,
+  "h": 324,
+  "empreinte": "69d369d369c3edc3edc3fdcaf7c6f3c601d2cfd0dffe6fc76fc36fc465a324e1",
+  "couleur": [
+   178.1,
+   164.1,
+   144.8
+  ]
+ },
+ "HARO536707": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO536707-1-324x324.jpg",
+  "octets": 13638,
+  "w": 324,
+  "h": 324,
+  "empreinte": "496449a449644924292439b496f699a4795859a6993cb778c7384b3c04fc047c",
+  "couleur": [
+   171.1,
+   153.4,
+   135.7
+  ]
+ },
+ "HARO536374": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO536374-bdfe6c272ee9-324x324.jpg",
+  "octets": 4460,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c1038121018000000000040086404a0001004008a00008c900ad8028825ac43f",
+  "couleur": [
+   141.5,
+   119,
+   90
+  ]
+ },
+ "HARO540154": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO540154-5111c70ecb96-324x324.jpg",
+  "octets": 10824,
+  "w": 324,
+  "h": 324,
+  "empreinte": "670b670b1497d5cde9cd04cda70b039f499c75d6da7f611fd8874c19e786c6c3",
+  "couleur": [
+   142.4,
+   123.2,
+   101
+  ]
+ },
+ "HARO538370": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO538370-e69f69e23639-324x322.jpg",
+  "octets": 13656,
+  "w": 324,
+  "h": 322,
+  "empreinte": "306f3cd904e6bde70e7083fea2ff323f193341b9321e8b1bc49ce4eb72633231",
+  "couleur": [
+   142.8,
+   110.3,
+   73.5
+  ]
+ },
+ "HARO523809": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO523809-259d65ea0ca7-324x282.jpg",
+  "octets": 6240,
+  "w": 324,
+  "h": 282,
+  "empreinte": "d3f2d3f2d9b239923c526a1adfc87d8472ab67752f344d16dd8d958e30da487b",
+  "couleur": [
+   205.2,
+   181.6,
+   156.5
+  ]
+ },
+ "HARO531772": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HARO531772-e2d387192aa5-324x324.jpg",
+  "octets": 7684,
+  "w": 324,
+  "h": 324,
+  "empreinte": "211f251f6ca7cd234d23b043c903214301910990a389c10e910ea30563254324",
+  "couleur": [
+   117.6,
+   97.9,
+   86.4
+  ]
+ },
+ "HEVEAF36001": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/HEVEAF36001-64b43ac03990-324x324.jpg",
+  "octets": 10842,
+  "w": 324,
+  "h": 324,
+  "empreinte": "6c0d880d961816d47330cbc201c12731f3ccb3c236e9926caa6649667993e2a9",
+  "couleur": [
+   181.4,
+   157.3,
+   122.6
+  ]
+ },
+ "IPEF3000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/IPEF3000-26e3ad2bd658-324x324.jpg",
+  "octets": 10164,
+  "w": 324,
+  "h": 324,
+  "empreinte": "d27d9a7922733aa321b1216121738173816600f700fc01ee10e0026842705378",
+  "couleur": [
+   81,
+   81.6,
+   84.1
+  ]
+ },
+ "IPE55": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/IPE55-5f2c2465a35f-324x324.jpg",
+  "octets": 5670,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0cdb3cdb168b728f5a673ec77c47f847f9cbb1c3f1abe12be34a06740c740c74",
+  "couleur": [
+   123.1,
+   100.6,
+   82.9
+  ]
+ },
+ "IPE3000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/IPE3000-648ab0031b74-324x324.jpg",
+  "octets": 5734,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0cdb3cdb168b728f5a673e877d47f847f9cbb1cbf1abe12be34a06740c740c74",
+  "couleur": [
+   123,
+   100.6,
+   82.9
+  ]
+ },
+ "JATF3004": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/JATF3004-86053f05ed2b-324x324.png",
+  "octets": 121822,
+  "w": 324,
+  "h": 324,
+  "empreinte": "9cbe993f94f7f2670e416321431b1c1b1d992dc39cf3be637a01fc21f181c623",
+  "couleur": [
+   162.8,
+   144.3,
+   124.8
+  ]
+ },
+ "KEMP3001": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/KEMP3001-0d8a6af35134-324x324.jpg",
+  "octets": 11598,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3ccc3e6806788258f205d224f29c33a4e064f81d7e0dbfa3eff97be41dd9076c",
+  "couleur": [
+   133.2,
+   92.1,
+   90
+  ]
+ },
+ "KEMP3000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/KEMP3000-8a9ade153f88-324x324.jpg",
+  "octets": 11598,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3ccc3e6806788258f205d224f29c33a4e064f81d7e0dbfa3eff97be41dd9076c",
+  "couleur": [
+   133.2,
+   92.1,
+   90
+  ]
+ },
+ "LAME16030": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/LAME16030-4b39070e7e43-324x324.jpg",
+  "octets": 27056,
+  "w": 324,
+  "h": 324,
+  "empreinte": "953116230e2306b3163c9b564a944e016d26818005c80d8e078e97ce07c605f6",
+  "couleur": [
+   182.6,
+   150.7,
+   129.7
+  ]
+ },
+ "LAME16025": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/LAME16025-d6820d57d178-324x324.jpg",
+  "octets": 20792,
+  "w": 324,
+  "h": 324,
+  "empreinte": "8f66967505ad69539b30b327695b987a9a4d0b469345dbb46f722f363bb22ce1",
+  "couleur": [
+   131.3,
+   101.7,
+   67.9
+  ]
+ },
+ "VLAME16012": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/VLAME16012-97ecb64f9c20-324x324.jpg",
+  "octets": 19152,
+  "w": 324,
+  "h": 324,
+  "empreinte": "b5790bdd09dd8dce86d642c6b3d631a7c9867124652664b2e6b2a6a1a4a124a4",
+  "couleur": [
+   164.5,
+   146.6,
+   125
+  ]
+ },
+ "VLAME16010": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/VLAME16010-1a1b62ba6810-324x319.jpg",
+  "octets": 16906,
+  "w": 324,
+  "h": 319,
+  "empreinte": "c8806803b40e5a16043e8438e5cdb9e839f80577133912cd22686734d696a693",
+  "couleur": [
+   125.3,
+   118.1,
+   113.1
+  ]
+ },
+ "MAHOG39000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/MAHOG39000-6f5a099ec09c-324x324.jpg",
+  "octets": 6716,
+  "w": 324,
+  "h": 324,
+  "empreinte": "07ce85d385db85db06dc4c794c7b4c7b0a4788731ad15ac74b8b4e054e0d0c3c",
+  "couleur": [
+   154.8,
+   138.9,
+   129.8
+  ]
+ },
+ "COUM39001": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/COUM39001-921f9d46dd05-324x324.jpg",
+  "octets": 11682,
+  "w": 324,
+  "h": 324,
+  "empreinte": "9c4a1c4a184a184a185834595c496c762c553c5533553f55521556155634d624",
+  "couleur": [
+   137.2,
+   123.6,
+   115.4
+  ]
+ },
+ "VMASSA36003": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/VMASSA36003-a1b1f1505bf0-324x324.jpg",
+  "octets": 10754,
+  "w": 324,
+  "h": 324,
+  "empreinte": "38b23cdcd8fcd9f0e8fcee4de295e396e3966394a19069145a5c56762c390c9d",
+  "couleur": [
+   146.3,
+   111.8,
+   107.9
+  ]
+ },
+ "EPAD36005": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/08/gescomo-no-image-324x324.png",
+  "octets": 79930,
+  "w": 324,
+  "h": 324,
+  "empreinte": "115f3ca53ee2049b0a650b2c0b2120f8188458c41a41b5335294369096938d49",
+  "couleur": [
+   225.8,
+   211.6,
+   200.8
+  ],
+  "ecartee": {
+   "type": "placeholder",
+   "raison": "fichier source « gescomo-no-image-324x324.png »"
+  }
+ },
+ "TAUA36000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/TAUA36000-47045bfda86d-324x324.jpg",
+  "octets": 4362,
+  "w": 324,
+  "h": 324,
+  "empreinte": "000140070007848ec487d482d4823c8b54878647ce46d267414cc00e1827042f",
+  "couleur": [
+   187.9,
+   182.4,
+   173
+  ]
+ },
+ "TAUA16000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/08/gescomo-no-image-324x324.png",
+  "octets": 79930,
+  "w": 324,
+  "h": 324,
+  "empreinte": "115f3ca53ee2049b0a650b2c0b2120f8188458c41a41b5335294369096938d49",
+  "couleur": [
+   225.8,
+   211.6,
+   200.8
+  ],
+  "ecartee": {
+   "type": "placeholder",
+   "raison": "fichier source « gescomo-no-image-324x324.png »"
+  }
+ },
+ "TECK36008": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/TECK36008-cbe0d3980885-324x324.jpg",
+  "octets": 11350,
+  "w": 324,
+  "h": 324,
+  "empreinte": "06ff07fc23ff11ff30fe31fe12369269b36773f7f3f1e0e4a2e46e37debeb3de",
+  "couleur": [
+   199.4,
+   175.2,
+   147.8
+  ]
+ },
+ "TECK36009": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/TECK36009-3a2c60a397b8-324x324.jpg",
+  "octets": 8924,
+  "w": 324,
+  "h": 324,
+  "empreinte": "f80ffc257e472cd92fd939d928d939cd3e473c6b7b19f9c9e979f9ebc9f9e31f",
+  "couleur": [
+   175.9,
+   148.4,
+   129.4
+  ]
+ },
+ "TECK26004": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/TECK26004-28a71f43fcb9-324x324.jpg",
+  "octets": 4884,
+  "w": 324,
+  "h": 324,
+  "empreinte": "c05ae02ee23f62ff637f617f60ff62ffe0ff23ff38ff3807e3d016f27ce3d8e3",
+  "couleur": [
+   193.7,
+   183,
+   172.1
+  ]
+ },
+ "TECK36011": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/TECK36011-9d6ebe2ccc65-324x324.jpg",
+  "octets": 9492,
+  "w": 324,
+  "h": 324,
+  "empreinte": "413f059f639f60bf243f247f24b022b723a631b631c932ec386f389e38fe38ef",
+  "couleur": [
+   208.8,
+   184.3,
+   151.8
+  ]
+ },
+ "TECK26006": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/TECK26006-9f6bd3905c23-324x324.jpg",
+  "octets": 10426,
+  "w": 324,
+  "h": 324,
+  "empreinte": "6131c419f50ff405c605db051d051d059e815e855c8cec03cc99e816307398c6",
+  "couleur": [
+   114.9,
+   100.9,
+   87.7
+  ]
+ },
+ "TECK36004": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/TECK36004-2786432f7133-324x324.jpg",
+  "octets": 11334,
+  "w": 324,
+  "h": 324,
+  "empreinte": "06ff07fc23ff11ff30fe29fe32369369b36772f7f3f0e0e4a2e46e37debeb3de",
+  "couleur": [
+   199.4,
+   175.3,
+   147.8
+  ]
+ },
+ "TECK36012": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/TECK36012-d46bae955aeb-324x324.jpg",
+  "octets": 12030,
+  "w": 324,
+  "h": 324,
+  "empreinte": "f15dd14dd14df14df16df16dd1adcb8d39ad361f7fd9fffcfffef7dfffcfffa6",
+  "couleur": [
+   152.2,
+   124.1,
+   106.1
+  ]
+ },
+ "TECK36005": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/TECK36005-93d8c5b99b6e-324x324.jpg",
+  "octets": 8926,
+  "w": 324,
+  "h": 324,
+  "empreinte": "f00ffc2d7e472cd92fd939d938d939cd3e473c6b7b19f989e979f9ebc9f9e31f",
+  "couleur": [
+   175.9,
+   148.4,
+   129.5
+  ]
+ },
+ "MERB16001": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/MERB26000-1-324x324.jpg",
+  "octets": 15732,
+  "w": 324,
+  "h": 324,
+  "empreinte": "00191018043026b044980c18a820282870c88008814ce0000000000040000000",
+  "couleur": [
+   149,
+   105.5,
+   87.1
+  ]
+ },
+ "MERB26000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/MERB26000-3dcf2dbc2944-324x324.jpg",
+  "octets": 14234,
+  "w": 324,
+  "h": 324,
+  "empreinte": "333433b4b674b254ad8599559333c3e724f32d6b34757cd676ff3cdd3ddf386e",
+  "couleur": [
+   138.1,
+   97.3,
+   76.4
+  ]
+ },
+ "NOYF36001": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/09/NOYF36001-9db9da395b1e-324x324.jpg",
+  "octets": 8554,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0dc00c030e8a0d8a6dab6f8c2f846f8ccf88c72aa5e6efa4791e3b1b9ca36b30",
+  "couleur": [
+   163.6,
+   153.6,
+   142.9
+  ]
+ },
+ "POINF36003": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/06/POINF36003-b029b5a60795-324x324.jpg",
+  "octets": 12286,
+  "w": 324,
+  "h": 324,
+  "empreinte": "009f30bc399a399a381a7b1af32cf26c336a93cdcc5f383f181f181ea51f183b",
+  "couleur": [
+   189.6,
+   167,
+   136
+  ]
+ },
+ "POIN36029": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/12/POIN36029.jpg",
+  "octets": 12716,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 127842,
+  "converti": true,
+  "empreinte": "73e573e5b3f7b39793174307334fb34733c512e5b3b5b39368536e1b2c07accb",
+  "couleur": [
+   123.8,
+   99.5,
+   78.4
+  ]
+ },
+ "POINF2601": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POINF2601-27a60b3d2d33-324x324.jpg",
+  "octets": 7688,
+  "w": 324,
+  "h": 324,
+  "empreinte": "0500e0c3fc3e9fffe7efebf8cfbbcfbb2fb96939c4d8c9f1c931c9b04e38073b",
+  "couleur": [
+   161.1,
+   147.1,
+   133.8
+  ]
+ },
+ "POINF2603": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POINF2603-53d9cc227dd3-324x324.jpg",
+  "octets": 11012,
+  "w": 324,
+  "h": 324,
+  "empreinte": "00010006000b002f3cdb3987e60edcc6b0d6e0d0d07df432f278ecbeee7bce3e",
+  "couleur": [
+   193.1,
+   169.4,
+   143.8
+  ]
+ },
+ "POINB36004": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/12/POINB36004-a4ee45130daa-324x324.jpg",
+  "octets": 10748,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1fff10ff70e47b84d394d3c7d396f13fe10be18fc3878bb2f63cf9fefddfff77",
+  "couleur": [
+   110.1,
+   78.8,
+   55
+  ]
+ },
+ "POINB36002": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/01/POINB36002.jpg",
+  "octets": 18294,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 159429,
+  "converti": true,
+  "empreinte": "00fb195e196e387f5a1b4c393a7c583f303f403f001f201f013f045b068f030f",
+  "couleur": [
+   193.4,
+   167.1,
+   146.1
+  ]
+ },
+ "POINB36006": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/01/POINB36006-ce1cacc52321-324x324.jpg",
+  "octets": 10072,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1a6e1a4e5a26982c7a3f4a3f807fe0bf7c9f02bf019f051f065f021f021f120f",
+  "couleur": [
+   207,
+   197.4,
+   193.6
+  ]
+ },
+ "POINB36003": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/12/POINB36003-bb8826ee1160-324x324.jpg",
+  "octets": 11638,
+  "w": 324,
+  "h": 324,
+  "empreinte": "74ef756f7327b06532fa1fe21e1f1e7f7fff7ffbfff6fef6ffeefdebb3ebefbc",
+  "couleur": [
+   109.2,
+   92.9,
+   76.1
+  ]
+ },
+ "POINB36005": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/02/POINB36005-d68dd0907dc3-324x324.jpg",
+  "octets": 9204,
+  "w": 324,
+  "h": 324,
+  "empreinte": "ffff0fff59f4197899e489e489f1daf4e644c3e0cbe48be68fce13ed23ef0aea",
+  "couleur": [
+   152.1,
+   133.7,
+   119
+  ]
+ },
+ "POINB36001": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/12/POINB36001-d9f012d85c97-324x324.jpg",
+  "octets": 11690,
+  "w": 324,
+  "h": 324,
+  "empreinte": "4c764c764c364c36cd78cd780d7a1dfb9c7d9dde9f7f9fed957c993fddbeefbb",
+  "couleur": [
+   140.4,
+   111.7,
+   77.5
+  ]
+ },
+ "POINB36000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/08/POINB36000-1-324x324.jpg",
+  "octets": 11148,
+  "w": 324,
+  "h": 324,
+  "empreinte": "8b979bbe9b38cf1c9c0f700fc00f820f020f000701070407008fc1078917252b",
+  "couleur": [
+   184.3,
+   141.1,
+   82.8
+  ]
+ },
+ "POINF2608": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POINF2608-99e6470e6969-324x324.jpg",
+  "octets": 11640,
+  "w": 324,
+  "h": 324,
+  "empreinte": "28df1f0f030b0313030b033203222b680d280f606ecd5e87f8f033c09f10cc1a",
+  "couleur": [
+   205.4,
+   194.3,
+   181.4
+  ]
+ },
+ "POIN39262": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POIN39262-1eb8e64a0f32-324x324.jpg",
+  "octets": 8040,
+  "w": 324,
+  "h": 324,
+  "empreinte": "8728972097209f224f22563252004e000260188c8e42361c618e00c388791638",
+  "couleur": [
+   139.4,
+   111.8,
+   85.9
+  ]
+ },
+ "POINF2610": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POINF2610-56a4bf3eb57a-324x324.jpg",
+  "octets": 9876,
+  "w": 324,
+  "h": 324,
+  "empreinte": "ac12b227362413a0b6609e418e498f499e49a641b6599a5e99663679865c8036",
+  "couleur": [
+   174.9,
+   168.4,
+   158.2
+  ]
+ },
+ "POIN38018": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POIN38018-d2040d53768b-324x324.jpg",
+  "octets": 10670,
+  "w": 324,
+  "h": 324,
+  "empreinte": "a0f901b209b60d9689b381b011b441b529b531a4ade929f1c7c8a750234cbb84",
+  "couleur": [
+   165.8,
+   147.8,
+   120.9
+  ]
+ },
+ "POIN38016": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POIN38016-55.jpg",
+  "octets": 13178,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 86992,
+  "converti": true,
+  "empreinte": "a0f901b209b60d9689b381b011b441b529b531a4ade929f1c7c8a750234cbb84",
+  "couleur": [
+   165.9,
+   147.8,
+   121.1
+  ]
+ },
+ "POIN36005": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POIN36005-4fdbe35ea1e5-324x324.jpg",
+  "octets": 9516,
+  "w": 324,
+  "h": 324,
+  "empreinte": "7f177f173f0f3f371f36bf363f06bd863d863fb23fd83ff83ff63ff63f773e6c",
+  "couleur": [
+   165,
+   148.6,
+   136.4
+  ]
+ },
+ "POIN39268": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POIN39268-9fe036c2e9a2-324x324.jpg",
+  "octets": 10716,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3fc23fe25fe31fc606f099f09992cde4cbb929bb8ffec3fbf3dbc1db83f9b37b",
+  "couleur": [
+   168.9,
+   161.1,
+   146.5
+  ]
+ },
+ "POINF36002": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/11/POINF36002-6f8a03183fd8-324x324.png",
+  "octets": 104838,
+  "w": 324,
+  "h": 324,
+  "empreinte": "2e1f2e1f2e6c2e683660c6780ffe3f763e6c3fde3f9d3f7c1f7b1fa91db21bf2",
+  "couleur": [
+   170.1,
+   144.4,
+   111.9
+  ]
+ },
+ "POIN39274": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/06/POIN39274-13517227c576-324x324.jpg",
+  "octets": 9838,
+  "w": 324,
+  "h": 324,
+  "empreinte": "e1fee3366c3a6cc874cc2cdc24ec7ee87c987cd17ef32ef32eee6cf768ff40f7",
+  "couleur": [
+   180,
+   146.6,
+   108.7
+  ]
+ },
+ "POINF39027": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/06/POINF39027-cbffdffaeeb2-324x324.jpg",
+  "octets": 10028,
+  "w": 324,
+  "h": 324,
+  "empreinte": "f3c7cdc6c71ad6cad2e2c5a2d3a3f263f403fc131c3bc06780efc09ec01c8238",
+  "couleur": [
+   141,
+   119.4,
+   95.6
+  ]
+ },
+ "POINF39025": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/04/POINF39025.jpg",
+  "octets": 9210,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 171937,
+  "converti": true,
+  "empreinte": "2fcf923fc9b5d931d581c581d590b8683a65d9ed78f7d8ff073f201de11f815f",
+  "couleur": [
+   172.9,
+   146.9,
+   123.2
+  ]
+ },
+ "POINF39038": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/08/POINF39038-ad99933958e6-324x324.jpg",
+  "octets": 14168,
+  "w": 324,
+  "h": 324,
+  "empreinte": "26d6645c345d38e225f7e5e6e5dee4ffe4dfe741e773cc6de6e7e3196a06fca7",
+  "couleur": [
+   175.9,
+   141.3,
+   100.5
+  ]
+ },
+ "POINF39012": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POINF39012-9cbaff16b061-324x324.jpg",
+  "octets": 9368,
+  "w": 324,
+  "h": 324,
+  "empreinte": "b499b422b9fab9db399a31fb319131133852f9d2d2f244e048e113e1316401e1",
+  "couleur": [
+   153.1,
+   137.5,
+   121.7
+  ]
+ },
+ "POINF39004": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POINF39004-1-324x324.jpg",
+  "octets": 10494,
+  "w": 324,
+  "h": 324,
+  "empreinte": "ce304620462046204e20e620aa00a0008000888c86319018a18688f396388c1a",
+  "couleur": [
+   161.9,
+   140.3,
+   117.7
+  ]
+ },
+ "POIN39264": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POIN39264-7bbd669e3c64-324x324.jpg",
+  "octets": 13242,
+  "w": 324,
+  "h": 324,
+  "empreinte": "5e725ef456e41ef01e611667d6678ee71ee71ce73cf71ced3e793fb37ed77e67",
+  "couleur": [
+   170.2,
+   131.4,
+   91.7
+  ]
+ },
+ "POINF39030": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/08/POINF39020-324x324.jpg",
+  "octets": 18190,
+  "w": 324,
+  "h": 324,
+  "empreinte": "930ebf1e9e97fcdfb4b8d158445c400660136c1b301318151c0b34427c16b3b4",
+  "couleur": [
+   123.7,
+   60.8,
+   18.4
+  ]
+ },
+ "POINF39028_A_B": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/04/POINF39028_A_B.jpg",
+  "octets": 16446,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 191717,
+  "converti": true,
+  "empreinte": "479c63f96995699d2999398c278e299c281c6f1c6fde6fdf2efd0eff0fef0def",
+  "couleur": [
+   168.8,
+   138,
+   95.3
+  ]
+ },
+ "POINF39009": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POINF39009-08b7acea7b9e-324x324.jpg",
+  "octets": 9926,
+  "w": 324,
+  "h": 324,
+  "empreinte": "d1bbc7bb479bc2f33c54f0ce34ce30e668de69ce6916608f41c7199fb86fecd3",
+  "couleur": [
+   189.9,
+   165.9,
+   142.7
+  ]
+ },
+ "POIN36027": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POIN36027-1-324x324.jpg",
+  "octets": 6050,
+  "w": 324,
+  "h": 324,
+  "empreinte": "5c705c705c705c725c335c3358335c335cb35c335d935cf35c735838585c77b4",
+  "couleur": [
+   217.4,
+   205.2,
+   196.6
+  ]
+ },
+ "POINF39010": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POINF39010-d1dcf796a384-324x324.jpg",
+  "octets": 11874,
+  "w": 324,
+  "h": 324,
+  "empreinte": "97539433949794ca44ca54ec44da54eadc2b180b046784f706f707ef073f876f",
+  "couleur": [
+   141.7,
+   130.5,
+   116.8
+  ]
+ },
+ "POINF39001": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POINF39001-d48a56a018fc-324x324.jpg",
+  "octets": 10254,
+  "w": 324,
+  "h": 324,
+  "empreinte": "000701f383b394b3c4a3acb7c066d0cbf106c3065b0907f023f801e030c018a1",
+  "couleur": [
+   154.5,
+   121.2,
+   82.1
+  ]
+ },
+ "POIN39266": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/08/POIN39266-1de915f630c8-324x324.jpg",
+  "octets": 9564,
+  "w": 324,
+  "h": 324,
+  "empreinte": "817f19cc3e700a5a1e703e503c587d0c18db13306734058c887c663c0e1c1c1c",
+  "couleur": [
+   147.4,
+   139.4,
+   126
+  ]
+ },
+ "POIN39261": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/08/POIN39261-53951accbacd-324x281.jpg",
+  "octets": 13662,
+  "w": 324,
+  "h": 281,
+  "empreinte": "20a7807fc8fec978cb43c953c933c973c92349f1c97dc71987c906f32df303f3",
+  "couleur": [
+   184.3,
+   178.5,
+   171.4
+  ]
+ },
+ "POINF39035": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/09/POINF39035-324x324.jpg",
+  "octets": 18336,
+  "w": 324,
+  "h": 324,
+  "empreinte": "4a9c4a944a96cb96cbb64b67d3d3d4b6c32a4ba8cba8c31cc30ec30e030f0a0e",
+  "couleur": [
+   167.5,
+   125.2,
+   89.7
+  ]
+ },
+ "POIN39272": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2026/04/POIN39272.jpg",
+  "octets": 12092,
+  "w": 324,
+  "h": 324,
+  "formatSource": "JPEG",
+  "octetsSource": 160109,
+  "converti": true,
+  "empreinte": "3d373d333d333d3b7d3b1d33a53ba73b172c987e03b7279e0fcf078f150f040f",
+  "couleur": [
+   186,
+   163.2,
+   139.1
+  ]
+ },
+ "POINF38000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POINF38000-99d129a8ea52-324x324.jpg",
+  "octets": 20028,
+  "w": 324,
+  "h": 324,
+  "empreinte": "b648bf1cdf82f7c3fec1e6c962c8c8c848886c8c4daa1caa3d8639a67dc73d87",
+  "couleur": [
+   171.3,
+   150.7,
+   119.6
+  ]
+ },
+ "POIN36028": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POIN36028-1-324x324.jpg",
+  "octets": 14988,
+  "w": 324,
+  "h": 324,
+  "empreinte": "73e573e5b3f7b3979317c307334fb34733c512e5b3b5b39368536c1b2c07accb",
+  "couleur": [
+   123.8,
+   99.5,
+   78.3
+  ]
+ },
+ "POIN36020": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/POIN36020-81816dffacd5-324x324.jpg",
+  "octets": 11486,
+  "w": 324,
+  "h": 324,
+  "empreinte": "3ff60ff400fe20f620c72b532b122b1622d723a32dabea0bce5ece5f865f84ff",
+  "couleur": [
+   152.6,
+   138.1,
+   121.3
+  ]
+ },
+ "WENF3000": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENF3000-5bf69f82dc8d-324x324.jpg",
+  "octets": 5994,
+  "w": 324,
+  "h": 324,
+  "empreinte": "ffe3ffe2ffe27fc23fe86fe886ca4ed220d240f07f76f83205e416c487846764",
+  "couleur": [
+   144.9,
+   131.7,
+   116.6
+  ]
+ },
+ "WENG3007": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG3007-ef15607c3de4-324x324.jpg",
+  "octets": 10386,
+  "w": 324,
+  "h": 324,
+  "empreinte": "a2e39c858c858cc689b2d9969ca7aaa6cd271f079a0598a59d279d47cb43cb67",
+  "couleur": [
+   77.9,
+   65.1,
+   52.8
+  ]
+ },
+ "WENG36010": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG36010-96920d184082-324x324.jpg",
+  "octets": 6864,
+  "w": 324,
+  "h": 324,
+  "empreinte": "f004c133cd0c4dcc4bc6480fc606c70cc781e781e700e701ef21f240e4c0d881",
+  "couleur": [
+   93.3,
+   96.3,
+   101.1
+  ]
+ },
+ "WENG36017": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG36017-2fa0f13db756-324x324.png",
+  "octets": 97816,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1124132d539153d153db5039931e13115300730673047b047b047f0078807881",
+  "couleur": [
+   103.8,
+   108,
+   113.9
+  ]
+ },
+ "WENG3011": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG3011-ebf51ecd6ad7-324x324.jpg",
+  "octets": 11100,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1f1013515153735a5312061367971f4238d306a38e039f811c019c0118019a11",
+  "couleur": [
+   83.3,
+   78.6,
+   72.5
+  ]
+ },
+ "WENG36008": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG36008-2fa0f13db756-324x324.png",
+  "octets": 97816,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1124132d539153d153db5039931e13115300730673047b047b047f0078807881",
+  "couleur": [
+   103.8,
+   108,
+   113.9
+  ]
+ },
+ "WENG36019": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG36019-2fa0f13db756-324x324.png",
+  "octets": 97816,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1124132d539153d153db5039931e13115300730673047b047b047f0078807881",
+  "couleur": [
+   103.8,
+   108,
+   113.9
+  ]
+ },
+ "WENG3016": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG3016-2fa0f13db756-324x324.png",
+  "octets": 97816,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1124132d539153d153db5039931e13115300730673047b047b047f0078807881",
+  "couleur": [
+   103.8,
+   108,
+   113.9
+  ]
+ },
+ "WENG3009": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG3009-2fa0f13db756-324x324.png",
+  "octets": 97816,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1124132d539153d153db5039931e13115300730673047b047b047f0078807881",
+  "couleur": [
+   103.8,
+   108,
+   113.9
+  ]
+ },
+ "WENG3012": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG3012-2fa0f13db756-324x324.png",
+  "octets": 97816,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1124132d539153d153db5039931e13115300730673047b047b047f0078807881",
+  "couleur": [
+   103.8,
+   108,
+   113.9
+  ]
+ },
+ "WENG3013": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG3013-2fa0f13db756-324x324.png",
+  "octets": 97816,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1124132d539153d153db5039931e13115300730673047b047b047f0078807881",
+  "couleur": [
+   103.8,
+   108,
+   113.9
+  ]
+ },
+ "WENG1003": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG1003-8a529aea773c-324x324.jpg",
+  "octets": 6044,
+  "w": 324,
+  "h": 324,
+  "empreinte": "ffe3ffe2ffe23fe03fe86fe886ca4ed220d240f07f76f83205e416c447846764",
+  "couleur": [
+   144.8,
+   131.7,
+   116.5
+  ]
+ },
+ "WENG1002": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG1002-2fa0f13db756-324x324.png",
+  "octets": 97816,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1124132d539153d153db5039931e13115300730673047b047b047f0078807881",
+  "couleur": [
+   103.8,
+   108,
+   113.9
+  ]
+ },
+ "WENG3015": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG3015-2fa0f13db756-324x324.png",
+  "octets": 97816,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1124132d539153d153db5039931e13115300730673047b047b047f0078807881",
+  "couleur": [
+   103.8,
+   108,
+   113.9
+  ]
+ },
+ "WENG3008": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG3008-df0c361ebfff-324x324.jpg",
+  "octets": 9940,
+  "w": 324,
+  "h": 324,
+  "empreinte": "a05bb85bb0d3b97b30dbc5d9039831ec8d8ee7f8b0e7f997364b70a7312a9d06",
+  "couleur": [
+   101.2,
+   84,
+   76.3
+  ]
+ },
+ "WENG3014": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG3014-2fa0f13db756-324x324.png",
+  "octets": 97816,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1124132d539153d153db5039931e13115300730673047b047b047f0078807881",
+  "couleur": [
+   103.8,
+   108,
+   113.9
+  ]
+ },
+ "WENG36011": {
+  "source": "https://www.premibel.fr/wp-content/uploads/2025/05/WENG36011-2fa0f13db756-324x324.png",
+  "octets": 97816,
+  "w": 324,
+  "h": 324,
+  "empreinte": "1124132d539153d153db5039931e13115300730673047b047b047f0078807881",
+  "couleur": [
+   103.8,
+   108,
+   113.9
+  ]
+ }
+}

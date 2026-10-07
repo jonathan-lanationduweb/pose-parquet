@@ -109,9 +109,10 @@ final class Queue {
 		$notifier   = $notifier ?? new Notifier();
 		$repository = $repository ?? new Repository();
 		$etats      = [];
+		$projet     = $repository->find_by_id( $project_id ) ?: null;
 
 		foreach ( Notifier::TYPES as $type ) {
-			if ( ! $notifier->concerne( $type ) ) {
+			if ( ! $notifier->concerne( $type, $projet ) ) {
 				// Choix de réglage, pas incident : on le fige tout de suite.
 				$repository->set_mail_status( $project_id, $type, Notifier::STATUS_SKIPPED, null );
 				$etats[ $type ] = Notifier::STATUS_SKIPPED;
@@ -172,7 +173,7 @@ final class Queue {
 			}
 
 			$notifier = new Notifier();
-			if ( ! $notifier->concerne( $type ) ) {
+			if ( ! $notifier->concerne( $type, $project ) ) {
 				$repository->set_mail_status( $project_id, $type, Notifier::STATUS_SKIPPED, null );
 				return;
 			}

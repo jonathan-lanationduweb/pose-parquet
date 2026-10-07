@@ -29,6 +29,11 @@ declare(strict_types=1);
 namespace PoseParquet\Core\Admin;
 
 use PoseParquet\Core\Antispam\FormToken;
+use PoseParquet\Core\Contenus\Types;
+use PoseParquet\Core\Maintenance\Reglages as Maintenance;
+use PoseParquet\Core\Catalogue\Ecran as Catalogue;
+use PoseParquet\Core\Site\MonSite;
+use PoseParquet\Core\Publication\Publication;
 use PoseParquet\Core\Antispam\RateLimiter;
 use PoseParquet\Core\Database\Installer;
 use PoseParquet\Core\Database\Schema;
@@ -57,71 +62,206 @@ final class Menu {
 
 	public static function register(): void {
 		add_action( 'admin_menu', [ self::class, 'add_pages' ] );
+		// Après tous les autres : composer l'ordre final, rubriques et icônes.
+		add_action( 'admin_menu', [ self::class, 'ordonner' ], 999 );
+		add_action( 'admin_menu', [ self::class, 'epurer' ], 999 );
 		add_action( 'admin_enqueue_scripts', [ self::class, 'enqueue' ] );
+		add_filter( 'parent_file', [ self::class, 'parent' ] );
+		add_filter( 'submenu_file', [ self::class, 'sous_menu' ] );
 	}
 
+	/**
+	 * Le menu du module, dans le SOCLE commun (référence : Expert Parquet,
+	 * EP_Admin_Contenu::ordonner) — même place, mêmes rubriques, icônes :
+	 *
+	 *   Pose Parquet                 (position 3, sous le tableau de bord WordPress)
+	 *   ├── Tableau de bord
+	 *   ├── CONTENU      Guides, Tutoriels, Inspirations, Pages, Images
+	 *   ├── ACTIVITÉ     Projets
+	 *   ├── PRODUITS     Catalogue Premibel
+	 *   └── SITE         Mon site, Maintenance, Réglages   (État : depuis Réglages)
+	 *
+	 * Les Images sont rangées dans « Contenu », comme les Médias d'Expert
+	 * Parquet : une rubrique pour une seule entrée multiplierait les niveaux.
+	 * Chaque entrée garde son propre droit : un gestionnaire des projets ne
+	 * voit ni les contenus, ni le catalogue, ni la maintenance, ni les réglages.
+	 */
 	public static function add_pages(): void {
 		add_menu_page(
 			__( 'Pose Parquet', 'pose-parquet-core' ),
 			__( 'Pose Parquet', 'pose-parquet-core' ),
 			Capabilities::VIEW_PROJECTS,
-			self::SLUG,
-			[ Projects::class, 'render' ],
-			'dashicons-layout',
-			58
+			Tableau::PAGE,
+			[ Tableau::class, 'render' ],
+			'dashicons-admin-home',
+			3
 		);
-		// Le premier sous-menu reprend l'entrée parente, sinon WordPress en
-		// fabrique un doublon nommé comme le menu.
-		add_submenu_page(
-			self::SLUG,
-			__( 'Demandes', 'pose-parquet-core' ),
-			__( 'Demandes', 'pose-parquet-core' ),
-			Capabilities::VIEW_PROJECTS,
-			self::SLUG,
-			[ Projects::class, 'render' ]
-		);
-		add_submenu_page(
-			self::SLUG,
-			__( 'Réglages Pose Parquet', 'pose-parquet-core' ),
-			__( 'Réglages', 'pose-parquet-core' ),
-			Capabilities::MANAGE_SETTINGS,
-			Settings::PAGE,
-			[ Settings::class, 'render' ]
-		);
-		add_submenu_page(
-			self::SLUG,
-			__( 'État du plugin', 'pose-parquet-core' ),
-			__( 'État', 'pose-parquet-core' ),
-			Capabilities::MANAGE_SETTINGS,
-			self::STATUS_PAGE,
-			[ self::class, 'render_status' ]
-		);
+		add_submenu_page( Tableau::PAGE, __( 'Tableau de bord', 'pose-parquet-core' ), __( 'Tableau de bord', 'pose-parquet-core' ), Capabilities::VIEW_PROJECTS, Tableau::PAGE, [ Tableau::class, 'render' ] );
+		foreach ( [
+			Types::GUIDE       => __( 'Guides', 'pose-parquet-core' ),
+			Types::TUTORIEL    => __( 'Tutoriels', 'pose-parquet-core' ),
+			Types::INSPIRATION => __( 'Inspirations', 'pose-parquet-core' ),
+			Types::PAGE        => __( 'Pages', 'pose-parquet-core' ),
+		] as $type => $libelle ) {
+			add_submenu_page( Tableau::PAGE, $libelle, $libelle, Capabilities::EDIT_CONTENTS, 'edit.php?post_type=' . $type );
+		}
+		add_submenu_page( Tableau::PAGE, __( 'Images', 'pose-parquet-core' ), __( 'Images', 'pose-parquet-core' ), 'upload_files', 'upload.php' );
+		add_submenu_page( Tableau::PAGE, __( 'Projets', 'pose-parquet-core' ), __( 'Projets', 'pose-parquet-core' ), Capabilities::VIEW_PROJECTS, self::SLUG, [ Projects::class, 'render' ] );
+		add_submenu_page( Tableau::PAGE, __( 'Catalogue Premibel', 'pose-parquet-core' ), __( 'Catalogue Premibel', 'pose-parquet-core' ), Capabilities::EDIT_CONTENTS, Catalogue::PAGE, [ Catalogue::class, 'render' ] );
+		add_submenu_page( Tableau::PAGE, __( 'Publication du site', 'pose-parquet-core' ), __( 'Publication', 'pose-parquet-core' ), Capabilities::MANAGE_SETTINGS, Publication::PAGE, [ Publication::class, 'render' ] );
+		add_submenu_page( Tableau::PAGE, __( 'Mon site', 'pose-parquet-core' ), __( 'Mon site', 'pose-parquet-core' ), Capabilities::MANAGE_SETTINGS, MonSite::PAGE, [ MonSite::class, 'render' ] );
+		add_submenu_page( Tableau::PAGE, __( 'Mode maintenance', 'pose-parquet-core' ), __( 'Maintenance', 'pose-parquet-core' ), Capabilities::MANAGE_SETTINGS, Maintenance::PAGE, [ Maintenance::class, 'render' ] );
+		add_submenu_page( Tableau::PAGE, __( 'Réglages Pose Parquet', 'pose-parquet-core' ), __( 'Réglages', 'pose-parquet-core' ), Capabilities::MANAGE_SETTINGS, Settings::PAGE, [ Settings::class, 'render' ] );
+		/*
+		 * « État » (diagnostic technique) : accessible — lien depuis Réglages —
+		 * mais absent du menu, la maquette ne le montre pas.
+		 *
+		 * Page SANS parent (''), la manière prévue par WordPress pour une page
+		 * cachée. La version précédente l'inscrivait sous « Pose Parquet » puis
+		 * la retirait du menu (remove_submenu_page) : WordPress recalculait
+		 * alors son nom interne sans parent (admin_page_…), qui ne
+		 * correspondait plus à celui inscrit (pose-parquet_page_…), et
+		 * refusait l'accès même à un administrateur — 403 « Sorry, you are not
+		 * allowed to access this page » relevé le 06/10/2026.
+		 */
+		$etat = add_submenu_page( '', __( 'État du plugin', 'pose-parquet-core' ), __( 'État', 'pose-parquet-core' ), Capabilities::MANAGE_SETTINGS, self::STATUS_PAGE, [ self::class, 'render_status' ] );
+		// Une page cachée ne reçoit pas son titre du menu : sans lui, <title>
+		// est vide et WordPress appelle strip_tags( null ) (avis « Deprecated »).
+		if ( $etat ) {
+			add_action(
+				'load-' . $etat,
+				static function (): void {
+					global $title;
+					$title = __( 'État du plugin', 'pose-parquet-core' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+				}
+			);
+		}
 	}
 
 	/**
-	 * La feuille de style, et seulement sur nos écrans.
-	 *
-	 * Pas de fichier JavaScript : rien dans ces écrans n'en a besoin. Les
-	 * formulaires sont des formulaires, les filtres sont des liens, la
-	 * pagination est une liste de liens. Un script aurait été du poids et une
-	 * surface d'erreur pour refaire ce que le navigateur fait déjà.
+	 * Ordre final du sous-menu, avec rubriques et icônes. On compose à partir
+	 * de ce que WordPress a réellement inscrit (et donc de ce que l'utilisateur
+	 * a le droit de voir) : aucune entrée inventée, aucune capacité devinée.
+	 * Les entrées ne sont jamais RETIRÉES ici (pas de remove_submenu_page) :
+	 * une page cachée se déclare sans parent — voir « État ».
 	 */
-	public static function enqueue( string $hook ): void {
-		$nos_ecrans = [
-			'toplevel_page_' . self::SLUG,
-			self::SLUG . '_page_' . Settings::PAGE,
-			self::SLUG . '_page_' . self::STATUS_PAGE,
-		];
-		if ( ! in_array( $hook, $nos_ecrans, true ) ) {
+	public static function ordonner(): void {
+		global $submenu;
+		$tb = Tableau::PAGE;
+		if ( empty( $submenu[ $tb ] ) ) {
 			return;
 		}
+		$existe = [];
+		foreach ( $submenu[ $tb ] as $entree ) {
+			$existe[ $entree[2] ] = $entree;
+		}
+		$avec = static fn( string $slug, string $icone ): ?array => isset( $existe[ $slug ] ) ? Socle::icone( $existe[ $slug ], $icone ) : null;
+		$liste = static fn( string $type ): string => 'edit.php?post_type=' . $type;
+		$rubrique = static fn( string $nom, array $entrees ): array => array_filter( $entrees ) ? array_merge( [ Socle::section( $nom ) ], array_values( array_filter( $entrees ) ) ) : [];
 
-		wp_enqueue_style(
-			'pose-parquet-admin',
-			plugins_url( 'assets/admin.css', POSE_PARQUET_FILE ),
-			[],
-			POSE_PARQUET_VERSION
+		$ordre = array_merge(
+			array_filter( [ $avec( $tb, 'dashicons-dashboard' ) ] ),
+			$rubrique( 'Contenu', [
+				$avec( $liste( Types::GUIDE ), 'dashicons-media-document' ),
+				$avec( $liste( Types::TUTORIEL ), 'dashicons-hammer' ),
+				$avec( $liste( Types::INSPIRATION ), 'dashicons-format-gallery' ),
+				$avec( $liste( Types::PAGE ), 'dashicons-edit' ),
+				$avec( 'upload.php', 'dashicons-format-image' ),
+			] ),
+			$rubrique( 'Activité', [ $avec( self::SLUG, 'dashicons-clipboard' ) ] ),
+			$rubrique( 'Produits', [ $avec( Catalogue::PAGE, 'dashicons-products' ) ] ),
+			$rubrique( 'Site', [
+				$avec( Publication::PAGE, 'dashicons-upload' ),
+				$avec( MonSite::PAGE, 'dashicons-admin-site-alt3' ),
+				$avec( Maintenance::PAGE, 'dashicons-admin-tools' ),
+				$avec( Settings::PAGE, 'dashicons-admin-generic' ),
+			] )
 		);
+		$submenu[ $tb ] = array_values( $ordre ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+	}
+
+	/**
+	 * Comme Expert Parquet (EP_Security::epurer_menu) : les menus natifs dont
+	 * ce site n'a pas l'usage (Articles, Commentaires) ou qui sont rangés sous
+	 * le module (Médias → Images) disparaissent de la colonne. Un seul chemin.
+	 * Retirer un menu n'ouvre ni ne ferme aucun accès : chaque écran vérifie
+	 * lui-même ses droits. Les pages natives de WordPress (Pages) ne sont pas
+	 * celles du site : elles sortent aussi du menu.
+	 */
+	public static function epurer(): void {
+		global $submenu;
+		foreach ( [ 'edit.php', 'edit.php?post_type=page', 'edit-comments.php', 'upload.php' ] as $page ) {
+			remove_menu_page( $page );
+			unset( $submenu[ $page ] );
+		}
+	}
+
+	/** Les écrans de contenus (listes, édition, catégories) s'ouvrent sous « Pose Parquet ». */
+	public static function parent( ?string $parent ): ?string {
+		global $typenow, $taxnow, $plugin_page;
+		if ( $plugin_page === self::STATUS_PAGE ) {
+			return Tableau::PAGE; // « État » s'ouvre sous Pose Parquet → Réglages.
+		}
+		global $pagenow;
+		if ( in_array( (string) $typenow, Types::all(), true ) || in_array( (string) $taxnow, [ Types::CAT_GUIDE, Types::CAT_TUTORIEL ], true ) ) {
+			return Tableau::PAGE;
+		}
+		// La médiathèque est rangée sous le module : le menu reste ouvert.
+		if ( in_array( (string) $pagenow, [ 'upload.php', 'media-new.php' ], true ) ) {
+			return Tableau::PAGE;
+		}
+		return $parent;
+	}
+
+	public static function sous_menu( ?string $fichier ): ?string {
+		global $typenow, $plugin_page;
+		if ( $plugin_page === self::STATUS_PAGE ) {
+			return Settings::PAGE;
+		}
+		global $pagenow;
+		if ( in_array( (string) $typenow, Types::all(), true ) ) {
+			return 'edit.php?post_type=' . $typenow;
+		}
+		if ( in_array( (string) $pagenow, [ 'upload.php', 'media-new.php' ], true ) ) {
+			return 'upload.php';
+		}
+		return $fichier;
+	}
+
+	/**
+	 * Feuille de style et script de sélection d'image, sur nos écrans seulement.
+	 *
+	 * Le seul JavaScript : ouvrir la médiathèque de WordPress pour choisir une
+	 * image (couverture, fond de maintenance). Tout le reste est du formulaire.
+	 */
+	public static function enqueue( string $hook ): void {
+		$ecran     = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		$contenu   = $ecran && in_array( (string) $ecran->post_type, Types::all(), true );
+		$module    = str_contains( $hook, 'pose-parquet' );
+		if ( ! $contenu && ! $module ) {
+			return;
+		}
+		// Feuille propre aux écrans Projets / État (antérieure au socle) ; les
+		// composants communs viennent du socle (Admin\Socle).
+		wp_enqueue_style( 'pose-parquet-admin', plugins_url( 'assets/admin.css', POSE_PARQUET_FILE ), [ 'pp-socle-shell' ], (string) filemtime( POSE_PARQUET_DIR . '/assets/admin.css' ) );
+		$avec_media = ( $contenu && $ecran->base === 'post' ) || str_contains( $hook, Maintenance::PAGE ) || str_contains( $hook, MonSite::PAGE );
+		if ( $contenu || $module ) {
+			if ( $avec_media ) {
+				wp_enqueue_media();
+			}
+			wp_enqueue_script( 'pose-parquet-admin', plugins_url( 'assets/admin.js', POSE_PARQUET_FILE ), $avec_media ? [ 'media-editor' ] : [], (string) filemtime( POSE_PARQUET_DIR . '/assets/admin.js' ), true );
+			wp_localize_script(
+				'pose-parquet-admin',
+				'ppAdmin',
+				[
+					'choisir'   => __( 'Choisir une image', 'pose-parquet-core' ),
+					'remplacer' => __( 'Remplacer l’image', 'pose-parquet-core' ),
+					'utiliser'  => __( 'Utiliser cette image', 'pose-parquet-core' ),
+					'manquante' => __( 'Image manquante', 'pose-parquet-core' ),
+					'recherche' => $ecran && $ecran->post_type ? ( get_post_type_object( (string) $ecran->post_type )->labels->search_items ?? '' ) . '…' : '',
+				]
+			);
+		}
 	}
 
 	/** Page « État » : les faits, lus en base au moment de l'affichage. */

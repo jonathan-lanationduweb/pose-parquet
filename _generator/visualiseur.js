@@ -14,7 +14,7 @@
  */
 const { SITE, layout, appLayout, breadcrumb } = require('./layout');
 const { NB_PIECES_LETTRES } = require('./scenes');
-const { NB_PARQUETS, NB_MOTIFS, NB_DEMONSTRATION, NB_REELS, enLettres } = require('./catalogue');
+const { NB_PREMIBEL, NB_PREMIBEL_VISU, NB_PREMIBEL_FIDELE, NB_MOTIFS, NB_DEMONSTRATION, enLettres } = require('./catalogue');
 const { MAX_VERSIONS } = require('../js/studio/app.js');
 /** « cinq » devient « Cinq » : ce nombre ouvre une phrase. */
 const MAJ_PIECES = NB_PIECES_LETTRES.charAt(0).toUpperCase() + NB_PIECES_LETTRES.slice(1);
@@ -87,7 +87,7 @@ function buildVisualiseurPage(write) {
        * qui compte — le rendu approche la teinte, il ne remplace pas un
        * échantillon — est dite pour les deux.
        */
-      a: `Les deux à la fois, et la distinction vaut d’être connue : ${NB_DEMONSTRATION} sont des références de démonstration, calculées par le moteur, qui ne correspondent à aucun produit commercial précis ; ${NB_REELS} sont relevées sur des fiches produit réelles et renvoient vers elles. Dans les deux cas le rendu approche la teinte et le veinage : il sert à choisir une direction — une teinte, un motif, un sens de pose — pas à valider une commande sans avoir vu un échantillon.`,
+      a: `Des références réelles. Le catalogue compte ${NB_PREMIBEL} parquets Premibel ; ${NB_PREMIBEL_VISU} peuvent être essayés dans la pièce, les autres renvoient vers leur fiche. Pour la plupart, le rendu est indicatif : il reprend la couleur et la largeur de lame de la référence avec une famille de bois calculée par le moteur. ${NB_PREMIBEL_FIDELE} en rendu fidèle portent une matière construite pour elles et comparée à leur photo — teinte, veinage, nœuds, longueur réelle des lames. Dans les deux cas, le rendu sert à choisir une direction, pas à valider une commande sans avoir vu un échantillon. Les ${NB_DEMONSTRATION} parquets de démonstration du moteur ne servent plus qu’aux exemples, et sont toujours signalés comme tels.`,
     },
     {
       q: 'Puis-je comparer plusieurs parquets ?',
@@ -108,7 +108,7 @@ function buildVisualiseurPage(write) {
     {
       num: '(02)',
       title: 'Essayez les parquets',
-      text: `${NB_PARQUETS} références, chacune avec son veinage et sa largeur de lame. Un clic, tout le sol change.`,
+      text: `${NB_PREMIBEL_VISU} références Premibel à essayer, chacune à sa largeur de lame. Un clic, tout le sol change.`,
     },
     {
       num: '(03)',
@@ -129,7 +129,7 @@ function buildVisualiseurPage(write) {
               <a class="link-arrow" href="simulateur-pose.html">Étudier le sens de pose ${ICON.arrow}</a>
             </div>
             <ul class="landing-hero__facts">
-              <li><b>${NB_PARQUETS}</b> parquets à essayer</li>
+              <li><b>${NB_PREMIBEL_VISU}</b> parquets à essayer</li>
               <li><b>${NB_MOTIFS}</b> motifs</li>
               <li><b>0</b> envoi de photo</li>
             </ul>
