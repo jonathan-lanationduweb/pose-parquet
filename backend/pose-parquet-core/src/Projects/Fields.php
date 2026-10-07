@@ -157,12 +157,22 @@ final class Fields {
 		'installationType' => true,
 		'style'            => false,
 		'timeframe'        => true,
-		'firstName'        => true,
-		'lastName'         => true,
-		'email'            => true,
-		'phone'            => true,
+		/*
+		 * Coordonnées FACULTATIVES depuis le 06/10/2026.
+		 *
+		 * Le formulaire public ne les demande plus : il qualifie un projet
+		 * pour orienter le visiteur vers Premibel ou Allure Design, et
+		 * personne chez Pose-Parquet ne rappelle. On ne stocke pas de donnée
+		 * personnelle « au cas où ». Les champs restent dans le contrat —
+		 * validés s'ils sont fournis — pour le jour où une transmission réelle
+		 * à une entreprise serait mise en place, en le disant au visiteur.
+		 */
+		'firstName'        => false,
+		'lastName'         => false,
+		'email'            => false,
+		'phone'            => false,
 		'message'          => false,
-		'consent'          => true,
+		'consent'          => false,
 		'sourceUrl'        => false,
 		'utmSource'        => false,
 		'utmMedium'        => false,

@@ -20,8 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 <div class="wrap pp-admin">
-	<h1><?php esc_html_e( 'Demande introuvable', 'pose-parquet-core' ); ?></h1>
+	<h1><?php esc_html_e( 'Projet introuvable', 'pose-parquet-core' ); ?></h1>
 	<?php Notices::output( $view['notice'] ); ?>
-	<p><?php esc_html_e( 'Cette demande n’existe pas, ou plus.', 'pose-parquet-core' ); ?></p>
+	<p><?php esc_html_e( 'Ce projet n’existe pas, ou plus.', 'pose-parquet-core' ); ?></p>
 	<p><a class="button button-primary" href="<?php echo esc_url( View::list_url() ); ?>"><?php esc_html_e( 'Retour à la liste', 'pose-parquet-core' ); ?></a></p>
 </div>

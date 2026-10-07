@@ -48,7 +48,7 @@ final class Projects {
 	public static function render(): void {
 		if ( ! current_user_can( Capabilities::VIEW_PROJECTS ) ) {
 			wp_die(
-				esc_html__( 'Vous n’avez pas les droits nécessaires pour consulter les demandes.', 'pose-parquet-core' ),
+				esc_html__( 'Vous n’avez pas les droits nécessaires pour consulter les projets.', 'pose-parquet-core' ),
 				esc_html__( 'Accès refusé', 'pose-parquet-core' ),
 				[ 'response' => 403 ]
 			);

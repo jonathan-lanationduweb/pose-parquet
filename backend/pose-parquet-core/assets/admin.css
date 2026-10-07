@@ -64,13 +64,18 @@
 /* Pastille de statut. Le fond reste neutre : sept couleurs vives sur une liste
    de vingt lignes, c'est un sapin de Noël, pas une information. Seuls les deux
    états qui terminent une demande sont grisés, et « spam » barré. */
+/* Même mesure que les badges du socle (adm-badge) : 22 px, rayon 3 px. */
 .pp-admin .pp-status {
-	display: inline-block;
-	padding: 0.1em 0.6em;
+	display: inline-flex;
+	align-items: center;
+	height: 22px;
+	box-sizing: border-box;
+	padding: 0 8px;
 	border: 1px solid #c3c4c7;
-	border-radius: 999px;
+	border-radius: 3px;
 	background: #f6f7f7;
-	font-size: 0.85em;
+	font-size: 12px;
+	line-height: 1;
 	white-space: nowrap;
 }
 .pp-admin .pp-status--new {
@@ -98,21 +103,41 @@
 }
 
 /*
- * Repli en petite largeur.
- *
- * Sous 900 px, les quatre colonnes secondaires — téléphone, ville, surface,
- * projet — disparaissent. Restent Référence, Date, Client et Statut : de quoi
- * reconnaître une demande et l'ouvrir. Le reste est sur la fiche, à un clic,
- * et vaut mieux que huit colonnes de six caractères.
+ * Liste des projets orientés : huit colonnes, largeurs fixées pour que la
+ * Destination (et ses liens rapides) garde la place de se lire.
  */
+.pp-table--projets .pp-col-date { width: 92px; }
+.pp-table--projets .pp-col-ref { width: 128px; }
+.pp-table--projets .pp-col-origine { width: 110px; }
+.pp-table--projets .pp-col-besoin { width: 120px; }
+.pp-table--projets .pp-col-zone { width: 130px; }
+.pp-table--projets .pp-col-statut { width: 110px; }
+.pp-table--projets td { vertical-align: top; }
+.pp-admin .pp-liens { display: flex; flex-direction: column; gap: 2px; margin-top: 4px; }
+.pp-admin .pp-lien { font-size: 12px; text-decoration: none; }
+.pp-admin .pp-lien:hover { text-decoration: underline; }
+
 @media (max-width: 900px) {
-	.pp-admin .pp-col-secondary {
-		display: none;
-	}
 	.pp-admin .pp-search input[type="search"] {
 		min-width: 0;
 		flex: 1 1 12rem;
 	}
+}
+
+/*
+ * Sous 782 px : chaque projet devient une fiche empilée, libellé à gauche,
+ * valeur à droite. Pas de défilement horizontal.
+ */
+@media (max-width: 782px) {
+	.pp-table--projets thead { display: none; }
+	.pp-table--projets, .pp-table--projets tbody, .pp-table--projets tr, .pp-table--projets td { display: block; width: auto !important; }
+	.pp-table--projets tr { padding: 8px 12px; border-bottom: 1px solid #dcdcde; }
+	.pp-table--projets td { display: flex !important; justify-content: space-between; gap: 12px; padding: 4px 0 !important; text-align: right; }
+	.pp-table--projets td::before { content: attr(data-label) !important; position: static !important; width: auto !important; display: block !important; flex: none; color: #646970; text-align: left; }
+	.pp-table--projets td .pp-cellule { text-align: right; }
+	.pp-table--projets td .pp-cellule .pp-sub { display: block; }
+	.pp-table--projets td .pp-liens { align-items: flex-end; }
+	.pp-table--projets td > * { min-width: 0; }
 }
 
 /* ---- Fiche ---- */
@@ -222,3 +247,6 @@
 .pp-detail .pp-note-body {
 	margin: 0;
 }
+
+/* Contenus, tableau de bord, maintenance, réglages : composants du socle
+   commun (assets/socle/admin-composants.css). */

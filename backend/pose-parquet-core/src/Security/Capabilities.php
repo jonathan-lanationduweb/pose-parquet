@@ -30,6 +30,31 @@ final class Capabilities {
 	public const MANAGE_SETTINGS = 'pp_manage_settings';
 
 	/**
+	 * Contenus éditoriaux (guides, tutoriels, inspirations, pages du site).
+	 *
+	 * Un seul jeu de droits pour les quatre types : `capability_type`
+	 * `pp_contenu` / `pp_contenus` avec `map_meta_cap`, donc les droits
+	 * primitifs que WordPress attend pour un type de contenu, et rien de plus.
+	 * Accordés à l'administrateur SEULEMENT : ni les éditeurs, ni les auteurs,
+	 * ni le gestionnaire des projets ne les reçoivent d'office.
+	 */
+	public const CONTENTS = [
+		'edit_pp_contenus',
+		'edit_others_pp_contenus',
+		'edit_published_pp_contenus',
+		'edit_private_pp_contenus',
+		'publish_pp_contenus',
+		'read_private_pp_contenus',
+		'delete_pp_contenus',
+		'delete_others_pp_contenus',
+		'delete_published_pp_contenus',
+		'delete_private_pp_contenus',
+	];
+
+	/** Le droit qui ouvre les écrans de contenus. */
+	public const EDIT_CONTENTS = 'edit_pp_contenus';
+
+	/**
 	 * Numéro du plancher de droits posé en base.
 	 *
 	 * À incrémenter quand une capability est ajoutée à `all()` ou à
@@ -37,12 +62,13 @@ final class Capabilities {
 	 * sur les installations déjà en service. Distinct de la version du plugin,
 	 * qui bouge à chaque livraison alors que le plancher, lui, bouge rarement.
 	 */
-	public const VERSION        = 1;
+	// 2 : droits des contenus éditoriaux (06/10/2026).
+	public const VERSION        = 2;
 	public const OPTION_VERSION = 'pose_parquet_caps_version';
 
 	/** @return string[] */
 	public static function all(): array {
-		return [ self::VIEW_PROJECTS, self::MANAGE_PROJECTS, self::MANAGE_SETTINGS ];
+		return array_merge( [ self::VIEW_PROJECTS, self::MANAGE_PROJECTS, self::MANAGE_SETTINGS ], self::CONTENTS );
 	}
 
 	/**

@@ -1,0 +1,460 @@
+/*
+ * SOCLE ADMIN — les composants. Communs à nos sites WordPress.
+ *
+ * Repris du back-office Expert Parquet (assets/admin.css et
+ * admin-contenu.css), mêmes valeurs, préfixe neutre « adm- ». Chargés
+ * UNIQUEMENT sur les écrans du module : wp-admin reste wp-admin ailleurs.
+ * Aucune police, aucune réinitialisation globale : les contrôles WordPress
+ * (.button, .notice, .widefat, listes) gardent leur apparence, nos blocs
+ * viennent s'y poser. Angles droits ou à peine arrondis, bordures franches
+ * plutôt qu'ombres, une seule couleur de marque (l'accent), avec parcimonie.
+ *
+ * Par site : --adm-accent, --adm-accent-fonce, --adm-accent-pale,
+ * --adm-creme (posés par le module sur body.adm-ecran).
+ *
+ *   adm-entete     titre d'écran et sous-titre
+ *   adm-chiffres   indicateurs (adm-chiffre, --attention)
+ *   adm-grille     deux colonnes 2/1, une sous 1100 px
+ *   adm-carte      carte : titre, corps, pied
+ *   adm-etat       liste « libellé → valeur » (ok, attente, ko)
+ *   adm-table      tableau compact
+ *   adm-badge      statut
+ *   adm-champ      champ de formulaire (et adm-compteur)
+ *   adm-image      bloc image (aperçu 16/9, actions)
+ *   adm-panneau    panneau de colonne droite
+ *   adm-toggle     interrupteur
+ *   adm-info, adm-note, adm-avertissement
+ *   adm-bouton     bouton (--plein, --contour, --danger, --petit, --bloc)
+ *   adm-reglages   grille de cartes de réglages
+ */
+
+.adm-ecran {
+	--adm-encre:     #17181A;
+	--adm-graphite:  #4A4845;
+	--adm-gris:      #6E6B66;
+	--adm-pierre:    #C6C3BD;
+	--adm-trait:     #E3E1DC;
+	--adm-papier:    #F6F5F3;
+	--adm-surface:   #FFFFFF;
+	--adm-succes:    #2F5D42;
+	--adm-succes-pale: #E3F0E7;
+	--adm-alerte:    #7A5A18;
+	--adm-erreur:    #932E22;
+	--adm-info:      #1D5F8A;
+	--adm-info-pale: #E8F1F8;
+	--adm-r:         4px;
+	/* Valeurs de repli : celles d'Expert Parquet. */
+	--adm-accent:       #B04A1E;
+	--adm-accent-fonce: #93401B;
+	--adm-accent-pale:  #F3E6DE;
+	--adm-creme:        #FBF6F2;
+}
+
+/* ------------------------------------------------------------- en-tête */
+.adm-ecran .wrap > h1, .adm-ecran h1.wp-heading-inline { font-size: 23px; font-weight: 600; color: var(--adm-encre); letter-spacing: -0.01em; }
+.adm-entete__sous-titre { margin: 2px 0 18px; font-size: 13px; color: var(--adm-gris); }
+
+/* ------------------------------------------------------------- indicateurs */
+.adm-chiffres { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 0 0 20px; }
+.adm-chiffre {
+	background: var(--adm-surface);
+	border: 1px solid var(--adm-trait);
+	border-left: 3px solid var(--adm-pierre);
+	padding: 14px 16px 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+/* L'accent ne sert qu'à ce qui demande une action aujourd'hui. */
+.adm-chiffre--attention { border-left-color: var(--adm-accent); }
+.adm-chiffre__libelle { color: var(--adm-gris); font-size: 13px; line-height: 1.3; }
+.adm-chiffre__valeur { font-size: 30px; font-weight: 400; line-height: 1.1; color: var(--adm-encre); font-variant-numeric: tabular-nums; }
+.adm-chiffre__lien { font-size: 13px; margin-top: 4px; text-decoration: none; }
+
+/* ------------------------------------------------------------- grilles */
+.adm-grille { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.adm-grille > *, .adm-reglages > *, .adm-carte { min-width: 0; }
+@media (max-width: 1100px) { .adm-grille { grid-template-columns: minmax(0, 1fr); } }
+.adm-reglages { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; align-items: start; }
+.adm-reglages .adm-carte { margin: 0; }
+
+/* ------------------------------------------------------------- cartes */
+.adm-carte { background: var(--adm-surface); border: 1px solid var(--adm-trait); margin: 0 0 16px; }
+.adm-carte__titre {
+	margin: 0;
+	padding: 10px 14px;
+	border-bottom: 1px solid var(--adm-trait);
+	font-size: 14px;
+	line-height: 1.4;
+	font-weight: 600;
+	color: var(--adm-encre);
+	background: var(--adm-papier);
+}
+.adm-carte__corps { padding: 12px 14px; }
+.adm-carte__corps > :first-child { margin-top: 0; }
+.adm-carte__corps > :last-child { margin-bottom: 0; }
+.adm-carte__pied { padding: 10px 14px; border-top: 1px solid var(--adm-trait); background: var(--adm-papier); }
+.adm-vide { color: var(--adm-gris); margin: 0; }
+
+/* ------------------------------------------------------------- état « libellé → valeur » */
+.adm-etat { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.adm-etat dt { color: var(--adm-graphite); padding: 5px 0; border-top: 1px solid var(--adm-trait); }
+.adm-etat dd { margin: 0; padding: 5px 0; border-top: 1px solid var(--adm-trait); text-align: right; }
+.adm-etat dt:first-of-type, .adm-etat dd:first-of-type { border-top: 0; }
+.adm-etat__valeur { font-weight: 600; }
+.adm-etat__valeur--ok { color: var(--adm-succes); }
+.adm-etat__valeur--attente { color: var(--adm-alerte); }
+.adm-etat__valeur--ko { color: var(--adm-erreur); }
+.adm-etat__note { grid-column: 1 / -1; margin: 0 0 6px; color: var(--adm-gris); font-size: 12px; text-align: left; }
+
+/* ------------------------------------------------------------- tableau compact */
+.adm-table { border-collapse: collapse; width: 100%; }
+.adm-table th, .adm-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--adm-trait); vertical-align: top; }
+.adm-table th { color: var(--adm-gris); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .02em; }
+.adm-table tbody tr:last-child td { border-bottom: 0; }
+.adm-table td a { text-decoration: none; }
+.adm-table .adm-nombre { text-align: right; font-variant-numeric: tabular-nums; }
+.adm-defilement { overflow-x: auto; min-width: 0; }
+
+/* ------------------------------------------------------------- badges */
+.adm-badge {
+	display: inline-block;
+	padding: 1px 8px;
+	border: 1px solid var(--adm-pierre);
+	border-radius: 2px;
+	background: #F2F1EF;
+	color: var(--adm-encre);
+	font-size: 12px;
+	line-height: 1.7;
+	white-space: nowrap;
+}
+.adm-badge--ok { background: var(--adm-succes-pale); border-color: #9DBFA8; }
+.adm-badge--attente { background: #F6EFDC; border-color: #C9B27A; }
+.adm-badge--ko { background: #F6E6E3; border-color: #C9968D; }
+.adm-badge--neutre { background: #F1EEED; border-color: #BFB5B2; }
+
+/* ------------------------------------------------------------- champs */
+.adm-champ { margin: 0 0 12px; }
+.adm-champ > label, .adm-champ__libelle, .adm-champ legend { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: var(--adm-graphite); }
+.adm-ecran .adm-champ input[type="text"], .adm-ecran .adm-champ input[type="url"], .adm-ecran .adm-champ input[type="email"],
+.adm-ecran .adm-champ textarea, .adm-ecran .adm-champ select {
+	width: 100%;
+	max-width: none;
+	border: 1px solid var(--adm-trait);
+	border-radius: var(--adm-r);
+	background: var(--adm-surface);
+	color: var(--adm-encre);
+	font-size: 13px;
+	padding: 7px 10px;
+	min-height: 34px;
+	box-shadow: none;
+}
+.adm-ecran .adm-champ input:focus, .adm-ecran .adm-champ textarea:focus, .adm-ecran .adm-champ select:focus { border-color: var(--adm-accent); box-shadow: 0 0 0 1px var(--adm-accent); outline: none; }
+.adm-champ .description { display: block; margin-top: 4px; color: var(--adm-gris); font-size: 12px; }
+.adm-champ--case > label { font-weight: 400; font-size: 13px; color: var(--adm-encre); }
+.adm-deux-champs { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 12px; }
+.adm-compteur { color: var(--adm-gris); font-size: 12px; margin-left: 6px; }
+.adm-compteur--trop { color: var(--adm-erreur); }
+@media (max-width: 782px) { .adm-deux-champs { grid-template-columns: minmax(0, 1fr); } }
+
+/* ------------------------------------------------------------- image */
+.adm-image__entete { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+.adm-image__entete .adm-champ__libelle { margin: 0; }
+.adm-image__actions { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+.adm-image__apercu { border: 1px solid var(--adm-trait); border-radius: var(--adm-r); overflow: hidden; background: var(--adm-papier); aspect-ratio: 16 / 9; max-width: 640px; display: flex; align-items: center; justify-content: center; }
+.adm-image__apercu img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.adm-image__vide { color: var(--adm-gris); font-size: 12px; }
+.adm-image__vide--alerte { color: var(--adm-erreur); font-weight: 600; }
+.adm-image--ligne .adm-image__apercu { width: 118px; height: 88px; aspect-ratio: auto; flex: none; }
+.adm-image--ligne .adm-image__corps { display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+
+/* ------------------------------------------------------------- panneaux (colonne droite) */
+.adm-panneau { background: var(--adm-surface); border: 1px solid var(--adm-trait); border-radius: var(--adm-r); padding: 18px 18px 16px; margin: 0 0 16px; }
+.adm-panneau__entete { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.adm-panneau__titre { margin: 0; font-size: 16px; font-weight: 600; color: var(--adm-encre); display: flex; align-items: center; gap: 8px; }
+.adm-panneau__titre .dashicons { color: var(--adm-accent); font-size: 18px; width: 18px; height: 18px; }
+.adm-panneau__texte { margin: 0 0 14px; font-size: 12px; color: var(--adm-gris); line-height: 1.5; }
+.adm-panneau__alerte { margin: 0 0 14px; font-size: 12px; color: var(--adm-graphite); }
+.adm-pastille { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--adm-pierre); flex: none; vertical-align: middle; }
+.adm-pastille--ok { background: var(--adm-succes); }
+.adm-pastille--actif { background: var(--adm-accent); }
+
+/* ------------------------------------------------------------- interrupteur */
+.adm-toggle-form { display: inline-flex; align-items: center; gap: 8px; margin: 0; }
+.adm-toggle { position: relative; width: 44px; height: 24px; border-radius: 12px; border: 0; background: var(--adm-pierre); cursor: pointer; padding: 0; transition: background .15s; }
+.adm-toggle__curseur { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .2); transition: transform .15s; }
+.adm-toggle--on { background: var(--adm-accent); }
+.adm-toggle--on .adm-toggle__curseur { transform: translateX(20px); }
+.adm-toggle:focus-visible { outline: 2px solid var(--adm-accent); outline-offset: 2px; }
+.adm-toggle__libelle { font-size: 12px; color: var(--adm-graphite); }
+
+/* ------------------------------------------------------------- encarts */
+.adm-info { display: flex; gap: 8px; align-items: flex-start; margin: 12px 0; padding: 10px 12px; background: var(--adm-info-pale); border-radius: var(--adm-r); font-size: 12px; color: var(--adm-graphite); line-height: 1.5; }
+.adm-info .dashicons { color: var(--adm-info); flex: none; font-size: 18px; width: 18px; height: 18px; }
+.adm-note { padding: 10px 12px; background: var(--adm-papier); border-left: 3px solid var(--adm-pierre); margin: 0 0 12px; }
+.adm-avertissement { padding: 10px 12px; background: #F6EFDC; border-left: 3px solid #C9B27A; margin: 0 0 12px; }
+
+/* ------------------------------------------------------------- boutons */
+.adm-bouton {
+	box-sizing: border-box;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 7px 14px;
+	border: 1px solid var(--adm-trait);
+	border-radius: var(--adm-r);
+	background: var(--adm-surface);
+	color: var(--adm-encre);
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.4;
+	text-decoration: none;
+	cursor: pointer;
+}
+.adm-bouton .dashicons { font-size: 15px; width: 15px; height: 15px; }
+.adm-bouton:hover, .adm-bouton:focus { color: var(--adm-encre); border-color: var(--adm-pierre); background: var(--adm-papier); }
+.adm-bouton--plein { background: var(--adm-accent); border-color: var(--adm-accent); color: #fff; font-weight: 600; }
+.adm-bouton--plein:hover, .adm-bouton--plein:focus { background: var(--adm-accent-fonce); border-color: var(--adm-accent-fonce); color: #fff; }
+.adm-bouton--contour { border-color: var(--adm-accent); color: var(--adm-accent); }
+.adm-bouton--contour:hover, .adm-bouton--contour:focus { background: var(--adm-creme); color: var(--adm-accent); border-color: var(--adm-accent); }
+.adm-bouton--danger { border-color: #E6B9B2; color: var(--adm-erreur); padding-inline: 8px; }
+.adm-bouton--danger:hover { background: #FBECE9; color: var(--adm-erreur); border-color: #D59A91; }
+.adm-bouton--petit { padding: 5px 10px; font-size: 12px; }
+.adm-bouton--bloc { display: flex; width: 100%; padding: 10px 14px; }
+.adm-bouton--bloc + .adm-bouton--bloc { margin-top: 8px; }
+
+/* ------------------------------------------------------------- listes WordPress (types du module) */
+.adm-ecran .wp-list-table .column-pp_image { width: 72px; }
+.adm-ecran .wp-list-table .column-pp_etat { width: 110px; }
+.adm-ecran .wp-list-table .column-pp_date { width: 120px; }
+.adm-ecran .wp-list-table .column-pp_modifie { width: 140px; }
+.adm-ecran .wp-list-table .column-pp_modifier { width: 80px; text-align: right; }
+.adm-ecran .wp-list-table .column-pp_adresse { width: 260px; }
+.adm-vignette { display: block; width: 52px; height: 50px; object-fit: cover; border-radius: 2px; }
+.adm-vignette--vide {
+	display: flex; align-items: center; justify-content: center; text-align: center;
+	width: 52px; height: 50px; padding: 2px; border: 1px dashed #C9968D; border-radius: 2px;
+	color: var(--adm-erreur); font-size: 10px; line-height: 1.15; background: #F6E6E3; box-sizing: border-box;
+}
+
+/* ------------------------------------------------------------- boîtes de l'écran d'édition */
+.adm-ecran #poststuff .postbox .adm-champ textarea { min-height: 70px; }
+.adm-bloc { margin: 18px 0 0; }
+.adm-bloc__titre { margin: 0 0 8px; padding: 0; font-size: 14px; font-weight: 600; color: var(--adm-encre); }
+.adm-ecran .adm-resume { width: 100%; min-height: 76px; border: 1px solid var(--adm-trait); border-radius: var(--adm-r); padding: 7px 10px; }
+
+/* ------------------------------------------------------------- responsive */
+@media (max-width: 782px) {
+	.adm-chiffres { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+	.adm-chiffre__valeur { font-size: 26px; }
+}
+@media (max-width: 480px) {
+	.adm-chiffres { grid-template-columns: 1fr 1fr; gap: 8px; }
+	.adm-chiffre { padding: 10px 12px; }
+}
+
+/* Aperçu d'une page publique, réduit de moitié (maintenance). */
+.adm-apercu-cadre { position: relative; overflow: hidden; aspect-ratio: 4 / 5; border: 1px solid var(--adm-trait); border-radius: var(--adm-r); background: var(--adm-papier); }
+.adm-apercu-cadre iframe { position: absolute; top: 0; left: 0; width: 200%; height: 200%; border: 0; transform: scale(0.5); transform-origin: 0 0; pointer-events: none; }
+.adm-contenu-titre { margin-top: 22px; }
+.adm-champ--case legend { margin-bottom: 6px; }
+fieldset.adm-champ { border: 0; padding: 0; margin: 0 0 16px; min-width: 0; }
+.adm-champ--case label { line-height: 2; }
+.adm-champ .adm-compteur { font-weight: 400; }
+/* Réglages : la table de la Settings API, empilée dans sa carte. */
+.adm-reglages .adm-carte__corps > form > h2 { display: none; }
+.adm-reglages .form-table, .adm-reglages .form-table tbody, .adm-reglages .form-table tr,
+.adm-reglages .form-table th, .adm-reglages .form-table td { display: block; width: auto; padding: 0; }
+.adm-reglages .form-table th { margin: 12px 0 5px; font-size: 12px; font-weight: 600; color: var(--adm-graphite); }
+.adm-reglages .form-table input[type="email"], .adm-reglages .form-table input[type="text"] { width: 100%; max-width: none; }
+.adm-reglages .form-table .description { font-size: 12px; }
+/* Édition : les titres de bloc ne prennent pas la marge des titres de boîte de WordPress. */
+.adm-ecran #poststuff .adm-bloc__titre { padding: 0; margin: 0 0 8px; font-size: 14px; line-height: 1.4; }
+.adm-ecran #poststuff .adm-image__entete .adm-bloc__titre { margin: 0; }
+/* Le bouton principal de WordPress prend l'accent de la marque, comme sur le socle. */
+.adm-ecran .wp-core-ui .button-primary, .adm-ecran.wp-core-ui .button-primary { background: var(--adm-accent); border-color: var(--adm-accent); color: #fff; }
+.adm-ecran .wp-core-ui .button-primary:hover, .adm-ecran.wp-core-ui .button-primary:hover,
+.adm-ecran .wp-core-ui .button-primary:focus, .adm-ecran.wp-core-ui .button-primary:focus { background: var(--adm-accent-fonce); border-color: var(--adm-accent-fonce); color: #fff; }
+.adm-ecran .wp-core-ui .button-primary:focus, .adm-ecran.wp-core-ui .button-primary:focus { box-shadow: 0 0 0 1px #fff, 0 0 0 3px var(--adm-accent); }
+
+/* Champs structurés (pages, Mon site) : un bloc par section du site. */
+.adm-ecran fieldset.adm-structure { border: 1px solid var(--adm-trait); background: var(--adm-surface); border-radius: var(--adm-r); padding: 4px 16px 6px; margin: 0 0 16px; min-width: 0; }
+.adm-ecran fieldset.adm-structure > legend { padding: 0 6px; margin: 0 0 0 -6px; font-size: 13px; font-weight: 600; color: var(--adm-encre); }
+.adm-ecran .adm-structure .adm-champ { margin: 10px 0 12px; }
+.adm-ecran .adm-structure .adm-champ input[type="checkbox"] { margin: 0 6px 0 0; }
+.adm-carte .adm-structure:last-child { margin-bottom: 0; }
+@media (min-width: 1101px) { .adm-colonne-collante { position: sticky; top: 46px; } }
+
+/* =====================================================================
+   FINITION — échelle commune, largeur, onglets, listes compactes.
+   Une seule échelle d'espacement : 8 · 12 · 16 · 24 · 32.
+   Règle de couleur : actions et liens WordPress en bleu natif ; l'accent
+   sauge pour la navigation active, les boutons principaux et la marque.
+   ===================================================================== */
+.adm-ecran {
+	--adm-e1: 8px;
+	--adm-e2: 12px;
+	--adm-e3: 16px;
+	--adm-e4: 24px;
+	--adm-e5: 32px;
+}
+
+/* Largeur : un conteneur cohérent, pas des champs de 1700 px sur 1920. */
+.adm-ecran #wpbody-content > .wrap { max-width: 1480px; }
+
+/* En-tête avec action à droite (Mon site). */
+.adm-entete-actions { display: flex; align-items: center; justify-content: space-between; gap: var(--adm-e2); flex-wrap: wrap; }
+.adm-entete-actions h1.wp-heading-inline { margin-right: 0; }
+.adm-entete__sous-titre { margin: 2px 0 var(--adm-e3); }
+
+/* Cartes : même rayon que les panneaux, mêmes marges internes. */
+.adm-carte { border-radius: var(--adm-r); overflow: hidden; margin-bottom: var(--adm-e3); }
+.adm-carte__titre { padding: var(--adm-e2) var(--adm-e3); }
+.adm-carte__corps { padding: var(--adm-e2) var(--adm-e3); }
+.adm-carte__pied { padding: var(--adm-e1) var(--adm-e3); }
+.adm-carte__aide { margin: 0 0 var(--adm-e2); font-size: 12px; color: var(--adm-gris); line-height: 1.5; }
+.adm-carte__aide:last-child { margin: var(--adm-e2) 0 0; }
+.adm-carte__sous-titre { margin: var(--adm-e3) 0 var(--adm-e1); font-size: 12px; font-weight: 600; color: var(--adm-graphite); text-transform: uppercase; letter-spacing: .02em; }
+.adm-carte__actions { margin: var(--adm-e3) 0 0; }
+.adm-carte__formulaire { margin: 0; }
+.adm-panneau { padding: var(--adm-e3); margin-bottom: var(--adm-e3); }
+
+/* Grilles de cartes. */
+.adm-colonnes-2, .adm-colonnes-3 { display: grid; gap: var(--adm-e3); align-items: start; }
+.adm-colonnes-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.adm-colonnes-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.adm-colonnes-2 > .adm-carte, .adm-colonnes-3 > .adm-carte { margin: 0; }
+.adm-colonnes-2 + *, .adm-colonnes-3 + * { margin-top: var(--adm-e3); }
+@media (max-width: 1100px) { .adm-colonnes-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 900px) { .adm-colonnes-2, .adm-colonnes-3 { grid-template-columns: minmax(0, 1fr); } }
+
+/* Indicateurs : même hauteur, lien toujours en bas. */
+.adm-chiffres { gap: var(--adm-e2); margin-bottom: var(--adm-e4); align-items: stretch; }
+.adm-chiffre { padding: var(--adm-e3); }
+.adm-chiffre__lien { margin-top: auto; padding-top: var(--adm-e1); }
+.adm-grille { gap: var(--adm-e3); }
+
+/* Réglages : deux colonnes, cartes d'une même rangée à la même hauteur. */
+.adm-reglages--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--adm-e3); align-items: stretch; }
+.adm-reglages--2 > .adm-carte { display: flex; flex-direction: column; }
+.adm-reglages--2 > .adm-carte > .adm-carte__corps { flex: 1; }
+.adm-reglages__large { grid-column: 1 / -1; }
+@media (max-width: 1000px) { .adm-reglages--2 { grid-template-columns: minmax(0, 1fr); } }
+/* Clé / valeur, valeurs alignées en colonne comme les Réglages d'Expert Parquet. */
+.adm-reglages .adm-etat { grid-template-columns: minmax(150px, 40%) 1fr; }
+.adm-reglages .adm-etat dd { text-align: left; }
+
+/* Alerte d'une ligne, sous un champ. */
+.adm-alerte-ligne { display: flex; gap: 6px; align-items: flex-start; margin: 6px 0 0; padding: 6px 8px; background: var(--adm-info-pale); border-radius: var(--adm-r); font-size: 12px; line-height: 1.4; color: var(--adm-graphite); }
+.adm-alerte-ligne .dashicons { font-size: 16px; width: 16px; height: 16px; color: var(--adm-info); flex: none; }
+.adm-alerte-ligne--ko { background: #F6EFDC; }
+.adm-alerte-ligne--ko .dashicons { color: var(--adm-alerte); }
+.adm-reglages .form-table input[type="email"] { min-height: 34px; border: 1px solid var(--adm-trait); border-radius: var(--adm-r); padding: 6px 10px; }
+.adm-reglages .form-table th { margin-top: var(--adm-e3); }
+.adm-reglages .form-table tr:first-child th { margin-top: 0; }
+
+/* Tableau qui s'empile sur mobile (Rôles et droits). */
+.adm-table th[scope="row"] { color: var(--adm-encre); font-weight: 400; text-transform: none; font-size: 13px; letter-spacing: 0; }
+@media (max-width: 600px) {
+	.adm-table--empilable thead { display: none; }
+	.adm-table--empilable tr { display: block; padding: var(--adm-e1) 0; border-bottom: 1px solid var(--adm-trait); }
+	.adm-table--empilable tbody tr:last-child { border-bottom: 0; }
+	.adm-table--empilable th[scope="row"], .adm-table--empilable td { display: flex; justify-content: space-between; border: 0; padding: 3px 0; }
+	.adm-table--empilable th[scope="row"] { font-weight: 600; }
+	.adm-table--empilable td::before { content: attr(data-label); color: var(--adm-gris); }
+}
+
+/* Badges : une seule mesure pour tous les états (contenus, images, projets, catalogue). */
+.adm-badge { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 3px; font-size: 12px; line-height: 1; box-sizing: border-box; vertical-align: middle; }
+
+/* Onglets internes (WordPress natifs) ; ils défilent horizontalement sur mobile. */
+.adm-ecran .adm-onglets { margin: 0 0 var(--adm-e3); }
+@media (max-width: 782px) {
+	.adm-ecran .adm-onglets { display: flex; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; border-bottom: 1px solid #c3c4c7; padding-top: 0; }
+	.adm-ecran .adm-onglets .nav-tab { flex: none; float: none; margin-bottom: -1px; white-space: nowrap; }
+}
+
+/* Listes compactes « entrée · libellé · affiché ». */
+.adm-liste { width: 100%; border-collapse: collapse; }
+.adm-liste th, .adm-liste td { padding: 6px 0; border-top: 1px solid var(--adm-trait); vertical-align: middle; text-align: left; }
+.adm-liste tbody tr:first-child th, .adm-liste tbody tr:first-child td { border-top: 0; }
+.adm-liste thead th { border-top: 0; padding-top: 0; font-size: 12px; font-weight: 600; color: var(--adm-gris); text-transform: uppercase; letter-spacing: .02em; }
+.adm-liste thead + tbody tr:first-child th, .adm-liste thead + tbody tr:first-child td { border-top: 1px solid var(--adm-trait); }
+.adm-liste tbody th { width: 34%; padding-right: var(--adm-e2); font-weight: 400; color: var(--adm-graphite); }
+.adm-liste td input[type="text"] { width: 100%; min-height: 32px; border: 1px solid var(--adm-trait); border-radius: var(--adm-r); padding: 4px 8px; font-size: 13px; box-shadow: none; }
+.adm-liste td input[type="text"]:focus { border-color: var(--adm-accent); box-shadow: 0 0 0 1px var(--adm-accent); outline: none; }
+.adm-liste .adm-liste__case { width: 1%; white-space: nowrap; padding-left: var(--adm-e2); font-size: 12px; color: var(--adm-graphite); }
+.adm-liste .adm-liste__case input { margin: 0 4px 0 0; }
+.adm-liste--etroite tbody th { width: 38%; }
+
+/* Barre d'enregistrement collée au bas de l'écran. */
+.adm-barre-actions {
+	position: sticky;
+	bottom: 0;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: var(--adm-e2);
+	margin: var(--adm-e3) 0 0;
+	padding: var(--adm-e2) var(--adm-e3);
+	background: rgba(255, 255, 255, .96);
+	border: 1px solid var(--adm-trait);
+	border-radius: var(--adm-r);
+}
+.adm-barre-actions__note { font-size: 12px; color: var(--adm-gris); margin-right: auto; }
+@media (max-width: 600px) { .adm-barre-actions__note { display: none; } .adm-barre-actions .adm-bouton { width: 100%; } }
+
+/* Mon site — aperçu léger (esquisse, pas un second navigateur). */
+.adm-apercu-site { border: 1px solid var(--adm-trait); border-radius: var(--adm-r); overflow: hidden; background: #F2EFE8; }
+.adm-apercu-site__entete { display: flex; align-items: center; gap: var(--adm-e2); padding: var(--adm-e2); flex-wrap: wrap; }
+.adm-apercu-site__marque { display: inline-flex; align-items: center; gap: 6px; font-size: 16px; color: #1c1c1a; }
+.adm-apercu-site__marque strong { font-weight: 400; }
+.adm-apercu-site__marque span:last-child { opacity: .55; }
+.adm-apercu-site__symbole { width: 7px; height: 13px; background: linear-gradient(90deg, currentColor 0 30%, transparent 30% 38%, currentColor 38% 68%, transparent 68% 76%, currentColor 76%); }
+.adm-apercu-site__logo { display: block; height: 22px; width: auto; max-width: 120px; object-fit: contain; }
+.adm-apercu-site__menu { display: flex; gap: var(--adm-e1); flex-wrap: wrap; font-size: 11px; color: #3c3b38; margin-left: auto; }
+.adm-apercu-site__cta { font-size: 11px; padding: 3px 8px; border: 1px solid #1c1c1a; border-radius: 999px; color: #1c1c1a; }
+.adm-apercu-site__pied { padding: var(--adm-e2); background: #1c1c1a; color: #f2efe8; font-size: 14px; }
+.adm-apercu-site__pied small { display: block; margin-top: 4px; font-size: 11px; opacity: .7; }
+
+/* Catalogue : la synchronisation en deux colonnes, sans vide. */
+.adm-sync { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--adm-e3); align-items: start; }
+.adm-sync .adm-info { margin-top: 0; }
+@media (max-width: 900px) { .adm-sync { grid-template-columns: minmax(0, 1fr); } }
+
+/* Maintenance : aperçu cadré. */
+.adm-apercu-cadre { max-height: 640px; }
+
+/* Tableaux : texte et badges centrés sur la même ligne. */
+.adm-table th, .adm-table td { vertical-align: middle; }
+
+/* Liens des cartes et panneaux : un seul style (bleu WordPress, souligné au survol), comme les indicateurs. */
+.adm-ecran .adm-panneau a, .adm-ecran .adm-carte__pied a, .adm-ecran .adm-chiffre__lien { text-decoration: none; }
+.adm-ecran .adm-panneau a:hover, .adm-ecran .adm-carte__pied a:hover, .adm-ecran .adm-chiffre__lien:hover { text-decoration: underline; }
+
+/* Cases à cocher d'un groupe : une ligne chacune, sans double interligne. */
+.adm-champ--case br { display: none; }
+.adm-champ--case > label { display: block; line-height: 1.5; margin: 0 0 var(--adm-e1); }
+.adm-champ--case > label:last-child { margin-bottom: 0; }
+
+/* Mobile : le bouton d'en-tête suffit, la barre reprend sa place dans le flux. */
+@media (max-width: 782px) { .adm-barre-actions { position: static; } }
+
+/* État d’un canal (email) en tête de carte. */
+.adm-etat-ligne { margin: 0 0 8px; font-size: 13px; color: var(--adm-graphite); }
+
+/* Publication du site : panneau, actions, journal, contenus sans image. */
+.adm-publication .adm-etat { margin-bottom: var(--adm-e2); }
+.adm-publication__actions { display: flex; flex-wrap: wrap; gap: var(--adm-e1); align-items: center; margin-top: var(--adm-e2); }
+.adm-publication__actions .adm-bouton[disabled] { opacity: .6; cursor: not-allowed; }
+.adm-publication .adm-alerte-ligne { margin-bottom: var(--adm-e2); }
+.adm-journal__raison { display: block; margin-top: 4px; font-size: 12px; color: var(--adm-gris); }
+.adm-sans-image { margin: 0; padding: 0; list-style: none; }
+.adm-sans-image li { display: flex; justify-content: space-between; gap: var(--adm-e2); padding: 6px 0; border-top: 1px solid var(--adm-trait); }
+.adm-sans-image li:first-child { border-top: 0; }
+.adm-sans-image a { text-decoration: none; white-space: nowrap; }
+.adm-rappel-publication { margin: 0 0 var(--adm-e3) !important; }
+@media (min-width: 601px) { .adm-publication-journal th[scope="row"], .adm-table--empilable th[scope="row"] { white-space: nowrap; } }

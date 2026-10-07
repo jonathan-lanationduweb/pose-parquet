@@ -55,7 +55,9 @@ final class Service {
 			return [ 'ok' => false, 'code' => self::ERR_STORAGE ];
 		}
 
-		$id = $repo->insert_project( $data, $now, $now );
+		// Pas de consentement reçu, pas de date de consentement : la colonne
+		// reste NULL plutôt que d'affirmer un accord qui n'a pas été donné.
+		$id = $repo->insert_project( $data, ! empty( $data['consent'] ) ? $now : null, $now );
 		if ( $id <= 0 ) {
 			return $this->abandon( $transactional, 'Insertion refusée' );
 		}
