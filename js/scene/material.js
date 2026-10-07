@@ -24,7 +24,7 @@
  */
 import { buildTexture, buildMips, etendreMips, TILE, TILE_METERS } from './texture.js';
 import { reliefFromAlbedo } from './relief.js';
-import { chrono } from '../utils/perf.js';
+import { chrono, noter } from '../utils/perf.js';
 import { motifEffectif } from './motifs-regles.js';
 
 /** Rugosité de référence par finition : ce qui distingue mat, satiné, verni. */
@@ -229,65 +229,104 @@ function retenir(id, maps) {
  * fabrication reste synchrone, comme avant — plus lente, mais juste.
  */
 let worker = null;
+/**
+ * Second worker, réservé à ce qui doit arriver VITE : ébauches et aperçus.
+ *
+ * Mesuré le 05/10/2026 : un worker traite ses messages l'un après l'autre, et
+ * la tuile définitive d'un point de Hongrie l'occupe 3 à 7 s. Un clic sur une
+ * autre référence pendant ce temps voyait son ébauche attendre derrière une
+ * tuile devenue inutile — d'où les ~10 s de « changement à chaud ». Sur une
+ * file à part, l'ébauche ne fait plus jamais la queue derrière une
+ * définitive ; la définitive, elle, démarre en même temps que l'ébauche au
+ * lieu d'après.
+ */
+let workerRapide = null;
 let workerIndisponible = false;
 const enCours = new Map();   // clé → { resolve, reject, material, tile }
 const abonnes = new Set();
 let compteur = 0;
 
-function obtenirWorker() {
-  if (worker || workerIndisponible) return worker;
+function creerWorker() {
+  const w = new Worker(new URL('./texture-worker.js', import.meta.url), { type: 'module' });
+  w.onmessage = recevoir;
+  w.onerror = panne;
+  return w;
+}
+
+/** @param {boolean} [rapide] la file des ébauches et des aperçus */
+function obtenirWorker(rapide = false) {
+  if (workerIndisponible) return null;
+  if (rapide ? workerRapide : worker) return rapide ? workerRapide : worker;
   if (typeof Worker !== 'function' || typeof OffscreenCanvas !== 'function') {
     workerIndisponible = true;
     return null;
   }
   try {
-    worker = new Worker(new URL('./texture-worker.js', import.meta.url), { type: 'module' });
+    if (rapide) workerRapide = creerWorker();
+    else worker = creerWorker();
   } catch {
     workerIndisponible = true;
     return null;
   }
-  worker.onmessage = (event) => {
-    const { id, albedo, relief, erreur, bitmap } = event.data || {};
-    const attente = enCours.get(id);
-    if (!attente) return;
-    enCours.delete(id);
-    if (erreur) {
-      attente.reject(new Error(erreur));
-      return;
-    }
-    if (bitmap) {
-      // Aperçu : rien à mettre en cache de cartes, on livre l'image.
-      apercus.set(attente.cle, bitmap);
-      attente.resolve(bitmap);
-      return;
-    }
-    // Les tableaux arrivent transférés : `Uint8ClampedArray` reconstruite sur
-    // le tampon reçu, sans copie.
-    const a0 = { size: albedo.size, data: new Uint8ClampedArray(albedo.data.buffer || albedo.data) };
-    const r0 = { size: relief.size, data: new Uint8ClampedArray(relief.data.buffer || relief.data) };
-    const maps = retenir(attente.cle, assemble(attente.material, null, a0, r0));
-    /*
-     * La définitive chasse son ébauche.
-     *
-     * Sans cette ligne, le cache garderait les deux : deux entrées pour un même
-     * choix dans un cache de douze, donc des évictions deux fois plus fréquentes
-     * et des reconstructions qu'on croyait justement éviter.
-     */
-    if (!attente.ebauche) cache.delete(attente.cle + SUFFIXE_EBAUCHE);
-    attente.resolve(maps);
-    abonnes.forEach((cb) => { try { cb(attente.cle, maps); } catch { /* un abonné défaillant n'arrête pas les autres */ } });
-  };
-  worker.onerror = () => {
-    // Le worker est hors d'usage : on rejette ce qui attend et on repasse en
-    // synchrone pour la suite de la session.
-    enCours.forEach((att) => att.reject(new Error('worker de texture indisponible')));
-    enCours.clear();
-    worker.terminate();
-    worker = null;
-    workerIndisponible = true;
-    abonnes.forEach((cb) => { try { cb(null, null); } catch { /* idem */ } });
-  };
-  return worker;
+  return rapide ? workerRapide : worker;
+}
+
+/** Une tuile ou un aperçu revient d'un des deux workers. */
+function recevoir(event) {
+  const { id, albedo, relief, erreur, bitmap, durees } = event.data || {};
+  const attente = enCours.get(id);
+  if (!attente) return;
+  enCours.delete(id);
+  if (durees) {
+    // `?perf=1` seulement : le temps de worker, et l'attente en file avant lui.
+    const voie = attente.ebauche ? 'ebauche' : 'definitive';
+    Object.entries(durees).forEach(([k, v]) => noter(`worker.${voie}.${k}`, v));
+    noter(`worker.${voie}.aller-retour`, performance.now() - attente.poste);
+  }
+  if (erreur) {
+    attente.reject(new Error(erreur));
+    return;
+  }
+  if (bitmap) {
+    // Aperçu : rien à mettre en cache de cartes, on livre l'image.
+    apercus.set(attente.cle, bitmap);
+    attente.resolve(bitmap);
+    return;
+  }
+  // Les tableaux arrivent transférés : `Uint8ClampedArray` reconstruite sur
+  // le tampon reçu, sans copie.
+  const a0 = { size: albedo.size, data: new Uint8ClampedArray(albedo.data.buffer || albedo.data) };
+  const r0 = { size: relief.size, data: new Uint8ClampedArray(relief.data.buffer || relief.data) };
+  const maps = retenir(attente.cle, assemble(attente.material, null, a0, r0));
+  /*
+   * La définitive chasse son ébauche.
+   *
+   * Sans cette ligne, le cache garderait les deux : deux entrées pour un même
+   * choix dans un cache de douze, donc des évictions deux fois plus fréquentes
+   * et des reconstructions qu'on croyait justement éviter.
+   */
+  if (!attente.ebauche) cache.delete(attente.cle + SUFFIXE_EBAUCHE);
+  /*
+   * Une ébauche arrivée APRÈS sa définitive (les deux files sont
+   * parallèles) ne doit pas la remplacer : on la jette.
+   */
+  if (attente.ebauche && cache.has(attente.cle.slice(0, -SUFFIXE_EBAUCHE.length))) cache.delete(attente.cle);
+  attente.resolve(maps);
+  abonnes.forEach((cb) => { try { cb(attente.cle, maps); } catch { /* un abonné défaillant n'arrête pas les autres */ } });
+}
+
+/**
+ * Un worker est hors d'usage : on rejette ce qui attend et on repasse en
+ * synchrone pour la suite de la session — les deux files ensemble.
+ */
+function panne() {
+  enCours.forEach((att) => att.reject(new Error('worker de texture indisponible')));
+  enCours.clear();
+  [worker, workerRapide].forEach((w) => w && w.terminate());
+  worker = null;
+  workerRapide = null;
+  workerIndisponible = true;
+  abonnes.forEach((cb) => { try { cb(null, null); } catch { /* idem */ } });
 }
 
 /**
@@ -324,7 +363,7 @@ export function materialMapsAsync(material, config = {}) {
    * exactement l'attente qu'elle est censée supprimer.
    */
   if (MOTIFS_LENTS.has(motifEffectif(material, config.pattern))) {
-    posterTuile(w, material, config, true);
+    posterTuile(obtenirWorker(true) || w, material, config, true);
   }
   return posterTuile(w, material, config, false);
 }
@@ -346,7 +385,7 @@ function posterTuile(w, material, config, ebauche) {
   let resolve; let reject;
   const promesse = new Promise((res, rej) => { resolve = res; reject = rej; });
   const id = (compteur += 1);
-  enCours.set(id, { cle, material, resolve, reject, promesse, ebauche });
+  enCours.set(id, { cle, material, resolve, reject, promesse, ebauche, poste: performance.now() });
   // Le matériau part en copie structurée : données pures uniquement.
   w.postMessage({
     id,
@@ -385,7 +424,7 @@ export function apercuAsync(material, pattern, size = 320) {
   if (apercus.has(cle)) return Promise.resolve(apercus.get(cle));
   const deja = [...enCours.values()].find((a) => a.cle === cle);
   if (deja) return deja.promesse;
-  const wk = obtenirWorker();
+  const wk = obtenirWorker(true);
   if (!wk) return Promise.resolve(buildTexture(material, { pattern, size }));
   if (apercus.size >= MAX_APERCUS) {
     const premier = apercus.keys().next().value;
