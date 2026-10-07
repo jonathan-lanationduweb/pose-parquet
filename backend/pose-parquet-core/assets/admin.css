@@ -71,21 +71,25 @@
 	height: 22px;
 	box-sizing: border-box;
 	padding: 0 8px;
-	border: 1px solid #c3c4c7;
+	border: 1px solid #d3d1cd;
 	border-radius: 3px;
-	background: #f6f7f7;
+	background: #f3f3f2;
+	color: #4a4845;
 	font-size: 12px;
+	font-weight: 500;
 	line-height: 1;
 	white-space: nowrap;
 }
+/* Nouveau : information (bleu). À contacter : attention (orange). */
 .pp-admin .pp-status--new {
-	border-color: #2271b1;
-	background: #f0f6fc;
-	font-weight: 600;
+	border-color: #a9c7e3;
+	background: #eaf2fa;
+	color: #1d4f76;
 }
 .pp-admin .pp-status--to_contact {
-	border-color: #bd8600;
-	background: #fcf9e8;
+	border-color: #e2c47e;
+	background: #fcf5e2;
+	color: #6b4e0b;
 }
 .pp-admin .pp-status--completed,
 .pp-admin .pp-status--lost {
@@ -113,6 +117,16 @@
 .pp-table--projets .pp-col-zone { width: 130px; }
 .pp-table--projets .pp-col-statut { width: 110px; }
 .pp-table--projets td { vertical-align: top; }
+/*
+ * Sous 1280 px, les largeurs fixes ne laissaient presque rien au Produit et à
+ * la Destination (mesuré à 1024 : une lettre par ligne). Le tableau reprend
+ * une mise en page automatique ; sous 782 px, chaque ligne devient une fiche.
+ */
+@media (max-width: 1280px) {
+	.pp-table--projets { table-layout: auto; }
+	.pp-table--projets th { width: auto !important; }
+	.pp-table--projets .pp-col-date, .pp-table--projets .pp-col-ref { white-space: nowrap; }
+}
 .pp-admin .pp-liens { display: flex; flex-direction: column; gap: 2px; margin-top: 4px; }
 .pp-admin .pp-lien { font-size: 12px; text-decoration: none; }
 .pp-admin .pp-lien:hover { text-decoration: underline; }

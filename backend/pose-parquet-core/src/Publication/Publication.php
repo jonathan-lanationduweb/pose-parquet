@@ -509,6 +509,17 @@ final class Publication {
 			$lignes[] = [ __( 'Étape', 'pose-parquet-core' ), [ 'export' => __( 'export et validation', 'pose-parquet-core' ), 'validation' => __( 'validation', 'pose-parquet-core' ), 'build' => __( 'construction du site', 'pose-parquet-core' ), 'ci' => __( 'workflow GitHub', 'pose-parquet-core' ) ][ $e['etape'] ] ?? $e['etape'] ];
 		}
 		\PoseParquet\Core\Admin\Socle::etat( $lignes );
+		self::alertes( $e );
+		echo '<div class="adm-publication__actions">';
+		if ( $compact ) {
+			echo '<a class="adm-bouton" href="' . esc_url( self::url() ) . '"><span class="dashicons dashicons-visibility" aria-hidden="true"></span>' . esc_html__( 'Prévisualiser', 'pose-parquet-core' ) . '</a>';
+		}
+		echo self::bouton( $e ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé dans bouton().
+		echo '</div></div>';
+	}
+
+	/** Ce qui demande l'attention : maintenance à publier, échec, publication non configurée. */
+	private static function alertes( array $e ): void {
 		if ( $e['maintenance_a_publier'] ) {
 			echo '<p class="adm-panneau__alerte"><span class="adm-pastille adm-pastille--actif"></span> ' . esc_html( \PoseParquet\Core\Maintenance\Reglages::actif() ? __( 'Maintenance activée — publication nécessaire. Le site public n’affiche pas encore la page de maintenance.', 'pose-parquet-core' ) : __( 'Maintenance désactivée — publication nécessaire. Le site public affiche encore la page de maintenance.', 'pose-parquet-core' ) ) . '</p>';
 		}
@@ -521,12 +532,30 @@ final class Publication {
 				? '<p class="adm-panneau__texte">' . esc_html__( 'Aucune publication n’est configurée ici : ni dossier local du site avec Node, ni GitHub. Voir Publication.', 'pose-parquet-core' ) . '</p>'
 				: '<p class="adm-alerte-ligne"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span>' . esc_html__( 'Publication GitHub à configurer : POSE_PARQUET_GITHUB_REPO et POSE_PARQUET_GITHUB_TOKEN dans wp-config.php, WP_EXPORT_URL dans le dépôt GitHub.', 'pose-parquet-core' ) . '</p>';
 		}
-		echo '<div class="adm-publication__actions">';
-		if ( $compact ) {
-			echo '<a class="adm-bouton" href="' . esc_url( self::url() ) . '"><span class="dashicons dashicons-visibility" aria-hidden="true"></span>' . esc_html__( 'Prévisualiser', 'pose-parquet-core' ) . '</a>';
+	}
+
+	/**
+	 * Le bandeau « Site public » de l'écran Publication : le statut, la
+	 * dernière publication, le mode. Les actions sont dans l'en-tête de l'écran.
+	 */
+	public static function bandeau(): void {
+		$e     = self::etat();
+		$modes = [ 'local' => __( 'Local', 'pose-parquet-core' ), 'github' => 'GitHub Actions', 'aucune' => __( 'Non configurée', 'pose-parquet-core' ) ];
+		echo '<section class="adm-bandeau adm-publication" data-pp-publication="' . esc_attr( $e['statut'] ) . '" aria-label="' . esc_attr__( 'Site public', 'pose-parquet-core' ) . '">';
+		echo '<div class="adm-bandeau__ligne">';
+		echo '<div class="adm-bandeau__statut"><span class="adm-bandeau__libelle">' . esc_html__( 'Site public', 'pose-parquet-core' ) . '</span>' . \PoseParquet\Core\Admin\Socle::badge( $e['libelle'], self::variante( $e['statut'] ) ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe.
+		echo '<dl class="adm-bandeau__infos">';
+		echo '<div><dt>' . esc_html__( 'Dernière publication', 'pose-parquet-core' ) . '</dt><dd>' . esc_html( self::date( $e['derniere'] ) ) . '</dd></div>';
+		if ( $e['statut'] === 'modifications' || $e['statut'] === 'echec' ) {
+			echo '<div><dt>' . esc_html__( 'Changements', 'pose-parquet-core' ) . '</dt><dd>' . (int) count( $e['changements'] ) . '</dd></div>';
 		}
-		echo self::bouton( $e ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé dans bouton().
-		echo '</div></div>';
+		if ( $e['statut'] === 'en_cours' && $e['etape'] !== '' ) {
+			echo '<div><dt>' . esc_html__( 'Étape', 'pose-parquet-core' ) . '</dt><dd>' . esc_html( [ 'export' => __( 'export et validation', 'pose-parquet-core' ), 'validation' => __( 'validation', 'pose-parquet-core' ), 'build' => __( 'construction du site', 'pose-parquet-core' ), 'ci' => __( 'workflow GitHub', 'pose-parquet-core' ) ][ $e['etape'] ] ?? $e['etape'] ) . '</dd></div>';
+		}
+		echo '<div><dt>' . esc_html__( 'Mode', 'pose-parquet-core' ) . '</dt><dd>' . esc_html( $modes[ $e['mode'] ] ?? $e['mode'] ) . '</dd></div>';
+		echo '</dl></div>';
+		self::alertes( $e );
+		echo '</section>';
 	}
 
 	/** Une ligne d'avertissement réutilisable (Mon site, maintenance) quand il y a quelque chose à publier. */

@@ -19,47 +19,59 @@
 #adminmenuback, #adminmenuwrap, #adminmenu { background: #17181A; }
 #adminmenu .wp-submenu, #adminmenu .wp-has-current-submenu .wp-submenu, #adminmenu .wp-has-current-submenu.opensub .wp-submenu { background: #1F2124; }
 
-/* Logotype en tête de colonne */
+/* Logotype en tête de colonne : cadré, aligné sur les icônes du menu. */
 #adminmenu::before {
 	content: "";
 	display: block;
-	height: 56px;
-	margin: 10px 12px 6px;
+	height: 30px;
+	margin: 16px 12px 8px;
+	padding: 0 0 14px;
 	background: var(--adm-logo, none) no-repeat left center;
 	background-size: contain;
+	background-origin: content-box;
+	background-clip: content-box;
 	border-bottom: 1px solid rgba(255, 255, 255, .08);
 }
+/* Menu replié : pas de logotype écrasé dans 36 px. */
+.folded #adminmenu::before { display: none; }
+@media screen and (min-width: 783px) and (max-width: 960px) { .auto-fold #adminmenu::before { display: none; } }
 
-/* Entrée courante : couleur d'accent du site (et non le bleu WordPress) */
+/* Entrée courante : fond à peine plus clair et filet sauge à gauche — pas de bloc plein. */
 #adminmenu li.current a.menu-top,
 #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
-#adminmenu .wp-has-current-submenu .wp-submenu .wp-submenu-head,
-#adminmenu .wp-menu-arrow,
-#adminmenu .wp-menu-arrow div { background: var(--adm-accent, #2271b1); color: #fff; }
+#adminmenu .wp-has-current-submenu .wp-submenu .wp-submenu-head { background: #26292D; color: #fff; box-shadow: inset 3px 0 0 var(--adm-accent-clair, #72aee6); }
+#adminmenu li.current a.menu-top .wp-menu-image:before,
+#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu .wp-menu-image:before { color: #fff; }
+#adminmenu .wp-menu-arrow { display: none; }
 #adminmenu .wp-submenu li.current a,
 #adminmenu .wp-submenu li.current a:hover,
-#adminmenu .wp-submenu li.current a:focus { background: var(--adm-accent, #2271b1); color: #fff; font-weight: 500; border-radius: 0; }
-#adminmenu .wp-submenu a:hover, #adminmenu .wp-submenu a:focus { color: var(--adm-accent-clair, #72aee6); }
+#adminmenu .wp-submenu li.current a:focus { background: rgba(255, 255, 255, .07); color: #fff; font-weight: 600; border-radius: 0; box-shadow: inset 3px 0 0 var(--adm-accent-clair, #72aee6); }
+#adminmenu .wp-submenu a:hover, #adminmenu .wp-submenu a:focus { color: var(--adm-accent-clair, #72aee6); background: rgba(255, 255, 255, .04); }
+#adminmenu .wp-submenu a:focus-visible { box-shadow: inset 0 0 0 2px var(--adm-accent-clair, #72aee6); outline: 0; }
 #adminmenu li.menu-top:hover, #adminmenu li.opensub > a.menu-top, #adminmenu li > a.menu-top:focus { color: var(--adm-accent-clair, #72aee6); }
 #adminmenu li.menu-top:hover .wp-menu-image:before, #adminmenu li.opensub > a.menu-top .wp-menu-image:before { color: var(--adm-accent-clair, #72aee6); }
 
 /* Icônes des entrées du module */
-#adminmenu .wp-submenu .adm-menu-icone { font-size: 16px; width: 16px; height: 16px; margin: -2px 8px 0 0; vertical-align: middle; opacity: .85; }
-#adminmenu .wp-submenu li.current .adm-menu-icone { opacity: 1; }
-#adminmenu .wp-submenu li a { padding: 7px 12px; font-size: 13px; }
+#adminmenu .wp-submenu .adm-menu-icone { font-size: 16px; width: 16px; height: 16px; margin: -2px 10px 0 0; vertical-align: middle; opacity: .7; }
+#adminmenu .wp-submenu li.current .adm-menu-icone, #adminmenu .wp-submenu a:hover .adm-menu-icone { opacity: 1; }
+#adminmenu .wp-submenu li a { padding: 7px 12px; font-size: 13px; line-height: 1.4; }
+/* Entrée sur deux lignes (« Catalogue Premibel ») : le texte reste aligné à droite de l'icône. */
+#adminmenu .wp-submenu li a:has(> .adm-menu-icone) { display: flex; align-items: flex-start; }
+#adminmenu .wp-submenu li a:has(> .adm-menu-icone) .adm-menu-icone { flex: none; margin-top: 1px; }
 
 /* Intitulés de rubrique */
 #adminmenu .wp-submenu li a .adm-menu-section,
 #adminmenu .wp-submenu li .adm-menu-section {
 	display: block;
-	padding: 6px 0 2px;
+	padding: 10px 0 2px;
 	font-size: 10px;
+	font-weight: 600;
 	letter-spacing: .12em;
 	text-transform: uppercase;
-	color: rgba(240, 246, 252, .5);
+	color: rgba(240, 246, 252, .45);
 	cursor: default;
 }
-#adminmenu .wp-submenu li.adm-menu-section-item { margin-top: 6px; border-top: 1px solid rgba(255, 255, 255, .06); }
+#adminmenu .wp-submenu li.adm-menu-section-item { margin-top: 8px; border-top: 1px solid rgba(255, 255, 255, .07); }
 #adminmenu .wp-submenu li.adm-menu-section-item > a { pointer-events: none; background: transparent !important; }
 #adminmenu .wp-submenu li.adm-menu-section-item:first-of-type { margin-top: 0; border-top: 0; }
 
