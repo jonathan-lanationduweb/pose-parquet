@@ -699,7 +699,7 @@ $section( 'Notices : un code, pas une phrase' );
 $_GET = [ Notices::ARG => Notices::STATUS_UPDATED ];
 $verifie( 'code connu → message', ( Notices::pending()['text'] ?? '' ) === 'Statut mis à jour.' );
 $_GET = [ Notices::ARG => Notices::STATUS_STALE ];
-$verifie( 'message de concurrence attendu', str_contains( (string) ( Notices::pending()['text'] ?? '' ), 'modifiée entre-temps' ) );
+$verifie( 'message de concurrence attendu', str_contains( (string) ( Notices::pending()['text'] ?? '' ), 'modifié entre-temps' ) );
 $_GET = [ Notices::ARG => 'code_invente' ];
 $verifie( 'code inconnu → aucun message', Notices::pending() === null );
 $_GET = [ Notices::ARG => '<script>alert(1)</script>' ];
@@ -1181,7 +1181,11 @@ $section( 'Front : rien touché' );
 
 $verifie( 'aucun fichier front dans le plugin', ! is_dir( POSE_PARQUET_DIR . '/js' ) && ! is_dir( POSE_PARQUET_DIR . '/css' ) );
 $verifie( 'la feuille admin est bien dans le plugin', is_readable( POSE_PARQUET_DIR . '/assets/admin.css' ) );
-$verifie( 'aucun script JS ajouté', glob( POSE_PARQUET_DIR . '/assets/*.js' ) === [] );
+// Un seul script depuis le 06/10/2026 : ouvrir la médiathèque de WordPress
+// (images des contenus, fond de maintenance). Pas de bibliothèque, pas d'appel réseau.
+$scripts = array_map( 'basename', glob( POSE_PARQUET_DIR . '/assets/*.js' ) ?: [] );
+$code_js = (string) file_get_contents( POSE_PARQUET_DIR . '/assets/admin.js' );
+$verifie( 'un seul script : admin.js (médiathèque WordPress)', $scripts === [ 'admin.js' ] && str_contains( $code_js, 'wp.media(' ) && ! preg_match( '/(?<![.\w])fetch\(|XMLHttpRequest|^\s*import\s/m', $code_js ), implode( ',', $scripts ) );
 
 /* ================================================================== */
 $section( 'Nettoyage' );

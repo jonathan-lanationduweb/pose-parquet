@@ -99,11 +99,16 @@ foreach ( Fields::ROOT as $nom => $obligatoire ) {
 	}
 	$verifie( "$nom absent → erreur sur $nom", $refuse( pp_requete_metier( [ $nom => null ] ), $nom ) );
 }
-$verifie( 'chaîne vide = absent', $refuse( pp_requete_metier( [ 'firstName' => '   ' ] ), 'firstName' ) );
+$verifie( 'chaîne vide = absent', $refuse( pp_requete_metier( [ 'department' => '   ' ] ), 'department' ) );
 $verifie( 'département absent → erreur', $refuse( pp_requete_metier( [ 'department' => null ] ), 'department' ) );
-$v = $valide( pp_requete_metier( [ 'email' => null, 'phone' => null ] ) );
+$v = $valide( pp_requete_metier( [ 'department' => null, 'surface' => null ] ) );
 $verifie( 'plusieurs erreurs remontées ensemble', count( $v['errors'] ) === 2 );
-$verifie( 'message d’absence distinct', str_contains( $v['errors']['email'] ?? '', 'absent' ) );
+$verifie( 'message d’absence distinct', str_contains( $v['errors']['department'] ?? '', 'absent' ) );
+// Coordonnées facultatives (06/10/2026) : leur absence n'est pas une erreur,
+// mais si elles sont fournies, elles restent validées.
+$v = $valide( pp_requete_metier( [ 'firstName' => null, 'lastName' => null, 'email' => null, 'phone' => null, 'consent' => null ] ) );
+$verifie( 'projet sans coordonnées accepté', $v['ok'] === true, wp_json_encode( $v['errors'] ) );
+$verifie( 'email fourni invalide : toujours refusé', $refuse( pp_requete_metier( [ 'email' => 'pas-un-email' ] ), 'email' ) );
 
 /* ------------------------------------------------------------------ */
 $section( 'Types' );
@@ -154,7 +159,7 @@ $verifie( 'casse du département : « 2a » normalisé, pas refusé', ( $valide(
 /* ------------------------------------------------------------------ */
 $section( 'Consentement' );
 $verifie( 'consent false refusé', str_contains( $valide( pp_requete_metier( [ 'consent' => false ] ) )['errors']['consent'] ?? '', 'accepté' ) );
-$verifie( 'consent absent refusé', $refuse( pp_requete_metier( [ 'consent' => null ] ), 'consent' ) );
+$verifie( 'consent absent accepté (aucune coordonnée demandée)', ! isset( ( $valide( pp_requete_metier( [ 'consent' => null ] ) )['errors'] )['consent'] ) );
 $verifie( 'consent 1 (entier) refusé', $refuse( pp_requete_metier( [ 'consent' => 1 ] ), 'consent' ) );
 $verifie( 'consentAt fourni par le client refusé', $refuse( pp_requete_metier( [ 'consentAt' => '2020-01-01 00:00:00' ] ), 'consentAt' ) );
 
