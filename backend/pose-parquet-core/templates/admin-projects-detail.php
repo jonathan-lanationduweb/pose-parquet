@@ -55,7 +55,7 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 ?>
 <div class="wrap pp-admin pp-detail">
 	<h1 class="wp-heading-inline">
-		<?php esc_html_e( 'Demande', 'pose-parquet-core' ); ?>
+		<?php esc_html_e( 'Projet', 'pose-parquet-core' ); ?>
 		<span class="pp-ref-title"><?php echo esc_html( $reference !== '' ? $reference : sprintf( '#%d', $id ) ); ?></span>
 	</h1>
 	<a href="<?php echo esc_url( $view['back_url'] ); ?>" class="page-title-action"><?php esc_html_e( 'Retour à la liste', 'pose-parquet-core' ); ?></a>
@@ -81,8 +81,10 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 	<div class="pp-cols">
 		<div class="pp-col-main">
 
+			<?php $pp_coordonnees = trim( $nom . (string) $p['email'] . (string) $p['phone'] . (string) $p['city'] ) !== ''; ?>
+			<?php if ( $pp_coordonnees ) : ?>
 			<section class="pp-card">
-				<h2><?php esc_html_e( 'Client', 'pose-parquet-core' ); ?></h2>
+				<h2><?php esc_html_e( 'Coordonnées (ancien parcours)', 'pose-parquet-core' ); ?></h2>
 				<dl class="pp-fields">
 					<?php $ligne( __( 'Nom', 'pose-parquet-core' ), $nom, true ); ?>
 					<div class="pp-field">
@@ -114,6 +116,9 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 					</div>
 				</dl>
 			</section>
+			<?php else : ?>
+			<p class="pp-sub"><?php esc_html_e( 'Parcours anonyme : le site oriente sans demander de coordonnées.', 'pose-parquet-core' ); ?></p>
+			<?php endif; ?>
 
 			<section class="pp-card">
 				<h2><?php esc_html_e( 'Projet', 'pose-parquet-core' ); ?></h2>
@@ -143,7 +148,7 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 			<?php if ( $view['visualizer'] ) : ?>
 				<section class="pp-card">
 					<h2><?php esc_html_e( 'Visualiseur', 'pose-parquet-core' ); ?></h2>
-					<p class="pp-sub"><?php esc_html_e( 'Ce que le visiteur a essayé avant d’envoyer sa demande.', 'pose-parquet-core' ); ?></p>
+					<p class="pp-sub"><?php esc_html_e( 'Ce que le visiteur a essayé avant de décrire son projet.', 'pose-parquet-core' ); ?></p>
 					<dl class="pp-fields">
 						<?php foreach ( $view['visualizer'] as $libelle => $valeur ) : ?>
 							<?php $ligne( (string) $libelle, (string) $valeur, true ); ?>

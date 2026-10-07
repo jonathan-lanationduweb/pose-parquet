@@ -29,11 +29,11 @@ final class Repository {
 	 * une fois l'identifiant connu.
 	 *
 	 * @param array<string,mixed> $data       sortie de Validator::validate()['data']
-	 * @param string              $consent_at datetime serveur, format MySQL
+	 * @param string|null         $consent_at datetime serveur, format MySQL ; null sans consentement
 	 * @param string              $now        datetime serveur, format MySQL
 	 * @return int identifiant créé, 0 en cas d'échec
 	 */
-	public function insert_project( array $data, string $consent_at, string $now ): int {
+	public function insert_project( array $data, ?string $consent_at, string $now ): int {
 		global $wpdb;
 
 		$row     = [
@@ -205,7 +205,9 @@ final class Repository {
 		 * de la zone, et une colonne « Destination » sans moyen de verifier
 		 * d'ou vient le projet oblige a ouvrir chaque fiche.
 		 */
-		. ' lead_source, lead_need, lead_destination, lead_destination_auto, region';
+		. ' lead_source, lead_need, lead_destination, lead_destination_auto, region,'
+		/* Le parquet choisi dans le Visualiseur : colonne « Produit » et lien Premibel. */
+		. ' product_id';
 
 	/**
 	 * Construit le WHERE commun à `search()` et `count_search()`.

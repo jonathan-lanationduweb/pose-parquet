@@ -51,13 +51,13 @@ final class Notices {
 		return [
 			self::STATUS_UPDATED   => [ 'success', __( 'Statut mis à jour.', 'pose-parquet-core' ) ],
 			self::STATUS_UNCHANGED => [ 'info', __( 'Le statut était déjà celui-là : rien n’a changé.', 'pose-parquet-core' ) ],
-			self::STATUS_STALE     => [ 'warning', __( 'Cette demande a été modifiée entre-temps. Rechargez la fiche.', 'pose-parquet-core' ) ],
+			self::STATUS_STALE     => [ 'warning', __( 'Ce projet a été modifié entre-temps. Rechargez la fiche.', 'pose-parquet-core' ) ],
 			self::NOTE_ADDED       => [ 'success', __( 'Note ajoutée.', 'pose-parquet-core' ) ],
 			self::NOTE_EMPTY       => [ 'error', __( 'La note est vide : rien n’a été enregistré.', 'pose-parquet-core' ) ],
 			/* translators: %s : nombre maximal de caractères. */
 			self::NOTE_TOO_LONG    => [ 'error', sprintf( __( 'La note dépasse %s caractères : rien n’a été enregistré.', 'pose-parquet-core' ), number_format_i18n( \PoseParquet\Core\Projects\Notes::MAX_LENGTH ) ) ],
 			self::SAVE_FAILED      => [ 'error', __( 'Impossible d’enregistrer la modification.', 'pose-parquet-core' ) ],
-			self::NOT_FOUND        => [ 'error', __( 'Cette demande n’existe pas ou n’existe plus.', 'pose-parquet-core' ) ],
+			self::NOT_FOUND        => [ 'error', __( 'Ce projet n’existe pas ou n’existe plus.', 'pose-parquet-core' ) ],
 			self::CAPS_REPAIRED    => [ 'success', __( 'Les droits du plugin ont été réappliqués.', 'pose-parquet-core' ) ],
 			/* translators: %1$s : nombre d’envois traités, %2$s : nombre restant en file. */
 			self::MAIL_QUEUE_RUN   => [ 'success', sprintf( __( 'File des notifications : %1$s envoi(s) traité(s), %2$s en attente.', 'pose-parquet-core' ), number_format_i18n( self::compteur( 'pp_traites' ) ), number_format_i18n( self::compteur( 'pp_restants' ) ) ) ],
