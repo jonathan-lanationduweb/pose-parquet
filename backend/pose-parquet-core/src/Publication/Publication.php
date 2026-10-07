@@ -516,7 +516,10 @@ final class Publication {
 			echo '<p class="adm-alerte-ligne adm-alerte-ligne--ko"><span class="dashicons dashicons-warning" aria-hidden="true"></span>' . esc_html__( 'Publication échouée :', 'pose-parquet-core' ) . ' ' . esc_html( $e['raison'] ) . ' ' . esc_html__( 'Le site en ligne n’a pas changé.', 'pose-parquet-core' ) . '</p>';
 		}
 		if ( $e['mode'] === 'aucune' ) {
-			echo '<p class="adm-panneau__texte">' . esc_html__( 'Aucune publication n’est configurée ici : ni dossier local du site avec Node, ni GitHub. Voir Publication.', 'pose-parquet-core' ) . '</p>';
+			// Hors poste local, la seule publication prévue est GitHub : on dit ce qui manque.
+			echo wp_get_environment_type() === 'local'
+				? '<p class="adm-panneau__texte">' . esc_html__( 'Aucune publication n’est configurée ici : ni dossier local du site avec Node, ni GitHub. Voir Publication.', 'pose-parquet-core' ) . '</p>'
+				: '<p class="adm-alerte-ligne"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span>' . esc_html__( 'Publication GitHub à configurer : POSE_PARQUET_GITHUB_REPO et POSE_PARQUET_GITHUB_TOKEN dans wp-config.php, WP_EXPORT_URL dans le dépôt GitHub.', 'pose-parquet-core' ) . '</p>';
 		}
 		echo '<div class="adm-publication__actions">';
 		if ( $compact ) {
