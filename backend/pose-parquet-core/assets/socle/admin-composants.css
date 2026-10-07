@@ -33,8 +33,8 @@
 	--adm-graphite:  #4A4845;
 	--adm-gris:      #6E6B66;
 	--adm-pierre:    #C6C3BD;
-	--adm-trait:     #E3E1DC;
-	--adm-papier:    #F6F5F3;
+	--adm-trait:     #DCDCDE;
+	--adm-papier:    #F6F7F7;
 	--adm-surface:   #FFFFFF;
 	--adm-succes:    #2F5D42;
 	--adm-succes-pale: #E3F0E7;
@@ -43,6 +43,10 @@
 	--adm-info:      #1D5F8A;
 	--adm-info-pale: #E8F1F8;
 	--adm-r:         4px;
+	/* Action principale : le bleu de WordPress. L'accent (sauge) reste à la marque et à la navigation active. */
+	--adm-action:       #2271B1;
+	--adm-action-fonce: #135E96;
+	--adm-attention:    #DBA617;
 	/* Valeurs de repli : celles d'Expert Parquet. */
 	--adm-accent:       #B04A1E;
 	--adm-accent-fonce: #93401B;
@@ -51,7 +55,7 @@
 }
 
 /* ------------------------------------------------------------- en-tête */
-.adm-ecran .wrap > h1, .adm-ecran h1.wp-heading-inline { font-size: 23px; font-weight: 600; color: var(--adm-encre); letter-spacing: -0.01em; }
+.adm-ecran .wrap > h1, .adm-ecran h1.wp-heading-inline { font-size: 24px; line-height: 1.3; font-weight: 600; color: var(--adm-encre); letter-spacing: -0.01em; }
 .adm-entete__sous-titre { margin: 2px 0 18px; font-size: 13px; color: var(--adm-gris); }
 
 /* ------------------------------------------------------------- indicateurs */
@@ -67,9 +71,9 @@
 	min-width: 0;
 }
 /* L'accent ne sert qu'à ce qui demande une action aujourd'hui. */
-.adm-chiffre--attention { border-left-color: var(--adm-accent); }
+.adm-chiffre--attention { border-left-color: var(--adm-attention); }
 .adm-chiffre__libelle { color: var(--adm-gris); font-size: 13px; line-height: 1.3; }
-.adm-chiffre__valeur { font-size: 30px; font-weight: 400; line-height: 1.1; color: var(--adm-encre); font-variant-numeric: tabular-nums; }
+.adm-chiffre__valeur { font-size: 28px; font-weight: 600; line-height: 1.15; color: var(--adm-encre); font-variant-numeric: tabular-nums; }
 .adm-chiffre__lien { font-size: 13px; margin-top: 4px; text-decoration: none; }
 
 /* ------------------------------------------------------------- grilles */
@@ -119,24 +123,32 @@
 
 /* ------------------------------------------------------------- badges */
 .adm-badge {
-	display: inline-block;
-	padding: 1px 8px;
-	border: 1px solid var(--adm-pierre);
-	border-radius: 2px;
-	background: #F2F1EF;
-	color: var(--adm-encre);
+	display: inline-flex;
+	align-items: center;
+	height: 22px;
+	box-sizing: border-box;
+	padding: 0 8px;
+	border: 1px solid #D3D1CD;
+	border-radius: 3px;
+	background: #F3F3F2;
+	color: var(--adm-graphite);
 	font-size: 12px;
-	line-height: 1.7;
+	font-weight: 500;
+	line-height: 1;
 	white-space: nowrap;
+	vertical-align: middle;
 }
-.adm-badge--ok { background: var(--adm-succes-pale); border-color: #9DBFA8; }
-.adm-badge--attente { background: #F6EFDC; border-color: #C9B27A; }
-.adm-badge--ko { background: #F6E6E3; border-color: #C9968D; }
-.adm-badge--neutre { background: #F1EEED; border-color: #BFB5B2; }
+/* Vert : succès. Orange : attention. Rouge : erreur. Gris : neutre. Bleu : information. Sauge : marque. */
+.adm-badge--ok { background: #EDF6EF; border-color: #A6CBB0; color: #1F5132; }
+.adm-badge--attente { background: #FCF5E2; border-color: #E2C47E; color: #6B4E0B; }
+.adm-badge--ko { background: #FBECEA; border-color: #E2ABA4; color: #8A2A20; }
+.adm-badge--neutre { background: #F3F3F2; border-color: #D3D1CD; color: var(--adm-graphite); }
+.adm-badge--info { background: #EAF2FA; border-color: #A9C7E3; color: #1D4F76; }
+.adm-badge--marque { background: #E9EEE6; border-color: #B7C6B3; color: #38483B; }
 
 /* ------------------------------------------------------------- champs */
 .adm-champ { margin: 0 0 12px; }
-.adm-champ > label, .adm-champ__libelle, .adm-champ legend { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: var(--adm-graphite); }
+.adm-champ > label, .adm-champ__libelle, .adm-champ legend { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--adm-encre); }
 .adm-ecran .adm-champ input[type="text"], .adm-ecran .adm-champ input[type="url"], .adm-ecran .adm-champ input[type="email"],
 .adm-ecran .adm-champ textarea, .adm-ecran .adm-champ select {
 	width: 100%;
@@ -150,8 +162,8 @@
 	min-height: 34px;
 	box-shadow: none;
 }
-.adm-ecran .adm-champ input:focus, .adm-ecran .adm-champ textarea:focus, .adm-ecran .adm-champ select:focus { border-color: var(--adm-accent); box-shadow: 0 0 0 1px var(--adm-accent); outline: none; }
-.adm-champ .description { display: block; margin-top: 4px; color: var(--adm-gris); font-size: 12px; }
+.adm-ecran .adm-champ input:focus, .adm-ecran .adm-champ textarea:focus, .adm-ecran .adm-champ select:focus { border-color: var(--adm-action); box-shadow: 0 0 0 1px var(--adm-action); outline: none; }
+.adm-champ .description { display: block; margin-top: 4px; color: var(--adm-gris); font-size: 13px; line-height: 1.45; }
 .adm-champ--case > label { font-weight: 400; font-size: 13px; color: var(--adm-encre); }
 .adm-deux-champs { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 12px; }
 .adm-compteur { color: var(--adm-gris); font-size: 12px; margin-left: 6px; }
@@ -172,9 +184,9 @@
 /* ------------------------------------------------------------- panneaux (colonne droite) */
 .adm-panneau { background: var(--adm-surface); border: 1px solid var(--adm-trait); border-radius: var(--adm-r); padding: 18px 18px 16px; margin: 0 0 16px; }
 .adm-panneau__entete { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
-.adm-panneau__titre { margin: 0; font-size: 16px; font-weight: 600; color: var(--adm-encre); display: flex; align-items: center; gap: 8px; }
+.adm-panneau__titre { margin: 0; font-size: 15px; font-weight: 600; color: var(--adm-encre); display: flex; align-items: center; gap: 8px; }
 .adm-panneau__titre .dashicons { color: var(--adm-accent); font-size: 18px; width: 18px; height: 18px; }
-.adm-panneau__texte { margin: 0 0 14px; font-size: 12px; color: var(--adm-gris); line-height: 1.5; }
+.adm-panneau__texte { margin: 0 0 16px; font-size: 13px; color: var(--adm-gris); line-height: 1.5; }
 .adm-panneau__alerte { margin: 0 0 14px; font-size: 12px; color: var(--adm-graphite); }
 .adm-pastille { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--adm-pierre); flex: none; vertical-align: middle; }
 .adm-pastille--ok { background: var(--adm-succes); }
@@ -186,8 +198,10 @@
 .adm-toggle__curseur { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .2); transition: transform .15s; }
 .adm-toggle--on { background: var(--adm-accent); }
 .adm-toggle--on .adm-toggle__curseur { transform: translateX(20px); }
-.adm-toggle:focus-visible { outline: 2px solid var(--adm-accent); outline-offset: 2px; }
-.adm-toggle__libelle { font-size: 12px; color: var(--adm-graphite); }
+.adm-toggle:hover { background: #ADAAA4; }
+.adm-toggle--on:hover { background: var(--adm-accent-fonce); }
+.adm-toggle:focus-visible { outline: 2px solid var(--adm-action); outline-offset: 2px; }
+.adm-toggle__libelle { font-size: 13px; color: var(--adm-graphite); }
 
 /* ------------------------------------------------------------- encarts */
 .adm-info { display: flex; gap: 8px; align-items: flex-start; margin: 12px 0; padding: 10px 12px; background: var(--adm-info-pale); border-radius: var(--adm-r); font-size: 12px; color: var(--adm-graphite); line-height: 1.5; }
@@ -214,9 +228,12 @@
 	cursor: pointer;
 }
 .adm-bouton .dashicons { font-size: 15px; width: 15px; height: 15px; }
-.adm-bouton:hover, .adm-bouton:focus { color: var(--adm-encre); border-color: var(--adm-pierre); background: var(--adm-papier); }
-.adm-bouton--plein { background: var(--adm-accent); border-color: var(--adm-accent); color: #fff; font-weight: 600; }
-.adm-bouton--plein:hover, .adm-bouton--plein:focus { background: var(--adm-accent-fonce); border-color: var(--adm-accent-fonce); color: #fff; }
+.adm-bouton:hover, .adm-bouton:focus { color: var(--adm-encre); border-color: #A7AAAD; background: var(--adm-papier); }
+.adm-bouton:focus-visible { outline: 0; box-shadow: 0 0 0 1px #fff, 0 0 0 3px var(--adm-action); }
+.adm-bouton[disabled], .adm-bouton[disabled]:hover { opacity: .55; cursor: not-allowed; background: var(--adm-surface); border-color: var(--adm-trait); color: var(--adm-gris); }
+.adm-bouton--plein { background: var(--adm-action); border-color: var(--adm-action); color: #fff; font-weight: 600; }
+.adm-bouton--plein:hover, .adm-bouton--plein:focus { background: var(--adm-action-fonce); border-color: var(--adm-action-fonce); color: #fff; }
+.adm-bouton--plein[disabled], .adm-bouton--plein[disabled]:hover { background: var(--adm-action); border-color: var(--adm-action); color: #fff; }
 .adm-bouton--contour { border-color: var(--adm-accent); color: var(--adm-accent); }
 .adm-bouton--contour:hover, .adm-bouton--contour:focus { background: var(--adm-creme); color: var(--adm-accent); border-color: var(--adm-accent); }
 .adm-bouton--danger { border-color: #E6B9B2; color: var(--adm-erreur); padding-inline: 8px; }
@@ -226,17 +243,17 @@
 .adm-bouton--bloc + .adm-bouton--bloc { margin-top: 8px; }
 
 /* ------------------------------------------------------------- listes WordPress (types du module) */
-.adm-ecran .wp-list-table .column-pp_image { width: 72px; }
+.adm-ecran .wp-list-table .column-pp_image { width: 80px; }
 .adm-ecran .wp-list-table .column-pp_etat { width: 110px; }
 .adm-ecran .wp-list-table .column-pp_date { width: 120px; }
 .adm-ecran .wp-list-table .column-pp_modifie { width: 140px; }
 .adm-ecran .wp-list-table .column-pp_modifier { width: 80px; text-align: right; }
 .adm-ecran .wp-list-table .column-pp_adresse { width: 260px; }
-.adm-vignette { display: block; width: 52px; height: 50px; object-fit: cover; border-radius: 2px; }
+.adm-vignette { display: block; width: 64px; height: 48px; object-fit: cover; border-radius: 3px; background: var(--adm-papier); }
 .adm-vignette--vide {
 	display: flex; align-items: center; justify-content: center; text-align: center;
-	width: 52px; height: 50px; padding: 2px; border: 1px dashed #C9968D; border-radius: 2px;
-	color: var(--adm-erreur); font-size: 10px; line-height: 1.15; background: #F6E6E3; box-sizing: border-box;
+	width: 64px; height: 48px; padding: 4px; border: 1px solid var(--adm-trait); border-radius: 3px;
+	color: var(--adm-gris); font-size: 11px; line-height: 1.2; background: #F0F0F1; box-sizing: border-box;
 }
 
 /* ------------------------------------------------------------- boîtes de l'écran d'édition */
@@ -273,11 +290,7 @@ fieldset.adm-champ { border: 0; padding: 0; margin: 0 0 16px; min-width: 0; }
 /* Édition : les titres de bloc ne prennent pas la marge des titres de boîte de WordPress. */
 .adm-ecran #poststuff .adm-bloc__titre { padding: 0; margin: 0 0 8px; font-size: 14px; line-height: 1.4; }
 .adm-ecran #poststuff .adm-image__entete .adm-bloc__titre { margin: 0; }
-/* Le bouton principal de WordPress prend l'accent de la marque, comme sur le socle. */
-.adm-ecran .wp-core-ui .button-primary, .adm-ecran.wp-core-ui .button-primary { background: var(--adm-accent); border-color: var(--adm-accent); color: #fff; }
-.adm-ecran .wp-core-ui .button-primary:hover, .adm-ecran.wp-core-ui .button-primary:hover,
-.adm-ecran .wp-core-ui .button-primary:focus, .adm-ecran.wp-core-ui .button-primary:focus { background: var(--adm-accent-fonce); border-color: var(--adm-accent-fonce); color: #fff; }
-.adm-ecran .wp-core-ui .button-primary:focus, .adm-ecran.wp-core-ui .button-primary:focus { box-shadow: 0 0 0 1px #fff, 0 0 0 3px var(--adm-accent); }
+/* Le bouton principal de WordPress garde son bleu : action principale = bleu WordPress, partout. */
 
 /* Champs structurés (pages, Mon site) : un bloc par section du site. */
 .adm-ecran fieldset.adm-structure { border: 1px solid var(--adm-trait); background: var(--adm-surface); border-radius: var(--adm-r); padding: 4px 16px 6px; margin: 0 0 16px; min-width: 0; }
@@ -314,7 +327,7 @@ fieldset.adm-champ { border: 0; padding: 0; margin: 0 0 16px; min-width: 0; }
 .adm-carte__titre { padding: var(--adm-e2) var(--adm-e3); }
 .adm-carte__corps { padding: var(--adm-e2) var(--adm-e3); }
 .adm-carte__pied { padding: var(--adm-e1) var(--adm-e3); }
-.adm-carte__aide { margin: 0 0 var(--adm-e2); font-size: 12px; color: var(--adm-gris); line-height: 1.5; }
+.adm-carte__aide { margin: 0 0 var(--adm-e2); font-size: 13px; color: var(--adm-gris); line-height: 1.5; }
 .adm-carte__aide:last-child { margin: var(--adm-e2) 0 0; }
 .adm-carte__sous-titre { margin: var(--adm-e3) 0 var(--adm-e1); font-size: 12px; font-weight: 600; color: var(--adm-graphite); text-transform: uppercase; letter-spacing: .02em; }
 .adm-carte__actions { margin: var(--adm-e3) 0 0; }
@@ -366,9 +379,6 @@ fieldset.adm-champ { border: 0; padding: 0; margin: 0 0 16px; min-width: 0; }
 	.adm-table--empilable td::before { content: attr(data-label); color: var(--adm-gris); }
 }
 
-/* Badges : une seule mesure pour tous les états (contenus, images, projets, catalogue). */
-.adm-badge { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 3px; font-size: 12px; line-height: 1; box-sizing: border-box; vertical-align: middle; }
-
 /* Onglets internes (WordPress natifs) ; ils défilent horizontalement sur mobile. */
 .adm-ecran .adm-onglets { margin: 0 0 var(--adm-e3); }
 @media (max-width: 782px) {
@@ -384,7 +394,7 @@ fieldset.adm-champ { border: 0; padding: 0; margin: 0 0 16px; min-width: 0; }
 .adm-liste thead + tbody tr:first-child th, .adm-liste thead + tbody tr:first-child td { border-top: 1px solid var(--adm-trait); }
 .adm-liste tbody th { width: 34%; padding-right: var(--adm-e2); font-weight: 400; color: var(--adm-graphite); }
 .adm-liste td input[type="text"] { width: 100%; min-height: 32px; border: 1px solid var(--adm-trait); border-radius: var(--adm-r); padding: 4px 8px; font-size: 13px; box-shadow: none; }
-.adm-liste td input[type="text"]:focus { border-color: var(--adm-accent); box-shadow: 0 0 0 1px var(--adm-accent); outline: none; }
+.adm-liste td input[type="text"]:focus { border-color: var(--adm-action); box-shadow: 0 0 0 1px var(--adm-action); outline: none; }
 .adm-liste .adm-liste__case { width: 1%; white-space: nowrap; padding-left: var(--adm-e2); font-size: 12px; color: var(--adm-graphite); }
 .adm-liste .adm-liste__case input { margin: 0 4px 0 0; }
 .adm-liste--etroite tbody th { width: 38%; }
@@ -406,19 +416,6 @@ fieldset.adm-champ { border: 0; padding: 0; margin: 0 0 16px; min-width: 0; }
 }
 .adm-barre-actions__note { font-size: 12px; color: var(--adm-gris); margin-right: auto; }
 @media (max-width: 600px) { .adm-barre-actions__note { display: none; } .adm-barre-actions .adm-bouton { width: 100%; } }
-
-/* Mon site — aperçu léger (esquisse, pas un second navigateur). */
-.adm-apercu-site { border: 1px solid var(--adm-trait); border-radius: var(--adm-r); overflow: hidden; background: #F2EFE8; }
-.adm-apercu-site__entete { display: flex; align-items: center; gap: var(--adm-e2); padding: var(--adm-e2); flex-wrap: wrap; }
-.adm-apercu-site__marque { display: inline-flex; align-items: center; gap: 6px; font-size: 16px; color: #1c1c1a; }
-.adm-apercu-site__marque strong { font-weight: 400; }
-.adm-apercu-site__marque span:last-child { opacity: .55; }
-.adm-apercu-site__symbole { width: 7px; height: 13px; background: linear-gradient(90deg, currentColor 0 30%, transparent 30% 38%, currentColor 38% 68%, transparent 68% 76%, currentColor 76%); }
-.adm-apercu-site__logo { display: block; height: 22px; width: auto; max-width: 120px; object-fit: contain; }
-.adm-apercu-site__menu { display: flex; gap: var(--adm-e1); flex-wrap: wrap; font-size: 11px; color: #3c3b38; margin-left: auto; }
-.adm-apercu-site__cta { font-size: 11px; padding: 3px 8px; border: 1px solid #1c1c1a; border-radius: 999px; color: #1c1c1a; }
-.adm-apercu-site__pied { padding: var(--adm-e2); background: #1c1c1a; color: #f2efe8; font-size: 14px; }
-.adm-apercu-site__pied small { display: block; margin-top: 4px; font-size: 11px; opacity: .7; }
 
 /* Catalogue : la synchronisation en deux colonnes, sans vide. */
 .adm-sync { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--adm-e3); align-items: start; }
@@ -458,3 +455,187 @@ fieldset.adm-champ { border: 0; padding: 0; margin: 0 0 16px; min-width: 0; }
 .adm-sans-image a { text-decoration: none; white-space: nowrap; }
 .adm-rappel-publication { margin: 0 0 var(--adm-e3) !important; }
 @media (min-width: 601px) { .adm-publication-journal th[scope="row"], .adm-table--empilable th[scope="row"] { white-space: nowrap; } }
+
+/* =====================================================================
+   POLISH — en-têtes, états vides, publication, listes, formulaires.
+   Échelle unique : 4 · 8 · 12 · 16 · 24 · 32 · 48. WordPress d'abord :
+   bleu pour l'action principale, sauge pour la marque et la navigation
+   active, orange pour l'attention, rouge pour l'erreur.
+   ===================================================================== */
+
+/* -- En-tête d'écran : titre, description, action principale à droite. */
+.adm-entete-actions { align-items: center; row-gap: var(--adm-e1); }
+.adm-entete__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--adm-e1); }
+.adm-entete__actions .adm-carte__formulaire { display: inline-flex; }
+.adm-ecran .adm-entete__sous-titre { margin: 4px 0 var(--adm-e4); font-size: 13px; line-height: 1.5; max-width: 760px; }
+
+/* Listes WordPress du module : « Ajouter » à droite, en bouton principal. */
+.adm-ecran.edit-php .wrap > .page-title-action,
+.adm-ecran.edit-tags-php .wrap > .page-title-action {
+	float: right;
+	top: 0;
+	margin: 10px 0 0;
+	padding: 5px 14px;
+	border: 1px solid var(--adm-action);
+	border-radius: 3px;
+	background: var(--adm-action);
+	color: #fff;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.5;
+}
+.adm-ecran.edit-php .wrap > .page-title-action:hover,
+.adm-ecran.edit-php .wrap > .page-title-action:focus { background: var(--adm-action-fonce); border-color: var(--adm-action-fonce); color: #fff; }
+.adm-ecran.edit-php .wrap > .page-title-action:focus { box-shadow: 0 0 0 1px #fff, 0 0 0 3px var(--adm-action); }
+.adm-ecran.edit-php .wp-header-end { clear: both; }
+
+/* Lignes : tout part de la même ligne haute (titre, miniature, état), comme WordPress,
+   avec un rythme régulier ; les actions de ligne restent sous le titre. */
+.adm-ecran.edit-php .wp-list-table tbody td { vertical-align: top; padding-top: var(--adm-e2); padding-bottom: var(--adm-e2); }
+.adm-ecran.edit-php .wp-list-table tbody th.check-column { vertical-align: top; padding-top: 14px; }
+.adm-ecran.edit-php .wp-list-table tbody td .adm-badge { margin-top: -1px; }
+.adm-ecran.edit-php .wp-list-table .row-title { font-weight: 600; }
+.adm-ecran.edit-php .wp-list-table .row-actions { padding-top: 2px; font-size: 12px; }
+.adm-ecran .wp-list-table .column-pp_modifier a { color: var(--adm-gris); text-decoration: none; }
+.adm-ecran .wp-list-table .column-pp_modifier a:hover,
+.adm-ecran .wp-list-table .column-pp_modifier a:focus { color: var(--adm-action); text-decoration: underline; }
+.adm-ecran .wp-list-table td.column-taxonomy-pp_guide_categorie,
+.adm-ecran .wp-list-table td.column-pp_date,
+.adm-ecran .wp-list-table td.column-pp_modifie { color: var(--adm-gris); }
+
+/* -- Notices WordPress : courtes, même rythme que le reste. */
+.adm-ecran .wrap .notice { margin: 0 0 var(--adm-e3); }
+.adm-ecran .wrap .notice p { margin: 8px 0; font-size: 13px; line-height: 1.5; }
+
+/* -- Cartes : un titre (et son éventuel badge) sur une seule hauteur. */
+.adm-carte__titre { display: flex; align-items: center; justify-content: space-between; gap: var(--adm-e1); min-height: 22px; }
+.adm-carte__actions--droite { display: flex; justify-content: flex-end; margin: var(--adm-e4) calc(-1 * var(--adm-e3)) calc(-1 * var(--adm-e2)); padding: var(--adm-e2) var(--adm-e3); border-top: 1px solid var(--adm-trait); background: var(--adm-papier); }
+
+/* -- Panneaux de la colonne droite. */
+.adm-panneau__statut { margin: 0 0 var(--adm-e1); }
+/* Maintenance : le badge dit l'état ; le libellé de l'interrupteur reste pour les lecteurs d'écran. */
+#maintenance .adm-toggle__libelle { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.adm-panneau__lien { margin: var(--adm-e2) 0 0; font-size: 13px; }
+
+/* -- États vides : une phrase, pas une zone blanche. */
+.adm-vide-etat { display: flex; gap: var(--adm-e2); align-items: flex-start; padding: var(--adm-e3); border: 1px dashed var(--adm-trait); border-radius: var(--adm-r); background: var(--adm-papier); }
+.adm-vide-etat .dashicons { flex: none; width: 20px; height: 20px; font-size: 20px; color: var(--adm-gris); }
+.adm-vide-etat .dashicons-yes-alt { color: var(--adm-succes); }
+.adm-vide-etat p { margin: 0; font-size: 13px; line-height: 1.5; }
+.adm-vide-etat strong { display: block; font-weight: 600; color: var(--adm-encre); }
+.adm-vide-etat p span { display: block; color: var(--adm-gris); }
+
+/* -- Comptes (orientations) : libellé à gauche, nombre à droite. */
+.adm-compte { margin: 0; padding: 0; list-style: none; }
+.adm-compte li { display: flex; align-items: center; justify-content: space-between; gap: var(--adm-e2); margin: 0; padding: var(--adm-e1) 0; border-top: 1px solid var(--adm-trait); }
+.adm-compte li:first-child { border-top: 0; padding-top: 0; }
+.adm-compte li:last-child { padding-bottom: 0; }
+.adm-compte a { text-decoration: none; }
+.adm-compte a:hover { text-decoration: underline; }
+.adm-compte__valeur { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 22px; padding: 0 8px; box-sizing: border-box; border-radius: 11px; background: var(--adm-accent-pale); color: var(--adm-accent-fonce); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.adm-compte__valeur--zero { background: #F0F0F1; color: var(--adm-gris); font-weight: 500; }
+
+/* -- Publication : le bandeau « Site public » en tête d'écran. */
+.adm-bandeau { margin: 0 0 var(--adm-e3); padding: var(--adm-e3); background: var(--adm-surface); border: 1px solid var(--adm-trait); border-left: 3px solid var(--adm-pierre); border-radius: var(--adm-r); }
+.adm-bandeau[data-pp-publication="a_jour"] { border-left-color: var(--adm-succes); }
+.adm-bandeau[data-pp-publication="modifications"] { border-left-color: var(--adm-attention); }
+.adm-bandeau[data-pp-publication="echec"] { border-left-color: var(--adm-erreur); }
+.adm-bandeau[data-pp-publication="en_cours"] { border-left-color: var(--adm-info); }
+.adm-bandeau__ligne { display: flex; flex-wrap: wrap; align-items: center; gap: var(--adm-e2) var(--adm-e5); }
+.adm-bandeau__statut { display: flex; align-items: center; gap: var(--adm-e2); }
+.adm-bandeau__libelle { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--adm-gris); }
+.adm-bandeau__infos { display: flex; flex-wrap: wrap; gap: var(--adm-e1) var(--adm-e5); margin: 0; }
+.adm-bandeau__infos > div { display: flex; align-items: baseline; gap: var(--adm-e1); }
+.adm-bandeau__infos dt { font-size: 13px; color: var(--adm-gris); }
+.adm-bandeau__infos dd { margin: 0; font-size: 13px; font-weight: 600; color: var(--adm-encre); }
+.adm-bandeau .adm-alerte-ligne, .adm-bandeau .adm-panneau__alerte, .adm-bandeau .adm-panneau__texte { margin: var(--adm-e2) 0 0; }
+.adm-ancre { display: block; scroll-margin-top: 48px; }
+
+/* Journal : compact ; le détail technique d'un échec reste replié. */
+.adm-details { margin-top: 6px; font-size: 12px; color: var(--adm-graphite); }
+.adm-details summary { display: inline-block; cursor: pointer; color: var(--adm-action); }
+.adm-details summary:focus-visible { outline: 2px solid var(--adm-action); outline-offset: 1px; }
+.adm-details p { margin: 6px 0 0; max-width: 520px; line-height: 1.45; }
+.adm-table__liens { white-space: nowrap; }
+
+/* -- Formulaires : une largeur de lecture, pas toute la largeur de l'écran. */
+.adm-ecran .adm-champ input[type="text"], .adm-ecran .adm-champ input[type="email"], .adm-ecran .adm-champ select { max-width: 600px; }
+.adm-ecran .adm-champ input[type="url"] { max-width: 760px; }
+.adm-ecran .adm-champ textarea { max-width: 880px; }
+.adm-reglages .form-table input[type="email"], .adm-reglages .form-table input[type="text"] { max-width: 600px; }
+.adm-reglages .form-table input[type="email"]:focus { border-color: var(--adm-action); box-shadow: 0 0 0 1px var(--adm-action); outline: none; }
+
+/* -- Onglets (Mon site) : onglets WordPress, l'onglet courant marqué de la sauge. */
+.adm-ecran .adm-onglets .nav-tab { font-size: 13px; font-weight: 500; padding: 8px 14px; }
+.adm-ecran .adm-onglets .nav-tab-active { color: var(--adm-encre); box-shadow: inset 0 3px 0 var(--adm-accent); }
+.adm-ecran .adm-onglets .nav-tab:focus { outline: 0; box-shadow: 0 0 0 2px var(--adm-action); }
+.adm-ecran .adm-onglets .nav-tab-active:focus { box-shadow: inset 0 3px 0 var(--adm-accent), 0 0 0 2px var(--adm-action); }
+
+/* Listes « entrée · libellé · afficher » : l'en-tête de la colonne case. */
+.adm-liste thead th.adm-liste__case { padding-left: var(--adm-e2); }
+
+/* -- Mon site : carte de marque (pas une maquette du site). */
+.adm-marque { margin: 0 0 var(--adm-e2); padding: var(--adm-e3); border: 1px solid var(--adm-trait); border-radius: var(--adm-r); background: #F2EFE8; }
+.adm-marque__nom { display: flex; align-items: center; gap: var(--adm-e1); font-size: 20px; line-height: 1.2; color: #1C1C1A; }
+.adm-marque__nom strong { font-weight: 600; }
+.adm-marque__nom span:last-child { color: #6E6B66; }
+.adm-marque__symbole { display: inline-block; width: 9px; height: 17px; flex: none; background: linear-gradient(90deg, currentColor 0 30%, transparent 30% 38%, currentColor 38% 68%, transparent 68% 76%, currentColor 76%); }
+.adm-marque__logo { display: block; max-width: 220px; max-height: 36px; object-fit: contain; }
+.adm-marque__baseline { margin: var(--adm-e1) 0 0; font-size: 13px; line-height: 1.45; color: var(--adm-graphite); }
+.adm-marque__favicon img { display: inline-block; vertical-align: middle; border-radius: 2px; }
+.adm-marque__favicon-symbole { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 3px; background: #1C1C1A; color: #F2EFE8; vertical-align: middle; }
+.adm-marque__favicon-symbole .adm-marque__symbole { width: 6px; height: 10px; }
+
+/* -- Catalogue : le nombre de références en grand, la commande en bloc discret. */
+.adm-chiffres--principal .adm-chiffre:first-child { border-left-color: var(--adm-accent); }
+.adm-chiffres--principal .adm-chiffre:first-child .adm-chiffre__valeur { font-size: 36px; }
+.adm-chiffres--principal .adm-chiffre { justify-content: space-between; }
+.adm-commande { margin: 0 0 var(--adm-e2); padding: var(--adm-e1) var(--adm-e2); border: 1px solid var(--adm-trait); border-radius: var(--adm-r); background: var(--adm-papier); font: 12px/1.6 Consolas, Monaco, "Courier New", monospace; color: var(--adm-encre); white-space: pre-wrap; word-break: break-word; }
+.adm-commande code { padding: 0; background: none; font: inherit; }
+.adm-carte__aide code { padding: 1px 4px; font-size: 12px; background: #F0F0F1; word-break: break-all; }
+
+/* -- Projets : deux lignes de filtres nommées ; l'essentiel d'abord. */
+.pp-admin .pp-filters { float: none; clear: both; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 0; margin: 0 0 4px; }
+.pp-admin .pp-filters li { margin: 0; }
+.pp-admin .pp-filters__libelle { min-width: 88px; margin-right: var(--adm-e1) !important; font-size: 12px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--adm-gris); }
+.pp-admin .pp-filters--statut { margin-bottom: var(--adm-e1); }
+.pp-table--projets td.pp-col-date, .pp-table--projets td.pp-col-origine, .pp-table--projets td.pp-col-produit { color: var(--adm-gris); font-size: 13px; }
+.pp-table--projets td.pp-col-besoin, .pp-table--projets td.pp-col-zone, .pp-table--projets td.pp-col-destination { color: var(--adm-encre); }
+.pp-table--projets .pp-vide td { padding: var(--adm-e3); }
+.pp-table--projets .pp-vide td::before { display: none !important; }
+
+/* -- Responsive : tablette, puis téléphone. */
+@media (max-width: 1100px) {
+	.adm-chiffres--principal .adm-chiffre:first-child .adm-chiffre__valeur { font-size: 30px; }
+}
+@media (max-width: 782px) {
+	.adm-entete-actions { align-items: flex-start; }
+	.adm-entete__actions { width: 100%; }
+	.adm-ecran.edit-php .wrap > .page-title-action { float: none; display: inline-block; margin: 0 0 var(--adm-e1); }
+	.adm-bandeau__ligne, .adm-bandeau__infos { flex-direction: column; align-items: flex-start; gap: var(--adm-e1); }
+	.adm-carte__actions--droite .adm-bouton { width: 100%; }
+	.pp-admin .pp-filters { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+	.pp-admin .pp-filters li { flex: none; white-space: nowrap; }
+}
+@media (max-width: 480px) {
+	.adm-entete__actions .adm-bouton, .adm-entete__actions .adm-carte__formulaire { flex: 1 1 auto; }
+	.adm-entete__actions .adm-carte__formulaire .adm-bouton { width: 100%; }
+}
+
+/* -- Listes « libellé → valeur » : un filet continu, les notes à gauche. */
+.adm-etat { column-gap: 0; }
+.adm-etat dd { padding-left: var(--adm-e2); }
+.adm-etat dd.adm-etat__note { padding: 6px 0 0; border-top: 0; text-align: left; }
+.adm-table tbody tr:last-child th { border-bottom: 0; }
+.pp-admin .pp-filters { column-gap: 6px; }
+
+/* Téléphone : chaque ligne « entrée · libellé · afficher » devient une petite fiche. */
+@media (max-width: 600px) {
+	.adm-liste thead { display: none; }
+	.adm-liste tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px var(--adm-e2); padding: var(--adm-e1) 0; border-top: 1px solid var(--adm-trait); }
+	.adm-liste tbody tr:first-child { border-top: 0; }
+	.adm-liste th, .adm-liste td, .adm-liste thead + tbody tr:first-child th, .adm-liste thead + tbody tr:first-child td { padding: 0; border: 0; }
+	.adm-liste tbody th, .adm-liste--etroite tbody th { grid-column: 1 / -1; width: auto; font-size: 12px; font-weight: 600; }
+	.adm-liste .adm-liste__case { width: auto; padding-left: 0; }
+	.adm-liste td:not(.adm-liste__case):last-child { grid-column: 1 / -1; }
+}

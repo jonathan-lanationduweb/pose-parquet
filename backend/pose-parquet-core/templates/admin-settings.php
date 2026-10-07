@@ -73,7 +73,7 @@ $roles     = [
 				<input type="text" id="pp-site-dossier" name="pp_site_dossier" value="<?php echo esc_attr( SitePublic::dossier() ); ?>" placeholder="C:\…\pose-parquet.com" />
 				<span class="description"><?php echo esc_html( Apercu::dossier() ? __( 'Utilisé : l’éditeur, l’aperçu et le catalogue lisent les fichiers du site ici, sans serveur de développement.', 'pose-parquet-core' ) : __( 'Vide : les fichiers sont lus sur l’adresse du site public.', 'pose-parquet-core' ) ); ?></span>
 			</p>
-			<p class="adm-carte__actions"><button type="submit" class="adm-bouton"><?php esc_html_e( 'Enregistrer', 'pose-parquet-core' ); ?></button></p>
+			<p class="adm-carte__actions"><button type="submit" class="adm-bouton adm-bouton--plein"><?php esc_html_e( 'Enregistrer', 'pose-parquet-core' ); ?></button></p>
 		</form>
 		<?php Socle::carte_fermer(); ?>
 
