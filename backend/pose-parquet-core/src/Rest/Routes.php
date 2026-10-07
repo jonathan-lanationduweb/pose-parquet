@@ -25,6 +25,10 @@ final class Routes {
 
 	/** Branché sur `rest_api_init`. */
 	public static function register(): void {
+		// Contenus éditoriaux publiés, lus par le générateur du site (lecture seule).
+		\PoseParquet\Core\Contenus\Export::route( self::NAMESPACE );
+		// Fichiers publics du site (dossier local) : éditeur et aperçu sans serveur de développement.
+		\PoseParquet\Core\Contenus\Apercu::route( self::NAMESPACE );
 		register_rest_route(
 			self::NAMESPACE,
 			'/health',

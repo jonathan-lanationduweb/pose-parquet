@@ -82,6 +82,31 @@ final class Schema {
 		 * interne et de la confirmation visiteur — pending / sent / failed /
 		 * skipped, voir Mail\Notifier. Un état, jamais le contenu de l'email.
 		 *
+		 * Qualification commerciale (schema 4). `lead_source` : la famille de la
+		 * page d'ENTREE — `source_url` dit celle de l'envoi, presque toujours
+		 * /projet/, ce qui n'apprend rien. `entry_page` : ce chemin d'entree en
+		 * clair. `lead_need` : ce que la demande cherche. `lead_destination` :
+		 * vers qui l'orienter, une RECOMMANDATION qu'un humain confirme.
+		 *
+		 * Six colonnes et non un JSON. Les trois `lead_*` sont precisement ce
+		 * sur quoi l'administration filtre ; un JSON_EXTRACT ne s'indexe pas, et
+		 * « montre-moi les demandes a orienter vers Premibel » ferait alors un
+		 * parcours complet de table. Les deux `utm_*` rejoignent une serie deja
+		 * en colonnes : en ranger deux ailleurs que les trois autres n'aurait
+		 * decrit aucune realite. `lead_destination` porte un index, c'est le
+		 * filtre quotidien.
+		 *
+		 * `lead_destination_auto` (schema 5) : ce que la regle a recommande a la
+		 * creation, et qui ne bouge plus jamais. `lead_destination` porte la
+		 * decision en vigueur, qu'un gestionnaire peut corriger. Comparer les deux
+		 * repond a « cette demande a-t-elle ete reorientee par un humain, et
+		 * depuis quoi ? » sans avoir a relire les notes.
+		 *
+		 * Une colonne plutot qu'un recalcul a l'affichage : recalculer aurait
+		 * demande de reecrire la regle en PHP, donc de la tenir a jour dans deux
+		 * langages, et aurait fait mentir les vieilles demandes le jour ou la
+		 * regle change. Ce qui est ecrit est ce qui a ete decide ce jour-la.
+		 *
 		 * Les champs de projet sont des VARCHAR courts et non des ENUM SQL : les
 		 * valeurs possibles sont des listes éditoriales du front (types de pièce,
 		 * de support…) qui évolueront sans qu'on veuille modifier une table.
@@ -113,9 +138,16 @@ final class Schema {
   orientation smallint(6) DEFAULT NULL,
   visualizer_config longtext,
   source_url varchar(500) NOT NULL DEFAULT '',
+  entry_page varchar(500) NOT NULL DEFAULT '',
   utm_source varchar(100) NOT NULL DEFAULT '',
   utm_medium varchar(100) NOT NULL DEFAULT '',
   utm_campaign varchar(100) NOT NULL DEFAULT '',
+  utm_content varchar(100) NOT NULL DEFAULT '',
+  utm_term varchar(100) NOT NULL DEFAULT '',
+  lead_source varchar(40) NOT NULL DEFAULT '',
+  lead_need varchar(40) NOT NULL DEFAULT '',
+  lead_destination varchar(40) NOT NULL DEFAULT '',
+  lead_destination_auto varchar(40) NOT NULL DEFAULT '',
   consent_at datetime DEFAULT NULL,
   internal_mail_status varchar(10) NOT NULL DEFAULT 'pending',
   internal_mail_sent_at datetime DEFAULT NULL,
@@ -128,7 +160,8 @@ final class Schema {
   KEY status (status),
   KEY created_at (created_at),
   KEY email (email),
-  KEY department (department)
+  KEY department (department),
+  KEY lead_destination (lead_destination)
 ) $charset;";
 
 		/*

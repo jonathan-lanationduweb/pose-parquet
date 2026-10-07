@@ -112,8 +112,10 @@ pose-parquet.com/
 │
 ├── data/
 │   ├── parquets.json                    catalogue du Studio
-│   ├── products.premibel-pilot.json     pilote : références Premibel réelles
+│   ├── products.premibel.json           catalogue Premibel synchronisé (node _generator/sync-premibel.js)
+│   ├── products.premibel-pilot.json     override manuel : familles de rendu, noms relus
 │   ├── products.premibel-exemple.json   exemple de format d'échange
+│   ├── material-profiles.json           profils « Rendu fidèle » validés par SKU (docs/material-profiles.md)
 │   ├── render-families.json             familles de rendu
 │   ├── room-tours.json                  visites de pièce
 │   ├── contenus.json                    index de contenus, généré
@@ -415,16 +417,19 @@ arbitré à ce jour, et rien dans le code ne le préjuge.
 7. **Évolution du back-office** — ce que l'administration doit montrer une fois
    les leads qualifiés et routés.
 
-### Branches prévues
+### Branches V2
 
-Créées au moment où leur travail commence, pas avant :
+Toutes créées le 1er octobre 2026. Les quatre dernières partent du sommet de
+`feature/v2-commercial-positioning`, qui porte le socle commun (positionnement,
+qualification du besoin, règle de routage, suivi interne) dont elles ont besoin.
+Elles rejoignent `develop` après lui.
 
 ```
-feature/v2-commercial-positioning     (créée)
-feature/v2-premibel-catalog
-feature/v2-allure-design-routing
-feature/v2-lead-qualification
-feature/v2-conversion-tracking
+feature/v2-commercial-positioning     (créée — socle V2, missions 18 à 23)
+feature/v2-premibel-catalog           (créée)
+feature/v2-allure-design-routing      (créée)
+feature/v2-lead-qualification         (créée)
+feature/v2-conversion-tracking        (créée)
 ```
 
 Flux Git et rôle des branches : [docs/git-workflow.md](docs/git-workflow.md).

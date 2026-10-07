@@ -21,6 +21,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # « Publier le site » dans WordPress (Pose Parquet → Publication), en
+  # production : le plugin envoie un repository_dispatch avec un jeton qui ne
+  # quitte jamais le serveur WordPress (wp-config.php). Voir
+  # docs/backend/publication-wordpress.md.
+  repository_dispatch:
+    types: [wordpress-publish]
 
 permissions:
   contents: read
@@ -45,6 +51,10 @@ jobs:
       # désindexer prend des semaines.
       SITE_ENVIRONMENT: ${{ vars.SITE_ENVIRONMENT || 'staging' }}
       API_BASE_URL: ${{ vars.API_BASE_URL }}
+      # Export public des contenus WordPress publiés, ex.
+      # https://admin.pose-parquet.com/wp-json/pose-parquet/v1/contenus
+      # Absente = le site est publié tel qu'il est dans le dépôt.
+      WP_EXPORT_URL: ${{ vars.WP_EXPORT_URL }}
 
     steps:
       - name: Récupérer le dépôt
@@ -52,6 +62,25 @@ jobs:
 
       - name: Configurer Pages
         uses: actions/configure-pages@v5
+
+      # WordPress est la source éditoriale : quand son export est déclaré, le
+      # site est reconstruit à partir de lui à CHAQUE déploiement (push comme
+      # publication depuis WordPress) — sinon un push republierait l'ancien
+      # instantané du dépôt. `contenus.js` valide l'export avant d'écrire quoi
+      # que ce soit : une erreur structurante fait échouer le job ICI, avant
+      # tout artefact, et le site en ligne reste celui d'avant.
+      - name: Installer Node
+        if: env.WP_EXPORT_URL != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Tirer le contenu WordPress, valider, construire
+        if: env.WP_EXPORT_URL != ''
+        env:
+          # Le générateur écrit dans SITE_ROOT : le dépôt extrait ici.
+          SITE_ROOT: ${{ github.workspace }}
+        run: node _generator/contenus.js "$WP_EXPORT_URL"
 
       - name: Préparer l'artefact
         run: |
@@ -102,6 +131,7 @@ jobs:
                 --exclude 'design' \
                 --exclude 'node_modules' \
                 --exclude 'serve.js' \
+                --exclude '.*.tmp' \
                 --exclude 'README.md' \
                 --exclude 'CREDITS.md' \
                 --exclude '/js' \
@@ -114,6 +144,17 @@ jobs:
         run: |
           # Une exclusion oubliée ne doit pas se découvrir en production.
           fuites=0
+
+          # Temporaires de l'ecriture atomique du generateur : retires apres
+          # chaque ecriture, mais une construction interrompue peut en laisser
+          # un, et cela n'a rien a faire dans un artefact public.
+          temporaires=$(find _site -name '.*.tmp' | head -5)
+          if [ -n "$temporaires" ]; then
+            echo "::error::des fichiers temporaires du generateur sont dans l'artefact :"
+            echo "$temporaires"
+            fuites=1
+          fi
+
           for interdit in docs design backend _generator _calibrage .claude .vscode .kilo README.md js css components; do
             if [ -e "_site/$interdit" ]; then
               echo "::error::_site/$interdit ne devrait pas être publié"

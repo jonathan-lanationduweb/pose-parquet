@@ -19,7 +19,7 @@ $oui_non = static fn( bool $ok ): string => $ok
 <div class="wrap">
 	<h1><?php esc_html_e( 'Pose Parquet — État du plugin', 'pose-parquet-core' ); ?></h1>
 	<?php \PoseParquet\Core\Admin\Notices::output( \PoseParquet\Core\Admin\Notices::pending() ); ?>
-	<p><?php esc_html_e( 'Page de diagnostic technique : ce que le plugin a réellement installé. Le travail quotidien se fait dans « Demandes ».', 'pose-parquet-core' ); ?></p>
+	<p><?php esc_html_e( 'Page de diagnostic technique : ce que le plugin a réellement installé. Le travail quotidien se fait dans « Projets ».', 'pose-parquet-core' ); ?></p>
 
 	<table class="widefat striped" style="max-width:40rem">
 		<tbody>
@@ -48,7 +48,7 @@ $oui_non = static fn( bool $ok ): string => $ok
 		</tbody>
 	</table>
 
-	<h2><?php esc_html_e( 'Statuts de demande', 'pose-parquet-core' ); ?></h2>
+	<h2><?php esc_html_e( 'Statuts de projet', 'pose-parquet-core' ); ?></h2>
 	<p>
 		<?php foreach ( $state['statuses'] as $value => $label ) : ?>
 			<code><?php echo esc_html( $value ); ?></code> <?php echo esc_html( $label ); ?> &nbsp;
@@ -57,7 +57,7 @@ $oui_non = static fn( bool $ok ): string => $ok
 
 	<h2><?php esc_html_e( 'API REST', 'pose-parquet-core' ); ?></h2>
 	<p><a href="<?php echo esc_url( $state['health_url'] ); ?>" target="_blank" rel="noopener"><code><?php echo esc_html( $state['health_url'] ); ?></code></a></p>
-	<p><code>POST <?php echo esc_html( $state['projects_url'] ); ?></code> — <?php esc_html_e( 'dépôt d’une demande (formulaire public).', 'pose-parquet-core' ); ?></p>
+	<p><code>POST <?php echo esc_html( $state['projects_url'] ); ?></code> — <?php esc_html_e( 'enregistrement d’un projet qualifié (formulaire public « Décrivez votre projet »).', 'pose-parquet-core' ); ?></p>
 	<p><code>GET <?php echo esc_html( $state['form_token_url'] ); ?></code> — <?php esc_html_e( 'jeton temporel à joindre à chaque dépôt.', 'pose-parquet-core' ); ?></p>
 
 	<h2><?php esc_html_e( 'Emails', 'pose-parquet-core' ); ?></h2>
@@ -154,7 +154,7 @@ $oui_non = static fn( bool $ok ): string => $ok
 					_n( '%s notification en échec définitif.', '%s notifications en échec définitif.', $echecs_mail, 'pose-parquet-core' ),
 					number_format_i18n( $echecs_mail )
 				) ); ?></strong>
-				<?php esc_html_e( 'La demande est enregistrée, mais personne n’a été prévenu par email : il faut rappeler ces personnes à la main.', 'pose-parquet-core' ); ?>
+				<?php esc_html_e( 'Le projet est enregistré, mais la notification interne n’est pas partie. Le visiteur, lui, a déjà reçu son orientation à l’écran.', 'pose-parquet-core' ); ?>
 				<a href="<?php echo esc_url( $state['mail_failed_url'] ); ?>"><?php esc_html_e( 'Voir les demandes concernées', 'pose-parquet-core' ); ?></a>
 			</p>
 		</div>
@@ -269,11 +269,11 @@ $oui_non = static fn( bool $ok ): string => $ok
 		<p class="description" style="max-width:40rem"><?php esc_html_e( 'Les droits sont posés une fois, à l’installation : le plugin ne les réécrit pas à chaque page. Une révocation faite ici tient donc, et un manque réel apparaîtrait ci-dessus avec un bouton de réparation.', 'pose-parquet-core' ); ?></p>
 	<?php endif; ?>
 
-	<h2><?php esc_html_e( 'Demandes', 'pose-parquet-core' ); ?></h2>
+	<h2><?php esc_html_e( 'Projets', 'pose-parquet-core' ); ?></h2>
 	<p>
 		<?php
 		/* translators: %d : nombre de demandes en base. */
-		echo esc_html( sprintf( _n( '%d demande enregistrée.', '%d demandes enregistrées.', (int) $state['projects_count'], 'pose-parquet-core' ), (int) $state['projects_count'] ) );
+		echo esc_html( sprintf( _n( '%d projet enregistré.', '%d projets enregistrés.', (int) $state['projects_count'], 'pose-parquet-core' ), (int) $state['projects_count'] ) );
 		?>
 	</p>
 	<table class="widefat striped" style="max-width:40rem">
@@ -286,5 +286,5 @@ $oui_non = static fn( bool $ok ): string => $ok
 			<?php endforeach; ?>
 		</tbody>
 	</table>
-	<p><a href="<?php echo esc_url( $state['projects_admin'] ); ?>"><?php esc_html_e( 'Ouvrir la liste des demandes', 'pose-parquet-core' ); ?></a></p>
+	<p><a href="<?php echo esc_url( $state['projects_admin'] ); ?>"><?php esc_html_e( 'Ouvrir la liste des projets', 'pose-parquet-core' ); ?></a></p>
 </div>

@@ -200,6 +200,33 @@
 .visualizer__actions { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.5rem; }
 .visualizer__actions .btn { width: 100%; }
 
+/*
+ * La phrase d'orientation, sous les actions du Mode Plan.
+ *
+ * `grid-column: 1 / -1` et non `flex-basis` : ce conteneur est une grille à
+ * deux colonnes — « Réinitialiser » en largeur automatique, le bouton projet
+ * sur le reste. La phrase traverse les deux et prend sa propre ligne ; elle
+ * se lit après les boutons, pas entre eux.
+ */
+.visualizer__aide {
+  grid-column: 1 / -1;
+  /*
+   * `order: 3` pour rester la derniere, toujours.
+   *
+   * Sous 26 rem la grille passe en une colonne et « Reinitialiser » recoit
+   * `order: 2` pour glisser sous le bouton principal. Sans ordre explicite,
+   * cette phrase gardait 0 et s'intercalait ENTRE les deux boutons : un
+   * commentaire au milieu d'une barre d'actions, et « Reinitialiser »
+   * repousse tout en bas. Mesure a 390 px avant correction : bouton projet a
+   * 1165, phrase a 1220, reinitialiser a 1265.
+   */
+  order: 3;
+  margin: 0.15rem 0 0;
+  font-size: var(--fs-xs);
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
 /* ---------- Plan ---------- */
 .visualizer__stage {
   position: relative;

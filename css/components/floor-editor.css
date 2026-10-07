@@ -25,10 +25,14 @@
   position: absolute;
   inset: 0;
 }
+/* Contour seul, sans voile : on règle le sol en regardant le VRAI rendu.
+   L'ancien remplissage (blanc-vert à 28 %) délavait le parquet pendant tout
+   le réglage — c'est lui qui le faisait paraître clair et transparent. */
 .floor-mask__shape {
-  fill: rgba(139, 160, 136, 0.28);
+  fill: none;
   stroke: #f2efe8;
-  stroke-width: 0.4;
+  stroke-width: 1.6;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.8));
   vector-effect: non-scaling-stroke;
   stroke-dasharray: 2 2;
 }
@@ -61,7 +65,7 @@
 }
 
 .floor-mask[data-mode="brush"] .floor-mask__shape {
-  fill: rgba(139, 160, 136, 0.12);
+  fill: none;
   stroke-opacity: 0.35;
 }
 .floor-mask[data-mode="brush"] { cursor: none; }
@@ -81,3 +85,85 @@
 }
 .floor-mask__cursor[data-mode="remove"] { border-style: dashed; }
 .floor-mask__cursor[data-mode="add"] { background: rgba(139, 160, 136, 0.25); }
+
+/* Zone de prise de 44 px autour d'un cercle visuel de 30 px : le doigt
+   attrape la poignée sans qu'elle masque davantage la photo. */
+.floor-mask__handle::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: var(--r-pill);
+}
+
+/* Marge de saisie : 22 px autour de la photo, soit la marge que la scène lui
+   laisse pendant l'édition. Les points y sont ramenés au bord de l'image. */
+.floor-mask__marge {
+  position: absolute;
+  inset: -22px;
+}
+.floor-mask[data-mode="off"] .floor-mask__marge { display: none; }
+
+/* Pendant l'édition, un doigt peint ou pose un point : il ne fait pas défiler
+   la page. Sans cela, `touch-action: pan-y` hérité de la scène transformait un
+   trait vertical au pinceau en défilement, et le navigateur coupait le geste. */
+.floor-mask:not([data-mode="off"]) { touch-action: none; }
+
+/* Poignée d'un point situé hors de l'écran (coin de perspective d'une scène
+   pré-calibrée) : affichée sur le bord de la zone visible, bordure pointillée
+   et flèche vers le vrai point. La flèche tourne avec `--angle`, posé par
+   l'éditeur ; la valeur du point, elle, n'est jamais modifiée. */
+.floor-mask__fleche {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: rotate(var(--angle, 0rad));
+  pointer-events: none;
+}
+.floor-mask__fleche::after {
+  content: "";
+  position: absolute;
+  /* Pointe à 20 px du centre : elle reste dans la marge de 22 px laissée
+     autour de la zone saisissable, donc à l'écran. */
+  left: 13px;
+  top: -5px;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid #f2efe8;
+  filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.9));
+}
+/* Poignée écartée de son point parce qu'une autre était au même endroit :
+   un trait fin la relie au vrai point, marqué d'un petit rond. On voit ainsi
+   quel coin on déplace. Rien ne s'affiche quand les poignées sont espacées. */
+.floor-mask__lien {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--lien, 0px);
+  height: 0;
+  border-top: 1.5px solid #f2efe8;
+  transform-origin: 0 50%;
+  transform: rotate(var(--angle-lien, 0rad));
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.85));
+  pointer-events: none;
+  z-index: -1;
+}
+.floor-mask__lien::after {
+  content: "";
+  position: absolute;
+  right: -3.5px;
+  top: -4.25px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f2efe8;
+  box-shadow: 0 0 0 1.5px #16181a;
+}
+.floor-mask__handle[data-decale]:not([data-hors]) .floor-mask__lien { display: block; }
+/* La poignée tenue passe devant les autres. */
+.floor-mask__handle[data-active="true"] { z-index: 2; }
+.floor-mask__handle[data-hors] { border-style: dashed; border-color: #f2efe8; background: #16181a; }
+.floor-mask__handle[data-hors] .floor-mask__fleche { display: block; }

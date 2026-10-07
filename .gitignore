@@ -13,6 +13,14 @@ desktop.ini
 # un `git add -A` emporterait tout le dossier.
 .kilo/
 *.swp
+
+# Fichiers temporaires de l'ecriture atomique du generateur.
+#
+# Ils sont retires apres chaque ecriture, et apres un echec quand c'est
+# possible. Un build interrompu au mauvais instant peut en laisser un :
+# cette regle evite qu'il se retrouve dans un commit. Les controles ne les
+# voient pas — ils ne collectent que les `.html`.
+.*.tmp
 _calibrage/_candidates/
 
 # Signature de build, ecrite par le generateur, jamais publiee
@@ -21,3 +29,7 @@ assets/dev-build.json
 # Paquet livrable du plugin, reconstruit par backend/deploy/faire-paquet.sh.
 # C'est une sortie de build : elle se refabrique, elle ne se versionne pas.
 backend/deploy/paquet/
+
+# Migration WordPress : fichier local (chemins absolus de la machine), régénéré par _generator/exporter-wordpress.js.
+# L'instantané data/wordpress/contenus.json, lui, se versionne.
+data/wordpress/import.json

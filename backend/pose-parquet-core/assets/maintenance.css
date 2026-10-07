@@ -1,0 +1,76 @@
+/*
+ * Page de maintenance — une seule feuille, deux lecteurs :
+ *   - WordPress (templates/maintenance-page.php) l'insère telle quelle ;
+ *   - le générateur du site statique (_generator/wordpress.js) aussi.
+ * Les @font-face sont déclarées par chacun (chemins différents) ; ici, rien
+ * que la mise en page. Une image pleine hauteur, le logo, un titre, un texte,
+ * deux liens. Ni compte à rebours, ni animation, ni formulaire.
+ */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #fff;
+  background: #2b2621;
+}
+.pm {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  padding: clamp(1.5rem, 1rem + 2.5vw, 3.5rem);
+  background-color: #6b5745;
+  background-size: cover;
+  background-position: center;
+  isolation: isolate;
+}
+.pm::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(100deg, rgba(38, 30, 23, 0.72) 0%, rgba(38, 30, 23, 0.42) 55%, rgba(38, 30, 23, 0.18) 100%);
+}
+.pm__marque {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.75rem);
+  letter-spacing: -0.01em;
+  color: #fff;
+  text-decoration: none;
+}
+.pm__marque svg { width: 0.62em; height: 1.15em; }
+.pm__marque span { opacity: 0.72; }
+.pm__corps { align-self: center; max-width: 34rem; display: grid; gap: 1.25rem; padding: 2rem 0; }
+.pm__titre {
+  margin: 0;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 1.6rem + 4.2vw, 4.75rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.pm__texte { margin: 0; max-width: 32rem; font-size: clamp(0.95rem, 0.9rem + 0.25vw, 1.08rem); line-height: 1.6; color: rgba(255, 255, 255, 0.84); }
+.pm__liens { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem; }
+.pm__lien {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 12.5rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: 999px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.pm__lien small { font-size: 0.74rem; font-weight: 400; opacity: 0.85; }
+.pm__lien--clair { background: #f4f2ec; color: #16181a; }
+.pm__lien--sombre { background: #4a5a46; color: #fff; }
+.pm__lien:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+@media (max-width: 30rem) {
+  .pm__liens { flex-direction: column; }
+  .pm__lien { width: 100%; }
+}

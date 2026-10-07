@@ -212,7 +212,7 @@ const MOTIFS = [
     title: 'Bâton rompu : le motif et sa pose | Pose Parquet',
     h1: 'Le bâton rompu',
     description:
-      "Lames droites assemblées à angle droit : le motif à chevrons le plus accessible. Rendu, formats, traçage et différences avec le Point de Hongrie.",
+      "Lames droites assemblées à angle droit : le motif en V le plus accessible. Rendu, formats, traçage et différences avec le Point de Hongrie.",
     reading: '5 min',
     excerpt: "Des lames droites, un rendu tressé : le motif graphique le plus accessible.",
     lead:

@@ -9,24 +9,47 @@ const { aPrecharger } = require('./polices');
  */
 const POLICE_TITRE = aPrecharger('Instrument Serif');
 const POLICE_TEXTE = aPrecharger('Inter');
+/*
+ * « Mon site » (WordPress) : identité, libellés de l'en-tête et du pied de
+ * page, liens commerciaux. Les valeurs par défaut et le schéma sont dans
+ * content-site.js ; WordPress les remplace avant tout rendu (wordpress.js).
+ * Ici, seulement la MANIÈRE de les afficher.
+ */
+const { REGLAGES } = require('./content-site');
+const T = require('./textes');
+
 const SITE = {
-  name: 'Pose Parquet',
+  get name() {
+    return REGLAGES.nom;
+  },
   domain: 'https://pose-parquet.com',
-  baseline: 'Comprendre, préparer, visualiser et réussir la pose de son parquet.',
+  get baseline() {
+    return REGLAGES.baseline;
+  },
 };
 
+/* Les adresses suivent l'arborescence : WordPress règle le libellé et l'affichage. */
 const NAV = [
-  { href: 'guides/', label: 'Guides', section: 'guides', num: '01' },
-  { href: 'motifs/', label: 'Motifs', section: 'motifs', num: '02' },
-  { href: 'tutoriels/', label: 'Tutoriels', section: 'tutoriels', num: '03' },
-  { href: 'inspiration/', label: 'Inspiration', section: 'inspiration', num: '04' },
-  { href: 'outils/', label: 'Outils', section: 'outils', num: '05' },
+  { href: 'guides/', cle: 'guides', section: 'guides' },
+  { href: 'motifs/', cle: 'motifs', section: 'motifs' },
+  { href: 'tutoriels/', cle: 'tutoriels', section: 'tutoriels' },
+  { href: 'inspiration/', cle: 'inspiration', section: 'inspiration' },
+  { href: 'outils/', cle: 'outils', section: 'outils' },
 ];
 
 const DRAWER_EXTRA = [
-  { href: 'a-propos/', label: 'À propos', section: 'a-propos', num: '06' },
-  { href: 'contact/', label: 'Contact', section: 'contact', num: '07' },
+  { href: 'a-propos/', cle: 'a_propos', section: 'a-propos' },
+  { href: 'contact/', cle: 'contact', section: 'contact' },
 ];
+
+const visibles = (liste) =>
+  liste.filter((item) => REGLAGES[`nav_${item.cle}_afficher`]).map((item) => ({ ...item, label: T.texte(REGLAGES[`nav_${item.cle}`]) }));
+
+/** Le nom du site en logotype texte : premier mot en valeur, la suite atténuée. */
+const motsDuNom = () => {
+  const [premier, ...suite] = String(REGLAGES.nom).split(' ');
+  return [T.texte(premier), T.texte(suite.join(' '))];
+};
 
 /**
  * Le symbole d'identité — Concept C : trois lames verticales inégales,
@@ -49,31 +72,38 @@ const mark = symbol('brand__mark');
 const arrow = `<svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg>`;
 
 function header(p) {
-  const links = NAV.map(
+  const links = visibles(NAV).map(
     (item) =>
       `<li><a class="nav__link" href="${p}${item.href}" data-nav-section="${item.section}">${item.label}</a></li>`
   ).join('\n            ');
 
-  const drawerLinks = [...NAV, ...DRAWER_EXTRA]
+  const drawerLinks = visibles([...NAV, ...DRAWER_EXTRA])
     .map(
       (item, index) =>
-        `<a class="drawer__link" href="${p}${item.href}"><span>${item.num}</span>${item.label}</a>`
+        `<a class="drawer__link" href="${p}${item.href}"><span>${String(index + 1).padStart(2, '0')}</span>${item.label}</a>`
     )
     .join('\n          ');
+
+  const [nomFort, nomSuite] = motsDuNom();
+  const logo = REGLAGES.logo && REGLAGES.logo.chemin
+    ? `<img class="brand__logo" src="${p}${T.attribut(REGLAGES.logo.chemin)}" alt="" width="${REGLAGES.logo.largeur}" height="${REGLAGES.logo.hauteur}" />`
+    : `${mark}<strong>${nomFort}</strong><span>${nomSuite}</span>`;
+  const ctaProjet = REGLAGES.cta_projet_afficher
+    ? `\n          <a class="header__cta" href="${p}projet/"><span>${T.texte(REGLAGES.cta_projet)}</span></a>`
+    : '';
 
   return `<a class="skip-link" href="#contenu">Aller au contenu</a>
     <header class="site-header" data-header data-over="false" data-scrolled="false">
       <div class="wrap-wide site-header__inner">
-        <a class="brand" href="${p}index.html" aria-label="Pose Parquet, accueil">
-          ${mark}<strong>Pose</strong><span>Parquet</span>
+        <a class="brand" href="${p}index.html" aria-label="${T.attribut(REGLAGES.nom)}, accueil">
+          ${logo}
         </a>
         <nav class="nav" aria-label="Navigation principale">
           <ul class="nav__list">
             ${links}
           </ul>
         </nav>
-        <div class="header__actions">
-          <a class="header__cta" href="${p}projet/"><span>Votre projet</span></a>
+        <div class="header__actions">${ctaProjet}
           <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false"
             aria-controls="menu-mobile" aria-label="Ouvrir le menu">
             <span></span><span></span><span></span>
@@ -86,13 +116,13 @@ function header(p) {
         ${drawerLinks}
       </nav>
       <div class="drawer__footer">
-        <a class="btn btn--light btn--block" href="${p}projet/"><span>Décrire mon projet</span>${arrow}</a>
-        <a class="btn btn--outline-light btn--block" href="${p}outils/studio.html"><span>Visualiser mon parquet</span></a>
+        <a class="btn btn--light btn--block" href="${p}projet/"><span>${T.texte(REGLAGES.menu_cta_projet)}</span>${arrow}</a>
+        <a class="btn btn--outline-light btn--block" href="${p}outils/studio.html"><span>${T.texte(REGLAGES.menu_cta_visualiseur)}</span></a>
         <!-- « Média indépendant · aucune vente en ligne » figurait aussi ici.
              L'information est utile, mais répétée en tête de menu sur chaque
              page elle prend un ton défensif. Elle reste dans le pied de page et
              développée sur la page À propos, c'est-à-dire là où on la cherche. -->
-        <p class="drawer__meta">Guides, motifs et outils</p>
+        <p class="drawer__meta">${T.texte(REGLAGES.menu_note)}</p>
       </div>
     </div>`;
 }
@@ -105,40 +135,37 @@ function header(p) {
  * mais serrée — elle signe la page au lieu d'en ouvrir une seconde.
  */
 function footer(p) {
+  const R = REGLAGES;
+  const lien = (href, cle) => (R[`pied_${cle}_afficher`] ? [[href, T.texte(R[`pied_${cle}`])]] : []);
   const groups = [
     {
-      title: 'Comprendre',
-      links: [
-        ['guides/', 'Guides'],
-        ['motifs/', 'Motifs'],
-        ['tutoriels/', 'Tutoriels'],
-      ],
+      title: T.texte(R.pied_col_comprendre),
+      links: [...lien('guides/', 'guides'), ...lien('motifs/', 'motifs'), ...lien('tutoriels/', 'tutoriels')],
     },
     {
-      title: 'Outils',
-      links: [
-        ['outils/studio.html', 'Visualiser ma pièce'],
-        ['outils/simulateur-pose.html', 'Mode Plan'],
-        ['inspiration/', 'Inspiration'],
-      ],
+      title: T.texte(R.pied_col_outils),
+      links: [...lien('outils/studio.html', 'studio'), ...lien('outils/simulateur-pose.html', 'plan'), ...lien('inspiration/', 'inspiration')],
     },
     {
-      title: 'À propos',
-      links: [
-        ['a-propos/methode-editoriale.html', 'Notre méthode'],
-        ['contact/', 'Contact'],
-        ['projet/', 'Votre projet'],
-      ],
+      title: T.texte(R.pied_col_apropos),
+      links: [...lien('a-propos/methode-editoriale.html', 'methode'), ...lien('contact/', 'contact'), ...lien('projet/', 'projet')],
     },
-  ];
+  ].filter((group) => group.links.length);
+
+  // La mention d'orientation : une destination désactivée n'y figure plus.
+  const destinations = [
+    R.premibel_afficher ? `<strong>${T.riche(R.premibel_libelle)}</strong> ${T.texte(R.pied_premibel)}` : '',
+    R.allure_afficher ? `<strong>${T.riche(R.allure_libelle)}</strong> ${T.texte(R.pied_allure)}` : '',
+  ].filter(Boolean);
+  const [nomFort, nomSuite] = motsDuNom();
 
   return `<footer class="site-footer">
       <div class="wrap-wide footer__inner">
         <div class="footer__top">
           <div class="footer__brand">
             ${symbol('footer__mark')}
-            <p class="footer__wordmark">Pose <span>Parquet</span></p>
-            <p class="footer__baseline">Guides et outils pour réussir la pose de son parquet.</p>
+            <p class="footer__wordmark">${nomFort} <span>${nomSuite}</span></p>
+            <p class="footer__baseline">${T.texte(R.pied_presentation)}</p>
           </div>
           <nav class="footer__nav" aria-label="Pied de page">
             ${groups
@@ -154,11 +181,41 @@ function footer(p) {
           </nav>
         </div>
         <div class="footer__bottom">
-          <p>&copy; 2026 Pose Parquet — média indépendant, aucune vente en ligne.</p>
-          <p>Photographies sous licence Pexels</p>
+          <!--
+            « Média indépendant, aucune vente en ligne » figurait ici.
+
+            La première moitié n'est plus exacte : le site oriente vers les
+            références de Premibel quand elles existent, et un lecteur qui
+            découvrirait ce lien après coup aurait raison de se sentir trompé.
+            La seconde reste vraie — rien ne se vend ni ne se paie ici — mais
+            énoncée seule elle laissait entendre la première.
+
+            Le pied de page ne développe pas : il renvoie à la page qui le
+            fait, une fois, sobrement.
+          -->
+          <p>&copy; ${T.texte(R.pied_mention)}</p>
+          <!--
+            Deux destinations nommées, une ligne, pas de logo.
+
+            Le pied de page dit vers QUI l'on oriente et pour QUOI ; le détail
+            — la zone, ce que la relation ne change pas — est à la page qui
+            l'explique. Écrire trois phrases ici en ferait une réclame en bas
+            de 32 pages.
+          -->
+          ${destinations.length ? `<p class="footer__orientation">${destinations.join(', ')} : ${T.texte(R.pied_orientation)} <a href="${p}a-propos/#liens-commerciaux">${T.texte(R.pied_liens_commerciaux)}</a></p>` : ''}
+          <p>${T.texte(R.pied_credits)}</p>
         </div>
       </div>
     </footer>`;
+}
+
+/** Le favicon : celui de « Mon site » s'il est choisi, sinon les icônes générées du symbole. */
+function favicon(p, build) {
+  const f = REGLAGES.favicon;
+  if (f && f.chemin) return `    <link rel="icon" href="${p}${T.attribut(f.chemin)}" type="${T.attribut(f.type)}" />`;
+  return `    <link rel="icon" href="${p}assets/icons/favicon.svg?v=${build.icons}" type="image/svg+xml" />
+    <link rel="icon" href="${p}assets/icons/favicon-32.png?v=${build.icons}" sizes="32x32" type="image/png" />
+    <link rel="icon" href="${p}assets/icons/favicon-16.png?v=${build.icons}" sizes="16x16" type="image/png" />`;
 }
 
 function breadcrumb(p, trail) {
@@ -238,9 +295,7 @@ function layout(page) {
     <meta property="og:url" content="${canonical}" />
     <meta property="og:image" content="${ogImage}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="icon" href="${p}assets/icons/favicon.svg?v=${build.icons}" type="image/svg+xml" />
-    <link rel="icon" href="${p}assets/icons/favicon-32.png?v=${build.icons}" sizes="32x32" type="image/png" />
-    <link rel="icon" href="${p}assets/icons/favicon-16.png?v=${build.icons}" sizes="16x16" type="image/png" />
+${favicon(p, build)}
     <link rel="apple-touch-icon" href="${p}assets/icons/apple-touch-icon.png?v=${build.icons}" />
     <link rel="manifest" href="${p}site.webmanifest?v=${build.icons}" />
     <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/${POLICE_TITRE}" crossorigin />
@@ -321,9 +376,7 @@ function appLayout(page) {
     <meta name="robots" content="noindex, follow" />
     <link rel="canonical" href="${canonical}" />
     <meta name="theme-color" content="#101214" />
-    <link rel="icon" href="${p}assets/icons/favicon.svg?v=${build.icons}" type="image/svg+xml" />
-    <link rel="icon" href="${p}assets/icons/favicon-32.png?v=${build.icons}" sizes="32x32" type="image/png" />
-    <link rel="icon" href="${p}assets/icons/favicon-16.png?v=${build.icons}" sizes="16x16" type="image/png" />
+${favicon(p, build)}
     <link rel="apple-touch-icon" href="${p}assets/icons/apple-touch-icon.png?v=${build.icons}" />
     <link rel="manifest" href="${p}site.webmanifest?v=${build.icons}" />
     <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/${POLICE_TEXTE}" crossorigin />

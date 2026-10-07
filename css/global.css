@@ -194,6 +194,9 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 
 /* Composition asymétrique */
 .split { display: grid; gap: clamp(2rem, 4vw, 5rem); align-items: center; }
+/* Deux colonnes de hauteurs très différentes : centrer la courte au milieu de
+   la longue laisse un grand vide en haut et en bas. */
+.split--top { align-items: start; }
 @media (min-width: 62rem) {
   .split { grid-template-columns: 1fr 1fr; }
   .split--wide-left { grid-template-columns: 1.35fr 0.65fr; }
@@ -225,3 +228,6 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 /* Média plein cadre */
 .media-fill { position: relative; overflow: hidden; border-radius: var(--r-media); background: var(--c-mineral); }
 .media-fill img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Un nom composé qui ne se coupe pas sur son trait d'union (« Île-de- / France »). */
+.u-nowrap { white-space: nowrap; }

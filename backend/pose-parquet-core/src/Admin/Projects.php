@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace PoseParquet\Core\Admin;
 
 use PoseParquet\Core\Mail\Notifier;
+use PoseParquet\Core\Projects\Fields;
 use PoseParquet\Core\Projects\Repository;
 use PoseParquet\Core\Projects\Status;
 use PoseParquet\Core\Security\Capabilities;
@@ -47,7 +48,7 @@ final class Projects {
 	public static function render(): void {
 		if ( ! current_user_can( Capabilities::VIEW_PROJECTS ) ) {
 			wp_die(
-				esc_html__( 'Vous n’avez pas les droits nécessaires pour consulter les demandes.', 'pose-parquet-core' ),
+				esc_html__( 'Vous n’avez pas les droits nécessaires pour consulter les projets.', 'pose-parquet-core' ),
 				esc_html__( 'Accès refusé', 'pose-parquet-core' ),
 				[ 'response' => 403 ]
 			);
@@ -75,7 +76,12 @@ final class Projects {
 		$page   = isset( $_GET['paged'] ) ? max( 1, absint( wp_unslash( $_GET['paged'] ) ) ) : 1;
 		// Sort des notifications : `failed` ou `pending`, rien d'autre ne filtre.
 		$mail   = isset( $_GET['mail'] ) ? sanitize_key( wp_unslash( $_GET['mail'] ) ) : '';
+		// Destination recommandée : une valeur de la liste fermée, ou rien.
+		$dest   = isset( $_GET['destination'] ) ? sanitize_key( wp_unslash( $_GET['destination'] ) ) : '';
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+		if ( ! in_array( $dest, Fields::enum( 'leadDestination' ), true ) ) {
+			$dest = '';
+		}
 		if ( ! in_array( $mail, [ Notifier::STATUS_FAILED, Notifier::STATUS_PENDING ], true ) ) {
 			$mail = '';
 		}
@@ -87,7 +93,7 @@ final class Projects {
 		$terme = mb_substr( trim( $terme ), 0, Repository::SEARCH_MAX );
 
 		$repo   = new Repository();
-		$args   = [ 'status' => $statut, 'search' => $terme, 'mail' => $mail ];
+		$args   = [ 'status' => $statut, 'search' => $terme, 'mail' => $mail, 'destination' => $dest ];
 		$total  = $repo->count_search( $args );
 		$pages  = (int) ceil( $total / Repository::PER_PAGE );
 
@@ -110,6 +116,8 @@ final class Projects {
 			'status'   => $statut,
 			'search'   => $terme,
 			'mail'     => $mail,
+			'dest'     => $dest,
+			'dests'    => Fields::enum( 'leadDestination' ),
 			'statuses' => Status::labels(),
 			'notice'   => Notices::pending(),
 			'can_edit' => current_user_can( Capabilities::MANAGE_PROJECTS ),
@@ -144,6 +152,9 @@ final class Projects {
 			'back_url' => View::list_url(),
 			'visualizer' => self::visualizer_view( $project ),
 			'acquisition' => self::acquisition_view( $project ),
+			'lead_need'   => (string) ( $project['lead_need'] ?? '' ),
+			'destination' => (string) ( $project['lead_destination'] ?? '' ),
+			'destinations' => Fields::enum( 'leadDestination' ),
 		];
 
 		require POSE_PARQUET_DIR . '/templates/admin-projects-detail.php';
@@ -272,13 +283,29 @@ final class Projects {
 		 * `utm_medium` désigne tout autre chose — le canal d'acquisition.
 		 */
 		$champs = [
-			'source_url'   => __( 'Page d’origine', 'pose-parquet-core' ),
+			'entry_page'   => __( 'Page d’entrée', 'pose-parquet-core' ),
+			'source_url'   => __( 'Page d’envoi', 'pose-parquet-core' ),
 			'utm_source'   => __( 'Source', 'pose-parquet-core' ),
 			'utm_medium'   => __( 'Média', 'pose-parquet-core' ),
 			'utm_campaign' => __( 'Campagne', 'pose-parquet-core' ),
+			'utm_content'  => __( 'Création', 'pose-parquet-core' ),
+			'utm_term'     => __( 'Mot-clé', 'pose-parquet-core' ),
 		];
 
 		$lignes = [];
+
+		/*
+		 * L'origine en tête, et traduite.
+		 *
+		 * « Fiche motif » se lit ; « motif » se devine. Les autres lignes sont
+		 * des chemins et des valeurs de campagne, qui n'ont pas de traduction
+		 * et n'en veulent pas.
+		 */
+		$source = (string) ( $project['lead_source'] ?? '' );
+		if ( $source !== '' ) {
+			$lignes[ __( 'Origine', 'pose-parquet-core' ) ] = View::label( 'lead_source', $source );
+		}
+
 		foreach ( $champs as $colonne => $libelle ) {
 			$valeur = (string) ( $project[ $colonne ] ?? '' );
 			if ( $valeur !== '' ) {

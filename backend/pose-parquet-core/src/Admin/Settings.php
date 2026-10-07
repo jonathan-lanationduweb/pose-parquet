@@ -53,14 +53,24 @@ final class Settings {
 			self::SECTION,
 			__( 'Emails', 'pose-parquet-core' ),
 			static function (): void {
-				echo '<p>' . esc_html__( 'L’adresse qui reçoit chaque nouvelle demande, et l’accusé de réception envoyé au visiteur. L’expéditeur (From) reste celui configuré pour le site ou le transport SMTP.', 'pose-parquet-core' ) . '</p>';
+				/*
+				 * L'état RÉEL du canal, en tête : le site public est une passerelle,
+				 * le parcours du visiteur ne dépend d'aucun email. Tant que
+				 * l'adresse est de test ou qu'aucun transport n'est déclaré, l'email
+				 * est « À configurer » — pas un canal de suivi. L'infrastructure
+				 * (file, nouvelles tentatives) reste en place pour plus tard.
+				 */
+				$diag   = Diagnostics::report();
+				$actif  = (bool) ( $diag['production_ready'] ?? false );
+				echo '<p class="adm-etat-ligne">' . esc_html__( 'État :', 'pose-parquet-core' ) . ' ' . Socle::badge( $actif ? __( 'Actif', 'pose-parquet-core' ) : __( 'À configurer', 'pose-parquet-core' ), $actif ? 'ok' : 'attente' ) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe.
+				echo '<p class="adm-carte__aide">' . esc_html__( 'Notification interne à chaque nouveau projet orienté. Le parcours du visiteur n’en dépend pas : aucun email ne lui est promis.', 'pose-parquet-core' ) . '</p>';
 			},
 			self::PAGE
 		);
 
 		add_settings_field(
 			self::KEY_NOTIFICATION_EMAIL,
-			__( 'Adresse de réception des demandes', 'pose-parquet-core' ),
+			__( 'Adresse de réception', 'pose-parquet-core' ),
 			static function (): void {
 				printf(
 					'<input type="email" class="regular-text" id="%1$s" name="%2$s[%1$s]" value="%3$s" required autocomplete="off" />',
@@ -68,8 +78,6 @@ final class Settings {
 					esc_attr( self::OPTION ),
 					esc_attr( self::notification_email() )
 				);
-				echo '<p class="description">' . esc_html__( 'Par défaut : l’adresse d’administration du site.', 'pose-parquet-core' ) . '</p>';
-
 				/*
 				 * Le champ n'est jamais vide — il hérite de `admin_email` — donc
 				 * rien, dans ce qu'il montre, ne distingue une adresse choisie
@@ -78,12 +86,12 @@ final class Settings {
 				 * développement. On le dit ici, à l'endroit où la décision se
 				 * prend.
 				 */
+				// Une ligne, la plus grave seulement : une adresse de test l'emporte sur une adresse héritée.
 				$diagnostic = Diagnostics::report();
-				if ( ! $diagnostic['explicit'] ) {
-					echo '<p class="description" style="color:#996800"><strong>' . esc_html__( 'Cette adresse est héritée, pas choisie.', 'pose-parquet-core' ) . '</strong> ' . esc_html__( 'Enregistrez cet écran pour la confirmer, même si vous n’en changez pas.', 'pose-parquet-core' ) . '</p>';
-				}
 				if ( ! $diagnostic['deliverable'] ) {
-					echo '<p class="description" style="color:#b42318"><strong>' . esc_html__( 'Ce domaine est réservé aux tests.', 'pose-parquet-core' ) . '</strong> ' . esc_html__( 'Aucun email ne peut y être remis : les demandes seraient enregistrées sans que personne ne soit prévenu.', 'pose-parquet-core' ) . '</p>';
+					echo '<p class="adm-alerte-ligne adm-alerte-ligne--ko"><span class="dashicons dashicons-warning" aria-hidden="true"></span>' . esc_html( sprintf( /* translators: %s : adresse */ __( '%s est une adresse de test : aucun email réel ne sera remis.', 'pose-parquet-core' ), self::notification_email() ) ) . '</p>';
+				} elseif ( ! $diagnostic['explicit'] ) {
+					echo '<p class="adm-alerte-ligne"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span>' . esc_html__( 'Adresse héritée du site : enregistrez pour la confirmer.', 'pose-parquet-core' ) . '</p>';
 				}
 			},
 			self::PAGE,
@@ -93,14 +101,14 @@ final class Settings {
 
 		add_settings_field(
 			self::KEY_VISITOR_CONFIRMATION,
-			__( 'Confirmation automatique au visiteur', 'pose-parquet-core' ),
+			__( 'Confirmation automatique', 'pose-parquet-core' ),
 			static function (): void {
 				printf(
 					'<label><input type="checkbox" id="%1$s" name="%2$s[%1$s]" value="1" %3$s /> %4$s</label>',
 					esc_attr( self::KEY_VISITOR_CONFIRMATION ),
 					esc_attr( self::OPTION ),
 					checked( self::visitor_confirmation_enabled(), true, false ),
-					esc_html__( 'activée', 'pose-parquet-core' )
+					esc_html__( 'Envoyer un accusé de réception au visiteur', 'pose-parquet-core' )
 				);
 			},
 			self::PAGE,

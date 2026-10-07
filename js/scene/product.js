@@ -79,8 +79,11 @@ export const KNOWN_PATTERNS = ['lames', 'point-de-hongrie', 'baton-rompu'];
 /**
  * Niveau de fidélité du rendu d'un produit.
  *
- * `ready`        de vraies cartes matière, préparées pour le sol.
- * `approximate`  une famille de rendu de démonstration en tient lieu.
+ * `ready`        de vraies cartes matière préparées pour le sol, OU un profil
+ *                matière construit pour CETTE référence, comparé à sa photo
+ *                et validé (`data/material-profiles.json`, voir
+ *                `validerProfilMatiere`).
+ * `approximate`  une famille de rendu partagée en tient lieu.
  * `unavailable`  ni l'un ni l'autre : le produit n'est pas proposé.
  *
  * La distinction existe pour une raison simple : **il ne faut jamais laisser
@@ -89,6 +92,93 @@ export const KNOWN_PATTERNS = ['lames', 'point-de-hongrie', 'baton-rompu'];
  * décidera plus tard ; la donnée, elle, doit exister dès maintenant.
  */
 export const VISUAL_STATUS = ['ready', 'approximate', 'unavailable'];
+
+/* ------------------------------------------------------------------ */
+/* Profils matière validés                                             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Les réglages de dessin que le moteur lit RÉELLEMENT (js/scene/texture.js).
+ * Un profil n'en déclare ni plus ni moins : une clé inconnue serait un réglage
+ * que personne ne dessine, et laisserait croire qu'il compte.
+ */
+export const TEXTURE_KEYS = {
+  base: 'rgb', grain: 'rgb',
+  warm: [0, 30], spread: [0, 40],
+  grainLines: [0, 30], grainAlpha: [0, 0.6], grainWidth: [0.004, 0.06],
+  knots: [0, 4], knotSize: [0, 0.2], knotDepth: [0, 1],
+  contrast: [0, 2], bevel: [0, 0.08], joint: [0, 1], sheen: [0, 0.2], cracks: [0, 0.6],
+};
+/** Finition : les deux grandeurs que `createMaterial` accepte d'un profil. */
+const SURFACE_KEYS = { roughness: [0.05, 1], clearcoat: [0, 0.6] };
+/** Les points que la comparaison visuelle doit avoir tous validés. */
+export const CONTROLES_MATIERE = ['motif', 'largeur', 'couleur', 'variation', 'finition', 'comparaison'];
+/** Écart de couleur maximal (ΔE CIE76) entre la tuile et le sol de la photo de référence. */
+export const SEUIL_DELTA_E = 8;
+
+/**
+ * Un profil matière mérite-t-il « Rendu fidèle » pour cette fiche ?
+ *
+ * La règle est stricte, et chaque point est vérifiable sans regarder une
+ * image : le regard a eu lieu avant, il est consigné dans le profil.
+ *
+ *   - verdict `ready`, daté ;
+ *   - la fiche et le profil parlent du même produit : motif, largeur et
+ *     longueur identiques. Si Premibel change une dimension, le profil ne vaut
+ *     plus et la fiche redevient « indicatif » d'elle-même ;
+ *   - réglages de dessin complets, connus et bornés ;
+ *   - la référence est la photo de CETTE fiche (sa vignette locale), propre au
+ *     produit — et elle sert au regard, jamais au sol ;
+ *   - chaque point de contrôle validé, aucune contradiction relevée ;
+ *   - écart de couleur mesuré sous le seuil.
+ *
+ * @returns {{ok: boolean, raisons: string[]}}
+ */
+export function validerProfilMatiere(profil, fiche) {
+  const raisons = [];
+  const non = (r) => raisons.push(r);
+  if (!profil || typeof profil !== 'object') return { ok: false, raisons: ['profil absent'] };
+  if (profil.verdict !== 'ready') non(`verdict « ${profil.verdict || 'absent'} »`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(profil.valideLe || ''))) non('date de validation absente');
+
+  const d = fiche.dimensions || {};
+  if (profil.motif !== fiche.defaultPattern || !(fiche.compatiblePatterns || []).includes(profil.motif)) {
+    non(`motif validé « ${profil.motif} » ≠ motif du produit « ${fiche.defaultPattern} »`);
+  }
+  if (!Number.isFinite(profil.largeurMm) || profil.largeurMm !== d.widthMm) non(`largeur validée ${profil.largeurMm} ≠ fiche ${d.widthMm}`);
+  if (!Number.isFinite(profil.longueurMm) || profil.longueurMm !== d.lengthMm) non(`longueur validée ${profil.longueurMm} ≠ fiche ${d.lengthMm}`);
+  if (fiche.unsupportedPattern) non('motif non pris en charge');
+
+  const tex = profil.texture || {};
+  for (const [cle, borne] of Object.entries(TEXTURE_KEYS)) {
+    const v = tex[cle];
+    if (borne === 'rgb') {
+      if (!Array.isArray(v) || v.length !== 3 || !v.every((c) => Number.isInteger(c) && c >= 0 && c <= 255)) non(`texture.${cle} : couleur invalide`);
+    } else if (!Number.isFinite(v) || v < borne[0] || v > borne[1]) non(`texture.${cle} hors bornes [${borne}] : ${v}`);
+  }
+  Object.keys(tex).filter((k) => !(k in TEXTURE_KEYS)).forEach((k) => non(`texture.${k} : réglage inconnu du moteur`));
+  for (const [cle, v] of Object.entries(profil.surface || {})) {
+    const borne = SURFACE_KEYS[cle];
+    if (!borne) non(`surface.${cle} : réglage inconnu du moteur`);
+    else if (!Number.isFinite(v) || v < borne[0] || v > borne[1]) non(`surface.${cle} hors bornes : ${v}`);
+  }
+  if (profil.angleDeg !== undefined && (profil.motif !== 'point-de-hongrie' || !(profil.angleDeg >= 15 && profil.angleDeg <= 75))) {
+    non(`angleDeg réservé au point de Hongrie, entre 15 et 75° : ${profil.angleDeg}`);
+  }
+
+  const ref = profil.reference || {};
+  const vignette = fiche.visual && fiche.visual.thumbnail;
+  if (!vignette || ref.image !== vignette) non('la référence n’est pas la vignette de cette fiche');
+  if (ref.propreAuProduit !== true) non('photo de référence non vérifiée comme propre au produit');
+
+  const c = profil.controle || {};
+  CONTROLES_MATIERE.filter((k) => c[k] !== true).forEach((k) => non(`contrôle « ${k} » non validé`));
+  if (c.contradiction !== false) non('contradiction non écartée');
+  const de = profil.mesure && profil.mesure.deltaE;
+  if (!Number.isFinite(de) || de > SEUIL_DELTA_E) non(`écart de couleur ${de} > ${SEUIL_DELTA_E}`);
+
+  return { ok: raisons.length === 0, raisons };
+}
 
 /* ------------------------------------------------------------------ */
 /* Normalisation                                                       */
@@ -246,7 +336,7 @@ export function resolveFamily(fiche, familles) {
  * catalogue de production comporte toujours des fiches incomplètes, et il vaut
  * mieux les afficher signalées que faire tomber la page.
  */
-export function normalizeProduct(raw, familles = {}) {
+export function normalizeProduct(raw, familles = {}, profils = {}) {
   const warnings = [];
 
   const id = first(raw.id, raw.sku, raw.reference, raw.ref, raw.slug);
@@ -294,24 +384,26 @@ export function normalizeProduct(raw, familles = {}) {
     sku: first(raw.sku, raw.reference, raw.ref) || null,
     name: name || null,
     slug: first(raw.slug, slugify(name)) || null,
-    woodSpecies: first(raw.woodSpecies, raw.essence, raw.wood, raw.bois) || null,
+    woodSpecies: first(raw.woodSpecies, raw.species, raw.essence, raw.wood, raw.bois) || null,
     range: first(raw.range, raw.gamme, raw.collection) || null,
     tone: first(raw.tone, raw.teinte, raw.couleur) || null,
+    toneSource: first(raw.toneSource) || null,
     // « Finition » et « Aspect » sont deux informations distinctes chez
     // Premibel, et les écraser dans un seul champ perdrait la moitié du sens :
     // « Verni » dit la brillance, « Brossé » dit le traitement de surface. Un
     // brossé n'est pas un niveau de brillance — c'est un grain ouvert, souvent
     // mat, et un « Verni brossé » existe.
     finish: first(raw.finish, raw.finition) || null,
-    surfaceTreatment: first(raw.surfaceTreatment, raw.aspect, raw.traitement_surface) || null,
+    surfaceTreatment: first(raw.surfaceTreatment, raw.treatment, raw.aspect, raw.traitement_surface) || null,
     parquetType: first(raw.parquetType, raw.type_parquet, raw.typeParquet, raw.type) || null,
     dimensions: { widthMm, lengthMm, thicknessMm, lengthRangeMm: l.rangeMm },
     compatiblePatterns,
     defaultPattern,
     visual: {
-      familyId: first(rawVisual.familyId, raw.famille_rendu, raw.familleRendu, raw.renderFamily) || null,
+      familyId: first(rawVisual.familyId, raw.visualFamily, raw.famille_rendu, raw.familleRendu, raw.renderFamily) || null,
       // Catalogue : ces deux-là ne touchent jamais le sol.
       thumbnail: first(rawVisual.thumbnail, raw.thumbnail, raw.image) || null,
+      image: first(rawVisual.image, raw.image) || null,
       sample: first(rawVisual.sample, raw.sample, raw.samplePhoto) || null,
       // Rendu : préparées pour être projetées, raccordables, sans ombre.
       albedo: first(rawVisual.albedo, raw.albedo, raw.maps && raw.maps.albedo) || null,
@@ -333,20 +425,49 @@ export function normalizeProduct(raw, familles = {}) {
     // poser — Versailles, notamment. On l'inscrit plutôt que de transformer
     // arbitrairement une dalle en pose droite.
     unsupportedPattern: first(raw.unsupportedPattern, raw.motif_non_supporte) || null,
+    /* Pourquoi une fiche n'a pas de rendu, quand la source le dit (synchronisation Premibel). */
+    visualReason: first(raw.visualReason) || null,
     source: first(raw.source, raw.origine) || null,
     displayOrder: num(first(raw.displayOrder, raw.ordre_affichage, raw.ordreAffichage, raw.order)) ?? 0,
     active: first(raw.active, raw.actif, raw.enabled) !== false,
     warnings,
   };
 
-  const famille = resolveFamily(fiche, familles);
+  /*
+   * Une fiche que sa source déclare SANS rendu ne reçoit pas de famille par
+   * défaut. Sans cette garde, `resolveFamily` lui trouvait « la luminance la
+   * plus proche » : chaque référence du catalogue synchronisé serait devenue
+   * « approximate », c'est-à-dire visualisable avec un bois qui n'est pas le
+   * sien.
+   */
+  const declareeSansRendu = first(raw.visualStatus, raw.visual_status) === 'unavailable' && !fiche.visual.familyId && !fiche.visual.albedo;
+  const famille = declareeSansRendu ? { id: null, reason: 'aucun rendu déclaré par la source' } : resolveFamily(fiche, familles);
   fiche.visual.familyId = famille.id;
   fiche.visual.familyReason = famille.reason;
 
   // Paramètres de dessin : ceux de la fiche s'ils existent (les douze
   // références actuelles les portent en ligne), sinon ceux de la famille.
-  fiche.visual.params = raw.texture || (familles[famille.id] && familles[famille.id].texture) || null;
+  fiche.visual.params = declareeSansRendu ? null : raw.texture || (familles[famille.id] && familles[famille.id].texture) || null;
   fiche.patternProfiles = first(raw.patternProfiles, raw.profils_motifs, raw.profilsMotifs) || null;
+
+  /*
+   * Profil matière : le seul chemin procédural vers « Rendu fidèle ». Validé
+   * ici, au point d'entrée unique — le Studio, l'accueil et les compteurs du
+   * générateur voient donc le même statut. Un profil refusé ne fait rien
+   * d'autre qu'expliquer pourquoi : la fiche garde sa famille.
+   */
+  fiche.materialProfile = null;
+  const profil = profils[fiche.sku] || profils[fiche.id];
+  if (profil && !declareeSansRendu) {
+    const verdict = validerProfilMatiere(profil, fiche);
+    if (verdict.ok) {
+      fiche.materialProfile = profil;
+      fiche.visual.params = profil.texture;
+      fiche.visual.familyReason = 'profil matière validé';
+    } else if (profil.verdict === 'ready') {
+      warnings.push(`profil matière refusé : ${verdict.raisons.join(' ; ')}`);
+    }
+  }
 
   // Niveau de fidélité.
   //
@@ -358,7 +479,7 @@ export function normalizeProduct(raw, familles = {}) {
   if (fiche.unsupportedPattern) {
     fiche.visualStatus = 'unavailable';
     warnings.push(`motif non pris en charge par le moteur : ${fiche.unsupportedPattern}`);
-  } else if (fiche.visual.albedo) fiche.visualStatus = 'ready';
+  } else if (fiche.visual.albedo || fiche.materialProfile) fiche.visualStatus = 'ready';
   else if (fiche.visual.params) fiche.visualStatus = 'approximate';
   else {
     fiche.visualStatus = 'unavailable';
@@ -366,7 +487,11 @@ export function normalizeProduct(raw, familles = {}) {
   }
   // Une fiche peut se déclarer plus prudente que ce que le calcul conclut,
   // jamais plus optimiste : on ne se décrète pas fidèle.
-  if (declare && VISUAL_STATUS.indexOf(declare) > VISUAL_STATUS.indexOf(fiche.visualStatus)) {
+  // Seule exception : « approximate », que la synchronisation écrit faute de
+  // mieux, cède devant un profil validé — c'est précisément ce que le profil
+  // apporte. « unavailable » ne cède jamais.
+  const cede = declare === 'approximate' && fiche.materialProfile;
+  if (declare && !cede && VISUAL_STATUS.indexOf(declare) > VISUAL_STATUS.indexOf(fiche.visualStatus)) {
     fiche.visualStatus = declare;
   }
 
@@ -408,8 +533,15 @@ function profilsDepuisDimensions(fiche) {
   if (w === null) return null;
   const profil = { width: w / 1000 };
   if (l !== null) profil.length = l / 1000;
+  // Une matière validée est dessinée à sa longueur réelle, et à l'angle relevé
+  // pour un point de Hongrie (voir `dimensionsDessinees` dans texture.js).
+  const mp = fiche.materialProfile;
+  if (mp && l !== null) profil.exactLength = true;
   const out = {};
-  fiche.compatiblePatterns.forEach((p) => { out[p] = { ...profil }; });
+  fiche.compatiblePatterns.forEach((p) => {
+    out[p] = { ...profil };
+    if (mp && p === 'point-de-hongrie' && mp.angleDeg) out[p].angleDeg = mp.angleDeg;
+  });
   return out;
 }
 
@@ -429,6 +561,9 @@ export function toMaterial(fiche) {
     defaultPattern: fiche.defaultPattern,
     compatiblePatterns: fiche.compatiblePatterns,
     texture: fiche.visual.params,
+    // Finition relevée par le profil validé ; sinon `createMaterial` la déduit
+    // du libellé (« Verni », « Brossé »…).
+    ...((fiche.materialProfile && fiche.materialProfile.surface) || {}),
     // Les dimensions du produit SONT les dimensions du motif.
     //
     // Un point de Hongrie Premibel de 92 × 520 mm, c'est un chevron de
@@ -510,6 +645,8 @@ export async function loadProducts(base = '') {
     .then((r) => (r.ok ? r.json() : {}))
     .catch(() => ({}));
   const families = manifeste.familles || {};
+  // Profils matière validés, déclarés par le manifeste comme les catalogues.
+  const profils = manifeste.profils ? ((await lireJson(`${base}${manifeste.profils}`).catch(() => ({}))).profils || {}) : {};
   const sources = Array.isArray(manifeste.catalogues)
     ? manifeste.catalogues
     : [{ fichier: manifeste.catalogue || 'data/parquets.json', source: 'demonstration' }];
@@ -519,7 +656,7 @@ export async function loadProducts(base = '') {
     const data = await lireJson(`${base}${s.fichier}`);
     const brutes = Array.isArray(data.produits) ? data.produits : data.parquets;
     if (!Array.isArray(brutes)) throw new Error(`catalogue vide ou mal formé : ${s.fichier}`);
-    brutes.forEach((r) => toutes.push(normalizeProduct({ source: s.source, ...r }, families)));
+    brutes.forEach((r) => toutes.push(normalizeProduct({ source: s.source, ...r }, families, profils)));
   }
   const source = sources.map((s) => s.fichier).join(' + ');
   const products = toutes.filter(estProposable).sort((a, b) => a.displayOrder - b.displayOrder);
@@ -566,7 +703,7 @@ export function validateCatalog(fiches, families = {}) {
       dire('bloquant', 'longueur inférieure à la largeur');
     }
 
-    if (!f.visual.familyId && !f.visual.albedo) dire('bloquant', 'ni famille de rendu ni carte matière');
+    if (!f.visual.familyId && !f.visual.albedo && !f.materialProfile) dire('bloquant', 'ni famille de rendu ni carte matière');
     else if (f.visual.familyId && !families[f.visual.familyId] && !f.visual.albedo) {
       dire('bloquant', `famille de rendu inconnue : ${f.visual.familyId}`);
     }

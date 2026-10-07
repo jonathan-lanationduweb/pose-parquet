@@ -16,6 +16,8 @@ import { PATTERNS, getPattern, patternThumb } from './patterns.js';
 import { clamp } from '../utils/dom.js';
 import icons from '../utils/icons.js';
 import { getState, setState, PLAN_TO_PATTERN, PATTERN_TO_PLAN } from './plan-state.js';
+import { buildPlanParams } from '../forms/plan-handoff.js';
+import { emettre } from '../analytics/events.js';
 
 /** Passerelle de teintes entre le visualiseur photo et le mode plan. */
 const TONE_TO_PLAN = { clair: 'clair', naturel: 'naturel', miel: 'naturel', brun: 'fume', fume: 'fume', graphite: 'fume' };
@@ -369,8 +371,26 @@ export class FloorVisualizer {
     this.projectLink.className = 'btn btn--sm';
     this.projectLink.href = `${this.base()}projet/`;
     this.projectLink.textContent = 'Utiliser dans mon projet';
+    this.projectLink.addEventListener('click', () => {
+      emettre('start_project', { contexte: 'mode-plan', pattern: this.state.pattern });
+    });
 
-    group.append(reset, this.projectLink);
+    /*
+     * Une phrase, pas un troisieme bouton.
+     *
+     * Le Mode Plan est l'endroit du site ou la question « et qui va poser ? »
+     * arrive naturellement : on vient de calculer une surface, un nombre de
+     * lames, un taux de chutes. Mais deux boutons qui menent tous les deux au
+     * formulaire ne donneraient pas un choix, ils donneraient une hesitation.
+     *
+     * La phrase prepare la question ; le bouton existant l'emporte avec le
+     * calepinage, et c'est le formulaire qui demande le besoin et la zone.
+     */
+    const note = document.createElement('p');
+    note.className = 'visualizer__aide';
+    note.textContent = 'Besoin d’aide pour la pose ? Décrivez votre projet : nous orientons selon votre région.';
+
+    group.append(reset, this.projectLink, note);
     return group;
   }
 
@@ -504,9 +524,24 @@ export class FloorVisualizer {
     this.updatePatternButtons();
     if (this.plankOutput) this.plankOutput.textContent = `${plankWidth} cm`;
     if (this.projectLink) {
-      this.projectLink.href = `${this.base()}projet/?orientation=${this.state.pattern}&surface=${Math.round(
-        this.state.length * this.state.width
-      )}`;
+      /*
+       * Le sens de pose voyage sous `pose`, et non plus sous `orientation`.
+       *
+       * `orientation` était déjà pris — c'est le nom que le Studio donne à son
+       * ANGLE DE RENDU, en degrés. Le lien écrivait donc `orientation=diagonale`
+       * là où le formulaire attendait `orientation=45`, et le sens de pose
+       * n'arrivait jamais : `Number('diagonale')` ne vaut rien, la valeur était
+       * écartée sans bruit. Le plan partait avec sa surface et sans son motif.
+       *
+       * Deux notions, deux noms. Voir js/forms/plan-handoff.js, qui porte la
+       * convention pour l'outil comme pour le formulaire.
+       */
+      const query = buildPlanParams({
+        pose: this.state.pattern,
+        surface: this.state.length * this.state.width,
+      });
+      const cible = `${this.base()}projet/`;
+      this.projectLink.href = query.toString() ? `${cible}?${query.toString()}` : cible;
     }
   }
 

@@ -12,7 +12,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-5);
-  min-height: clamp(20rem, 16rem + 12vw, 28rem);
+  /* Hauteur réduite : 28 rem par tuile faisaient 814 px de section sur un
+     écran large, pour quatre liens de trois lignes. */
+  min-height: clamp(17rem, 13rem + 9vw, 22.5rem);
   padding: clamp(1.4rem, 1rem + 1.2vw, 2rem);
   border-radius: var(--r-card);
   background: var(--tile-bg, var(--c-mineral));
@@ -45,11 +47,73 @@
 .tile__more svg { width: 0.95em; height: 0.95em; transition: transform var(--dur-2) var(--ease-out); }
 .tile:hover .tile__more svg { transform: translateX(5px); }
 
+/*
+ * Deux colonnes de `list-row` sous un seul chapeau de section.
+ *
+ * Les deux listes éditoriales de l'accueil — le dossier « sens de pose » et
+ * les tutoriels — se suivaient en deux sections identiques. Elles partagent
+ * désormais un titre ; chacune garde le sien, en `h3`.
+ */
+.duo-rows {
+  display: grid;
+  /* Sur téléphone les deux colonnes s'empilent : l'écart entre elles fait
+     alors double emploi avec la respiration des listes. */
+  gap: clamp(1.5rem, 0.5rem + 3vw, 3.5rem);
+}
+@media (min-width: 62rem) {
+  .duo-rows { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(2rem, 1rem + 3vw, 4rem); }
+}
+.duo-rows__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  padding-bottom: var(--sp-2);
+  margin-bottom: var(--sp-1);
+  border-bottom: 1px solid var(--c-line, rgba(22, 24, 26, 0.12));
+}
+.duo-rows__head h3 { margin: 0; font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem); }
+
+/*
+ * Une `list-row` en demi-largeur ne tient pas sur quatre colonnes.
+ *
+ * Au-dessus de 55 rem, `.list-row` aligne numéro, titre, résumé et durée sur
+ * une seule ligne — très bien sur toute la largeur de la page, illisible dans
+ * une colonne de 660 px : « Poser un parquet flottant, étape par étape »
+ * repassait sur quatre lignes à côté d'un résumé lui-même à six. Dans
+ * `.duo-rows`, la ligne reste empilée, et le titre descend d'un cran.
+ */
+.duo-rows .list-row__title { font-size: clamp(1.2rem, 1.02rem + 0.55vw, 1.55rem); }
+@media (min-width: 55rem) {
+  .duo-rows .list-row {
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+    gap: 0.2rem var(--sp-4);
+    align-items: baseline;
+  }
+  .duo-rows .list-row__num   { grid-area: 1 / 1; }
+  .duo-rows .list-row__title { grid-area: 1 / 2; }
+  .duo-rows .list-row__text  { grid-area: 2 / 2; margin-top: 0.4rem; }
+  .duo-rows .list-row__meta  { grid-area: 3 / 2; margin-top: 0.3rem; white-space: nowrap; }
+}
+
 /* Média intégré à la carte, façon vignette pleine largeur */
 .tile__media {
   margin: 0 calc(-1 * clamp(1.4rem, 1rem + 1.2vw, 2rem)) calc(-1 * clamp(1.4rem, 1rem + 1.2vw, 2rem));
-  height: clamp(8.5rem, 5rem + 10vw, 12rem);
+  height: clamp(7rem, 4rem + 7vw, 9.5rem);
   overflow: hidden;
+}
+
+/*
+ * Sur téléphone, les quatre tuiles se suivent en colonne et leurs vignettes
+ * ajoutaient à elles seules près de 600 px avant le premier vrai contenu.
+ * Elles sont décoratives — `alt` vide, aucune information qu'on perde. On
+ * garde les quatre entrées, on retire ce qui ne fait que pousser le reste
+ * vers le bas.
+ */
+@media (max-width: 47.99rem) {
+  .tile__media { display: none; }
+  .tile { min-height: 0; gap: var(--sp-4); }
 }
 .tile__media img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-4) var(--ease-out); }
 .tile:hover .tile__media img { transform: scale(1.06); }

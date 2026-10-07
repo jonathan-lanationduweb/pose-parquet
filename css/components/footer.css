@@ -82,6 +82,27 @@
 }
 .footer__bottom p { margin: 0; }
 
+/*
+ * La ligne d'orientation commerciale.
+ *
+ * `flex-basis: 100%` : elle prend sa propre ligne au lieu de se serrer entre
+ * le copyright et le crédit photo. C'est une phrase, pas une mention — la
+ * comprimer en troisième colonne l'aurait rendue illisible sur tablette,
+ * précisément là où elle doit se lire.
+ *
+ * `max-width` en ch et non en rem : on borne la LONGUEUR DE LIGNE, pas la
+ * largeur du bloc, et 78 caractères est la limite au-delà de laquelle l'œil
+ * perd le début de la ligne suivante.
+ */
+.footer__orientation {
+  flex-basis: 100%;
+  order: -1;
+  max-width: 78ch;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+.footer__orientation strong { font-weight: 500; color: var(--text); }
+
 /* ---------- Téléphone : trois lignes de liens, pas trois colonnes ----------
    Empiler les colonnes du bureau donnait un pied de page de 505 px avec un
    vide sous le dernier groupe. Ici, chaque groupe devient une ligne de liens

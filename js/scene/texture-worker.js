@@ -46,15 +46,22 @@ self.onmessage = (event) => {
      *
      * Le worker ne décide de rien : il fabrique la taille qu'on lui demande.
      */
+    // Trois temps chronométrés, rapportés avec la tuile : c'est ce qui permet
+    // de dire où part le temps d'un point de Hongrie (dessin des tracés,
+    // lecture des pixels, relief) sans instrumenter le worker de l'extérieur.
+    const t0 = performance.now();
     const tile = buildTexture(material, {
       pattern: motifEffectif(material, config.pattern),
       width: config.width || null,
       size: config.size || undefined,
     });
+    const t1 = performance.now();
     const [albedo] = buildMips(tile, 1);
+    const t2 = performance.now();
     const relief = reliefFromAlbedo(albedo, material.surface);
+    const t3 = performance.now();
     self.postMessage(
-      { id, albedo, relief },
+      { id, albedo, relief, durees: { dessin: t1 - t0, pixels: t2 - t1, relief: t3 - t2 } },
       [albedo.data.buffer, relief.data.buffer],
     );
   } catch (erreur) {

@@ -1,0 +1,441 @@
+{
+  "version": 1,
+  "note": "PROFILS MATIÈRE — le seul chemin procédural vers « Rendu fidèle ». Un profil est construit pour UNE référence Premibel, en regardant sa photo (jamais en la posant au sol), et validé par js/scene/product.js `validerProfilMatiere` : motif, largeur et longueur identiques à la fiche, réglages connus du moteur et bornés, photo propre au produit, six contrôles visuels validés, aucune contradiction, ΔE ≤ SEUIL_DELTA_E. Si la fiche Premibel change de dimension, le profil cesse de valoir et la fiche redevient « Rendu indicatif » d'elle-même. Les verdicts « approximate » consignent les références étudiées et refusées, avec ce qui manque. Méthode : docs/material-profiles.md.",
+  "profils": {
+    "CHENF39031": {
+      "verdict": "ready",
+      "valideLe": "2026-10-05",
+      "motif": "lames",
+      "largeurMm": 190,
+      "longueurMm": 1900,
+      "texture": {
+        "base": [
+          198,
+          156,
+          118
+        ],
+        "grain": [
+          166,
+          121,
+          82
+        ],
+        "warm": 6,
+        "spread": 12,
+        "grainLines": 11,
+        "grainAlpha": 0.2,
+        "grainWidth": 0.018,
+        "knots": 1.3,
+        "knotSize": 0.06,
+        "contrast": 1,
+        "bevel": 0.03,
+        "joint": 0.45,
+        "sheen": 0.06,
+        "cracks": 0,
+        "knotDepth": 0.45
+      },
+      "surface": {
+        "roughness": 0.55,
+        "clearcoat": 0.2
+      },
+      "reference": {
+        "image": "assets/images/products/premibel/CHENF39031.webp",
+        "propreAuProduit": true,
+        "photo": "1 image(s) Premibel, comparée en pleine taille (CHENF39031, image 1), consultée le 2026-10-05, jamais publiée ni posée au sol",
+        "zone": [
+          0.5,
+          0.8,
+          0.98,
+          0.98
+        ],
+        "observe": "Chêne naturel chaud, veinage modéré, quelques petits nœuds, variation douce entre lames ; vernis brossé satiné (reflets nets des fenêtres)."
+      },
+      "mesure": {
+        "deltaE": 0.25,
+        "labReference": [
+          64.06,
+          10.85,
+          26
+        ],
+        "labRendu": [
+          64.18,
+          10.77,
+          25.79
+        ],
+        "dessinMm": [
+          192,
+          1900
+        ]
+      },
+      "controle": {
+        "motif": true,
+        "largeur": true,
+        "couleur": true,
+        "variation": true,
+        "finition": true,
+        "comparaison": true,
+        "contradiction": false
+      }
+    },
+    "CHENF39014": {
+      "verdict": "ready",
+      "valideLe": "2026-10-05",
+      "motif": "lames",
+      "largeurMm": 190,
+      "longueurMm": 1900,
+      "texture": {
+        "base": [
+          99,
+          55,
+          33
+        ],
+        "grain": [
+          69,
+          30,
+          13
+        ],
+        "warm": 10,
+        "spread": 28,
+        "grainLines": 12,
+        "grainAlpha": 0.3,
+        "grainWidth": 0.018,
+        "knots": 1.6,
+        "knotSize": 0.07,
+        "contrast": 1.2,
+        "bevel": 0.03,
+        "joint": 0.55,
+        "sheen": 0.07,
+        "cracks": 0,
+        "knotDepth": 0.5
+      },
+      "surface": {
+        "roughness": 0.55,
+        "clearcoat": 0.2
+      },
+      "reference": {
+        "image": "assets/images/products/premibel/CHENF39014.webp",
+        "propreAuProduit": true,
+        "photo": "1 image(s) Premibel, comparée en pleine taille (CHENF39014, image 1), consultée le 2026-10-05, jamais publiée ni posée au sol",
+        "zone": [
+          0,
+          0.62,
+          1,
+          0.98
+        ],
+        "observe": "Chêne fumé brun-rouge, forte variation entre lames, figure marquée et nœuds visibles ; vernis brossé satiné (reflets francs)."
+      },
+      "mesure": {
+        "deltaE": 1.08,
+        "labReference": [
+          31.56,
+          18.91,
+          24.1
+        ],
+        "labRendu": [
+          31.9,
+          19.66,
+          24.8
+        ],
+        "dessinMm": [
+          192,
+          1900
+        ]
+      },
+      "controle": {
+        "motif": true,
+        "largeur": true,
+        "couleur": true,
+        "variation": true,
+        "finition": true,
+        "comparaison": true,
+        "contradiction": false
+      }
+    },
+    "BTRPF39009": {
+      "verdict": "ready",
+      "valideLe": "2026-10-05",
+      "motif": "baton-rompu",
+      "largeurMm": 90,
+      "longueurMm": 600,
+      "texture": {
+        "base": [
+          211,
+          185,
+          160
+        ],
+        "grain": [
+          183,
+          154,
+          126
+        ],
+        "warm": 4,
+        "spread": 10,
+        "grainLines": 9,
+        "grainAlpha": 0.2,
+        "grainWidth": 0.014,
+        "knots": 0.8,
+        "knotSize": 0.11,
+        "contrast": 0.95,
+        "bevel": 0.03,
+        "joint": 0.45,
+        "sheen": 0.04,
+        "cracks": 0,
+        "knotDepth": 0.6
+      },
+      "surface": {
+        "roughness": 0.68,
+        "clearcoat": 0.1
+      },
+      "reference": {
+        "image": "assets/images/products/premibel/BTRPF39009.webp",
+        "propreAuProduit": true,
+        "photo": "1 image(s) Premibel, comparée en pleine taille (BTRPF39009, image 1), consultée le 2026-10-05, jamais publiée ni posée au sol",
+        "zone": [
+          0,
+          0.62,
+          1,
+          0.98
+        ],
+        "observe": "Bâton rompu clair beige-gris, rustique : un nœud par élément environ, variation faible ; vernis brossé mat-satiné."
+      },
+      "mesure": {
+        "deltaE": 0.97,
+        "labReference": [
+          72.7,
+          5.82,
+          17.11
+        ],
+        "labRendu": [
+          73.44,
+          5.65,
+          16.51
+        ],
+        "dessinMm": [
+          91,
+          600
+        ]
+      },
+      "controle": {
+        "motif": true,
+        "largeur": true,
+        "couleur": true,
+        "variation": true,
+        "finition": true,
+        "comparaison": true,
+        "contradiction": false
+      }
+    },
+    "BTRPF39001": {
+      "verdict": "ready",
+      "valideLe": "2026-10-05",
+      "motif": "baton-rompu",
+      "largeurMm": 90,
+      "longueurMm": 600,
+      "texture": {
+        "base": [
+          174,
+          131,
+          78
+        ],
+        "grain": [
+          142,
+          98,
+          49
+        ],
+        "warm": 9,
+        "spread": 8,
+        "grainLines": 12,
+        "grainAlpha": 0.2,
+        "grainWidth": 0.017,
+        "knots": 0.1,
+        "knotSize": 0.08,
+        "contrast": 1.08,
+        "bevel": 0.03,
+        "joint": 0.45,
+        "sheen": 0.05,
+        "cracks": 0,
+        "knotDepth": 0.3
+      },
+      "surface": {
+        "roughness": 0.55,
+        "clearcoat": 0.18
+      },
+      "reference": {
+        "image": "assets/images/products/premibel/BTRPF39001.webp",
+        "propreAuProduit": true,
+        "photo": "2 image(s) Premibel, comparée en pleine taille (BTRPF39001, image 1), consultée le 2026-10-05, jamais publiée ni posée au sol",
+        "zone": [
+          0,
+          0.62,
+          1,
+          0.98
+        ],
+        "observe": "Bâton rompu miel doré, choix « Select » : presque sans nœud, très homogène ; vernis brossé avec reflets doux."
+      },
+      "mesure": {
+        "deltaE": 0.4,
+        "labReference": [
+          55.55,
+          10.53,
+          34.52
+        ],
+        "labRendu": [
+          55.68,
+          10.71,
+          34.85
+        ],
+        "dessinMm": [
+          91,
+          600
+        ]
+      },
+      "controle": {
+        "motif": true,
+        "largeur": true,
+        "couleur": true,
+        "variation": true,
+        "finition": true,
+        "comparaison": true,
+        "contradiction": false
+      }
+    },
+    "CHENF39008": {
+      "verdict": "approximate",
+      "etudieLe": "2026-10-05",
+      "motif": "lames",
+      "raison": "Rustique « old brown » à nœuds sombres nombreux, autour desquels le fil du bois dévie : le moteur pose des nœuds ronds sans déviation du fil — à forte densité ils se lisent comme des trous, à faible densité le produit perd son caractère. Les accents clairs du veinage dominent aussi là où la photo montre un fil sombre.",
+      "manque": [
+        "déviation du fil autour des nœuds",
+        "veinage sombre sur fond miel"
+      ]
+    },
+    "CHEN29198": {
+      "verdict": "approximate",
+      "etudieLe": "2026-10-05",
+      "motif": "lames",
+      "raison": "Chêne clair rustique à large figure et nœuds irréguliers, souvent fendus : le moteur, même avec des nœuds sombres (knotDepth), pose des disques ronds et réguliers sur un fil sans figure large — le sol se lit comme un pin noueux. Couleur et dimensions concordent (ΔE 1,0).",
+      "manque": [
+        "nœuds irréguliers fendus",
+        "figure large"
+      ]
+    },
+    "CHENF36015": {
+      "verdict": "approximate",
+      "etudieLe": "2026-10-05",
+      "motif": "lames",
+      "raison": "Gerces ouvertes et nœuds marqués sur toute la photo (choix « Campagne ») : le moteur trace une gerce d’un demi-pixel, invisible.",
+      "manque": [
+        "gerces ouvertes"
+      ]
+    },
+    "CHENF36014": {
+      "verdict": "approximate",
+      "etudieLe": "2026-10-05",
+      "motif": "lames",
+      "raison": "Même défaut que CHENF36015 : gerces noires et nœuds éclatés, signature du produit, non reproductibles.",
+      "manque": [
+        "gerces ouvertes"
+      ]
+    },
+    "CHEN29291": {
+      "verdict": "approximate",
+      "etudieLe": "2026-10-05",
+      "motif": "lames",
+      "raison": "Chêne blanchi aux pores blancs (gros plan de la galerie) : le moteur ne sait pas remplir le veinage d’une teinte plus claire que le fond, et y dessine des arcs absents de la photo.",
+      "manque": [
+        "pores blanchis",
+        "veinage droit sur quartier"
+      ]
+    },
+    "CHENF2685": {
+      "verdict": "approximate",
+      "etudieLe": "2026-10-05",
+      "motif": "lames",
+      "raison": "Noir « extra » à sciage profond (gros plan de la galerie) : relief de sciage non reproductible, la couleur seule ne suffit pas.",
+      "manque": [
+        "sciage"
+      ]
+    },
+    "CHENF39003": {
+      "verdict": "approximate",
+      "etudieLe": "2026-10-05",
+      "motif": "lames",
+      "raison": "Photo prise en plein soleil : le grain ne se lit pas, la comparaison est impossible.",
+      "manque": [
+        "photo de référence inexploitable"
+      ]
+    },
+    "CHENF36013": {
+      "verdict": "approximate",
+      "etudieLe": "2026-10-05",
+      "motif": "lames",
+      "raison": "Longueur absente de la fiche (« 1000–2200 » dans le titre seulement) et brossage « à l’ancienne » : données incomplètes.",
+      "manque": [
+        "longueur",
+        "brossage à l’ancienne"
+      ]
+    },
+    "CHEN29318": {
+      "verdict": "approximate",
+      "etudieLe": "2026-10-05",
+      "motif": "lames",
+      "raison": "Longueur absente de la fiche Premibel : rendu à l’échelle impossible à valider.",
+      "manque": [
+        "longueur"
+      ]
+    },
+    "POINF39026": {
+      "verdict": "approximate",
+      "etudieLe": "2026-10-05",
+      "motif": "point-de-hongrie",
+      "raison": "Angle de coupe non publié par Premibel (ni attribut ni description) et non mesurable sur une photo en perspective : le moteur dessinerait 45° par hypothèse. Couleur et largeur concordent (ΔE < 2).",
+      "manque": [
+        "angle de coupe"
+      ]
+    },
+    "POINF39009": {
+      "verdict": "approximate",
+      "etudieLe": "2026-10-05",
+      "motif": "point-de-hongrie",
+      "raison": "Angle de coupe non publié, comme POINF39026 ; la géométrie du motif n’est pas validable.",
+      "manque": [
+        "angle de coupe"
+      ]
+    },
+    "POIN39262": {
+      "verdict": "approximate",
+      "etudieLe": "2026-10-05",
+      "motif": "point-de-hongrie",
+      "raison": "Angle de coupe non publié, comme POINF39026 ; la géométrie du motif n’est pas validable.",
+      "manque": [
+        "angle de coupe"
+      ]
+    },
+    "POINF2603": {
+      "verdict": "approximate",
+      "etudieLe": "2026-10-05",
+      "motif": "point-de-hongrie",
+      "raison": "Contradiction : la fiche annonce 240 × 1450 mm, la photo montre des chevrons étroits (~90 mm).",
+      "manque": [
+        "photo contradictoire"
+      ]
+    },
+    "BTRP26000": {
+      "verdict": "approximate",
+      "etudieLe": "2026-10-05",
+      "motif": "baton-rompu",
+      "raison": "Aspect « Vieilli » (patine, usure) et photo composite : patine non reproductible.",
+      "manque": [
+        "patine"
+      ]
+    },
+    "BTRP39001": {
+      "verdict": "approximate",
+      "etudieLe": "2026-10-05",
+      "motif": "baton-rompu",
+      "raison": "Photo identique à celle de BTRP39003 et BTRP39004, de teintes différentes : elle ne représente pas CETTE référence.",
+      "manque": [
+        "photo propre au produit"
+      ]
+    }
+  }
+}

@@ -115,10 +115,6 @@
 
 .pf__status { margin: var(--sp-3) 0 0; font-size: var(--fs-sm); color: var(--text-muted); text-align: right; }
 
-.pf__success { display: grid; gap: var(--sp-3); justify-items: start; padding: var(--sp-5) 0; }
-.pf__success h2 { font-size: var(--fs-h3); }
-.pf__success p { color: var(--text-soft); max-width: 46ch; margin: 0; }
-.pf__success:focus-visible { outline: none; }
 
 @media (max-width: 30rem) {
   .pf__actions { flex-direction: column-reverse; }
@@ -175,37 +171,108 @@
 }
 .pf__failure:focus-visible { outline: none; }
 
-/* Référence de la demande, sur l'écran de confirmation. */
-.pf__reference {
-  margin: 0;
-  padding: 0.7rem 0.95rem;
-  border-radius: var(--r-sm);
-  background: var(--c-sage-pale);
-  color: var(--c-sage-deep);
-  font-variant-numeric: tabular-nums;
-}
-
-/*
- * Bandeau d'indisponibilite, en tete du formulaire.
- *
- * Il est volontairement calme : ni rouge d'erreur, ni icone d'alarme. Rien
- * n'est casse, et le visiteur n'a rien fait de mal — c'est le service qui
- * n'est pas encore branche. Le ton est celui d'une information, et l'action
- * qui marche (ecrire) est le seul bouton plein de la zone.
- */
-.pf__offline {
-  margin: 0 0 var(--sp-5);
-  padding: clamp(0.95rem, 0.7rem + 0.8vw, 1.4rem);
-  border: 1px solid var(--line-strong);
-  border-left: 3px solid var(--c-clay, #b3462f);
-  border-radius: var(--r-block);
-  background: var(--bg-soft, #f6f3ec);
-  display: grid;
-  gap: 0.55rem;
-}
-.pf__offline p { margin: 0; font-size: 0.95rem; color: var(--text-soft); }
-.pf__offline-title { font-weight: 500; color: var(--text) !important; font-size: 1rem !important; }
-.pf__offline .btn { margin-top: 0.2rem; }
 
 /* Le bouton d'envoi desactive doit avoir l'air desactive, pas casse. */
 .pf [data-submit]:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Ce qui vient apres l'etape en cours. Discret : c'est un reperage, pas une
+   consigne. Disparait a la derniere etape, ou il n'y a plus de suite. */
+.pf__next {
+  grid-column: 1 / -1;
+  margin: var(--sp-2) 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.pf__next[hidden] { display: none; }
+
+/* ================================================================== */
+/* Conclusion du parcours : l'orientation                              */
+/* ================================================================== */
+/*
+ * Pas un « Merci » : la suite du projet. En tête, le projet résumé ; puis
+ * une carte par entreprise, numérotée dans l'ordre où l'on s'en sert
+ * (01 le parquet, 02 la pose). Deux colonnes dès qu'il y a la place, une
+ * pile sur téléphone — jamais deux colonnes étroites.
+ */
+.pf__result { display: grid; gap: var(--sp-5); }
+.pf__result:focus-visible { outline: none; }
+
+.pf-result__head { display: grid; gap: var(--sp-3); padding-bottom: var(--sp-5); border-bottom: 1px solid var(--line); }
+.pf-result__head .eyebrow { margin: 0; }
+.pf-result__title { margin: 0; font-size: var(--fs-h3); }
+.pf-result__intro { margin: 0; max-width: 56ch; color: var(--text-soft); }
+
+.pf-recap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: var(--sp-2) 0 0;
+}
+.pf-recap > div {
+  display: grid;
+  gap: 0.05rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+.pf-recap dt { font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); }
+.pf-recap dd { margin: 0; font-size: 0.95rem; color: var(--text); }
+
+.pf-result__dests { display: grid; gap: var(--sp-4); }
+@media (min-width: 40rem) {
+  .pf-result__dests[data-n="2"] { grid-template-columns: 1fr 1fr; }
+}
+
+.pf-dest {
+  display: grid;
+  gap: var(--sp-3);
+  align-content: start;
+  padding: clamp(1.1rem, 0.9rem + 0.8vw, 1.6rem);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+}
+.pf-dest--premibel { border-top: 3px solid var(--c-sage-deep); }
+.pf-dest--allure_design { border-top: 3px solid var(--c-clay); }
+.pf-dest > p, .pf-dest > h3 { margin: 0; }
+.pf-dest__num { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); }
+.pf-dest__role { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-soft); }
+.pf-dest__nom { font-family: var(--font-display); font-size: clamp(1.5rem, 1.3rem + 0.8vw, 2rem); font-weight: 400; line-height: 1.1; }
+.pf-dest__texte { color: var(--text-soft); font-size: 0.95rem; }
+.pf-dest__produit {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--r-sm);
+  background: var(--c-sage-pale);
+  color: var(--c-sage-deep);
+  font-size: 0.9rem;
+}
+.pf-dest__produit p { margin: 0; min-width: 0; }
+.pf-dest__produit span { display: block; font-size: 0.8rem; opacity: 0.85; }
+.pf-dest__vignette { flex: none; width: 3.5rem; height: 3.5rem; border-radius: var(--r-sm); object-fit: cover; background: var(--c-paper, #fff); }
+.pf-dest__cta { justify-self: start; margin-top: var(--sp-2); }
+@media (max-width: 30rem) {
+  .pf-dest__cta { justify-self: stretch; text-align: center; }
+}
+
+.pf-result__note,
+.pf-result__studio {
+  margin: 0;
+  padding: 0.7rem 0.95rem;
+  border-radius: var(--r-sm);
+  background: var(--bg-soft, #f6f3ec);
+  color: var(--text-soft);
+  font-size: 0.9rem;
+}
+.pf-result__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3) var(--sp-5); }
+.pf-result__orient { margin: 0; font-size: 0.85rem; color: var(--text-muted); max-width: 60ch; }
+
+/* La colonne de conseils cède la place : après l'orientation, le contenu
+   principal a besoin de la largeur, et la colonne ne dit plus que l'étape
+   suivante. */
+@media (min-width: 62rem) {
+  .project-intro:has(> aside[data-etat="orientation"]) { grid-template-columns: 1fr minmax(14rem, 17rem); }
+}

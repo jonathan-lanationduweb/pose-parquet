@@ -60,10 +60,43 @@ function depot(req, res, url) {
   });
 }
 
+/**
+ * Maintenance, comme un vrai serveur la servirait.
+ *
+ * Quand WordPress l'a activée (assets/maintenance.json, écrit par le build),
+ * toute page HTML répond **503 Service Unavailable** avec `Retry-After`, et le
+ * corps de maintenance.html. Les fichiers (CSS, JS, images, polices) passent :
+ * la page de maintenance en a besoin. Aperçu du vrai site : `?apercu=1`, qui
+ * pose le cookie `pp_apercu`. C'est la règle à reproduire sur l'hébergement
+ * définitif (voir docs/backend/wordpress-contenus.md) ; GitHub Pages ne sait
+ * pas renvoyer de 503.
+ */
+function maintenance(req, res, url) {
+  let actif = false;
+  try {
+    actif = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets', 'maintenance.json'), 'utf8')).actif === true;
+  } catch {
+    return false;
+  }
+  if (!actif) return false;
+  const page = url.endsWith('/') || url.endsWith('.html');
+  if (!page || url === '/maintenance.html') return false;
+  if (/[?&]apercu=1(&|$)/.test(req.url)) {
+    res.setHeader('Set-Cookie', 'pp_apercu=1; Path=/; SameSite=Lax');
+    return false;
+  }
+  if (/(^|;\s*)pp_apercu=1/.test(req.headers.cookie || '')) return false;
+  const corps = fs.readFileSync(path.join(ROOT, 'maintenance.html'));
+  res.writeHead(503, { 'Content-Type': TYPES['.html'], 'Retry-After': '3600', 'Cache-Control': 'no-store' });
+  res.end(corps);
+  return true;
+}
+
 http
   .createServer((req, res) => {
     const url = decodeURIComponent(req.url.split('?')[0].split('#')[0]);
     if (req.method === 'PUT' && url.startsWith('/__depot/')) return depot(req, res, url);
+    if (maintenance(req, res, url)) return undefined;
     let filePath = path.join(ROOT, url);
 
     if (!filePath.startsWith(ROOT)) return send(res, 403, 'Interdit', TYPES['.txt']);

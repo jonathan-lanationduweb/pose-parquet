@@ -85,6 +85,14 @@ export const chrono = actif
   : (nom, fn) => fn();
 
 /**
+ * Durée mesurée AILLEURS — dans un worker, qui n'a pas accès à ces relevés —
+ * et rapportée ici pour figurer dans le même rapport.
+ */
+export const noter = actif
+  ? (nom, duree) => { if (Number.isFinite(duree)) releves.push({ nom, duree: Math.round(duree * 100) / 100 }); }
+  : () => {};
+
+/**
  * Résumé par nom : nombre d'appels, médiane, maximum, total.
  *
  * La médiane plutôt que la moyenne : le premier rendu d'un matériau coûte dix

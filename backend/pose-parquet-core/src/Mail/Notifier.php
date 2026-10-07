@@ -55,8 +55,19 @@ final class Notifier {
 	 * La confirmation au visiteur peut être désactivée dans les réglages :
 	 * ce n'est pas un échec, c'est un choix, et il se lit `skipped`.
 	 */
-	public function concerne( string $type ): bool {
-		return $type !== self::TYPE_VISITOR || Settings::visitor_confirmation_enabled();
+	public function concerne( string $type, ?array $project = null ): bool {
+		if ( $type !== self::TYPE_VISITOR ) {
+			return true;
+		}
+		/*
+		 * Pas d'adresse, pas d'accusé de réception : c'est le cas normal
+		 * depuis que le formulaire ne demande plus de coordonnées. Un choix de
+		 * conception, donc `skipped`, et non un échec `no_recipient`.
+		 */
+		if ( $project !== null && ! is_email( (string) ( $project['email'] ?? '' ) ) ) {
+			return false;
+		}
+		return Settings::visitor_confirmation_enabled();
 	}
 
 	/**

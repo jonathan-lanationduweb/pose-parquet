@@ -20,6 +20,7 @@ declare(strict_types=1);
 use PoseParquet\Core\Admin\Actions;
 use PoseParquet\Core\Admin\Notices;
 use PoseParquet\Core\Admin\View;
+use PoseParquet\Core\Projects\LeadRouting;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -54,7 +55,7 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 ?>
 <div class="wrap pp-admin pp-detail">
 	<h1 class="wp-heading-inline">
-		<?php esc_html_e( 'Demande', 'pose-parquet-core' ); ?>
+		<?php esc_html_e( 'Projet', 'pose-parquet-core' ); ?>
 		<span class="pp-ref-title"><?php echo esc_html( $reference !== '' ? $reference : sprintf( '#%d', $id ) ); ?></span>
 	</h1>
 	<a href="<?php echo esc_url( $view['back_url'] ); ?>" class="page-title-action"><?php esc_html_e( 'Retour à la liste', 'pose-parquet-core' ); ?></a>
@@ -80,8 +81,10 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 	<div class="pp-cols">
 		<div class="pp-col-main">
 
+			<?php $pp_coordonnees = trim( $nom . (string) $p['email'] . (string) $p['phone'] . (string) $p['city'] ) !== ''; ?>
+			<?php if ( $pp_coordonnees ) : ?>
 			<section class="pp-card">
-				<h2><?php esc_html_e( 'Client', 'pose-parquet-core' ); ?></h2>
+				<h2><?php esc_html_e( 'Coordonnées (ancien parcours)', 'pose-parquet-core' ); ?></h2>
 				<dl class="pp-fields">
 					<?php $ligne( __( 'Nom', 'pose-parquet-core' ), $nom, true ); ?>
 					<div class="pp-field">
@@ -113,6 +116,9 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 					</div>
 				</dl>
 			</section>
+			<?php else : ?>
+			<p class="pp-sub"><?php esc_html_e( 'Parcours anonyme : le site oriente sans demander de coordonnées.', 'pose-parquet-core' ); ?></p>
+			<?php endif; ?>
 
 			<section class="pp-card">
 				<h2><?php esc_html_e( 'Projet', 'pose-parquet-core' ); ?></h2>
@@ -142,7 +148,7 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 			<?php if ( $view['visualizer'] ) : ?>
 				<section class="pp-card">
 					<h2><?php esc_html_e( 'Visualiseur', 'pose-parquet-core' ); ?></h2>
-					<p class="pp-sub"><?php esc_html_e( 'Ce que le visiteur a essayé avant d’envoyer sa demande.', 'pose-parquet-core' ); ?></p>
+					<p class="pp-sub"><?php esc_html_e( 'Ce que le visiteur a essayé avant de décrire son projet.', 'pose-parquet-core' ); ?></p>
 					<dl class="pp-fields">
 						<?php foreach ( $view['visualizer'] as $libelle => $valeur ) : ?>
 							<?php $ligne( (string) $libelle, (string) $valeur, true ); ?>
@@ -217,6 +223,103 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 					<p class="pp-sub"><?php esc_html_e( 'Vous n’avez pas le droit de modifier le statut.', 'pose-parquet-core' ); ?></p>
 				<?php endif; ?>
 			</section>
+
+			<?php
+			/*
+			 * Qualification commerciale.
+			 *
+			 * Juste sous le statut, avant les emails : quand on ouvre une
+			 * demande, les deux premières questions sont « où en est-on ? » et
+			 * « à qui est-ce ? ». Les avoir côte à côte évite de descendre la
+			 * page pour la seconde.
+			 *
+			 * La carte ne s'affiche pas pour une demande d'avant le schéma 4 :
+			 * elle n'aurait que des cases vides et un menu déroulant proposant
+			 * d'inventer une destination pour un lead qu'on n'a pas qualifié.
+			 */
+			$pp_besoin      = (string) ( $view['lead_need'] ?? '' );
+			$pp_destination = (string) ( $view['destination'] ?? '' );
+			?>
+			<?php if ( $pp_besoin !== '' || $pp_destination !== '' ) : ?>
+				<section class="pp-card">
+					<h2><?php esc_html_e( 'Qualification', 'pose-parquet-core' ); ?></h2>
+					<dl class="pp-fields">
+						<?php
+						$ligne( __( 'Besoin', 'pose-parquet-core' ), View::label( 'lead_need', $pp_besoin ), true );
+						/*
+						 * Département d'abord, région ensuite.
+						 *
+						 * Dans cet ordre parce que c'est l'ordre de la déduction : le
+						 * département est la donnée, la région en est la conséquence.
+						 * Les deux ne peuvent plus se contredire — la région affichée
+						 * ici est recalculée depuis le département, pas relue d'une
+						 * colonne qui pourrait dater d'avant cette règle.
+						 */
+						$ligne( __( 'Département', 'pose-parquet-core' ), (string) ( $p['department'] ?? '' ), true );
+						$ligne( __( 'Région', 'pose-parquet-core' ), LeadRouting::region( $p ), true );
+						$ligne(
+							__( 'Zone', 'pose-parquet-core' ),
+							LeadRouting::en_idf( $p )
+								? __( 'Île-de-France : Allure Design intervient', 'pose-parquet-core' )
+								: __( 'Hors zone d’intervention d’Allure Design', 'pose-parquet-core' ),
+							true
+						);
+						?>
+					</dl>
+
+					<?php
+					/*
+					 * Pourquoi cette destination.
+					 *
+					 * « Destination : Allure Design » seul laisse deviner s'il faut
+					 * faire confiance. Les deux faits sur lesquels la règle s'est
+					 * appuyée — le besoin et la zone — permettent de la contredire en
+					 * connaissance de cause. Une recommandation dont on ne voit pas le
+					 * raisonnement finit suivie sans être lue, ou ignorée sans être
+					 * examinée.
+					 */
+					$pp_raison = LeadRouting::raison( $p );
+					?>
+					<?php if ( $pp_raison !== '' ) : ?>
+						<p class="pp-sub"><strong><?php esc_html_e( 'Pourquoi', 'pose-parquet-core' ); ?></strong> — <?php echo esc_html( $pp_raison ); ?></p>
+					<?php endif; ?>
+
+					<?php if ( LeadRouting::corrigee( $p ) ) : ?>
+						<p class="pp-sub">
+							<?php
+							printf(
+								/* translators: %s : destination recommandée automatiquement. */
+								esc_html__( 'Corrigée à la main. La règle avait recommandé : %s.', 'pose-parquet-core' ),
+								esc_html( LeadRouting::libelle_auto( $p ) )
+							);
+							?>
+						</p>
+					<?php endif; ?>
+
+					<?php if ( $view['can_edit'] ) : ?>
+						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="pp-status-form">
+							<?php wp_nonce_field( Actions::nonce_action( Actions::UPDATE_DESTINATION, $id ) ); ?>
+							<input type="hidden" name="action" value="<?php echo esc_attr( Actions::UPDATE_DESTINATION ); ?>" />
+							<input type="hidden" name="project_id" value="<?php echo esc_attr( (string) $id ); ?>" />
+							<label for="pp-destination"><?php esc_html_e( 'Destination', 'pose-parquet-core' ); ?></label>
+							<select id="pp-destination" name="lead_destination">
+								<?php foreach ( (array) ( $view['destinations'] ?? [] ) as $pp_valeur ) : ?>
+									<option value="<?php echo esc_attr( $pp_valeur ); ?>"<?php selected( $pp_destination, $pp_valeur ); ?>>
+										<?php echo esc_html( View::label( 'lead_destination', $pp_valeur ) ); ?>
+									</option>
+								<?php endforeach; ?>
+							</select>
+							<p class="pp-sub"><?php esc_html_e( 'Proposée automatiquement d’après le parcours. À vous de trancher : rien n’est envoyé sur la seule foi de cette valeur.', 'pose-parquet-core' ); ?></p>
+							<?php submit_button( __( 'Changer la destination', 'pose-parquet-core' ), 'secondary', 'submit', false ); ?>
+						</form>
+					<?php else : ?>
+						<dl class="pp-fields">
+							<?php $ligne( __( 'Destination', 'pose-parquet-core' ), View::label( 'lead_destination', $pp_destination ), true ); ?>
+						</dl>
+						<p class="pp-sub"><?php esc_html_e( 'Vous n’avez pas le droit de modifier la destination.', 'pose-parquet-core' ); ?></p>
+					<?php endif; ?>
+				</section>
+			<?php endif; ?>
 
 			<section class="pp-card">
 				<h2><?php esc_html_e( 'Emails', 'pose-parquet-core' ); ?></h2>
