@@ -107,7 +107,8 @@ final class Ecran {
 		$i = (array) ( $d['images'] ?? [] );
 		$g = (array) ( $d['photosPartagees'] ?? [] );
 
-		echo '<div class="adm-chiffres">';
+		// Le nombre de références d'abord, en grand ; les autres mesures à sa suite.
+		echo '<div class="adm-chiffres adm-chiffres--principal">';
 		Socle::chiffre( __( 'Références', 'pose-parquet-core' ), self::nombre( $d['produits'] ?? null ) );
 		Socle::chiffre( __( 'Visualisables', 'pose-parquet-core' ), self::nombre( $d['visualisables'] ?? null ) );
 		Socle::chiffre( __( 'Rendu fidèle', 'pose-parquet-core' ), self::nombre( $s['ready'] ?? null ) );
@@ -152,7 +153,7 @@ final class Ecran {
 		Socle::carte_ouvrir( __( 'Synchronisation', 'pose-parquet-core' ) );
 		echo '<div class="adm-sync">';
 		echo '<div><p class="adm-carte__aide">' . esc_html__( 'Elle se lance depuis le dépôt du site, puis le build publie le nouvel état :', 'pose-parquet-core' ) . '</p>';
-		echo '<p class="adm-note"><code>' . esc_html( (string) ( $d['commande'] ?? 'node _generator/sync-premibel.js' ) ) . '</code></p>';
+		echo '<pre class="adm-commande"><code>' . esc_html( (string) ( $d['commande'] ?? 'node _generator/sync-premibel.js' ) ) . '</code></pre>';
 		echo '<p class="adm-carte__aide">' . esc_html__( 'Lu sur :', 'pose-parquet-core' ) . ' <code>' . esc_html( self::url_fichier() ) . '</code></p></div>';
 		echo '<div><div class="adm-info"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span><span>' . esc_html__( 'WordPress ne lance pas la synchronisation : il n’a pas accès au générateur du site, et aucun produit ne s’édite ici. Les prix ne sont jamais importés.', 'pose-parquet-core' ) . '</span></div>';
 		echo $relire . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé ci-dessus.
