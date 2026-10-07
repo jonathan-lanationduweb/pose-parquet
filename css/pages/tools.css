@@ -64,3 +64,44 @@
 }
 .landing-hero__facts b { font-family: var(--font-display); font-size: 1.5rem; color: var(--text); margin-right: 0.3rem; }
 .landing-hero__demo { min-width: 0; }
+
+/* ---------- Page Outils : un outil principal, un outil complémentaire ---------- */
+.page-hero--tools { padding-bottom: clamp(1.25rem, 0.75rem + 1.5vw, 2.5rem); }
+.tool-main {
+  display: grid;
+  gap: clamp(1.25rem, 0.75rem + 2vw, 2.5rem);
+  padding: clamp(1.25rem, 0.75rem + 2vw, 2.5rem);
+  border-radius: var(--r-block);
+  background: var(--tint-mineral);
+}
+@media (min-width: 62rem) {
+  .tool-main { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr); align-items: start; }
+  .tool-main__points { grid-column: 1 / -1; }
+}
+.tool-main__head { display: grid; gap: var(--sp-4); align-content: start; }
+.tool-main__title { margin: 0; font-size: var(--fs-h2); }
+.tool-main__head .lead { margin: 0; }
+.tool-main__demo { min-width: 0; }
+.tool-main__points {
+  display: grid;
+  gap: var(--sp-3) var(--sp-5);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  margin: 0;
+  padding: var(--sp-4) 0 0;
+  border-top: 1px solid var(--line-strong);
+  list-style: none;
+}
+.tool-main__points li { display: grid; gap: 0.15rem; font-size: var(--fs-sm); color: var(--text-soft); }
+.tool-main__points strong { font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; color: var(--text); }
+
+.tool-block--secondary .tool-block__title { font-size: var(--fs-h3); }
+
+.tools-next__inner { display: grid; gap: var(--sp-5); }
+@media (min-width: 62rem) {
+  .tools-next__inner { grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr); align-items: start; }
+}
+.tools-next__title { font-size: var(--fs-h4); margin: 0; }
+.tools-next__lead { margin: var(--sp-2) 0 0; font-size: var(--fs-sm); color: var(--text-muted); max-width: 38ch; }
+.roadmap--compact { gap: 0 var(--sp-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); }
+.roadmap--compact .roadmap__item { padding-block: 0.6rem; font-size: var(--fs-xs); }
+.roadmap--compact .roadmap__item strong { font-size: var(--fs-sm); }

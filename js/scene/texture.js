@@ -72,7 +72,47 @@ export function patternProfile(material, pattern, widthOverride) {
     width,
     length,
     angleDeg: declared.angleDeg || fallback.angleDeg || 45,
+    // Longueur dessinée à la valeur réelle plutôt qu'arrondie à un diviseur de
+    // la tuile. Réservé aux matières validées : voir `dimensionsDessinees`.
+    exactLength: Boolean(declared.exactLength),
   };
+}
+
+/**
+ * Ce que le moteur DESSINE réellement, en pixels de tuile et en millimètres.
+ *
+ * Le tracé arrondit les dimensions pour que la tuile se raccorde : la largeur à
+ * un diviseur de la tuile, et — historiquement — la longueur aussi. Une lame
+ * droite de 1900 mm sortait à 1600 mm, un bâton rompu 90 × 600 à 90 × 634 :
+ * proche, mais ce n'est plus le produit. Pour une matière validée
+ * (`exactLength`), la longueur est tenue :
+ *
+ *   lames        chaque rangée enchaîne des lames de la longueur réelle et une
+ *                coupe qui referme la rangée sur la tuile, comme une rive ;
+ *   bâton rompu  le pavage (l,l)/(w,−w) n'exige pas un rapport entier
+ *                longueur/largeur — vérifié par recouvrement, sans trou ni
+ *                chevauchement — seule la largeur reste arrondie ;
+ *   point de Hongrie  la longueur était déjà tenue.
+ *
+ * Les rendus indicatifs gardent l'arrondi historique : 211 rendus contrôlés ne
+ * changent pas d'un pixel. La même fonction sert au tracé et aux contrôles
+ * (`_generator/check-matieres.js`) : on vérifie ce qui est dessiné, pas une
+ * intention.
+ */
+const PX_PAR_MM = TILE / (TILE_METERS * 1000);
+export function dimensionsDessinees(profile, pattern) {
+  const largeur = fit((profile.width / TILE_METERS) * TILE);
+  let longueur;
+  if (pattern === 'point-de-hongrie') longueur = (profile.length / TILE_METERS) * TILE;
+  else if (pattern === 'baton-rompu') {
+    longueur = profile.exactLength
+      ? (profile.length / TILE_METERS) * TILE
+      : largeur * Math.max(2, Math.round(profile.length / profile.width));
+  } else {
+    const brute = Math.min(TILE, (profile.length / TILE_METERS) * TILE);
+    longueur = profile.exactLength ? brute : fit(brute);
+  }
+  return { largeur, longueur, largeurMm: largeur / PX_PAR_MM, longueurMm: longueur / PX_PAR_MM };
 }
 
 const clampByte = (v) => Math.max(0, Math.min(255, Math.round(v)));
@@ -150,12 +190,14 @@ const seedOf = (id) => {
 /* ------------------------------------------------------------------ */
 
 /** Trace une strie dans la longueur de la lame, avec une légère ondulation. */
-function streak(ctx, x, y, w, h, horizontal, t, wobble, random) {
+function streak(ctx, x, y, w, h, horizontal, t, wobble, random, trace = true) {
   const long = horizontal ? w : h;
   const across = horizontal ? h : w;
   const a = across * t;
   const w1 = across * wobble * (random() - 0.5);
   const w2 = across * wobble * (random() - 0.5);
+  // Les tirages ont eu lieu : sauter le tracé ne décale pas la suite.
+  if (!trace) return;
   ctx.beginPath();
   if (horizontal) {
     ctx.moveTo(x - 4, y + a);
@@ -275,6 +317,38 @@ function cathedral(ctx, x, y, w, h, horizontal, random, poseEncre, tex, vigueur)
  * donne la *matière*. Sans elle, chaque lame reste un aplat dégradé — et une
  * fois projetée au sol, la surface se lit comme une image plaquée.
  */
+/**
+ * Un nœud : cœur sombre et halo, posé au hasard dans la lame.
+ *
+ * `knotDepth` (0 à 1, absent = 0) dit à quel point le cœur est noir et net.
+ * À 0, le nœud historique : discret, un halo large — un nœud trop marqué se lit
+ * comme une tache posée sur la lame. Mais sur un chêne rustique clair, ce halo
+ * large et pâle est justement ce qui se lit comme une tache : le vrai nœud y est
+ * un cœur brun-noir à bord franc, presque sans auréole. Le réglage resserre le
+ * halo et fonce le cœur ; à 0 il ne change rien, tirages compris.
+ */
+function noeud(ctx, x, y, w, h, across, tex, random) {
+  const kx = x + w * (0.15 + random() * 0.7);
+  const ky = y + h * (0.2 + random() * 0.6);
+  const kr = across * tex.knotSize * (0.58 + random() * 0.6);
+  const prof = tex.knotDepth || 0;
+  const portee = kr * (2.4 - 1.3 * prof);
+  const halo = ctx.createRadialGradient(kx, ky, kr * 0.2, kx, ky, portee);
+  halo.addColorStop(0, `rgba(${tex.grain[0]},${tex.grain[1]},${tex.grain[2]},${0.3 * (1 - 0.5 * prof)})`);
+  halo.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = halo;
+  ctx.beginPath();
+  ctx.arc(kx, ky, portee, 0, Math.PI * 2);
+  ctx.fill();
+  const noir = 1 + prof * 3.2;
+  ctx.fillStyle = `rgba(${clampByte(tex.grain[0] - 26 * noir)},${clampByte(tex.grain[1] - 24 * noir)},${clampByte(
+    tex.grain[2] - 20 * noir
+  )},${0.5 + 0.38 * prof})`;
+  ctx.beginPath();
+  ctx.ellipse(kx, ky, kr, kr * 0.72, random() * Math.PI, 0, Math.PI * 2);
+  ctx.fill();
+}
+
 function grain(ctx, x, y, w, h, tex, random) {
   const long = Math.max(w, h);
   const across = Math.min(w, h);
@@ -322,11 +396,17 @@ function grain(ctx, x, y, w, h, tex, random) {
 
   // 3. Fibre de fond : une strie tous les pixels environ, presque invisible
   //    une à une. C'est ce qui casse l'aplat.
+  //
+  //    Sur une ébauche (tuile réduite), une fibre fait moins d'un quart de
+  //    pixel : invisible, et pourtant c'est la plus grosse part des tracés —
+  //    28 sur environ 45 par lame de point de Hongrie. On garde les tirages
+  //    (la suite du dessin, nœuds compris, tombe au même endroit que sur la
+  //    définitive) et on saute seulement le tracé.
   const fibres = Math.max(26, Math.round(across * 1.15));
   for (let i = 0; i < fibres; i += 1) {
     poseEncre(tex.grainAlpha * vigueurLame * 0.62 * (0.3 + random()), 11);
     ctx.lineWidth = Math.max(0.5, across * 0.0065 * (0.6 + random()));
-    streak(ctx, x, y, w, h, horizontal, 0.015 + random() * 0.97, 0.05, random);
+    streak(ctx, x, y, w, h, horizontal, 0.015 + random() * 0.97, 0.05, random, dessinFin);
   }
 
   // 4. Cernes marqués : le dessin propre au matériau, peu nombreux.
@@ -345,27 +425,16 @@ function grain(ctx, x, y, w, h, tex, random) {
   // rétablirait de toute façon, mais pas avant la fin de cette fonction.
   ctx.globalAlpha = 1;
 
-  // Nœuds : cercles sombres cernés d'un halo, fréquence propre au matériau
-  if (random() < tex.knots) {
-    const kx = x + w * (0.15 + random() * 0.7);
-    const ky = y + h * (0.2 + random() * 0.6);
-    // Discrets : un nœud trop marqué se lit comme une tache posée sur la lame,
-    // et se répète visiblement d'une tuile à l'autre.
-    const kr = across * tex.knotSize * (0.58 + random() * 0.6);
-    const halo = ctx.createRadialGradient(kx, ky, kr * 0.2, kx, ky, kr * 2.4);
-    halo.addColorStop(0, `rgba(${tex.grain[0]},${tex.grain[1]},${tex.grain[2]},0.3)`);
-    halo.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = halo;
-    ctx.beginPath();
-    ctx.arc(kx, ky, kr * 2.4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = `rgba(${clampByte(tex.grain[0] - 26)},${clampByte(tex.grain[1] - 24)},${clampByte(
-      tex.grain[2] - 20
-    )},0.5)`;
-    ctx.beginPath();
-    ctx.ellipse(kx, ky, kr, kr * 0.72, random() * Math.PI, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  // Nœuds : cercles sombres cernés d'un halo, fréquence propre au matériau.
+  //
+  // `knots` < 1 est une probabilité — un nœud au plus par lame, le tirage
+  // historique, à l'identique. Au-delà, c'est un NOMBRE moyen par lame : une
+  // lame rustique de 1,90 m en montre trois ou quatre, et un seul nœud par lame
+  // la faisait passer pour un choix « select ». La partie entière est posée
+  // d'office, la fraction tirée comme avant.
+  const noeudsSurs = Math.floor(tex.knots);
+  for (let k = 0; k < noeudsSurs; k += 1) noeud(ctx, x, y, w, h, across, tex, random);
+  if (random() < tex.knots - noeudsSurs) noeud(ctx, x, y, w, h, across, tex, random);
 
   // Fentes et gerces : la signature des bois rustiques
   if (tex.cracks && random() < tex.cracks) {
@@ -516,9 +585,12 @@ function wrapped(ctx, draw, box) {
 /* ------------------------------------------------------------------ */
 
 function drawStraight(ctx, tex, profile, random) {
-  const h = fit((profile.width / TILE_METERS) * TILE);
-  const w = fit(Math.min(TILE, (profile.length / TILE_METERS) * TILE));
+  const { largeur: h, longueur: w } = dimensionsDessinees(profile, 'lames');
   const rows = Math.round(TILE / h);
+  if (profile.exactLength) {
+    drawStraightExact(ctx, tex, h, w, rows, random);
+    return;
+  }
   const cols = Math.round(TILE / w);
 
   for (let r = 0; r < rows; r += 1) {
@@ -532,11 +604,44 @@ function drawStraight(ctx, tex, profile, random) {
   }
 }
 
+/**
+ * Lames droites à leur longueur réelle.
+ *
+ * Une rangée fait exactement la tuile : n lames entières, plus une coupe qui
+ * la referme. Une coupe trop courte (moins d'un tiers de lame) se lirait comme
+ * un défaut : elle est fondue avec une lame voisine en deux demi-longueurs.
+ * L'ordre tourne d'une rangée à l'autre pour que les coupes ne s'alignent pas
+ * en colonne — exactement ce qu'on évite sur un chantier.
+ */
+function drawStraightExact(ctx, tex, h, L, rows, random) {
+  const n = Math.max(1, Math.floor(TILE / L));
+  const reste = TILE - n * L;
+  const segments = Array(n).fill(L);
+  if (reste > 0.5) {
+    if (reste < L / 3 && n > 1) {
+      segments.pop();
+      segments.push((L + reste) / 2, (L + reste) / 2);
+    } else segments.push(reste);
+  }
+  for (let r = 0; r < rows; r += 1) {
+    const offset = (((r % 3) + (r % 5) * 0.13) * L) / 3;
+    const debut = r % segments.length;
+    let x = offset;
+    for (let k = 0; k < segments.length; k += 1) {
+      const w = segments[(debut + k) % segments.length];
+      const x0 = x;
+      const y = r * h;
+      wrapped(ctx, () => board(ctx, x0, y, w, h, tex, random), { x: x0, y, w, h });
+      x += w;
+    }
+  }
+}
+
 function drawHerringbone(ctx, tex, profile, random) {
-  const w = fit((profile.width / TILE_METERS) * TILE);
-  // Longueur réelle de l'élément, arrondie à un multiple de la largeur : c'est
-  // la condition pour que le motif se referme sur lui-même.
-  const l = w * Math.max(2, Math.round(profile.length / profile.width));
+  // Largeur arrondie à un diviseur de la tuile ; longueur arrondie à un
+  // multiple de la largeur pour les rendus indicatifs, réelle pour une matière
+  // validée (voir `dimensionsDessinees`).
+  const { largeur: w, longueur: l } = dimensionsDessinees(profile, 'baton-rompu');
   const steps = Math.ceil((TILE * 1.6) / w) + 2;
   /**
    * Marge de couverture, calculée sur la géométrie et non au doigt mouillé.
@@ -586,7 +691,7 @@ function drawHerringbone(ctx, tex, profile, random) {
  * motif ne se refermerait pas sur lui-même.
  */
 function drawChevron(ctx, tex, profile, random) {
-  const w = fit((profile.width / TILE_METERS) * TILE);
+  const { largeur: w } = dimensionsDessinees(profile, 'point-de-hongrie');
   const rad = (Math.min(75, Math.max(15, profile.angleDeg)) * Math.PI) / 180;
   const length = (profile.length / TILE_METERS) * TILE;
   const armX = length * Math.sin(rad);
@@ -725,7 +830,23 @@ function filmGrain(ctx, w, h, amount) {
  * @param {number} [o.width]    largeur de lame en m (défaut : celle du matériau)
  * @returns {HTMLCanvasElement}
  */
+/**
+ * Faux pendant le dessin d'une tuile réduite (ébauche, aperçu) : les traits
+ * plus fins qu'un pixel y sont sautés. Voir les fibres dans `grain()`.
+ * À pleine taille, rien ne change — tuile identique au pixel près.
+ */
+let dessinFin = true;
+
 export function buildTexture(material, { pattern = 'lames', width, size = TILE } = {}) {
+  dessinFin = size >= TILE / 2;
+  try {
+    return dessinerTuile(material, pattern, width, size);
+  } finally {
+    dessinFin = true;
+  }
+}
+
+function dessinerTuile(material, pattern, width, size) {
   const tex = material.texture;
   const profile = patternProfile(material, pattern, width);
   const canvas = creerCanvas(size, size);

@@ -18,6 +18,8 @@
  * sol se prolonge très souvent au-delà du cadre.
  */
 
+import { CADRE_DEPART, METRES_DEFAUT, contourDuCadre, dimensionsDuCadre, planDuCadre } from './cadre-photo.js';
+
 export const SCHEMA = 'pose-parquet/scene@1';
 
 const clone = (points) => points.map((p) => ({ x: p.x, y: p.y }));
@@ -208,41 +210,80 @@ export function normalizeScene(raw) {
       tint: num(light.tint, 0.5),
       // Assombrissement au pied des murs et des meubles.
       contact: num(light.contact, 0.35),
+      // Lecture robuste de la lumière (photo importée) : un canapé foncé ou
+      // un tapis clair encore sous le cadre ne doit pas être pris pour une
+      // ombre ou une tache de soleil. Les pièces calibrées n'en ont pas
+      // besoin — leurs objets sont déjà détourés.
+      robust: light.robust === true,
     },
 
     warnings: Array.isArray(raw.warnings) ? raw.warnings.slice() : [],
   };
 }
 
-/** Quadrilatère de départ pour une photo dont on ne sait rien. */
-export const DEFAULT_QUAD = [
-  { x: 0.18, y: 0.62 },
-  { x: 0.82, y: 0.62 },
-  { x: 1.02, y: 1.0 },
-  { x: -0.02, y: 1.0 },
+/**
+ * Cadre de départ pour une photo dont on ne sait rien : un cadre EN
+ * PERSPECTIVE, entièrement dans l'image (voir js/scene/cadre-photo.js). Le
+ * précédent, frontal et bord à bord, donnait un fond large de 88 % du devant :
+ * une pièce sans profondeur, le parquet « plaqué » du 06/10/2026.
+ * Même valeur que `DEFAULT_FRAME` (js/scene/editor.js).
+ */
+export const DEFAULT_QUAD = CADRE_DEPART.map((p) => ({ ...p }));
+
+/**
+ * Cadre de départ d'un SECOND sol (pièce voisine, couloir) : un sol vu par
+ * une ouverture ne descend pas jusqu'au bas de la photo, son contour reste
+ * donc le cadre lui-même — et un grand cadre se resserre plus vite qu'un
+ * petit ne s'agrandit.
+ */
+export const CADRE_SECOND_SOL = [
+  { x: 0.06, y: 0.5 },
+  { x: 0.94, y: 0.5 },
+  { x: 1.0, y: 1.0 },
+  { x: 0.0, y: 1.0 },
 ];
 
 /**
- * Scène minimale : une photo, une zone, un plan approximatif.
+ * Scène minimale : une photo, une zone, un plan déduit du cadre.
  * C'est le point de départ de la correction manuelle — et exactement ce qu'un
  * service d'analyse renverra en mieux.
+ *
+ * Le contour prolonge les côtés du cadre jusqu'au bas de la photo, et les
+ * dimensions du plan sont lues dans la photo (modèle de caméra) au lieu d'un
+ * 4,20 × 4 m fixe.
  */
 export function createBlankScene({ width, height, quad = DEFAULT_QUAD, meters, label = 'Ma pièce' } = {}) {
-  return normalizeScene({
+  // Les poignées (`cadre`) et le plan sont deux choses : le plan est le
+  // rectangle de sol qu'elles désignent (voir `planDuCadre`).
+  const plan = planDuCadre(quad, width || 1, height || 1) || quad;
+  const scene = normalizeScene({
     id: `upload-${Date.now().toString(36)}`,
     label,
     source: 'manual',
     image: { width, height, alt: 'Votre pièce' },
+    light: { robust: true },
     floorZones: [
       {
         id: 'zone-1',
         label: 'Sol',
         surfaceId: 'sol',
-        plane: { quad, meters: meters || { width: 4.2, depth: 4 } },
-        mask: { polygon: quad },
+        plane: { quad: plan, meters: meters || metresDuCadre(plan, width, height) },
+        mask: { polygon: contourDuCadre(plan) },
       },
     ],
   });
+  scene.floorZones[0].cadre = quad.map((p) => ({ x: p.x, y: p.y }));
+  return scene;
+}
+
+/**
+ * Dimensions d'un plan posé sur une photo, en mètres : lues dans la
+ * perspective du cadre, ou celles de l'ancien plan fixe si le cadre ne décrit
+ * pas un sol (coin au-dessus de l'horizon).
+ */
+export function metresDuCadre(quad, width, height) {
+  const lues = dimensionsDuCadre(quad, width, height);
+  return lues ? { width: lues.width, depth: lues.depth } : { ...METRES_DEFAUT };
 }
 
 /**
@@ -265,10 +306,10 @@ export function addZone(scene, { label, quad, surfaceId, meters } = {}) {
       surfaceId: surfaceId || scene.surfaces[0].id,
       order: index,
       plane: {
-        quad: quad || DEFAULT_QUAD,
+        quad: quad || CADRE_SECOND_SOL,
         meters: meters || scene.floorZones[0].plane.meters,
       },
-      mask: { polygon: quad || DEFAULT_QUAD },
+      mask: { polygon: quad || CADRE_SECOND_SOL },
     },
     index,
     {}

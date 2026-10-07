@@ -120,24 +120,14 @@ registerAnalyzer('precalibrated', async ({ sceneId, base = '' }) => {
 
 /**
  * Aucune analyse : on renvoie un plan de départ plausible pour un intérieur
- * photographié debout, que l'utilisateur déplace ensuite. Le seul indice
- * exploité est le format de l'image, qui décale un peu la ligne d'horizon.
+ * photographié debout, que l'utilisateur déplace ensuite.
+ *
+ * Le cadre de départ est EN PERSPECTIVE et entièrement DANS l'image
+ * (`CADRE_DEPART`, js/scene/cadre-photo.js) ; le contour prolonge ses côtés
+ * jusqu'au bas de la photo et les dimensions du plan sont lues dans la
+ * perspective. L'ancien cadre frontal, bord à bord, donnait une pièce sans
+ * profondeur : un parquet « plaqué ».
  */
-registerAnalyzer('manual', ({ width = 0, height = 0, label, quad, meters } = {}) => {
-  const ratio = width && height ? width / height : 1.5;
-  const horizon = ratio > 1.6 ? 0.6 : 0.64;
-  return createBlankScene({
-    width,
-    height,
-    label,
-    meters,
-    quad:
-      quad ||
-      [
-        { x: 0.18, y: horizon },
-        { x: 0.82, y: horizon },
-        { x: 1.03, y: 1.0 },
-        { x: -0.03, y: 1.0 },
-      ],
-  });
-});
+registerAnalyzer('manual', ({ width = 0, height = 0, label, quad, meters } = {}) =>
+  createBlankScene({ width, height, label, meters, quad: quad || undefined })
+);

@@ -16,13 +16,20 @@ import { createSceneRenderer } from './renderer.js';
 import { loadImage } from './image-loader.js';
 import { loadCatalog } from '../studio/catalog.js';
 import { motifEffectif } from './motifs-regles.js';
+import { quandCartesPretes } from './material.js';
 
 const MAX_WIDTH = 1200;
-/** Trois références du catalogue, choisies pour montrer l'écart de rendu. */
+/**
+ * Trois références RÉELLES du catalogue Premibel synchronisé, une par motif,
+ * choisies pour montrer l'écart de rendu. Ce sont des rendus indicatifs
+ * (famille procédurale de même couleur) ; le lien « Visualiser » ouvre le
+ * Studio sur la même référence, qui y affiche « Voir ce parquet chez Premibel ».
+ * `check-motifs` vérifie que chaque paire est permise par la fiche.
+ */
 const CHIPS = [
-  { material: 'chene-naturel', pattern: 'lames' },
-  { material: 'chene-miel', pattern: 'point-de-hongrie' },
-  { material: 'chene-fume', pattern: 'baton-rompu' },
+  { material: 'CHENF39031', pattern: 'lames' },
+  { material: 'POINF39026', pattern: 'point-de-hongrie' },
+  { material: 'BTRPF39009', pattern: 'baton-rompu' },
 ];
 
 function downscale(prepared) {
@@ -108,7 +115,22 @@ export function mountPreview(root) {
       button.className = 'vzp__chip';
       button.dataset.chip = chip.material;
       button.setAttribute('aria-pressed', String(chip === current));
-      button.textContent = material.name;
+      /* La photo commerciale identifie la référence ; le rendu, lui, est dans
+         la scène. Pas de vignette locale (WebP indisponible chez la source) :
+         le nom seul suffit. */
+      const vignette = material.product && material.product.visual && material.product.visual.thumbnail;
+      if (vignette) {
+        const img = document.createElement('img');
+        img.className = 'vzp__chip-photo';
+        img.src = `${base}${vignette}`;
+        img.alt = '';
+        img.width = 24;
+        img.height = 24;
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        button.appendChild(img);
+      }
+      button.appendChild(document.createTextNode(material.name));
       button.addEventListener('click', () => {
         current = chip;
         chips
@@ -137,7 +159,13 @@ export function mountPreview(root) {
   function setCaption() {
     const material = catalog.get(current.material);
     const pattern = catalog.patterns.find((item) => item.id === motifCourant());
-    if (material && pattern) caption.textContent = `${material.name}, ${pattern.label.toLowerCase()}`;
+    if (material && pattern) {
+      // Le statut vient de la fiche, jamais d'un libellé écrit ici : une
+      // référence qui passe « Rendu fidèle » le dit sans qu'on touche l'accueil.
+      const fiche = material.product && material.product.source === 'premibel' ? material.product : null;
+      const mention = fiche ? { ready: ' (rendu fidèle)', approximate: ' (rendu indicatif)' }[fiche.visualStatus] || '' : '';
+      caption.textContent = `${material.name}, ${pattern.label.toLowerCase()}${mention}`;
+    }
   }
 
   /**
@@ -171,11 +199,26 @@ export function mountPreview(root) {
     });
   }
 
+  /*
+   * `paint()` rend `false` tant que les cartes du matériau se fabriquent dans
+   * le worker (voir renderer.js, `surfacesFor`). L'aperçu ignorait ce retour :
+   * il se déclarait prêt sur un canevas vide, et rien ne le repeignait — le
+   * côté « Après » restait la photo d'origine jusqu'au premier clic sur une
+   * finition. On attend donc le signal du worker, et `data-ready` ne vaut
+   * « true » que lorsqu'un parquet a réellement été peint.
+   */
+  let attente = null;
   function draw() {
     if (!renderer.ready || !catalog) return;
     const material = catalog.get(current.material);
-    renderer.paint(canvas, { material, pattern: motifCourant(), angle: 0, width: null, scale: 1 });
-    root.dataset.ready = 'true';
+    const peint = renderer.paint(canvas, { material, pattern: motifCourant(), angle: 0, width: null, scale: 1 });
+    if (peint) {
+      root.dataset.ready = 'true';
+      if (attente) { attente(); attente = null; }
+      return;
+    }
+    root.dataset.ready = 'attente';
+    if (!attente) attente = quandCartesPretes(() => draw());
   }
 
   async function load() {

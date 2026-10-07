@@ -378,6 +378,14 @@
   margin-inline: auto;
 }
 .vzp__figure { margin: 0; display: grid; gap: 0.7rem; min-width: 0; }
+/* La scène garde son rapport 16/10 et sa hauteur est bornée (ci-dessous) : sur
+   grand écran elle plafonne donc à 620 × 1,6 = 992 px, moins que les 76 rem du
+   bloc — et restait collée à gauche, une bande vide à sa droite (constaté à
+   1440, 1668 et 1920 px). Le bloc prend la largeur réelle de la scène et se
+   centre : légende et références s'alignent sur elle. */
+@media (min-width: 40.01rem) {
+  .vzp { max-width: min(76rem, calc(min(70svh, 620px) * 1.6)); }
+}
 .vzp__stage {
   position: relative;
   --compare: 52%;
@@ -490,4 +498,6 @@
   cursor: pointer;
 }
 .vzp__chip:hover { border-color: var(--line-strong); color: var(--text); }
+.vzp__chip { display: inline-flex; align-items: center; gap: 0.45rem; }
+.vzp__chip-photo { width: 1.5rem; height: 1.5rem; border-radius: 50%; object-fit: cover; flex: none; background: #fff; box-shadow: inset 0 0 0 1px var(--line); }
 .vzp__chip[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); }
