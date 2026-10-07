@@ -227,33 +227,32 @@ final class MonSite {
 	}
 
 	/**
-	 * Un aperçu LÉGER de ce que les réglages enregistrés donnent : logo ou nom,
-	 * menu, bouton, et la signature du pied de page. Une esquisse, pas le site.
+	 * Une carte de marque : le logo (ou le nom), la baseline, le favicon.
+	 * D'après les réglages enregistrés ; pas une maquette du site.
 	 */
 	private static function apercu( array $v ): void {
-		$nom   = (string) ( $v['nom'] ?? '' );
-		$mots  = explode( ' ', $nom, 2 );
-		$logo  = absint( $v['logo'] ?? 0 ) ? (string) wp_get_attachment_image_url( absint( $v['logo'] ), 'medium' ) : '';
-		$marque = $logo
-			? '<img class="adm-apercu-site__logo" src="' . esc_url( $logo ) . '" alt="" />'
-			: '<span class="adm-apercu-site__symbole" aria-hidden="true"></span><strong>' . esc_html( $mots[0] ) . '</strong> <span>' . esc_html( $mots[1] ?? '' ) . '</span>';
-		$menu = [];
-		foreach ( [ 'guides', 'motifs', 'tutoriels', 'inspiration', 'outils' ] as $cle ) {
-			if ( ! empty( $v[ 'nav_' . $cle . '_afficher' ] ) ) {
-				$menu[] = '<span>' . esc_html( (string) ( $v[ 'nav_' . $cle ] ?? '' ) ) . '</span>';
-			}
-		}
-		Socle::carte_ouvrir( __( 'Aperçu', 'pose-parquet-core' ) );
-		echo '<div class="adm-apercu-site" aria-hidden="true">';
-		echo '<div class="adm-apercu-site__entete"><span class="adm-apercu-site__marque">' . $marque . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé ci-dessus, échappé.
-		echo '<span class="adm-apercu-site__menu">' . implode( '', $menu ) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		if ( ! empty( $v['cta_projet_afficher'] ) ) {
-			echo '<span class="adm-apercu-site__cta">' . esc_html( (string) ( $v['cta_projet'] ?? '' ) ) . '</span>';
+		$nom      = (string) ( $v['nom'] ?? '' );
+		$mots     = explode( ' ', $nom, 2 );
+		$logo     = absint( $v['logo'] ?? 0 ) ? (string) wp_get_attachment_image_url( absint( $v['logo'] ), 'medium' ) : '';
+		$favicon  = absint( $v['favicon'] ?? 0 ) ? (string) wp_get_attachment_image_url( absint( $v['favicon'] ), 'thumbnail' ) : '';
+		$symbole  = '<span class="adm-marque__symbole" aria-hidden="true"></span>';
+		Socle::carte_ouvrir( __( 'Aperçu de la marque', 'pose-parquet-core' ) );
+		echo '<div class="adm-marque">';
+		echo '<div class="adm-marque__nom">';
+		echo $logo // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé ici.
+			? '<img class="adm-marque__logo" src="' . esc_url( $logo ) . '" alt="" />'
+			: $symbole . '<strong>' . esc_html( $mots[0] ) . '</strong> <span>' . esc_html( $mots[1] ?? '' ) . '</span>';
+		echo '</div>';
+		if ( (string) ( $v['baseline'] ?? '' ) !== '' ) {
+			echo '<p class="adm-marque__baseline">' . esc_html( (string) $v['baseline'] ) . '</p>';
 		}
 		echo '</div>';
-		echo '<div class="adm-apercu-site__pied"><strong>' . esc_html( $mots[0] ) . '</strong> ' . esc_html( $mots[1] ?? '' ) . '<small>' . esc_html( (string) ( $v['pied_presentation'] ?? '' ) ) . '</small></div>';
-		echo '</div>';
-		echo '<p class="adm-carte__aide">' . esc_html__( 'Esquisse d’après les réglages enregistrés. Le rendu exact est celui du site après publication.', 'pose-parquet-core' ) . '</p>';
+		echo '<dl class="adm-etat">';
+		echo '<dt>' . esc_html__( 'Logo', 'pose-parquet-core' ) . '</dt><dd>' . esc_html( $logo ? __( 'Image', 'pose-parquet-core' ) : __( 'Symbole et nom du site', 'pose-parquet-core' ) ) . '</dd>';
+		echo '<dt>' . esc_html__( 'Favicon', 'pose-parquet-core' ) . '</dt><dd class="adm-marque__favicon">';
+		echo $favicon ? '<img src="' . esc_url( $favicon ) . '" alt="" width="16" height="16" />' : '<span class="adm-marque__favicon-symbole">' . $symbole . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé ici.
+		echo '</dd></dl>';
+		echo '<p class="adm-carte__aide">' . esc_html__( 'D’après les réglages enregistrés. Le rendu exact est celui du site après publication.', 'pose-parquet-core' ) . '</p>';
 		Socle::carte_fermer();
 	}
 
@@ -287,7 +286,7 @@ final class MonSite {
 	private static function liste( array $champs, array $tous, array $valeurs, string $entete = '' ): void {
 		echo '<table class="adm-liste">';
 		if ( $entete !== '' ) {
-			echo '<thead><tr><th scope="col">' . esc_html( $entete ) . '</th><th scope="col">' . esc_html__( 'Libellé', 'pose-parquet-core' ) . '</th><th scope="col"><span class="screen-reader-text">' . esc_html__( 'Affichage', 'pose-parquet-core' ) . '</span></th></tr></thead>';
+			echo '<thead><tr><th scope="col">' . esc_html( $entete ) . '</th><th scope="col">' . esc_html__( 'Libellé', 'pose-parquet-core' ) . '</th><th scope="col" class="adm-liste__case">' . esc_html__( 'Afficher', 'pose-parquet-core' ) . '</th></tr></thead>';
 		}
 		echo '<tbody>';
 		foreach ( $champs as $d ) {
@@ -383,7 +382,14 @@ final class MonSite {
 			if ( ! $siens ) {
 				continue;
 			}
-			Socle::carte_ouvrir( $titre );
+			// « Actif » quand le lien est affiché sur le site ; rien sinon.
+			$affiche = false;
+			foreach ( $siens as $d ) {
+				if ( $d['type'] === 'oui-non' ) {
+					$affiche = ! empty( $valeurs[ $d['cle'] ] ?? $d['defaut'] );
+				}
+			}
+			Socle::carte_ouvrir( $titre, '', $affiche ? Socle::badge( __( 'Actif', 'pose-parquet-core' ), 'ok' ) : '' );
 			foreach ( $siens as $d ) {
 				// Le libellé dans la carte n'a plus besoin de répéter le nom du partenaire.
 				$d['libelle'] = (string) preg_replace( '/^[^:]+:\s*/u', '', $d['libelle'] );

@@ -115,11 +115,29 @@ final class Socle {
 
 	/* ------------------------------------------------------------------ rendu */
 
-	public static function entete( string $titre, string $sous_titre = '' ): void {
-		echo '<h1 class="wp-heading-inline">' . esc_html( $titre ) . '</h1><hr class="wp-header-end">';
+	/**
+	 * Titre d'écran, description courte, et l'action principale à droite.
+	 *
+	 * @param string $actions_html boutons déjà échappés (formulaire ou lien)
+	 */
+	public static function entete( string $titre, string $sous_titre = '', string $actions_html = '' ): void {
+		echo '<div class="adm-entete-actions"><h1 class="wp-heading-inline">' . esc_html( $titre ) . '</h1>';
+		if ( $actions_html !== '' ) {
+			echo '<div class="adm-entete__actions">' . $actions_html . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé par l'appelant.
+		}
+		echo '</div><hr class="wp-header-end">';
 		if ( $sous_titre !== '' ) {
 			echo '<p class="adm-entete__sous-titre">' . esc_html( $sous_titre ) . '</p>';
 		}
+	}
+
+	/** État vide : une phrase qui dit ce qui se passe, pas une zone blanche. */
+	public static function vide( string $titre, string $texte = '', string $dashicon = 'dashicons-yes-alt' ): void {
+		echo '<div class="adm-vide-etat"><span class="dashicons ' . esc_attr( $dashicon ) . '" aria-hidden="true"></span><p><strong>' . esc_html( $titre ) . '</strong>';
+		if ( $texte !== '' ) {
+			echo '<span>' . esc_html( $texte ) . '</span>';
+		}
+		echo '</p></div>';
 	}
 
 	public static function chiffre( string $libelle, string $valeur, string $lien = '', string $texte_lien = '', bool $attention = false ): void {
@@ -132,8 +150,13 @@ final class Socle {
 		echo '</div>';
 	}
 
-	public static function carte_ouvrir( string $titre, string $classe = '' ): void {
-		echo '<section class="adm-carte ' . esc_attr( $classe ) . '"><h2 class="adm-carte__titre">' . esc_html( $titre ) . '</h2><div class="adm-carte__corps">';
+	/** @param string $badge_html un badge (Socle::badge) aligné à droite du titre */
+	public static function carte_ouvrir( string $titre, string $classe = '', string $badge_html = '' ): void {
+		echo '<section class="adm-carte ' . esc_attr( $classe ) . '"><h2 class="adm-carte__titre">' . esc_html( $titre );
+		if ( $badge_html !== '' ) {
+			echo ' ' . $badge_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe.
+		}
+		echo '</h2><div class="adm-carte__corps">';
 	}
 
 	public static function carte_fermer( string $pied_html = '' ): void {

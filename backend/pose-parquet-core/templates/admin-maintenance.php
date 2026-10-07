@@ -28,7 +28,7 @@ $messages = [
 ];
 ?>
 <div class="wrap">
-	<?php Socle::entete( __( 'Maintenance', 'pose-parquet-core' ), __( 'Une page temporaire pour les visiteurs pendant vos mises à jour. L’administration reste accessible.', 'pose-parquet-core' ) ); ?>
+	<?php Socle::entete( __( 'Maintenance', 'pose-parquet-core' ), __( 'Une page temporaire pour les visiteurs pendant vos mises à jour. L’administration reste accessible.', 'pose-parquet-core' ), '<button type="submit" form="pp-maintenance" class="adm-bouton adm-bouton--plein">' . esc_html__( 'Enregistrer', 'pose-parquet-core' ) . '</button>' ); ?>
 	<?php \PoseParquet\Core\Publication\Publication::rappel(); ?>
 	<?php if ( isset( $messages[ $retour ] ) ) : ?>
 		<div class="notice notice-success is-dismissible"><p><?php echo esc_html( $messages[ $retour ] ); ?></p></div>
@@ -39,7 +39,7 @@ $messages = [
 			<?php Reglages::panneau(); ?>
 
 			<?php Socle::carte_ouvrir( __( 'Contenu de la page', 'pose-parquet-core' ) ); ?>
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<form id="pp-maintenance" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="<?php echo esc_attr( Reglages::ACTION ); ?>" />
 				<?php wp_nonce_field( Reglages::ACTION ); ?>
 
@@ -76,7 +76,7 @@ $messages = [
 					<label><input type="checkbox" name="pp_allure" value="1" <?php checked( $m['allure'] ); ?> /> <?php esc_html_e( 'Allure Design — Pose et rénovation en Île-de-France', 'pose-parquet-core' ); ?></label>
 				</fieldset>
 
-				<p><button type="submit" class="adm-bouton adm-bouton--plein"><?php esc_html_e( 'Enregistrer la page de maintenance', 'pose-parquet-core' ); ?></button></p>
+				<p class="adm-carte__actions adm-carte__actions--droite"><button type="submit" class="adm-bouton adm-bouton--plein"><?php esc_html_e( 'Enregistrer la page de maintenance', 'pose-parquet-core' ); ?></button></p>
 			</form>
 			<?php Socle::carte_fermer(); ?>
 		</div>

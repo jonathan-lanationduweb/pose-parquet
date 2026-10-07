@@ -28,6 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="wrap pp-admin">
 	<h1 class="wp-heading-inline"><?php esc_html_e( 'Projets orientés', 'pose-parquet-core' ); ?></h1>
 	<hr class="wp-header-end" />
+	<p class="adm-entete__sous-titre"><?php esc_html_e( 'Les visiteurs orientés par le site : besoin, zone, destination recommandée et suivi.', 'pose-parquet-core' ); ?></p>
 
 	<?php Notices::output( $view['notice'] ); ?>
 
@@ -65,7 +66,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	$pp_dest_actuelle = (string) ( $view['dest'] ?? '' );
 	?>
 	<ul class="subsubsub pp-filters pp-filters--destination">
-		<li><?php esc_html_e( 'Destination :', 'pose-parquet-core' ); ?> </li>
+		<li class="pp-filters__libelle"><?php esc_html_e( 'Destination', 'pose-parquet-core' ); ?></li>
 		<?php
 		$pp_dests   = [ '' => __( 'Toutes', 'pose-parquet-core' ) ];
 		foreach ( (array) ( $view['dests'] ?? [] ) as $pp_d ) {
@@ -91,7 +92,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php endforeach; ?>
 	</ul>
 
-	<ul class="subsubsub pp-filters">
+	<ul class="subsubsub pp-filters pp-filters--statut">
+		<li class="pp-filters__libelle"><?php esc_html_e( 'Statut', 'pose-parquet-core' ); ?></li>
 		<?php
 		$onglets = [ '' => __( 'Tous', 'pose-parquet-core' ) ] + $view['statuses'];
 		$dernier = array_key_last( $onglets );
@@ -184,12 +186,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</thead>
 		<tbody>
 			<?php if ( ! $view['rows'] ) : ?>
-				<tr>
+				<tr class="pp-vide">
 					<td colspan="<?php echo count( $pp_colonnes ); ?>">
 						<?php
-						echo $view['search'] !== '' || $view['status'] !== ''
-							? esc_html__( 'Aucun projet ne correspond à ce filtre.', 'pose-parquet-core' )
-							: esc_html__( 'Aucun projet pour le moment.', 'pose-parquet-core' );
+						if ( $view['search'] !== '' || $view['status'] !== '' || $pp_dest_actuelle !== '' ) {
+							\PoseParquet\Core\Admin\Socle::vide( __( 'Aucun projet ne correspond à ce filtre.', 'pose-parquet-core' ), __( 'Élargissez la recherche ou revenez à « Tous ».', 'pose-parquet-core' ), 'dashicons-search' );
+						} else {
+							\PoseParquet\Core\Admin\Socle::vide( __( 'Aucun projet pour le moment.', 'pose-parquet-core' ), __( 'Les projets orientés depuis le site apparaîtront ici.', 'pose-parquet-core' ), 'dashicons-portfolio' );
+						}
 						?>
 					</td>
 				</tr>

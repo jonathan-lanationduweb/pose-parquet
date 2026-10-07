@@ -152,8 +152,10 @@ final class Reglages {
 			$actif ? __( 'Rouvrir le site public ?', 'pose-parquet-core' ) : __( 'Activer la maintenance ? Les visiteurs verront la page de maintenance. Vous garderez l’accès à WordPress et au vrai site.', 'pose-parquet-core' )
 		);
 		echo '</div>';
+		// Le statut d'abord, en toutes lettres.
+		echo '<p class="adm-panneau__statut">' . \PoseParquet\Core\Admin\Socle::badge( $actif ? __( 'Maintenance activée', 'pose-parquet-core' ) : __( 'Maintenance désactivée', 'pose-parquet-core' ), $actif ? 'attente' : 'neutre' ) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe.
 		if ( $actif ) {
-			echo '<p class="adm-panneau__alerte"><span class="adm-pastille adm-pastille--actif"></span> ' . esc_html__( 'Maintenance active : le public voit la page de maintenance (HTTP 503). Connecté, vous voyez le vrai site.', 'pose-parquet-core' ) . '</p>';
+			echo '<p class="adm-panneau__texte">' . esc_html__( 'Le public voit la page de maintenance (HTTP 503). Connecté, vous voyez le vrai site.', 'pose-parquet-core' ) . '</p>';
 		} else {
 			echo '<p class="adm-panneau__texte">' . esc_html__( 'Activez un mode maintenance pour afficher une page temporaire aux visiteurs. L’administration reste accessible.', 'pose-parquet-core' ) . '</p>';
 		}
@@ -163,7 +165,7 @@ final class Reglages {
 			echo '<p class="adm-alerte-ligne adm-alerte-ligne--ko"><span class="dashicons dashicons-warning" aria-hidden="true"></span>' . esc_html( $actif ? __( 'Maintenance activée — publication nécessaire : le site public ne l’affiche pas encore.', 'pose-parquet-core' ) : __( 'Maintenance désactivée — publication nécessaire : le site public l’affiche encore.', 'pose-parquet-core' ) ) . ' <a href="' . esc_url( \PoseParquet\Core\Publication\Publication::url() ) . '">' . esc_html__( 'Publier', 'pose-parquet-core' ) . '</a></p>';
 		}
 		if ( $compact ) {
-			echo '<p class="adm-panneau__texte" style="margin:0"><a href="' . esc_url( self::url() ) . '">' . esc_html__( 'Titre, message, image et aperçu', 'pose-parquet-core' ) . '</a></p>';
+			echo '<p class="adm-panneau__lien"><a href="' . esc_url( self::url() ) . '">' . esc_html__( 'Titre, message, image et aperçu', 'pose-parquet-core' ) . '</a></p>';
 		}
 		echo '</div>';
 	}

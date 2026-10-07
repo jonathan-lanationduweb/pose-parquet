@@ -63,8 +63,7 @@ final class Tableau {
 			Socle::chiffre( __( 'Inspirations', 'pose-parquet-core' ), (string) $publies[ Types::INSPIRATION ], admin_url( 'edit.php?post_type=' . Types::INSPIRATION ), __( 'Gérer les inspirations', 'pose-parquet-core' ) );
 			$premier_manque = (string) array_search( max( $manque ), $manque, true );
 			Socle::chiffre(
-				/* translators: %d : nombre de contenus */
-				sprintf( _n( '%d contenu sans image', '%d contenus sans image', $total_manque, 'pose-parquet-core' ), $total_manque ),
+				__( 'Images manquantes', 'pose-parquet-core' ),
 				(string) $total_manque,
 				$total_manque ? add_query_arg( Listes::FILTRE_IMAGE, 'manquante', admin_url( 'edit.php?post_type=' . $premier_manque ) ) : '',
 				$total_manque ? __( 'Voir la liste filtrée', 'pose-parquet-core' ) : __( 'Toutes les images sont en place', 'pose-parquet-core' ),
@@ -79,12 +78,12 @@ final class Tableau {
 		echo '<div class="adm-grille"><div>';
 		if ( $contenus ) {
 			Socle::carte_ouvrir( __( 'Contenus', 'pose-parquet-core' ) );
-			echo '<div class="adm-defilement"><table class="adm-table"><thead><tr><th>' . esc_html__( 'Contenu', 'pose-parquet-core' ) . '</th><th class="adm-nombre">' . esc_html__( 'Publiés', 'pose-parquet-core' ) . '</th><th class="adm-nombre">' . esc_html__( 'Brouillons', 'pose-parquet-core' ) . '</th><th>' . esc_html__( 'Images', 'pose-parquet-core' ) . '</th></tr></thead><tbody>';
+			echo '<div class="adm-defilement"><table class="adm-table adm-table--empilable"><thead><tr><th>' . esc_html__( 'Contenu', 'pose-parquet-core' ) . '</th><th class="adm-nombre">' . esc_html__( 'Publiés', 'pose-parquet-core' ) . '</th><th class="adm-nombre">' . esc_html__( 'Brouillons', 'pose-parquet-core' ) . '</th><th>' . esc_html__( 'Images', 'pose-parquet-core' ) . '</th></tr></thead><tbody>';
 			foreach ( $types as $type => $libelle ) {
 				$base = admin_url( 'edit.php?post_type=' . $type );
-				echo '<tr><td><a href="' . esc_url( $base ) . '">' . esc_html( $libelle ) . '</a></td>';
-				echo '<td class="adm-nombre">' . (int) $publies[ $type ] . '</td>';
-				echo '<td class="adm-nombre">' . (int) ( wp_count_posts( $type )->draft ?? 0 ) . '</td><td>';
+				echo '<tr><th scope="row"><a href="' . esc_url( $base ) . '">' . esc_html( $libelle ) . '</a></th>';
+				echo '<td class="adm-nombre" data-label="' . esc_attr__( 'Publiés', 'pose-parquet-core' ) . '">' . (int) $publies[ $type ] . '</td>';
+				echo '<td class="adm-nombre" data-label="' . esc_attr__( 'Brouillons', 'pose-parquet-core' ) . '">' . (int) ( wp_count_posts( $type )->draft ?? 0 ) . '</td><td data-label="' . esc_attr__( 'Images', 'pose-parquet-core' ) . '">';
 				if ( ! Types::avec_couverture( $type ) ) {
 					echo '—';
 				} elseif ( $manque[ $type ] ) {
@@ -115,40 +114,20 @@ final class Tableau {
 		}
 
 		if ( $projets ) {
-			/*
-			 * Orientations : vers qui le site a envoyé les visiteurs, compté en
-			 * base (lead_destination). Pas de graphique : quatre nombres et le
-			 * lien vers la liste filtrée.
-			 */
-			$orientations = [
-				'premibel'      => __( 'Orientés Premibel', 'pose-parquet-core' ),
-				'allure_design' => __( 'Orientés Allure Design', 'pose-parquet-core' ),
-				'mixed'         => __( 'Orientés vers les deux', 'pose-parquet-core' ),
-				'undetermined'  => __( 'À qualifier', 'pose-parquet-core' ),
-			];
-			Socle::carte_ouvrir( __( 'Orientations', 'pose-parquet-core' ) );
-			echo '<div class="adm-defilement"><table class="adm-table"><thead><tr><th>' . esc_html__( 'Destination', 'pose-parquet-core' ) . '</th><th class="adm-nombre">' . esc_html__( 'Projets', 'pose-parquet-core' ) . '</th></tr></thead><tbody>';
-			foreach ( $orientations as $destination => $libelle ) {
-				$n = $repo->count_search( [ 'destination' => $destination ] );
-				echo '<tr><td><a href="' . esc_url( View::list_url( [ 'destination' => $destination ] ) ) . '">' . esc_html( $libelle ) . '</a></td><td class="adm-nombre">' . (int) $n . '</td></tr>';
-			}
-			echo '</tbody></table></div>';
-			Socle::carte_fermer();
-
 			Socle::carte_ouvrir( __( 'Projets récents', 'pose-parquet-core' ) );
 			$recents = array_slice( $repo->search( [ 'page' => 1 ] ), 0, 5 );
 			if ( ! $recents ) {
-				echo '<p class="adm-vide">' . esc_html__( 'Aucun projet pour le moment.', 'pose-parquet-core' ) . '</p>';
+				Socle::vide( __( 'Aucun projet pour le moment.', 'pose-parquet-core' ), __( 'Les projets orientés depuis le site apparaîtront ici.', 'pose-parquet-core' ), 'dashicons-portfolio' );
 			} else {
 				$statuts = Status::labels();
-				echo '<div class="adm-defilement"><table class="adm-table"><thead><tr><th>' . esc_html__( 'Date', 'pose-parquet-core' ) . '</th><th>' . esc_html__( 'Référence', 'pose-parquet-core' ) . '</th><th>' . esc_html__( 'Besoin', 'pose-parquet-core' ) . '</th><th>' . esc_html__( 'Orientation', 'pose-parquet-core' ) . '</th><th>' . esc_html__( 'Statut', 'pose-parquet-core' ) . '</th></tr></thead><tbody>';
+				echo '<div class="adm-defilement"><table class="adm-table adm-table--empilable"><thead><tr><th>' . esc_html__( 'Date', 'pose-parquet-core' ) . '</th><th>' . esc_html__( 'Référence', 'pose-parquet-core' ) . '</th><th>' . esc_html__( 'Besoin', 'pose-parquet-core' ) . '</th><th>' . esc_html__( 'Orientation', 'pose-parquet-core' ) . '</th><th>' . esc_html__( 'Statut', 'pose-parquet-core' ) . '</th></tr></thead><tbody>';
 				foreach ( $recents as $p ) {
 					$dest = (string) ( $p['lead_destination'] ?? '' );
-					echo '<tr><td>' . esc_html( mysql2date( 'j M Y', (string) $p['created_at'] ) ) . '</td>';
-					echo '<td><a href="' . esc_url( View::detail_url( (int) $p['id'] ) ) . '">' . esc_html( (string) $p['reference'] ) . '</a></td>';
-					echo '<td>' . esc_html( Labels::of( 'lead_need', (string) ( $p['lead_need'] ?? '' ) ) ?: '—' ) . '</td>';
-					echo '<td>' . esc_html( $dest !== '' ? Labels::of( 'lead_destination', $dest ) : __( 'À qualifier', 'pose-parquet-core' ) ) . '</td>';
-					echo '<td>' . Socle::badge( (string) ( $statuts[ (string) $p['status'] ] ?? $p['status'] ) ) . '</td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe.
+					echo '<tr><th scope="row">' . esc_html( mysql2date( 'j M Y', (string) $p['created_at'] ) ) . '</th>';
+					echo '<td data-label="' . esc_attr__( 'Référence', 'pose-parquet-core' ) . '"><a href="' . esc_url( View::detail_url( (int) $p['id'] ) ) . '">' . esc_html( (string) $p['reference'] ) . '</a></td>';
+					echo '<td data-label="' . esc_attr__( 'Besoin', 'pose-parquet-core' ) . '">' . esc_html( Labels::of( 'lead_need', (string) ( $p['lead_need'] ?? '' ) ) ?: '—' ) . '</td>';
+					echo '<td data-label="' . esc_attr__( 'Orientation', 'pose-parquet-core' ) . '">' . esc_html( $dest !== '' ? Labels::of( 'lead_destination', $dest ) : __( 'À qualifier', 'pose-parquet-core' ) ) . '</td>';
+					echo '<td data-label="' . esc_attr__( 'Statut', 'pose-parquet-core' ) . '">' . Socle::badge( (string) ( $statuts[ (string) $p['status'] ] ?? $p['status'] ) ) . '</td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe.
 				}
 				echo '</tbody></table></div>';
 			}
@@ -160,6 +139,29 @@ final class Tableau {
 			// Publier le site : l'état, la dernière publication, Prévisualiser / Publier.
 			\PoseParquet\Core\Publication\Publication::panneau();
 			Maintenance::panneau( true );
+		}
+		if ( $projets ) {
+			/*
+			 * Orientations : vers qui le site a envoyé les visiteurs, compté en
+			 * base (lead_destination). Pas de graphique : quatre nombres et le
+			 * lien vers la liste filtrée.
+			 */
+			$orientations = [
+				'premibel'      => __( 'Premibel', 'pose-parquet-core' ),
+				'allure_design' => __( 'Allure Design', 'pose-parquet-core' ),
+				'mixed'         => __( 'Les deux', 'pose-parquet-core' ),
+				'undetermined'  => __( 'À qualifier', 'pose-parquet-core' ),
+			];
+			// Une liste compacte : la destination, le nombre aligné à droite.
+			Socle::carte_ouvrir( __( 'Orientations', 'pose-parquet-core' ) );
+			echo '<ul class="adm-compte">';
+			foreach ( $orientations as $destination => $libelle ) {
+				$n = $repo->count_search( [ 'destination' => $destination ] );
+				echo '<li><a href="' . esc_url( View::list_url( [ 'destination' => $destination ] ) ) . '">' . esc_html( $libelle ) . '</a><span class="adm-compte__valeur' . ( $n ? '' : ' adm-compte__valeur--zero' ) . '">' . (int) $n . '</span></li>';
+			}
+			echo '</ul>';
+			Socle::carte_fermer();
+
 		}
 		if ( $contenus ) {
 			$etat = Catalogue::lire();
@@ -176,7 +178,7 @@ final class Tableau {
 			} else {
 				echo '<p class="adm-panneau__texte">' . esc_html__( 'État indisponible : le site public ne répond pas.', 'pose-parquet-core' ) . '</p>';
 			}
-			echo '<p class="adm-panneau__texte" style="margin:12px 0 0"><a href="' . esc_url( admin_url( 'admin.php?page=' . Catalogue::PAGE ) ) . '">' . esc_html__( 'Voir l’état du catalogue', 'pose-parquet-core' ) . '</a></p></div>';
+			echo '<p class="adm-panneau__lien"><a href="' . esc_url( admin_url( 'admin.php?page=' . Catalogue::PAGE ) ) . '">' . esc_html__( 'Voir l’état du catalogue', 'pose-parquet-core' ) . '</a></p></div>';
 		}
 		echo '</div></div></div>';
 	}

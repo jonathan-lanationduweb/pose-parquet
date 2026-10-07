@@ -59,54 +59,74 @@ $liens = static function ( array $c ): string {
 };
 ?>
 <div class="wrap">
-	<?php Socle::entete( __( 'Publication du site', 'pose-parquet-core' ), __( 'Enregistrer, prévisualiser, puis publier : le site public est reconstruit à partir de WordPress, sans ligne de commande.', 'pose-parquet-core' ) ); ?>
+	<?php
+	// L'action principale en tête d'écran : prévisualiser les changements, puis publier.
+	Socle::entete(
+		__( 'Publication', 'pose-parquet-core' ),
+		__( 'Enregistrer, prévisualiser, puis publier : le site public est reconstruit à partir de WordPress, sans ligne de commande.', 'pose-parquet-core' ),
+		'<a class="adm-bouton" href="#pp-changements"><span class="dashicons dashicons-visibility" aria-hidden="true"></span>' . esc_html__( 'Prévisualiser', 'pose-parquet-core' ) . '</a>' . Publication::bouton( $e )
+	);
+	?>
 	<?php if ( isset( $retours[ $retour ] ) ) : ?>
 		<div class="notice notice-<?php echo esc_attr( $retours[ $retour ][0] ); ?> is-dismissible"><p><?php echo esc_html( $retours[ $retour ][1] ); ?></p></div>
 	<?php endif; ?>
 
+	<?php Publication::bandeau(); ?>
+
 	<div class="adm-grille">
 		<div>
+			<span id="pp-changements" class="adm-ancre"></span>
 			<?php Socle::carte_ouvrir( __( 'Changements à publier', 'pose-parquet-core' ) ); ?>
 			<?php if ( $e['statut'] === 'en_cours' ) : ?>
-				<p class="adm-vide"><?php esc_html_e( 'Publication en cours : la liste sera recalculée à la fin.', 'pose-parquet-core' ); ?></p>
+				<?php Socle::vide( __( 'Publication en cours.', 'pose-parquet-core' ), __( 'La liste sera recalculée à la fin.', 'pose-parquet-core' ), 'dashicons-update' ); ?>
 			<?php elseif ( ! $e['changements'] ) : ?>
-				<p class="adm-vide"><?php esc_html_e( 'Aucun : le site public affiche exactement ce qui est publié dans WordPress.', 'pose-parquet-core' ); ?></p>
+				<?php Socle::vide( __( 'Aucune modification à publier.', 'pose-parquet-core' ), __( 'Votre site est à jour : il affiche exactement ce qui est publié dans WordPress.', 'pose-parquet-core' ) ); ?>
 			<?php else : ?>
 				<div class="adm-defilement"><table class="adm-table">
 					<thead><tr><th><?php esc_html_e( 'Élément', 'pose-parquet-core' ); ?></th><th><?php esc_html_e( 'Changement', 'pose-parquet-core' ); ?></th><th><?php esc_html_e( 'Voir', 'pose-parquet-core' ); ?></th></tr></thead>
 					<tbody>
 					<?php foreach ( $e['changements'] as $c ) : ?>
-						<tr><td><?php echo esc_html( $c['libelle'] ); ?></td><td><?php echo esc_html( $c['changement'] ); ?></td><td><?php echo $liens( $c ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé ci-dessus. ?></td></tr>
+						<tr><td><?php echo esc_html( $c['libelle'] ); ?></td><td><?php echo esc_html( $c['changement'] ); ?></td><td class="adm-table__liens"><?php echo $liens( $c ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé ci-dessus. ?></td></tr>
 					<?php endforeach; ?>
 					</tbody>
 				</table></div>
 			<?php endif; ?>
 			<?php Socle::carte_fermer( '<a href="' . esc_url( SitePublic::url() ) . '" target="_blank" rel="noopener">' . esc_html__( 'Voir le site actuellement publié ↗', 'pose-parquet-core' ) . '</a>' ); ?>
 
-			<?php Socle::carte_ouvrir( __( 'Dernières publications', 'pose-parquet-core' ) ); ?>
+			<?php Socle::carte_ouvrir( __( 'Journal des publications', 'pose-parquet-core' ) ); ?>
 			<?php if ( ! $journal ) : ?>
-				<p class="adm-vide"><?php esc_html_e( 'Aucune publication lancée depuis WordPress pour le moment.', 'pose-parquet-core' ); ?></p>
+				<?php Socle::vide( __( 'Aucune publication pour le moment.', 'pose-parquet-core' ), __( 'Les publications lancées depuis WordPress apparaîtront ici.', 'pose-parquet-core' ), 'dashicons-clock' ); ?>
 			<?php else : ?>
-				<div class="adm-defilement"><table class="adm-table adm-table--empilable">
-					<thead><tr><th><?php esc_html_e( 'Date', 'pose-parquet-core' ); ?></th><th><?php esc_html_e( 'Environnement', 'pose-parquet-core' ); ?></th><th><?php esc_html_e( 'Utilisateur', 'pose-parquet-core' ); ?></th><th><?php esc_html_e( 'Résultat', 'pose-parquet-core' ); ?></th><th class="adm-nombre"><?php esc_html_e( 'Durée', 'pose-parquet-core' ); ?></th><th><?php esc_html_e( 'Empreinte', 'pose-parquet-core' ); ?></th></tr></thead>
+				<div class="adm-defilement"><table class="adm-table adm-table--empilable adm-journal">
+					<thead><tr><th><?php esc_html_e( 'Date', 'pose-parquet-core' ); ?></th><th><?php esc_html_e( 'Environnement', 'pose-parquet-core' ); ?></th><th><?php esc_html_e( 'Utilisateur', 'pose-parquet-core' ); ?></th><th class="adm-nombre"><?php esc_html_e( 'Durée', 'pose-parquet-core' ); ?></th><th><?php esc_html_e( 'Résultat', 'pose-parquet-core' ); ?></th></tr></thead>
 					<tbody>
 					<?php foreach ( $journal as $l ) : ?>
+						<?php
+						// Les lignes d'avant ce champ n'ont qu'un mode : local → Local, github → préproduction.
+						[ $pp_env, $pp_var ] = Publication::libelle_environnement( (string) ( $l['environnement'] ?? Publication::environnement( (string) ( $l['mode'] ?? 'local' ) ) ) );
+						$pp_succes           = $l['resultat'] === 'succes';
+						$pp_empreinte        = (string) ( $l['empreinte'] ?? '' );
+						?>
 						<tr>
 							<th scope="row"><?php echo esc_html( wp_date( 'j M Y, H:i', (int) $l['date'] ) ); ?></th>
-							<?php
-							// Les lignes d'avant ce champ n'ont qu'un mode : local → Local, github → préproduction.
-							[ $pp_env, $pp_var ] = Publication::libelle_environnement( (string) ( $l['environnement'] ?? Publication::environnement( (string) ( $l['mode'] ?? 'local' ) ) ) );
-							?>
 							<td data-label="<?php esc_attr_e( 'Environnement', 'pose-parquet-core' ); ?>"><?php echo Socle::badge( $pp_env, $pp_var ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe. ?></td>
 							<td data-label="<?php esc_attr_e( 'Utilisateur', 'pose-parquet-core' ); ?>"><?php echo esc_html( (string) $l['utilisateur'] ); ?></td>
+							<td class="adm-nombre" data-label="<?php esc_attr_e( 'Durée', 'pose-parquet-core' ); ?>"><?php echo esc_html( sprintf( '%d s', (int) $l['duree'] ) ); ?></td>
 							<td data-label="<?php esc_attr_e( 'Résultat', 'pose-parquet-core' ); ?>">
-								<?php echo Socle::badge( $l['resultat'] === 'succes' ? __( 'Publié', 'pose-parquet-core' ) : __( 'Échec', 'pose-parquet-core' ), $l['resultat'] === 'succes' ? 'ok' : 'ko' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe. ?>
-								<?php if ( $l['resultat'] !== 'succes' && $l['raison'] !== '' ) : ?>
-									<span class="adm-journal__raison"><?php echo esc_html( $l['raison'] ); ?><?php echo ! empty( $l['site_intact'] ) ? ' ' . esc_html__( 'Site en ligne inchangé.', 'pose-parquet-core' ) : ''; ?></span>
+								<?php echo Socle::badge( $pp_succes ? __( 'Succès', 'pose-parquet-core' ) : __( 'Échec', 'pose-parquet-core' ), $pp_succes ? 'ok' : 'ko' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe. ?>
+								<?php if ( ! $pp_succes && ( $l['raison'] !== '' || $pp_empreinte !== '' ) ) : ?>
+									<?php // Le détail technique reste replié : on le déplie quand on en a besoin. ?>
+									<details class="adm-details">
+										<summary><?php esc_html_e( 'Détails', 'pose-parquet-core' ); ?></summary>
+										<?php if ( $l['raison'] !== '' ) : ?>
+											<p><?php echo esc_html( $l['raison'] ); ?><?php echo ! empty( $l['site_intact'] ) ? ' ' . esc_html__( 'Site en ligne inchangé.', 'pose-parquet-core' ) : ''; ?></p>
+										<?php endif; ?>
+										<?php if ( $pp_empreinte !== '' ) : ?>
+											<p><?php esc_html_e( 'Empreinte du contenu :', 'pose-parquet-core' ); ?> <code><?php echo esc_html( $pp_empreinte ); ?></code></p>
+										<?php endif; ?>
+									</details>
 								<?php endif; ?>
 							</td>
-							<td class="adm-nombre" data-label="<?php esc_attr_e( 'Durée', 'pose-parquet-core' ); ?>"><?php echo esc_html( sprintf( '%d s', (int) $l['duree'] ) ); ?></td>
-							<td data-label="<?php esc_attr_e( 'Empreinte', 'pose-parquet-core' ); ?>"><code><?php echo esc_html( (string) ( $l['empreinte'] ?: '—' ) ); ?></code></td>
 						</tr>
 					<?php endforeach; ?>
 					</tbody>
@@ -116,7 +136,6 @@ $liens = static function ( array $c ): string {
 		</div>
 
 		<div>
-			<?php Publication::panneau( false ); ?>
 			<?php Socle::carte_ouvrir( __( 'Comment le site est publié', 'pose-parquet-core' ) ); ?>
 			<?php
 			$modes = [
