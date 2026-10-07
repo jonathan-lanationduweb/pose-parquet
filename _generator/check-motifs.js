@@ -90,9 +90,19 @@ verifier(
 const ecartees = fiches.filter((f) => !PRODUIT.estProposable(f));
 verifier(
   `${ecartees.length} référence(s) écartée(s), chacune avec sa raison`,
-  ecartees.every((f) => f.unsupportedPattern || REGLES.motifsDe(f).length === 0),
-  ecartees.map((f) => `${f.id} (${f.unsupportedPattern || 'sans motif'})`).join(', ')
+  /* Raison acceptée : motif non supporté, aucun motif, référence inactive, ou
+     raison déclarée par la source (la synchronisation Premibel écrit
+     `visualReason` : essence sans famille, teinte absente, dalle…). Une fiche
+     écartée SANS raison reste un échec. */
+  ecartees.every((f) => f.unsupportedPattern || REGLES.motifsDe(f).length === 0 || !f.active || Boolean(f.visualReason)),
+  ecartees.filter((f) => !(f.unsupportedPattern || REGLES.motifsDe(f).length === 0 || !f.active || f.visualReason)).map((f) => f.id).join(', ')
 );
+const raisons = {};
+for (const f of ecartees) {
+  const r = f.unsupportedPattern ? `motif ${f.unsupportedPattern}` : !f.active ? 'inactive' : (f.visualReason || 'sans motif').replace(/\s*\(.*$/, '').replace(/ de \d.*$/, '');
+  raisons[r] = (raisons[r] || 0) + 1;
+}
+console.log('       raisons : ' + JSON.stringify(raisons));
 
 const repartition = {};
 for (const f of proposees) {
