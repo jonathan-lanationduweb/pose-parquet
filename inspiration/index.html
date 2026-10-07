@@ -32,9 +32,9 @@
     <link rel="manifest" href="../site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../assets/dist/site.923a9d93e9.css" />
-    <link rel="stylesheet" href="../assets/dist/spotlight.a68de9bd7c.css" />
-    <script type="module" src="../assets/dist/ba77d05fce/js/main.js"></script>
+    <link rel="stylesheet" href="../assets/dist/site.070ddff7ad.css" />
+    <link rel="stylesheet" href="../assets/dist/spotlight.eebb971c2b.css" />
+    <script type="module" src="../assets/dist/ced9b1be6d/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/index.html"},{"@type":"ListItem","position":2,"name":"Inspiration","item":"https://pose-parquet.com/"}]}</script>
   </head>
   <body class="page">
@@ -84,189 +84,221 @@
     </div>
     <main id="contenu">
       <nav class="breadcrumb wrap-wide" aria-label="Fil d'Ariane"><ol><li><a href="../index.html">Accueil</a></li><li><span aria-current="page">Inspiration</span></li></ol></nav>
-      <header class="page-hero">
+      <header class="page-hero page-hero--compact">
         <div class="wrap-wide page-hero__grid">
           <div>
             <p class="eyebrow">Inspiration</p>
             <h1 class="page-hero__title">Des sols, des directions, des ambiances</h1>
           </div>
-          <p class="page-hero__lead">Une sélection d’ambiances, classées par motif et par type de pièce : la légende donne le motif et la teinte. Celles dont la pièce est calibrée s’ouvrent dans le Studio — sur cette photographie même — pour y essayer d’autres parquets.</p>
+          <p class="page-hero__lead">Une sélection d’ambiances, classées par motif et par type de pièce : la légende donne le motif et la teinte que la photographie montre. Chaque pièce calibrée s’ouvre dans le Studio — sur cette photographie même — pour y essayer d’autres parquets.</p>
         </div>
       </header>
 
-      <section class="section spotlight section--flush-top" data-carousel aria-labelledby="inspi-title">
+      <section class="section spotlight" aria-labelledby="inspi-title">
         <div class="wrap-wide">
           <div class="spotlight__head">
             <div>
               <p class="eyebrow">Ambiances</p>
               <h2 id="inspi-title">Voir avant de choisir.</h2>
             </div>
-            <!-- Les commandes n'apparaissent qu'avec JavaScript : sans lui, la
-                 piste se fait défiler au doigt ou à la barre de défilement, et
-                 deux boutons morts ne serviraient qu'à décevoir. -->
-            <div class="spotlight__nav" data-carousel-nav hidden>
-              <span class="spotlight__count" data-carousel-count>01 / 08</span>
-              <button class="spotlight__btn" type="button" data-carousel-prev aria-label="Ambiance précédente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H6"/><path d="m12 19-7-7 7-7"/></svg></button>
-              <button class="spotlight__btn" type="button" data-carousel-next aria-label="Ambiance suivante"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></button>
+            <p class="spotlight__count">8 ambiances, toutes essayables dans le Studio</p>
+          </div>
+          <div class="filter-bar filter-bar--grouped" data-filters="galerie" role="group" aria-label="Filtrer les ambiances">
+            <button class="filter-chip" type="button" data-filter-value="all" aria-pressed="true">Tout</button>
+            <div class="filter-group" role="group" aria-labelledby="filtre-motif">
+              <span class="filter-group__label" id="filtre-motif">Motif</span>
+              <button class="filter-chip" type="button" data-filter-value="droite" data-filter-group="motif" aria-pressed="false">Lames droites</button>
+              <button class="filter-chip" type="button" data-filter-value="hongrie" data-filter-group="motif" aria-pressed="false">Point de Hongrie</button>
+              <button class="filter-chip" type="button" data-filter-value="baton-rompu" data-filter-group="motif" aria-pressed="false">Bâton rompu</button>
+            </div>
+            <div class="filter-group" role="group" aria-labelledby="filtre-piece">
+              <span class="filter-group__label" id="filtre-piece">Pièce</span>
+              <button class="filter-chip" type="button" data-filter-value="sejour" data-filter-group="piece" aria-pressed="false">Séjour</button>
+              <button class="filter-chip" type="button" data-filter-value="chambre" data-filter-group="piece" aria-pressed="false">Chambre</button>
+              <button class="filter-chip" type="button" data-filter-value="cuisine" data-filter-group="piece" aria-pressed="false">Cuisine</button>
+              <button class="filter-chip" type="button" data-filter-value="couloir" data-filter-group="piece" aria-pressed="false">Couloir et entrée</button>
             </div>
           </div>
-          <div class="filter-bar" data-filters="galerie" role="group" aria-label="Filtrer par motif">
-            <button class="filter-chip" type="button" data-filter-value="all" aria-pressed="true">Tout</button>
-            <button class="filter-chip" type="button" data-filter-value="droite" aria-pressed="false">Lames droites</button>
-            <button class="filter-chip" type="button" data-filter-value="hongrie" aria-pressed="false">Point de Hongrie</button>
-            <button class="filter-chip" type="button" data-filter-value="baton-rompu" aria-pressed="false">Bâton rompu</button>
-            <button class="filter-chip" type="button" data-filter-value="sejour" aria-pressed="false">Séjours</button>
-            <button class="filter-chip" type="button" data-filter-value="chambre" aria-pressed="false">Chambres</button>
-          </div>
-        </div>
-        <div class="carousel spotlight__rail">
-          <div class="carousel__viewport" id="galerie" data-carousel-viewport tabindex="0" role="region"
-            aria-label="Ambiances, 8 au total — flèches gauche et droite du clavier pour naviguer">
-            <figure class="carousel__slide spot" data-tags="hongrie sejour">
-              <a class="spot__surface" href="../outils/studio.html?piece=sejour&parquet=chene-fume&motif=point-de-hongrie&orientation=0" aria-label="Essayer cette ambiance dans le Studio : Séjour traversant, Point de Hongrie · chêne fumé">
-                <span class="spot__media"><picture>
-              <source type="image/webp" srcset="../assets/images/room-sejour-640.webp 640w, ../assets/images/room-sejour-1120.webp 1120w, ../assets/images/room-sejour-1600.webp 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" />
-              <img src="../assets/images/room-sejour.jpg" srcset="../assets/images/room-sejour-640.jpg 640w, ../assets/images/room-sejour-1120.jpg 1120w, ../assets/images/room-sejour-1600.jpg 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" alt="Séjour vide et lumineux aux grandes fenêtres, sol clair"
+          <p class="eyebrow spotlight__une">À la une</p>
+          <div class="insp-grid" id="galerie" data-filtered="false">
+            <article class="insp-card insp-card--une" data-tags="hongrie chambre">
+              <a class="insp-card__surface" href="../outils/studio.html?piece=chambre-parisienne&parquet=chene-naturel&motif=point-de-hongrie&orientation=0">
+                <span class="insp-card__media"><picture>
+              <source type="image/webp" srcset="../assets/images/room-chambre-parisienne-640.webp 640w, ../assets/images/room-chambre-parisienne-1120.webp 1120w, ../assets/images/room-chambre-parisienne-1600.webp 1600w" sizes="(min-width: 62rem) min(66vw, 1040px), (min-width: 48rem) 58vw, 100vw" />
+              <img src="../assets/images/room-chambre-parisienne.jpg" srcset="../assets/images/room-chambre-parisienne-640.jpg 640w, ../assets/images/room-chambre-parisienne-1120.jpg 1120w, ../assets/images/room-chambre-parisienne-1600.jpg 1600w" sizes="(min-width: 62rem) min(66vw, 1040px), (min-width: 48rem) 58vw, 100vw" alt="Pièce aux murs bleus et parquet en point de Hongrie"
                 width="1600" height="1067" fetchpriority="high" decoding="async"  />
             </picture></span>
-                <figcaption class="spot__cap">
-                  <span class="spot__title">Séjour traversant</span>
-                  <span class="spot__meta">Point de Hongrie · chêne fumé</span>
-                  <span class="spot__try">Essayer cette ambiance <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
-                </figcaption>
+                <div class="insp-card__body">
+                  <h3 class="insp-card__title">Chambre parisienne</h3>
+                  <span class="insp-card__meta">Point de Hongrie · chêne naturel</span>
+                  <span class="insp-card__text">Murs bleu profond, point de Hongrie clair : le V mène à la baie.</span>
+                  <span class="insp-card__try">Essayer dans le Studio <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
               </a>
-            </figure>
-            <figure class="carousel__slide spot" data-tags="hongrie chambre">
-              <a class="spot__surface" href="../outils/studio.html?piece=chambre-parisienne&parquet=chene-naturel&motif=point-de-hongrie&orientation=0" aria-label="Essayer cette ambiance dans le Studio : Chambre parisienne, Point de Hongrie · chêne naturel">
-                <span class="spot__media"><picture>
-              <source type="image/webp" srcset="../assets/images/room-chambre-parisienne-640.webp 640w, ../assets/images/room-chambre-parisienne-1120.webp 1120w, ../assets/images/room-chambre-parisienne-1600.webp 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" />
-              <img src="../assets/images/room-chambre-parisienne.jpg" srcset="../assets/images/room-chambre-parisienne-640.jpg 640w, ../assets/images/room-chambre-parisienne-1120.jpg 1120w, ../assets/images/room-chambre-parisienne-1600.jpg 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" alt="Pièce aux murs bleus et parquet en point de Hongrie"
+            </article>
+            <article class="insp-card insp-card--voisine" data-tags="baton-rompu sejour">
+              <a class="insp-card__surface" href="../outils/studio.html?piece=piece-arcades&parquet=chene-naturel&motif=baton-rompu&orientation=0">
+                <span class="insp-card__media"><picture>
+              <source type="image/webp" srcset="../assets/images/room-piece-arcades-640.webp 640w, ../assets/images/room-piece-arcades-1120.webp 1120w, ../assets/images/room-piece-arcades-1600.webp 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 42vw, 100vw" />
+              <img src="../assets/images/room-piece-arcades.jpg" srcset="../assets/images/room-piece-arcades-640.jpg 640w, ../assets/images/room-piece-arcades-1120.jpg 1120w, ../assets/images/room-piece-arcades-1600.jpg 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 42vw, 100vw" alt="Grande pièce vide à arcades, murs crème et parquet en bâton rompu"
                 width="1600" height="1067" loading="lazy" decoding="async"  />
             </picture></span>
-                <figcaption class="spot__cap">
-                  <span class="spot__title">Chambre parisienne</span>
-                  <span class="spot__meta">Point de Hongrie · chêne naturel</span>
-                  <span class="spot__try">Essayer cette ambiance <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
-                </figcaption>
+                <div class="insp-card__body">
+                  <h3 class="insp-card__title">Pièce aux arcades</h3>
+                  <span class="insp-card__meta">Bâton rompu · chêne naturel</span>
+                  <span class="insp-card__text">Bâton rompu blond sous deux arcades : le motif anime sans alourdir.</span>
+                  <span class="insp-card__try">Essayer dans le Studio <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
               </a>
-            </figure>
-            <figure class="carousel__slide spot" data-tags="droite cuisine">
-              <a class="spot__surface" href="../outils/studio.html?piece=cuisine-ouverte&parquet=chene-gris&motif=lames&orientation=0" aria-label="Essayer cette ambiance dans le Studio : Cuisine ouverte, Lames larges · chêne gris">
-                <span class="spot__media"><picture>
-              <source type="image/webp" srcset="../assets/images/room-cuisine-ouverte-640.webp 640w, ../assets/images/room-cuisine-ouverte-1120.webp 1120w, ../assets/images/room-cuisine-ouverte-1600.webp 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" />
-              <img src="../assets/images/room-cuisine-ouverte.jpg" srcset="../assets/images/room-cuisine-ouverte-640.jpg 640w, ../assets/images/room-cuisine-ouverte-1120.jpg 1120w, ../assets/images/room-cuisine-ouverte-1600.jpg 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" alt="Cuisine ouverte sur un grand séjour vide, sol en lames foncées"
+            </article>
+            <article class="insp-card insp-card--grille" data-tags="droite sejour">
+              <a class="insp-card__surface" href="../outils/studio.html?piece=sejour&parquet=chene-dore&motif=lames&orientation=0">
+                <span class="insp-card__media"><picture>
+              <source type="image/webp" srcset="../assets/images/room-sejour-640.webp 640w, ../assets/images/room-sejour-1120.webp 1120w, ../assets/images/room-sejour-1600.webp 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" />
+              <img src="../assets/images/room-sejour.jpg" srcset="../assets/images/room-sejour-640.jpg 640w, ../assets/images/room-sejour-1120.jpg 1120w, ../assets/images/room-sejour-1600.jpg 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" alt="Séjour vide et lumineux aux grandes fenêtres, parquet doré en lames droites filant vers la pièce du fond"
                 width="1600" height="1067" loading="lazy" decoding="async"  />
             </picture></span>
-                <figcaption class="spot__cap">
-                  <span class="spot__title">Cuisine ouverte</span>
-                  <span class="spot__meta">Lames larges · chêne gris</span>
-                  <span class="spot__try">Essayer cette ambiance <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
-                </figcaption>
+                <div class="insp-card__body">
+                  <h3 class="insp-card__title">Séjour traversant</h3>
+                  <span class="insp-card__meta">Lames droites · chêne doré</span>
+                  <span class="insp-card__text">Deux pièces en enfilade, un seul sol doré qui file vers la lumière.</span>
+                  <span class="insp-card__try">Essayer dans le Studio <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
               </a>
-            </figure>
-            <figure class="carousel__slide spot" data-tags="hongrie couloir">
-              <button class="spot__surface" type="button"
-                data-lightbox-trigger="Couloir en enfilade — Point de Hongrie · chêne naturel" aria-label="Agrandir : Couloir en enfilade">
-                <span class="spot__media"><picture>
-              <source type="image/webp" srcset="../assets/images/room-couloir-bleu-640.webp 640w, ../assets/images/room-couloir-bleu-1120.webp 1120w, ../assets/images/room-couloir-bleu-1600.webp 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" />
-              <img src="../assets/images/room-couloir-bleu.jpg" srcset="../assets/images/room-couloir-bleu-640.jpg 640w, ../assets/images/room-couloir-bleu-1120.jpg 1120w, ../assets/images/room-couloir-bleu-1600.jpg 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" alt="Couloir aux murs bleu nuit à moulures, parquet en point de Hongrie dans l’axe"
+            </article>
+            <article class="insp-card insp-card--grille" data-tags="droite cuisine">
+              <a class="insp-card__surface" href="../outils/studio.html?piece=cuisine-ouverte&parquet=chene-fume&motif=lames&orientation=0">
+                <span class="insp-card__media"><picture>
+              <source type="image/webp" srcset="../assets/images/room-cuisine-ouverte-640.webp 640w, ../assets/images/room-cuisine-ouverte-1120.webp 1120w, ../assets/images/room-cuisine-ouverte-1600.webp 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" />
+              <img src="../assets/images/room-cuisine-ouverte.jpg" srcset="../assets/images/room-cuisine-ouverte-640.jpg 640w, ../assets/images/room-cuisine-ouverte-1120.jpg 1120w, ../assets/images/room-cuisine-ouverte-1600.jpg 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" alt="Cuisine ouverte sur un grand séjour vide, sol en lames foncées"
                 width="1600" height="1067" loading="lazy" decoding="async"  />
             </picture></span>
-                <figcaption class="spot__cap">
-                  <span class="spot__title">Couloir en enfilade</span>
-                  <span class="spot__meta">Point de Hongrie · chêne naturel</span>
-                  <span class="spot__credit">Photographie Max Vakhtbovych</span>
-                </figcaption>
-              </button>
-            </figure>
-            <figure class="carousel__slide spot" data-tags="droite chambre">
-              <a class="spot__surface" href="../outils/studio.html?piece=chambre-claire&parquet=chene-brun&motif=lames&orientation=0" aria-label="Essayer cette ambiance dans le Studio : Chambre claire, Lames droites · chêne brun">
-                <span class="spot__media"><picture>
-              <source type="image/webp" srcset="../assets/images/room-chambre-claire-640.webp 640w, ../assets/images/room-chambre-claire-1120.webp 1120w, ../assets/images/room-chambre-claire-1600.webp 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" />
-              <img src="../assets/images/room-chambre-claire.jpg" srcset="../assets/images/room-chambre-claire-640.jpg 640w, ../assets/images/room-chambre-claire-1120.jpg 1120w, ../assets/images/room-chambre-claire-1600.jpg 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" alt="Chambre vide aux murs blancs et plafond à caisson, sol en lames foncées, trois fenêtres"
+                <div class="insp-card__body">
+                  <h3 class="insp-card__title">Cuisine ouverte</h3>
+                  <span class="insp-card__meta">Lames larges · chêne fumé</span>
+                  <span class="insp-card__text">Plateau blanc, lames larges presque noires : tout tient au contraste.</span>
+                  <span class="insp-card__try">Essayer dans le Studio <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
+              </a>
+            </article>
+            <article class="insp-card insp-card--grille" data-tags="hongrie couloir">
+              <a class="insp-card__surface" href="../outils/studio.html?piece=couloir-enfilade&parquet=chene-naturel&motif=point-de-hongrie&orientation=0">
+                <span class="insp-card__media"><picture>
+              <source type="image/webp" srcset="../assets/images/room-couloir-bleu-640.webp 640w, ../assets/images/room-couloir-bleu-1120.webp 1120w, ../assets/images/room-couloir-bleu-1600.webp 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" />
+              <img src="../assets/images/room-couloir-bleu.jpg" srcset="../assets/images/room-couloir-bleu-640.jpg 640w, ../assets/images/room-couloir-bleu-1120.jpg 1120w, ../assets/images/room-couloir-bleu-1600.jpg 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" alt="Couloir aux murs bleu nuit à moulures, parquet en point de Hongrie dans l’axe"
                 width="1600" height="1067" loading="lazy" decoding="async"  />
             </picture></span>
-                <figcaption class="spot__cap">
-                  <span class="spot__title">Chambre claire</span>
-                  <span class="spot__meta">Lames droites · chêne brun</span>
-                  <span class="spot__try">Essayer cette ambiance <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
-                </figcaption>
+                <div class="insp-card__body">
+                  <h3 class="insp-card__title">Couloir en enfilade</h3>
+                  <span class="insp-card__meta">Point de Hongrie · chêne naturel</span>
+                  <span class="insp-card__text">Lambris bleu nuit, pointe continue dans l’axe : le couloir s’allonge.</span>
+                  <span class="insp-card__try">Essayer dans le Studio <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
               </a>
-            </figure>
-            <figure class="carousel__slide spot" data-tags="droite sejour">
-              <a class="spot__surface" href="../outils/studio.html?piece=salon-angle&parquet=chene-tabac&motif=lames&orientation=0" aria-label="Essayer cette ambiance dans le Studio : Salon d’angle, Lames droites · chêne foncé">
-                <span class="spot__media"><picture>
-              <source type="image/webp" srcset="../assets/images/room-salon-angle-640.webp 640w, ../assets/images/room-salon-angle-1120.webp 1120w, ../assets/images/room-salon-angle-1600.webp 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" />
-              <img src="../assets/images/room-salon-angle.jpg" srcset="../assets/images/room-salon-angle-640.jpg 640w, ../assets/images/room-salon-angle-1120.jpg 1120w, ../assets/images/room-salon-angle-1600.jpg 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" alt="Grande pièce vide formant un angle, sol en lames de noyer et plinthes bois"
+            </article>
+            <article class="insp-card insp-card--grille" data-tags="droite chambre">
+              <a class="insp-card__surface" href="../outils/studio.html?piece=chambre-claire&parquet=chene-brun&motif=lames&orientation=0">
+                <span class="insp-card__media"><picture>
+              <source type="image/webp" srcset="../assets/images/room-chambre-claire-640.webp 640w, ../assets/images/room-chambre-claire-1120.webp 1120w, ../assets/images/room-chambre-claire-1600.webp 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" />
+              <img src="../assets/images/room-chambre-claire.jpg" srcset="../assets/images/room-chambre-claire-640.jpg 640w, ../assets/images/room-chambre-claire-1120.jpg 1120w, ../assets/images/room-chambre-claire-1600.jpg 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" alt="Chambre vide aux murs blancs et plafond à caisson, sol en lames foncées, trois fenêtres"
                 width="1600" height="1067" loading="lazy" decoding="async"  />
             </picture></span>
-                <figcaption class="spot__cap">
-                  <span class="spot__title">Salon d’angle</span>
-                  <span class="spot__meta">Lames droites · chêne foncé</span>
-                  <span class="spot__try">Essayer cette ambiance <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
-                </figcaption>
+                <div class="insp-card__body">
+                  <h3 class="insp-card__title">Chambre claire</h3>
+                  <span class="insp-card__meta">Lames droites · chêne brun</span>
+                  <span class="insp-card__text">Murs blancs, plafond à caisson : la chaleur vient des lames brunes.</span>
+                  <span class="insp-card__try">Essayer dans le Studio <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
               </a>
-            </figure>
-            <figure class="carousel__slide spot" data-tags="baton-rompu sejour">
-              <a class="spot__surface" href="../outils/studio.html?piece=piece-arcades&parquet=chene-fume&motif=baton-rompu&orientation=0" aria-label="Essayer cette ambiance dans le Studio : Pièce aux arcades, Bâton rompu · chêne fumé">
-                <span class="spot__media"><picture>
-              <source type="image/webp" srcset="../assets/images/room-piece-arcades-640.webp 640w, ../assets/images/room-piece-arcades-1120.webp 1120w, ../assets/images/room-piece-arcades-1600.webp 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" />
-              <img src="../assets/images/room-piece-arcades.jpg" srcset="../assets/images/room-piece-arcades-640.jpg 640w, ../assets/images/room-piece-arcades-1120.jpg 1120w, ../assets/images/room-piece-arcades-1600.jpg 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" alt="Grande pièce vide à arcades, murs crème et parquet en bâton rompu"
+            </article>
+            <article class="insp-card insp-card--grille" data-tags="droite sejour">
+              <a class="insp-card__surface" href="../outils/studio.html?piece=salon-angle&parquet=chene-tabac&motif=lames&orientation=0">
+                <span class="insp-card__media"><picture>
+              <source type="image/webp" srcset="../assets/images/room-salon-angle-640.webp 640w, ../assets/images/room-salon-angle-1120.webp 1120w, ../assets/images/room-salon-angle-1600.webp 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" />
+              <img src="../assets/images/room-salon-angle.jpg" srcset="../assets/images/room-salon-angle-640.jpg 640w, ../assets/images/room-salon-angle-1120.jpg 1120w, ../assets/images/room-salon-angle-1600.jpg 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" alt="Grande pièce vide formant un angle, sol en lames de noyer et plinthes bois"
                 width="1600" height="1067" loading="lazy" decoding="async"  />
             </picture></span>
-                <figcaption class="spot__cap">
-                  <span class="spot__title">Pièce aux arcades</span>
-                  <span class="spot__meta">Bâton rompu · chêne fumé</span>
-                  <span class="spot__try">Essayer cette ambiance <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
-                </figcaption>
+                <div class="insp-card__body">
+                  <h3 class="insp-card__title">Salon d’angle</h3>
+                  <span class="insp-card__meta">Lames droites · chêne tabac</span>
+                  <span class="insp-card__text">Lames étroites tabac, plinthes assorties : une base sobre, prête à meubler.</span>
+                  <span class="insp-card__try">Essayer dans le Studio <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
               </a>
-            </figure>
-            <figure class="carousel__slide spot" data-tags="droite couloir">
-              <a class="spot__surface" href="../outils/studio.html?piece=entree-cadree&parquet=chene-miel&motif=lames&orientation=0" aria-label="Essayer cette ambiance dans le Studio : Entrée cadrée, Lames dans l’axe · chêne miel">
-                <span class="spot__media"><picture>
-              <source type="image/webp" srcset="../assets/images/room-entree-cadree-640.webp 640w, ../assets/images/room-entree-cadree-1120.webp 1120w, ../assets/images/room-entree-cadree-1600.webp 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" />
-              <img src="../assets/images/room-entree-cadree.jpg" srcset="../assets/images/room-entree-cadree-640.jpg 640w, ../assets/images/room-entree-cadree-1120.jpg 1120w, ../assets/images/room-entree-cadree-1600.jpg 1600w" sizes="(min-width: 90rem) min(52vw, 52rem), (min-width: 48rem) min(62vw, 44rem), 82vw" alt="Entrée vide aux murs blancs et plinthes bois, parquet miel, portes en enfilade au fond"
+            </article>
+            <article class="insp-card insp-card--grille" data-tags="droite couloir">
+              <a class="insp-card__surface" href="../outils/studio.html?piece=entree-cadree&parquet=chene-miel&motif=lames&orientation=0">
+                <span class="insp-card__media"><picture>
+              <source type="image/webp" srcset="../assets/images/room-entree-cadree-640.webp 640w, ../assets/images/room-entree-cadree-1120.webp 1120w, ../assets/images/room-entree-cadree-1600.webp 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" />
+              <img src="../assets/images/room-entree-cadree.jpg" srcset="../assets/images/room-entree-cadree-640.jpg 640w, ../assets/images/room-entree-cadree-1120.jpg 1120w, ../assets/images/room-entree-cadree-1600.jpg 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" alt="Entrée vide aux murs blancs et plinthes bois, parquet miel, portes en enfilade au fond"
                 width="1600" height="1067" loading="lazy" decoding="async"  />
             </picture></span>
-                <figcaption class="spot__cap">
-                  <span class="spot__title">Entrée cadrée</span>
-                  <span class="spot__meta">Lames dans l’axe · chêne miel</span>
-                  <span class="spot__try">Essayer cette ambiance <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
-                </figcaption>
+                <div class="insp-card__body">
+                  <h3 class="insp-card__title">Entrée cadrée</h3>
+                  <span class="insp-card__meta">Lames dans l’axe · chêne miel</span>
+                  <span class="insp-card__text">Lames miel dans l’axe, portes en enfilade : le regard file au fond.</span>
+                  <span class="insp-card__try">Essayer dans le Studio <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+                </div>
               </a>
-            </figure>
+            </article>
           </div>
-          <div class="wrap-wide">
-            <p class="filter-empty" data-filters-empty="galerie" hidden>Aucune ambiance pour ce motif pour l’instant.</p>
-            <div class="carousel__progress"><span data-carousel-progress></span></div>
-          </div>
-        </div>
-        <div class="wrap-wide">
-          <p class="note-inline u-mt-5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.2 17.5h5.6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z"/></svg><span>Photographies publiées sur Pexels sous <a href="https://www.pexels.com/license/" rel="noopener">licence Pexels</a>, qui autorise l’usage sur un site. Auteurs et liens sources dans <code>assets/images/CREDITS.md</code>.</span></p>
+          <p class="filter-empty spotlight__empty" data-filters-empty="galerie" hidden>Aucune ambiance ne réunit ces deux critères pour l’instant.</p>
+          <p class="note-inline spotlight__note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.2 17.5h5.6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z"/></svg><span>Photographies publiées sur Pexels sous <a href="https://www.pexels.com/license/" rel="noopener">licence Pexels</a>, qui autorise l’usage sur un site. Auteurs et liens sources dans <code>assets/images/CREDITS.md</code>.</span></p>
         </div>
       </section>
 
-      <div class="modal modal--media" data-modal data-lightbox id="lightbox" role="dialog" aria-modal="true" aria-label="Visuel agrandi">
-        <div class="modal__dialog">
-          <button class="modal__close" type="button" data-modal-close aria-label="Fermer"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12"/><path d="m18 6-12 12"/></svg></button>
-          <div data-lightbox-slot></div>
-          <p class="modal__caption" data-lightbox-caption></p>
-        </div>
-      </div>
-      <section class="section">
-      <div class="wrap">
-        <div class="cta-band" data-reveal>
-          <div>
-            <h2>Un projet de pose à préparer ?</h2>
-            <p>Décrivez votre pièce, votre support et le rendu recherché en cinq étapes. Vous recevez une réponse construite, sans démarchage.</p>
+      <section class="section motif-pick" aria-labelledby="motif-pick-title">
+        <div class="wrap-wide">
+          <div class="motif-pick__head">
+            <div>
+              <p class="eyebrow">Par motif</p>
+              <h2 id="motif-pick-title">Choisir par motif</h2>
+            </div>
+            <p class="motif-pick__lead">Trois écritures au sol reviennent dans ces ambiances ; chaque fiche détaille rendu, coupes et pièces adaptées.</p>
           </div>
-          <div class="cta-band__actions">
-            <a class="btn btn--light" href="../projet/">Décrire mon projet</a>
-            <a class="btn btn--outline-light" href="../outils/studio.html">Visualiser mon parquet</a>
+          <div class="motif-pick__list">
+            <a class="motif-pick__item" href="../motifs/pose-droite.html">
+              <span class="motif-pick__viz" data-pattern-thumb="longueur"></span>
+              <div class="motif-pick__text">
+                <h3 class="motif-pick__title">Lames droites</h3>
+                <span class="motif-pick__desc">Une seule direction, des joints décalés : le bois et la lumière parlent.</span>
+                <span class="link-arrow">Découvrir ce motif <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+              </div>
+            </a>
+            <a class="motif-pick__item" href="../motifs/point-de-hongrie.html">
+              <span class="motif-pick__viz" data-pattern-thumb="point-de-hongrie"></span>
+              <div class="motif-pick__text">
+                <h3 class="motif-pick__title">Point de Hongrie</h3>
+                <span class="motif-pick__desc">Coupes d’onglet, pointe continue : un V net qui donne un axe.</span>
+                <span class="link-arrow">Découvrir ce motif <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+              </div>
+            </a>
+            <a class="motif-pick__item" href="../motifs/baton-rompu.html">
+              <span class="motif-pick__viz" data-pattern-thumb="baton-rompu"></span>
+              <div class="motif-pick__text">
+                <h3 class="motif-pick__title">Bâton rompu</h3>
+                <span class="motif-pick__desc">Lames à angle droit, décrochés en escalier : graphique, sans coupe d’onglet.</span>
+                <span class="link-arrow">Découvrir ce motif <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+              </div>
+            </a>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <section class="section section--inspi-cta">
+        <div class="wrap">
+          <div class="cta-band cta-band--compact" data-reveal>
+            <div>
+              <h2>Vous avez trouvé une ambiance ?</h2>
+              <p>Essayez-la dans votre pièce ou décrivez votre projet.</p>
+            </div>
+            <div class="cta-band__actions">
+              <a class="btn btn--light" href="../outils/studio.html">Visualiser mon parquet</a>
+              <a class="btn btn--outline-light" href="../projet/">Décrire mon projet</a>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
     <footer class="site-footer">
       <div class="wrap-wide footer__inner">
@@ -317,7 +349,7 @@
             l'explique. Écrire trois phrases ici en ferait une réclame en bas
             de 32 pages.
           -->
-          <p class="footer__orientation">Selon le besoin, ce site oriente vers <strong>Premibel</strong> pour les références de parquet et vers <strong>Allure&nbsp;Design</strong> pour la pose et les travaux en Île-de-France. <a href="../a-propos/#liens-commerciaux">En savoir plus</a></p>
+          <p class="footer__orientation"><strong>Premibel</strong> pour les références de parquet, <strong>Allure&nbsp;Design</strong> pour la pose et la rénovation en Île-de-France : Pose Parquet oriente selon le besoin. <a href="../a-propos/#liens-commerciaux">Nos liens commerciaux</a></p>
           <p>Photographies sous licence Pexels</p>
         </div>
       </div>

@@ -1,0 +1,279 @@
+/* Styles du composant formulaire projet (isolés sous .project-form) */
+.project-form {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-block);
+  padding: clamp(1.2rem, 1rem + 2vw, 2.4rem);
+}
+
+.pf__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding-bottom: var(--sp-5);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: var(--sp-6);
+}
+.pf__count {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.pf__count b { color: var(--text); }
+
+.pf__dots { display: flex; gap: 0.4rem; list-style: none; margin: 0; padding: 0; }
+.pf__dot {
+  width: 2.1rem;
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--line);
+  transition: background var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
+  /* Le trait fait 4 px, la cible non : un pseudo-élément étend la zone
+     cliquable à 40 px de haut sans changer le dessin. */
+  position: relative;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.pf__dot::after { content: ""; position: absolute; inset: -18px 0; }
+.pf__dot:hover { transform: scaleY(1.6); }
+.pf__dot[data-state="done"] { background: var(--accent); }
+.pf__dot[data-state="current"] { background: var(--c-ink); }
+
+/*
+ * Au doigt, 44 × 44 px.
+ *
+ * Les cinq points sont réellement interactifs : revenir en arrière est libre,
+ * avancer passe par la validation de l'étape courante. Ils méritent donc une
+ * cible franche, et 34 × 40 px n'en est pas une pour un pouce.
+ *
+ * Le dessin ne change pas d'un pixel — le trait reste à 2,1rem sur 4 px. Seule
+ * la zone invisible grandit : 4 + 2 × 20 = 44 px de haut, et
+ * 33,6 + 2 × 6 = 45,6 px de large. Six pixels et non cinq parce que 2,1rem
+ * vaut 33,6 px : cinq auraient donné 43,6 px, c'est-à-dire juste en dessous du
+ * seuil, ce qui n'est pas une cible de 44 px mais une cible qui en a l'air.
+ *
+ * L'écart entre les points passe en revanche de 6,4 à 12 px, et c'est
+ * nécessaire, pas cosmétique : à 6,4 px d'écart, deux zones de cette largeur
+ * se chevaucheraient, et un appui dans la zone commune irait au point que
+ * l'ordre du DOM désigne, pas à celui que le doigt visait. Deux cibles qui se
+ * disputent un appui valent moins qu'une cible un peu petite. Douze pixels
+ * mettent les centres à 45,6 px, exactement la largeur d'une zone : elles se
+ * touchent sans jamais se recouvrir.
+ *
+ * Le surcoût est de 22,4 px sur la largeur de la rangée, mesurée à 194 px pour
+ * 300 px disponibles à 390 px de viewport : aucun débordement, aucun
+ * changement de retour à la ligne.
+ *
+ * Rien de tout cela ne s'applique à la souris, où 34 × 40 px se visent très
+ * bien et où le survol donne déjà un retour.
+ */
+@media (pointer: coarse) {
+  .pf__dots { gap: 0.75rem; }
+  .pf__dot::after { inset: -20px -6px; }
+}
+
+.pf__step { animation: pf-in var(--dur-3) var(--ease-out) both; }
+@keyframes pf-in { from { opacity: 0; transform: translateY(10px); } }
+@media (prefers-reduced-motion: reduce) { .pf__step { animation: none; } }
+
+.pf__title { font-size: var(--fs-h4); }
+.pf__title:focus-visible { outline-offset: 6px; }
+.pf__hint { margin: var(--sp-2) 0 0; color: var(--text-muted); font-size: var(--fs-sm); }
+
+.pf__grid {
+  margin-top: var(--sp-5);
+  display: grid;
+  gap: var(--sp-5);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.pf-field { min-width: 0; border: 0; margin: 0; padding: 0; grid-column: 1 / -1; }
+.pf-field--half { grid-column: span 1; }
+@media (max-width: 34rem) {
+  .pf__grid { grid-template-columns: 1fr; }
+  .pf-field--half { grid-column: 1 / -1; }
+}
+.pf-field legend.field__label { padding: 0; margin-bottom: 0.5rem; }
+.pf-field .choice-grid { margin-top: 0.4rem; }
+.pf-field[data-invalid="true"] .choice { border-color: #b8543a; }
+
+.pf__actions {
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  justify-content: flex-end;
+}
+.pf__actions .btn--ghost { margin-right: auto; }
+
+.pf__status { margin: var(--sp-3) 0 0; font-size: var(--fs-sm); color: var(--text-muted); text-align: right; }
+
+
+@media (max-width: 30rem) {
+  .pf__actions { flex-direction: column-reverse; }
+  .pf__actions .btn { width: 100%; }
+  .pf__actions .btn--ghost { margin-right: 0; }
+}
+
+/* Reprise d'une simulation faite dans le Studio */
+.pf__from-studio {
+  margin: 0 0 var(--sp-5);
+  padding: 0.7rem 0.95rem;
+  border-radius: var(--r-sm);
+  background: var(--c-sage-pale);
+  color: var(--c-sage-deep);
+  font-size: 0.88rem;
+}
+
+/*
+ * Pot de miel.
+ *
+ * Sorti du cadre par `position: absolute`, PAS masqué par `display: none`.
+ * La différence est tout l'intérêt du piège : `display: none` est la première
+ * chose qu'un robot un peu écrit vérifie, et un champ ainsi marqué lui dit de
+ * ne pas y toucher. Ici le champ est, du point de vue du CSS, affiché et
+ * remplissable ; il est simplement à mille pixels de l'écran.
+ *
+ * `aria-hidden` et `tabindex="-1"`, posés dans le gabarit, le retirent en
+ * revanche du parcours clavier et de l'arbre d'accessibilité : un lecteur
+ * d'écran ne l'annonce pas, une tabulation ne l'atteint pas. Aucun utilisateur
+ * réel ne peut donc le remplir — un anti-spam qui écarte des humains serait
+ * pire que pas d'anti-spam.
+ *
+ * `overflow: hidden` et la hauteur nulle empêchent la page de gagner mille
+ * pixels de défilement à cause de lui.
+ */
+.pf__trap {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Échec d'envoi : au-dessus des actions, annoncé par role="alert". */
+.pf__failure {
+  margin: var(--sp-3) 0 0;
+  padding: 0.7rem 0.95rem;
+  border-left: 3px solid var(--c-clay, #b3462f);
+  border-radius: var(--r-sm);
+  background: rgba(179, 70, 47, 0.08);
+  color: var(--text);
+  font-size: 0.92rem;
+}
+.pf__failure:focus-visible { outline: none; }
+
+
+/* Le bouton d'envoi desactive doit avoir l'air desactive, pas casse. */
+.pf [data-submit]:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Ce qui vient apres l'etape en cours. Discret : c'est un reperage, pas une
+   consigne. Disparait a la derniere etape, ou il n'y a plus de suite. */
+.pf__next {
+  grid-column: 1 / -1;
+  margin: var(--sp-2) 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.pf__next[hidden] { display: none; }
+
+/* ================================================================== */
+/* Conclusion du parcours : l'orientation                              */
+/* ================================================================== */
+/*
+ * Pas un « Merci » : la suite du projet. En tête, le projet résumé ; puis
+ * une carte par entreprise, numérotée dans l'ordre où l'on s'en sert
+ * (01 le parquet, 02 la pose). Deux colonnes dès qu'il y a la place, une
+ * pile sur téléphone — jamais deux colonnes étroites.
+ */
+.pf__result { display: grid; gap: var(--sp-5); }
+.pf__result:focus-visible { outline: none; }
+
+.pf-result__head { display: grid; gap: var(--sp-3); padding-bottom: var(--sp-5); border-bottom: 1px solid var(--line); }
+.pf-result__head .eyebrow { margin: 0; }
+.pf-result__title { margin: 0; font-size: var(--fs-h3); }
+.pf-result__intro { margin: 0; max-width: 56ch; color: var(--text-soft); }
+
+.pf-recap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: var(--sp-2) 0 0;
+}
+.pf-recap > div {
+  display: grid;
+  gap: 0.05rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+.pf-recap dt { font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); }
+.pf-recap dd { margin: 0; font-size: 0.95rem; color: var(--text); }
+
+.pf-result__dests { display: grid; gap: var(--sp-4); }
+@media (min-width: 40rem) {
+  .pf-result__dests[data-n="2"] { grid-template-columns: 1fr 1fr; }
+}
+
+.pf-dest {
+  display: grid;
+  gap: var(--sp-3);
+  align-content: start;
+  padding: clamp(1.1rem, 0.9rem + 0.8vw, 1.6rem);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+}
+.pf-dest--premibel { border-top: 3px solid var(--c-sage-deep); }
+.pf-dest--allure_design { border-top: 3px solid var(--c-clay); }
+.pf-dest > p, .pf-dest > h3 { margin: 0; }
+.pf-dest__num { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); }
+.pf-dest__role { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-soft); }
+.pf-dest__nom { font-family: var(--font-display); font-size: clamp(1.5rem, 1.3rem + 0.8vw, 2rem); font-weight: 400; line-height: 1.1; }
+.pf-dest__texte { color: var(--text-soft); font-size: 0.95rem; }
+.pf-dest__produit {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--r-sm);
+  background: var(--c-sage-pale);
+  color: var(--c-sage-deep);
+  font-size: 0.9rem;
+}
+.pf-dest__produit p { margin: 0; min-width: 0; }
+.pf-dest__produit span { display: block; font-size: 0.8rem; opacity: 0.85; }
+.pf-dest__vignette { flex: none; width: 3.5rem; height: 3.5rem; border-radius: var(--r-sm); object-fit: cover; background: var(--c-paper, #fff); }
+.pf-dest__cta { justify-self: start; margin-top: var(--sp-2); }
+@media (max-width: 30rem) {
+  .pf-dest__cta { justify-self: stretch; text-align: center; }
+}
+
+.pf-result__note,
+.pf-result__studio {
+  margin: 0;
+  padding: 0.7rem 0.95rem;
+  border-radius: var(--r-sm);
+  background: var(--bg-soft, #f6f3ec);
+  color: var(--text-soft);
+  font-size: 0.9rem;
+}
+.pf-result__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3) var(--sp-5); }
+.pf-result__orient { margin: 0; font-size: 0.85rem; color: var(--text-muted); max-width: 60ch; }
+
+/* La colonne de conseils cède la place : après l'orientation, le contenu
+   principal a besoin de la largeur, et la colonne ne dit plus que l'étape
+   suivante. */
+@media (min-width: 62rem) {
+  .project-intro:has(> aside[data-etat="orientation"]) { grid-template-columns: 1fr minmax(14rem, 17rem); }
+}
+

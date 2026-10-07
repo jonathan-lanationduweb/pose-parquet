@@ -32,9 +32,9 @@
     <link rel="manifest" href="../site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../assets/dist/site.923a9d93e9.css" />
-    <link rel="stylesheet" href="../assets/dist/scene.39a7881ce6.css" />
-    <script type="module" src="../assets/dist/ba77d05fce/js/main.js"></script>
+    <link rel="stylesheet" href="../assets/dist/site.070ddff7ad.css" />
+    <link rel="stylesheet" href="../assets/dist/scene.8a51f44f53.css" />
+    <script type="module" src="../assets/dist/ced9b1be6d/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/index.html"},{"@type":"ListItem","position":2,"name":"Tutoriels","item":"https://pose-parquet.com/"}]}</script>
   </head>
   <body class="page">
@@ -97,53 +97,35 @@
       <section class="section section--flush-top" aria-labelledby="tuto-liste">
         <div class="wrap">
           <h2 class="visually-hidden" id="tuto-liste">Tous les tutoriels</h2>
-          <div class="grid grid--3">
-            <article class="card" data-tags="" data-reveal>
-            <div class="card__media">
+          <!--
+            UN TUTORIEL À LA UNE, LES AUTRES EN LISTE.
+
+            Trois cartes de même poids, dont deux en aplat vide — leurs
+            photographies justes n'existent pas encore (IMAGE_REQUIRED dans
+            photos.js). La carte illustrée passe à la une ; les deux autres
+            deviennent des lignes, où l'absence d'image ne se remarque pas.
+          -->
+          <div class="listing-featured">
+            <article class="feature-card" data-reveal>
               <picture>
-              <source type="image/webp" srcset="../assets/images/cover-poser-un-parquet-flottant-560.webp 560w, ../assets/images/cover-poser-un-parquet-flottant-980.webp 980w, ../assets/images/cover-poser-un-parquet-flottant-1400.webp 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" />
-              <img src="../assets/images/cover-poser-un-parquet-flottant.jpg" srcset="../assets/images/cover-poser-un-parquet-flottant-560.jpg 560w, ../assets/images/cover-poser-un-parquet-flottant-980.jpg 980w, ../assets/images/cover-poser-un-parquet-flottant-1400.jpg 1400w" sizes="(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw" alt=""
-                width="1400" height="875" loading="lazy" decoding="async"  />
+              <source type="image/webp" srcset="../assets/images/cover-poser-un-parquet-flottant-560.webp 560w, ../assets/images/cover-poser-un-parquet-flottant-980.webp 980w, ../assets/images/cover-poser-un-parquet-flottant-1400.webp 1400w" sizes="(min-width: 60rem) 45rem, 94vw" />
+              <img src="../assets/images/cover-poser-un-parquet-flottant.jpg" srcset="../assets/images/cover-poser-un-parquet-flottant-560.jpg 560w, ../assets/images/cover-poser-un-parquet-flottant-980.jpg 980w, ../assets/images/cover-poser-un-parquet-flottant-1400.jpg 1400w" sizes="(min-width: 60rem) 45rem, 94vw" alt=""
+                width="1400" height="875" fetchpriority="high" decoding="async"  />
             </picture>
-              <span class="badge">Accessible</span>
-            </div>
-            <div class="card__body">
-              <h3 class="card__title"><a href="../tutoriels/poser-un-parquet-flottant.html">Poser un parquet flottant, étape par étape</a></h3>
-              <p class="card__text">Le tutoriel de référence : de la sous-couche aux plinthes, avec les points de contrôle.</p>
-              <div class="card__footer">
-                <ul class="meta-list"><li>9 min</li></ul>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg>
+              <p class="eyebrow">Accessible · 1 journée pour 20 m²</p>
+              <h2><a href="poser-un-parquet-flottant.html">Poser un parquet flottant, étape par étape</a></h2>
+              <p>Le tutoriel de référence : de la sous-couche aux plinthes, avec les points de contrôle.</p>
+            </article>
+            <div class="listing-side">
+              <div class="cluster-list">
+                <a href="coller-un-parquet-contrecolle.html"><strong>Coller un parquet contrecollé</strong><span>Confirmé · 1 à 2 jours pour 20 m²</span></a>
+                <a href="reussir-le-calepinage.html"><strong>Réussir son calepinage</strong><span>Accessible · 1 à 2 heures</span></a>
               </div>
+              <aside class="callout">
+        <p class="callout__label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.2 17.5h5.6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z"/></svg>Conseil</p>
+        <p>Avant de poser, vérifiez la planéité et l’humidité du support : c’est la cause de la plupart des désordres. <a href="../guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a>.</p>
+      </aside>
             </div>
-          </article>
-            <article class="card" data-tags="" data-reveal>
-            <div class="card__media card__media--attente">
-              
-              <span class="badge">Confirmé</span>
-            </div>
-            <div class="card__body">
-              <h3 class="card__title"><a href="../tutoriels/coller-un-parquet-contrecolle.html">Coller un parquet contrecollé</a></h3>
-              <p class="card__text">La pose la plus stable et la plus silencieuse — et la moins tolérante à l'improvisation.</p>
-              <div class="card__footer">
-                <ul class="meta-list"><li>8 min</li></ul>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg>
-              </div>
-            </div>
-          </article>
-            <article class="card" data-tags="" data-reveal>
-            <div class="card__media card__media--attente">
-              
-              <span class="badge">Accessible</span>
-            </div>
-            <div class="card__body">
-              <h3 class="card__title"><a href="../tutoriels/reussir-le-calepinage.html">Réussir son calepinage</a></h3>
-              <p class="card__text">Une heure de traçage évite deux jours de rattrapage.</p>
-              <div class="card__footer">
-                <ul class="meta-list"><li>6 min</li></ul>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg>
-              </div>
-            </div>
-          </article>
           </div>
         </div>
       </section>
@@ -170,7 +152,28 @@
         <div class="wrap-wide">
           <div class="tool-block">
             <div class="tool-block__media">
-              <div data-vz-preview data-room="chambre" data-base="../"></div>
+              <div class="vzp" data-vz-preview data-room="chambre" data-base="../" data-reveal>
+            <figure class="vzp__figure">
+              <div class="vzp__stage" data-stage>
+                <img class="vzp__photo" data-photo loading="lazy" decoding="async"
+                  width="1600" height="1067"
+                  src="../assets/images/room-chambre.jpg" alt="Chambre aux murs bleus ouverte sur le jardin" />
+                <!-- Couche visuelle d'une figure qui porte deja sa description
+                     dans la legende : rien a annoncer une seconde fois. -->
+                <canvas class="vzp__canvas" data-canvas aria-hidden="true"></canvas>
+                <span class="vzp__tag vzp__tag--before">Avant</span>
+                <span class="vzp__tag vzp__tag--after">Après</span>
+                <input class="vzp__range" type="range" min="3" max="97" value="52"
+                  aria-label="Curseur de comparaison entre la pièce d’origine et le parquet simulé" data-range />
+                <span class="vzp__handle" aria-hidden="true"></span>
+              </div>
+              <figcaption class="vzp__caption">
+                <span data-caption>Chêne naturel Houston, lames droites (rendu fidèle)</span> — rendu calculé dans votre navigateur.
+                <span data-credit>Photo : Max Vakhtbovych / Pexels.</span>
+              </figcaption>
+            </figure>
+            <div class="vzp__chips" role="group" aria-label="Aperçu d’autres finitions" data-chips></div>
+          </div>
             </div>
             <div class="tool-block__body">
               <p class="tool-block__num">Avant de commencer</p>
@@ -189,7 +192,7 @@
         <div class="cta-band" data-reveal>
           <div>
             <h2>Un projet de pose à préparer ?</h2>
-            <p>Décrivez votre pièce, votre support et le rendu recherché en cinq étapes. Vous recevez une réponse construite, sans démarchage.</p>
+            <p>Décrivez votre pièce, votre support et le rendu recherché en quatre étapes, sans laisser vos coordonnées : vous voyez aussitôt vers qui vous tourner.</p>
           </div>
           <div class="cta-band__actions">
             <a class="btn btn--light" href="../projet/">Décrire mon projet</a>
@@ -248,7 +251,7 @@
             l'explique. Écrire trois phrases ici en ferait une réclame en bas
             de 32 pages.
           -->
-          <p class="footer__orientation">Selon le besoin, ce site oriente vers <strong>Premibel</strong> pour les références de parquet et vers <strong>Allure&nbsp;Design</strong> pour la pose et les travaux en Île-de-France. <a href="../a-propos/#liens-commerciaux">En savoir plus</a></p>
+          <p class="footer__orientation"><strong>Premibel</strong> pour les références de parquet, <strong>Allure&nbsp;Design</strong> pour la pose et la rénovation en Île-de-France : Pose Parquet oriente selon le besoin. <a href="../a-propos/#liens-commerciaux">Nos liens commerciaux</a></p>
           <p>Photographies sous licence Pexels</p>
         </div>
       </div>

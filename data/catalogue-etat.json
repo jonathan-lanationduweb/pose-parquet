@@ -1,0 +1,26 @@
+{
+ "version": 1,
+ "derniereSynchro": "2026-10-05T12:03:24.833Z",
+ "source": "https://www.premibel.fr/wp-json/wc/store/v1/products",
+ "commande": "node _generator/sync-premibel.js puis node _generator/build.js",
+ "produitsApi": 783,
+ "produits": 394,
+ "inactifs": 1,
+ "statuts": {
+  "ready": 4,
+  "approximate": 207,
+  "unavailable": 183
+ },
+ "visualisables": 211,
+ "images": {
+  "erreurs": 0,
+  "ecartees": 12,
+  "placeholders": 9,
+  "bandeaux": 3
+ },
+ "photosPartagees": {
+  "groupes": 36,
+  "douteux": 11,
+  "erreurs": 0
+ }
+}

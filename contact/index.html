@@ -32,8 +32,8 @@
     <link rel="manifest" href="../site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../assets/dist/site.923a9d93e9.css" />
-    <script type="module" src="../assets/dist/ba77d05fce/js/main.js"></script>
+    <link rel="stylesheet" href="../assets/dist/site.070ddff7ad.css" />
+    <script type="module" src="../assets/dist/ced9b1be6d/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/index.html"},{"@type":"ListItem","position":2,"name":"Contact","item":"https://pose-parquet.com/"}]}</script>
   </head>
   <body class="page">
@@ -87,36 +87,55 @@
         <div class="wrap-wide page-hero__grid">
           <div>
             <p class="eyebrow">Contact</p>
-            <h1 class="page-hero__title">Une question, une correction, une idée d'outil ?</h1>
+            <h1 class="page-hero__title">Nous écrire</h1>
           </div>
-          <p class="page-hero__lead">Le site est écrit et maintenu par une petite équipe. Les retours de terrain sont particulièrement bienvenus.</p>
+          <p class="page-hero__lead">Une question sur un contenu, une erreur à corriger, ou un chantier à préparer : chaque demande a son chemin, et les retours de terrain sont bienvenus.</p>
         </div>
       </header>
 
       <section class="section section--flush-top">
         <div class="wrap">
-          <div class="contact-grid">
-            <div class="contact-card">
-              <h2>Écrire</h2>
-              <p class="text-muted">Pour une question éditoriale, un signalement d'erreur ou une proposition de contenu.</p>
-              <p><a class="link-arrow" href="mailto:bonjour@pose-parquet.com">bonjour@pose-parquet.com</a></p>
-              <hr class="rule" />
-              <h3>Projet de pose</h3>
-              <p class="text-muted">Pour décrire un chantier, le formulaire dédié est plus efficace qu'un email.</p>
+          <!--
+            TROIS RAISONS D'ÉCRIRE, TROIS CHEMINS.
+
+            Une question sur un contenu et une demande de chantier n'ont pas le
+            même destinataire. La seconde passe par le formulaire projet : c'est
+            lui qui qualifie le besoin et la zone, puis oriente vers Premibel ou
+            Allure Design. Un courriel commercial ici ne ferait que retarder la
+            réponse.
+          -->
+          <div class="contact-routes">
+            <div class="contact-route">
+              <p class="eyebrow">Question éditoriale</p>
+              <h2>Une question sur un guide, un motif, un outil</h2>
+              <p class="text-muted">Un point mal expliqué, un cas qui n’est pas traité, une idée de contenu.</p>
+              <a class="link-arrow" href="mailto:bonjour@pose-parquet.com?subject=Question%20%C3%A9ditoriale">bonjour@pose-parquet.com</a>
+            </div>
+            <div class="contact-route">
+              <p class="eyebrow">Correction</p>
+              <h2>Une erreur à signaler</h2>
+              <p class="text-muted">Un seuil, une source, une image qui ne montre pas ce que la page annonce : indiquez l’adresse de la page.</p>
+              <a class="link-arrow" href="mailto:bonjour@pose-parquet.com?subject=Correction">Signaler une erreur</a>
+            </div>
+            <div class="contact-route contact-route--projet">
+              <p class="eyebrow">Projet, devis, parquet</p>
+              <h2>Un chantier à préparer</h2>
+              <p>Pour une référence de parquet ou une pose, le formulaire est plus rapide qu’un courriel : il pose les bonnes questions et oriente selon votre besoin et votre département.</p>
               <a class="btn btn--sm" href="../projet/">Décrire mon projet</a>
             </div>
-            <div class="contact-card">
-              <h2>Ce que nous ne faisons pas</h2>
-              <ul class="project-points">
-                <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>Aucune vente ni paiement sur ce site : nous orientons, nous ne facturons rien.</span></li>
-                <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>Aucun démarchage : vos coordonnées ne sont pas revendues.</span></li>
-                <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>Aucun guide écrit pour vendre : un lien produit s’ajoute à un texte, il ne le commande jamais.</span></li>
-              </ul>
-              <aside class="callout callout--key">
+          </div>
+
+          <div class="contact-card contact-card--note">
+            <h2>Ce que nous ne faisons pas</h2>
+            <ul class="project-points">
+              <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>Aucune vente ni paiement sur ce site : nous orientons, nous ne facturons rien.</span></li>
+              <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>Aucun démarchage : vos coordonnées ne sont pas revendues.</span></li>
+              <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>Aucun guide écrit pour vendre : un lien produit s’ajoute à un texte, il ne le commande jamais.</span></li>
+            </ul>
+            <aside class="callout callout--key">
         <p class="callout__label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9 17.5 20 6.5"/></svg>À retenir</p>
         <p>Certains liens mènent vers des références de parquet réellement en vente, chez Premibel. C’est écrit <a href="../a-propos/#liens-commerciaux">à la page À propos</a>, et c’est visible sur chaque lien.</p>
       </aside>
-            </div>
           </div>
         </div>
       </section>
@@ -170,7 +189,7 @@
             l'explique. Écrire trois phrases ici en ferait une réclame en bas
             de 32 pages.
           -->
-          <p class="footer__orientation">Selon le besoin, ce site oriente vers <strong>Premibel</strong> pour les références de parquet et vers <strong>Allure&nbsp;Design</strong> pour la pose et les travaux en Île-de-France. <a href="../a-propos/#liens-commerciaux">En savoir plus</a></p>
+          <p class="footer__orientation"><strong>Premibel</strong> pour les références de parquet, <strong>Allure&nbsp;Design</strong> pour la pose et la rénovation en Île-de-France : Pose Parquet oriente selon le besoin. <a href="../a-propos/#liens-commerciaux">Nos liens commerciaux</a></p>
           <p>Photographies sous licence Pexels</p>
         </div>
       </div>

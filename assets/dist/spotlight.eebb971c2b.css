@@ -1,0 +1,414 @@
+/**
+ * Inspiration — page éditoriale : une à la une, une voisine, une grille.
+ *
+ * La version précédente faisait reposer toute la page sur un carrousel : une
+ * ambiance dominait, la suivante affleurait, six restaient derrière deux
+ * flèches. On ne découvre pas une collection de huit photographies en
+ * cliquant sept fois. Ici tout est posé à plat et se lit en faisant défiler
+ * la page ; la hiérarchie est dans la TAILLE des cartes, pas dans un ordre de
+ * passage.
+ *
+ * DENSITÉ. La première version à plat faisait 6 000 px sur téléphone : huit
+ * cartes pleine largeur, chacune presque un écran. Rien n'est caché pour
+ * autant — pas de défileur obligatoire, pas de « voir plus » — mais les six
+ * cartes de la grille passent en format compact sous 48rem (photo à gauche,
+ * texte à droite), la voisine perd de la hauteur, la section des motifs
+ * devient trois lignes basses, et les marges intérieures se resserrent. La
+ * page doit se lire comme une progression : deux ambiances fortes, six plus
+ * courtes, puis les motifs, puis la suite du parcours.
+ *
+ * L'identité sombre de la section est conservée : c'est elle qui fait tenir
+ * les huit photographies ensemble, et le reste du site est clair.
+ *
+ * Cette feuille n'est servie qu'à la page qui porte `.spotlight` (voir
+ * _generator/assets.js) : les règles de l'en-tête de page qui suivent ne
+ * touchent donc que cette page.
+ */
+
+/* ---------- En-tête de page, resserré ---------- */
+/*
+ * Le fil d'Ariane porte déjà la hauteur du bandeau fixe : l'en-tête n'a pas
+ * à l'ajouter une seconde fois. Il ne garde qu'un souffle au-dessus du titre.
+ * Les deux colonnes se rapprochent — 59 / 41 au lieu de 65 / 35.
+ */
+.page-hero--compact,
+.breadcrumb + .page-hero.page-hero--compact {
+  padding-top: clamp(1rem, 0.5rem + 1.5vw, 2rem);
+  padding-bottom: clamp(1.25rem, 0.5rem + 1.5vw, 2.25rem);
+}
+.page-hero--compact .page-hero__grid { gap: clamp(0.75rem, 0.5rem + 1vw, 1.5rem); }
+@media (min-width: 62rem) {
+  .page-hero--compact .page-hero__grid {
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+    gap: clamp(2rem, 1rem + 3vw, 4rem);
+  }
+}
+.page-hero--compact .page-hero__lead { max-width: 50ch; }
+@media (max-width: 47.99rem) {
+  .page-hero--compact .page-hero__lead { font-size: var(--fs-base); }
+}
+
+/* ---------- La section sombre ---------- */
+.spotlight {
+  background: var(--c-ink);
+  color: var(--text-invert);
+  padding-block: clamp(2rem, 1.25rem + 2vw, 3.25rem);
+}
+.spotlight .eyebrow { color: rgba(255, 255, 255, 0.64); }
+.spotlight h2 { color: var(--text-invert); max-width: 18ch; }
+
+.spotlight__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-3) var(--sp-6);
+  margin-bottom: clamp(1rem, 0.75rem + 0.8vw, 1.5rem);
+}
+.spotlight__count {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* ---------- Filtres : Tout, puis Motif, puis Pièce ---------- */
+/*
+ * Une barre infinie de pastilles ne hiérarchise rien. Les pastilles sont
+ * rangées en deux groupes nommés, séparés d'un filet ; sur téléphone la
+ * barre tient sur UNE ligne et défile horizontalement, en débordant des
+ * marges pour que la dernière pastille affleure et dise qu'il y en a d'autres.
+ */
+.spotlight .filter-bar--grouped {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+  margin-bottom: clamp(1rem, 0.75rem + 0.8vw, 1.5rem);
+}
+.filter-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.filter-group__label {
+  font-family: var(--font-sans);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+  color: rgba(255, 255, 255, 0.64);
+  white-space: nowrap;
+  margin-right: 0.15rem;
+}
+.spotlight .filter-chip {
+  border-color: rgba(255, 255, 255, 0.26);
+  color: rgba(255, 255, 255, 0.82);
+  background: transparent;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.spotlight .filter-chip:hover { border-color: rgba(255, 255, 255, 0.5); color: var(--text-invert); }
+.spotlight .filter-chip[aria-pressed="true"] {
+  background: var(--text-invert);
+  border-color: var(--text-invert);
+  color: var(--c-ink);
+}
+.spotlight .filter-chip:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+@media (min-width: 48rem) {
+  .filter-chip + .filter-group,
+  .filter-group + .filter-group {
+    border-left: 1px solid rgba(255, 255, 255, 0.18);
+    padding-left: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+  }
+}
+@media (max-width: 47.99rem) {
+  .spotlight .filter-bar--grouped {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: var(--gutter);
+    scroll-padding-inline: var(--gutter);
+    -webkit-overflow-scrolling: touch;
+  }
+  .spotlight .filter-bar--grouped::-webkit-scrollbar { display: none; }
+  .filter-group { flex-wrap: nowrap; }
+  .filter-group::before {
+    content: "";
+    flex: none;
+    width: 1px;
+    height: 1.5rem;
+    margin-right: 0.25rem;
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* ---------- La grille ---------- */
+/*
+ * Douze colonnes. Sur grand écran la une en prend huit et sa voisine quatre,
+ * puis trois cartes par rangée ; sur tablette sept et cinq, puis deux par
+ * rangée ; sur téléphone une colonne.
+ *
+ * Quand un filtre est actif (`data-filtered`), la une et la voisine
+ * reprennent le format commun : une carte dominante n'a de sens que devant
+ * la collection complète.
+ */
+.spotlight__une { margin-bottom: var(--sp-3); }
+.insp-grid {
+  display: grid;
+  gap: clamp(0.75rem, 0.5rem + 0.8vw, 1.25rem);
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 48rem) {
+  .insp-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .insp-card { grid-column: span 6; }
+  .insp-card--une { grid-column: span 7; }
+  .insp-card--voisine { grid-column: span 5; }
+  .insp-grid[data-filtered="true"] .insp-card { grid-column: span 6; }
+}
+@media (min-width: 62rem) {
+  .insp-card { grid-column: span 4; }
+  .insp-card--une { grid-column: span 8; }
+  .insp-card--voisine { grid-column: span 4; }
+  .insp-grid[data-filtered="true"] .insp-card { grid-column: span 4; }
+}
+
+/* ---------- Une carte ---------- */
+.insp-card { margin: 0; display: flex; min-width: 0; }
+
+/* La surface entière est la cible : lien vers le Studio, ou loupe. */
+.insp-card__surface {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: #1f2326;
+  color: inherit;
+  text-decoration: none;
+  text-align: left;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  transition: background var(--dur-2) var(--ease-out);
+}
+.insp-card__surface:hover { background: #262b2f; }
+.insp-card__surface:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+.insp-card__media {
+  display: block;
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #15171a;
+}
+.insp-card__media picture,
+.insp-card__media img { display: block; width: 100%; height: 100%; }
+.insp-card__media img { object-fit: cover; transition: transform var(--dur-4) var(--ease-out); }
+.insp-card__surface:hover .insp-card__media img { transform: scale(1.03); }
+
+/*
+ * À la une. Sur téléphone les deux cartes fortes sont pleine largeur en 16/9 :
+ * la photo garde sa lecture, et la seconde ne prend plus un écran à elle
+ * seule. À partir de la tablette, la voisine fixe la hauteur de la rangée
+ * (format carré) et la une s'étire pour l'égaler ; en filtrage, les deux
+ * reprennent le 3/2 commun.
+ */
+.insp-card--une .insp-card__media,
+.insp-card--voisine .insp-card__media { aspect-ratio: 16 / 9; }
+@media (min-width: 48rem) {
+  .insp-card--voisine .insp-card__media { aspect-ratio: 1 / 1; }
+  .insp-card--une .insp-card__media { aspect-ratio: auto; flex: 1 1 auto; min-height: 14rem; }
+  .insp-grid[data-filtered="true"] .insp-card--une .insp-card__media,
+  .insp-grid[data-filtered="true"] .insp-card--voisine .insp-card__media {
+    aspect-ratio: 3 / 2;
+    flex: none;
+    min-height: 0;
+  }
+}
+/* La grille : 3/2 dès trois colonnes, le 4/3 allongeait chaque rangée de 40 px pour rien. */
+@media (min-width: 62rem) {
+  .insp-card--grille .insp-card__media { aspect-ratio: 3 / 2; }
+}
+
+.insp-card__body {
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+  padding: clamp(0.9rem, 0.7rem + 0.6vw, 1.25rem) clamp(0.9rem, 0.7rem + 0.6vw, 1.25rem) clamp(1rem, 0.8rem + 0.6vw, 1.35rem);
+}
+.insp-card__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.2rem, 1.1rem + 0.4vw, 1.5rem);
+  line-height: 1.1;
+  letter-spacing: var(--tracking-display);
+  color: #fff;
+}
+.insp-card--une .insp-card__title { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.3rem); }
+.insp-card__meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.74);
+}
+.insp-card__text {
+  margin-top: 0.15rem;
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 52ch;
+}
+.insp-card--une .insp-card__text { font-size: var(--fs-base); }
+
+/* Pas de gros bouton plein : un lien souligné, qui réagit avec la carte. */
+.insp-card__try {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.45rem;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.35);
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color var(--dur-2) var(--ease-out);
+}
+.insp-card__try svg { width: 1em; height: 1em; transition: transform var(--dur-2) var(--ease-out); }
+.insp-card__surface:hover .insp-card__try { text-decoration-color: #fff; }
+.insp-card__surface:hover .insp-card__try svg { transform: translateX(3px); }
+.insp-card__credit { font-size: var(--fs-xs); color: rgba(255, 255, 255, 0.64); }
+
+/*
+ * Format compact, téléphone seulement : la photo à gauche sur 42 pour cent,
+ * le texte à droite, et la carte fait la hauteur de son texte — autour de
+ * 10 rem au lieu de 28. Les six ambiances restent là, avec leur nom, leur
+ * motif, leur teinte, leur phrase et leur lien ; seule la mise en page change.
+ */
+@media (max-width: 47.99rem) {
+  .insp-card--grille .insp-card__surface {
+    flex-direction: row;
+    align-items: stretch;
+    border-radius: var(--r-md);
+  }
+  .insp-card--grille .insp-card__media {
+    flex: 0 0 42%;
+    aspect-ratio: auto;
+    min-height: 9.5rem;
+  }
+  .insp-card--grille .insp-card__media picture {
+    position: absolute;
+    inset: 0;
+  }
+  .insp-card--grille .insp-card__body {
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 0.2rem;
+    padding: 0.75rem 0.85rem 0.8rem;
+  }
+  .insp-card--grille .insp-card__title { font-size: 1.1rem; }
+  .insp-card--grille .insp-card__meta { font-size: 0.68rem; letter-spacing: 0.04em; }
+  .insp-card--grille .insp-card__text { font-size: var(--fs-xs); line-height: 1.4; margin-top: 0.1rem; }
+  .insp-card--grille .insp-card__try { font-size: var(--fs-xs); margin-top: 0.3rem; }
+}
+
+.spotlight__empty { color: rgba(255, 255, 255, 0.72); }
+
+/* Les crédits : une note, pas une section. */
+.spotlight__note {
+  margin-top: clamp(1rem, 0.75rem + 0.8vw, 1.5rem);
+  font-size: var(--fs-xs);
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.6);
+}
+.spotlight__note svg { width: 14px; height: 14px; flex: none; margin-top: 0.15rem; }
+.spotlight__note a,
+.spotlight__note code { color: inherit; }
+
+/* ---------- Choisir par motif : trois lignes basses ---------- */
+.section.motif-pick { padding-block: clamp(2rem, 1.25rem + 2vw, 3.25rem); }
+.motif-pick__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-3) var(--sp-6);
+  margin-bottom: clamp(1rem, 0.75rem + 0.8vw, 1.5rem);
+}
+.motif-pick__lead { margin: 0; max-width: 46ch; color: var(--text-soft); font-size: var(--fs-sm); }
+.motif-pick__list {
+  display: grid;
+  gap: clamp(0.6rem, 0.4rem + 0.6vw, 1rem);
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 48rem) {
+  .motif-pick__list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.motif-pick__item {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  column-gap: var(--sp-4);
+  align-items: center;
+  padding: 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color var(--dur-2) var(--ease-out), transform var(--dur-3) var(--ease-out);
+}
+.motif-pick__item:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+.motif-pick__item:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.motif-pick__viz {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--c-mineral);
+}
+.motif-pick__viz svg { display: block; width: 100%; height: 100%; }
+.motif-pick__text { display: grid; gap: 0.15rem; min-width: 0; }
+.motif-pick__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.1rem, 1rem + 0.4vw, 1.3rem);
+  line-height: 1.1;
+}
+.motif-pick__desc { font-size: var(--fs-xs); line-height: 1.4; color: var(--text-soft); }
+.motif-pick__item .link-arrow { margin-top: 0.25rem; font-size: var(--fs-xs); color: var(--accent); }
+@media (min-width: 62rem) {
+  .motif-pick__item { grid-template-columns: 7rem minmax(0, 1fr); padding: 0.75rem; }
+  .motif-pick__viz { aspect-ratio: 4 / 3; }
+}
+
+/* ---------- Conclusion ---------- */
+/* Le bloc conclut ; il ne refait pas un écran. */
+.section--inspi-cta { padding-block: clamp(1.25rem, 0.75rem + 1.5vw, 2.25rem) clamp(2rem, 1.25rem + 2vw, 3rem); }
+.cta-band.cta-band--compact { padding: clamp(1.5rem, 1.1rem + 2vw, 2.75rem); gap: var(--sp-5); }
+.cta-band.cta-band--compact p { margin-top: var(--sp-2); }
+
+/* ---------- Écran tactile ---------- */
+@media (pointer: coarse) {
+  .spotlight .filter-chip { min-height: 2.75rem; }
+}
+
+/* ---------- Mouvement réduit ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .insp-card__surface,
+  .insp-card__media img,
+  .insp-card__try,
+  .insp-card__try svg,
+  .motif-pick__item { transition: none; }
+  .insp-card__surface:hover .insp-card__media img,
+  .insp-card__surface:hover .insp-card__try svg,
+  .motif-pick__item:hover { transform: none; }
+}
+
+/* ---------- Paysage court ---------- */
+@media (max-height: 30rem) and (min-width: 40rem) {
+  .page-hero--compact { padding-top: var(--sp-3); padding-bottom: var(--sp-4); }
+  .spotlight { padding-block: var(--sp-5); }
+  .spotlight__head { margin-bottom: var(--sp-4); }
+}
+
