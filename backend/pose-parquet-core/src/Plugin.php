@@ -70,6 +70,8 @@ final class Plugin {
 
 		// Ce que WordPress expose de lui-même et dont ce site n'a pas l'usage.
 		Hardening::register();
+		// Sur un serveur, WordPress est une ADMINISTRATION : pas de front public, rien d'indexable.
+		\PoseParquet\Core\Security\Environnement::register();
 
 		add_action( 'rest_api_init', [ Routes::class, 'register' ] );
 		// Liste fermée d'origines pour notre espace REST, à la place du CORS permissif de WordPress.

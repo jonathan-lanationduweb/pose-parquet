@@ -122,7 +122,7 @@ $liens = static function ( array $c ): string {
 			$modes = [
 				'local'  => __( 'Local : WordPress lance le script de publication du dépôt (export → validation → build).', 'pose-parquet-core' ),
 				'github' => __( 'GitHub : WordPress déclenche le workflow de déploiement, qui tire l’export, valide, construit et déploie.', 'pose-parquet-core' ),
-				'aucune' => __( 'Non configurée : ni dossier local avec Node, ni GitHub (wp-config.php).', 'pose-parquet-core' ),
+				'aucune' => wp_get_environment_type() === 'local' ? __( 'Non configurée : ni dossier local avec Node, ni GitHub (wp-config.php).', 'pose-parquet-core' ) : __( 'Publication GitHub à configurer (jeton et dépôt dans wp-config.php, WP_EXPORT_URL dans GitHub).', 'pose-parquet-core' ),
 			];
 			Socle::etat(
 				[
