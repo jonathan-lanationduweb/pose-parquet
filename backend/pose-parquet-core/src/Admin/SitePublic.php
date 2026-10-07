@@ -32,11 +32,20 @@ final class SitePublic {
 		add_action( 'admin_post_' . self::ACTION, [ self::class, 'enregistrer' ] );
 	}
 
-	/** Par défaut : le serveur local du dépôt en développement, le domaine sinon. */
+	/** La préproduction publique (GitHub Pages). */
+	public const PREPRODUCTION = 'https://jonathan-lanationduweb.github.io/pose-parquet/';
+
+	/**
+	 * Par défaut : le serveur local du dépôt en développement, la préproduction
+	 * GitHub Pages en staging, le domaine en production. Un WordPress de
+	 * staging ne doit jamais lire l'ancien site pose-parquet.com.
+	 */
 	public static function defaut(): string {
-		return wp_get_environment_type() === 'local' || wp_get_environment_type() === 'development'
-			? 'http://localhost:5180/'
-			: 'https://pose-parquet.com/';
+		return match ( wp_get_environment_type() ) {
+			'local', 'development' => 'http://localhost:5180/',
+			'staging'              => self::PREPRODUCTION,
+			default                => 'https://pose-parquet.com/',
+		};
 	}
 
 	public static function url(): string {
