@@ -104,7 +104,9 @@ export function brancherLiens(contexte = {}) {
     'click',
     (evenement) => {
       const lien = evenement.target && evenement.target.closest && evenement.target.closest('a[href]');
-      if (lien && estLienAllure(lien.getAttribute('href'))) suivreClic(contexte);
+      // `data-suivi` : le lien mesure lui-même son clic, avec un contexte plus
+      // riche (écran d'orientation du projet). On ne le compte pas deux fois.
+      if (lien && !lien.hasAttribute('data-suivi') && estLienAllure(lien.getAttribute('href'))) suivreClic(contexte);
     },
     // En phase de capture : un composant qui arrêterait la propagation plus
     // bas ne doit pas faire disparaître la mesure d'un clic bien réel.

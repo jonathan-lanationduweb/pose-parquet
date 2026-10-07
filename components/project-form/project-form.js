@@ -21,6 +21,9 @@ import { fetchFormToken, submitProject, SubmitError, ERREURS } from '../../js/fo
 import { readHandoffParams } from '../../js/forms/studio-handoff.js';
 import { readPlanParams } from '../../js/forms/plan-handoff.js';
 import { contexteVisite, champsQualification, ouvrirVisite } from '../../js/forms/lead-context.js';
+import { estIdf, regionDe } from '../../js/forms/departements.js';
+import { orientation, recapitulatif, lienVisualiseur, contexteClic, evenementClic, LIBELLES } from '../../js/forms/orientation.js';
+import { echapper } from '../../js/utils/dom.js';
 import { emettre } from '../../js/analytics/events.js';
 
 const uid = () => Math.random().toString(36).slice(2, 8);
@@ -194,7 +197,12 @@ function prefillFromPlan(form) {
 
   const note = document.createElement('p');
   note.className = 'pf__from-studio';
-  note.textContent = `Reprise de votre calepinage : ${repris.join(' · ')}. À corriger si besoin.`;
+  /* Un lien qui ne transmet que le besoin (accueil, tutoriels) n'apporte aucun
+     calepinage : la phrase le nomme pour ce qu'il est. */
+  const seulBesoin = Boolean(lu.besoin) && repris.length === 1 && !lu.pose && lu.surface === null;
+  note.textContent = seulBesoin
+    ? `Votre besoin : ${repris[0]}. À corriger si besoin.`
+    : `Reprise de votre calepinage : ${repris.join(' · ')}. À corriger si besoin.`;
   form.prepend(note);
   return true;
 }
@@ -287,24 +295,12 @@ export function mountProjectForm(root, options = {}) {
   root.classList.add('project-form');
   root.innerHTML = `
     <!--
-      Indisponibilité annoncée AVANT la saisie.
-
-      Le message existait déjà, mais il arrivait à la fin : le visiteur
-      remplissait cinq étapes, cliquait « Envoyer », et apprenait à ce
-      moment-là que rien ne partirait. C'était honnête et c'était quand même
-      une perte de temps. Ce bandeau dit la même chose au premier écran, et
-      donne tout de suite le chemin qui, lui, fonctionne.
-
-      Il ne s'affiche que si aucun backend n'est configuré pour cet hôte, et
-      disparaît de lui-même le jour où il y en a un : c'est un état, pas une
-      décision de conception.
+      Plus de bandeau d'indisponibilité de l'envoi : il n'y a plus de
+      demande à envoyer. L'orientation se calcule
+      dans le navigateur ; l'enregistrement du parcours (statistiques) est un
+      plus, jamais une condition. Une API absente ou en panne ne bloque donc
+      plus personne.
     -->
-    <div class="pf__offline" role="status" hidden>
-      <p class="pf__offline-title">Ce formulaire ne peut pas encore envoyer votre demande.</p>
-      <p>Le service qui reçoit les projets n’est pas relié à cette version du site. Pour nous décrire votre chantier dès maintenant, écrivez-nous — nous répondons à chaque message.</p>
-      <p><a class="btn btn--accent btn--sm" href="mailto:projet@pose-parquet.com">Écrire à projet@pose-parquet.com</a></p>
-    </div>
-
     <form class="pf" novalidate>
       <div class="pf__head">
         <p class="pf__count" aria-live="polite">Étape <b>1</b> sur ${config.steps.length}</p>
@@ -367,13 +363,8 @@ export function mountProjectForm(root, options = {}) {
       <p class="pf__failure" role="alert" hidden tabindex="-1"></p>
     </form>
 
-    <div class="pf__success" hidden tabindex="-1">
-      <p class="eyebrow" data-success-eyebrow>Demande enregistrée</p>
-      <h2 data-success-title>Merci, votre projet est bien décrit.</h2>
-      <p data-success-text>Nous avons reçu votre demande et nous vous répondrons par email ou par téléphone.</p>
-      <p class="pf__reference" data-success-reference hidden></p>
-      <button type="button" class="btn btn--ghost btn--sm" data-restart>Décrire un autre projet</button>
-    </div>`;
+    <!-- La conclusion du parcours : une orientation (js/forms/orientation.js). -->
+    <div class="pf__result" data-result hidden tabindex="-1"></div>`;
 
   const form = root.querySelector('form');
   const steps = Array.from(root.querySelectorAll('.pf__step'));
@@ -385,7 +376,8 @@ export function mountProjectForm(root, options = {}) {
   const submitBtn = root.querySelector('[data-submit]');
   const status = root.querySelector('.pf__status');
   const failure = root.querySelector('.pf__failure');
-  const success = root.querySelector('.pf__success');
+  const resultat = root.querySelector('[data-result]');
+  const base = root.dataset.base || '../';
 
   const fieldsByName = new Map();
   config.steps.forEach((step) => step.fields.forEach((field) => fieldsByName.set(field.name, field)));
@@ -436,25 +428,13 @@ export function mountProjectForm(root, options = {}) {
     tokenIssuedAt = issuedAt;
   };
 
+  /*
+   * L'API ne sert qu'à ENREGISTRER le parcours (statistiques, administration).
+   * Si elle manque ou ne répond pas, le visiteur obtient quand même son
+   * orientation : rien, dans ce qu'il voit, ne dépend du serveur ni d'un email.
+   */
   if (apiConfigured()) {
-    // L'échec est avalé ici : il se manifestera à l'envoi, avec un message.
-    // Prévenir au chargement d'une page qu'on vient peut-être seulement de
-    // parcourir serait bruyant pour rien.
     tokenPromise = renewToken().catch(() => {});
-  } else {
-    /*
-     * Aucun backend pour cet hôte. On le dit au premier écran, et on retire
-     * l'action qui ne peut pas aboutir : un bouton « Envoyer » actif au bout
-     * de cinq étapes est une promesse, et celle-là ne serait pas tenue.
-     *
-     * Le reste du formulaire continue de fonctionner. Ce n'est pas de
-     * l'entêtement : les étapes servent aussi à préparer ce qu'on va écrire,
-     * et le bandeau donne l'adresse pour l'envoyer vraiment.
-     */
-    const bandeau = root.querySelector('.pf__offline');
-    if (bandeau) bandeau.hidden = false;
-    submitBtn.disabled = true;
-    submitBtn.title = 'Envoi indisponible sur cette version du site';
   }
 
   /** Vrai tant qu'une requête d'envoi est en vol. */
@@ -638,110 +618,240 @@ export function mountProjectForm(root, options = {}) {
     effacerEchec();
     sending = true;
     submitBtn.disabled = true;
-    status.textContent = 'Envoi en cours…';
+    status.textContent = 'Préparation de votre orientation…';
 
+    const donnees = new FormData(form);
+    /*
+     * La qualification est CALCULÉE au moment de l'envoi : elle dépend de ce
+     * que le visiteur vient de répondre — son délai, sa surface — autant que
+     * d'où il vient. `produitPremibel` se lit dans le contexte du Studio : une
+     * référence identifiée qui porte une fiche réelle.
+     */
+    const qualification = champsQualification({
+      besoin: String(donnees.get('besoin') || ''),
+      produitPremibel: ficheReelle,
+      timeframe: String(donnees.get('delai') || ''),
+      surface: Number(donnees.get('surface') || 0),
+      department: String(donnees.get('departement') || ''),
+    });
+
+    let reference = '';
     try {
-      // Le jeton demandé au montage a pu ne pas être arrivé : on l'attend.
-      if (tokenPromise) await tokenPromise;
-      if (!token && apiConfigured()) await renewToken();
-
-      const resultat = await submitProject({
-        buildPayload: () => {
-          const donnees = new FormData(form);
-          /*
-           * La qualification est CALCULÉE au moment de l'envoi, pas au
-           * montage : elle dépend de ce que le visiteur vient de répondre —
-           * son délai, sa surface — autant que d'où il vient.
-           *
-           * `produitPremibel` se lit dans le contexte du Studio : une
-           * référence identifiée qui porte une fiche réelle. Les parquets de
-           * démonstration n'en sont pas, et n'orientent donc rien.
-           */
-          const qualification = champsQualification({
-            besoin: String(donnees.get('besoin') || ''),
-            produitPremibel: ficheReelle,
-            timeframe: String(donnees.get('delai') || ''),
-            surface: Number(donnees.get('surface') || 0),
-            // Le département est la seule donnée géographique : la région
-            // s'en déduit, ici pour l'orientation et côté serveur pour le
-            // stockage. Il n'y a plus de zone à contredire.
-            department: String(donnees.get('departement') || ''),
-          });
-          return buildProjectPayload({
-            formData: donnees,
-            formToken: token,
-            // Le serveur ne garde que le chemin ; on ne lui donne que cela.
-            sourcePath: window.location.pathname,
-            utm,
-            visualizer,
-            qualification,
-          });
-        },
-        renewToken,
-        tokenIssuedAt: () => tokenIssuedAt,
-      });
-
-      sent = true;
-      emettre('submit_project', {
-        reference: String(resultat.reference || ''),
-        source: contexteVisite().leadSource || '',
-      });
-      status.textContent = '';
-
-      const refBloc = root.querySelector('[data-success-reference]');
-      if (resultat.reference) {
-        refBloc.textContent = `Référence : ${resultat.reference}. Conservez-la si vous souhaitez nous contacter à ce sujet.`;
-        refBloc.hidden = false;
-      } else {
-        refBloc.hidden = true;
+      if (apiConfigured()) {
+        // Le jeton demandé au montage a pu ne pas être arrivé : on l'attend.
+        if (tokenPromise) await tokenPromise;
+        if (!token) await renewToken();
+        const enregistre = await submitProject({
+          buildPayload: () =>
+            buildProjectPayload({
+              formData: new FormData(form),
+              formToken: token,
+              // Le serveur ne garde que le chemin ; on ne lui donne que cela.
+              sourcePath: window.location.pathname,
+              utm,
+              visualizer,
+              qualification,
+            }),
+          renewToken,
+          tokenIssuedAt: () => tokenIssuedAt,
+        });
+        reference = String(enregistre.reference || '');
       }
-
-      form.hidden = true;
-      success.hidden = false;
-      success.focus();
     } catch (erreur) {
       const code = erreur instanceof SubmitError ? erreur.code : ERREURS.SERVEUR;
-
       /*
-       * 422 de validation : on désigne les champs plutôt que d'afficher une
-       * phrase générale. Si aucun champ n'a pu être rattaché — un cas qui ne
-       * devrait pas arriver, le contrat étant partagé — on retombe sur le
-       * message général plutôt que de laisser l'écran muet.
+       * Seul un refus de VALIDATION arrête le parcours : une réponse est
+       * réellement à corriger, et le serveur dit laquelle. Toute autre panne
+       * (réseau, serveur, limite de débit) ne touche que nos statistiques —
+       * l'orientation, elle, ne dépend pas du serveur.
        */
       if (code === ERREURS.VALIDATION && appliquerErreursServeur(erreur.fields)) {
         status.textContent = '';
-        // Le champ fautif garde le focus que `appliquerErreursServeur` lui a donné.
         montrerEchec(MESSAGES_ECHEC.validation, false);
-      } else {
-        montrerEchec(MESSAGES_ECHEC[code] || MESSAGES_ECHEC.server);
+        submitBtn.disabled = false;
+        sending = false;
+        return;
       }
-
-      /*
-       * Le formulaire reste tel quel : rien n'est vidé, aucune étape n'est
-       * perdue, et le bouton redevient actif. Quelqu'un qui vient de remplir
-       * cinq étapes ne doit pas les ressaisir parce que le réseau a hoqueté.
-       */
-      submitBtn.disabled = false;
-    } finally {
-      sending = false;
     }
+
+    sending = false;
+    sent = true;
+    emettre('submit_project', {
+      reference,
+      source: contexteVisite().leadSource || '',
+      besoin: qualification.leadNeed,
+      destination: qualification.leadDestination,
+      enregistre: Boolean(reference),
+    });
+    status.textContent = '';
+    await montrerOrientation(donnees, qualification, reference);
   });
 
-  root.querySelector('[data-restart]').addEventListener('click', () => {
-    form.reset();
+  /* ---- Conclusion : l'orientation ---- */
+
+  const titrePage = document.querySelector('.page-hero__title');
+  const chapoPage = document.querySelector('.page-hero__lead');
+  const colonne = root.closest('.project-intro') ? root.closest('.project-intro').querySelector(':scope > aside') : null;
+  const avant = {
+    titre: titrePage ? titrePage.textContent : '',
+    chapo: chapoPage ? chapoPage.textContent : '',
+    colonne: colonne ? colonne.innerHTML : '',
+  };
+  const studio = readHandoffParams(params);
+
+  /**
+   * Le parquet essayé dans le Visualiseur, avec sa vraie fiche Premibel.
+   * Lu dans le catalogue publié (le lien vient de là, jamais de l'URL de la
+   * page) ; si le catalogue ne répond pas, on renvoie au catalogue Premibel.
+   */
+  async function produitDuStudio() {
+    if (!studio.productId || !studio.ficheProduit) return null;
+    try {
+      const ctrl = typeof AbortController === 'function' ? new AbortController() : null;
+      const minuteur = ctrl ? setTimeout(() => ctrl.abort(), 5000) : null;
+      const r = await fetch(`${base}data/products.premibel.json`, ctrl ? { signal: ctrl.signal } : {});
+      if (minuteur) clearTimeout(minuteur);
+      if (!r.ok) return null;
+      const catalogue = await r.json();
+      const p = (catalogue.produits || []).find((x) => x.id === studio.productId || x.sku === studio.productId);
+      return p
+        ? { id: p.id, sku: p.sku || p.id, nom: p.name, url: p.productUrl, motif: studio.pattern, vignette: p.thumbnail ? `${base}${p.thumbnail}` : null }
+        : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function montrerOrientation(donnees, qualification, reference) {
+    const departement = String(donnees.get('departement') || '').trim().toUpperCase();
+    const idf = estIdf(departement);
+    const produit = await produitDuStudio();
+    // Les liens commerciaux réglés dans WordPress (Mon site), écrits sur la page par le build.
+    const liens = {
+      premibelUrl: root.dataset.premibelUrl || '',
+      premibelActif: root.dataset.premibelActif !== '0',
+      allureActif: root.dataset.allureActif !== '0',
+    };
+    const vue = orientation({ destination: qualification.leadDestination, besoin: qualification.leadNeed, idf, produit, liens });
+    const lignes = recapitulatif({
+      besoin: qualification.leadNeed,
+      piece: String(donnees.get('piece') || ''),
+      surface: donnees.get('surface'),
+      parquet: String(donnees.get('parquet') || ''),
+      orientation: String(donnees.get('orientation') || ''),
+      produitNom: (produit && produit.nom) || studio.productLabel || '',
+      motif: studio.pattern || '',
+      angle: studio.angle,
+      departement,
+      region: regionDe(departement),
+      idf,
+      delai: String(donnees.get('delai') || ''),
+    });
+    const origine = contexteVisite().leadSource || '';
+    const depuisStudio = studio.present && (studio.productId || studio.pattern);
+    const retourStudio = lienVisualiseur(base, studio);
+
+    const surface = Number(donnees.get('surface')) > 0 ? `${Number(donnees.get('surface'))} m²` : '';
+    // La référence choisie : vignette, nom, SKU, motif, surface — seulement ce qui est connu.
+    const ficheProduit = (pr) => {
+      const details = [
+        pr.sku ? `Réf. ${echapper(pr.sku)}` : '',
+        pr.motif && LIBELLES.motif[pr.motif] ? LIBELLES.motif[pr.motif] : '',
+        surface,
+      ].filter(Boolean).join(' · ');
+      return `<div class="pf-dest__produit">
+          ${pr.vignette ? `<img class="pf-dest__vignette" src="${echapper(pr.vignette)}" alt="" width="64" height="64" loading="lazy" />` : ''}
+          <p><strong>${echapper(pr.nom)}</strong>${details ? `<span>${details}</span>` : ''}</p>
+        </div>`;
+    };
+    const carte = (etape) => `
+      <article class="pf-dest pf-dest--${etape.cible}" data-cible="${etape.cible}">
+        <p class="pf-dest__num">${String(etape.numero).padStart(2, '0')}</p>
+        <p class="pf-dest__role">${echapper(etape.titre)}</p>
+        <h3 class="pf-dest__nom">${echapper(etape.entreprise)}</h3>
+        <p class="pf-dest__texte">${echapper(etape.texte)}</p>
+        ${etape.produit ? ficheProduit(etape.produit) : ''}
+        ${etape.cta ? `<a class="btn ${etape.numero === 1 || vue.etapes.length > 1 ? 'btn--accent' : 'btn--ghost'} pf-dest__cta" href="${echapper(etape.cta.url)}" target="_blank" rel="noopener" data-suivi="${etape.cible}">${echapper(etape.cta.libelle)}</a>` : ''}
+      </article>`;
+    // Ce que le Visualiseur a préparé : référence, SKU, motif, orientation, pièce. Jamais la photo.
+    const configStudio = [
+      (produit && produit.nom) || studio.productLabel || '',
+      produit && produit.sku ? `Réf. ${produit.sku}` : '',
+      studio.pattern && LIBELLES.motif[studio.pattern] ? LIBELLES.motif[studio.pattern] : '',
+      Number.isInteger(studio.angle) ? `${studio.angle}°` : '',
+      studio.sceneLabel || '',
+    ].filter(Boolean).map(echapper).join(' · ');
+
+    resultat.innerHTML = `
+      <header class="pf-result__head">
+        <p class="eyebrow">Votre projet</p>
+        <h2 class="pf-result__title">${echapper(vue.titre)}</h2>
+        <p class="pf-result__intro">${echapper(vue.intro)}</p>
+        ${lignes.length ? `<dl class="pf-recap">${lignes.map((l) => `<div><dt>${echapper(l.libelle)}</dt><dd>${echapper(l.valeur)}</dd></div>`).join('')}</dl>` : ''}
+      </header>
+      <div class="pf-result__dests" data-n="${vue.etapes.length}">${vue.etapes.map(carte).join('')}</div>
+      ${vue.note ? `<p class="pf-result__note">${echapper(vue.note)}</p>` : ''}
+      ${depuisStudio ? `<p class="pf-result__studio"><strong>Configuration préparée dans le Visualiseur</strong>${configStudio ? ` : ${configStudio}` : ''}. Votre photo n’a pas quitté votre navigateur.</p>` : ''}
+      <div class="pf-result__actions">
+        <button type="button" class="btn btn--ghost btn--sm" data-modifier>${vue.preciser ? 'Préciser mon besoin' : 'Modifier mon projet'}</button>
+        <a class="link-arrow" href="${echapper(retourStudio)}">${depuisStudio ? 'Revoir dans le Visualiseur' : 'Essayer un parquet dans le Visualiseur'}</a>
+      </div>
+      <p class="pf-result__orient">Pose-Parquet vous oriente : il ne transmet pas votre projet. Vous gardez la main, et aucune coordonnée ne vous a été demandée.</p>`;
+
+    // Mesure des clics sortants : contexte non personnel uniquement.
+    resultat.querySelectorAll('a[data-suivi]').forEach((lien) => {
+      lien.addEventListener('click', () => {
+        const cible = lien.dataset.suivi;
+        emettre(evenementClic(cible), contexteClic({
+          cible,
+          besoin: qualification.leadNeed,
+          destination: vue.destination,
+          produit,
+          motif: studio.pattern || String(donnees.get('orientation') || ''),
+          origine,
+          idf: departement ? idf : undefined,
+          page: window.location.pathname,
+        }));
+      });
+    });
+    resultat.querySelector('[data-modifier]').addEventListener('click', () => modifier(vue.preciser));
+
+    // La page entière change de propos : le titre, le chapô, la colonne.
+    if (titrePage) titrePage.textContent = 'Voici comment avancer.';
+    if (chapoPage) chapoPage.textContent = 'Selon vos réponses, voici vers qui vous tourner pour la suite de votre projet.';
+    if (colonne) {
+      colonne.innerHTML = `<div class="aside-box pf-next"><h3>Votre prochaine étape</h3><p>${echapper(vue.prochaine)}</p></div>`;
+      colonne.dataset.etat = 'orientation';
+    }
+    root.dataset.etat = 'orientation';
+
+    form.hidden = true;
+    resultat.hidden = false;
+    emettre('view_orientation', { destination: vue.destination, besoin: qualification.leadNeed, origine, enregistre: Boolean(reference) });
+    resultat.focus({ preventScroll: true });
+    resultat.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /** Retour au formulaire, réponses conservées. */
+  function modifier(preciser) {
     form.hidden = false;
-    success.hidden = true;
+    resultat.hidden = true;
+    resultat.innerHTML = '';
     submitBtn.disabled = false;
     status.textContent = '';
     effacerEchec();
-    root.querySelectorAll('[data-invalid]').forEach((el) => { el.dataset.invalid = 'false'; });
-    // Nouvelle demande, donc nouveau jeton : celui qui a servi est consommé
-    // côté limite de débit, et le suivant doit avoir son propre âge.
+    // Un parcours modifié est un nouveau parcours : nouveau jeton.
     sent = false;
     if (apiConfigured()) tokenPromise = renewToken().catch(() => {});
-    show(0);
+    if (titrePage) titrePage.textContent = avant.titre;
+    if (chapoPage) chapoPage.textContent = avant.chapo;
+    if (colonne) { colonne.innerHTML = avant.colonne; delete colonne.dataset.etat; }
+    delete root.dataset.etat;
+    // « Préciser mon besoin » ramène à la question du besoin.
+    const etapeBesoin = config.steps.findIndex((s) => s.fields.some((f) => f.name === 'besoin'));
+    show(preciser && etapeBesoin >= 0 ? etapeBesoin : 0);
     form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
+  }
 
   /**
    * Pré-remplissage depuis l'URL (ex. retour du simulateur de pose).

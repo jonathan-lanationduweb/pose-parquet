@@ -18,3 +18,25 @@
 .contact-card { padding: var(--sp-6); border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface); display: grid; gap: var(--sp-4); align-content: start; }
 
 .contact-card .btn { justify-self: start; }
+
+/* ---------- Contact : trois raisons, trois chemins ---------- */
+.contact-routes {
+  display: grid;
+  gap: clamp(0.9rem, 0.6rem + 1vw, 1.5rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  margin-bottom: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+}
+.contact-route {
+  display: grid;
+  gap: var(--sp-3);
+  align-content: start;
+  padding: clamp(1.1rem, 0.9rem + 0.8vw, 1.75rem);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+}
+.contact-route h2 { margin: 0; font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.5rem); }
+.contact-route p { margin: 0; }
+.contact-route .btn, .contact-route .link-arrow { justify-self: start; }
+.contact-route--projet { background: var(--tint-sage); border-color: transparent; }
+.contact-card--note { max-width: 46rem; }

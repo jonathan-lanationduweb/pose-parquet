@@ -10,12 +10,17 @@
 export const projectFormConfig = {
   id: 'projet',
   title: 'Décrire mon projet',
-  submitLabel: 'Envoyer ma demande',
+  /*
+   * Le formulaire ne « fait pas une demande » : il qualifie le projet pour
+   * montrer vers qui se tourner (js/forms/orientation.js). Le bouton dit donc
+   * ce qui se passe vraiment au clic.
+   */
+  submitLabel: 'Voir comment avancer',
   steps: [
     {
       id: 'lieu',
       title: 'Où se situe le projet ?',
-      hint: 'Ces informations permettent de situer le chantier et ses contraintes.',
+      hint: 'Le département suffit : il dit qui peut intervenir.',
       fields: [
         /*
          * ZONE ET RÉGION ONT DISPARU DE LA SAISIE.
@@ -30,8 +35,11 @@ export const projectFormConfig = {
          * déduit, côté front pour l'orientation et côté serveur pour le
          * stockage. Voir js/forms/departements.js.
          *
-         * Deux champs de moins, aucune étape de moins : cette étape en garde
-         * deux, et le parcours ses cinq.
+         * LA VILLE A SUIVI (lot « passerelle commerciale »). Facultative, elle
+         * ne servait ni à l'orientation (le département suffit) ni à
+         * personne : Pose-Parquet ne se déplace pas et ne transmet pas le
+         * projet. On ne demande pas ce dont on n'a pas l'usage. Le serveur
+         * l'accepte toujours absente (champ facultatif du contrat).
          */
         {
           name: 'departement',
@@ -41,14 +49,7 @@ export const projectFormConfig = {
           placeholder: '75, 92, 44…',
           pattern: '^(0[1-9]|[1-8][0-9]|9[0-5]|2[AB]|97[1-6])$',
           errorMessage: 'Indiquez un numéro de département valide (ex. 75, 2A, 974).',
-          hint: 'La région en est déduite : inutile de la saisir.',
-          width: 'half',
-        },
-        {
-          name: 'ville',
-          label: 'Ville',
-          type: 'text',
-          placeholder: 'Facultatif',
+          hint: 'La région en est déduite : l’orientation dépend de la zone (Île-de-France ou non).',
           width: 'half',
         },
       ],
@@ -161,7 +162,7 @@ export const projectFormConfig = {
     {
       id: 'delai',
       title: 'De quoi avez-vous besoin, et pour quand ?',
-      hint: 'Une estimation suffit : elle nous aide à orienter et à organiser la réponse.',
+      hint: 'Une estimation suffit : elle sert à vous orienter vers la bonne entreprise.',
       fields: [
         /*
          * La question qui décide de l'orientation.
@@ -170,7 +171,8 @@ export const projectFormConfig = {
          * n'en portait qu'une, le délai : c'était la plus maigre du parcours,
          * et une étape entière pour un seul bouton radio se traverse comme
          * une formalité. Deux questions courtes la remettent au niveau des
-         * quatre autres, et le parcours compte toujours cinq étapes.
+         * trois autres. Le parcours compte quatre étapes depuis que celle des
+         * coordonnées a disparu.
          *
          * Obligatoire, comme les autres boutons radio du formulaire. C'est un
          * seul geste, et c'est le seul champ dont dépend l'orientation : le
@@ -210,46 +212,19 @@ export const projectFormConfig = {
         },
       ],
     },
-    {
-      id: 'contact',
-      title: 'Vos coordonnées',
-      hint: 'Utilisées uniquement pour répondre à votre demande.',
-      fields: [
-        { name: 'prenom', label: 'Prénom', type: 'text', required: true, width: 'half', autocomplete: 'given-name' },
-        { name: 'nom', label: 'Nom', type: 'text', required: true, width: 'half', autocomplete: 'family-name' },
-        {
-          name: 'email',
-          label: 'Email',
-          type: 'email',
-          required: true,
-          width: 'half',
-          autocomplete: 'email',
-          errorMessage: 'Indiquez une adresse email valide.',
-        },
-        {
-          name: 'telephone',
-          label: 'Téléphone',
-          type: 'tel',
-          required: true,
-          width: 'half',
-          autocomplete: 'tel',
-          pattern: '^(?:\\+33|0)\\s?[1-9](?:[\\s.\\-]?\\d{2}){4}$',
-          errorMessage: 'Indiquez un numéro de téléphone français valide.',
-        },
-        {
-          name: 'message',
-          label: 'Message',
-          type: 'textarea',
-          placeholder: 'Contraintes, chauffage au sol, état du support, délais…',
-        },
-        {
-          name: 'consentement',
-          label: 'J’accepte d’être recontacté au sujet de ce projet.',
-          type: 'consent',
-          required: true,
-        },
-      ],
-    },
+    /*
+     * PLUS D'ÉTAPE « VOS COORDONNÉES ».
+     *
+     * Elle demandait prénom, nom, email, téléphone et un consentement « à
+     * être recontacté » — pour une réponse que personne chez Pose-Parquet ne
+     * fait : le parcours se termine par une orientation vers Premibel ou
+     * Allure Design, que le visiteur rejoint lui-même. Aucune de ces données
+     * ne servait à l'orientation (elle se calcule sur le besoin et le
+     * département). On ne collecte pas de données personnelles « au cas où ».
+     *
+     * Le jour où une transmission réelle à une entreprise existera, une étape
+     * de contact pourra revenir — en disant à QUI les coordonnées partent.
+     */
   ],
 };
 

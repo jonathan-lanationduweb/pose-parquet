@@ -53,6 +53,9 @@ export const EVENEMENTS = [
   'click_allure_design',
   'start_project',
   'submit_project',
+  // Le parcours « Décrivez votre projet » a affiché son orientation : l'étape
+  // entre « Projet » et le clic Premibel / Allure Design dans l'entonnoir.
+  'view_orientation',
 ];
 
 const CONNUS = new Set(EVENEMENTS);

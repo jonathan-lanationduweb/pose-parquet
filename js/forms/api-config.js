@@ -134,4 +134,43 @@ export function apiUrl(chemin) {
  */
 export const TIMEOUT_MS = 12000;
 
-export default { apiBaseUrl, apiConfigured, apiUrl, TIMEOUT_MS };
+/**
+ * L'API répond-elle VRAIMENT ? Un appel à `/health`, borné dans le temps.
+ *
+ * Le formulaire décidait de son état sur le seul nom d'hôte de la page :
+ * `localhost` et `127.0.0.1` étaient reliés, tout autre hôte affichait
+ * « ne peut pas encore envoyer » sans rien tester — et, à l'inverse, un
+ * WordPress local éteint ne déclenchait aucun bandeau : le visiteur remplissait
+ * cinq étapes pour rien. L'état affiché suit désormais la réponse réelle.
+ *
+ * @returns {Promise<boolean>}
+ */
+export async function apiDisponible(delai = 6000) {
+  const url = apiUrl('/health');
+  if (!url || typeof fetch !== 'function') return false;
+  const ctrl = typeof AbortController === 'function' ? new AbortController() : null;
+  const minuteur = ctrl ? setTimeout(() => ctrl.abort(), delai) : null;
+  try {
+    const r = await fetch(url, { method: 'GET', credentials: 'omit', signal: ctrl ? ctrl.signal : undefined });
+    if (!r.ok) return false;
+    const corps = await r.json().catch(() => null);
+    return Boolean(corps && corps.status === 'ok');
+  } catch {
+    return false;
+  } finally {
+    if (minuteur) clearTimeout(minuteur);
+  }
+}
+
+/**
+ * Page servie en local sur un hôte que le WordPress de développement
+ * n'autorise pas (`[::1]`, `*.localhost`, adresse du réseau local) : sert à
+ * donner la bonne adresse au développeur. Jamais vrai en production.
+ */
+export function hoteLocalNonRelie() {
+  const h = typeof window !== 'undefined' ? window.location.hostname : '';
+  if (Object.prototype.hasOwnProperty.call(PAR_HOTE, h)) return false;
+  return /^\[?::1\]?$|\.localhost$|\.local$|^10\.|^192\.168\.|^172\.(1[6-9]|2\d|3[01])\./.test(h);
+}
+
+export default { apiBaseUrl, apiConfigured, apiUrl, apiDisponible, hoteLocalNonRelie, TIMEOUT_MS };

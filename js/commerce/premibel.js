@@ -30,9 +30,9 @@
  */
 
 import { emettre } from '../analytics/events.js';
-
-/** Les domaines qui autorisent à écrire le nom de Premibel sur un bouton. */
-const HOTES_PREMIBEL = new Set(['premibel.fr', 'www.premibel.fr']);
+/* Les domaines qui autorisent à écrire le nom de Premibel sur un bouton :
+   définis une seule fois, partagés avec la synchronisation du catalogue. */
+import { HOTES_PREMIBEL } from './premibel-hotes.js';
 
 /**
  * La fiche commerciale d'un matériau, ou `null`.
@@ -89,6 +89,7 @@ export function suivreClic(material, contexte) {
   if (!fiche) return;
   emettre(fiche.premibel ? 'click_premibel' : 'view_product', {
     productId: (material && material.id) || '',
+    sku: (material && material.sku) || '',
     contexte: contexte || '',
   });
 }
