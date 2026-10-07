@@ -32,8 +32,8 @@
     <link rel="manifest" href="../site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../assets/dist/site.923a9d93e9.css" />
-    <script type="module" src="../assets/dist/ba77d05fce/js/main.js"></script>
+    <link rel="stylesheet" href="../assets/dist/site.070ddff7ad.css" />
+    <script type="module" src="../assets/dist/ced9b1be6d/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/index.html"},{"@type":"ListItem","position":2,"name":"Motifs","item":"https://pose-parquet.com/"}]}</script>
   </head>
   <body class="page">
@@ -93,76 +93,71 @@
         </div>
       </header>
 
-      <section class="section section--flush-top" aria-labelledby="motifs-liste">
-        <div class="wrap">
-          <h2 class="visually-hidden" id="motifs-liste">Tous les motifs de pose</h2>
-          <div class="grid grid--3">
-            <a class="pattern-card" href="pose-droite.html" data-reveal>
-              <div class="pattern-card__viz" data-pattern-thumb="longueur"></div>
-              <h3>Pose droite</h3>
-              <p>Le motif de référence : sobre, économique, compatible avec tous les formats.</p>
-              <span class="mono">Chutes faibles</span>
-            </a>
-            <a class="pattern-card" href="pose-longueur.html" data-reveal>
-              <div class="pattern-card__viz" data-pattern-thumb="longueur"></div>
-              <h3>Pose dans la longueur</h3>
-              <p>L'orientation par défaut, qui prolonge l'espace et limite les coupes.</p>
-              <span class="mono">Chutes faibles</span>
-            </a>
-            <a class="pattern-card" href="pose-largeur.html" data-reveal>
-              <div class="pattern-card__viz" data-pattern-thumb="largeur"></div>
-              <h3>Pose dans la largeur</h3>
-              <p>Une correction visuelle assumée pour les pièces trop longues.</p>
-              <span class="mono">Chutes faibles</span>
-            </a>
-            <a class="pattern-card" href="pose-diagonale.html" data-reveal>
-              <div class="pattern-card__viz" data-pattern-thumb="diagonale"></div>
-              <h3>Pose en diagonale</h3>
-              <p>Un motif qui agrandit et rattrape les murs faux — au prix de chutes sensiblement plus élevées.</p>
-              <span class="mono">Chutes élevées</span>
-            </a>
-            <a class="pattern-card" href="point-de-hongrie.html" data-reveal>
-              <div class="pattern-card__viz" data-pattern-thumb="point-de-hongrie"></div>
-              <h3>Point de Hongrie</h3>
-              <p>Des pointes continues, un axe impitoyable : le motif le plus exigeant.</p>
-              <span class="mono">Chutes élevées</span>
-            </a>
-            <a class="pattern-card" href="baton-rompu.html" data-reveal>
-              <div class="pattern-card__viz" data-pattern-thumb="baton-rompu"></div>
-              <h3>Bâton rompu</h3>
-              <p>Des lames droites, un rendu tressé : le motif graphique le plus accessible.</p>
-              <span class="mono">Chutes modérées</span>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <section class="section section--alt">
+      <section class="section section--flush-top" aria-labelledby="motifs-droits">
         <div class="wrap">
           <!--
-            Comparatif horizontal, pleine largeur.
+            DEUX FAMILLES, PAS SIX CARTES DE MÊME POIDS.
 
-            La version précédente plaçait le texte dans la colonne gauche d'un
-            bloc « split » et les deux cartes dans la droite, avec une grille
-            « grid--2 » imbriquée. Cette grille n'avait que la moitié de la
-            largeur : elle retombait donc à une seule colonne, les deux cartes
-            s'empilaient, et il restait à gauche du texte un vide de la hauteur
-            des deux cartes.
-
-            Les deux motifs se comparent côte à côte — c'est le sujet même de
-            la section. Ils ont maintenant la même largeur et la même hauteur,
-            sur toute la largeur du bloc.
+            La grille alignait six fiches identiques, puis une section entière
+            reprenait deux d'entre elles pour les comparer. Les motifs se
+            rangent pourtant d'eux-mêmes : quatre façons d'orienter des lames
+            droites, et deux motifs en V qui se confondent. La seconde famille
+            porte donc la comparaison, et la section séparée disparaît.
           -->
-          <div class="section-head">
-            <p class="eyebrow">Comparer</p>
-            <h2>Deux motifs souvent confondus</h2>
-            <p class="lead">Point de Hongrie et bâton rompu dessinent tous deux un sol en V, mais ne se posent ni ne se commandent de la même façon.</p>
+          <div class="motif-family">
+            <div class="motif-family__head">
+              <h2 id="motifs-droits">Lames droites : choisir une direction</h2>
+              <p>Le même parquet, posé dans un sens ou un autre : c’est la direction qui allonge, élargit ou dynamise la pièce.</p>
+            </div>
+            <div class="grid grid--4 motif-family__grid">
+              <a class="pattern-card" href="pose-droite.html" data-reveal>
+                <div class="pattern-card__viz" data-pattern-thumb="longueur"></div>
+                <h3>Pose droite</h3>
+                <p>Le motif de référence : sobre, économique, compatible avec tous les formats.</p>
+                <span class="mono">Chutes faibles</span>
+              </a>
+              <a class="pattern-card" href="pose-longueur.html" data-reveal>
+                <div class="pattern-card__viz" data-pattern-thumb="longueur"></div>
+                <h3>Pose dans la longueur</h3>
+                <p>L'orientation par défaut, qui prolonge l'espace et limite les coupes.</p>
+                <span class="mono">Chutes faibles</span>
+              </a>
+              <a class="pattern-card" href="pose-largeur.html" data-reveal>
+                <div class="pattern-card__viz" data-pattern-thumb="largeur"></div>
+                <h3>Pose dans la largeur</h3>
+                <p>Une correction visuelle assumée pour les pièces trop longues.</p>
+                <span class="mono">Chutes faibles</span>
+              </a>
+              <a class="pattern-card" href="pose-diagonale.html" data-reveal>
+                <div class="pattern-card__viz" data-pattern-thumb="diagonale"></div>
+                <h3>Pose en diagonale</h3>
+                <p>Un motif qui agrandit et rattrape les murs faux — au prix de chutes sensiblement plus élevées.</p>
+                <span class="mono">Chutes élevées</span>
+              </a>
+            </div>
           </div>
-          <div class="grid grid--2">
-            <div class="pattern-card"><div class="pattern-card__viz" data-pattern-thumb="point-de-hongrie"></div><h3>Point de Hongrie</h3><p>Coupe d'onglet, pointe continue.</p></div>
-            <div class="pattern-card"><div class="pattern-card__viz" data-pattern-thumb="baton-rompu"></div><h3>Bâton rompu</h3><p>Lames droites, décrochés en escalier.</p></div>
+
+          <div class="motif-family motif-family--v" aria-labelledby="motifs-v">
+            <div class="motif-family__head">
+              <h2 id="motifs-v">Les motifs en V : deux dessins souvent confondus</h2>
+              <p>Point de Hongrie et bâton rompu dessinent tous deux un V. Le premier coupe ses lames à l’onglet et file en pointe continue ; le second pose des lames droites à angle droit, en escalier.</p>
+              <p><a class="link-arrow" href="../guides/point-de-hongrie-ou-baton-rompu.html">Lire le comparatif complet<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a></p>
+            </div>
+            <div class="grid grid--2 motif-family__grid">
+              <a class="pattern-card" href="point-de-hongrie.html" data-reveal>
+                <div class="pattern-card__viz" data-pattern-thumb="point-de-hongrie"></div>
+                <h3>Point de Hongrie</h3>
+                <p>Des pointes continues, un axe impitoyable : le motif le plus exigeant.</p>
+                <span class="mono">Chutes élevées</span>
+              </a>
+              <a class="pattern-card" href="baton-rompu.html" data-reveal>
+                <div class="pattern-card__viz" data-pattern-thumb="baton-rompu"></div>
+                <h3>Bâton rompu</h3>
+                <p>Des lames droites, un rendu tressé : le motif graphique le plus accessible.</p>
+                <span class="mono">Chutes modérées</span>
+              </a>
+            </div>
           </div>
-          <p class="u-mt-5"><a class="link-arrow" href="../guides/point-de-hongrie-ou-baton-rompu.html">Lire le comparatif complet<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a></p>
         </div>
       </section>
       <section class="section">
@@ -170,7 +165,7 @@
         <div class="cta-band" data-reveal>
           <div>
             <h2>Un projet de pose à préparer ?</h2>
-            <p>Décrivez votre pièce, votre support et le rendu recherché en cinq étapes. Vous recevez une réponse construite, sans démarchage.</p>
+            <p>Décrivez votre pièce, votre support et le rendu recherché en quatre étapes, sans laisser vos coordonnées : vous voyez aussitôt vers qui vous tourner.</p>
           </div>
           <div class="cta-band__actions">
             <a class="btn btn--light" href="../projet/">Décrire mon projet</a>
@@ -229,7 +224,7 @@
             l'explique. Écrire trois phrases ici en ferait une réclame en bas
             de 32 pages.
           -->
-          <p class="footer__orientation">Selon le besoin, ce site oriente vers <strong>Premibel</strong> pour les références de parquet et vers <strong>Allure&nbsp;Design</strong> pour la pose et les travaux en Île-de-France. <a href="../a-propos/#liens-commerciaux">En savoir plus</a></p>
+          <p class="footer__orientation"><strong>Premibel</strong> pour les références de parquet, <strong>Allure&nbsp;Design</strong> pour la pose et la rénovation en Île-de-France : Pose Parquet oriente selon le besoin. <a href="../a-propos/#liens-commerciaux">Nos liens commerciaux</a></p>
           <p>Photographies sous licence Pexels</p>
         </div>
       </div>

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Outils parquet : simulateur et calculateurs | Pose Parquet</title>
-    <meta name="description" content="Les outils Pose Parquet : simulateur de sens de pose, et prochainement calculateur de surface, calepinage, checklist avant pose et diagnostic du support." />
+    <meta name="description" content="Les outils Pose Parquet : le Visualiseur pour voir un parquet dans sa pièce, le Mode Plan pour comparer les sens de pose, et les outils à venir." />
     <!-- Balise robots toujours explicite. Sa valeur par défaut est « index,
          follow » : les fichiers du dépôt décrivent la production, et c'est le
          déploiement qui marque une préproduction — voir
@@ -21,7 +21,7 @@
     <meta property="og:site_name" content="Pose Parquet" />
     <meta property="og:locale" content="fr_FR" />
     <meta property="og:title" content="Outils parquet : simulateur et calculateurs | Pose Parquet" />
-    <meta property="og:description" content="Les outils Pose Parquet : simulateur de sens de pose, et prochainement calculateur de surface, calepinage, checklist avant pose et diagnostic du support." />
+    <meta property="og:description" content="Les outils Pose Parquet : le Visualiseur pour voir un parquet dans sa pièce, le Mode Plan pour comparer les sens de pose, et les outils à venir." />
     <meta property="og:url" content="https://pose-parquet.com/outils/" />
     <meta property="og:image" content="https://pose-parquet.com/assets/images/og-default.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -32,10 +32,10 @@
     <link rel="manifest" href="../site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../assets/dist/site.923a9d93e9.css" />
+    <link rel="stylesheet" href="../assets/dist/site.070ddff7ad.css" />
     <link rel="stylesheet" href="../assets/dist/plan.119de6b46c.css" />
-    <link rel="stylesheet" href="../assets/dist/scene.39a7881ce6.css" />
-    <script type="module" src="../assets/dist/ba77d05fce/js/main.js"></script>
+    <link rel="stylesheet" href="../assets/dist/scene.8a51f44f53.css" />
+    <script type="module" src="../assets/dist/ced9b1be6d/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/index.html"},{"@type":"ListItem","position":2,"name":"Outils","item":"https://pose-parquet.com/"}]}</script>
   </head>
   <body class="page">
@@ -85,54 +85,78 @@
     </div>
     <main id="contenu">
       <nav class="breadcrumb wrap-wide" aria-label="Fil d'Ariane"><ol><li><a href="../index.html">Accueil</a></li><li><span aria-current="page">Outils</span></li></ol></nav>
-      <header class="page-hero">
+      <header class="page-hero page-hero--tools">
         <div class="wrap-wide page-hero__grid">
           <div>
             <p class="eyebrow">Outils</p>
             <h1 class="page-hero__title">Une boîte à outils, pas une brochure</h1>
           </div>
-          <p class="page-hero__lead">Des outils simples, utilisables depuis un téléphone sur le chantier comme depuis un bureau au moment de décider.</p>
+          <p class="page-hero__lead">Deux outils disponibles, gratuits, sans inscription : voir un parquet dans sa pièce, puis comparer les sens de pose sur un plan à l’échelle.</p>
         </div>
       </header>
 
-      <section class="section section--flush-top">
-        <div class="wrap-wide tool-blocks">
-          <article class="tool-block tool-block--lead" data-reveal>
-            <div class="tool-block__media">
-              <div data-vz-preview data-room="sejour" data-base="../"></div>
-            </div>
-            <div class="tool-block__body">
-              <p class="tool-block__num">Outil 01 <span class="badge badge--sage">Visualiseur</span></p>
-              <h2 class="tool-block__title">Visualiseur Parquet</h2>
-              <p class="lead">Une application dédiée : votre pièce occupe l’écran, le catalogue se range sur le côté, et le sol change à chaque clic. Une photo peut contenir plusieurs sols visibles — le parquet choisi les change tous.</p>
-              <ul class="tool-block__points">
-                <li>26 parquets à essayer, chacun avec son veinage et sa largeur de lame.</li>
-                <li>Le pinceau garde vos meubles, vos tapis et vos plinthes visibles.</li>
-                <li>Jusqu’à trois versions enregistrées, comparées sur la même photo.</li>
-                <li>Tout est calculé dans le navigateur : la photo n’est ni envoyée ni conservée.</li>
-              </ul>
+      <section class="section section--flush-top" aria-labelledby="outil-principal">
+        <div class="wrap-wide">
+          <article class="tool-main">
+            <div class="tool-main__head">
+              <p class="eyebrow">Outil principal</p>
+              <h2 class="tool-main__title" id="outil-principal">Visualiseur Parquet</h2>
+              <p class="lead">Votre pièce occupe l’écran, le catalogue se range sur le côté, et le sol change à chaque clic. Glissez le curseur : le rendu est calculé ici, dans votre navigateur.</p>
               <div class="cluster">
                 <a class="btn" href="studio.html">Visualiser mon parquet</a>
-                <a class="link-arrow" href="../inspiration/">Voir des ambiances à essayer</a>
+                <a class="link-arrow" href="../inspiration/">Partir d’une ambiance</a>
               </div>
             </div>
+            <div class="tool-main__demo">
+              <div class="vzp" data-vz-preview data-room="sejour" data-base="../" data-reveal>
+            <figure class="vzp__figure">
+              <div class="vzp__stage" data-stage>
+                <img class="vzp__photo" data-photo loading="lazy" decoding="async"
+                  width="1600" height="1067"
+                  src="../assets/images/room-sejour.jpg" alt="Séjour vide et lumineux ouvert sur une salle à manger" />
+                <!-- Couche visuelle d'une figure qui porte deja sa description
+                     dans la legende : rien a annoncer une seconde fois. -->
+                <canvas class="vzp__canvas" data-canvas aria-hidden="true"></canvas>
+                <span class="vzp__tag vzp__tag--before">Avant</span>
+                <span class="vzp__tag vzp__tag--after">Après</span>
+                <input class="vzp__range" type="range" min="3" max="97" value="52"
+                  aria-label="Curseur de comparaison entre la pièce d’origine et le parquet simulé" data-range />
+                <span class="vzp__handle" aria-hidden="true"></span>
+              </div>
+              <figcaption class="vzp__caption">
+                <span data-caption>Chêne naturel Houston, lames droites (rendu fidèle)</span> — rendu calculé dans votre navigateur.
+                <span data-credit>Photo : Curtis Adams / Pexels.</span>
+              </figcaption>
+            </figure>
+            <div class="vzp__chips" role="group" aria-label="Aperçu d’autres finitions" data-chips></div>
+          </div>
+            </div>
+            <ul class="tool-main__points">
+              <li><strong>211 parquets à essayer</strong><span>des références Premibel à leur largeur de lame, en rendu indicatif — 4 en rendu fidèle</span></li>
+              <li><strong>Plusieurs sols</strong><span>une photo peut en contenir plusieurs : le parquet choisi les change tous</span></li>
+              <li><strong>Trois versions</strong><span>enregistrées et comparées sur la même photo</span></li>
+              <li><strong>Rien n’est envoyé</strong><span>la photo n’est ni transmise ni conservée</span></li>
+            </ul>
           </article>
+        </div>
+      </section>
 
-          <article class="tool-block tool-block--reverse" data-reveal>
+      <section class="section section--alt section--compact" aria-labelledby="outil-plan">
+        <div class="wrap-wide">
+          <article class="tool-block tool-block--reverse tool-block--secondary">
             <div class="tool-block__media">
               <div data-visualizer data-mode="compact" data-base="../"></div>
             </div>
             <div class="tool-block__body">
-              <p class="tool-block__num">Outil 02 <span class="badge badge--outline">Mode Plan</span></p>
-              <h2 class="tool-block__title">Mode Plan</h2>
-              <p class="lead">Vue du dessus à l’échelle : dimensions de la pièce, largeur de lame, position de la fenêtre et de l’entrée. Utile pour trancher le sens de pose avant d’acheter.</p>
+              <p class="tool-block__num">Outil complémentaire</p>
+              <h2 class="tool-block__title" id="outil-plan">Mode Plan</h2>
+              <p>Vue du dessus à l’échelle : dimensions, largeur de lame, fenêtre et entrée. Pour trancher le sens de pose avant d’acheter.</p>
               <ul class="tool-block__points">
                 <li>Cinq motifs, du droit au point de Hongrie.</li>
-                <li>Surface, nombre de lames et chutes estimées, recalculés à chaque changement.</li>
-                <li>Estimations indicatives : elles ne remplacent pas un calepinage de chantier.</li>
+                <li>Surface, lames et chutes estimées à chaque changement : des ordres de grandeur, pas un calepinage.</li>
               </ul>
               <div class="cluster">
-                <a class="btn btn--ghost" href="simulateur-pose.html">Ouvrir le mode plan</a>
+                <a class="btn btn--ghost" href="simulateur-pose.html">Ouvrir le Mode Plan</a>
                 <a class="link-arrow" href="../guides/quel-sens-de-pose-choisir.html">Comprendre le sens de pose</a>
               </div>
             </div>
@@ -140,23 +164,23 @@
         </div>
       </section>
 
-      <section class="section section--alt section--compact" aria-labelledby="a-venir">
+      <section class="section section--compact tools-next" aria-labelledby="a-venir">
         <div class="wrap-wide">
-          <div class="section-head section-head__row">
+          <div class="tools-next__inner">
             <div>
-              <p class="eyebrow">Feuille de route</p>
-              <h2 id="a-venir">Les outils qui suivront</h2>
+              <p class="eyebrow">À venir</p>
+              <h2 class="tools-next__title" id="a-venir">Les outils qui suivront</h2>
+              <p class="tools-next__lead">Pas encore disponibles. Même logique : une question concrète, une réponse immédiate, aucune inscription.</p>
             </div>
-            <p class="lead">Même logique à chaque fois : une question concrète, une réponse immédiate, aucune inscription.</p>
+            <ul class="roadmap roadmap--compact">
+              <li class="roadmap__item"><strong>Calculateur de surface</strong><span>Surfaces complexes, décrochés, chutes.</span></li>
+              <li class="roadmap__item"><strong>Calculateur de calepinage</strong><span>Nombre de lames, coupes de rive, répartition.</span></li>
+              <li class="roadmap__item"><strong>Checklist avant pose</strong><span>Support, acclimatation, outillage, calepinage.</span></li>
+              <li class="roadmap__item"><strong>Diagnostic du support</strong><span>Planéité, humidité, cohésion, adhérence.</span></li>
+              <li class="roadmap__item"><strong>Comparateur massif / contrecollé</strong><span>Selon pièce, support et budget.</span></li>
+              <li class="roadmap__item"><strong>Questionnaire sens de pose</strong><span>Cinq questions, une recommandation.</span></li>
+            </ul>
           </div>
-          <ul class="roadmap">
-            <li class="roadmap__item"><strong>Calculateur de surface</strong><span>Surfaces complexes, décrochés, chutes.</span></li>
-            <li class="roadmap__item"><strong>Calculateur de calepinage</strong><span>Nombre de lames, coupes de rive, répartition.</span></li>
-            <li class="roadmap__item"><strong>Checklist avant pose</strong><span>Support, acclimatation, outillage, calepinage.</span></li>
-            <li class="roadmap__item"><strong>Diagnostic du support</strong><span>Planéité, humidité, cohésion, adhérence.</span></li>
-            <li class="roadmap__item"><strong>Comparateur massif / contrecollé</strong><span>Selon pièce, support et budget.</span></li>
-            <li class="roadmap__item"><strong>Questionnaire sens de pose</strong><span>Cinq questions, une recommandation.</span></li>
-          </ul>
         </div>
       </section>
       <section class="section">
@@ -164,7 +188,7 @@
         <div class="cta-band" data-reveal>
           <div>
             <h2>Un projet de pose à préparer ?</h2>
-            <p>Décrivez votre pièce, votre support et le rendu recherché en cinq étapes. Vous recevez une réponse construite, sans démarchage.</p>
+            <p>Décrivez votre pièce, votre support et le rendu recherché en quatre étapes, sans laisser vos coordonnées : vous voyez aussitôt vers qui vous tourner.</p>
           </div>
           <div class="cta-band__actions">
             <a class="btn btn--light" href="../projet/">Décrire mon projet</a>
@@ -223,7 +247,7 @@
             l'explique. Écrire trois phrases ici en ferait une réclame en bas
             de 32 pages.
           -->
-          <p class="footer__orientation">Selon le besoin, ce site oriente vers <strong>Premibel</strong> pour les références de parquet et vers <strong>Allure&nbsp;Design</strong> pour la pose et les travaux en Île-de-France. <a href="../a-propos/#liens-commerciaux">En savoir plus</a></p>
+          <p class="footer__orientation"><strong>Premibel</strong> pour les références de parquet, <strong>Allure&nbsp;Design</strong> pour la pose et la rénovation en Île-de-France : Pose Parquet oriente selon le besoin. <a href="../a-propos/#liens-commerciaux">Nos liens commerciaux</a></p>
           <p>Photographies sous licence Pexels</p>
         </div>
       </div>
