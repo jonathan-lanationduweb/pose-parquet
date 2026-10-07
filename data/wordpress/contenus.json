@@ -1,0 +1,1470 @@
+{
+ "version": 1,
+ "maintenance": {
+  "actif": false,
+  "titre": "Le site revient bientôt.",
+  "message": "Nous effectuons actuellement une mise à jour de Pose-Parquet. En attendant, vous pouvez poursuivre votre projet auprès de nos deux destinations.",
+  "image": {
+   "id": 44,
+   "source": "room-piece-arcades",
+   "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-piece-arcades.jpg",
+   "largeur": 1600,
+   "hauteur": 1067,
+   "alt": "Grande pièce vide à arcades, murs crème et parquet en bâton rompu",
+   "credit": "Daniel Tanque",
+   "tailles": [
+    {
+     "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-piece-arcades-150x150.jpg",
+     "largeur": 150,
+     "hauteur": 150
+    },
+    {
+     "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-piece-arcades-300x200.jpg",
+     "largeur": 300,
+     "hauteur": 200
+    },
+    {
+     "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-piece-arcades-768x512.jpg",
+     "largeur": 768,
+     "hauteur": 512
+    },
+    {
+     "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-piece-arcades-1024x683.jpg",
+     "largeur": 1024,
+     "hauteur": 683
+    },
+    {
+     "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-piece-arcades-1536x1024.jpg",
+     "largeur": 1536,
+     "hauteur": 1024
+    },
+    {
+     "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-piece-arcades.jpg",
+     "largeur": 1600,
+     "hauteur": 1067
+    }
+   ]
+  },
+  "liens": {
+   "premibel": true,
+   "allure": true
+  }
+ },
+ "guides": [
+  {
+   "slug": "quel-sens-de-pose-choisir",
+   "titre": "Quel sens de pose choisir pour son parquet ? | Pose Parquet",
+   "h1": "Quel sens de pose choisir pour son parquet ?",
+   "description": "Lumière, proportions, circulation, support : la méthode pour choisir le sens de pose de votre parquet, avec un simulateur pour visualiser le résultat.",
+   "categorie": "Sens de pose",
+   "date": "2026-08-24",
+   "resume": "Cinq critères suffisent à trancher, et ils ne se valent pas. Voici l'ordre dans lequel les regarder.",
+   "intro": "Le sens de pose se décide avant la première lame et ne se rattrape pas. Cinq critères permettent de trancher dans presque toutes les situations : la lumière, les proportions de la pièce, la circulation, le support et le motif retenu.",
+   "lecture": "9 min",
+   "faq": [
+    {
+     "q": "Faut-il toujours poser dans le sens de la lumière ?",
+     "a": "Non, mais c'est le point de départ le plus fiable. Poser dans le sens des rayons limite les ombres portées sur les joints. Si la pièce est très étroite ou si le support impose une direction, un autre critère peut primer."
+    },
+    {
+     "q": "Peut-on changer de sens entre deux pièces ?",
+     "a": "Oui, à condition d'assumer une transition nette : barre de seuil, coupe droite au droit de la porte ou frise de raccord. Un changement de sens sans transition dessinée se remarque immédiatement."
+    },
+    {
+     "q": "Le sens de pose change-t-il la quantité de parquet à acheter ?",
+     "a": "Oui. Une pose droite est la plus économe en matière ; une pose diagonale ou un Point de Hongrie multiplient les coupes de rive et consomment sensiblement plus. Les ordres de grandeur souvent cités vont de 7 à 8 % pour une pose droite à 12 à 15 % pour un motif orienté, mais ils dépendent de la pièce, du calepinage et des longueurs livrées : à confirmer par un calepinage avant de commander. Dans tous les cas, le surplus se commande dès le départ, dans le même lot."
+    }
+   ],
+   "corps": "\n      <p>Le sens de pose est la première décision visible d'un chantier de parquet. Elle influence la perception des volumes, la façon dont la lumière accroche les joints, la quantité de coupes et parfois la tenue même du revêtement. Une fois les lames collées ou clouées, revenir en arrière signifie déposer l'ensemble.</p>\n      <p>Bonne nouvelle : dans la majorité des pièces, le choix se joue sur cinq critères, dans un ordre de priorité assez stable.</p>\n\n      <h2 id=\"lumiere\">1. La lumière : le critère qui prime presque toujours</h2>\n      <p>Un parquet n'est jamais parfaitement plan. Chaque joint crée un micro-relief qui, éclairé de côté, dessine une ligne d'ombre. Poser les lames <strong>dans le sens des rayons</strong> — c'est-à-dire perpendiculairement au mur qui porte la fenêtre — limite ces ombres et donne un sol visuellement plus continu.</p>\n      <p>Ce réflexe vient de la pose clouée traditionnelle, mais il reste valable avec les parquets contrecollés actuels, notamment avec des finitions brossées ou huilées qui accrochent davantage la lumière rasante.</p>\n      <aside class=\"callout\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9.2 17.5h5.6\"/><path d=\"M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z\"/></svg>Conseil</p>\n        <p>Testez avant de décider : posez trois ou quatre lames à blanc sur le sol, en fin de journée, quand la lumière est la plus rasante. La différence entre les deux orientations est souvent flagrante.</p>\n      </aside>\n\n      <h2 id=\"proportions\">2. Les proportions de la pièce</h2>\n      <p>Les lames guident le regard. Elles étirent l'espace dans leur direction :</p>\n      <ul>\n        <li><strong>Pose dans la longueur</strong> : allonge encore la pièce. Idéale dans un séjour large, discutable dans un couloir déjà étroit.</li>\n        <li><strong>Pose dans la largeur</strong> : élargit visuellement un espace tout en longueur, au prix de coupes plus nombreuses.</li>\n        <li><strong>Pose en diagonale</strong> : casse les lignes, agrandit la perception d'un petit volume et rattrape des murs non parallèles.</li>\n      </ul>\n      <p>Dans une pièce carrée, ce critère devient neutre : la lumière et le motif reprennent la main.</p>\n      <figure>\n        <img src=\"../assets/images/guide-sens-proportions.svg\" alt=\"Trois orientations de lames comparées dans une même pièce\" loading=\"lazy\" decoding=\"async\" width=\"1100\" height=\"290\" />\n        <figcaption>Une même pièce, trois lectures : la direction des lames modifie la perception des proportions avant tout autre paramètre.</figcaption>\n      </figure>\n\n      <h2 id=\"circulation\">3. La circulation et les seuils</h2>\n      <p>Le regard entre dans une pièce par la porte. Une pose parallèle à l'axe d'entrée accompagne ce mouvement ; une pose perpendiculaire crée une sensation de barrière, surtout avec des lames larges et contrastées.</p>\n      <p>Dans un logement traversant, on gagne à traiter les circulations comme un ensemble : couloir, entrée et pièces de vie posés dans la même direction donnent une continuité que les changements de sens cassent.</p>\n\n      <h2 id=\"support\">4. Le support impose parfois la direction</h2>\n      <p>Certaines configurations ne laissent pas le choix :</p>\n      <ul>\n        <li><strong>Pose clouée sur lambourdes ou solives</strong> : les lames doivent être perpendiculaires aux supports.</li>\n        <li><strong>Ancien plancher conservé</strong> : les nouvelles lames se posent perpendiculairement aux anciennes, pour ne pas superposer les joints.</li>\n        <li><strong>Chauffage au sol</strong> : la direction est libre, mais la pose collée et l'inertie du support imposent d'autres précautions.</li>\n      </ul>\n      <aside class=\"callout callout--warning\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4.5 2.8 20h18.4L12 4.5Z\"/><path d=\"M12 10v4\"/><path d=\"M12 17.2h.01\"/></svg>Erreur à éviter</p>\n        <p>Poser un parquet flottant dans le sens de la longueur d'une grande pièce sans respecter les joints de fractionnement, c'est prendre le risque de blocages et de tuilage. Au-delà de 8 mètres dans une direction, un joint de dilatation intermédiaire s'impose.</p>\n      </aside>\n\n      <h2 id=\"motif\">5. Le motif choisi</h2>\n      <p>Un Point de Hongrie ou un bâton rompu ne se raisonnent pas comme une pose droite : ce sont des motifs orientés, dont l'axe principal doit être décidé en premier. Cet axe suit généralement la longueur de la pièce ou l'axe d'entrée, plus rarement la fenêtre.</p>\n      <p><a class=\"link-arrow\" href=\"../motifs/\">Comparer les motifs de pose<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h13\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></p>\n\n      <h2 id=\"methode\">La méthode en cinq minutes</h2>\n      <ol class=\"steps\"><li><h3>Repérez la source de lumière principale</h3><p>Une seule fenêtre ? Elle décide. Plusieurs ouvertures ? Retenez celle qui éclaire le plus longtemps dans la journée.</p></li><li><h3>Mesurez et notez le rapport longueur / largeur</h3><p>Au-delà d'un rapport de 1,6, la pièce est perçue comme étroite : la pose dans la largeur ou en diagonale devient pertinente.</p></li><li><h3>Tracez l'axe d'entrée</h3><p>Depuis la porte principale, en direction du fond de la pièce. Cet axe départage souvent deux options équivalentes.</p></li><li><h3>Vérifiez les contraintes du support</h3><p>Solives, ancien plancher, chape, chauffage au sol : ces éléments peuvent annuler les trois premiers critères.</p></li><li><h3>Visualisez avant de commander</h3><p>Le simulateur de pose permet de comparer les orientations sur vos dimensions réelles, avec la fenêtre au bon endroit.</p></li></ol>\n      <aside class=\"callout callout--key\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 12.5 9 17.5 20 6.5\"/></svg>À retenir</p>\n        <ul><li>La lumière tranche le plus souvent.</li><li>Les proportions tranchent lorsque la lumière est neutre.</li><li>Le support peut imposer un sens, quel que soit le rendu souhaité.</li><li>Le motif se décide avant le sens, jamais après.</li></ul>\n      </aside>\n\n      <h2 id=\"visualiser\">Visualiser plutôt qu'imaginer</h2>\n      <p>Les descriptions ont leurs limites : deux orientations décrites de la même façon peuvent donner deux ambiances très différentes une fois posées. Le simulateur reproduit votre pièce, place la fenêtre et l'entrée, puis applique le motif choisi.</p>\n      <div data-visualizer data-mode=\"compact\" data-base=\"../\"></div>\n    ",
+   "corpsIntact": true,
+   "image": {
+    "id": 12,
+    "source": "cover-quel-sens-de-pose-choisir",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-quel-sens-de-pose-choisir.jpg",
+    "largeur": 1400,
+    "hauteur": 875,
+    "alt": "Couloir d’appartement ancien aux lames patinées filant dans l’axe, ouvert sur une pièce où elles partent en travers",
+    "credit": "Curtis Adams",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-quel-sens-de-pose-choisir-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-quel-sens-de-pose-choisir-300x188.jpg",
+      "largeur": 300,
+      "hauteur": 188
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-quel-sens-de-pose-choisir-768x480.jpg",
+      "largeur": 768,
+      "hauteur": 480
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-quel-sens-de-pose-choisir-1024x640.jpg",
+      "largeur": 1024,
+      "hauteur": 640
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-quel-sens-de-pose-choisir.jpg",
+      "largeur": 1400,
+      "hauteur": 875
+     }
+    ]
+   },
+   "tags": [
+    "sens-de-pose",
+    "comprendre"
+   ],
+   "related": [
+    "poser-parquet-sens-de-la-lumiere",
+    "sens-de-pose-piece-etroite",
+    "sens-de-pose-couloir"
+   ]
+  },
+  {
+   "slug": "poser-parquet-sens-de-la-lumiere",
+   "titre": "Poser un parquet dans le sens de la lumière | Pose Parquet",
+   "h1": "Poser un parquet dans le sens de la lumière",
+   "description": "Pourquoi la règle du sens de la lumière fonctionne, quand elle ne s'applique pas, et comment trancher dans une pièce à plusieurs ouvertures.",
+   "categorie": "Sens de pose",
+   "date": "2026-08-20",
+   "resume": "La règle la plus citée du parquet. Encore faut-il savoir ce qu'elle recouvre et quand elle cesse d'être vraie.",
+   "intro": "« Poser dans le sens de la lumière » est la règle la plus répétée du parquet. Elle repose sur un phénomène optique très concret, mais elle connaît des exceptions qu'il vaut mieux identifier avant de commander les lames.",
+   "lecture": "6 min",
+   "faq": [
+    {
+     "q": "Que signifie exactement « dans le sens de la lumière » ?",
+     "a": "Les lames sont posées perpendiculairement au mur qui porte la fenêtre, donc parallèlement à la direction des rayons qui entrent dans la pièce."
+    },
+    {
+     "q": "Et si la pièce a des fenêtres sur deux murs ?",
+     "a": "Retenez l'ouverture qui apporte la lumière la plus rasante et la plus durable dans la journée, souvent la plus grande ou celle exposée au sud. Les autres critères, proportions et axe d'entrée, départagent ensuite."
+    },
+    {
+     "q": "La règle vaut-elle pour un parquet mat ?",
+     "a": "Elle compte moins. Une finition très mate et peu texturée renvoie peu de lumière rasante : les joints se voient nettement moins, et les autres critères prennent le dessus."
+    }
+   ],
+   "corps": "\n      <p>La lumière rasante révèle les reliefs. Sur un parquet, chaque joint entre deux lames forme une arête minuscule qui projette une ombre dès que la lumière arrive de côté. Multipliée par des dizaines de joints, cette ombre dessine des lignes bien visibles.</p>\n\n      <h2 id=\"phenomene\">Le phénomène en une image</h2>\n      <p>Placez les lames <strong>perpendiculairement à la fenêtre</strong> et les rayons filent le long des joints : l'ombre reste dans l'axe et se remarque peu. Placez-les <strong>parallèlement à la fenêtre</strong> et chaque joint se retrouve éclairé de côté : les lignes ressortent, surtout en fin de journée.</p>\n      <div class=\"ba\">\n        <div class=\"ba__layer\"><img src=\"../assets/images/lumiere-avant.svg\" alt=\"Lames parallèles à la fenêtre\" loading=\"lazy\" decoding=\"async\" width=\"1200\" height=\"750\" /></div>\n        <div class=\"ba__layer ba__layer--after\"><img src=\"../assets/images/lumiere-apres.svg\" alt=\"Lames dans le sens des rayons\" loading=\"lazy\" decoding=\"async\" width=\"1200\" height=\"750\" /></div>\n        <span class=\"ba__tag ba__tag--before\">Lames parallèles à la fenêtre</span>\n        <span class=\"ba__tag ba__tag--after\">Lames dans le sens des rayons</span>\n        <input class=\"ba__range\" type=\"range\" min=\"0\" max=\"100\" value=\"50\" aria-label=\"Comparer avant et après\" />\n        <span class=\"ba__handle\" aria-hidden=\"true\"></span>\n      </div>\n      <p class=\"text-muted\">Déplacez le curseur pour comparer les deux orientations sous la même lumière.</p>\n\n      <h2 id=\"quand\">Quand la règle s'applique vraiment</h2>\n      <ul>\n        <li>Pièce éclairée par une seule ouverture principale.</li>\n        <li>Finition brossée, huilée ou vieillie, qui accroche la lumière.</li>\n        <li>Lames étroites et nombreuses, donc joints nombreux.</li>\n        <li>Sol très éclairé en lumière naturelle rasante, typiquement une exposition ouest.</li>\n      </ul>\n\n      <h2 id=\"exceptions\">Les quatre exceptions</h2>\n      <div class=\"table-wrap\">\n        <table class=\"table-compare\">\n          <thead><tr><th scope=\"col\">Situation</th><th scope=\"col\">Ce qui prime</th><th scope=\"col\">Direction retenue</th></tr></thead>\n          <tbody><tr><th scope=\"row\">Couloir étroit</th><td>Continuité de la circulation</td><td>Dans l'axe du couloir</td></tr><tr><th scope=\"row\">Pièce très allongée</th><td>Correction des proportions</td><td>Dans la largeur ou en diagonale</td></tr><tr><th scope=\"row\">Pose clouée sur solives</th><td>Contrainte structurelle</td><td>Perpendiculaire aux solives</td></tr><tr><th scope=\"row\">Motif orienté (Point de Hongrie)</th><td>Axe du motif</td><td>Axe principal de la pièce</td></tr></tbody>\n        </table>\n      </div>\n      <aside class=\"callout callout--warning\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4.5 2.8 20h18.4L12 4.5Z\"/><path d=\"M12 10v4\"/><path d=\"M12 17.2h.01\"/></svg>Erreur à éviter</p>\n        <p>Ne cherchez pas à appliquer la règle pièce par pièce dans un logement ouvert. Un séjour, une cuisine et un couloir posés chacun dans « leur » sens de lumière produisent un patchwork. Sur un plateau ouvert, une seule direction pour tout l'espace.</p>\n      </aside>\n\n      <h2 id=\"reperer\">Repérer la bonne direction en pratique</h2>\n      <ol class=\"steps\"><li><h3>Observez la pièce en fin de journée</h3><p>C'est le moment où la lumière est la plus rasante, donc le plus révélateur.</p></li><li><h3>Posez quelques lames à blanc</h3><p>Trois ou quatre lames suffisent, dans une orientation puis dans l’autre, au même endroit.</p></li><li><h3>Photographiez les deux essais</h3><p>La photo aplatit la perspective et montre les lignes de joints plus objectivement que l'œil.</p></li></ol>\n      <aside class=\"callout\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9.2 17.5h5.6\"/><path d=\"M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z\"/></svg>Conseil</p>\n        <p>Si vous hésitez encore, gardez à l'esprit que le rendu le plus discret est presque toujours le plus durable : un sol qui se fait oublier vieillit mieux qu'un effet graphique dont on se lasse.</p>\n      </aside>\n\n      <h2 id=\"simuler\">Simuler la lumière dans votre pièce</h2>\n      <p>Le simulateur place la fenêtre sur le mur de votre choix et applique une nappe de lumière cohérente avec le motif retenu. Utile pour comparer sans poser une seule lame.</p>\n      <div data-visualizer data-mode=\"compact\" data-base=\"../\"></div>\n    ",
+   "corpsIntact": true,
+   "image": {
+    "id": 14,
+    "source": "cover-poser-parquet-sens-de-la-lumiere",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-poser-parquet-sens-de-la-lumiere.jpg",
+    "largeur": 1400,
+    "hauteur": 875,
+    "alt": "Ombre d'une fenêtre projetée sur le parquet d'une pièce vide",
+    "credit": "sanket mahind",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-poser-parquet-sens-de-la-lumiere-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-poser-parquet-sens-de-la-lumiere-300x188.jpg",
+      "largeur": 300,
+      "hauteur": 188
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-poser-parquet-sens-de-la-lumiere-768x480.jpg",
+      "largeur": 768,
+      "hauteur": 480
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-poser-parquet-sens-de-la-lumiere-1024x640.jpg",
+      "largeur": 1024,
+      "hauteur": 640
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-poser-parquet-sens-de-la-lumiere.jpg",
+      "largeur": 1400,
+      "hauteur": 875
+     }
+    ]
+   },
+   "tags": [
+    "sens-de-pose",
+    "comprendre"
+   ],
+   "related": [
+    "quel-sens-de-pose-choisir",
+    "sens-de-pose-piece-etroite",
+    "erreurs-a-eviter-avant-de-poser"
+   ]
+  },
+  {
+   "slug": "preparer-son-sol-avant-la-pose",
+   "titre": "Préparer son sol avant la pose d’un parquet | Pose Parquet",
+   "h1": "Comment préparer un sol avant la pose ?",
+   "description": "Planéité, humidité, ragréage, sous-couche : les contrôles à mener sur le support avant de poser un parquet, avec les seuils à respecter.",
+   "categorie": "Préparation",
+   "date": "2026-08-18",
+   "resume": "La plupart des désordres viennent du support, pas du parquet. Voici les contrôles à mener avant la première lame.",
+   "intro": "Un parquet ne corrige jamais les défauts du sol sur lequel il est posé : il les révèle. La préparation du support représente l'essentiel du travail invisible d'un chantier réussi.",
+   "lecture": "10 min",
+   "faq": [
+    {
+     "q": "Quelle planéité faut-il atteindre ?",
+     "a": "La règle courante est de 5 mm sous une règle de 2 mètres pour une pose collée, et 3 mm sous la même règle pour une pose flottante avec des lames rigides. Au-delà, un ragréage s'impose."
+    },
+    {
+     "q": "Comment vérifier l’humidité d’une chape ?",
+     "a": "La mesure fiable se fait à la bombe à carbure. Un contrôle indicatif consiste à scotcher hermétiquement un film plastique d'un mètre carré pendant 24 à 48 heures : la moindre condensation signale un support encore humide."
+    },
+    {
+     "q": "Peut-on poser un parquet sur un carrelage existant ?",
+     "a": "Oui, si le carrelage est adhérent, propre, plan et sec. Les carreaux sonnant creux doivent être déposés et rebouchés, et un primaire adapté est nécessaire avant une pose collée."
+    }
+   ],
+   "corps": "\n      <p>Tuilage, lames qui claquent, joints qui s'ouvrent, points durs sous le pied : la plupart des désordres constatés après une pose viennent du support, rarement du parquet lui-même. La préparation demande du temps, mais elle est mesurable, donc vérifiable.</p>\n\n      <h2 id=\"diagnostic\">Le diagnostic en quatre mesures</h2>\n      <div class=\"table-wrap\">\n        <table class=\"table-compare\">\n          <thead><tr><th scope=\"col\">Contrôle</th><th scope=\"col\">Méthode</th><th scope=\"col\">Seuil courant</th></tr></thead>\n          <tbody><tr><th scope=\"row\">Planéité</th><td>Règle de 2 m et cales</td><td>≤ 5 mm (collée) / ≤ 3 mm (flottante)</td></tr><tr><th scope=\"row\">Humidité</th><td>Bombe à carbure</td><td>≤ 3 % pour une chape ciment</td></tr><tr><th scope=\"row\">Cohésion</th><td>Rayure et test d’adhérence</td><td>Surface non farinante, non friable</td></tr><tr><th scope=\"row\">Propreté</th><td>Aspiration et inspection</td><td>Sans laitance, colle, plâtre ni graisse</td></tr></tbody>\n        </table>\n      </div>\n      <aside class=\"callout callout--warning\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4.5 2.8 20h18.4L12 4.5Z\"/><path d=\"M12 10v4\"/><path d=\"M12 17.2h.01\"/></svg>Erreur à éviter</p>\n        <p>Une chape neuve n'est pas sèche parce qu'elle est dure. Comptez en moyenne une semaine de séchage par centimètre d'épaisseur pour une chape ciment traditionnelle, davantage en hiver ou dans une pièce peu ventilée.</p>\n      </aside>\n\n      <h2 id=\"planeite\">Corriger la planéité</h2>\n      <p>Trois cas de figure, trois réponses :</p>\n      <ul>\n        <li><strong>Défauts localisés</strong> : rebouchage à l'enduit de rebouchage fibré, ponçage des points hauts.</li>\n        <li><strong>Défauts diffus sur toute la surface</strong> : ragréage autolissant, en respectant l'épaisseur minimale du produit.</li>\n        <li><strong>Sol très irrégulier ou plancher bois ancien</strong> : panneautage en contreplaqué ou en OSB vissé, qui redonne un plan de pose homogène.</li>\n      </ul>\n      <figure>\n        <img src=\"../assets/images/preparation-ragreage.jpg\" alt=\"Ragréage frais en cours de mise en œuvre sur un sol intérieur\" loading=\"lazy\" decoding=\"async\" width=\"1400\" height=\"875\" />\n        <figcaption>Le ragréage rattrape les défauts du support : c'est lui qui donne au parquet un plan de pose homogène.</figcaption>\n      </figure>\n\n      <h2 id=\"humidite\">Gérer l'humidité</h2>\n      <p>L'humidité est la cause la plus fréquente des sinistres. Deux sources à distinguer : l'humidité résiduelle du support et les remontées capillaires, notamment sur dalle en rez-de-chaussée sans coupure de capillarité.</p>\n      <p>Dans le premier cas, il faut attendre ou assécher. Dans le second, une barrière étanche — film polyéthylène pour une pose flottante, primaire époxy bicomposant pour une pose collée — est indispensable.</p>\n      <aside class=\"callout\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9.2 17.5h5.6\"/><path d=\"M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z\"/></svg>Conseil</p>\n        <p>Le parquet lui-même doit être acclimaté : laissez les paquets fermés à plat dans la pièce, entre 48 et 72 heures, à une température de 18 à 22 °C et une hygrométrie de 45 à 60 %.</p>\n      </aside>\n\n      <h2 id=\"souscouche\">Choisir la sous-couche</h2>\n      <p>La sous-couche ne concerne que la pose flottante. Elle joue sur trois plans : correction des micro-défauts, confort acoustique et pare-vapeur.</p>\n      <ul>\n        <li><strong>En appartement</strong>, l'affaiblissement des bruits d'impact est souvent imposé par le règlement de copropriété : visez au minimum 18 dB.</li>\n        <li><strong>Sur dalle béton</strong>, un pare-vapeur est nécessaire, intégré ou posé en complément.</li>\n        <li><strong>Sur chauffage au sol</strong>, privilégiez une résistance thermique faible, idéalement inférieure à 0,15 m².K/W.</li>\n      </ul>\n\n      <h2 id=\"checklist\">La checklist avant la première lame</h2>\n      <ol class=\"steps\"><li><h3>Support sec, mesuré et documenté</h3><p>Notez la valeur, la date et la méthode : c'est ce qui compte en cas de litige.</p></li><li><h3>Planéité contrôlée à la règle de 2 m</h3><p>Dans les deux directions, y compris le long des murs et devant les seuils.</p></li><li><h3>Sol aspiré, dépoussiéré, primaire appliqué si nécessaire</h3><p>Un support propre conditionne l'adhérence de la colle.</p></li><li><h3>Parquet acclimaté dans la pièce</h3><p>48 à 72 heures, paquets fermés, posés à plat.</p></li><li><h3>Calepinage tracé au sol</h3><p>Axe de départ, joints périphériques de 8 à 10 mm, position des coupes de rive.</p></li></ol>\n      <aside class=\"callout callout--key\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 12.5 9 17.5 20 6.5\"/></svg>À retenir</p>\n        <ul><li>Mesurez plutôt que d'estimer : planéité et humidité se chiffrent.</li><li>Le ragréage est un investissement, pas une option de confort.</li><li>L'acclimatation évite la majorité des jeux de joints ultérieurs.</li></ul>\n      </aside>\n    ",
+   "corpsIntact": true,
+   "image": {
+    "id": 16,
+    "source": "cover-preparer-son-sol-avant-la-pose",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-preparer-son-sol-avant-la-pose.jpg",
+    "largeur": 1400,
+    "hauteur": 875,
+    "alt": "Ouvrier lissant une chape à la truelle mécanique avant la pose du sol",
+    "credit": "Sài Gòn Công Ty CP",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-preparer-son-sol-avant-la-pose-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-preparer-son-sol-avant-la-pose-300x188.jpg",
+      "largeur": 300,
+      "hauteur": 188
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-preparer-son-sol-avant-la-pose-768x480.jpg",
+      "largeur": 768,
+      "hauteur": 480
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-preparer-son-sol-avant-la-pose-1024x640.jpg",
+      "largeur": 1024,
+      "hauteur": 640
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-preparer-son-sol-avant-la-pose.jpg",
+      "largeur": 1400,
+      "hauteur": 875
+     }
+    ]
+   },
+   "tags": [
+    "preparation",
+    "poser"
+   ],
+   "related": [
+    "erreurs-a-eviter-avant-de-poser",
+    "parquet-massif-ou-contrecolle",
+    "quel-sens-de-pose-choisir"
+   ]
+  },
+  {
+   "slug": "point-de-hongrie-ou-baton-rompu",
+   "titre": "Point de Hongrie ou bâton rompu ? | Pose Parquet",
+   "h1": "Point de Hongrie ou bâton rompu ?",
+   "description": "Deux motifs souvent confondus. Coupe, rendu, contraintes de pose, coût et pièces adaptées : le comparatif complet, illustré par un simulateur.",
+   "categorie": "Motifs",
+   "date": "2026-08-14",
+   "resume": "Une coupe d'onglet sépare ces deux motifs. Elle change le rendu, le prix et la pose.",
+   "intro": "On les confond souvent, alors qu'un seul détail les sépare : la coupe des extrémités. Ce détail change le dessin au sol, la mise en œuvre et le budget.",
+   "lecture": "7 min",
+   "faq": [
+    {
+     "q": "Lequel est le plus cher ?",
+     "a": "Le Point de Hongrie. Les lames sont coupées à l'onglet en usine, avec des versions gauche et droite à commander en quantités égales, et les chutes sont plus importantes."
+    },
+    {
+     "q": "Peut-on poser ces motifs dans une petite pièce ?",
+     "a": "Oui, en adaptant le format des lames. Dans une pièce de moins de 12 m², des lames courtes et étroites évitent un motif écrasant et limitent les coupes de rive."
+    },
+    {
+     "q": "Ces motifs conviennent-ils à un chauffage au sol ?",
+     "a": "Oui, en pose collée avec un contrecollé stable. La colle assure le contact thermique et limite les mouvements du bois."
+    }
+   ],
+   "corps": "\n      <p>Les deux motifs assemblent des lames en biais et produisent un sol très graphique. La différence tient à la coupe : le bâton rompu utilise des lames droites, le Point de Hongrie des lames coupées à l'onglet. L'angle du Point de Hongrie n'est pas figé — 45° est le plus répandu, mais on rencontre aussi 30° et 60°, qui allongent la pointe et changent nettement le rendu.</p>\n\n      <h2 id=\"difference\">La différence en une phrase</h2>\n      <p>Dans le <strong>bâton rompu</strong>, le bout d'une lame vient buter contre le chant de la suivante : le dessin forme des marches d'escalier. Dans le <strong>Point de Hongrie</strong>, les extrémités coupées en biais se rejoignent : le dessin forme des pointes continues, alignées en colonnes.</p>\n      <div class=\"grid grid--2\">\n        <div class=\"pattern-card\"><div class=\"pattern-card__viz\" data-pattern-thumb=\"point-de-hongrie\"></div><h3>Point de Hongrie</h3><p>Pointe continue, joints alignés, coupe d'onglet.</p></div>\n        <div class=\"pattern-card\"><div class=\"pattern-card__viz\" data-pattern-thumb=\"baton-rompu\"></div><h3>Bâton rompu</h3><p>Lames droites, décrochés en escalier, aucune coupe spéciale.</p></div>\n      </div>\n\n      <h2 id=\"comparatif\">Comparatif détaillé</h2>\n      <div class=\"table-wrap\">\n        <table class=\"table-compare\">\n          <thead><tr><th scope=\"col\">Critère</th><th scope=\"col\">Point de Hongrie</th><th scope=\"col\">Bâton rompu</th></tr></thead>\n          <tbody><tr><th scope=\"row\">Coupe des lames</th><td>Onglet, le plus souvent à 45° ; lames gauches et droites</td><td>Lames droites standard</td></tr><tr><th scope=\"row\">Rendu au sol</th><td>Pointes continues, effet flèche</td><td>Décrochés en escalier, effet tressé</td></tr><tr><th scope=\"row\">Chutes estimées</th><td>12 à 15 %</td><td>10 à 12 %</td></tr><tr><th scope=\"row\">Approvisionnement</th><td>Lots dédiés, délais plus longs</td><td>Lames courantes</td></tr><tr><th scope=\"row\">Difficulté de pose</th><td>Élevée : traçage et axe très précis</td><td>Élevée, mais coupes plus tolérantes</td></tr><tr><th scope=\"row\">Effet visuel dominant</th><td>Allonge et guide le regard</td><td>Anime la surface, plus statique</td></tr></tbody>\n        </table>\n      </div>\n\n      <h2 id=\"choisir\">Comment choisir</h2>\n      <ul>\n        <li><strong>Pièce longue à valoriser</strong> : le Point de Hongrie, dont la pointe file vers le fond.</li>\n        <li><strong>Grande surface ouverte</strong> : le bâton rompu, qui anime sans imposer de direction.</li>\n        <li><strong>Budget contraint</strong> : le bâton rompu, en lames courantes.</li>\n        <li><strong>Rénovation d'un appartement ancien</strong> : les deux se justifient, mais le Point de Hongrie s'accorde mieux aux moulures et aux parquets d'origine.</li>\n      </ul>\n      <aside class=\"callout\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9.2 17.5h5.6\"/><path d=\"M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z\"/></svg>Conseil</p>\n        <p>Quel que soit le motif, tracez l'axe principal au cordeau et vérifiez-le à l'équerre avant de coller la première lame. Un axe légèrement faux ne se corrige pas en cours de pose : l'écart se cumule rangée après rangée.</p>\n      </aside>\n      <aside class=\"callout callout--warning\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4.5 2.8 20h18.4L12 4.5Z\"/><path d=\"M12 10v4\"/><path d=\"M12 17.2h.01\"/></svg>Erreur à éviter</p>\n        <p>N'improvisez pas la rive. Une frise périphérique, même simple, rattrape les murs non parallèles et évite des coupes en pointe très fines, fragiles et disgracieuses.</p>\n      </aside>\n\n      <h2 id=\"simulateur\">Voir les deux motifs dans votre pièce</h2>\n      <p>Changez de motif d'un clic et comparez sur vos dimensions réelles.</p>\n      <div data-visualizer data-mode=\"compact\" data-base=\"../\"></div>\n    ",
+   "corpsIntact": true,
+   "image": {
+    "id": 18,
+    "source": "cover-point-de-hongrie-ou-baton-rompu",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-point-de-hongrie-ou-baton-rompu.jpg",
+    "largeur": 1400,
+    "hauteur": 875,
+    "alt": "Gros plan sur un parquet de chêne ancien posé en bâton rompu, lames à bouts carrés",
+    "credit": "Magda Ehlers",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-point-de-hongrie-ou-baton-rompu-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-point-de-hongrie-ou-baton-rompu-300x188.jpg",
+      "largeur": 300,
+      "hauteur": 188
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-point-de-hongrie-ou-baton-rompu-768x480.jpg",
+      "largeur": 768,
+      "hauteur": 480
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-point-de-hongrie-ou-baton-rompu-1024x640.jpg",
+      "largeur": 1024,
+      "hauteur": 640
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-point-de-hongrie-ou-baton-rompu.jpg",
+      "largeur": 1400,
+      "hauteur": 875
+     }
+    ]
+   },
+   "tags": [
+    "motifs",
+    "choisir"
+   ],
+   "related": [
+    "quel-sens-de-pose-choisir",
+    "parquet-massif-ou-contrecolle",
+    "preparer-son-sol-avant-la-pose"
+   ]
+  },
+  {
+   "slug": "erreurs-a-eviter-avant-de-poser",
+   "titre": "Erreurs à éviter avant de poser un parquet | Pose Parquet",
+   "h1": "Les erreurs à éviter avant de poser un parquet",
+   "description": "Acclimatation oubliée, joints périphériques trop justes, support mal mesuré, commande sans marge : les huit erreurs les plus fréquentes et comment les éviter.",
+   "categorie": "Préparation",
+   "date": "2026-08-10",
+   "resume": "Huit erreurs reviennent en boucle sur les chantiers. Toutes se corrigent avant la pose, aucune après.",
+   "intro": "Les erreurs coûteuses ne se produisent pas pendant la pose, mais dans les jours qui la précèdent. Voici les huit plus fréquentes, dans l'ordre où elles surviennent.",
+   "lecture": "8 min",
+   "faq": [
+    {
+     "q": "Combien de temps faut-il acclimater un parquet ?",
+     "a": "48 heures minimum pour un contrecollé, 72 heures pour un massif, paquets fermés, à plat, dans la pièce de destination chauffée à température d'usage."
+    },
+    {
+     "q": "Quel jeu périphérique faut-il laisser ?",
+     "a": "8 à 10 mm sur toute la périphérie pour une pose flottante, et davantage sur les grandes longueurs : comptez environ 1,5 mm par mètre de largeur de pièce."
+    },
+    {
+     "q": "Combien de parquet commander en plus ?",
+     "a": "Prévoyez 7 à 10 % de plus pour une pose droite, 12 à 15 % pour une diagonale ou un motif, et gardez une réserve d'un demi-paquet pour les réparations futures."
+    }
+   ],
+   "corps": "\n      <h2 id=\"acclimatation\">1. Poser un parquet non acclimaté</h2>\n      <p>Le bois échange en permanence de l'humidité avec l'air. Posé trop sec, il gonflera ; posé trop humide, il se rétractera et ouvrira des joints. L'acclimatation en paquets fermés, dans la pièce, est non négociable.</p>\n\n      <h2 id=\"joints\">2. Négliger les joints périphériques</h2>\n      <p>Un parquet flottant est un plateau qui doit pouvoir bouger. Sans jeu suffisant contre les murs, les huisseries et les tuyaux, il se bloque et tuile. Les plinthes masquent ce jeu : il n'y a aucune raison de l'économiser.</p>\n      <aside class=\"callout callout--warning\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4.5 2.8 20h18.4L12 4.5Z\"/><path d=\"M12 10v4\"/><path d=\"M12 17.2h.01\"/></svg>Erreur à éviter</p>\n        <p>Attention aux points singuliers : seuils de porte, poteaux, angles rentrants et passages de tuyaux de chauffage. Ce sont eux qui bloquent, pas les longs murs droits.</p>\n      </aside>\n\n      <h2 id=\"support\">3. Estimer le support au lieu de le mesurer</h2>\n      <p>« Il a l'air plan » et « il doit être sec » ne sont pas des mesures. Une règle de 2 mètres et un test d'humidité coûtent bien moins cher qu'une dépose.</p>\n\n      <h2 id=\"melange\">4. Ne pas mélanger les paquets</h2>\n      <p>Le bois varie d'un paquet à l'autre. Piocher dans trois ou quatre paquets simultanément répartit les nuances et évite les zones plus claires ou plus foncées.</p>\n\n      <h2 id=\"commande\">5. Commander au plus juste</h2>\n      <p>Les coupes de rive, les erreurs et les lames écartées pour défaut consomment plus que prévu. Une commande complémentaire arrive dans un autre lot, avec une teinte légèrement différente.</p>\n\n      <h2 id=\"calepinage\">6. Poser sans calepinage</h2>\n      <p>Commencer contre un mur sans avoir calculé la dernière rangée est le meilleur moyen de finir avec une bande de 2 cm. Le calepinage se trace avant, au cordeau, en répartissant les coupes entre la première et la dernière rangée.</p>\n      <aside class=\"callout\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9.2 17.5h5.6\"/><path d=\"M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z\"/></svg>Conseil</p>\n        <p>Si la dernière rangée fait moins d'un tiers de la largeur d'une lame, retirez cette largeur de la première rangée et répartissez la différence des deux côtés.</p>\n      </aside>\n\n      <h2 id=\"sens\">7. Décider le sens de pose au dernier moment</h2>\n      <p>Le sens conditionne la quantité de matière, la position des coupes et parfois le type de pose. C'est une décision de conception, pas d'exécution.</p>\n      <p><a class=\"link-arrow\" href=\"quel-sens-de-pose-choisir.html\">Lire le guide du sens de pose<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h13\"/><path d=\"m12 5 7 7-7 7\"/></svg></a></p>\n\n      <h2 id=\"chantier\">8. Poser avant les autres corps d'état</h2>\n      <p>Peinture, plomberie, cuisine : tout ce qui produit de la poussière, de l'eau ou des chocs doit être terminé. Un parquet posé trop tôt devient un plan de travail.</p>\n      <aside class=\"callout callout--key\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 12.5 9 17.5 20 6.5\"/></svg>À retenir</p>\n        <ul><li>Mesurer plutôt qu'estimer, systématiquement.</li><li>Acclimater le parquet et respecter les jeux périphériques.</li><li>Calepiner avant de poser la première lame.</li><li>Commander avec marge, dans un seul lot.</li></ul>\n      </aside>\n    ",
+   "corpsIntact": true,
+   "image": {
+    "id": 20,
+    "source": "cover-erreurs-a-eviter-avant-de-poser",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-erreurs-a-eviter-avant-de-poser.jpg",
+    "largeur": 1400,
+    "hauteur": 875,
+    "alt": "Vieux plancher de bois patiné aux joints ouverts, vu en perspective",
+    "credit": "Pexels",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-erreurs-a-eviter-avant-de-poser-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-erreurs-a-eviter-avant-de-poser-300x188.jpg",
+      "largeur": 300,
+      "hauteur": 188
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-erreurs-a-eviter-avant-de-poser-768x480.jpg",
+      "largeur": 768,
+      "hauteur": 480
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-erreurs-a-eviter-avant-de-poser-1024x640.jpg",
+      "largeur": 1024,
+      "hauteur": 640
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-erreurs-a-eviter-avant-de-poser.jpg",
+      "largeur": 1400,
+      "hauteur": 875
+     }
+    ]
+   },
+   "tags": [
+    "preparation",
+    "comprendre"
+   ],
+   "related": [
+    "preparer-son-sol-avant-la-pose",
+    "quel-sens-de-pose-choisir",
+    "parquet-massif-ou-contrecolle"
+   ]
+  },
+  {
+   "slug": "parquet-massif-ou-contrecolle",
+   "titre": "Parquet massif ou contrecollé à la pose | Pose Parquet",
+   "h1": "Parquet massif ou contrecollé : quelles différences pour la pose ?",
+   "description": "Structure, stabilité, rénovation, chauffage au sol : ce qui distingue vraiment un parquet massif d'un contrecollé au moment de la pose.",
+   "categorie": "Comprendre",
+   "date": "2026-08-06",
+   "resume": "Le débat porte rarement sur le bon terrain : ce qui change vraiment, c'est la stabilité dimensionnelle.",
+   "intro": "Massif et contrecollé sont deux parquets à part entière : dans les deux cas, la couche visible est en bois noble. Ce qui les sépare tient à leur structure, et donc à leur comportement une fois posés.",
+   "lecture": "8 min",
+   "faq": [
+    {
+     "q": "Le contrecollé est-il un « faux parquet » ?",
+     "a": "Non. Un parquet contrecollé possède une couche d'usure en bois noble d'au moins 2,5 mm. En dessous, on parle de sol stratifié, qui n'est pas un parquet."
+    },
+    {
+     "q": "Combien de fois peut-on poncer un parquet ?",
+     "a": "Un massif de 20 mm accepte cinq à sept ponçages. Un contrecollé avec 3 mm de couche d'usure en accepte deux à trois, ce qui couvre déjà plusieurs décennies d'usage domestique."
+    },
+    {
+     "q": "Lequel choisir avec un chauffage au sol ?",
+     "a": "Un contrecollé collé en plein, avec une épaisseur maîtrisée et une essence stable. Le massif est déconseillé, sauf produits spécifiquement certifiés compatibles."
+    }
+   ],
+   "corps": "\n      <h2 id=\"structure\">Deux structures, deux comportements</h2>\n      <p>Le <strong>massif</strong> est une pièce de bois pleine, de 14 à 23 mm d'épaisseur. Il travaille dans toute sa masse au gré de l'hygrométrie.</p>\n      <p>Le <strong>contrecollé</strong> superpose une couche d'usure en bois noble, une âme en bois résineux ou en contreplaqué à fils croisés, et un contre-parement. Ce croisement des fibres limite fortement les variations dimensionnelles.</p>\n      <figure>\n        <img src=\"../assets/images/massif-contrecolle.jpg\" alt=\"Échantillons de lames de bois de différentes essences et épaisseurs\" loading=\"lazy\" decoding=\"async\" width=\"1400\" height=\"875\" />\n        <figcaption>Massif ou contrecollé : la structure de la lame, et non son aspect de surface, détermine les poses possibles.</figcaption>\n      </figure>\n\n      <h2 id=\"comparatif\">Comparatif orienté pose</h2>\n      <div class=\"table-wrap\">\n        <table class=\"table-compare\">\n          <thead><tr><th scope=\"col\">Critère</th><th scope=\"col\">Massif</th><th scope=\"col\">Contrecollé</th></tr></thead>\n          <tbody><tr><th scope=\"row\">Poses possibles</th><td>Clouée, collée</td><td>Collée, flottante</td></tr><tr><th scope=\"row\">Stabilité dimensionnelle</th><td>Sensible à l’hygrométrie</td><td>Très stable</td></tr><tr><th scope=\"row\">Chauffage au sol</th><td>Déconseillé sauf produit certifié</td><td>Adapté en pose collée</td></tr><tr><th scope=\"row\">Épaisseur courante</th><td>14 à 23 mm</td><td>10 à 15 mm</td></tr><tr><th scope=\"row\">Ponçages</th><td>5 à 7</td><td>2 à 3</td></tr><tr><th scope=\"row\">Grands formats et motifs</th><td>Limité par les mouvements</td><td>Bien adapté</td></tr></tbody>\n        </table>\n      </div>\n\n      <h2 id=\"pose\">Ce que cela change concrètement sur le chantier</h2>\n      <ul>\n        <li><strong>Tolérance sur le support</strong> : le contrecollé flottant demande une planéité plus stricte que le massif cloué sur lambourdes.</li>\n        <li><strong>Hauteur disponible</strong> : sous une porte ou face à un carrelage existant, les quelques millimètres d'écart peuvent décider seuls.</li>\n        <li><strong>Motifs</strong> : Point de Hongrie et bâton rompu se posent plus sereinement en contrecollé collé, plus stable.</li>\n        <li><strong>Acoustique</strong> : en appartement, la pose collée en plein réduit nettement les bruits d'impact par rapport à une pose flottante.</li>\n      </ul>\n      <aside class=\"callout\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9.2 17.5h5.6\"/><path d=\"M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z\"/></svg>Conseil</p>\n        <p>Regardez l'épaisseur de la couche d'usure plutôt que le prix au mètre carré : c'est elle qui détermine la durée de vie réelle d'un contrecollé.</p>\n      </aside>\n\n      <h2 id=\"rénovation\">Et en rénovation ?</h2>\n      <p>Sur un ancien plancher bois sain, le massif cloué reste cohérent. Sur une dalle béton en rénovation d'appartement, le contrecollé collé est le choix le plus sûr, particulièrement avec un chauffage au sol.</p>\n      <p>Pour comparer des gammes existantes et leurs épaisseurs de couche d'usure, un distributeur spécialisé comme <a href=\"https://premibel.fr\" rel=\"noopener\">Premibel</a> publie les caractéristiques techniques détaillées de ses parquets contrecollés, utiles pour vérifier ces points avant de commander.</p>\n      <aside class=\"callout callout--key\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 12.5 9 17.5 20 6.5\"/></svg>À retenir</p>\n        <ul><li>La vraie différence est la stabilité, pas la « noblesse » du produit.</li><li>Le contrecollé ouvre la pose flottante et le chauffage au sol.</li><li>Le massif reste imbattable en durée de vie ponçable.</li></ul>\n      </aside>\n    ",
+   "corpsIntact": true,
+   "image": {
+    "id": 22,
+    "source": "cover-parquet-massif-ou-contrecolle",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-parquet-massif-ou-contrecolle.jpg",
+    "largeur": 1400,
+    "hauteur": 875,
+    "alt": "Échantillons de placages de bois posés côte à côte",
+    "credit": "cottonbro studio",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-parquet-massif-ou-contrecolle-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-parquet-massif-ou-contrecolle-300x188.jpg",
+      "largeur": 300,
+      "hauteur": 188
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-parquet-massif-ou-contrecolle-768x480.jpg",
+      "largeur": 768,
+      "hauteur": 480
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-parquet-massif-ou-contrecolle-1024x640.jpg",
+      "largeur": 1024,
+      "hauteur": 640
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-parquet-massif-ou-contrecolle.jpg",
+      "largeur": 1400,
+      "hauteur": 875
+     }
+    ]
+   },
+   "tags": [
+    "comprendre",
+    "choisir"
+   ],
+   "related": [
+    "preparer-son-sol-avant-la-pose",
+    "quel-sens-de-pose-choisir",
+    "point-de-hongrie-ou-baton-rompu"
+   ]
+  },
+  {
+   "slug": "sens-de-pose-couloir",
+   "titre": "Quel sens de pose dans un couloir ? | Pose Parquet",
+   "h1": "Sens de pose dans un couloir",
+   "description": "Dans un couloir, la continuité prime sur la lumière. Comment orienter les lames, gérer les seuils et raccorder les pièces adjacentes.",
+   "categorie": "Sens de pose",
+   "date": "2026-08-02",
+   "resume": "Le couloir est le seul espace où la règle de la lumière passe au second plan.",
+   "intro": "Un couloir est un espace de passage, étroit et souvent peu éclairé. La question du sens de pose s'y résout autrement que dans une pièce de vie.",
+   "lecture": "5 min",
+   "faq": [
+    {
+     "q": "Faut-il poser dans le sens de la marche ?",
+     "a": "Oui, dans la très grande majorité des cas. Les lames dans l'axe du couloir accompagnent le déplacement et limitent le nombre de coupes."
+    },
+    {
+     "q": "Comment raccorder le couloir aux pièces adjacentes ?",
+     "a": "Soit en conservant la même direction partout, soit en marquant une coupe droite au droit de chaque porte, avec ou sans barre de seuil selon le type de pose."
+    }
+   ],
+   "corps": "\n      <h2 id=\"axe\">Poser dans l'axe : la règle par défaut</h2>\n      <p>Dans un couloir, la lumière arrive rarement de côté : elle vient d'une extrémité, ou d'un éclairage artificiel. Le critère lumineux perd donc son poids habituel, au profit de deux autres.</p>\n      <ul>\n        <li><strong>La continuité visuelle</strong> : des lames dans l'axe prolongent le couloir et l'apaisent.</li>\n        <li><strong>Le nombre de coupes</strong> : une pose transversale multiplie les coupes de rive et les chutes dans un espace où chaque lame est courte.</li>\n      </ul>\n      <aside class=\"callout callout--warning\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4.5 2.8 20h18.4L12 4.5Z\"/><path d=\"M12 10v4\"/><path d=\"M12 17.2h.01\"/></svg>Erreur à éviter</p>\n        <p>La pose en travers d'un couloir étroit produit un effet d'échelle, très marqué avec des lames contrastées. À réserver aux couloirs larges, traités comme de vraies pièces.</p>\n      </aside>\n\n      <h2 id=\"seuils\">Gérer les seuils</h2>\n      <p>Deux stratégies, à choisir dès le calepinage :</p>\n      <ol class=\"steps\"><li><h3>Continuité totale</h3><p>Même direction dans le couloir et les pièces, sans seuil. Le rendu est le plus fluide, mais impose une pose cohérente sur l'ensemble du niveau.</p></li><li><h3>Coupe franche au droit des portes</h3><p>Le changement de direction est assumé, marqué par une coupe nette ou une barre de seuil discrète, alignée sur le nu de la porte fermée.</p></li></ol>\n      <aside class=\"callout\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9.2 17.5h5.6\"/><path d=\"M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z\"/></svg>Conseil</p>\n        <p>Dans un couloir en L, traitez la partie la plus longue comme direction principale et raccordez la seconde par une coupe droite dans l'angle.</p>\n      </aside>\n\n      <h2 id=\"simuler\">Simuler un couloir</h2>\n      <p>Entrez par exemple 8 m sur 1,2 m dans le simulateur : l'effet des différentes orientations est immédiat.</p>\n      <div data-visualizer data-mode=\"compact\" data-base=\"../\"></div>\n    ",
+   "corpsIntact": true,
+   "image": {
+    "id": 24,
+    "source": "cover-sens-de-pose-couloir",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-sens-de-pose-couloir.jpg",
+    "largeur": 1400,
+    "hauteur": 875,
+    "alt": "Couloir d'appartement au parquet posé dans l'axe de circulation",
+    "credit": "Lisa Anna",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-sens-de-pose-couloir-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-sens-de-pose-couloir-300x188.jpg",
+      "largeur": 300,
+      "hauteur": 188
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-sens-de-pose-couloir-768x480.jpg",
+      "largeur": 768,
+      "hauteur": 480
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-sens-de-pose-couloir-1024x640.jpg",
+      "largeur": 1024,
+      "hauteur": 640
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-sens-de-pose-couloir.jpg",
+      "largeur": 1400,
+      "hauteur": 875
+     }
+    ]
+   },
+   "tags": [
+    "sens-de-pose",
+    "poser"
+   ],
+   "related": [
+    "quel-sens-de-pose-choisir",
+    "sens-de-pose-piece-etroite",
+    "poser-parquet-sens-de-la-lumiere"
+   ]
+  },
+  {
+   "slug": "sens-de-pose-piece-etroite",
+   "titre": "Sens de pose dans une pièce étroite | Pose Parquet",
+   "h1": "Sens de pose dans une pièce étroite",
+   "description": "Élargir visuellement une pièce tout en longueur : quand poser dans la largeur, quand préférer la diagonale, et ce que cela change en coupes.",
+   "categorie": "Sens de pose",
+   "date": "2026-07-29",
+   "resume": "Poser dans la largeur élargit vraiment — à condition d'en accepter les coupes.",
+   "intro": "Dans une pièce dont la longueur dépasse 1,6 fois la largeur, le sens de pose devient un outil de correction visuelle. Encore faut-il mesurer ce que l'on gagne et ce que l'on paie.",
+   "lecture": "5 min",
+   "faq": [
+    {
+     "q": "La pose dans la largeur élargit-elle vraiment ?",
+     "a": "Oui, l'effet est réel : les lignes transversales interrompent la fuite du regard et raccourcissent visuellement la pièce. L'effet est d'autant plus fort que les lames sont larges et contrastées."
+    },
+    {
+     "q": "Combien de chutes en plus ?",
+     "a": "Comptez environ un point de plus qu'une pose dans la longueur, et 6 à 7 points de plus si vous optez pour la diagonale."
+    }
+   ],
+   "corps": "\n      <h2 id=\"mesurer\">Mesurer avant de décider</h2>\n      <p>Calculez le rapport longueur / largeur de la pièce :</p>\n      <ul>\n        <li><strong>Inférieur à 1,4</strong> : la pièce est équilibrée, la lumière décide.</li>\n        <li><strong>Entre 1,4 et 1,8</strong> : la pose dans la largeur devient intéressante si la lumière ne l'interdit pas.</li>\n        <li><strong>Supérieur à 1,8</strong> : la correction visuelle s'impose, en largeur ou en diagonale.</li>\n      </ul>\n\n      <h2 id=\"options\">Trois options, trois effets</h2>\n      <div class=\"table-wrap\">\n        <table class=\"table-compare\">\n          <thead><tr><th scope=\"col\">Option</th><th scope=\"col\">Effet visuel</th><th scope=\"col\">Chutes</th></tr></thead>\n          <tbody><tr><th scope=\"row\">Dans la longueur</th><td>Accentue la profondeur</td><td>≈ 7 %</td></tr><tr><th scope=\"row\">Dans la largeur</th><td>Élargit, rythme la pièce</td><td>≈ 8 %</td></tr><tr><th scope=\"row\">Diagonale</th><td>Casse les lignes, agrandit</td><td>≈ 14 %</td></tr></tbody>\n        </table>\n      </div>\n      <aside class=\"callout\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9.2 17.5h5.6\"/><path d=\"M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z\"/></svg>Conseil</p>\n        <p>Avec des lames très larges, la pose dans la largeur peut créer un effet de barreaudage. Des lames plus étroites, ou une teinte peu contrastée, adoucissent nettement le résultat.</p>\n      </aside>\n      <aside class=\"callout callout--warning\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4.5 2.8 20h18.4L12 4.5Z\"/><path d=\"M12 10v4\"/><path d=\"M12 17.2h.01\"/></svg>Erreur à éviter</p>\n        <p>Dans une pièce étroite éclairée par une fenêtre en pignon, poser dans la largeur revient à placer tous les joints perpendiculairement aux rayons : les lignes ressortiront fortement en fin de journée.</p>\n      </aside>\n\n      <h2 id=\"simuler\">Comparer sur vos dimensions</h2>\n      <div data-visualizer data-mode=\"compact\" data-base=\"../\"></div>\n    ",
+   "corpsIntact": true,
+   "image": {
+    "id": 26,
+    "source": "cover-sens-de-pose-piece-etroite",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-sens-de-pose-piece-etroite.jpg",
+    "largeur": 1400,
+    "hauteur": 875,
+    "alt": "Pièce allongée aux murs blancs et au parquet clair, baies vitrées au fond",
+    "credit": "Max Vakhtbovych",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-sens-de-pose-piece-etroite-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-sens-de-pose-piece-etroite-300x188.jpg",
+      "largeur": 300,
+      "hauteur": 188
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-sens-de-pose-piece-etroite-768x480.jpg",
+      "largeur": 768,
+      "hauteur": 480
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-sens-de-pose-piece-etroite-1024x640.jpg",
+      "largeur": 1024,
+      "hauteur": 640
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-sens-de-pose-piece-etroite.jpg",
+      "largeur": 1400,
+      "hauteur": 875
+     }
+    ]
+   },
+   "tags": [
+    "sens-de-pose",
+    "choisir"
+   ],
+   "related": [
+    "quel-sens-de-pose-choisir",
+    "sens-de-pose-couloir",
+    "poser-parquet-sens-de-la-lumiere"
+   ]
+  }
+ ],
+ "tutoriels": [
+  {
+   "slug": "poser-un-parquet-flottant",
+   "titre": "Poser un parquet flottant : le tutoriel | Pose Parquet",
+   "h1": "Poser un parquet flottant, étape par étape",
+   "description": "Sous-couche, calepinage, première rangée, coupes de rive, plinthes : le déroulé complet d'une pose flottante réussie, avec les points de contrôle.",
+   "categorie": "Tutoriel",
+   "date": "2026-08-16",
+   "resume": "Le tutoriel de référence : de la sous-couche aux plinthes, avec les points de contrôle.",
+   "intro": "La pose flottante est la plus accessible : les lames s'emboîtent sans être fixées au support. Sa réussite tient entièrement à la préparation et au calepinage.",
+   "lecture": "9 min",
+   "faq": [
+    {
+     "q": "Faut-il coller les joints ?",
+     "a": "Non avec un système à clic. La colle ne concerne que les anciens systèmes à languette, ou certaines pièces humides selon les préconisations du fabricant."
+    },
+    {
+     "q": "Peut-on poser un flottant dans une cuisine ?",
+     "a": "Oui avec un produit adapté et un traitement soigné des rives, mais la pose collée reste préférable dans les pièces exposées à l'eau."
+    }
+   ],
+   "corps": "\n      <h2 id=\"avant\">Avant de commencer</h2>\n      <p>Trois conditions doivent être réunies : support plan à 3 mm sous la règle de 2 mètres, support sec et propre, parquet acclimaté depuis 48 heures dans la pièce.</p>\n      <aside class=\"callout callout--warning\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4.5 2.8 20h18.4L12 4.5Z\"/><path d=\"M12 10v4\"/><path d=\"M12 17.2h.01\"/></svg>Erreur à éviter</p>\n        <p>Si l'une des trois conditions n'est pas remplie, la pose peut attendre. Aucune technique de pose ne compense un support humide ou irrégulier.</p>\n      </aside>\n\n      <h2 id=\"etapes\">Le déroulé</h2>\n      <ol class=\"steps\"><li><h3>Dérouler la sous-couche</h3><p>Lés jointifs, remontée de 3 à 4 cm le long des murs, adhésif d'étanchéité entre les lés si le produit le prévoit.</p></li><li><h3>Calculer le calepinage</h3><p>Divisez la largeur de la pièce par la largeur d'une lame. Si la dernière rangée fait moins d'un tiers de lame, retirez cette largeur à la première rangée.</p></li><li><h3>Poser la première rangée</h3><p>Languette contre le mur, cales de 8 à 10 mm sur tout le pourtour. C’est la rangée la plus importante : elle conditionne tout le reste.</p></li><li><h3>Progresser par rangées</h3><p>Décalage des joints d'au moins un tiers de lame, en alternant les décalages et en piochant dans plusieurs paquets.</p></li><li><h3>Traiter les obstacles</h3><p>Tuyaux, huisseries, seuils : percez au diamètre du tuyau plus 16 mm, recoupez la chute et recollez-la derrière.</p></li><li><h3>Poser la dernière rangée</h3><p>Coupe à la largeur relevée en trois points, mise en place au tire-lame.</p></li><li><h3>Retirer les cales et poser les plinthes</h3><p>Les plinthes se fixent au mur, jamais au parquet : le plancher doit rester libre de bouger.</p></li></ol>\n\n      <h2 id=\"controles\">Les points de contrôle</h2>\n      <div class=\"table-wrap\">\n        <table class=\"table-compare\">\n          <thead><tr><th scope=\"col\">Moment</th><th scope=\"col\">Contrôle</th><th scope=\"col\">Attendu</th></tr></thead>\n          <tbody><tr><th scope=\"row\">Avant la pose</th><td>Planéité et humidité</td><td>≤ 3 mm / 2 m, support sec</td></tr><tr><th scope=\"row\">Rangée 1</th><td>Alignement au cordeau</td><td>Écart nul sur toute la longueur</td></tr><tr><th scope=\"row\">Toutes les 3 rangées</th><td>Équerrage et jeux</td><td>Cales en place, joints serrés</td></tr><tr><th scope=\"row\">Fin de chantier</th><td>Jeu périphérique</td><td>8 à 10 mm sur tout le pourtour</td></tr></tbody>\n        </table>\n      </div>\n      <aside class=\"callout\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9.2 17.5h5.6\"/><path d=\"M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z\"/></svg>Conseil</p>\n        <p>Posez toujours dans le sens de la lumière quand c'est possible, et travaillez en éclairage rasant : les défauts d'emboîtement se voient immédiatement.</p>\n      </aside>\n      <aside class=\"callout callout--key\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 12.5 9 17.5 20 6.5\"/></svg>À retenir</p>\n        <ul><li>La première rangée conditionne toute la pose.</li><li>Les cales restent en place jusqu'aux plinthes.</li><li>Les plinthes se fixent au mur, jamais au sol.</li></ul>\n      </aside>\n    ",
+   "corpsIntact": true,
+   "image": {
+    "id": 28,
+    "source": "cover-poser-un-parquet-flottant",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-poser-un-parquet-flottant.jpg",
+    "largeur": 1400,
+    "hauteur": 875,
+    "alt": "Lame de parquet mise en place à la cale à frapper, au-dessus d’une sous-couche mousse",
+    "credit": "K",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-poser-un-parquet-flottant-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-poser-un-parquet-flottant-300x188.jpg",
+      "largeur": 300,
+      "hauteur": 188
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-poser-un-parquet-flottant-768x480.jpg",
+      "largeur": 768,
+      "hauteur": 480
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-poser-un-parquet-flottant-1024x640.jpg",
+      "largeur": 1024,
+      "hauteur": 640
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/cover-poser-un-parquet-flottant.jpg",
+      "largeur": 1400,
+      "hauteur": 875
+     }
+    ]
+   },
+   "duree": "1 journée pour 20 m²",
+   "niveau": "Accessible",
+   "outils": [
+    "Scie sauteuse ou scie à onglet",
+    "Cordeau et mètre",
+    "Cales de dilatation",
+    "Tire-lame et cale à frapper",
+    "Équerre"
+   ]
+  },
+  {
+   "slug": "coller-un-parquet-contrecolle",
+   "titre": "Coller un parquet contrecollé : la méthode | Pose Parquet",
+   "h1": "Coller un parquet contrecollé",
+   "description": "Primaire, choix de la colle, encollage à la spatule crantée, temps ouvert, marouflage : la méthode de pose collée en plein, étape par étape.",
+   "categorie": "Tutoriel",
+   "date": "2026-08-16",
+   "resume": "La pose la plus stable et la plus silencieuse — et la moins tolérante à l'improvisation.",
+   "intro": "La pose collée en plein offre la meilleure stabilité, le meilleur confort acoustique et la compatibilité avec le chauffage au sol. En contrepartie, elle ne pardonne aucune approximation.",
+   "lecture": "8 min",
+   "faq": [
+    {
+     "q": "Faut-il laisser un jeu périphérique en pose collée ?",
+     "a": "Oui, plus réduit qu'en flottant : 5 à 8 mm suffisent, mais le jeu reste nécessaire."
+    },
+    {
+     "q": "Quand mettre en chauffe un plancher chauffant ?",
+     "a": "Après le durcissement complet de la colle, avec une montée progressive de la température, généralement 5 °C par jour."
+    }
+   ],
+   "corps": "\n      <h2 id=\"support\">Préparer le support</h2>\n      <p>Le support doit être plan à 5 mm sous la règle de 2 mètres, sec, cohésif et dépoussiéré. Un primaire adapté est appliqué dans la quasi-totalité des cas : il bloque la poussière résiduelle et régule l'absorption.</p>\n      <aside class=\"callout callout--warning\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4.5 2.8 20h18.4L12 4.5Z\"/><path d=\"M12 10v4\"/><path d=\"M12 17.2h.01\"/></svg>Erreur à éviter</p>\n        <p>Sur dalle en rez-de-chaussée sans coupure de capillarité, un primaire époxy bicomposant faisant barrière à l'humidité est indispensable. Une colle seule ne suffit pas.</p>\n      </aside>\n\n      <h2 id=\"colle\">Choisir la colle</h2>\n      <div class=\"table-wrap\">\n        <table class=\"table-compare\">\n          <thead><tr><th scope=\"col\">Type</th><th scope=\"col\">Usage</th><th scope=\"col\">Remarque</th></tr></thead>\n          <tbody><tr><th scope=\"row\">MS polymère</th><td>Usage courant, chauffage au sol</td><td>Élastique, sans solvant</td></tr><tr><th scope=\"row\">Polyuréthane bicomposant</th><td>Grands formats, massif</td><td>Très rigide, mise en œuvre exigeante</td></tr><tr><th scope=\"row\">Dispersion acrylique</th><td>Contrecollé fin sur support absorbant</td><td>À proscrire sur chauffage au sol</td></tr></tbody>\n        </table>\n      </div>\n\n      <h2 id=\"etapes\">La méthode</h2>\n      <ol class=\"steps\"><li><h3>Tracer et poser à blanc</h3><p>Alignez la première rangée au cordeau et validez le calepinage avant tout encollage.</p></li><li><h3>Encoller par zones</h3><p>Ne jamais encoller plus que la surface posable dans le temps ouvert de la colle, généralement 20 à 40 minutes.</p></li><li><h3>Poser et maroufler</h3><p>Chaque lame est posée puis pressée pour assurer un transfert de colle complet au dos.</p></li><li><h3>Contrôler le transfert</h3><p>Soulevez une lame témoin toutes les dix : le dos doit être couvert à au moins 80 %.</p></li><li><h3>Laisser durcir sans circulation</h3><p>24 heures minimum avant de marcher, 72 heures avant de remettre le mobilier lourd.</p></li></ol>\n      <aside class=\"callout\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9.2 17.5h5.6\"/><path d=\"M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z\"/></svg>Conseil</p>\n        <p>Travaillez à deux : un opérateur encolle, l'autre pose. Le respect du temps ouvert est le principal facteur de réussite d'une pose collée.</p>\n      </aside>\n    ",
+   "corpsIntact": true,
+   "image": null,
+   "duree": "1 à 2 jours pour 20 m²",
+   "niveau": "Confirmé",
+   "outils": [
+    "Spatule crantée adaptée à la colle",
+    "Primaire et rouleau",
+    "Cordeau",
+    "Sangles ou poids",
+    "Scie à onglet"
+   ]
+  },
+  {
+   "slug": "reussir-le-calepinage",
+   "titre": "Réussir son calepinage de parquet | Pose Parquet",
+   "h1": "Réussir son calepinage",
+   "description": "Le calepinage détermine la position des coupes, l'axe de départ et la quantité de matière. Méthode de traçage pour une pose droite et pour un motif.",
+   "categorie": "Tutoriel",
+   "date": "2026-08-16",
+   "resume": "Une heure de traçage évite deux jours de rattrapage.",
+   "intro": "Le calepinage est le plan de pose : il fixe l'axe de départ, la répartition des coupes et le nombre de lames. Il se trace au sol, avant la première lame.",
+   "lecture": "6 min",
+   "faq": [
+    {
+     "q": "Le calepinage change-t-il la quantité à commander ?",
+     "a": "Oui : il permet d'estimer précisément les coupes de rive et donc le pourcentage de chutes réel."
+    }
+   ],
+   "corps": "\n      <h2 id=\"pourquoi\">Pourquoi tracer avant de poser</h2>\n      <p>Une pièce n'est jamais parfaitement rectangulaire. Partir d'un mur revient à reporter son défaut sur toute la surface. Le calepinage permet de répartir l'erreur au lieu de la subir.</p>\n\n      <h2 id=\"droite\">Calepinage d'une pose droite</h2>\n      <ol class=\"steps\"><li><h3>Mesurer la largeur en trois points</h3><p>Aux deux extrémités et au milieu : l'écart entre ces mesures révèle le défaut d'équerrage.</p></li><li><h3>Calculer le nombre de rangées</h3><p>Largeur de la pièce divisée par la largeur utile d'une lame, jeux périphériques déduits.</p></li><li><h3>Répartir la coupe</h3><p>Si la dernière rangée fait moins d'un tiers de lame, retirez la moitié de la différence à la première rangée.</p></li><li><h3>Tracer la ligne de départ au cordeau</h3><p>Cette ligne, et non le mur, sert de référence à toute la pose.</p></li></ol>\n\n      <h2 id=\"motif\">Calepinage d'un motif</h2>\n      <p>Point de Hongrie et bâton rompu se construisent depuis le centre de la pièce. On trace deux axes perpendiculaires passant par le centre, puis on monte le motif de part et d'autre.</p>\n      <aside class=\"callout callout--warning\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 4.5 2.8 20h18.4L12 4.5Z\"/><path d=\"M12 10v4\"/><path d=\"M12 17.2h.01\"/></svg>Erreur à éviter</p>\n        <p>Ne prenez jamais un mur comme référence d'axe pour un motif : le décalage se cumule et devient très visible sur la dernière colonne.</p>\n      </aside>\n      <aside class=\"callout\">\n        <p class=\"callout__label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9.2 17.5h5.6\"/><path d=\"M10 21h4\"/><path d=\"M12 3a6 6 0 0 0-3.6 10.8V15h7.2v-1.2A6 6 0 0 0 12 3Z\"/></svg>Conseil</p>\n        <p>Photographiez votre tracé avant de poser : en cas de doute en cours de chantier, la photo évite de tout re-mesurer.</p>\n      </aside>\n\n      <h2 id=\"simuler\">Vérifier le rendu avant de tracer</h2>\n      <p>Le simulateur donne un aperçu du calepinage selon vos dimensions et le motif retenu.</p>\n      <div data-visualizer data-mode=\"compact\" data-base=\"../\"></div>\n    ",
+   "corpsIntact": true,
+   "image": null,
+   "duree": "1 à 2 heures",
+   "niveau": "Accessible",
+   "outils": [
+    "Cordeau à tracer",
+    "Mètre 5 m",
+    "Équerre de maçon",
+    "Crayon de charpentier"
+   ]
+  }
+ ],
+ "inspirations": [
+  {
+   "id": 3935327,
+   "cle": "room-sejour",
+   "titre": "Séjour traversant",
+   "phrase": "Deux pièces en enfilade, un seul sol doré qui file vers la lumière.",
+   "piece": "sejour",
+   "motif": "droite",
+   "motifLibelle": "Lames droites",
+   "teinte": "chêne doré",
+   "taille": "wide",
+   "studio": {
+    "actif": true,
+    "bibliotheque": true,
+    "scene": "sejour",
+    "parquet": "chene-dore",
+    "motif": "lames",
+    "orientation": 0
+   },
+   "image": {
+    "id": 32,
+    "source": "room-sejour",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-sejour.jpg",
+    "largeur": 1600,
+    "hauteur": 1067,
+    "alt": "Séjour vide et lumineux aux grandes fenêtres, parquet doré en lames droites filant vers la pièce du fond",
+    "credit": "Curtis Adams",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-sejour-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-sejour-300x200.jpg",
+      "largeur": 300,
+      "hauteur": 200
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-sejour-768x512.jpg",
+      "largeur": 768,
+      "hauteur": 512
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-sejour-1024x683.jpg",
+      "largeur": 1024,
+      "hauteur": 683
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-sejour-1536x1024.jpg",
+      "largeur": 1536,
+      "hauteur": 1024
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-sejour.jpg",
+      "largeur": 1600,
+      "hauteur": 1067
+     }
+    ]
+   }
+  },
+  {
+   "id": 7587872,
+   "cle": "room-chambre-parisienne",
+   "titre": "Chambre parisienne",
+   "phrase": "Murs bleu profond, point de Hongrie clair : le V mène à la baie.",
+   "piece": "chambre",
+   "motif": "hongrie",
+   "motifLibelle": "Point de Hongrie",
+   "teinte": "chêne naturel",
+   "taille": "md",
+   "studio": {
+    "actif": true,
+    "bibliotheque": true,
+    "scene": "chambre-parisienne",
+    "parquet": "chene-naturel",
+    "motif": "point-de-hongrie",
+    "orientation": 0
+   },
+   "image": {
+    "id": 34,
+    "source": "room-chambre-parisienne",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-chambre-parisienne.jpg",
+    "largeur": 1600,
+    "hauteur": 1067,
+    "alt": "Pièce aux murs bleus et parquet en point de Hongrie",
+    "credit": "Max Vakhtbovych",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-chambre-parisienne-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-chambre-parisienne-300x200.jpg",
+      "largeur": 300,
+      "hauteur": 200
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-chambre-parisienne-768x512.jpg",
+      "largeur": 768,
+      "hauteur": 512
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-chambre-parisienne-1024x683.jpg",
+      "largeur": 1024,
+      "hauteur": 683
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-chambre-parisienne-1536x1024.jpg",
+      "largeur": 1536,
+      "hauteur": 1024
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-chambre-parisienne.jpg",
+      "largeur": 1600,
+      "hauteur": 1067
+     }
+    ]
+   }
+  },
+  {
+   "id": 8146149,
+   "cle": "room-cuisine-ouverte",
+   "titre": "Cuisine ouverte",
+   "phrase": "Plateau blanc, lames larges presque noires : tout tient au contraste.",
+   "piece": "cuisine",
+   "motif": "droite",
+   "motifLibelle": "Lames larges",
+   "teinte": "chêne fumé",
+   "taille": "sm",
+   "studio": {
+    "actif": true,
+    "bibliotheque": true,
+    "scene": "cuisine-ouverte",
+    "parquet": "chene-fume",
+    "motif": "lames",
+    "orientation": 0
+   },
+   "image": {
+    "id": 36,
+    "source": "room-cuisine-ouverte",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-cuisine-ouverte.jpg",
+    "largeur": 1600,
+    "hauteur": 1067,
+    "alt": "Cuisine ouverte sur un grand séjour vide, sol en lames foncées",
+    "credit": "Max Vakhtbovych",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-cuisine-ouverte-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-cuisine-ouverte-300x200.jpg",
+      "largeur": 300,
+      "hauteur": 200
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-cuisine-ouverte-768x512.jpg",
+      "largeur": 768,
+      "hauteur": 512
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-cuisine-ouverte-1024x683.jpg",
+      "largeur": 1024,
+      "hauteur": 683
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-cuisine-ouverte-1536x1024.jpg",
+      "largeur": 1536,
+      "hauteur": 1024
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-cuisine-ouverte.jpg",
+      "largeur": 1600,
+      "hauteur": 1067
+     }
+    ]
+   }
+  },
+  {
+   "id": 7587868,
+   "cle": "room-couloir-bleu",
+   "titre": "Couloir en enfilade",
+   "phrase": "Lambris bleu nuit, pointe continue dans l’axe : le couloir s’allonge.",
+   "piece": "couloir",
+   "motif": "hongrie",
+   "motifLibelle": "Point de Hongrie",
+   "teinte": "chêne naturel",
+   "taille": "sm",
+   "studio": {
+    "actif": true,
+    "bibliotheque": false,
+    "scene": "couloir-enfilade",
+    "parquet": "chene-naturel",
+    "motif": "point-de-hongrie",
+    "orientation": 0
+   },
+   "image": {
+    "id": 38,
+    "source": "room-couloir-bleu",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-couloir-bleu.jpg",
+    "largeur": 1600,
+    "hauteur": 1067,
+    "alt": "Couloir aux murs bleu nuit à moulures, parquet en point de Hongrie dans l’axe",
+    "credit": "Max Vakhtbovych",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-couloir-bleu-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-couloir-bleu-300x200.jpg",
+      "largeur": 300,
+      "hauteur": 200
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-couloir-bleu-768x512.jpg",
+      "largeur": 768,
+      "hauteur": 512
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-couloir-bleu-1024x683.jpg",
+      "largeur": 1024,
+      "hauteur": 683
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-couloir-bleu-1536x1024.jpg",
+      "largeur": 1536,
+      "hauteur": 1024
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-couloir-bleu.jpg",
+      "largeur": 1600,
+      "hauteur": 1067
+     }
+    ]
+   }
+  },
+  {
+   "id": 16641359,
+   "cle": "room-chambre-claire",
+   "titre": "Chambre claire",
+   "phrase": "Murs blancs, plafond à caisson : la chaleur vient des lames brunes.",
+   "piece": "chambre",
+   "motif": "droite",
+   "motifLibelle": "Lames droites",
+   "teinte": "chêne brun",
+   "taille": "md",
+   "studio": {
+    "actif": true,
+    "bibliotheque": true,
+    "scene": "chambre-claire",
+    "parquet": "chene-brun",
+    "motif": "lames",
+    "orientation": 0
+   },
+   "image": {
+    "id": 40,
+    "source": "room-chambre-claire",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-chambre-claire.jpg",
+    "largeur": 1600,
+    "hauteur": 1067,
+    "alt": "Chambre vide aux murs blancs et plafond à caisson, sol en lames foncées, trois fenêtres",
+    "credit": "Curtis Adams",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-chambre-claire-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-chambre-claire-300x200.jpg",
+      "largeur": 300,
+      "hauteur": 200
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-chambre-claire-768x512.jpg",
+      "largeur": 768,
+      "hauteur": 512
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-chambre-claire-1024x683.jpg",
+      "largeur": 1024,
+      "hauteur": 683
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-chambre-claire-1536x1024.jpg",
+      "largeur": 1536,
+      "hauteur": 1024
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-chambre-claire.jpg",
+      "largeur": 1600,
+      "hauteur": 1067
+     }
+    ]
+   }
+  },
+  {
+   "id": 9826455,
+   "cle": "room-salon-angle",
+   "titre": "Salon d’angle",
+   "phrase": "Lames étroites tabac, plinthes assorties : une base sobre, prête à meubler.",
+   "piece": "sejour",
+   "motif": "droite",
+   "motifLibelle": "Lames droites",
+   "teinte": "chêne tabac",
+   "taille": "wide",
+   "studio": {
+    "actif": true,
+    "bibliotheque": true,
+    "scene": "salon-angle",
+    "parquet": "chene-tabac",
+    "motif": "lames",
+    "orientation": 0
+   },
+   "image": {
+    "id": 42,
+    "source": "room-salon-angle",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-salon-angle.jpg",
+    "largeur": 1600,
+    "hauteur": 1067,
+    "alt": "Grande pièce vide formant un angle, sol en lames de noyer et plinthes bois",
+    "credit": "Gustavo Galeano Maz",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-salon-angle-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-salon-angle-300x200.jpg",
+      "largeur": 300,
+      "hauteur": 200
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-salon-angle-768x512.jpg",
+      "largeur": 768,
+      "hauteur": 512
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-salon-angle-1024x683.jpg",
+      "largeur": 1024,
+      "hauteur": 683
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-salon-angle-1536x1024.jpg",
+      "largeur": 1536,
+      "hauteur": 1024
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-salon-angle.jpg",
+      "largeur": 1600,
+      "hauteur": 1067
+     }
+    ]
+   }
+  },
+  {
+   "id": 13702811,
+   "cle": "room-piece-arcades",
+   "titre": "Pièce aux arcades",
+   "phrase": "Bâton rompu blond sous deux arcades : le motif anime sans alourdir.",
+   "piece": "sejour",
+   "motif": "baton-rompu",
+   "motifLibelle": "Bâton rompu",
+   "teinte": "chêne naturel",
+   "taille": "sm",
+   "studio": {
+    "actif": true,
+    "bibliotheque": true,
+    "scene": "piece-arcades",
+    "parquet": "chene-naturel",
+    "motif": "baton-rompu",
+    "orientation": 0
+   },
+   "image": {
+    "id": 44,
+    "source": "room-piece-arcades",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-piece-arcades.jpg",
+    "largeur": 1600,
+    "hauteur": 1067,
+    "alt": "Grande pièce vide à arcades, murs crème et parquet en bâton rompu",
+    "credit": "Daniel Tanque",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-piece-arcades-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-piece-arcades-300x200.jpg",
+      "largeur": 300,
+      "hauteur": 200
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-piece-arcades-768x512.jpg",
+      "largeur": 768,
+      "hauteur": 512
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-piece-arcades-1024x683.jpg",
+      "largeur": 1024,
+      "hauteur": 683
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-piece-arcades-1536x1024.jpg",
+      "largeur": 1536,
+      "hauteur": 1024
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-piece-arcades.jpg",
+      "largeur": 1600,
+      "hauteur": 1067
+     }
+    ]
+   }
+  },
+  {
+   "id": 7865621,
+   "cle": "room-entree-cadree",
+   "titre": "Entrée cadrée",
+   "phrase": "Lames miel dans l’axe, portes en enfilade : le regard file au fond.",
+   "piece": "couloir",
+   "motif": "droite",
+   "motifLibelle": "Lames dans l’axe",
+   "teinte": "chêne miel",
+   "taille": "md",
+   "studio": {
+    "actif": true,
+    "bibliotheque": true,
+    "scene": "entree-cadree",
+    "parquet": "chene-miel",
+    "motif": "lames",
+    "orientation": 0
+   },
+   "image": {
+    "id": 46,
+    "source": "room-entree-cadree",
+    "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-entree-cadree.jpg",
+    "largeur": 1600,
+    "hauteur": 1067,
+    "alt": "Entrée vide aux murs blancs et plinthes bois, parquet miel, portes en enfilade au fond",
+    "credit": "Gustavo Galeano Maz",
+    "tailles": [
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-entree-cadree-150x150.jpg",
+      "largeur": 150,
+      "hauteur": 150
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-entree-cadree-300x200.jpg",
+      "largeur": 300,
+      "hauteur": 200
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-entree-cadree-768x512.jpg",
+      "largeur": 768,
+      "hauteur": 512
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-entree-cadree-1024x683.jpg",
+      "largeur": 1024,
+      "hauteur": 683
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-entree-cadree-1536x1024.jpg",
+      "largeur": 1536,
+      "hauteur": 1024
+     },
+     {
+      "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/10/room-entree-cadree.jpg",
+      "largeur": 1600,
+      "hauteur": 1067
+     }
+    ]
+   }
+  }
+ ],
+ "pages": [
+  {
+   "cle": "accueil",
+   "adresse": "/",
+   "h1": null,
+   "chapo": null,
+   "titre": "Pose Parquet — Comprendre et réussir la pose de son parquet",
+   "description": "Média pratique et boîte à outils sur la pose du parquet : guides, motifs, tutoriels, inspiration et un simulateur de sens de pose gratuit.",
+   "corps": null,
+   "corpsIntact": true,
+   "champs": {
+    "hero_eyebrow": "Guides · Motifs · Outils",
+    "hero_titre": "Un parquet bien posé commence *avant* la première lame.",
+    "hero_texte": "Guides, inspirations et outils pour choisir votre parquet, le voir chez vous et préparer votre projet. Pour les références, nous orientons vers **Premibel**. Pour la pose et la rénovation en Île-de-France, vers **Allure Design**.",
+    "hero_cta_guides": "Explorer les guides",
+    "hero_cta_visualiseur": "Visualiser mon parquet",
+    "passerelle_eyebrow": "Après le choix",
+    "passerelle_titre": "Du choix du parquet à sa réalisation.",
+    "passerelle_intro": "Pose Parquet vous aide à définir votre besoin, puis vous oriente vers la bonne solution.",
+    "premibel_titre": "Trouver votre parquet",
+    "premibel_texte": "Références, essences, teintes et motifs : le catalogue de parquets et le showroom de Premibel.",
+    "premibel_cta": "Découvrir les parquets",
+    "allure_titre": "Faire poser ou rénover",
+    "allure_texte": "Pose de parquet, rénovation intérieure et aménagement, à Paris et en Île-de-France.",
+    "allure_cta": "Préparer mon projet",
+    "mixte": "Besoin du parquet et de la pose ? [Décrivez votre projet] : nous vous orientons vers les solutions adaptées.",
+    "projet_eyebrow": "Votre projet",
+    "projet_titre": "Un projet à concrétiser ?",
+    "projet_texte": "Décrivez votre pièce, votre parquet et votre besoin. Pose Parquet qualifie votre demande et vous oriente, selon le projet, vers Premibel, Allure Design ou les deux.",
+    "projet_points": "Quatre étapes courtes, aucune coordonnée demandée.\n« Je ne sais pas » est une réponse valable partout.\nAucun démarchage : vos coordonnées servent uniquement à répondre.\nL’orientation est relue et confirmée par une personne avant tout contact.",
+    "projet_cta": "Décrire mon projet",
+    "projet_cta2": "Visualiser mon parquet"
+   }
+  },
+  {
+   "cle": "a-propos",
+   "adresse": "/a-propos/",
+   "h1": "Un média pratique sur la pose du parquet",
+   "chapo": "Pose Parquet documente ce qui se décide avant la première lame : le support, le sens, le motif, la méthode.",
+   "titre": "À propos de Pose Parquet, média sur la pose du parquet",
+   "description": "Pose Parquet aide à comprendre la pose du parquet, à préparer son projet et à trouver les références adaptées : guides, motifs, tutoriels et outils de visualisation.",
+   "corps": null,
+   "corpsIntact": true,
+   "champs": {
+    "pres1_titre": "Pourquoi ce site",
+    "pres1_texte": "La documentation sur le parquet se partage entre catalogues commerciaux et notices techniques. Entre les deux, il manquait un endroit pour comprendre les décisions : pourquoi ce sens plutôt qu'un autre, ce que change réellement un ragréage, ce qui distingue deux motifs en V.",
+    "pres2_titre": "Notre méthode",
+    "pres2_texte": "Chaque contenu part d'une question concrète et se termine par une décision possible. Les chiffres cités correspondent aux pratiques courantes du métier et aux seuils usuels des documents techniques. Lorsqu'un sujet dépend du produit, nous le disons plutôt que de généraliser.",
+    "pres2_lien": "Lire notre méthode éditoriale en détail",
+    "pres3_titre": "Des outils plutôt que des promesses",
+    "pres3_texte": "Le Visualiseur montre un parquet dans une photo de votre pièce ; le Mode Plan compare les sens de pose à l’échelle. L’objectif ne change pas : transformer une hésitation en visualisation, puis en décision.",
+    "roles_titre": "Trois noms, trois métiers",
+    "pp_metier": "Éditorial et outils",
+    "pp_offre": "Guides, fiches motif, tutoriels, Visualiseur, Mode Plan",
+    "pp_zone": "Aucune : le site se lit partout",
+    "premibel_metier": "Références de parquet",
+    "premibel_offre": "Produits, fourniture, showroom",
+    "premibel_zone": "Aucune limite : un parquet se livre",
+    "allure_metier": "Pose et rénovation intérieure",
+    "allure_offre": "Revêtements de sol, aménagement, second œuvre",
+    "allure_zone": "Paris et l’Île-de-France",
+    "liens_titre": "Nos liens commerciaux",
+    "liens_intro": "Ce site n'héberge aucune publicité et ne vend rien. Il oriente en revanche, et nous préférons l'écrire noir sur blanc que le laisser découvrir.",
+    "liens_note": "Nous ne décrivons aucun lien juridique entre ces trois noms, parce que nous n'en avons pas à décrire : ce tableau dit ce que chacun *fait*, pas ce que chacun *est*."
+   }
+  },
+  {
+   "cle": "methode-editoriale",
+   "adresse": "/a-propos/methode-editoriale.html",
+   "h1": "Notre méthode éditoriale",
+   "chapo": "Comment les contenus de ce site sont écrits, vérifiés et corrigés — et ce que nous ne prétendons pas être.",
+   "titre": "Notre méthode éditoriale | Pose Parquet",
+   "description": "Comment les contenus de Pose Parquet sont écrits, vérifiés et corrigés : sources, limites assumées, liens commerciaux et politique de mise à jour.",
+   "corps": null,
+   "corpsIntact": true,
+   "champs": {
+    "qui_titre": "Qui écrit",
+    "qui_texte": "La rédaction de Pose Parquet. Aucun nom d’expert, aucun titre ni certification mis en avant : ce serait prêter à nos textes une autorité que nous n’avons pas. Ce que nous revendiquons : la lecture des documents techniques de référence, et le souci de dire ce que nous ne savons pas.",
+    "corrections_titre": "Corrections",
+    "corrections_texte": "Chaque article porte sa date de publication et, le cas échéant, de mise à jour. Une erreur signalée est corrigée et la date modifiée. Pour en signaler une : la [page contact].",
+    "construction_titre": "Comment un contenu est construit",
+    "construction_intro": "Quatre temps, toujours dans cet ordre. Un texte qui s'arrête au deuxième n'est pas publié.",
+    "etape1_titre": "Une question concrète",
+    "etape1_texte": "Celle que l'on se pose réellement avant un chantier, pas celle qui se cherche bien.",
+    "etape2_titre": "Les critères qui tranchent",
+    "etape2_texte": "Dans leur ordre d'importance, et non tous mis sur le même plan.",
+    "etape3_titre": "Les cas où la réponse change",
+    "etape3_texte": "Support, produit, configuration de la pièce : ce qui renverse le conseil.",
+    "etape4_titre": "Une décision possible",
+    "etape4_texte": "À la fin, jamais une simple liste d'options renvoyée au lecteur.",
+    "principes_titre": "Ce que nous vérifions, et comment",
+    "principes_intro": "Quatre engagements, chacun avec ce qu’il veut dire concrètement sur une page du site.",
+    "principe1_titre": "Les seuils viennent des textes de référence",
+    "principe1_texte": "Planéité, humidité, chutes, jeux périphériques : confrontés aux NF DTU de la série 51 et aux pratiques du métier.",
+    "principe1_exemple": "Quand une valeur dépend du produit, la page le dit au lieu de donner un chiffre unique.",
+    "principe2_titre": "Les outils donnent des ordres de grandeur",
+    "principe2_texte": "Surface, lames et chutes sont calculées par des règles simples, et présentées comme telles.",
+    "principe2_exemple": "Le Mode Plan affiche « estimation » à côté de chaque quantité : il ne remplace pas un calepinage.",
+    "principe3_titre": "Une source citée a été consultée",
+    "principe3_texte": "Les références en bas d’article sont réelles : AFNOR pour les NF DTU, CSTB, FCBA.",
+    "principe3_exemple": "Nous renvoyons à la norme ; nous n’en recopions pas le texte, protégé et payant.",
+    "principe4_titre": "Une image montre ce que la page annonce",
+    "principe4_texte": "Photographies Pexels sous licence, schémas faits par nos soins, rendus du Visualiseur signalés comme simulations.",
+    "principe4_exemple": "Sans image juste, la page s’en passe plutôt que d’illustrer un autre geste. Crédits dans `assets/images/CREDITS.md`.",
+    "refus_titre": "Quatre choses que nous ne ferons pas",
+    "refus": "Tester des produits ou publier des comparatifs de marques.\nInventer des témoignages, des avis d'artisans ou des retours de chantier.\nReproduire le texte des normes : elles sont payantes et protégées. Nous y renvoyons.\nAnnoncer une fonctionnalité automatique ou « intelligente » qui n'existe pas réellement dans nos outils.",
+    "liens_titre": "Liens commerciaux et liens sortants",
+    "liens_intro": "Le site n'affiche aucune publicité et ne vend rien. Il comporte en revanche trois sortes de liens, et la distinction mérite d'être faite plutôt que gommée."
+   }
+  },
+  {
+   "cle": "guides",
+   "adresse": "/guides/",
+   "h1": "Comprendre avant de poser",
+   "chapo": "Des guides pratiques sur le choix du parquet, la préparation du support, le sens de pose, les motifs et les finitions. Écrits pour être utiles sur le chantier, pas pour remplir une page.",
+   "titre": "Guides de pose du parquet : préparer et poser | Pose Parquet",
+   "description": "Sens de pose, préparation du support, motifs, massif ou contrecollé, erreurs à éviter : des repères concrets pour réussir votre chantier.",
+   "corps": null,
+   "corpsIntact": true
+  },
+  {
+   "cle": "tutoriels",
+   "adresse": "/tutoriels/",
+   "h1": "Le geste, étape par étape",
+   "chapo": "Des déroulés de chantier détaillés, avec l'outillage nécessaire, les points de contrôle et les erreurs qui coûtent cher.",
+   "titre": "Tutoriels de pose de parquet pas à pas | Pose Parquet",
+   "description": "Tutoriels détaillés : poser un parquet flottant, coller un contrecollé, réussir son calepinage. Outillage, étapes et points de contrôle.",
+   "corps": null,
+   "corpsIntact": true
+  },
+  {
+   "cle": "inspiration",
+   "adresse": "/inspiration/",
+   "h1": "Des sols, des directions, des ambiances",
+   "chapo": "Une sélection d’ambiances, classées par motif et par type de pièce : la légende donne le motif et la teinte que la photographie montre. Chaque pièce calibrée s’ouvre dans le Studio — sur cette photographie même — pour y essayer d’autres parquets.",
+   "titre": "Inspiration parquet : motifs et ambiances | Pose Parquet",
+   "description": "Galerie d'inspiration : pose droite, diagonale, Point de Hongrie et bâton rompu dans des séjours, chambres, cuisines et couloirs.",
+   "corps": null,
+   "corpsIntact": true
+  },
+  {
+   "cle": "outils",
+   "adresse": "/outils/",
+   "h1": "Une boîte à outils, pas une brochure",
+   "chapo": "Deux outils disponibles, gratuits, sans inscription : voir un parquet dans sa pièce, puis comparer les sens de pose sur un plan à l’échelle.",
+   "titre": "Outils parquet : simulateur et calculateurs | Pose Parquet",
+   "description": "Les outils Pose Parquet : le Visualiseur pour voir un parquet dans sa pièce, le Mode Plan pour comparer les sens de pose, et les outils à venir.",
+   "corps": null,
+   "corpsIntact": true
+  },
+  {
+   "cle": "contact",
+   "adresse": "/contact/",
+   "h1": "Nous écrire",
+   "chapo": "Une question sur un contenu, une erreur à corriger, ou un chantier à préparer : chaque demande a son chemin, et les retours de terrain sont bienvenus.",
+   "titre": "Contact | Pose Parquet",
+   "description": "Contacter l'équipe éditoriale de Pose Parquet : question, correction, proposition de contenu ou d'outil.",
+   "corps": null,
+   "corpsIntact": true,
+   "champs": {
+    "email_public": "bonjour@pose-parquet.com",
+    "r1_eyebrow": "Question éditoriale",
+    "r1_titre": "Une question sur un guide, un motif, un outil",
+    "r1_texte": "Un point mal expliqué, un cas qui n’est pas traité, une idée de contenu.",
+    "r2_eyebrow": "Correction",
+    "r2_titre": "Une erreur à signaler",
+    "r2_texte": "Un seuil, une source, une image qui ne montre pas ce que la page annonce : indiquez l’adresse de la page.",
+    "r2_lien": "Signaler une erreur",
+    "r3_eyebrow": "Projet, devis, parquet",
+    "r3_titre": "Un chantier à préparer",
+    "r3_texte": "Pour une référence de parquet ou une pose, le formulaire est plus rapide qu’un courriel : il pose les bonnes questions et oriente selon votre besoin et votre département.",
+    "r3_cta": "Décrire mon projet"
+   }
+  }
+ ],
+ "site": {
+  "nom": "Pose Parquet",
+  "baseline": "Comprendre, préparer, visualiser et réussir la pose de son parquet.",
+  "logo": null,
+  "favicon": null,
+  "cta_projet": "Votre projet",
+  "cta_projet_afficher": true,
+  "menu_cta_projet": "Décrire mon projet",
+  "menu_cta_visualiseur": "Visualiser mon parquet",
+  "menu_note": "Guides, motifs et outils",
+  "nav_guides": "Guides",
+  "nav_guides_afficher": true,
+  "nav_motifs": "Motifs",
+  "nav_motifs_afficher": true,
+  "nav_tutoriels": "Tutoriels",
+  "nav_tutoriels_afficher": true,
+  "nav_inspiration": "Inspiration",
+  "nav_inspiration_afficher": true,
+  "nav_outils": "Outils",
+  "nav_outils_afficher": true,
+  "nav_a_propos": "À propos",
+  "nav_a_propos_afficher": true,
+  "nav_contact": "Contact",
+  "nav_contact_afficher": true,
+  "pied_presentation": "Guides et outils pour réussir la pose de son parquet.",
+  "pied_mention": "2026 Pose Parquet — guides et outils pour préparer son projet.",
+  "pied_premibel": "pour les références de parquet",
+  "pied_allure": "pour la pose et la rénovation en Île-de-France",
+  "pied_orientation": "Pose Parquet oriente selon le besoin.",
+  "pied_liens_commerciaux": "Nos liens commerciaux",
+  "pied_credits": "Photographies sous licence Pexels",
+  "pied_col_comprendre": "Comprendre",
+  "pied_guides": "Guides",
+  "pied_guides_afficher": true,
+  "pied_motifs": "Motifs",
+  "pied_motifs_afficher": true,
+  "pied_tutoriels": "Tutoriels",
+  "pied_tutoriels_afficher": true,
+  "pied_col_outils": "Outils",
+  "pied_studio": "Visualiser ma pièce",
+  "pied_studio_afficher": true,
+  "pied_plan": "Mode Plan",
+  "pied_plan_afficher": true,
+  "pied_inspiration": "Inspiration",
+  "pied_inspiration_afficher": true,
+  "pied_col_apropos": "À propos",
+  "pied_methode": "Notre méthode",
+  "pied_methode_afficher": true,
+  "pied_contact": "Contact",
+  "pied_contact_afficher": true,
+  "pied_projet": "Votre projet",
+  "pied_projet_afficher": true,
+  "premibel_libelle": "Premibel",
+  "premibel_url": "https://www.premibel.fr/",
+  "premibel_afficher": true,
+  "allure_libelle": "Allure Design",
+  "allure_url": "https://www.allure-design.com/",
+  "allure_afficher": true
+ }
+}

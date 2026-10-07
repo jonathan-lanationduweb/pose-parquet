@@ -29,3 +29,7 @@ assets/dev-build.json
 # Paquet livrable du plugin, reconstruit par backend/deploy/faire-paquet.sh.
 # C'est une sortie de build : elle se refabrique, elle ne se versionne pas.
 backend/deploy/paquet/
+
+# Migration WordPress : fichier local (chemins absolus de la machine), régénéré par _generator/exporter-wordpress.js.
+# L'instantané data/wordpress/contenus.json, lui, se versionne.
+data/wordpress/import.json

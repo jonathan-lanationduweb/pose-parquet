@@ -97,37 +97,35 @@ const PHOTOS = {
     alt: 'Pièce vide et minimaliste dont les lames traversent la largeur',
   },
   /*
-   * Visuel PRODUIT POUR LE SITE, et non photographie.
+   * Visuel PRODUIT POUR LE SITE, et non photographie — 2 octobre 2026.
    *
-   * Aucune photothèque à notre disposition ne propose de pose réellement
-   * diagonale : la première image du dépôt (James Frid, 8918712) montrait des
-   * pavés de bois vus de dessus, sans rapport avec le sujet. Le visuel est
-   * donc calculé par le moteur du Visualiseur, sur une scène réelle, lames à
-   * −45°. `local: true` empêche `fetch-photos.js` de le remplacer par un
-   * téléchargement.
+   * POURQUOI UN PLAN. Aucune photothèque à notre disposition ne montre une
+   * vraie pose diagonale. Le visuel précédent était un rendu du Visualiseur
+   * sur la scène `entree-cadree`, lames à −45° : correct, mais la perspective
+   * écrasait l'angle — les lames paraissaient à 20° des plinthes, et le beige
+   * se confondait avec les murs. On n'y lisait pas « 45° des murs ».
    *
-   * SCÈNE — `entree-cadree` (Pexels 7865621), murs blancs et plinthes bois,
-   * vue axiale. Le rendu précédent utilisait la scène « chambre » (Pexels
-   * 7587859) : encore la chambre bleue, déjà très présente ailleurs, et dont
-   * la vue de trois quarts rendait la diagonale presque illisible — les lames
-   * y paraissaient parallèles au mur de gauche.
+   * CE QUE MONTRE CE VISUEL. La même géométrie que le Mode Plan, vue du
+   * dessus : `getPattern('diagonale').build()` de js/tools/patterns.js, pièce
+   * de 5,20 × 2,70 m, lames de 95 × 14 cm à joints décalés. Murs, porte et
+   * fenêtre sont dessinés ; un repère blanc marque l'angle de 45° avec le mur.
+   * C'est le moteur qui place les lames, pas une main : le visuel ne peut pas
+   * montrer un angle que l'outil ne pose pas.
    *
-   * ANGLE — −45° plutôt que +45°. Les deux ont été rendus et comparés côte à
-   * côte : à +45° les lames suivent à peu près la fuite de la pièce et se
-   * lisent comme une pose droite ; à −45° elles coupent les deux plinthes en
-   * oblique franche, et les joints de rangs traversent le cadre. C'est le
-   * motif que la page décrit, et il se voit.
+   * CADRAGE. La pièce tient dans la zone commune aux deux recadrages du site :
+   * le bandeau 16/7 de `.article-cover` (toute la largeur, 613 px au centre)
+   * et les cartes 4/3 (875 px de haut, 1 167 au centre). Murs, porte et
+   * repère restent visibles dans les deux.
    *
-   * REFAIRE CE RENDU — ouvrir /outils/studio.html?perf=1&piece=entree-cadree
-   * &motif=lames&orientation=-45 dans une fenêtre assez large pour que le
-   * canevas atteigne la taille de la photo de scène (1600 px), puis composer
-   * la photo et le canevas dans un cadre 1400 x 875 aligné en bas — le sol
-   * doit rester entier. Le pilotage passe par `window.__studio`, derrière
-   * `?perf=1`.
+   * REFAIRE CE VISUEL — exporter les lames avec `getPattern('diagonale')`
+   * ({ length: 520, width: 270, plankWidth: 14, plankLength: 95 }), les
+   * dessiner à 2 px par centimètre, centrées dans 1400 × 875, puis produire
+   * les déclinaisons 560, 980 et 1400 en jpg et webp. `local: true` empêche
+   * `fetch-photos.js` de le remplacer.
    */
   'cover-pose-diagonale': {
-    local: true, w: 1400, h: 875, credit: 'Rendu du Visualiseur Parquet',
-    alt: 'Simulation : entrée aux murs blancs dont les lames traversent le sol en diagonale, coupant les plinthes en oblique',
+    local: true, w: 1400, h: 875, credit: 'Plan dessiné par le moteur du Mode Plan',
+    alt: 'Plan vu du dessus d’une pièce rectangulaire, avec porte et fenêtre : les lames sont posées à 45° des murs, un repère marque l’angle',
   },
   /*
    * SOURCE — Pexels 7587872, Max Vakhtbovych, https://www.pexels.com/photo/7587872/
@@ -511,12 +509,32 @@ const INSPIRATION_PHOTOS = [
    * donc ecarte partout ou il tient lieu de nom de motif. Ici comme
    * ailleurs, on ecrit « Point de Hongrie » ou « baton rompu ».
    */
-  { id: 3935327, tags: 'hongrie sejour', credit: 'Curtis Adams', title: 'Séjour traversant', meta: 'Point de Hongrie · chêne fumé', size: 'wide',
-    alt: 'Séjour vide et lumineux aux grandes fenêtres, sol clair',
+  /*
+   * AUDIT VISUEL DU 1er OCTOBRE 2026 — la légende dit ce que la photo montre.
+   *
+   * Chaque fichier a été ouvert et regardé. Quatre cartes annonçaient autre
+   * chose que leur image, parce que `meta` décrivait la configuration que le
+   * Studio allait RENDRE et non le sol PHOTOGRAPHIÉ :
+   *   - Séjour traversant : « Point de Hongrie · chêne fumé » sur un parquet
+   *     doré en lames droites, posées dans l'axe ;
+   *   - Cuisine ouverte : « chêne gris » sur des lames larges presque noires ;
+   *   - Salon d'angle : « chêne foncé » nommait une famille de teintes, pas
+   *     le produit que le Studio ouvre (chêne tabac) ;
+   *   - Pièce aux arcades : « chêne fumé » sur un bâton rompu blond.
+   *
+   * `meta` et `config` suivent désormais la photographie, et `phrase` décrit
+   * l'ambiance réellement visible — une phrase, écrite devant le fichier.
+   * Le motif d'un deep-link ne peut pas différer du motif visible : on ne
+   * montre pas un point de Hongrie parce que le moteur sait le rendre.
+   */
+  { id: 3935327, tags: 'droite sejour', credit: 'Curtis Adams', title: 'Séjour traversant', meta: 'Lames droites · chêne doré', size: 'wide',
+    alt: 'Séjour vide et lumineux aux grandes fenêtres, parquet doré en lames droites filant vers la pièce du fond',
+    phrase: 'Deux pièces en enfilade, un seul sol doré qui file vers la lumière.',
     image: 'room-sejour', sceneId: 'sejour', visualizerAvailable: true, showInRoomLibrary: true,
-    config: { productId: 'chene-fume', pattern: 'point-de-hongrie', orientation: 0 } },
+    config: { productId: 'chene-dore', pattern: 'lames', orientation: 0 } },
   { id: 7587872, tags: 'hongrie chambre', credit: 'Max Vakhtbovych', title: 'Chambre parisienne', meta: 'Point de Hongrie · chêne naturel', size: 'md',
     alt: 'Pièce aux murs bleus et parquet en point de Hongrie',
+    phrase: 'Murs bleu profond, point de Hongrie clair : le V mène à la baie.',
     image: 'room-chambre-parisienne', sceneId: 'chambre-parisienne', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-naturel', pattern: 'point-de-hongrie', orientation: 0 } },
   /*
@@ -526,13 +544,14 @@ const INSPIRATION_PHOTOS = [
    * donc une autre piece que la carte. `check-inspiration` le verifie
    * desormais, et `fetch-photos` telecharge d'apres `image`.
    */
-  { id: 8146149, tags: 'droite cuisine', credit: 'Max Vakhtbovych', title: 'Cuisine ouverte', meta: 'Lames larges · chêne gris', size: 'sm',
+  { id: 8146149, tags: 'droite cuisine', credit: 'Max Vakhtbovych', title: 'Cuisine ouverte', meta: 'Lames larges · chêne fumé', size: 'sm',
     alt: 'Cuisine ouverte sur un grand séjour vide, sol en lames foncées',
     // Photo remplacée : l'ancienne (room-cuisine, 7060823) avait un grand tapis
     // au centre du sol et six chaises à pieds de 4 px. La nouvelle a le sol le
     // plus dégagé du dépôt et des plinthes blanches sur lames foncées.
+    phrase: 'Plateau blanc, lames larges presque noires : tout tient au contraste.',
     image: 'room-cuisine-ouverte', sceneId: 'cuisine-ouverte', visualizerAvailable: true, showInRoomLibrary: true,
-    config: { productId: 'chene-gris', pattern: 'lames', orientation: 0 } },
+    config: { productId: 'chene-fume', pattern: 'lames', orientation: 0 } },
   { id: 7587868, tags: 'hongrie couloir', credit: 'Max Vakhtbovych', title: 'Couloir en enfilade', meta: 'Point de Hongrie · chêne naturel', size: 'sm',
     alt: 'Couloir aux murs bleu nuit à moulures, parquet en point de Hongrie dans l’axe',
     // Photo remplacée, puis calibrée à la QUATRIÈME tentative. Les rejets :
@@ -550,6 +569,7 @@ const INSPIRATION_PHOTOS = [
     //
     // `showInRoomLibrary: false` : son sol ne fait que 7 pour cent du cadre.
     // Essayable par sa carte, sans allonger « Changer de pièce ».
+    phrase: 'Lambris bleu nuit, pointe continue dans l’axe : le couloir s’allonge.',
     image: 'room-couloir-bleu', sceneId: 'couloir-enfilade', visualizerAvailable: true, showInRoomLibrary: false,
     config: { productId: 'chene-naturel', pattern: 'point-de-hongrie', orientation: 0 } },
   { id: 16641359, tags: 'droite chambre', credit: 'Curtis Adams', title: 'Chambre claire', meta: 'Lames droites · chêne brun', size: 'md',
@@ -571,19 +591,21 @@ const INSPIRATION_PHOTOS = [
     // Première scène du dépôt dont la FOCALE est mesurée, par orthogonalité de
     // deux fuites relevées sur deux murs différents dont les horizons
     // concordent à 4,2 px. Voir data/scenes/chambre-claire.json.
+    phrase: 'Murs blancs, plafond à caisson : la chaleur vient des lames brunes.',
     image: 'room-chambre-claire', sceneId: 'chambre-claire', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-brun', pattern: 'lames', orientation: 0 } },
   /* Meme derive que la carte « Cuisine ouverte » : l'identifiant etait reste
    * sur l'ancienne photo (7045700, `room-grande-piece`). */
-  { id: 9826455, tags: 'droite sejour', credit: 'Gustavo Galeano Maz', title: 'Salon d’angle', meta: 'Lames droites · chêne foncé', size: 'wide',
+  { id: 9826455, tags: 'droite sejour', credit: 'Gustavo Galeano Maz', title: 'Salon d’angle', meta: 'Lames droites · chêne tabac', size: 'wide',
     alt: 'Grande pièce vide formant un angle, sol en lames de noyer et plinthes bois',
     // Photo remplacée : l'ancienne (room-grande-piece, 7045700) avait un sol
     // sombre et miroitant dont le champ d'orientation ne donnait aucune fuite
     // (r = -0,016). La nouvelle a pour sujet un angle de murs, ce qui lui donne
     // deux frontières horizontales à deux profondeurs.
+    phrase: 'Lames étroites tabac, plinthes assorties : une base sobre, prête à meubler.',
     image: 'room-salon-angle', sceneId: 'salon-angle', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-tabac', pattern: 'lames', orientation: 0 } },
-  { id: 13702811, tags: 'baton-rompu sejour', credit: 'Daniel Tanque', title: 'Pièce aux arcades', meta: 'Bâton rompu · chêne fumé', size: 'sm',
+  { id: 13702811, tags: 'baton-rompu sejour', credit: 'Daniel Tanque', title: 'Pièce aux arcades', meta: 'Bâton rompu · chêne naturel', size: 'sm',
     alt: 'Grande pièce vide à arcades, murs crème et parquet en bâton rompu',
     // Photo remplacée, et le titre suit la photo. L'ancienne
     // (room-sous-les-toits, 8082327) avait un sol presque vide, mais sa moitié
@@ -611,8 +633,9 @@ const INSPIRATION_PHOTOS = [
      * `chene-fume` accepte les trois motifs (`compatiblePatterns` dans
      * data/parquets.json) : la configuration suit donc la photo.
      */
+    phrase: 'Bâton rompu blond sous deux arcades : le motif anime sans alourdir.',
     image: 'room-piece-arcades', sceneId: 'piece-arcades', visualizerAvailable: true, showInRoomLibrary: true,
-    config: { productId: 'chene-fume', pattern: 'baton-rompu', orientation: 0 } },
+    config: { productId: 'chene-naturel', pattern: 'baton-rompu', orientation: 0 } },
   { id: 7865621, tags: 'droite couloir', credit: 'Gustavo Galeano Maz', title: 'Entrée cadrée', meta: 'Lames dans l’axe · chêne miel', size: 'md',
     alt: 'Entrée vide aux murs blancs et plinthes bois, parquet miel, portes en enfilade au fond',
     // Quatrième photo pour cette carte, et les trois refus ont tous la même
@@ -627,6 +650,7 @@ const INSPIRATION_PHOTOS = [
     // alignées à 1,23 px. Sol entièrement vide, plinthes bois sur murs blancs,
     // bord arrière horizontal à 0,002 de pente — donc point principal imposé.
     // Voir data/scenes/entree-cadree.json.
+    phrase: 'Lames miel dans l’axe, portes en enfilade : le regard file au fond.',
     image: 'room-entree-cadree', sceneId: 'entree-cadree', visualizerAvailable: true, showInRoomLibrary: true,
     config: { productId: 'chene-miel', pattern: 'lames', orientation: 0 } },
 ];
