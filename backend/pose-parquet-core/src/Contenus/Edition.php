@@ -110,8 +110,19 @@ final class Edition {
 		$init['remove_script_host'] = false;
 		$init['convert_urls']       = false;
 		// Les icônes des encadrés (callout) sont des SVG en ligne : l'éditeur ne les gardait pas.
+		// Liste fermée, la même que Html::autorise() à l'enregistrement : svg (ses attributs de tracé) et path[d], rien d'autre.
 		$init['extended_valid_elements'] = trim( ( (string) ( $init['extended_valid_elements'] ?? '' ) ) . ',svg[class|viewbox|viewBox|fill|stroke|stroke-width|stroke-linecap|stroke-linejoin|aria-hidden|width|height],path[d]', ',' );
-		$init['valid_children']          = trim( ( (string) ( $init['valid_children'] ?? '' ) ) . ',+p[svg],+span[svg],+svg[path]', ',' );
+		/*
+		 * « svg[path] » et non « +svg[path] » : le préfixe + AJOUTE des enfants à
+		 * une liste existante, or un élément déclaré par extended_valid_elements
+		 * n'en a pas encore — TinyMCE plantait à l'initialisation (« Cannot set
+		 * properties of undefined (setting 'path') ») et l'onglet Visuel restait
+		 * vide sur tous les guides et tutoriels. Sans préfixe, la liste des
+		 * enfants de svg est DÉFINIE : path, et seulement path.
+		 */
+		$init['valid_children']          = trim( ( (string) ( $init['valid_children'] ?? '' ) ) . ',+p[svg],+span[svg],svg[path]', ',' );
+		// Dans l'éditeur seulement (la feuille du site n'y est pas) : l'icône à la taille du texte, l'encadré repérable.
+		$init['content_style'] = trim( ( (string) ( $init['content_style'] ?? '' ) ) . ' svg{width:1.1em;height:1.1em;vertical-align:-0.18em;margin-right:0.35em;}aside{margin:1em 0;padding:0.6em 1em;border-left:3px solid #b7c6b3;background:#f4f6f2;}.callout__label{font-weight:600;margin:0 0 0.3em;}' );
 		return $init;
 	}
 
@@ -422,12 +433,12 @@ final class Edition {
 		}
 		$etat = Images::etat( $post );
 		if ( $etat === Images::MANQUANTE ) {
-			echo '<div class="notice notice-warning"><p><strong>' . esc_html__( 'Image manquante.', 'pose-parquet-core' ) . '</strong> ' . esc_html__( 'Ce contenu n’a pas d’image de couverture : sur le site, sa carte s’affichera sans photo. Vous pouvez publier quand même.', 'pose-parquet-core' ) . '</p></div>';
+			echo '<div class="notice notice-warning"><p><strong>' . esc_html__( 'Image manquante.', 'pose-parquet-core' ) . '</strong> ' . esc_html__( 'Sur le site, sa carte s’affichera sans photo.', 'pose-parquet-core' ) . '</p></div>';
 		} elseif ( $etat === Images::FICHIER_ABSENT ) {
-			echo '<div class="notice notice-error"><p><strong>' . esc_html__( 'Image introuvable.', 'pose-parquet-core' ) . '</strong> ' . esc_html__( 'L’image choisie n’existe plus dans la médiathèque (fichier supprimé). Choisissez-en une autre.', 'pose-parquet-core' ) . '</p></div>';
+			echo '<div class="notice notice-error"><p><strong>' . esc_html__( 'Image introuvable.', 'pose-parquet-core' ) . '</strong> ' . esc_html__( 'Elle a été supprimée de la médiathèque : choisissez-en une autre.', 'pose-parquet-core' ) . '</p></div>';
 		}
 		if ( $post->post_type === Types::INSPIRATION && trim( (string) get_post_meta( $post->ID, '_pp_phrase', true ) ) === '' ) {
-			echo '<div class="notice notice-warning"><p>' . esc_html__( 'Le texte court est vide : cette inspiration ne sera pas publiée sur le site tant qu’il manque.', 'pose-parquet-core' ) . '</p></div>';
+			echo '<div class="notice notice-warning"><p>' . esc_html__( 'Texte court manquant : cette inspiration n’apparaîtra pas sur le site.', 'pose-parquet-core' ) . '</p></div>';
 		}
 	}
 

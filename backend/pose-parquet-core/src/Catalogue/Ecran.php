@@ -152,11 +152,12 @@ final class Ecran {
 			. '<button type="submit" class="adm-bouton adm-bouton--petit"><span class="dashicons dashicons-image-rotate" aria-hidden="true"></span>' . esc_html__( 'Relire l’état publié', 'pose-parquet-core' ) . '</button></form>';
 		Socle::carte_ouvrir( __( 'Synchronisation', 'pose-parquet-core' ) );
 		echo '<div class="adm-sync">';
-		echo '<div><p class="adm-carte__aide">' . esc_html__( 'Elle se lance depuis le dépôt du site, puis le build publie le nouvel état :', 'pose-parquet-core' ) . '</p>';
-		echo '<pre class="adm-commande"><code>' . esc_html( (string) ( $d['commande'] ?? 'node _generator/sync-premibel.js' ) ) . '</code></pre>';
-		echo '<p class="adm-carte__aide">' . esc_html__( 'Lu sur :', 'pose-parquet-core' ) . ' <code>' . esc_html( self::url_fichier() ) . '</code></p></div>';
-		echo '<div><div class="adm-info"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span><span>' . esc_html__( 'WordPress ne lance pas la synchronisation : il n’a pas accès au générateur du site, et aucun produit ne s’édite ici. Les prix ne sont jamais importés.', 'pose-parquet-core' ) . '</span></div>';
+		echo '<div><div class="adm-info"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span><span>' . esc_html__( 'Le catalogue se met à jour par la synchronisation avec Premibel, puis la publication du site. Rien ne s’édite ici ; les prix ne sont jamais importés.', 'pose-parquet-core' ) . '</span></div>';
 		echo $relire . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé ci-dessus.
+		// Le détail technique, replié : la commande et le fichier lu.
+		echo '<details class="adm-details adm-details--technique"><summary>' . esc_html__( 'Détails techniques', 'pose-parquet-core' ) . '</summary>';
+		echo '<pre class="adm-commande"><code>' . esc_html( (string) ( $d['commande'] ?? 'node _generator/sync-premibel.js' ) ) . '</code></pre>';
+		echo '<p class="adm-carte__aide">' . esc_html__( 'Lu sur :', 'pose-parquet-core' ) . ' <code>' . esc_html( self::url_fichier() ) . '</code></p></details>';
 		echo '</div>';
 		Socle::carte_fermer();
 		echo '</div>';

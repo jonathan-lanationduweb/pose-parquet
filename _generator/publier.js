@@ -53,11 +53,12 @@ if (path.basename(fichierEtat) !== 'publication-etat.json' || !/^https?:\/\/[^\s
 const debut = Date.now();
 let etat = { version: 1, statut: 'en_cours', etape: 'export', debut: new Date(debut).toISOString(), pid: process.pid };
 
+// Écriture atomique avec nouvelles tentatives courtes : WordPress lit ce fichier pendant qu'on le remplace (Windows).
+const { ecrireAtomique } = require('./remplacement');
+
 function ecrireEtat(maj) {
   etat = { ...etat, ...maj, maj: new Date().toISOString() };
-  const tmp = `${fichierEtat}.${process.pid}.tmp`;
-  fs.writeFileSync(tmp, JSON.stringify(etat, null, 1));
-  fs.renameSync(tmp, fichierEtat);
+  ecrireAtomique(fichierEtat, JSON.stringify(etat, null, 1));
 }
 
 /** Les dernières lignes utiles d'une sortie : assez pour comprendre, pas un journal. */

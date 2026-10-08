@@ -111,10 +111,10 @@
  * Destination (et ses liens rapides) garde la place de se lire.
  */
 .pp-table--projets .pp-col-date { width: 92px; }
-.pp-table--projets .pp-col-ref { width: 128px; }
-.pp-table--projets .pp-col-origine { width: 110px; }
+.pp-table--projets .pp-col-ref { width: 136px; }
+.pp-table--projets .pp-col-origine { width: 120px; }
 .pp-table--projets .pp-col-besoin { width: 120px; }
-.pp-table--projets .pp-col-zone { width: 130px; }
+.pp-table--projets .pp-col-zone { width: 110px; }
 .pp-table--projets .pp-col-statut { width: 110px; }
 .pp-table--projets td { vertical-align: top; }
 /*
@@ -264,3 +264,17 @@
 
 /* Contenus, tableau de bord, maintenance, réglages : composants du socle
    commun (assets/socle/admin-composants.css). */
+
+/* Fiche projet : mêmes cartes que le socle (filet, rayon, titres 15 px). */
+.pp-detail .pp-card { border-color: #dcdcde; padding: 0.25rem 1rem 1rem; }
+.pp-detail .pp-card h2 { font-size: 15px; font-weight: 600; }
+.pp-detail .pp-ref-title { font-weight: 600; }
+
+/* Tablette (783–1280 px) : l'origine puis la date s'effacent pour que Produit, Destination et Statut restent lisibles d'un coup d'œil
+   (ils restent sur la fiche du projet et dans la fiche mobile). */
+@media (min-width: 783px) and (max-width: 1280px) {
+	.pp-table--projets .pp-col-origine { display: none; }
+}
+@media (min-width: 783px) and (max-width: 1100px) {
+	.pp-table--projets .pp-col-date { display: none; }
+}

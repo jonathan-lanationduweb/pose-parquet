@@ -134,6 +134,30 @@
     });
   }
 
+  /*
+   * Sections d'une page (En-tête, passerelle, projet…) : repliables, comme
+   * les longs formulaires du socle. Ouvertes par défaut ; un vrai bouton dans
+   * la légende, donc au clavier et annoncé (aria-expanded).
+   */
+  document.querySelectorAll('fieldset.adm-structure > legend').forEach(function (legende) {
+    var section = legende.parentNode;
+    var bouton = document.createElement('button');
+    bouton.type = 'button';
+    bouton.className = 'adm-structure__bascule';
+    bouton.setAttribute('aria-expanded', 'true');
+    while (legende.firstChild) bouton.appendChild(legende.firstChild);
+    var chevron = document.createElement('span');
+    chevron.className = 'dashicons dashicons-arrow-up-alt2';
+    chevron.setAttribute('aria-hidden', 'true');
+    bouton.appendChild(chevron);
+    legende.appendChild(bouton);
+    bouton.addEventListener('click', function () {
+      var replie = section.classList.toggle('adm-structure--replie');
+      bouton.setAttribute('aria-expanded', replie ? 'false' : 'true');
+      chevron.className = 'dashicons ' + (replie ? 'dashicons-arrow-down-alt2' : 'dashicons-arrow-up-alt2');
+    });
+  });
+
   var recherche = document.querySelector('#post-search-input');
   if (recherche && t.recherche && t.recherche !== '…') recherche.placeholder = t.recherche;
 })();
