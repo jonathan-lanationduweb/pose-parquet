@@ -1939,8 +1939,20 @@ write('data/catalogue-etat.json', `${JSON.stringify(require('./etat-catalogue').
  * existe (pour pouvoir la prévisualiser), active seulement si WordPress le dit.
  * Même gabarit et même feuille que la page servie par WordPress.
  */
+/*
+ * Le visiteur que la porte a renvoyé ici garde maintenance.html dans sa barre
+ * d'adresse : sans retour, il resterait sur « Le site revient bientôt » après
+ * la réouverture, même en rechargeant. Maintenance désactivée, la page renvoie
+ * donc vers l'accueil (sauf en aperçu, `?apercu=1`) ; activée, elle relit
+ * assets/maintenance.json au chargement, pour qu'une copie gardée en cache ne
+ * retienne personne une fois le site rouvert.
+ */
+const RETOUR_SITE = MAINTENANCE_ACTIVE
+  ? `<script>/* Maintenance : si le site a été rouvert depuis, retour à l'accueil. */(function(){if(!/\\/maintenance\\.html$/.test(location.pathname)||!window.fetch)return;fetch('assets/maintenance.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(m){if(m&&m.actif===false)location.replace('./');}).catch(function(){});})();</script>`
+  : `<script>/* Maintenance désactivée : cette page renvoie vers le site. Aperçu : ?apercu=1 */if(!/[?&]apercu=1(&|$)/.test(location.search))location.replace('./');</script>`;
 if (SOURCE_WP.maintenance) {
-  write('maintenance.html', WORDPRESS.pageMaintenance(SOURCE_WP.maintenance));
+  write('maintenance.html', WORDPRESS.pageMaintenance(SOURCE_WP.maintenance).replace('<head>', `<head>
+    ${RETOUR_SITE}`));
   write('assets/maintenance.json', `${JSON.stringify({ actif: MAINTENANCE_ACTIVE })}
 `);
 }

@@ -206,7 +206,14 @@ final class Publication {
 			$out[] = [ 'type' => 'site', 'libelle' => __( 'Mon site', 'pose-parquet-core' ), 'changement' => __( 'modifié', 'pose-parquet-core' ) ];
 		}
 		if ( ( $pub['maintenance'] ?? null ) != ( $cur['maintenance'] ?? null ) ) { // phpcs:ignore Universal.Operators.StrictComparisons
-			$out[] = [ 'type' => 'maintenance', 'libelle' => __( 'Maintenance', 'pose-parquet-core' ), 'changement' => ! empty( $cur['maintenance']['actif'] ) !== ! empty( $pub['maintenance']['actif'] ) ? ( ! empty( $cur['maintenance']['actif'] ) ? __( 'activée', 'pose-parquet-core' ) : __( 'désactivée', 'pose-parquet-core' ) ) : __( 'page modifiée', 'pose-parquet-core' ) ];
+			// En toutes lettres : ce que la publication fera au site public.
+			$avant = ! empty( $pub['maintenance']['actif'] );
+			$apres = ! empty( $cur['maintenance']['actif'] );
+			$out[] = match ( true ) {
+				$apres && ! $avant => [ 'type' => 'maintenance', 'libelle' => __( 'Activation de la maintenance', 'pose-parquet-core' ), 'changement' => __( 'les visiteurs verront la page de maintenance', 'pose-parquet-core' ) ],
+				! $apres && $avant => [ 'type' => 'maintenance', 'libelle' => __( 'Désactivation de la maintenance', 'pose-parquet-core' ), 'changement' => __( 'le site public sera rouvert', 'pose-parquet-core' ) ],
+				default            => [ 'type' => 'maintenance', 'libelle' => __( 'Page de maintenance', 'pose-parquet-core' ), 'changement' => __( 'modifiée', 'pose-parquet-core' ) ],
+			};
 		}
 		$listes = [
 			'guides'       => [ 'slug', __( 'Guide', 'pose-parquet-core' ), \PoseParquet\Core\Contenus\Types::GUIDE ],

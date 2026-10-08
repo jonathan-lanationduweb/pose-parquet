@@ -140,32 +140,82 @@ final class Reglages {
 	}
 
 	/**
-	 * Le panneau « Page de maintenance » du socle : interrupteur, état, et
-	 * (sur le tableau de bord) un lien vers l'écran complet.
+	 * Où en est le site public, face au réglage de WordPress. Le réglage change
+	 * tout de suite ; le site statique, seulement à la publication.
+	 *
+	 *   en_ligne                réglage désactivé, site publié ouvert
+	 *   maintenance_a_publier   réglage activé, pas encore publié
+	 *   en_maintenance          réglage activé et publié
+	 *   reactivation_a_publier  réglage désactivé, site publié encore en maintenance
+	 */
+	public static function etat_public(): string {
+		$actif   = self::actif();
+		$publiee = \PoseParquet\Core\Publication\Publication::maintenance_publiee();
+		$publiee = $publiee ?? $actif; // état publié inconnu : on ne suppose pas d'écart.
+		if ( $actif ) {
+			return $publiee ? 'en_maintenance' : 'maintenance_a_publier';
+		}
+		return $publiee ? 'reactivation_a_publier' : 'en_ligne';
+	}
+
+	/** @return array{0:string,1:string} libellé et variante (ok | attente | ko) de etat_public(). */
+	public static function libelle_public( string $etat ): array {
+		return [
+			'en_ligne'               => [ __( 'Site en ligne', 'pose-parquet-core' ), 'ok' ],
+			'maintenance_a_publier'  => [ __( 'Maintenance à publier', 'pose-parquet-core' ), 'attente' ],
+			'en_maintenance'         => [ __( 'Site en maintenance', 'pose-parquet-core' ), 'attente' ],
+			'reactivation_a_publier' => [ __( 'Réactivation à publier', 'pose-parquet-core' ), 'ko' ],
+		][ $etat ] ?? [ __( 'Site en ligne', 'pose-parquet-core' ), 'ok' ];
+	}
+
+	/**
+	 * Le panneau « Page de maintenance » du socle : interrupteur, puis deux
+	 * états distincts — le réglage de WordPress et le site public — et, quand
+	 * ils diffèrent, la publication à faire, avec son bouton.
 	 */
 	public static function panneau( bool $compact = false ): void {
-		$actif = self::actif();
-		echo '<div class="adm-panneau" id="maintenance"><div class="adm-panneau__entete"><h2 class="adm-panneau__titre"><span class="dashicons dashicons-admin-tools" aria-hidden="true"></span>' . esc_html__( 'Page de maintenance', 'pose-parquet-core' ) . '</h2>';
+		$actif  = self::actif();
+		$public = self::etat_public();
+		$pub    = \PoseParquet\Core\Publication\Publication::etat();
+		$ecart  = in_array( $public, [ 'maintenance_a_publier', 'reactivation_a_publier' ], true );
+		[ $libelle, $variante ] = self::libelle_public( $public );
+
+		echo '<div class="adm-panneau" id="maintenance"' . ( $pub['statut'] === 'en_cours' ? ' data-pp-publication="en_cours"' : '' ) . '><div class="adm-panneau__entete"><h2 class="adm-panneau__titre"><span class="dashicons dashicons-admin-tools" aria-hidden="true"></span>' . esc_html__( 'Page de maintenance', 'pose-parquet-core' ) . '</h2>';
 		\PoseParquet\Core\Admin\Socle::interrupteur(
 			$actif,
 			self::BASCULER,
-			$actif ? __( 'Rouvrir le site public ?', 'pose-parquet-core' ) : __( 'Activer la maintenance ? Les visiteurs verront la page de maintenance. Vous garderez l’accès à WordPress et au vrai site.', 'pose-parquet-core' )
+			$actif ? __( 'Désactiver la maintenance ? Il faudra ensuite publier le site pour le rouvrir au public.', 'pose-parquet-core' ) : __( 'Activer la maintenance ? Après publication, les visiteurs verront la page de maintenance. Vous garderez l’accès à WordPress et au vrai site.', 'pose-parquet-core' )
 		);
 		echo '</div>';
-		// Le statut d'abord, en toutes lettres.
-		echo '<p class="adm-panneau__statut">' . \PoseParquet\Core\Admin\Socle::badge( $actif ? __( 'Maintenance activée', 'pose-parquet-core' ) : __( 'Maintenance désactivée', 'pose-parquet-core' ), $actif ? 'attente' : 'neutre' ) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe.
-		if ( $actif ) {
-			echo '<p class="adm-panneau__texte">' . esc_html__( 'Le public voit la page de maintenance (HTTP 503). Connecté, vous voyez le vrai site.', 'pose-parquet-core' ) . '</p>';
-		} else {
-			echo '<p class="adm-panneau__texte">' . esc_html__( 'Activez un mode maintenance pour afficher une page temporaire aux visiteurs. L’administration reste accessible.', 'pose-parquet-core' ) . '</p>';
-		}
-		// Le toggle change WordPress tout de suite, le site statique seulement à la publication : on le dit.
-		$publiee = \PoseParquet\Core\Publication\Publication::maintenance_publiee();
-		if ( $publiee !== null && $publiee !== $actif ) {
-			echo '<p class="adm-alerte-ligne adm-alerte-ligne--ko"><span class="dashicons dashicons-warning" aria-hidden="true"></span>' . esc_html( $actif ? __( 'Maintenance activée — publication nécessaire : le site public ne l’affiche pas encore.', 'pose-parquet-core' ) : __( 'Maintenance désactivée — publication nécessaire : le site public l’affiche encore.', 'pose-parquet-core' ) ) . ' <a href="' . esc_url( \PoseParquet\Core\Publication\Publication::url() ) . '">' . esc_html__( 'Publier', 'pose-parquet-core' ) . '</a></p>';
+		// Deux états, deux lignes : ce que WordPress a enregistré, ce que voient les visiteurs.
+		\PoseParquet\Core\Admin\Socle::etat(
+			[
+				[ __( 'Configuration WordPress', 'pose-parquet-core' ), $actif ? __( 'Maintenance activée', 'pose-parquet-core' ) : __( 'Maintenance désactivée', 'pose-parquet-core' ) ],
+				[ __( 'Site public', 'pose-parquet-core' ), $libelle, $variante ],
+			]
+		);
+		$textes = [
+			'en_ligne'               => __( 'Le site public est ouvert à tous.', 'pose-parquet-core' ),
+			'maintenance_a_publier'  => __( 'Le site public est encore ouvert. Publiez pour afficher la page de maintenance.', 'pose-parquet-core' ),
+			'en_maintenance'         => __( 'Les visiteurs voient la page de maintenance. Pour voir le vrai site, ajoutez ?apercu=1 à son adresse.', 'pose-parquet-core' ),
+			'reactivation_a_publier' => __( 'Le site public est encore en maintenance. Publiez cette modification pour le réactiver.', 'pose-parquet-core' ),
+		];
+		echo '<p class="adm-panneau__texte' . ( $ecart ? ' adm-panneau__texte--fort' : '' ) . '">' . esc_html( $textes[ $public ] ) . '</p>';
+		if ( $ecart ) {
+			if ( $pub['statut'] === 'en_cours' ) {
+				echo '<p class="adm-alerte-ligne"><span class="dashicons dashicons-update" aria-hidden="true"></span>' . esc_html__( 'Publication en cours… Cette page se met à jour toute seule.', 'pose-parquet-core' ) . '</p>';
+			} elseif ( $pub['statut'] === 'echec' && $pub['raison'] !== '' ) {
+				echo '<p class="adm-alerte-ligne adm-alerte-ligne--ko"><span class="dashicons dashicons-warning" aria-hidden="true"></span>' . esc_html__( 'La dernière publication a échoué :', 'pose-parquet-core' ) . ' ' . esc_html( $pub['raison'] ) . '</p>';
+			}
+			// Le moteur de publication existant, pas un second : le même bouton que l'écran Publication.
+			// Sur le tableau de bord, le panneau Publication juste au-dessus le porte déjà.
+			if ( ! $compact ) {
+				echo '<div class="adm-panneau__publier">' . \PoseParquet\Core\Publication\Publication::bouton( $pub ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé dans bouton().
+			}
 		}
 		if ( $compact ) {
-			echo '<p class="adm-panneau__lien"><a href="' . esc_url( self::url() ) . '">' . esc_html__( 'Titre, message, image et aperçu', 'pose-parquet-core' ) . '</a></p>';
+			// Comme la maquette : un bouton secondaire vers l'écran complet (titre, message, image, aperçu).
+			echo '<p class="adm-panneau__lien"><a class="adm-bouton" href="' . esc_url( self::url() ) . '"><span class="dashicons dashicons-admin-generic" aria-hidden="true"></span>' . esc_html__( 'Configurer la page de maintenance', 'pose-parquet-core' ) . '</a></p>';
 		}
 		echo '</div>';
 	}
