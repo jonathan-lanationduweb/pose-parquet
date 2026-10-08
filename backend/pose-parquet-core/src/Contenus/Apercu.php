@@ -205,7 +205,7 @@ final class Apercu {
 			return;
 		}
 		echo '<div class="misc-pub-section"><a class="adm-bouton adm-bouton--petit" href="' . esc_url( self::url( $post->ID ) ) . '" target="_blank" rel="noopener"><span class="dashicons dashicons-visibility" aria-hidden="true"></span>' . esc_html__( 'Aperçu public', 'pose-parquet-core' ) . '</a>';
-		echo '<span class="description" style="display:block;margin-top:6px">' . esc_html__( 'Version enregistrée : enregistrez le brouillon d’abord.', 'pose-parquet-core' ) . '</span></div>';
+		echo '<span class="description adm-apercu-note">' . esc_html__( 'Montre la dernière version enregistrée.', 'pose-parquet-core' ) . '</span></div>';
 	}
 
 	/** Dans les listes : Aperçu et Dupliquer. */

@@ -50,12 +50,12 @@ $submenu = [];
 $menu    = [];
 \PoseParquet\Core\Admin\Menu::add_pages(); // hors contexte admin, les crochets du menu ne sont pas posés : on construit directement.
 $libelles = array_map( static fn( array $e ): string => wp_strip_all_tags( $e[0] ), $submenu['pose-parquet-tableau'] ?? [] );
-$verifie( 'Tableau de bord, Guides, Tutoriels, Inspirations, Pages, Images, Projets, Catalogue, Maintenance, Réglages', $libelles === [ 'Tableau de bord', 'Guides', 'Tutoriels', 'Inspirations', 'Pages', 'Images', 'Projets', 'Catalogue Premibel', 'Publication', 'Mon site', 'Maintenance', 'Réglages' ], implode( ', ', $libelles ) );
+$verifie( 'Tableau de bord, Guides, Tutoriels, Inspirations, Pages, Images, Projets, Catalogue, Maintenance, Réglages', $libelles === [ 'Tableau de bord', 'Guides', 'Tutoriels', 'Inspirations', 'Pages', 'Images', 'Projets', 'Catalogue Premibel', 'Mon site', 'Maintenance', 'Publication', 'Réglages' ], implode( ', ', $libelles ) );
 $verifie( 'Projets garde son adresse (page=pose-parquet)', in_array( 'pose-parquet', array_column( $submenu['pose-parquet-tableau'] ?? [], 2 ), true ) );
 $verifie( 'État : page cachée sans parent (pas de remove_submenu_page, pas de 403)', ! in_array( 'pose-parquet-status', array_column( $submenu['pose-parquet-tableau'] ?? [], 2 ), true ) );
 \PoseParquet\Core\Admin\Menu::ordonner();
 $libelles = array_map( static fn( array $e ): string => trim( wp_strip_all_tags( $e[0] ) ), $submenu['pose-parquet-tableau'] ?? [] );
-$attendu  = [ 'Tableau de bord', 'Contenu', 'Guides', 'Tutoriels', 'Inspirations', 'Pages', 'Images', 'Activité', 'Projets', 'Produits', 'Catalogue Premibel', 'Site', 'Publication', 'Mon site', 'Maintenance', 'Réglages' ];
+$attendu  = [ 'Tableau de bord', 'Contenu', 'Guides', 'Tutoriels', 'Inspirations', 'Pages', 'Images', 'Activité', 'Projets', 'Produits', 'Catalogue Premibel', 'Site', 'Mon site', 'Maintenance', 'Publication', 'Réglages' ];
 $verifie( 'socle : rubriques Contenu / Activité / Produits / Site, comme Expert Parquet', $libelles === $attendu, implode( ', ', $libelles ) );
 $verifie( 'socle : une rubrique n’est pas un lien (capability read, adresse vide)', ( $submenu['pose-parquet-tableau'][1][3] ?? null ) === '' && str_contains( (string) $submenu['pose-parquet-tableau'][1][0], 'adm-menu-section' ) );
 
