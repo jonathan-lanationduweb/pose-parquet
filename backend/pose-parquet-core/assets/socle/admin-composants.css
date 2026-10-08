@@ -471,7 +471,8 @@ fieldset.adm-champ { border: 0; padding: 0; margin: 0 0 16px; min-width: 0; }
 
 /* Listes WordPress du module : « Ajouter » à droite, en bouton principal. */
 .adm-ecran.edit-php .wrap > .page-title-action,
-.adm-ecran.edit-tags-php .wrap > .page-title-action {
+.adm-ecran.edit-tags-php .wrap > .page-title-action,
+.adm-ecran.upload-php .wrap > .page-title-action {
 	float: right;
 	top: 0;
 	margin: 10px 0 0;
@@ -485,7 +486,9 @@ fieldset.adm-champ { border: 0; padding: 0; margin: 0 0 16px; min-width: 0; }
 	line-height: 1.5;
 }
 .adm-ecran.edit-php .wrap > .page-title-action:hover,
-.adm-ecran.edit-php .wrap > .page-title-action:focus { background: var(--adm-action-fonce); border-color: var(--adm-action-fonce); color: #fff; }
+.adm-ecran.edit-php .wrap > .page-title-action:focus,
+.adm-ecran.upload-php .wrap > .page-title-action:hover,
+.adm-ecran.upload-php .wrap > .page-title-action:focus { background: var(--adm-action-fonce); border-color: var(--adm-action-fonce); color: #fff; }
 .adm-ecran.edit-php .wrap > .page-title-action:focus { box-shadow: 0 0 0 1px #fff, 0 0 0 3px var(--adm-action); }
 .adm-ecran.edit-php .wp-header-end { clear: both; }
 
@@ -639,3 +642,270 @@ fieldset.adm-champ { border: 0; padding: 0; margin: 0 0 16px; min-width: 0; }
 	.adm-liste .adm-liste__case { width: auto; padding-left: 0; }
 	.adm-liste td:not(.adm-liste__case):last-child { grid-column: 1 / -1; }
 }
+
+/* =====================================================================
+   MAQUETTE DU SOCLE — « Gestion du site » et pilotage.
+   Référence : skill lndw-wordpress-core, assets/reference-wordpress-admin.png.
+   Boutons principaux dans l'accent de la marque (sauge), boutons secondaires
+   en contour ; les liens des tableaux restent ceux de WordPress.
+   ===================================================================== */
+.adm-ecran {
+	--adm-action:       var(--adm-accent);
+	--adm-action-fonce: var(--adm-accent-fonce);
+}
+.adm-ecran .wp-core-ui .button-primary, .adm-ecran.wp-core-ui .button-primary { background: var(--adm-accent); border-color: var(--adm-accent); color: #fff; }
+.adm-ecran .wp-core-ui .button-primary:hover, .adm-ecran.wp-core-ui .button-primary:hover,
+.adm-ecran .wp-core-ui .button-primary:focus, .adm-ecran.wp-core-ui .button-primary:focus { background: var(--adm-accent-fonce); border-color: var(--adm-accent-fonce); color: #fff; }
+.adm-ecran .wp-core-ui .button-primary:focus, .adm-ecran.wp-core-ui .button-primary:focus { box-shadow: 0 0 0 1px #fff, 0 0 0 3px var(--adm-accent); }
+.adm-discret { color: var(--adm-gris); }
+
+/* -- Raccourcis : une carte par partie du site. */
+.adm-raccourcis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--adm-e2); margin: 0 0 var(--adm-e4); }
+.adm-raccourci { position: relative; display: flex; flex-direction: column; gap: 2px; min-width: 0; padding: var(--adm-e3); background: var(--adm-surface); border: 1px solid var(--adm-trait); border-radius: var(--adm-r); transition: border-color .15s; }
+.adm-raccourci:hover, .adm-raccourci:focus-within { border-color: var(--adm-accent); }
+.adm-raccourci--attention { border-color: #E2C47E; background: #FFFCF4; }
+.adm-raccourci__icone { width: 24px; height: 24px; font-size: 24px; margin: 0 0 var(--adm-e2); color: var(--adm-accent); }
+.adm-raccourci--attention .adm-raccourci__icone { color: #B07D0B; }
+.adm-raccourci__titre { font-size: 14px; font-weight: 600; color: var(--adm-encre); text-decoration: none; }
+/* Toute la carte mène à la liste ; l'action garde son propre lien, au-dessus. */
+.adm-raccourci__titre::after { content: ""; position: absolute; inset: 0; }
+.adm-raccourci__titre:focus { box-shadow: none; outline: 0; }
+.adm-raccourci:focus-within { box-shadow: 0 0 0 1px var(--adm-accent); }
+.adm-raccourci__ligne { font-size: 12px; line-height: 1.4; color: var(--adm-gris); }
+.adm-raccourci--attention .adm-raccourci__ligne { color: #6B4E0B; font-weight: 500; }
+.adm-raccourci__action { position: relative; z-index: 1; align-self: flex-start; margin-top: var(--adm-e2); font-size: 13px; font-weight: 500; color: var(--adm-accent); text-decoration: none; }
+.adm-raccourci__action:hover, .adm-raccourci__action:focus { color: var(--adm-accent-fonce); text-decoration: underline; }
+
+/* -- Derniers contenus : vignette, titre, type, statut, date. */
+.adm-derniers .adm-derniers__titre { display: flex; align-items: center; gap: var(--adm-e2); text-decoration: none; font-weight: 500; }
+.adm-derniers__vignette { flex: none; display: block; width: 40px; height: 30px; object-fit: cover; border-radius: 3px; background: #F0F0F1; }
+.adm-derniers__vignette--vide { border: 1px solid var(--adm-trait); box-sizing: border-box; }
+.adm-table th[scope="row"] .adm-derniers__titre span { color: var(--adm-action-lien, #2271B1); }
+.adm-ref { font-weight: 600; font-variant-numeric: tabular-nums; }
+.adm-gestion .adm-table tbody th, .adm-gestion .adm-table tbody td { padding-top: 9px; padding-bottom: 9px; }
+
+/* -- Statut du site public : icône, phrase, date. */
+.adm-statut { display: flex; align-items: flex-start; gap: var(--adm-e2); margin: 0 0 var(--adm-e2); }
+.adm-statut > .dashicons { flex: none; width: 28px; height: 28px; font-size: 28px; color: var(--adm-gris); }
+.adm-statut--ok > .dashicons { color: var(--adm-succes); }
+.adm-statut--attente > .dashicons { color: var(--adm-attention); }
+.adm-statut--ko > .dashicons { color: var(--adm-erreur); }
+.adm-statut--info > .dashicons { color: var(--adm-info); }
+.adm-statut__phrase { display: block; font-size: 14px; font-weight: 600; color: var(--adm-encre); line-height: 1.4; }
+.adm-statut__detail { display: block; margin-top: 2px; font-size: 13px; color: var(--adm-gris); }
+.adm-publication .adm-publication__actions .adm-carte__formulaire, .adm-publication .adm-publication__actions .adm-bouton { width: 100%; }
+.adm-publication__liens { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px var(--adm-e3); margin: var(--adm-e2) 0 0; font-size: 13px; }
+.adm-publication__liens a { color: var(--adm-accent); text-decoration: none; }
+.adm-publication__liens a:hover, .adm-publication__liens a:focus { color: var(--adm-accent-fonce); text-decoration: underline; }
+
+/* -- Écran Publication : bandeau (état + actions), puis une colonne. */
+.adm-bandeau__ligne { justify-content: space-between; align-items: center; }
+.adm-bandeau__statut { flex-direction: column; align-items: flex-start; gap: 6px; }
+.adm-bandeau__statut .adm-statut { margin: 0; }
+.adm-bandeau__statut .adm-statut__phrase { font-size: 16px; }
+.adm-bandeau__mode { font-size: 12px; color: var(--adm-gris); padding-left: 40px; }
+.adm-bandeau__actions { display: flex; flex-wrap: wrap; gap: var(--adm-e1); align-items: center; }
+.adm-bandeau__actions .adm-carte__formulaire { display: inline-flex; }
+.adm-bandeau__actions .adm-bouton { padding: 9px 16px; }
+.adm-publication-page { max-width: 1100px; }
+.adm-note-bas { display: flex; align-items: center; gap: var(--adm-e1); margin: var(--adm-e1) 0 0; font-size: 13px; color: var(--adm-gris); }
+.adm-note-bas .dashicons { color: var(--adm-succes); }
+
+/* -- Catalogue (tableau de bord) : le total, puis le détail. */
+.adm-catalogue-resume { margin: 0; font-size: 13px; color: var(--adm-gris); }
+.adm-catalogue-resume strong { font-size: 26px; font-weight: 600; line-height: 1.2; color: var(--adm-encre); margin-right: 4px; font-variant-numeric: tabular-nums; }
+.adm-catalogue-detail { margin: 2px 0 0; font-size: 13px; color: var(--adm-graphite); }
+.adm-discret .adm-badge { font-weight: 500; }
+
+@media (max-width: 782px) {
+	.adm-raccourcis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--adm-e1); }
+	.adm-raccourci { padding: var(--adm-e2); }
+	.adm-raccourci__icone { margin-bottom: var(--adm-e1); }
+	.adm-bandeau__mode { padding-left: 0; }
+	.adm-bandeau__actions, .adm-bandeau__actions .adm-carte__formulaire, .adm-bandeau__actions .adm-bouton { width: 100%; }
+}
+.adm-derniers__vignette--vide { display: inline-flex; align-items: center; justify-content: center; color: #A7AAAD; }
+.adm-derniers__vignette--vide .dashicons { width: 16px; height: 16px; font-size: 16px; }
+.adm-table th[scope="row"] a { text-decoration: none; }
+.adm-table th[scope="row"] a:hover { text-decoration: underline; }
+
+/* Cartes et panneaux : une seule famille (maquette) — titre sur fond blanc, filet fin, 15 px. */
+.adm-carte__titre { background: var(--adm-surface); font-size: 15px; padding: 14px var(--adm-e3) 12px; }
+.adm-carte__pied { background: var(--adm-surface); }
+.adm-panneau__titre { font-size: 15px; }
+/* Les raccourcis : l'action toujours en bas, alignée d'une carte à l'autre. */
+.adm-raccourci__action { margin-top: auto; padding-top: var(--adm-e2); }
+
+/* -- Édition d'un contenu : image de couverture mesurée, champs d'une même largeur. */
+.adm-ecran #poststuff .adm-image__apercu { max-width: 480px; }
+.adm-ecran .adm-resume, .adm-ecran #poststuff .adm-champ textarea { max-width: 880px; }
+.adm-ecran.post-php .wrap > .page-title-action, .adm-ecran.post-new-php .wrap > .page-title-action { border-color: var(--adm-accent); color: var(--adm-accent); background: var(--adm-surface); border-radius: 3px; }
+.adm-ecran.post-php .wrap > .page-title-action:hover, .adm-ecran.post-new-php .wrap > .page-title-action:hover { background: var(--adm-creme); color: var(--adm-accent-fonce); border-color: var(--adm-accent-fonce); }
+
+/* -- Inspirations : colonnes courtes. */
+.adm-ecran .wp-list-table .column-pp_piece, .adm-ecran .wp-list-table .column-pp_motif { width: 130px; }
+.adm-ecran .wp-list-table .column-pp_teinte, .adm-ecran .wp-list-table .column-pp_parquet { width: 120px; }
+.adm-ecran .wp-list-table .column-pp_studio { width: 80px; }
+.adm-ecran .wp-list-table .column-pp_studio a { text-decoration: none; }
+
+/* -- Listes déroulantes : même hauteur que les champs texte. */
+.adm-ecran .adm-champ select { height: 34px; min-height: 34px; padding: 0 28px 0 10px; line-height: 32px; }
+/* Cases « oui / non » des boîtes d'édition : la case, puis son libellé, sur une ligne. */
+/* (uniquement la forme « libellé puis case » des boîtes d'édition ; Mon site a déjà la case dans son libellé) */
+.adm-ecran p.adm-champ--case:has(> .adm-case) { display: flex; flex-direction: row-reverse; justify-content: flex-end; align-items: center; gap: var(--adm-e1); }
+.adm-ecran p.adm-champ--case:has(> .adm-case) > label { display: inline; margin: 0; font-weight: 500; font-size: 13px; line-height: 1.4; }
+.adm-ecran p.adm-champ--case .adm-case { display: inline-flex; flex: none; }
+.adm-ecran #poststuff .adm-note code { word-break: break-all; }
+
+/* -- Sections d'une page : en-tête dans la boîte (maquette « Section Héros »), repliables. */
+.adm-ecran fieldset.adm-structure { padding: 0 var(--adm-e3) var(--adm-e1); }
+.adm-ecran fieldset.adm-structure > legend { float: left; width: 100%; margin: 0 0 var(--adm-e1); padding: 0; border-bottom: 1px solid var(--adm-trait); }
+.adm-ecran fieldset.adm-structure > legend + * { clear: both; }
+.adm-structure__bascule { display: flex; align-items: center; justify-content: space-between; width: 100%; margin: 0; padding: 12px 0; border: 0; background: none; cursor: pointer; font: inherit; font-size: 14px; font-weight: 600; color: var(--adm-encre); text-align: left; }
+.adm-structure__bascule .dashicons { color: var(--adm-gris); }
+.adm-structure__bascule:hover .dashicons { color: var(--adm-encre); }
+.adm-structure__bascule:focus-visible { outline: 2px solid var(--adm-action); outline-offset: 2px; }
+.adm-ecran fieldset.adm-structure.adm-structure--replie > :not(legend) { display: none; }
+.adm-ecran fieldset.adm-structure.adm-structure--replie > legend { margin-bottom: 0; border-bottom: 0; }
+/* Publication : l'état et les listes sur la même largeur. */
+.adm-publication-page { max-width: none; }
+/* Détails techniques repliés (catalogue). */
+.adm-details--technique { margin-top: var(--adm-e3); padding-top: var(--adm-e2); border-top: 1px solid var(--adm-trait); }
+.adm-details--technique .adm-commande { margin-top: var(--adm-e1); }
+/* Alertes d'une ligne : 13 px partout (Réglages compris). */
+.adm-ecran .adm-alerte-ligne { font-size: 13px; }
+
+/* Carte de marque : le vrai logotype (symbole du site + Instrument Serif, la police de l'en-tête public). */
+@font-face { font-family: "PP Instrument Serif"; src: url("../fonts/instrument-serif-400-3.woff2") format("woff2"); font-display: swap; }
+.adm-marque__nom { font-family: "PP Instrument Serif", Georgia, serif; font-size: 28px; letter-spacing: -0.02em; line-height: 1; align-items: center; gap: 10px; }
+.adm-marque__nom strong { font-weight: 400; }
+.adm-marque__nom span:last-child { color: #1C1C1A; opacity: .55; }
+.adm-marque__symbole { display: block; width: 13px; height: 24px; background: none; color: #1C1C1A; }
+.adm-marque__favicon-symbole .adm-marque__symbole { width: 7px; height: 12px; color: #F2EFE8; }
+/* Catalogue : l'information, l'action, puis le détail technique replié, sur une colonne. */
+.adm-sync { display: block; }
+.adm-sync .adm-info { max-width: 760px; }
+/* Le triangle d'ouverture reste visible : on voit que le détail se déplie. */
+.adm-details summary { display: list-item; list-style: disclosure-closed inside; width: fit-content; }
+.adm-details[open] summary { list-style-type: disclosure-open; }
+/* Sous un en-tête « Afficher », la case suffit : « Affiché » reste pour les lecteurs d'écran. */
+/* (toute la carte : le menu mobile, sous le même en-tête, suit la même règle) */
+.adm-carte:has(.adm-liste thead) .adm-liste__case-texte { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.adm-carte:has(.adm-liste thead) td.adm-liste__case { text-align: center; }
+.adm-liste:has(thead) thead th.adm-liste__case { text-align: center; padding-left: var(--adm-e2); }
+/* Navigation : le menu mobile s'aligne sur le menu principal (mêmes colonnes). */
+.adm-carte:has(.adm-liste thead) .adm-liste { table-layout: fixed; }
+.adm-carte:has(.adm-liste thead) .adm-liste tbody th { width: 34%; }
+.adm-carte:has(.adm-liste thead) .adm-liste .adm-liste__case { width: 72px; }
+.adm-carte:has(.adm-liste thead) .adm-liste thead th:first-child { width: 34%; }
+
+/* Gestion du site, sur une colonne : l'état du site (publication, maintenance…) passe avant les listes. */
+@media (max-width: 1100px) {
+	.adm-gestion .adm-grille > div:last-child { order: -1; }
+}
+@media (min-width: 783px) and (max-width: 1100px) {
+	.adm-gestion .adm-grille > div:last-child { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--adm-e3); align-items: start; }
+}
+/* Téléphone : l'essentiel de chaque ligne (titre et statut ; référence et statut). */
+@media (max-width: 600px) {
+	.adm-derniers td[data-label="Type"], .adm-derniers td[data-label="Modifié"] { display: none !important; }
+	.adm-gestion .adm-table--empilable td[data-label="Date"] { display: none !important; }
+}
+@media (max-width: 600px) {
+	.adm-journal td[data-label="Environnement"], .adm-journal td[data-label="Utilisateur"] { display: none !important; }
+}
+/* Médiathèque : la barre de filtres comme une carte du socle. */
+.adm-ecran.upload-php .wp-filter { border-color: var(--adm-trait); border-radius: var(--adm-r); box-shadow: none; }
+.adm-ecran.upload-php .wp-header-end { clear: both; }
+.adm-ecran .wp-list-table .column-pp_duree { width: 170px; }
+.adm-ecran .wp-list-table .column-pp_niveau, .adm-ecran .wp-list-table .column-pp_outils { width: 110px; }
+
+/* Raccourcis : 7 sur une ligne en grand écran, 4 + 3 sur tablette, 2 par ligne sur téléphone — jamais une carte orpheline. */
+.adm-raccourcis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (min-width: 1240px) { .adm-raccourcis { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
+@media (min-width: 961px) and (max-width: 1239px) { .adm-raccourcis { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 782px) { .adm-raccourcis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Listes sur téléphone : la forme native de WordPress (titre + bouton de détail), sans la vignette. */
+@media (max-width: 782px) {
+	.adm-ecran .wp-list-table .column-pp_image { display: none !important; }
+	.adm-ecran.edit-php .wp-list-table tbody td { padding-top: 8px; padding-bottom: 8px; }
+}
+@media (max-width: 782px) {
+	/* Les actions de ligne restent visibles (pas de survol au doigt) : elles occupaient déjà leur place, invisibles. */
+	.adm-ecran .wp-list-table .row-actions { left: 0; font-size: 13px; }
+}
+
+/* Listes enrichies sur tablette : les colonnes secondaires s'effacent avant que le titre ne s'écrase. */
+@media (max-width: 1280px) {
+	.adm-ecran .wp-list-table .column-pp_parquet, .adm-ecran .wp-list-table .column-pp_outils { display: none; }
+	.adm-ecran .wp-list-table .column-pp_piece, .adm-ecran .wp-list-table .column-pp_motif, .adm-ecran .wp-list-table .column-pp_teinte { width: 110px; }
+	.adm-ecran .wp-list-table .column-pp_duree { width: 130px; }
+}
+@media (max-width: 1100px) {
+	.adm-ecran .wp-list-table .column-pp_teinte, .adm-ecran .wp-list-table .column-pp_motif, .adm-ecran.post-type-pp_tutoriel .wp-list-table .column-pp_categorie { display: none; }
+}
+
+/* Catalogue : les cinq mesures sur une ligne ; sur téléphone, 394 en tête puis 2 × 2. */
+.adm-chiffres--principal { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 900px) {
+	.adm-chiffres--principal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.adm-chiffres--principal .adm-chiffre:first-child { grid-column: 1 / -1; }
+}
+
+/* Boîtes latérales de l'édition (Référencement, Studio) : notes compactes. */
+.adm-ecran #side-sortables .adm-avertissement, .adm-ecran #side-sortables .adm-note { margin: var(--adm-e1) 0 0; padding: 6px 10px; font-size: 12px; line-height: 1.45; }
+.adm-ecran #side-sortables .adm-champ { margin-bottom: var(--adm-e2); }
+.adm-ecran #side-sortables .adm-champ textarea { min-height: 108px; }
+
+/* Mon site → Identité, sur une colonne : la carte de marque d'abord (on voit l'identité tout de suite). */
+@media (max-width: 1100px) {
+	.adm-onglet .adm-grille > div:last-child:has(.adm-marque) { order: -1; }
+}
+/* Projets sur téléphone : l'origine (détail secondaire) s'efface de la fiche. */
+@media (max-width: 782px) {
+	.pp-table--projets td.pp-col-origine { display: none !important; }
+}
+.adm-raccourci:hover .adm-raccourci__titre { color: var(--adm-accent-fonce); }
+/* Téléphone : l'en-tête « Afficher » est masqué, donc chaque case retrouve son libellé « Affiché ». */
+@media (max-width: 600px) {
+	.adm-carte:has(.adm-liste thead) .adm-liste__case-texte { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; }
+	.adm-carte:has(.adm-liste thead) .adm-liste .adm-liste__case { width: auto; text-align: left; }
+}
+.adm-panneau__lien .adm-bouton { text-decoration: none; }
+.adm-panneau__lien .adm-bouton:hover { text-decoration: none; }
+/* Vignettes de remplacement : gris neutre (le lien bleu reste au titre). */
+.adm-table th[scope="row"] .adm-derniers__titre .adm-derniers__vignette--vide, .adm-table th[scope="row"] .adm-derniers__titre .adm-derniers__vignette--vide .dashicons { color: #8C8F94; }
+/* Un bouton masqué (attribut hidden, ex. « Retirer » sans image) reste masqué malgré display: inline-flex. */
+.adm-bouton[hidden] { display: none !important; }
+/* Panneaux : pas de marge sous le dernier élément (padding seul, comme les cartes). */
+.adm-panneau > :last-child { margin-bottom: 0; }
+/* Réglages → Notifications (Settings API) : mêmes libellés que les autres formulaires (13 px). */
+.adm-reglages .form-table th { font-size: 13px; color: var(--adm-encre); }
+/* Bandeau Publication sur tablette / téléphone : l'état aligné à gauche, les actions en dessous sur toute la largeur. */
+@media (max-width: 782px) {
+	.adm-bandeau__ligne { align-items: stretch; }
+	.adm-bandeau__statut { align-items: flex-start; }
+}
+
+/* Édition : résumé et introduction sur toute la colonne, alignés sur le titre et les actions d'image. */
+.adm-ecran #poststuff .adm-champ textarea, .adm-ecran .adm-resume { max-width: none; }
+.adm-apercu-note { display: block; margin-top: 6px; font-size: 12px; }
+
+/* Cases des listes Mon site : même écart case / texte que partout (4 px), texte centré sur la case. */
+.adm-liste .adm-liste__case label { display: inline-flex; align-items: center; gap: 4px; }
+.adm-liste .adm-liste__case input { margin: 0; }
+.adm-ecran p.adm-champ--case:has(> .adm-case) { gap: 4px; }
+.adm-ecran p.adm-champ--case .adm-case input[type="checkbox"] { margin: 0; }
+
+/* Onglets Mon site : l'onglet courant ne se rate pas (filet sauge, demi-gras, fond de page), les autres en retrait. */
+.adm-ecran .adm-onglets .nav-tab { color: var(--adm-gris); }
+.adm-ecran .adm-onglets .nav-tab:hover { color: var(--adm-encre); }
+.adm-ecran .adm-onglets .nav-tab-active, .adm-ecran .adm-onglets .nav-tab-active:hover { color: var(--adm-encre); font-weight: 600; background: #f0f0f1; }
+
+/* Éditeur du corps : quand le focus y entre (clavier), le cadre le montre. */
+.adm-ecran #wp-content-editor-container:focus-within { box-shadow: 0 0 0 2px var(--adm-action); }
+
+/* Panneau Maintenance : configuration WordPress et site public sur deux lignes ; la publication à faire, avec son bouton. */
+.adm-panneau > .adm-etat { margin: 0 0 var(--adm-e1); }
+.adm-panneau__texte--fort { color: var(--adm-encre); }
+.adm-panneau__publier { margin: var(--adm-e1) 0 0; }

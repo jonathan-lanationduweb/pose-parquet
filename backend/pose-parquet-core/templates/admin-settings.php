@@ -71,7 +71,7 @@ $roles     = [
 			<p class="adm-champ">
 				<label for="pp-site-dossier"><?php esc_html_e( 'Dossier du site sur cette machine (développement)', 'pose-parquet-core' ); ?></label>
 				<input type="text" id="pp-site-dossier" name="pp_site_dossier" value="<?php echo esc_attr( SitePublic::dossier() ); ?>" placeholder="C:\…\pose-parquet.com" />
-				<span class="description"><?php echo esc_html( Apercu::dossier() ? __( 'Utilisé : l’éditeur, l’aperçu et le catalogue lisent les fichiers du site ici, sans serveur de développement.', 'pose-parquet-core' ) : __( 'Vide : les fichiers sont lus sur l’adresse du site public.', 'pose-parquet-core' ) ); ?></span>
+				<span class="description"><?php echo esc_html( Apercu::dossier() ? __( 'Utilisé pour l’aperçu et le catalogue sur ce poste.', 'pose-parquet-core' ) : __( 'Vide : les fichiers sont lus sur l’adresse du site public.', 'pose-parquet-core' ) ); ?></span>
 			</p>
 			<p class="adm-carte__actions"><button type="submit" class="adm-bouton adm-bouton--plein"><?php esc_html_e( 'Enregistrer', 'pose-parquet-core' ); ?></button></p>
 		</form>
@@ -100,7 +100,7 @@ $roles     = [
 				[ 'WP_AUTO_UPDATE_CORE', $constante === null ? __( 'non défini', 'pose-parquet-core' ) : ( is_bool( $constante ) ? ( $constante ? 'true' : 'false' ) : (string) $constante ) ],
 			],
 			$constante === 'minor'
-				? __( 'Réglé dans wp-config.php : une version majeure s’installe à la main, quand elle a été décidée.', 'pose-parquet-core' )
+				? __( 'Les versions majeures s’installent à la main, après vérification.', 'pose-parquet-core' )
 				: __( 'Recommandé : define( \'WP_AUTO_UPDATE_CORE\', \'minor\' ); dans wp-config.php (non appliqué d’ici).', 'pose-parquet-core' )
 		);
 		?>
@@ -120,7 +120,7 @@ $roles     = [
 			<?php endforeach; ?>
 			</tbody>
 		</table>
-		<p class="adm-carte__aide"><?php esc_html_e( 'Les contenus éditoriaux restent réservés aux administrateurs. Le détail réel des droits, rôle par rôle, est sur la page État.', 'pose-parquet-core' ); ?></p>
+		<p class="adm-carte__aide"><?php esc_html_e( 'Le détail des droits, rôle par rôle, est sur la page État technique.', 'pose-parquet-core' ); ?></p>
 		<?php Socle::carte_fermer(); ?>
 	</div>
 </div>

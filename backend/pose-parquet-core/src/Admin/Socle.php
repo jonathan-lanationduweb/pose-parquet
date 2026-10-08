@@ -30,12 +30,14 @@ final class Socle {
 	 * Pose Parquet (css/tokens.css : --accent = --c-sage-deep), pas la terre
 	 * cuite d'Expert Parquet, qui appartient à son identité.
 	 *
-	 * @return array{nom:string,logo:string,accent:string,accent_fonce:string,accent_clair:string,accent_pale:string,creme:string}
+	 * @return array{nom:string,logo:string,symbole:string,accent:string,accent_fonce:string,accent_clair:string,accent_pale:string,creme:string}
 	 */
 	public static function marque(): array {
 		return [
 			'nom'          => 'Pose Parquet',
 			'logo'         => plugins_url( 'assets/socle/logo-on-dark.png', POSE_PARQUET_FILE ),
+			// Le symbole seul, pour le menu replié.
+			'symbole'      => plugins_url( 'assets/socle/logo-symbole-on-dark.svg', POSE_PARQUET_FILE ),
 			'accent'       => '#46594A',
 			'accent_fonce' => '#38483B',
 			'accent_clair' => '#BFD0BB',
@@ -51,6 +53,10 @@ final class Socle {
 			return false;
 		}
 		if ( str_contains( (string) $ecran->id, 'pose-parquet' ) ) {
+			return true;
+		}
+		// La médiathèque est rangée sous « Contenu → Images » : même habillage que les autres écrans du module.
+		if ( in_array( (string) $ecran->id, [ 'upload', 'media' ], true ) ) {
 			return true;
 		}
 		if ( in_array( (string) $ecran->post_type, \PoseParquet\Core\Contenus\Types::all(), true ) ) {
@@ -76,13 +82,14 @@ final class Socle {
 		wp_add_inline_style(
 			'pp-socle-shell',
 			sprintf(
-				':root{--adm-accent:%1$s;--adm-accent-clair:%2$s;--adm-logo:url("%3$s");}body.adm-ecran{--adm-accent:%1$s;--adm-accent-fonce:%4$s;--adm-accent-pale:%5$s;--adm-creme:%6$s;}',
+				':root{--adm-accent:%1$s;--adm-accent-clair:%2$s;--adm-logo:url("%3$s");--adm-symbole:url("%7$s");}body.adm-ecran{--adm-accent:%1$s;--adm-accent-fonce:%4$s;--adm-accent-pale:%5$s;--adm-creme:%6$s;}',
 				esc_attr( $m['accent'] ),
 				esc_attr( $m['accent_clair'] ),
 				esc_url( $m['logo'] ),
 				esc_attr( $m['accent_fonce'] ),
 				esc_attr( $m['accent_pale'] ),
-				esc_attr( $m['creme'] )
+				esc_attr( $m['creme'] ),
+				esc_url( $m['symbole'] )
 			)
 		);
 		// Les intitulés de rubrique du menu ne sont pas des liens (même procédé qu'Expert Parquet).

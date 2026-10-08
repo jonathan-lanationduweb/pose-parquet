@@ -31,6 +31,7 @@ final class Listes {
 			add_filter( "views_edit-{$type}", [ self::class, 'vues' ] );
 		}
 		add_filter( 'post_row_actions', [ self::class, 'actions_de_ligne' ], 10, 2 );
+		add_filter( 'post_row_actions', [ self::class, 'corbeille_en_dernier' ], 30, 2 );
 		add_action( 'pre_get_posts', [ self::class, 'requete' ] );
 		add_filter( 'display_post_states', [ self::class, 'sans_etat_en_titre' ], 10, 2 );
 	}
@@ -38,29 +39,39 @@ final class Listes {
 	/** @param array<string,string> $colonnes */
 	public static function colonnes( array $colonnes ): array {
 		$type = isset( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$out  = [
-			'cb'    => $colonnes['cb'] ?? '<input type="checkbox" />',
-			'title' => __( 'Titre', 'pose-parquet-core' ),
-		];
+		// L'image d'abord, puis le titre (et ses actions discrètes au survol).
+		$out = [ 'cb' => $colonnes['cb'] ?? '<input type="checkbox" />' ];
 		if ( Types::avec_couverture( $type ) ) {
 			$out['pp_image'] = __( 'Image', 'pose-parquet-core' );
 		}
+		$out['title'] = __( 'Titre', 'pose-parquet-core' );
 		if ( Types::taxonomie( $type ) ) {
 			$out['pp_categorie'] = __( 'Catégorie', 'pose-parquet-core' );
 		}
-		if ( $type === Types::INSPIRATION ) {
-			$out['pp_piece'] = __( 'Pièce', 'pose-parquet-core' );
+		// Un tutoriel : le temps, le niveau, le nombre d'outils.
+		if ( $type === Types::TUTORIEL ) {
+			$out['pp_duree']  = __( 'Temps', 'pose-parquet-core' );
+			$out['pp_niveau'] = __( 'Niveau', 'pose-parquet-core' );
+			$out['pp_outils'] = __( 'Outils', 'pose-parquet-core' );
 		}
-		if ( $type === Types::PAGE ) {
-			$out['pp_adresse'] = __( 'Adresse sur le site', 'pose-parquet-core' );
+		// Une inspiration se lit d'un coup d'œil : pièce, motif, teinte, parquet, et le lien vers le Studio.
+		if ( $type === Types::INSPIRATION ) {
+			$out['pp_piece']   = __( 'Pièce', 'pose-parquet-core' );
+			$out['pp_motif']   = __( 'Motif', 'pose-parquet-core' );
+			$out['pp_teinte']  = __( 'Teinte', 'pose-parquet-core' );
+			$out['pp_parquet'] = __( 'Parquet', 'pose-parquet-core' );
+			$out['pp_studio']  = __( 'Studio', 'pose-parquet-core' );
 		}
 		$out['pp_etat'] = __( 'État', 'pose-parquet-core' );
 		if ( $type === Types::PAGE ) {
 			$out['pp_modifie'] = __( 'Modifiée le', 'pose-parquet-core' );
-		} else {
+		} elseif ( $type !== Types::INSPIRATION ) {
 			$out['pp_date'] = __( 'Date', 'pose-parquet-core' );
 		}
-		$out['pp_modifier'] = '<span class="screen-reader-text">' . esc_html__( 'Modifier', 'pose-parquet-core' ) . '</span>';
+		// Pages : « Modifier » en toutes lettres (on n'y crée rien, on modifie). Ailleurs, les actions de ligne suffisent.
+		if ( $type === Types::PAGE ) {
+			$out['pp_modifier'] = '<span class="screen-reader-text">' . esc_html__( 'Modifier', 'pose-parquet-core' ) . '</span>';
+		}
 		return $out;
 	}
 
@@ -88,6 +99,47 @@ final class Listes {
 			case 'pp_piece':
 				$piece = (string) get_post_meta( $post_id, '_pp_piece', true );
 				echo esc_html( Champs::PIECES[ $piece ] ?? '—' );
+				break;
+			case 'pp_duree':
+				$duree = (string) get_post_meta( $post_id, '_pp_duree', true );
+				echo esc_html( $duree !== '' ? $duree : '—' );
+				break;
+			case 'pp_niveau':
+				$niveau = (string) get_post_meta( $post_id, '_pp_niveau', true );
+				echo esc_html( Champs::NIVEAUX[ $niveau ] ?? ( $niveau !== '' ? $niveau : '—' ) );
+				break;
+			case 'pp_outils':
+				$outils = array_filter( array_map( 'trim', preg_split( '/\R/', (string) get_post_meta( $post_id, '_pp_outils', true ) ) ?: [] ) );
+				echo $outils ? esc_html( sprintf( /* translators: %d : nombre */ _n( '%d outil', '%d outils', count( $outils ), 'pose-parquet-core' ), count( $outils ) ) ) : '<span class="adm-discret">—</span>';
+				break;
+			case 'pp_motif':
+				$libelle = (string) get_post_meta( $post_id, '_pp_motif_libelle', true );
+				$motif   = (string) get_post_meta( $post_id, '_pp_motif', true );
+				echo esc_html( $libelle !== '' ? $libelle : ( Champs::MOTIFS_FILTRE[ $motif ] ?? '—' ) );
+				break;
+			case 'pp_teinte':
+				$teinte = (string) get_post_meta( $post_id, '_pp_teinte', true );
+				echo esc_html( $teinte !== '' ? $teinte : '—' );
+				break;
+			case 'pp_parquet':
+				$parquet = (string) get_post_meta( $post_id, '_pp_parquet', true );
+				echo $parquet !== '' ? '<span class="adm-discret">' . esc_html( $parquet ) . '</span>' : '—';
+				break;
+			case 'pp_studio':
+				// Le même lien que celui généré dans l'écran d'édition, ouvert sur le site public.
+				$scene = (string) get_post_meta( $post_id, '_pp_scene', true );
+				if ( get_post_meta( $post_id, '_pp_studio', true ) === '1' && $scene !== '' ) {
+					$args = [ 'piece' => $scene ];
+					foreach ( [ 'parquet' => '_pp_parquet', 'motif' => '_pp_studio_motif' ] as $cle => $meta ) {
+						$valeur = (string) get_post_meta( $post_id, $meta, true );
+						if ( $valeur !== '' ) {
+							$args[ $cle ] = $valeur;
+						}
+					}
+					echo '<a href="' . esc_url( \PoseParquet\Core\Admin\SitePublic::url() . 'outils/studio.html?' . http_build_query( $args ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Essayer', 'pose-parquet-core' ) . ' <span aria-hidden="true">↗</span></a>';
+				} else {
+					echo '<span class="adm-discret">—</span>';
+				}
 				break;
 			case 'pp_etat':
 				$etats = [
@@ -160,6 +212,16 @@ final class Listes {
 		unset( $actions['inline hide-if-no-js'], $actions['view'], $actions['preview'] );
 		if ( $post->post_type === Types::PAGE ) {
 			unset( $actions['trash'] );
+		}
+		return $actions;
+	}
+
+	/** La corbeille, seule action destructive, en dernier : Modifier · Aperçu · Dupliquer · Corbeille (après Apercu, priorité 20). */
+	public static function corbeille_en_dernier( array $actions, \WP_Post $post ): array {
+		if ( in_array( $post->post_type, Types::all(), true ) && isset( $actions['trash'] ) ) {
+			$corbeille = $actions['trash'];
+			unset( $actions['trash'] );
+			$actions['trash'] = $corbeille;
 		}
 		return $actions;
 	}

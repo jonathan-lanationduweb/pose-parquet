@@ -17,24 +17,32 @@
 
 /* Colonne */
 #adminmenuback, #adminmenuwrap, #adminmenu { background: #17181A; }
-#adminmenu .wp-submenu, #adminmenu .wp-has-current-submenu .wp-submenu, #adminmenu .wp-has-current-submenu.opensub .wp-submenu { background: #1F2124; }
+#adminmenu .wp-submenu, #adminmenu .wp-has-current-submenu.opensub .wp-submenu { background: #1F2124; }
+/* Le menu du module ouvert se lit comme la suite de la colonne, pas comme une boîte. */
+#adminmenu .wp-has-current-submenu .wp-submenu { background: #17181A; }
 
-/* Logotype en tête de colonne : cadré, aligné sur les icônes du menu. */
+/* Logotype en tête de colonne (le vrai logo, version fond sombre) : cadré, aligné sur les icônes. */
 #adminmenu::before {
 	content: "";
 	display: block;
-	height: 30px;
-	margin: 16px 12px 8px;
-	padding: 0 0 14px;
+	height: 32px;
+	margin: 22px 14px 10px 12px;
+	padding: 0 0 20px;
 	background: var(--adm-logo, none) no-repeat left center;
 	background-size: contain;
 	background-origin: content-box;
 	background-clip: content-box;
 	border-bottom: 1px solid rgba(255, 255, 255, .08);
 }
-/* Menu replié : pas de logotype écrasé dans 36 px. */
-.folded #adminmenu::before { display: none; }
-@media screen and (min-width: 783px) and (max-width: 960px) { .auto-fold #adminmenu::before { display: none; } }
+/* Menu replié : le symbole seul, centré dans les 36 px. */
+/* Même hauteur de bloc que déplié (32 px + marges) : le menu ne saute pas quand WordPress replie la colonne. */
+.folded #adminmenu::before { margin-left: 0; margin-right: 0; background-image: var(--adm-symbole, none); background-position: center; background-size: auto 24px; }
+@media screen and (min-width: 783px) and (max-width: 960px) {
+	.auto-fold #adminmenu::before { margin-left: 0; margin-right: 0; background-image: var(--adm-symbole, none); background-position: center; background-size: auto 24px; }
+}
+
+/* « Pose Parquet » mène déjà au tableau de bord du module : son doublon dans le sous-menu est masqué. */
+#adminmenu #toplevel_page_pose-parquet-tableau .wp-submenu li.wp-first-item { display: none; }
 
 /* Entrée courante : fond à peine plus clair et filet sauge à gauche — pas de bloc plein. */
 #adminmenu li.current a.menu-top,
@@ -77,3 +85,16 @@
 
 /* Barre d'administration : rappel de maintenance */
 #wpadminbar .adm-barre-maintenance > .ab-item { color: var(--adm-accent-clair, #72aee6) !important; }
+
+/* Pas de pointeur blanc vers le contenu : l'entrée active est marquée par son filet. */
+#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu::after,
+#adminmenu li.current a.menu-top::after { display: none; }
+/* Un seul filet à la fois : sur un écran du module, c'est l'entrée de l'écran qui est marquée, pas « Pose Parquet ». */
+/* (menu déplié seulement : replié, « Pose Parquet » est la seule entrée visible et garde sa marque) */
+@media screen and (min-width: 961px), screen and (max-width: 782px) {
+	body:not(.folded) #adminmenu #toplevel_page_pose-parquet-tableau:has(.wp-submenu li.current:not(.wp-first-item)) > a.menu-top { background: transparent; box-shadow: none; }
+}
+
+/* Libellés du module sur une ligne (« Catalogue Premibel ») : écart icône / texte et marge droite resserrés, rien d'autre. */
+#adminmenu .wp-submenu li a:has(> .adm-menu-icone) { padding-right: 4px; }
+#adminmenu .wp-submenu .adm-menu-icone { margin-right: 8px; }

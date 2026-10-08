@@ -495,34 +495,49 @@ final class Publication {
 			. esc_html( $etat['statut'] === 'en_cours' ? __( 'Publication en cours…', 'pose-parquet-core' ) : __( 'Publier le site', 'pose-parquet-core' ) ) . '</button></form>';
 	}
 
-	/** Le panneau « Site public » (tableau de bord, écran Publication). */
-	public static function panneau( bool $compact = true ): void {
-		$e = self::etat();
-		echo '<div class="adm-panneau adm-publication" data-pp-publication="' . esc_attr( $e['statut'] ) . '">';
-		echo '<div class="adm-panneau__entete"><h2 class="adm-panneau__titre"><span class="dashicons dashicons-admin-site-alt3" aria-hidden="true"></span>' . esc_html__( 'Site public', 'pose-parquet-core' ) . '</h2>';
-		echo \PoseParquet\Core\Admin\Socle::badge( $e['libelle'], self::variante( $e['statut'] ) ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe.
-		$lignes = [ [ __( 'Dernière publication', 'pose-parquet-core' ), self::date( $e['derniere'] ) ] ];
-		if ( $e['statut'] === 'modifications' || $e['statut'] === 'echec' ) {
-			$lignes[] = [ __( 'Changements', 'pose-parquet-core' ), (string) count( $e['changements'] ) ];
-		}
+	/**
+	 * L'état du site public en une phrase, avec son icône : à jour, à publier,
+	 * en cours, échec. Commun au tableau de bord et à l'écran Publication.
+	 */
+	private static function statut( array $e ): void {
+		$n = count( $e['changements'] );
+		[ $icone, $variante, $phrase ] = match ( $e['statut'] ) {
+			'a_jour'        => [ 'dashicons-yes-alt', 'ok', __( 'Le site public est à jour.', 'pose-parquet-core' ) ],
+			'modifications' => [ 'dashicons-warning', 'attente', sprintf( /* translators: %d : nombre */ _n( '%d modification à publier.', '%d modifications à publier.', $n, 'pose-parquet-core' ), $n ) ],
+			'en_cours'      => [ 'dashicons-update', 'info', __( 'Publication en cours…', 'pose-parquet-core' ) ],
+			default         => [ 'dashicons-dismiss', 'ko', __( 'La dernière publication a échoué.', 'pose-parquet-core' ) ],
+		};
+		echo '<div class="adm-statut adm-statut--' . esc_attr( $variante ) . '"><span class="dashicons ' . esc_attr( $icone ) . '" aria-hidden="true"></span><div>';
+		echo '<strong class="adm-statut__phrase">' . esc_html( $phrase ) . '</strong>';
 		if ( $e['statut'] === 'en_cours' && $e['etape'] !== '' ) {
-			$lignes[] = [ __( 'Étape', 'pose-parquet-core' ), [ 'export' => __( 'export et validation', 'pose-parquet-core' ), 'validation' => __( 'validation', 'pose-parquet-core' ), 'build' => __( 'construction du site', 'pose-parquet-core' ), 'ci' => __( 'workflow GitHub', 'pose-parquet-core' ) ][ $e['etape'] ] ?? $e['etape'] ];
+			$etapes = [ 'export' => __( 'export et validation', 'pose-parquet-core' ), 'validation' => __( 'validation', 'pose-parquet-core' ), 'build' => __( 'construction du site', 'pose-parquet-core' ), 'ci' => __( 'workflow GitHub', 'pose-parquet-core' ) ];
+			echo '<span class="adm-statut__detail">' . esc_html( sprintf( /* translators: %s : étape */ __( 'Étape : %s', 'pose-parquet-core' ), $etapes[ $e['etape'] ] ?? $e['etape'] ) ) . '</span>';
 		}
-		\PoseParquet\Core\Admin\Socle::etat( $lignes );
-		self::alertes( $e );
-		echo '<div class="adm-publication__actions">';
-		if ( $compact ) {
-			echo '<a class="adm-bouton" href="' . esc_url( self::url() ) . '"><span class="dashicons dashicons-visibility" aria-hidden="true"></span>' . esc_html__( 'Prévisualiser', 'pose-parquet-core' ) . '</a>';
-		}
-		echo self::bouton( $e ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé dans bouton().
+		echo '<span class="adm-statut__detail">' . esc_html( sprintf( /* translators: %s : date */ __( 'Dernière publication : %s', 'pose-parquet-core' ), self::date( $e['derniere'] ) ) ) . '</span>';
 		echo '</div></div>';
 	}
 
-	/** Ce qui demande l'attention : maintenance à publier, échec, publication non configurée. */
-	private static function alertes( array $e ): void {
-		if ( $e['maintenance_a_publier'] ) {
-			echo '<p class="adm-panneau__alerte"><span class="adm-pastille adm-pastille--actif"></span> ' . esc_html( \PoseParquet\Core\Maintenance\Reglages::actif() ? __( 'Maintenance activée — publication nécessaire. Le site public n’affiche pas encore la page de maintenance.', 'pose-parquet-core' ) : __( 'Maintenance désactivée — publication nécessaire. Le site public affiche encore la page de maintenance.', 'pose-parquet-core' ) ) . '</p>';
+	/** Le panneau « Publication du site » du tableau de bord : l'état, l'action, les liens. */
+	public static function panneau( bool $compact = true ): void {
+		$e = self::etat();
+		echo '<div class="adm-panneau adm-publication" data-pp-publication="' . esc_attr( $e['statut'] ) . '">';
+		echo '<div class="adm-panneau__entete"><h2 class="adm-panneau__titre"><span class="dashicons dashicons-admin-site-alt3" aria-hidden="true"></span>' . esc_html__( 'Publication du site', 'pose-parquet-core' ) . '</h2></div>';
+		self::statut( $e );
+		self::alertes( $e );
+		echo '<div class="adm-publication__actions">';
+		echo self::bouton( $e ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé dans bouton().
+		echo '</div>';
+		echo '<p class="adm-publication__liens">';
+		if ( $compact ) {
+			echo '<a href="' . esc_url( self::url() . '#pp-changements' ) . '">' . esc_html( $e['changements'] ? __( 'Prévisualiser les changements →', 'pose-parquet-core' ) : __( 'Historique des publications →', 'pose-parquet-core' ) ) . '</a>';
 		}
+		echo '<a href="' . esc_url( \PoseParquet\Core\Admin\SitePublic::url() ) . '" target="_blank" rel="noopener">' . esc_html__( 'Voir le site public ↗', 'pose-parquet-core' ) . '</a>';
+		echo '</p></div>';
+	}
+
+	/** Ce qui demande l'attention : échec, publication non configurée. */
+	private static function alertes( array $e ): void {
+		// La maintenance à publier est signalée dans son propre panneau, et figure dans la liste des changements.
 		if ( $e['statut'] === 'echec' && $e['raison'] !== '' ) {
 			echo '<p class="adm-alerte-ligne adm-alerte-ligne--ko"><span class="dashicons dashicons-warning" aria-hidden="true"></span>' . esc_html__( 'Publication échouée :', 'pose-parquet-core' ) . ' ' . esc_html( $e['raison'] ) . ' ' . esc_html__( 'Le site en ligne n’a pas changé.', 'pose-parquet-core' ) . '</p>';
 		}
@@ -543,17 +558,11 @@ final class Publication {
 		$modes = [ 'local' => __( 'Local', 'pose-parquet-core' ), 'github' => 'GitHub Actions', 'aucune' => __( 'Non configurée', 'pose-parquet-core' ) ];
 		echo '<section class="adm-bandeau adm-publication" data-pp-publication="' . esc_attr( $e['statut'] ) . '" aria-label="' . esc_attr__( 'Site public', 'pose-parquet-core' ) . '">';
 		echo '<div class="adm-bandeau__ligne">';
-		echo '<div class="adm-bandeau__statut"><span class="adm-bandeau__libelle">' . esc_html__( 'Site public', 'pose-parquet-core' ) . '</span>' . \PoseParquet\Core\Admin\Socle::badge( $e['libelle'], self::variante( $e['statut'] ) ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe.
-		echo '<dl class="adm-bandeau__infos">';
-		echo '<div><dt>' . esc_html__( 'Dernière publication', 'pose-parquet-core' ) . '</dt><dd>' . esc_html( self::date( $e['derniere'] ) ) . '</dd></div>';
-		if ( $e['statut'] === 'modifications' || $e['statut'] === 'echec' ) {
-			echo '<div><dt>' . esc_html__( 'Changements', 'pose-parquet-core' ) . '</dt><dd>' . (int) count( $e['changements'] ) . '</dd></div>';
-		}
-		if ( $e['statut'] === 'en_cours' && $e['etape'] !== '' ) {
-			echo '<div><dt>' . esc_html__( 'Étape', 'pose-parquet-core' ) . '</dt><dd>' . esc_html( [ 'export' => __( 'export et validation', 'pose-parquet-core' ), 'validation' => __( 'validation', 'pose-parquet-core' ), 'build' => __( 'construction du site', 'pose-parquet-core' ), 'ci' => __( 'workflow GitHub', 'pose-parquet-core' ) ][ $e['etape'] ] ?? $e['etape'] ) . '</dd></div>';
-		}
-		echo '<div><dt>' . esc_html__( 'Mode', 'pose-parquet-core' ) . '</dt><dd>' . esc_html( $modes[ $e['mode'] ] ?? $e['mode'] ) . '</dd></div>';
-		echo '</dl></div>';
+		echo '<div class="adm-bandeau__statut"><span class="adm-bandeau__libelle">' . esc_html__( 'Site public', 'pose-parquet-core' ) . '</span>';
+		self::statut( $e );
+		echo '<span class="adm-bandeau__mode">' . esc_html( sprintf( /* translators: %s : mode */ __( 'Mode de publication : %s', 'pose-parquet-core' ), $modes[ $e['mode'] ] ?? $e['mode'] ) ) . '</span></div>';
+		echo '<div class="adm-bandeau__actions"><a class="adm-bouton" href="#pp-changements"><span class="dashicons dashicons-visibility" aria-hidden="true"></span>' . esc_html__( 'Prévisualiser', 'pose-parquet-core' ) . '</a>' . self::bouton( $e ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé dans bouton().
+		echo '</div>';
 		self::alertes( $e );
 		echo '</section>';
 	}
