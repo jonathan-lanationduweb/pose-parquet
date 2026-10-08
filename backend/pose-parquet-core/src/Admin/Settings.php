@@ -63,7 +63,7 @@ final class Settings {
 				$diag   = Diagnostics::report();
 				$actif  = (bool) ( $diag['production_ready'] ?? false );
 				echo '<p class="adm-etat-ligne">' . esc_html__( 'État :', 'pose-parquet-core' ) . ' ' . Socle::badge( $actif ? __( 'Actif', 'pose-parquet-core' ) : __( 'À configurer', 'pose-parquet-core' ), $actif ? 'ok' : 'attente' ) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe.
-				echo '<p class="adm-carte__aide">' . esc_html__( 'Notification interne à chaque nouveau projet orienté. Le parcours du visiteur n’en dépend pas : aucun email ne lui est promis.', 'pose-parquet-core' ) . '</p>';
+				echo '<p class="adm-carte__aide">' . esc_html__( 'Un email à l’équipe à chaque nouveau projet orienté.', 'pose-parquet-core' ) . '</p>';
 			},
 			self::PAGE
 		);

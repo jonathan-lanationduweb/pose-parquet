@@ -164,15 +164,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php
 	// L'email n'est un canal que s'il est réellement configuré : sinon, aucun drapeau « email en échec ».
 	$pp_email_actif = (bool) ( Diagnostics::report()['production_ready'] ?? false );
+	// L'essentiel d'abord (référence, besoin, zone, destination, statut), le détail ensuite.
 	$pp_colonnes    = [
-		'date'        => __( 'Date', 'pose-parquet-core' ),
 		'ref'         => __( 'Référence', 'pose-parquet-core' ),
-		'origine'     => __( 'Origine', 'pose-parquet-core' ),
 		'besoin'      => __( 'Besoin', 'pose-parquet-core' ),
 		'zone'        => __( 'Zone', 'pose-parquet-core' ),
-		'produit'     => __( 'Produit', 'pose-parquet-core' ),
 		'destination' => __( 'Destination', 'pose-parquet-core' ),
 		'statut'      => __( 'Statut', 'pose-parquet-core' ),
+		'produit'     => __( 'Produit', 'pose-parquet-core' ),
+		'origine'     => __( 'Origine', 'pose-parquet-core' ),
+		'date'        => __( 'Date', 'pose-parquet-core' ),
 	];
 	?>
 	<table class="wp-list-table widefat fixed striped pp-table pp-table--projets">
@@ -208,7 +209,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$produit   = Liens::produit( $row );
 				?>
 				<tr>
-					<td class="pp-col-date" data-label="<?php echo esc_attr( $pp_colonnes['date'] ); ?>"><?php echo esc_html( View::date_short( $row['created_at'] ) ); ?></td>
 					<td class="pp-col-ref" data-label="<?php echo esc_attr( $pp_colonnes['ref'] ); ?>">
 						<a href="<?php echo esc_url( View::detail_url( $id ) ); ?>" class="pp-ref">
 							<?php echo esc_html( $reference !== '' ? $reference : sprintf( '#%d', $id ) ); ?>
@@ -219,7 +219,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 							</span>
 						<?php endif; ?>
 					</td>
-					<td class="pp-col-origine" data-label="<?php echo esc_attr( $pp_colonnes['origine'] ); ?>"><?php echo esc_html( View::label( 'lead_source', (string) ( $row['lead_source'] ?? '' ) ) ?: '—' ); ?></td>
 					<td class="pp-col-besoin" data-label="<?php echo esc_attr( $pp_colonnes['besoin'] ); ?>"><?php echo esc_html( View::label( 'lead_need', (string) ( $row['lead_need'] ?? '' ) ) ?: '—' ); ?></td>
 					<td class="pp-col-zone" data-label="<?php echo esc_attr( $pp_colonnes['zone'] ); ?>">
 						<?php
@@ -230,12 +229,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 						}
 						?>
 					</td>
-					<td class="pp-col-produit" data-label="<?php echo esc_attr( $pp_colonnes['produit'] ); ?>"><div class="pp-cellule">
-						<?php echo esc_html( $produit !== '' ? $produit : '—' ); ?>
-						<?php if ( View::surface( $row['surface'] ) !== '' ) : ?>
-							<span class="pp-sub"><?php echo esc_html( trim( View::surface( $row['surface'] ) . ' · ' . View::label( 'room_type', $row['room_type'] ), ' ·' ) ); ?></span>
-						<?php endif; ?>
-					</div></td>
 					<td class="pp-col-destination" data-label="<?php echo esc_attr( $pp_colonnes['destination'] ); ?>"><div class="pp-cellule">
 						<?php
 						/*
@@ -261,6 +254,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<?php echo esc_html( View::status( $row['status'] ) ); ?>
 						</span>
 					</td>
+					<td class="pp-col-produit" data-label="<?php echo esc_attr( $pp_colonnes['produit'] ); ?>"><div class="pp-cellule">
+						<?php echo esc_html( $produit !== '' ? $produit : '—' ); ?>
+						<?php if ( View::surface( $row['surface'] ) !== '' ) : ?>
+							<span class="pp-sub"><?php echo esc_html( trim( View::surface( $row['surface'] ) . ' · ' . View::label( 'room_type', $row['room_type'] ), ' ·' ) ); ?></span>
+						<?php endif; ?>
+					</div></td>
+					<td class="pp-col-origine" data-label="<?php echo esc_attr( $pp_colonnes['origine'] ); ?>"><?php echo esc_html( View::label( 'lead_source', (string) ( $row['lead_source'] ?? '' ) ) ?: '—' ); ?></td>
+					<td class="pp-col-date" data-label="<?php echo esc_attr( $pp_colonnes['date'] ); ?>"><?php echo esc_html( View::date_short( $row['created_at'] ) ); ?></td>
 				</tr>
 			<?php endforeach; ?>
 		</tbody>

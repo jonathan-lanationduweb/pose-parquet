@@ -148,7 +148,8 @@ final class MonSite {
 			}
 			echo '</ul></div>';
 		} elseif ( isset( $_GET['pp-site'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Modifications enregistrées. Elles seront en ligne après « Publier le site ».', 'pose-parquet-core' ) . '</p></div>';
+			// Court : ce qui s'est passé, puis l'étape suivante en lien.
+			echo '<div class="notice notice-success is-dismissible"><p><strong>' . esc_html__( 'Modifications enregistrées.', 'pose-parquet-core' ) . '</strong> <a href="' . esc_url( \PoseParquet\Core\Publication\Publication::url() ) . '">' . esc_html__( 'Publier le site →', 'pose-parquet-core' ) . '</a></p></div>';
 		}
 		if ( ! $schema ) {
 			echo '<p class="adm-avertissement">' . esc_html__( 'Les champs de « Mon site » n’ont pas encore été importés depuis le dépôt du site : php tools/importer-champs.php <racine WordPress> data/wordpress/import.json', 'pose-parquet-core' ) . '</p></div>';
@@ -235,7 +236,8 @@ final class MonSite {
 		$mots     = explode( ' ', $nom, 2 );
 		$logo     = absint( $v['logo'] ?? 0 ) ? (string) wp_get_attachment_image_url( absint( $v['logo'] ), 'medium' ) : '';
 		$favicon  = absint( $v['favicon'] ?? 0 ) ? (string) wp_get_attachment_image_url( absint( $v['favicon'] ), 'thumbnail' ) : '';
-		$symbole  = '<span class="adm-marque__symbole" aria-hidden="true"></span>';
+		// Le symbole du site, tel qu'il est dessiné dans l'en-tête public (même tracé).
+		$symbole  = '<svg class="adm-marque__symbole" viewBox="0 0 106 197" fill="currentColor" aria-hidden="true"><g transform="scale(106 197)"><path d="M0 0H0.3396V0.5584L0 0.6396ZM0 0.6599L0.3396 0.5787V1H0ZM0.4057 0H0.7453V0.2437L0.4057 0.3249ZM0.4057 0.3452L0.7453 0.264V1H0.4057ZM0.8208 0H1V0.5584L0.8208 0.6012ZM0.8208 0.6215L1 0.5787V1H0.8208Z"/></g></svg>';
 		Socle::carte_ouvrir( __( 'Aperçu de la marque', 'pose-parquet-core' ) );
 		echo '<div class="adm-marque">';
 		echo '<div class="adm-marque__nom">';
@@ -272,7 +274,7 @@ final class MonSite {
 		if ( $affiche ) {
 			$ida = 'pp-s-' . $affiche['cle'];
 			echo '<input type="hidden" name="pp_site[' . esc_attr( $affiche['cle'] ) . ']" value="0" />';
-			echo '<label for="' . esc_attr( $ida ) . '"><input type="checkbox" id="' . esc_attr( $ida ) . '" name="pp_site[' . esc_attr( $affiche['cle'] ) . ']" value="1"' . checked( ! empty( $valeurs[ $affiche['cle'] ] ), true, false ) . ' /> ' . esc_html__( 'Affiché', 'pose-parquet-core' ) . '</label>';
+			echo '<label for="' . esc_attr( $ida ) . '"><input type="checkbox" id="' . esc_attr( $ida ) . '" name="pp_site[' . esc_attr( $affiche['cle'] ) . ']" value="1"' . checked( ! empty( $valeurs[ $affiche['cle'] ] ), true, false ) . ' /> <span class="adm-liste__case-texte">' . esc_html__( 'Affiché', 'pose-parquet-core' ) . '</span></label>';
 		}
 		echo '</td></tr>';
 	}
@@ -305,7 +307,7 @@ final class MonSite {
 		echo '<div class="adm-colonnes-2">';
 		Socle::carte_ouvrir( __( 'Navigation', 'pose-parquet-core' ) );
 		echo '<p class="adm-carte__aide">' . esc_html__( 'Menu principal (ordinateur et mobile). Les adresses suivent l’arborescence du site.', 'pose-parquet-core' ) . '</p>';
-		self::liste( $groupe( 'Navigation' ), $champs, $valeurs, __( 'Entrée', 'pose-parquet-core' ) );
+		self::liste( $groupe( 'Navigation' ), $champs, $valeurs, __( 'Page', 'pose-parquet-core' ) );
 		$mobile = $groupe( 'Navigation (menu mobile)' );
 		if ( $mobile ) {
 			echo '<h3 class="adm-carte__sous-titre">' . esc_html__( 'Menu mobile seulement', 'pose-parquet-core' ) . '</h3>';
@@ -375,7 +377,7 @@ final class MonSite {
 	/* -- Liens commerciaux ----------------------------------------------- */
 
 	private static function onglet_liens( array $champs, array $valeurs ): void {
-		echo '<p class="adm-note">' . esc_html__( 'Ces liens alimentent les mentions et CTA prévus dans le site.', 'pose-parquet-core' ) . '</p>';
+		echo '<p class="adm-note">' . esc_html__( 'Ces liens alimentent les mentions et les boutons prévus dans le site.', 'pose-parquet-core' ) . '</p>';
 		echo '<div class="adm-colonnes-2">';
 		foreach ( [ 'premibel' => 'Premibel', 'allure' => 'Allure Design' ] as $prefixe => $titre ) {
 			$siens = array_values( array_filter( $champs, static fn( array $d ): bool => str_starts_with( $d['cle'], $prefixe . '_' ) ) );

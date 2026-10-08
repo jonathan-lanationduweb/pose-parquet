@@ -79,7 +79,7 @@ final class Menu {
 	 *   ├── CONTENU      Guides, Tutoriels, Inspirations, Pages, Images
 	 *   ├── ACTIVITÉ     Projets
 	 *   ├── PRODUITS     Catalogue Premibel
-	 *   └── SITE         Mon site, Maintenance, Réglages   (État : depuis Réglages)
+	 *   └── SITE         Mon site, Maintenance, Publication, Réglages   (État : depuis Réglages)
 	 *
 	 * Les Images sont rangées dans « Contenu », comme les Médias d'Expert
 	 * Parquet : une rubrique pour une seule entrée multiplierait les niveaux.
@@ -108,9 +108,9 @@ final class Menu {
 		add_submenu_page( Tableau::PAGE, __( 'Images', 'pose-parquet-core' ), __( 'Images', 'pose-parquet-core' ), 'upload_files', 'upload.php' );
 		add_submenu_page( Tableau::PAGE, __( 'Projets', 'pose-parquet-core' ), __( 'Projets', 'pose-parquet-core' ), Capabilities::VIEW_PROJECTS, self::SLUG, [ Projects::class, 'render' ] );
 		add_submenu_page( Tableau::PAGE, __( 'Catalogue Premibel', 'pose-parquet-core' ), __( 'Catalogue Premibel', 'pose-parquet-core' ), Capabilities::EDIT_CONTENTS, Catalogue::PAGE, [ Catalogue::class, 'render' ] );
-		add_submenu_page( Tableau::PAGE, __( 'Publication du site', 'pose-parquet-core' ), __( 'Publication', 'pose-parquet-core' ), Capabilities::MANAGE_SETTINGS, Publication::PAGE, [ Publication::class, 'render' ] );
 		add_submenu_page( Tableau::PAGE, __( 'Mon site', 'pose-parquet-core' ), __( 'Mon site', 'pose-parquet-core' ), Capabilities::MANAGE_SETTINGS, MonSite::PAGE, [ MonSite::class, 'render' ] );
 		add_submenu_page( Tableau::PAGE, __( 'Mode maintenance', 'pose-parquet-core' ), __( 'Maintenance', 'pose-parquet-core' ), Capabilities::MANAGE_SETTINGS, Maintenance::PAGE, [ Maintenance::class, 'render' ] );
+		add_submenu_page( Tableau::PAGE, __( 'Publication du site', 'pose-parquet-core' ), __( 'Publication', 'pose-parquet-core' ), Capabilities::MANAGE_SETTINGS, Publication::PAGE, [ Publication::class, 'render' ] );
 		add_submenu_page( Tableau::PAGE, __( 'Réglages Pose Parquet', 'pose-parquet-core' ), __( 'Réglages', 'pose-parquet-core' ), Capabilities::MANAGE_SETTINGS, Settings::PAGE, [ Settings::class, 'render' ] );
 		/*
 		 * « État » (diagnostic technique) : accessible — lien depuis Réglages —
@@ -171,9 +171,9 @@ final class Menu {
 			$rubrique( 'Activité', [ $avec( self::SLUG, 'dashicons-clipboard' ) ] ),
 			$rubrique( 'Produits', [ $avec( Catalogue::PAGE, 'dashicons-products' ) ] ),
 			$rubrique( 'Site', [
-				$avec( Publication::PAGE, 'dashicons-upload' ),
 				$avec( MonSite::PAGE, 'dashicons-admin-site-alt3' ),
 				$avec( Maintenance::PAGE, 'dashicons-admin-tools' ),
+				$avec( Publication::PAGE, 'dashicons-upload' ),
 				$avec( Settings::PAGE, 'dashicons-admin-generic' ),
 			] )
 		);
