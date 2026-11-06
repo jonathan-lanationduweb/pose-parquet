@@ -71,6 +71,10 @@ final class Champs {
 				'_pp_tags'        => [ 'type' => 'json', 'ui' => 'cache' ],
 				'_pp_related'     => [ 'type' => 'json', 'ui' => 'cache' ],
 			] + $technique,
+			Types::ARTICLE     => $seo + [
+				self::INTRO       => [ 'type' => 'textarea', 'max' => 1500, 'label' => 'Introduction', 'ui' => 'principal', 'aide' => 'Le paragraphe d’ouverture de l’article, sous le titre.' ],
+				'_pp_lecture'     => [ 'type' => 'text', 'max' => 20, 'label' => 'Temps de lecture', 'ui' => 'cote' ],
+			] + $technique,
 			Types::TUTORIEL    => $seo + [
 				self::INTRO       => [ 'type' => 'textarea', 'max' => 1500, 'label' => 'Introduction', 'ui' => 'principal', 'aide' => 'Le paragraphe d’ouverture du tutoriel, sous le titre.' ],
 				'_pp_duree'       => [ 'type' => 'text', 'max' => 60, 'label' => 'Temps estimé', 'ui' => 'cote' ],

@@ -9,6 +9,7 @@
  * parquet posé. Ici, on compare des parquets entre eux — sur la même scène.
  */
 import { echapper } from '../utils/dom.js';
+import { activateDialog } from '../utils/dialog.js';
 const PATTERN_LABELS = {
   lames: 'Lames droites',
   'point-de-hongrie': 'Point de Hongrie',
@@ -46,6 +47,13 @@ export function createCompare(host, { renderer, catalog, paintConfig, onUse, pro
   const count = root.querySelector('[data-count]');
   let mode = 'slider';
   let current = [];
+  let releaseDialog = null;
+
+  const refreshPending = () => {
+    const pending = Boolean(body.querySelector('.is-loading'));
+    root.setAttribute('aria-busy', String(pending));
+    title.textContent = `Comparer ${current.length} versions${pending ? ' · Préparation…' : ''}`;
+  };
 
   const label = (variant) => {
     const material = catalog.get(variant.config.materialId);
@@ -68,10 +76,16 @@ export function createCompare(host, { renderer, catalog, paintConfig, onUse, pro
     // en noir dans la comparaison (recette globale). On peint dès que c'est prêt.
     if (!renderer.paint(canvas, config, null, 1) && renderer.enAttente) {
       canvas.classList.add('is-loading');
+      if (renderer.photo) canvas.getContext('2d').drawImage(renderer.photo, 0, 0, canvas.width, canvas.height);
       renderer.preparer(config).then(() => {
         if (canvas.isConnected) renderer.paint(canvas, config, null, 1);
-        canvas.classList.remove('is-loading');
-      });
+      }).catch(() => {
+        if (!canvas.isConnected) return;
+        const error = document.createElement('p');
+        error.setAttribute('role', 'status');
+        error.textContent = 'Ce rendu n’a pas pu être chargé. Fermez puis rouvrez la comparaison pour réessayer.';
+        canvas.replaceWith(error);
+      }).finally(() => { canvas.classList.remove('is-loading'); refreshPending(); });
     }
     return canvas;
   };
@@ -168,6 +182,7 @@ export function createCompare(host, { renderer, catalog, paintConfig, onUse, pro
     modes.hidden = !two;
     if (two && mode === 'slider') renderSlider(current);
     else renderGrid(current);
+    refreshPending();
   }
 
   modes.querySelectorAll('[data-mode]').forEach((button) =>
@@ -184,14 +199,14 @@ export function createCompare(host, { renderer, catalog, paintConfig, onUse, pro
     root.hidden = true;
     body.innerHTML = '';
     document.body.classList.remove('is-comparing');
+    releaseDialog?.();
+    releaseDialog = null;
   };
   root.querySelector('[data-close]').addEventListener('click', close);
   // Au niveau du document, pas de la boîte : un Échap tapé alors que le focus
   // est resté sur la page — le cas d'un clic souris qui l'a déplacé — doit
   // fermer aussi. Sans effet tant que la boîte est cachée.
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && !root.hidden) close();
-  });
+
 
   host.appendChild(root);
 
@@ -202,10 +217,11 @@ export function createCompare(host, { renderer, catalog, paintConfig, onUse, pro
       title.textContent = `Comparer ${variants.length} versions`;
       if (projectLink) root.querySelector('[data-project]').href = projectLink(variants[0]);
       if (variants.length !== 2) mode = 'grid';
+      modes.querySelectorAll('[data-mode]').forEach(el => el.setAttribute('aria-pressed', String(el.dataset.mode === mode)));
       draw();
       root.hidden = false;
       document.body.classList.add('is-comparing');
-      window.setTimeout(() => root.querySelector('[data-close]').focus({ preventScroll: true }), 50);
+      if (!releaseDialog) releaseDialog = activateDialog(root, { onClose: close, initialFocus: root.querySelector('[data-close]') });
     },
     close,
   };

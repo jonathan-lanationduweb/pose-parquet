@@ -101,6 +101,7 @@ final class Menu {
 			Types::GUIDE       => __( 'Guides', 'pose-parquet-core' ),
 			Types::TUTORIEL    => __( 'Tutoriels', 'pose-parquet-core' ),
 			Types::INSPIRATION => __( 'Inspirations', 'pose-parquet-core' ),
+			Types::ARTICLE     => __( 'Articles', 'pose-parquet-core' ),
 			Types::PAGE        => __( 'Pages', 'pose-parquet-core' ),
 		] as $type => $libelle ) {
 			add_submenu_page( Tableau::PAGE, $libelle, $libelle, Capabilities::EDIT_CONTENTS, 'edit.php?post_type=' . $type );
@@ -165,6 +166,7 @@ final class Menu {
 				$avec( $liste( Types::GUIDE ), 'dashicons-media-document' ),
 				$avec( $liste( Types::TUTORIEL ), 'dashicons-hammer' ),
 				$avec( $liste( Types::INSPIRATION ), 'dashicons-format-gallery' ),
+				$avec( $liste( Types::ARTICLE ), 'dashicons-welcome-write-blog' ),
 				$avec( $liste( Types::PAGE ), 'dashicons-edit' ),
 				$avec( 'upload.php', 'dashicons-format-image' ),
 			] ),

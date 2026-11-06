@@ -619,6 +619,9 @@ export function lireJson(url) {
     fichiers.set(url, fetch(url).then((r) => {
       if (!r.ok) throw new Error(`introuvable : ${url}`);
       return r.json();
+    }).catch(error => {
+      fichiers.delete(url);
+      throw error;
     }));
   }
   return fichiers.get(url);

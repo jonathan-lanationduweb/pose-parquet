@@ -171,12 +171,13 @@ export function raisonIndisponible(material, nomDuMotif) {
  * @returns {string}
  */
 export function messageAdaptation(material, nomDuMotifRetenu) {
-  const nom = (material && material.name) || 'Ce parquet';
+  // Court : le message s'affiche sur la photo. Le nom du parquet, souvent
+  // long (« … Invisible 90x15x600 »), est déjà dans la liste et la barre.
   const seul = motifsDe(material).length === 1;
   const motif = enMinusculeInitiale(nomDuMotifRetenu);
   return seul
-    ? `${nom} se pose en ${motif} uniquement : le motif a été adapté.`
-    : `${nom} ne propose pas le motif précédent : passé en ${motif}.`;
+    ? `Motif adapté : ce parquet se pose uniquement en ${motif}.`
+    : `Motif adapté : passé en ${motif}, l’autre n’existe pas pour ce parquet.`;
 }
 
 /**

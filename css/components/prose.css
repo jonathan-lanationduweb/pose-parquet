@@ -112,6 +112,7 @@
 .callout--key ul { margin: 0; }
 
 /* Etapes de tutoriel */
+.prose ol.steps { list-style: none; padding-left: 0; }
 .steps { counter-reset: step; display: grid; gap: var(--sp-5); margin: var(--sp-6) 0; list-style: none; padding: 0; }
 .steps li {
   counter-increment: step;
@@ -230,4 +231,46 @@
   width: 12px; height: 2px;
   background: currentColor;
   opacity: 0.55;
+}
+
+/* Trois colonnes lisibles dans la largeur du téléphone, sans contenu coupé. */
+@media (max-width: 47.99rem) {
+  .prose, .article-layout { min-width: 0; }
+  .table-wrap:not(:has(thead tr > :nth-child(4))) .table-compare {
+    min-width: 0;
+    width: 100%;
+    table-layout: fixed;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .table-wrap:not(:has(thead tr > :nth-child(4))) :is(th, td) {
+    padding: 0.7rem 0.45rem;
+    overflow-wrap: anywhere;
+    hyphens: manual;
+  }
+  .table-wrap:not(:has(thead tr > :nth-child(4))) thead th {
+    font-size: 0.7rem;
+    letter-spacing: 0.035em;
+  }
+}
+
+/* Quatre colonnes ou plus : une fiche lisible par ligne sur téléphone. */
+@media (max-width: 47.99rem) {
+  .table-wrap:has(.table--stacked) { background: var(--surface); }
+  .table--stacked { display: block; min-width: 0; width: 100%; font-size: 0.9rem; position: relative; }
+  .table--stacked thead {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  .table--stacked tbody { display: block; }
+  .table--stacked tbody tr { display: block; padding: 0.7rem; border-bottom: 1px solid var(--line); }
+  .table--stacked tbody tr:last-child { border-bottom: 0; }
+  .table--stacked tbody :is(th, td) {
+    display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    column-gap: 0.75rem; width: auto; padding: 0.4rem 0; border: 0;
+    overflow-wrap: anywhere;
+  }
+  .table--stacked tbody :is(th, td)::before {
+    content: attr(data-label); font-weight: 500; color: var(--text-muted);
+  }
 }

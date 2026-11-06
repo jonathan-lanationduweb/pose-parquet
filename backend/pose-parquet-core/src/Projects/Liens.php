@@ -56,7 +56,7 @@ final class Liens {
 		if ( $local && is_readable( $local . '/data/products.premibel.json' ) ) {
 			$corps = (string) file_get_contents( $local . '/data/products.premibel.json' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		} else {
-			$r = wp_remote_get( SitePublic::url() . 'data/products.premibel.json', [ 'timeout' => 6 ] );
+			$r = \PoseParquet\Core\Admin\SitePublic::lire( SitePublic::url() . 'data/products.premibel.json', [ 'timeout' => 6 ] );
 			if ( ! is_wp_error( $r ) && (int) wp_remote_retrieve_response_code( $r ) === 200 ) {
 				$corps = (string) wp_remote_retrieve_body( $r );
 			}

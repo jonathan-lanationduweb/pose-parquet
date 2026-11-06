@@ -147,7 +147,7 @@ capabilities.
 
 ## Journal
 
-`Support\Logger` écrit via `error_log()` uniquement si `WP_DEBUG` est actif,
+`Support\Logger` écrit erreurs et alertes via `error_log()` même sans `WP_DEBUG` ; les traces INFO exigent le débogage,
 préfixe `[pose-parquet]`, niveaux ERREUR / ALERTE / INFO, contexte en JSON
 après retrait des clés personnelles et techniques (voir `security.md`).
 

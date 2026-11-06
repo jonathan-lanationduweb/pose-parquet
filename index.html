@@ -32,10 +32,16 @@
     <link rel="manifest" href="site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="assets/dist/site.070ddff7ad.css" />
+    <link rel="stylesheet" href="assets/dist/site.5382f6b607.css" />
     <link rel="stylesheet" href="assets/dist/scene.8a51f44f53.css" />
-    <script type="module" src="assets/dist/ced9b1be6d/js/main.js"></script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Pose Parquet","url":"https://pose-parquet.com","inLanguage":"fr-FR","description":"Comprendre, préparer, visualiser et réussir la pose de son parquet."}</script>
+    <!-- Adresse du backend, définissable au déploiement sans toucher au code.
+         Script classique et non module : il s'exécute avant les modules, donc
+         avant que api-config.js ne lise window.POSE_PARQUET_CONFIG. Pas
+         d'empreinte dans le nom — c'est ce qui permet de le remplacer. -->
+    <script src="config.js"></script>
+    <script type="module" src="assets/dist/730454e46f/js/main.js"></script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Pose Parquet","url":"https://pose-parquet.com","inLanguage":"fr-FR","description":"Comprendre, préparer, visualiser et réussir la pose de son parquet.","publisher":{"@id":"https://pose-parquet.com/#organisation"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","@id":"https://pose-parquet.com/#organisation","name":"Pose Parquet","url":"https://pose-parquet.com","logo":"https://pose-parquet.com/assets/icons/icon-512.png"}</script>
   </head>
   <body class="page">
     <a class="skip-link" href="#contenu">Aller au contenu</a>
@@ -170,7 +176,7 @@
               <span class="entry__num">03</span>
               <h3 class="entry__title">Visualiser</h3>
               <p class="entry__text">Votre photo, un parquet, un motif : le sol change à chaque clic.</p>
-              <span class="entry__foot"><span class="entry__meta">211 parquets à essayer</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
+              <span class="entry__foot"><span class="entry__meta">203 parquets à essayer</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></span>
             </a>
             <a class="entry entry--clay" href="projet/">
               <span class="entry__num">04</span>
@@ -262,7 +268,7 @@
                 <span class="vzp__handle" aria-hidden="true"></span>
               </div>
               <figcaption class="vzp__caption">
-                <span data-caption>Chêne naturel Houston, lames droites (rendu fidèle)</span> — rendu calculé dans votre navigateur.
+                <span data-caption>Chêne Colza 150x15, lames droites (rendu indicatif)</span> — rendu calculé dans votre navigateur.
                 <span data-credit>Photo : Curtis Adams / Pexels.</span>
               </figcaption>
             </figure>
@@ -557,8 +563,8 @@
               <ul class="feature__list">
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>Quatre étapes courtes, aucune coordonnée demandée.</span></li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>« Je ne sais pas » est une réponse valable partout.</span></li>
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>Aucun démarchage : vos coordonnées servent uniquement à répondre.</span></li>
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>L’orientation est relue et confirmée par une personne avant tout contact.</span></li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>Votre projet est qualifié selon votre besoin et votre localisation.</span></li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6"/></svg><span>À la fin, vous êtes orienté vers Premibel, Allure Design ou les deux selon votre projet.</span></li>
               </ul>
               <div class="cluster">
                 <a class="btn" href="projet/"><span>Décrire mon projet</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
@@ -627,6 +633,12 @@
           -->
           <p class="footer__orientation"><strong>Premibel</strong> pour les références de parquet, <strong>Allure&nbsp;Design</strong> pour la pose et la rénovation en Île-de-France : Pose Parquet oriente selon le besoin. <a href="a-propos/#liens-commerciaux">Nos liens commerciaux</a></p>
           <p>Photographies sous licence Pexels</p>
+          <!-- Les pages obligatoires et pratiques, sur toutes les pages : c'est là qu'on les cherche. -->
+          <ul class="footer__legal">
+            <li><a href="mentions-legales/">Mentions légales</a></li>
+            <li><a href="confidentialite/">Confidentialité et cookies</a></li>
+            <li><a href="plan-du-site/">Plan du site</a></li>
+          </ul>
         </div>
       </div>
     </footer>

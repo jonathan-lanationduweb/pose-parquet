@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>À propos de Pose Parquet, média sur la pose du parquet</title>
-    <meta name="description" content="Pose Parquet aide à comprendre la pose du parquet, à préparer son projet et à trouver les références adaptées : guides, motifs, tutoriels et outils de visualisation." />
+    <meta name="description" content="Pose Parquet aide à comprendre la pose du parquet et à préparer son projet : guides, motifs, tutoriels et outils de visualisation gratuits." />
     <!-- Balise robots toujours explicite. Sa valeur par défaut est « index,
          follow » : les fichiers du dépôt décrivent la production, et c'est le
          déploiement qui marque une préproduction — voir
@@ -21,7 +21,7 @@
     <meta property="og:site_name" content="Pose Parquet" />
     <meta property="og:locale" content="fr_FR" />
     <meta property="og:title" content="À propos de Pose Parquet, média sur la pose du parquet" />
-    <meta property="og:description" content="Pose Parquet aide à comprendre la pose du parquet, à préparer son projet et à trouver les références adaptées : guides, motifs, tutoriels et outils de visualisation." />
+    <meta property="og:description" content="Pose Parquet aide à comprendre la pose du parquet et à préparer son projet : guides, motifs, tutoriels et outils de visualisation gratuits." />
     <meta property="og:url" content="https://pose-parquet.com/a-propos/" />
     <meta property="og:image" content="https://pose-parquet.com/assets/images/og-default.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -32,9 +32,14 @@
     <link rel="manifest" href="../site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../assets/dist/site.070ddff7ad.css" />
-    <script type="module" src="../assets/dist/ced9b1be6d/js/main.js"></script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/index.html"},{"@type":"ListItem","position":2,"name":"À propos","item":"https://pose-parquet.com/"}]}</script>
+    <link rel="stylesheet" href="../assets/dist/site.5382f6b607.css" />
+    <!-- Adresse du backend, définissable au déploiement sans toucher au code.
+         Script classique et non module : il s'exécute avant les modules, donc
+         avant que api-config.js ne lise window.POSE_PARQUET_CONFIG. Pas
+         d'empreinte dans le nom — c'est ce qui permet de le remplacer. -->
+    <script src="../config.js"></script>
+    <script type="module" src="../assets/dist/730454e46f/js/main.js"></script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/"},{"@type":"ListItem","position":2,"name":"À propos"}]}</script>
   </head>
   <body class="page">
     <a class="skip-link" href="#contenu">Aller au contenu</a>
@@ -115,7 +120,7 @@
         <p class="callout__label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9 17.5 20 6.5"/></svg>Ce que ce site ne fait pas</p>
         <ul>
           <li>Aucune publicité, aucun panier, aucun paiement, aucun prix.</li>
-          <li>Aucun envoi automatique : une personne relit chaque demande avant tout contact.</li>
+          <li>Aucune coordonnée demandée : vous choisissez de poursuivre auprès du partenaire proposé.</li>
           <li>Aucun lien produit sur un parquet de démonstration, qui n'existe pas en vente.</li>
           <li>Aucune revente de coordonnées.</li>
         </ul>
@@ -139,9 +144,9 @@
             <h3>Trois noms, trois métiers</h3>
           </div>
           <div class="table-wrap">
-        <table class="table-compare">
+        <table class="table-compare table--stacked" role="table">
           <thead><tr><th scope="col">Qui</th><th scope="col">Métier</th><th scope="col">Ce qu’on y trouve</th><th scope="col">Zone</th></tr></thead>
-          <tbody><tr><th scope="row">Pose Parquet</th><td>Éditorial et outils</td><td>Guides, fiches motif, tutoriels, Visualiseur, Mode Plan</td><td>Aucune : le site se lit partout</td></tr><tr><th scope="row"><a href="https://www.premibel.fr/" rel="noopener">Premibel</a></th><td>Références de parquet</td><td>Produits, fourniture, showroom</td><td>Aucune limite : un parquet se livre</td></tr><tr><th scope="row"><a href="https://www.allure-design.com/" rel="noopener">Allure Design</a></th><td>Pose et rénovation intérieure</td><td>Revêtements de sol, aménagement, second œuvre</td><td>Paris et l’Île-de-France</td></tr></tbody>
+          <tbody role="rowgroup"><tr role="row"><th scope="row" data-label="Qui" role="rowheader"><span class="table-cell-value">Pose Parquet</span></th><td data-label="Métier" role="cell"><span class="table-cell-value">Éditorial et outils</span></td><td data-label="Ce qu’on y trouve" role="cell"><span class="table-cell-value">Guides, fiches motif, tutoriels, Visualiseur, Mode Plan</span></td><td data-label="Zone" role="cell"><span class="table-cell-value">Aucune : le site se lit partout</span></td></tr><tr role="row"><th scope="row" data-label="Qui" role="rowheader"><span class="table-cell-value"><a href="https://www.premibel.fr/" rel="noopener">Premibel</a></span></th><td data-label="Métier" role="cell"><span class="table-cell-value">Références de parquet</span></td><td data-label="Ce qu’on y trouve" role="cell"><span class="table-cell-value">Produits, fourniture, showroom</span></td><td data-label="Zone" role="cell"><span class="table-cell-value">Aucune limite : un parquet se livre</span></td></tr><tr role="row"><th scope="row" data-label="Qui" role="rowheader"><span class="table-cell-value"><a href="https://www.allure-design.com/" rel="noopener">Allure Design</a></span></th><td data-label="Métier" role="cell"><span class="table-cell-value">Pose et rénovation intérieure</span></td><td data-label="Ce qu’on y trouve" role="cell"><span class="table-cell-value">Revêtements de sol, aménagement, second œuvre</span></td><td data-label="Zone" role="cell"><span class="table-cell-value">Paris et l’Île-de-France</span></td></tr></tbody>
         </table>
       </div>
           <div class="prose">
@@ -160,7 +165,7 @@
 
             <h3>Dans le Visualiseur</h3>
             <p>Le Visualiseur propose deux sortes de parquets. Les uns sont des références de démonstration, calculées par le moteur, qui ne correspondent à aucun produit précis. Les autres sont relevées sur des fiches réelles de Premibel : celles-là portent un lien vers leur fiche, et le lien le dit avant qu'on clique. Un parquet de démonstration n'en a pas, et n'en aura pas — proposer d'acheter ce qui n'existe pas serait la pire chose que nous puissions faire.</p>
-            <p>Décrire un projet par le formulaire n'engage à rien et ne déclenche aucun envoi automatique : le formulaire demande de quoi vous avez besoin et où se situe le projet, une orientation est proposée, et <strong>une personne la confirme ou la corrige</strong> avant tout contact.</p>
+            <p>Décrire un projet par le formulaire n'engage à rien. À partir de votre besoin et de votre département, <strong>une orientation est calculée immédiatement</strong>, sans vous demander de coordonnées. Vous choisissez ensuite de consulter les parquets de Premibel ou de poursuivre votre projet auprès d’Allure Design selon votre localisation.</p>
             <aside class="callout callout--key">
         <p class="callout__label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9 17.5 20 6.5"/></svg>À retenir</p>
         <p>Ce que cette relation ne change pas : les guides, les fiches motif et les tutoriels sont écrits pour répondre à une question, pas pour amener à un produit. Un lien s’ajoute à un texte quand il l’éclaire ; il ne l’a jamais commandé.</p>
@@ -234,6 +239,12 @@
           -->
           <p class="footer__orientation"><strong>Premibel</strong> pour les références de parquet, <strong>Allure&nbsp;Design</strong> pour la pose et la rénovation en Île-de-France : Pose Parquet oriente selon le besoin. <a href="../a-propos/#liens-commerciaux">Nos liens commerciaux</a></p>
           <p>Photographies sous licence Pexels</p>
+          <!-- Les pages obligatoires et pratiques, sur toutes les pages : c'est là qu'on les cherche. -->
+          <ul class="footer__legal">
+            <li><a href="../mentions-legales/">Mentions légales</a></li>
+            <li><a href="../confidentialite/">Confidentialité et cookies</a></li>
+            <li><a href="../plan-du-site/">Plan du site</a></li>
+          </ul>
         </div>
       </div>
     </footer>

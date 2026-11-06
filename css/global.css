@@ -231,3 +231,21 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 
 /* Un nom composé qui ne se coupe pas sur son trait d'union (« Île-de- / France »). */
 .u-nowrap { white-space: nowrap; }
+
+/*
+ * Partenaire indisponible (panne ou maintenance, contrôlé par WordPress toutes
+ * les 15 minutes, voir js/commerce/partenaires.js) : ses liens disparaissent.
+ */
+/* Boutons et liens d'action (ils ont une classe) : retirés. */
+html[data-premibel-indisponible] a[href*="premibel.fr"][class],
+html[data-allure-indisponible] a[href*="allure-design.com"][class] {
+  display: none !important;
+}
+/* Lien dans une phrase ou un tableau : le nom reste, il n'est plus cliquable. */
+html[data-premibel-indisponible] a[href*="premibel.fr"]:not([class]),
+html[data-allure-indisponible] a[href*="allure-design.com"]:not([class]) {
+  pointer-events: none;
+  cursor: default;
+  color: inherit;
+  text-decoration: none;
+}

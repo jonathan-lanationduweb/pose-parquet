@@ -73,7 +73,7 @@ wp_delete_user( (int) $gestionnaire );
 $section( 'Workflow fermé' );
 $source = (string) file_get_contents( POSE_PARQUET_DIR . '/src/Publication/Publication.php' );
 $verifie( 'le module ne lit ni $_POST, ni $_GET, ni $_REQUEST (aucun paramètre du navigateur)', ! preg_match( '/\$_(POST|GET|REQUEST)\b/', $source ) );
-$verifie( 'commande construite de valeurs calculées, toutes échappées (escapeshellarg)', str_contains( $source, "array_map( 'escapeshellarg', [ \$node, \$script, '--etat', \$fichier, '--export', \$export ] )" ) );
+$verifie( 'commande construite de valeurs calculées, toutes échappées (escapeshellarg)', str_contains( $source, "array_map( 'escapeshellarg', array_merge( [ \$node, \$script, '--etat', \$fichier, '--export', \$export ], \$catalogue ? [ '--catalogue' ] : [] ) )" ) );
 $verifie( 'Node : constante ou emplacements fixes, jamais une saisie', str_contains( $source, "defined( 'POSE_PARQUET_NODE' )" ) );
 $runner = (string) \PoseParquet\Core\Contenus\Apercu::dossier() . '/_generator/publier.js';
 if ( is_file( $runner ) ) {
@@ -122,8 +122,9 @@ add_filter( 'pre_http_request', static function ( $pre, array $args, string $url
 $verifie( 'mode github choisi par la configuration serveur', Publication::mode() === 'github' );
 $r = Publication::lancer( $admin );
 $d = $requetes[0] ?? [];
-$verifie( 'repository_dispatch envoyé (POST /repos/…/dispatches)', $r['code'] === 'lancee' && ( $d['methode'] ?? '' ) === 'POST' && str_ends_with( (string) ( $d['url'] ?? '' ), '/repos/exemple/pose-parquet/dispatches' ) );
-$verifie( 'événement « wordpress-publish »', ( json_decode( (string) ( $d['corps'] ?? '' ), true )['event_type'] ?? '' ) === Publication::EVENEMENT_GITHUB );
+$verifie( 'workflow_dispatch envoyé (POST /repos/…/actions/workflows/deploy-pages.yml/dispatches)', $r['code'] === 'lancee' && ( $d['methode'] ?? '' ) === 'POST' && str_ends_with( (string) ( $d['url'] ?? '' ), '/repos/exemple/pose-parquet/actions/workflows/deploy-pages.yml/dispatches' ) );
+$verifie( 'branche main, et rien d’autre dans la charge', json_decode( (string) ( $d['corps'] ?? '' ), true ) === [ 'ref' => 'main' ] );
+$verifie( 'jeton sans droit sur le code : plus aucun appel à /dispatches du dépôt (repository_dispatch)', ! str_ends_with( (string) ( $d['url'] ?? '' ), '/repos/exemple/pose-parquet/dispatches' ) );
 $verifie( 'le jeton part du serveur, dans un en-tête', ( $d['auth'] ?? '' ) === 'Bearer jeton-de-test' );
 ob_start();
 Publication::panneau();
@@ -154,7 +155,7 @@ $v['debut'] = time() - Publication::DELAI_DEMARRAGE_GITHUB - 5;
 update_option( Publication::VERROU, $v, false );
 Publication::synchroniser();
 $j = Publication::memoire()['journal'][0] ?? [];
-$verifie( 'aucun run après 3 minutes : échec explicite (branche par défaut sans déclencheur)', ( $j['resultat'] ?? '' ) === 'echec' && str_contains( (string) $j['raison'], 'branche par défaut' ) && get_option( Publication::VERROU ) === false );
+$verifie( 'aucun run après 3 minutes : échec explicite (workflow sans déclencheur manuel)', ( $j['resultat'] ?? '' ) === 'echec' && str_contains( (string) $j['raison'], 'workflow_dispatch' ) && get_option( Publication::VERROU ) === false );
 
 /* ------------------------------------------------------------------ */
 // Remise en état.

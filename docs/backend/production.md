@@ -9,6 +9,23 @@
 > place et vérifié en local. Ce qui reste demande un hébergement, un domaine et
 > un compte SMTP — c'est-à-dire des décisions humaines, listées en fin de page.
 
+## Préparation du 2 novembre 2026
+
+Le code de préparation est prêt en local. L’hébergement est volontairement laissé en attente : aucun DNS, compte, certificat ou paramètre serveur distant n’a été modifié.
+
+- `node backend/deploy/faire-paquet.js plugin <nouveau dossier>` produit seulement le plugin exécutable (sans tests, outils, journaux ni configuration locale).
+- `node backend/deploy/faire-paquet.js site <nouveau dossier>` produit seulement les pages et ressources publiques. Le diagnostic de build, les aperçus WordPress et les sources internes sont exclus. Le manifeste SHA-256 est écrit à côté du paquet.
+- Ces commandes refusent une destination existante. Elles ne suppriment aucun dossier.
+- `php backend/deploy/verifier-production.php <racine WordPress>` contrôle les principaux réglages sans afficher de secret ni envoyer de notification. Une sortie 1 sur WAMP est attendue : WAMP reste local.
+- GitHub Actions reconstruit aussi le site en préproduction sans export distant. La production exige un export WordPress HTTPS et un CNAME cohérent. La configuration JS est sérialisée avec JSON, sans interpolation de la variable dans du code.
+- Les erreurs et alertes du plugin restent dans le journal PHP même quand WP_DEBUG est désactivé. Prévoir un journal serveur privé et sa rotation.
+
+Avant une mise en ligne réelle : appliquer la configuration sur une préproduction distante, tester une modification enregistrée puis prévisualisée et publiée, tester les notifications si elles sont activées, et restaurer une sauvegarde base + médias dans une installation isolée. Les tests simulés ne remplacent pas cette recette distante.
+
+### Retrait éditorial à traiter avant de promettre la dépublication
+
+Le générateur conserve actuellement les guides/tutoriels du dépôt absents de l’export WordPress. Passer un article en brouillon ne garantit donc pas sa disparition publique. Une publication ne doit pas être présentée comme une preuve de suppression. Le retrait doit traiter aussi le fichier HTML existant, les liens, le sitemap et, si nécessaire, une redirection. Cette politique n’a pas été changée dans la préparation d’hébergement.
+
 ## 1. wp-config de production
 
 Le wp-config local n'est pas un modèle : il déclare `WP_ENVIRONMENT_TYPE =
@@ -27,13 +44,14 @@ define( 'WP_DEBUG_LOG',     false );   // ou un chemin HORS de la racine web
 
 /* Personne ne modifie du code depuis l'administration. */
 define( 'DISALLOW_FILE_EDIT',  true );
-define( 'DISALLOW_FILE_MODS',  true );  // ni installation ni mise à jour par l'admin
+// DISALLOW_FILE_MODS : seulement si un processus externe assure les mises à jour.
+// Ne pas bloquer les mises à jour de sécurité sans solution de remplacement.
 
 /* Administration et connexion en HTTPS uniquement. */
 define( 'FORCE_SSL_ADMIN', true );
 
-/* Révisions et corbeille : ce site n'a pas de contenu éditorial. */
-define( 'WP_POST_REVISIONS', false );
+/* Les guides et tutoriels sont éditoriaux : conserver un historique. */
+define( 'WP_POST_REVISIONS', 20 );
 define( 'EMPTY_TRASH_DAYS', 7 );
 ```
 
@@ -114,12 +132,12 @@ Header always set X-Frame-Options "SAMEORIGIN"
 Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
 # HSTS : UNIQUEMENT quand le HTTPS est en place et vérifié. Un preload posé trop
 # tôt rend le domaine inaccessible en HTTP pendant des mois.
-Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
+# Après validation HTTPS et redirections sur le domaine cible :
+# Header always set Strict-Transport-Security "max-age=300"
+# Augmenter ensuite progressivement ; pas de includeSubDomains/preload sans audit DNS.
 ```
 
-Pour le **site public**, une politique de contenu stricte est possible parce
-que le site ne charge aucun script tiers — vérifié : zéro requête sortante vers
-un autre domaine.
+Pour le **site public**, commencer par une politique en observation (Content-Security-Policy-Report-Only). La maintenance utilise un script inline et des styles sont pilotés par le visualiseur : une politique stricte activée sans recette peut les casser. Le schéma ci-dessous est une cible à adapter et à tester, pas une configuration prête à activer. Elle ne doit pas être appliquée telle quelle à wp-admin.
 
 ```
 Content-Security-Policy:

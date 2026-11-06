@@ -16,6 +16,7 @@ namespace PoseParquet\Core\Catalogue;
 use PoseParquet\Core\Admin\SitePublic;
 use PoseParquet\Core\Admin\Socle;
 use PoseParquet\Core\Security\Capabilities;
+use PoseParquet\Core\Partenaires\Surveillance;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -25,10 +26,81 @@ final class Ecran {
 
 	public const PAGE       = 'pose-parquet-catalogue';
 	public const TRANSIENT  = 'pp_catalogue_etat';
-	public const ACTUALISER = 'pp_catalogue_actualiser';
+	public const ACTUALISER   = 'pp_catalogue_actualiser';
+	public const SYNCHRONISER = 'pp_catalogue_synchroniser';
+	public const VERIFIER     = 'pp_partenaires_verifier';
 
 	public static function register(): void {
 		add_action( 'admin_post_' . self::ACTUALISER, [ self::class, 'actualiser' ] );
+		add_action( 'admin_post_' . self::SYNCHRONISER, [ self::class, 'synchroniser' ] );
+		add_action( 'admin_post_' . self::VERIFIER, [ self::class, 'verifier' ] );
+	}
+
+	/** « Mettre à jour maintenant » : resynchronise le catalogue Premibel puis republie le site. */
+	public static function synchroniser(): void {
+		if ( ! current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
+			wp_die( '', '', [ 'response' => 403 ] );
+		}
+		check_admin_referer( self::SYNCHRONISER );
+		$r = \PoseParquet\Core\Publication\Publication::lancer( get_current_user_id(), true );
+		delete_transient( self::TRANSIENT );
+		wp_safe_redirect( add_query_arg( 'pp-publication', $r['code'], admin_url( 'admin.php?page=' . self::PAGE ) ) );
+		exit;
+	}
+
+	/** « Vérifier maintenant » : contrôle immédiat des sites partenaires. */
+	public static function verifier(): void {
+		if ( ! current_user_can( Capabilities::EDIT_CONTENTS ) ) {
+			wp_die( '', '', [ 'response' => 403 ] );
+		}
+		check_admin_referer( self::VERIFIER );
+		Surveillance::verifier();
+		wp_safe_redirect( admin_url( 'admin.php?page=' . self::PAGE ) );
+		exit;
+	}
+
+	/** Un bouton dans son petit formulaire POST (nonce compris). */
+	private static function bouton( string $action, string $libelle, string $icone, string $classe = 'adm-bouton adm-bouton--petit' ): string {
+		return '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="adm-carte__formulaire"><input type="hidden" name="action" value="' . esc_attr( $action ) . '">'
+			. wp_nonce_field( $action, '_wpnonce', true, false )
+			. '<button type="submit" class="' . esc_attr( $classe ) . '"><span class="dashicons ' . esc_attr( $icone ) . '" aria-hidden="true"></span>' . esc_html( $libelle ) . '</button></form>';
+	}
+
+	/** La carte « Sites partenaires » : disponibles ou retirés, et pourquoi. */
+	private static function carte_partenaires(): void {
+		$etat   = Surveillance::etat_brut();
+		$lignes = [];
+		foreach ( Surveillance::PARTENAIRES as $cle => $p ) {
+			$e = $etat[ $cle ] ?? null;
+			if ( ! is_array( $e ) ) {
+				$lignes[] = [ $p['nom'], __( 'Pas encore vérifié', 'pose-parquet-core' ), 'attente' ];
+				continue;
+			}
+			if ( ! empty( $e['ignore'] ) ) {
+				$lignes[] = [ $p['nom'], __( 'Masqué dans Mon site : non contrôlé', 'pose-parquet-core' ), 'attente' ];
+				continue;
+			}
+			$quand = wp_date( 'j F à H:i', (int) ( $e['verifie'] ?? time() ) );
+			if ( ! empty( $e['disponible'] ) ) {
+				$texte    = (int) $e['echecs'] > 0
+					/* translators: 1: raison, 2: date */
+					? sprintf( __( 'Disponible — un contrôle raté (%1$s), à confirmer. Vérifié le %2$s', 'pose-parquet-core' ), (string) $e['raison'], $quand )
+					/* translators: %s : date */
+					: sprintf( __( 'Disponible — vérifié le %s', 'pose-parquet-core' ), $quand );
+				$lignes[] = [ $p['nom'], $texte, (int) $e['echecs'] > 0 ? 'attente' : 'ok' ];
+			} else {
+				$lignes[] = [
+					$p['nom'],
+					/* translators: 1: raison, 2: date */
+					sprintf( __( 'Retiré du site : %1$s. Depuis le %2$s', 'pose-parquet-core' ), (string) $e['raison'], wp_date( 'j F à H:i', (int) ( $e['depuis'] ?? time() ) ) ),
+					'ko',
+				];
+			}
+		}
+		Socle::carte_ouvrir( __( 'Sites partenaires', 'pose-parquet-core' ) );
+		Socle::etat( $lignes, __( 'Contrôle automatique toutes les 15 minutes. Un site en panne ou en maintenance n’est plus proposé aux visiteurs (liens masqués, formulaire réorienté) ; il revient dès qu’il répond de nouveau.', 'pose-parquet-core' ) );
+		echo self::bouton( self::VERIFIER, __( 'Vérifier maintenant', 'pose-parquet-core' ), 'dashicons-update' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé dans bouton().
+		Socle::carte_fermer();
 	}
 
 	public static function url_fichier(): string {
@@ -51,7 +123,7 @@ final class Ecran {
 		if ( $local && is_readable( $local . '/data/catalogue-etat.json' ) ) {
 			$corps = (string) file_get_contents( $local . '/data/catalogue-etat.json' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		} else {
-			$r = wp_remote_get( self::url_fichier(), [ 'timeout' => 6, 'redirection' => 2 ] );
+			$r = \PoseParquet\Core\Admin\SitePublic::lire( self::url_fichier(), [ 'timeout' => 6, 'redirection' => 2 ] );
 			if ( is_wp_error( $r ) ) {
 				return [ 'ok' => false, 'erreur' => $r->get_error_message() ];
 			}
@@ -89,7 +161,8 @@ final class Ecran {
 		}
 		$etat = self::lire();
 		echo '<div class="wrap">';
-		Socle::entete( __( 'Catalogue Premibel', 'pose-parquet-core' ), __( 'Consultation seulement : le catalogue est piloté par la synchronisation avec Premibel, pas par WordPress.', 'pose-parquet-core' ) );
+		Socle::entete( __( 'Catalogue Premibel', 'pose-parquet-core' ), __( 'Le catalogue se synchronise avec Premibel chaque nuit ; les références retirées chez Premibel disparaissent du site. Rien ne s’édite ici.', 'pose-parquet-core' ) );
+		self::carte_partenaires();
 
 		if ( ! $etat['ok'] ) {
 			echo '<p class="adm-avertissement">' . esc_html(
@@ -152,7 +225,10 @@ final class Ecran {
 			. '<button type="submit" class="adm-bouton adm-bouton--petit"><span class="dashicons dashicons-image-rotate" aria-hidden="true"></span>' . esc_html__( 'Relire l’état publié', 'pose-parquet-core' ) . '</button></form>';
 		Socle::carte_ouvrir( __( 'Synchronisation', 'pose-parquet-core' ) );
 		echo '<div class="adm-sync">';
-		echo '<div><div class="adm-info"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span><span>' . esc_html__( 'Le catalogue se met à jour par la synchronisation avec Premibel, puis la publication du site. Rien ne s’édite ici ; les prix ne sont jamais importés.', 'pose-parquet-core' ) . '</span></div>';
+		echo '<div><div class="adm-info"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span><span>' . esc_html__( 'Mise à jour automatique chaque nuit : le catalogue est relu chez Premibel, les références qui n’y sont plus visibles sont retirées, puis le site est republié (et son sitemap avec, pour Google). Les prix ne sont jamais importés.', 'pose-parquet-core' ) . '</span></div>';
+		if ( current_user_can( Capabilities::MANAGE_SETTINGS ) && \PoseParquet\Core\Publication\Publication::mode() !== 'aucune' ) {
+			echo self::bouton( self::SYNCHRONISER, __( 'Mettre à jour maintenant', 'pose-parquet-core' ), 'dashicons-update', 'adm-bouton adm-bouton--petit adm-bouton--plein' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé dans bouton().
+		}
 		echo $relire . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé ci-dessus.
 		// Le détail technique, replié : la commande et le fichier lu.
 		echo '<details class="adm-details adm-details--technique"><summary>' . esc_html__( 'Détails techniques', 'pose-parquet-core' ) . '</summary>';

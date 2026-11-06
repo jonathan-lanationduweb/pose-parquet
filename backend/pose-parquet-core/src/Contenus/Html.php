@@ -85,7 +85,38 @@ final class Html {
 		$propre = (string) preg_replace( '#<p>(?:\s|&nbsp;|\x{00A0})*</p>\s*#u', '', $propre );
 		// Un champ de saisie n'a sa place que dans le comparateur avant/après.
 		$propre = (string) preg_replace( '/<input(?![^>]*class="[^"]*ba__range)[^>]*>/', '', $propre );
-		return $propre;
+		return self::attributs_data( $propre );
+	}
+
+	/**
+	 * Les attributs `data-*` ne gardent que des valeurs connues.
+	 *
+	 * Le site les relit en JavaScript : `data-pattern-thumb` finissait dans un
+	 * `innerHTML`, `data-base` dans un lien. Une valeur libre — que `wp_kses`
+	 * laisse passer, encodée — redevenait du HTML ou un `javascript:` une fois
+	 * décodée par le navigateur. Les contenus n'en emploient qu'une poignée :
+	 * un identifiant de motif, un mode, un chemin relatif « ../ ». Tout le reste
+	 * est retiré.
+	 */
+	private static function attributs_data( string $html ): string {
+		return (string) preg_replace_callback(
+			'/\s(data-(?:pattern-thumb|mode|base|visualizer))(?:="([^"]*)")?/',
+			static function ( array $m ): string {
+				$valeur = html_entity_decode( $m[2] ?? '', ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+				$ok = match ( $m[1] ) {
+					'data-pattern-thumb' => (bool) preg_match( '/^[a-z0-9-]{1,40}$/', $valeur ),
+					'data-mode'          => in_array( $valeur, [ 'compact', 'full', 'plan' ], true ),
+					'data-base'          => (bool) preg_match( '#^(?:\.\./)*$#', $valeur ),
+					'data-visualizer'    => $valeur === '',
+					default              => false,
+				};
+				if ( ! $ok ) {
+					return '';
+				}
+				return $valeur === '' && $m[1] === 'data-visualizer' ? ' data-visualizer' : ' ' . $m[1] . '="' . esc_attr( $valeur ) . '"';
+			},
+			$html
+		);
 	}
 
 	/**

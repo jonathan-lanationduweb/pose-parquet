@@ -57,6 +57,25 @@ final class SitePublic {
 		return (string) get_option( self::DOSSIER, '' );
 	}
 
+	/**
+	 * Lire un fichier du site public (catalogue, gabarit d'aperçu, instantané).
+	 *
+	 * Sur un serveur, `wp_safe_remote_get` : l'adresse est un réglage, et un
+	 * compte administrateur volé pouvait la faire pointer vers le réseau
+	 * interne de l'hébergeur (169.254.169.254, base de données…) — chaque
+	 * écran qui lit le catalogue relançait la requête. La version sûre refuse
+	 * les adresses privées et réservées. En local, le site public EST
+	 * localhost : la version simple reste nécessaire.
+	 *
+	 * @param array<string,mixed> $args
+	 * @return array<string,mixed>|\WP_Error
+	 */
+	public static function lire( string $url, array $args = [] ) {
+		return \PoseParquet\Core\Security\Environnement::sur_serveur()
+			? wp_safe_remote_get( $url, $args )
+			: wp_remote_get( $url, $args );
+	}
+
 	public static function enregistrer(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
 			wp_die( esc_html__( 'Vous n’avez pas les droits nécessaires.', 'pose-parquet-core' ), '', [ 'response' => 403 ] );

@@ -36,6 +36,7 @@ const { spawnSync } = require('child_process');
 const RACINE = path.join(__dirname, '..');
 const INSTANTANE = path.join(RACINE, 'data', 'wordpress', 'contenus.json');
 const DELAI_BUILD_MS = 4 * 60 * 1000;
+const DELAI_CATALOGUE_MS = 6 * 60 * 1000;
 const MAX_LIGNES = 12;
 
 function argument(nom) {
@@ -44,6 +45,8 @@ function argument(nom) {
 }
 
 const fichierEtat = argument('etat');
+/* « Mettre à jour maintenant » (Catalogue Premibel) : resynchroniser avant de publier. */
+const avecCatalogue = process.argv.includes('--catalogue');
 const urlExport = argument('export');
 if (path.basename(fichierEtat) !== 'publication-etat.json' || !/^https?:\/\/[^\s"'<>]+\/pose-parquet\/v1\/contenus$/.test(urlExport)) {
   console.error('Usage : node _generator/publier.js --etat <…/publication-etat.json> --export <…/wp-json/pose-parquet/v1/contenus>');
@@ -63,6 +66,23 @@ function ecrireEtat(maj) {
 
 /** Les dernières lignes utiles d'une sortie : assez pour comprendre, pas un journal. */
 const derniereLignes = (texte) => String(texte || '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean).slice(-MAX_LIGNES);
+
+/**
+ * Synchronisation du catalogue Premibel. Un échec ne bloque PAS la
+ * publication : sync-premibel.js n'écrit rien quand il échoue, le site
+ * repart du dernier catalogue valide, et l'échec est signalé.
+ */
+function synchroniserCatalogue() {
+  const r = spawnSync(process.execPath, [path.join(__dirname, 'sync-premibel.js')], {
+    cwd: RACINE,
+    env: { ...process.env, SITE_ROOT: RACINE },
+    encoding: 'utf8',
+    timeout: DELAI_CATALOGUE_MS,
+    windowsHide: true,
+  });
+  const ok = r.status === 0 && !r.error;
+  return { ok, raison: ok ? '' : derniereLignes(r.stderr).slice(-1)[0] || `code de sortie ${r.status}` };
+}
 
 function construire() {
   const r = spawnSync(process.execPath, [path.join(__dirname, 'build.js')], {
@@ -86,6 +106,13 @@ const empreinte = () => (fs.existsSync(INSTANTANE) ? crypto.createHash('sha1').u
 
 (async () => {
   ecrireEtat({});
+  let noteCatalogue = '';
+  if (avecCatalogue) {
+    ecrireEtat({ etape: 'catalogue' });
+    const c = synchroniserCatalogue();
+    noteCatalogue = c.ok ? 'catalogue Premibel synchronisé' : `catalogue Premibel NON synchronisé (${c.raison}) : le précédent est conservé`;
+    ecrireEtat({ etape: 'export' });
+  }
   const avant = fs.existsSync(INSTANTANE) ? fs.readFileSync(INSTANTANE) : null;
 
   // 1-2. Export et validation (tirer n'écrit l'instantané qu'après validation).
@@ -130,7 +157,7 @@ const empreinte = () => (fs.existsSync(INSTANTANE) ? crypto.createHash('sha1').u
     process.exit(1);
   }
 
-  ecrireEtat({ statut: 'succes', etape: 'termine', empreinte: empreinte(), sortie: b.sortie.slice(-4), duree: Math.round((Date.now() - debut) / 1000) });
+  ecrireEtat({ statut: 'succes', etape: 'termine', empreinte: empreinte(), sortie: [...(noteCatalogue ? [noteCatalogue] : []), ...b.sortie.slice(-4)], duree: Math.round((Date.now() - debut) / 1000) });
 })().catch((e) => {
   try {
     ecrireEtat({ statut: 'echec', etape: etat.etape, raison: `Erreur inattendue : ${e.message}`, duree: Math.round((Date.now() - debut) / 1000) });

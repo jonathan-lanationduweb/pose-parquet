@@ -146,7 +146,7 @@ final class Cors {
 				header( 'Access-Control-Allow-Origin: ' . self::normalize( $origin ) );
 				header( 'Access-Control-Allow-Methods: ' . self::ALLOWED_METHODS );
 				header( 'Access-Control-Allow-Headers: ' . self::ALLOWED_HEADERS );
-				header( 'Access-Control-Expose-Headers: X-Request-Id' );
+				header( 'Access-Control-Expose-Headers: X-Request-Id, Retry-After' );
 				header( 'Access-Control-Max-Age: ' . self::MAX_AGE );
 			}
 		}

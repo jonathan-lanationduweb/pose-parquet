@@ -153,7 +153,15 @@ final class Settings {
 	public static function defaults(): array {
 		return [
 			self::KEY_NOTIFICATION_EMAIL  => (string) get_option( 'admin_email', '' ),
-			self::KEY_VISITOR_CONFIRMATION => true,
+			/*
+			 * Désactivée par défaut : l'accusé part vers l'adresse SAISIE par le
+			 * visiteur. Un robot pouvait s'en servir pour faire envoyer, depuis
+			 * le domaine du site, des emails à des tiers (relais de spam, domaine
+			 * mis en liste noire). Le formulaire actuel ne demande d'ailleurs plus
+			 * de coordonnées. À activer en connaissance de cause, avec une
+			 * protection anti-robot (Turnstile) devant le formulaire.
+			 */
+			self::KEY_VISITOR_CONFIRMATION => false,
 		];
 	}
 

@@ -15,22 +15,26 @@ import { analyzeScene } from './analyzer.js';
 import { createSceneRenderer } from './renderer.js';
 import { loadImage } from './image-loader.js';
 import { loadCatalog } from '../studio/catalog.js';
-import { motifEffectif } from './motifs-regles.js';
+import { motifEffectif, motifAutorise } from './motifs-regles.js';
+import { VITRINE } from './vitrine.js';
 import { quandCartesPretes } from './material.js';
 
 const MAX_WIDTH = 1200;
 /**
  * Trois références RÉELLES du catalogue Premibel synchronisé, une par motif,
- * choisies pour montrer l'écart de rendu. Ce sont des rendus indicatifs
- * (famille procédurale de même couleur) ; le lien « Visualiser » ouvre le
- * Studio sur la même référence, qui y affiche « Voir ce parquet chez Premibel ».
- * `check-motifs` vérifie que chaque paire est permise par la fiche.
+ * tirées de js/scene/vitrine.js : pour chaque motif, la première référence de
+ * sa liste encore proposée (en vente chez Premibel, visualisable, motif
+ * permis). Une référence retirée chez Premibel est donc sautée d'elle-même.
+ * Le lien « Visualiser » ouvre le Studio sur la même référence.
  */
-const CHIPS = [
-  { material: 'CHENF39031', pattern: 'lames' },
-  { material: 'POINF39026', pattern: 'point-de-hongrie' },
-  { material: 'BTRPF39009', pattern: 'baton-rompu' },
-];
+const choisirPuces = (catalog) =>
+  VITRINE.map(({ pattern, candidats }) => {
+    const id = candidats.find((c) => {
+      const m = catalog.get(c);
+      return m && motifAutorise(m, pattern);
+    });
+    return id ? { material: id, pattern } : null;
+  }).filter(Boolean);
 
 function downscale(prepared) {
   if (prepared.width <= MAX_WIDTH) return prepared;
@@ -97,7 +101,8 @@ export function mountPreview(root) {
   const chips = root.querySelector('[data-chips]');
 
   const renderer = createSceneRenderer();
-  let current = CHIPS[0];
+  let CHIPS = [];
+  let current = null;
   let catalog = null;
 
   const applyRange = () => stage.style.setProperty('--compare', `${range.value}%`);
@@ -148,8 +153,8 @@ export function mountPreview(root) {
   /**
    * Le motif réellement posé pour la puce courante.
    *
-   * Les trois paires de `CHIPS` sont écrites à la main et valides aujourd'hui
-   * — `check-motifs.js` le vérifie à chaque construction. Si une donnée
+   * Les paires de `CHIPS` sont choisies parmi les références qui acceptent
+   * leur motif — `check-motifs.js` le vérifie à chaque construction. Si une donnée
    * changeait sans que le contrôle soit relancé, on préfère une légende juste
    * sur un motif de repli qu'une légende qui annonce un motif que le moteur
    * ne pose pas.
@@ -224,6 +229,9 @@ export function mountPreview(root) {
   async function load() {
     try {
       catalog = await loadCatalog(base);
+      CHIPS = choisirPuces(catalog);
+      current = CHIPS[0] || null;
+      if (!current) throw new Error('aucune référence de vitrine dans le catalogue');
       buildChips();
       const scene = await analyzeScene({ sceneId, base });
       const prepared = downscale(await loadImage(`${base}assets/images/${scene.image.file}`));

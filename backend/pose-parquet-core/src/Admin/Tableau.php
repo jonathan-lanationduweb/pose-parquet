@@ -44,6 +44,7 @@ final class Tableau {
 			Types::GUIDE       => __( 'Guide', 'pose-parquet-core' ),
 			Types::TUTORIEL    => __( 'Tutoriel', 'pose-parquet-core' ),
 			Types::INSPIRATION => __( 'Inspiration', 'pose-parquet-core' ),
+			Types::ARTICLE     => __( 'Article', 'pose-parquet-core' ),
 			Types::PAGE        => __( 'Page', 'pose-parquet-core' ),
 		];
 		$publies = [];

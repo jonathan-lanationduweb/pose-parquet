@@ -53,8 +53,13 @@ const entrees = Object.entries(profils);
 const prets = entrees.filter(([, p]) => p.verdict === 'ready');
 const refus = entrees.filter(([, p]) => p.verdict !== 'ready');
 verifier(`verdict connu pour chaque profil (${entrees.length})`, entrees.every(([, p]) => ['ready', 'approximate'].includes(p.verdict)));
-const orphelins = entrees.filter(([sku]) => !parSku.has(sku) || !parSku.get(sku).active);
-verifier('chaque profil désigne une fiche Premibel active', orphelins.length === 0, orphelins.map(([s]) => s).join(', '));
+// Une fiche absente du fichier est une faute de saisie ; une fiche que
+// Premibel a retirée (inactive) est la vie normale du catalogue : son profil
+// ne sert plus, on le signale sans bloquer.
+const orphelins = entrees.filter(([sku]) => !parSku.has(sku));
+verifier('chaque profil désigne une fiche Premibel connue', orphelins.length === 0, orphelins.map(([s]) => s).join(', '));
+const retires = entrees.filter(([sku]) => parSku.has(sku) && !parSku.get(sku).active);
+if (retires.length) console.log(`       à noter : profil(s) d'une référence retirée chez Premibel, inutilisé(s) : ${retires.map(([s]) => s).join(', ')}`);
 const refusMuets = refus.filter(([, p]) => !(typeof p.raison === 'string' && p.raison.length >= 30 && Array.isArray(p.manque) && p.manque.length));
 verifier(`chaque refus dit pourquoi et ce qui manque (${refus.length})`, refusMuets.length === 0, refusMuets.map(([s]) => s).join(', '));
 for (const [sku, p] of prets) {
@@ -165,9 +170,9 @@ const enDur = fs.readdirSync(path.join(RACINE, '_generator')).filter((n) => n.en
   .filter((n) => /\(rendu (fidèle|indicatif)\)/i.test(lire(`_generator/${n}`).replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')));
 verifier('aucune mention de rendu écrite en dur dans le générateur', enDur.length === 0, enDur.join(', '));
 const accueil = fs.existsSync(path.join(RACINE, 'index.html')) ? lire('index.html') : '';
-const attendue = `Chêne naturel Houston, lames droites${mentionRendu('CHENF39031') ? ` (${mentionRendu('CHENF39031')})` : ''}`;
+const attendue = require('./home').legendeVitrine();
 verifier(`accueil construit : légende « ${attendue} »`, accueil.includes(attendue));
-const puces = [...previewJs.matchAll(/material: '([A-Z0-9_]+)'/g)].map((m) => m[1]);
+const puces = require('../js/scene/vitrine.js').choisirVitrine((id) => ficheDe.get(id) || null).map((p) => p.material);
 console.log(`       accueil : ${puces.map((s) => `${s} ${(ficheDe.get(s) || {}).visualStatus}`).join(' · ')}`);
 
 /* ------------------------------------------------------------------ */

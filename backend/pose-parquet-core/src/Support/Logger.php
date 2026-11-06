@@ -2,10 +2,8 @@
 /**
  * Journal applicatif minimal.
  *
- * Écrit dans le journal PHP via error_log(), donc dans debug.log quand
- * WP_DEBUG_LOG est actif, et nulle part sinon. Pas de fichier propre, pas de
- * table de logs : au stade de la fondation, ce serait de la machinerie sans
- * lecteur.
+ * Erreurs et alertes : journal PHP du serveur, même sans WP_DEBUG.
+ * Traces INFO : débogage seulement. Aucun fichier sous la racine web.
  *
  * RÈGLE : aucune donnée personnelle dans le journal. Pas d'email, pas de
  * téléphone, pas de nom. On journalise des identifiants (id de demande,
@@ -33,6 +31,7 @@ final class Logger {
 		'payload', 'body', 'input', 'data', 'fields',
 		// Jeton, destinataires, adresse réseau : pas davantage.
 		'formToken', 'token', 'to', 'reply_to', 'remote_addr', 'website',
+		'password', 'authorization', 'cookie', 'secret', 'api_key',
 	];
 
 	/** @param array<string,mixed> $contexte */
@@ -52,7 +51,7 @@ final class Logger {
 
 	/** @param array<string,mixed> $contexte */
 	private static function write( string $niveau, string $message, array $contexte ): void {
-		if ( ! ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
+		if ( $niveau === 'INFO' && ! ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
 			return;
 		}
 		$ligne = sprintf( '[pose-parquet] %s %s', $niveau, $message );
@@ -68,8 +67,13 @@ final class Logger {
 	 * @return array<string,mixed>
 	 */
 	private static function nettoyer( array $contexte ): array {
-		foreach ( self::CLES_PERSONNELLES as $cle ) {
-			unset( $contexte[ $cle ] );
+		$interdites = array_map( 'strtolower', self::CLES_PERSONNELLES );
+		foreach ( $contexte as $cle => $valeur ) {
+			if ( in_array( strtolower( (string) $cle ), $interdites, true ) || is_object( $valeur ) ) {
+				unset( $contexte[ $cle ] );
+			} elseif ( is_array( $valeur ) ) {
+				$contexte[ $cle ] = self::nettoyer( $valeur );
+			}
 		}
 		return $contexte;
 	}

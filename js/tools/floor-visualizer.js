@@ -18,10 +18,34 @@ import icons from '../utils/icons.js';
 import { getState, setState, PLAN_TO_PATTERN, PATTERN_TO_PLAN } from './plan-state.js';
 import { buildPlanParams } from '../forms/plan-handoff.js';
 import { emettre } from '../analytics/events.js';
+import { PLAN_TEINTES } from './plan-teintes.js';
 
-/** Passerelle de teintes entre le visualiseur photo et le mode plan. */
-const TONE_TO_PLAN = { clair: 'clair', naturel: 'naturel', miel: 'naturel', brun: 'fume', fume: 'fume', graphite: 'fume' };
-const PLAN_TO_TONE = { clair: 'clair', naturel: 'naturel', fume: 'fume' };
+/*
+ * Les teintes sont celles du catalogue Premibel (une par famille de rendu
+ * présente dans le catalogue actif), générées au build par
+ * _generator/plan-teintes.js : resynchroniser le catalogue met le nuancier
+ * à jour sans toucher à ce fichier.
+ */
+const TONES = Object.fromEntries(PLAN_TEINTES.map((t) => [t.id, t]));
+const TONE_LABELS = PLAN_TEINTES.map(({ id, label, references }) => ({
+  id,
+  label,
+  title: `${label} — ${references} référence${references > 1 ? 's' : ''} Premibel`,
+}));
+const premiere = (...ids) => ids.find((id) => TONES[id]) || PLAN_TEINTES[0].id;
+const TONE_DEFAUT = premiere('chene-naturel');
+
+/** Passerelle de teintes entre le visualiseur photo (6 teintes génériques) et le mode plan. */
+const TONE_TO_PLAN = {
+  clair: premiere('chene-sable', 'chene-craie', 'chene-nude'),
+  naturel: TONE_DEFAUT,
+  miel: premiere('chene-miel', 'chene-dore', 'chene-caramel'),
+  brun: premiere('chene-brun', 'chene-tabac', 'chene-caramel'),
+  fume: premiere('chene-fume', 'chene-tabac', 'chene-brun'),
+  graphite: premiere('chene-gris', 'chene-fume', 'chene-brun'),
+};
+const FAMILLE_TO_TONE = { clair: 'clair', naturel: 'naturel', chaud: 'miel', fonce: 'brun' };
+const planToTone = (id) => (id === 'chene-gris' ? 'graphite' : id === 'chene-fume' ? 'fume' : FAMILLE_TO_TONE[(TONES[id] || {}).famille] || 'naturel');
 
 const WALLS = [
   { id: 'top', label: 'Haut' },
@@ -37,20 +61,8 @@ const DEFAULTS = {
   pattern: 'longueur',
   window: 'right',
   door: 'left',
-  tone: 'naturel',
+  tone: TONE_DEFAUT,
 };
-
-const TONES = {
-  clair: { hue: 38, sat: 24, light: 82 },
-  naturel: { hue: 32, sat: 30, light: 72 },
-  fume: { hue: 26, sat: 14, light: 52 },
-};
-
-const TONE_LABELS = [
-  { id: 'clair', label: 'Clair' },
-  { id: 'naturel', label: 'Naturel' },
-  { id: 'fume', label: 'Fumé' },
-];
 
 const PLANK_MIN = 7;
 const PLANK_MAX = 26;
@@ -68,7 +80,7 @@ const svgEl = (name, attrs = {}) => {
 const fr = (value, digits = 2) => value.toFixed(digits).replace('.', ',');
 
 const toneColor = (id) => {
-  const tone = TONES[id] || TONES.naturel;
+  const tone = TONES[id] || TONES[TONE_DEFAUT];
   return `hsl(${tone.hue} ${tone.sat}% ${tone.light}%)`;
 };
 
@@ -111,7 +123,7 @@ export class FloorVisualizer {
     // On partage les choix avec le visualiseur photo (et inversement).
     const shared = {};
     if (patch.pattern) shared.pattern = PLAN_TO_PATTERN[patch.pattern] || 'lames';
-    if (patch.tone) shared.tone = PLAN_TO_TONE[patch.tone] || 'naturel';
+    if (patch.tone) shared.tone = planToTone(patch.tone);
     if (patch.plankWidth) shared.plankWidth = patch.plankWidth / 100;
     if (Object.keys(shared).length) setState(shared, { silent: true });
   }
@@ -348,6 +360,7 @@ export class FloorVisualizer {
       ariaLabel: 'Teinte du parquet',
       decorate: (button, option) => {
         button.classList.add('tone-swatch');
+        if (option.title) button.title = option.title;
         const dot = document.createElement('i');
         // La pastille montre la couleur qui sera réellement peinte au sol.
         dot.style.setProperty('--tone', toneColor(option.id));
@@ -468,7 +481,7 @@ export class FloorVisualizer {
     svg.append(svgEl('rect', { x: 0, y: 0, width: length, height: width, fill: '#efece5' }));
 
     const group = svgEl('g', { 'clip-path': `url(#${clip.id})` });
-    const tone = TONES[this.state.tone] || TONES.naturel;
+    const tone = TONES[this.state.tone] || TONES[TONE_DEFAUT];
     pattern.build(ctx).forEach((plank) => {
       const light = tone.light + plank.shade * 9 - 4;
       group.append(
@@ -547,7 +560,9 @@ export class FloorVisualizer {
 
   /** Préfixe de chemin fourni par la page (data-base), pour les liens internes. */
   base() {
-    return this.root.dataset.base || '';
+    // Seulement « ../ » répété : une valeur libre (« javascript:… ») deviendrait un lien piégé.
+    const base = this.root.dataset.base || '';
+    return /^(?:\.\.\/)*$/.test(base) ? base : '';
   }
 
   uid() {

@@ -6,7 +6,9 @@ const { ICON, tip, key, faq, faqJsonLd, linkArrow, table, callout } = require('.
 const { GUIDES } = require('./content-guides');
 const { MOTIFS } = require('./content-motifs');
 const { TUTOS } = require('./content-tutos');
+const { ARTICLES } = require('./content-blog');
 const { PAGES } = require('./content-pages');
+const { buildPagesLegales } = require('./pages-legales');
 const { REGLAGES } = require('./content-site');
 const T = require('./textes');
 const images = require('./images');
@@ -31,7 +33,7 @@ const { picture } = require('./responsive');
  * construction. Sans instantané, rien ne change. Voir wordpress.js.
  */
 const WORDPRESS = require('./wordpress');
-const SOURCE_WP = WORDPRESS.appliquer({ GUIDES, TUTOS, PAGES, INSPIRATION_PHOTOS, PHOTOS });
+const SOURCE_WP = WORDPRESS.appliquer({ GUIDES, TUTOS, ARTICLES, PAGES, INSPIRATION_PHOTOS, PHOTOS });
 SOURCE_WP.avertissements.forEach((m) => console.warn(`[wordpress] ${m}`));
 const MAINTENANCE_ACTIVE = Boolean(SOURCE_WP.maintenance && SOURCE_WP.maintenance.actif);
 
@@ -59,7 +61,8 @@ function porteMaintenance(relPath, content) {
   return content.replace('<head>', `<head>
     ${porte}`);
 }
-const write = (relPath, content) => ecrireTexte(path.join(ROOT, relPath), porteMaintenance(relPath, content));
+const { responsiveTables } = require('./tables');
+const write = (relPath, content) => ecrireTexte(path.join(ROOT, relPath), porteMaintenance(relPath, /\.(html|tpl)$/.test(relPath) ? responsiveTables(content) : content));
 
 const frDate = (iso) =>
   new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -214,7 +217,7 @@ function relatedBlock(slugs, base) {
   if (!items.length) return '';
   return `<section class="related" aria-labelledby="related-title">
         <h2 id="related-title" class="section-head">À lire ensuite</h2>
-        <div class="grid grid--3">
+        <div class="grid grid--3 related__cards" tabindex="0" role="group" aria-label="Articles à lire ensuite">
           ${items.map((item) => articleCard(item, base, 'guides/')).join('\n          ')}
         </div>
       </section>`;
@@ -259,6 +262,11 @@ function editorialPage(item, options) {
 
   const published = item.date || '2026-08-01';
   const updated = item.updated || published;
+  // La couverture sert d'image de partage et d'image de l'article pour Google
+  // (recommandée pour les résultats enrichis) ; sans couverture, l'image du site.
+  const couverture = aUneCouverture(item.slug)
+    ? `assets/images/${PHOTOS[`cover-${item.slug}`].alias || `cover-${item.slug}`}.jpg`
+    : 'assets/images/og-default.jpg';
 
   const sources = resolveSources(item);
   const sourcesBlock = sources.length
@@ -283,6 +291,7 @@ function editorialPage(item, options) {
       '@type': jsonldType,
       headline: item.h1,
       description: item.description,
+      image: `${SITE.domain}/${couverture}`,
       inLanguage: 'fr-FR',
       datePublished: published,
       dateModified: updated,
@@ -322,6 +331,11 @@ function editorialPage(item, options) {
         </div>`
           : ''}
 
+        <details class="toc-mobile" data-toc data-toc-for="article-content">
+          <summary class="toc-mobile__barre"><span class="toc-mobile__titre">Sommaire</span><span class="toc-mobile__courant" data-toc-courant></span></summary>
+          <ol></ol>
+        </details>
+
         <div class="article-layout">
           <article class="prose" id="article-content">
 ${item.body}
@@ -360,6 +374,7 @@ ${item.body}
     path: `${dir}${item.slug}.html`,
     depth: 1,
     ogType: 'article',
+    ogImage: couverture,
     css: ['css/pages/article.css'],
     jsonld,
     body,
@@ -381,6 +396,56 @@ function asideGuide() {
               <p>Quatre étapes pour cadrer votre chantier : pièce, support, motif, délai.</p>
               <a class="btn btn--sm" href="../projet/">Commencer</a>
             </div>`;
+}
+
+/**
+ * Le blog : actualités et articles écrits dans WordPress (Pose Parquet →
+ * Articles). Même gabarit que les guides. Sans article publié, la page
+ * /blog/ reste en ligne (son adresse ne casse pas) mais n'est pas indexée.
+ */
+function buildBlog() {
+  const aside = asideGuide();
+  ARTICLES.forEach((article) => {
+    write(`blog/${article.slug}.html`, editorialPage(article, { section: 'blog', sectionLabel: 'Blog', dir: 'blog/', aside }));
+  });
+
+  const page = PAGES['blog'];
+  const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: page.nom }]);
+  const liste = ARTICLES.length
+    ? `<div class="grid grid--3" id="liste-blog">
+            ${ARTICLES.map((article) => articleCard(article, '../', 'blog/')).join('\n            ')}
+          </div>`
+    : `<p class="empty-note">Les premiers articles arrivent bientôt. En attendant, les <a href="../guides/">guides</a> répondent aux questions les plus fréquentes.</p>`;
+
+  write(
+    'blog/index.html',
+    layout({
+      title: page.titre,
+      description: page.description,
+      path: 'blog/index.html',
+      depth: 1,
+      css: ['css/pages/listing.css'],
+      jsonld: [crumbs.jsonld],
+      ...(ARTICLES.length ? {} : { robots: 'noindex, follow' }),
+      body: `      ${crumbs.html}
+      <header class="page-hero">
+        <div class="wrap-wide page-hero__grid">
+          <div>
+            <p class="eyebrow">${T.texte(page.nom)}</p>
+            <h1 class="page-hero__title">${T.texte(page.h1)}</h1>
+          </div>
+          <p class="page-hero__lead">${T.texte(page.chapo)}</p>
+        </div>
+      </header>
+
+      <section class="section section--flush-top">
+        <div class="wrap">
+          ${liste}
+        </div>
+      </section>
+      ${ctaBand('../')}`,
+    })
+  );
 }
 
 function buildGuides() {
@@ -523,8 +588,14 @@ function buildMotifs() {
                 : ''
             }`;
 
+    const reglages = PAGES[`motif-${motif.slug}`] || {};
     const item = {
       ...motif,
+      // Titre Google, description, titre affiché et chapô : réglables dans WordPress (Pages).
+      title: reglages.titre || motif.title,
+      description: reglages.description || motif.description,
+      h1: reglages.h1 || motif.h1,
+      lead: reglages.chapo || motif.lead,
       category: 'Motifs',
       date: '2026-08-12',
       related: ['point-de-hongrie-ou-baton-rompu', 'quel-sens-de-pose-choisir', 'preparer-son-sol-avant-la-pose'],
@@ -553,9 +624,9 @@ function buildMotifs() {
         <div class="wrap-wide page-hero__grid">
           <div>
             <p class="eyebrow">Motifs de pose</p>
-            <h1 class="page-hero__title">Six façons de dessiner un sol</h1>
+            <h1 class="page-hero__title">${PAGES['motifs'].h1}</h1>
           </div>
-          <p class="page-hero__lead">Le motif décide du caractère de la pièce autant que l'essence du bois. Chaque fiche détaille le rendu, les contraintes de pose, le niveau de chutes attendu — un ordre de grandeur, jamais un calcul — et les pièces adaptées.</p>
+          <p class="page-hero__lead">${PAGES['motifs'].chapo}</p>
         </div>
       </header>
 
@@ -598,9 +669,8 @@ function buildMotifs() {
   write(
     'motifs/index.html',
     layout({
-      title: 'Motifs de pose du parquet : lesquels choisir | Pose Parquet',
-      description:
-        "Pose droite, dans la longueur, dans la largeur, diagonale, Point de Hongrie, bâton rompu : rendu, chutes, difficulté et pièces adaptées pour chaque motif.",
+      title: PAGES['motifs'].titre,
+      description: PAGES['motifs'].description,
       path: 'motifs/index.html',
       depth: 1,
       css: ['css/pages/listing.css'],
@@ -1190,8 +1260,8 @@ function buildTools() {
   const body = `      ${crumbs.html}
       <header class="tool-hero wrap">
         <p class="eyebrow">Mode plan · outil</p>
-        <h1>Une pièce. Plusieurs directions.</h1>
-        <p class="lead">Vue du dessus, à l'échelle : renseignez vos dimensions, placez la fenêtre et l'entrée, comparez les motifs. Les quantités affichées sont des estimations indicatives.</p>
+        <h1>${PAGES['simulateur'].h1}</h1>
+        <p class="lead">${PAGES['simulateur'].chapo}</p>
         <p class="u-mt-5"><a class="link-arrow" href="visualiseur.html">Plutôt voir le rendu dans une photo ? Ouvrir le visualiseur</a></p>
       </header>
 
@@ -1228,9 +1298,8 @@ function buildTools() {
   write(
     'outils/simulateur-pose.html',
     layout({
-      title: 'Simulateur de sens de pose du parquet | Pose Parquet',
-      description:
-        "Simulateur gratuit : dessinez votre pièce, placez la fenêtre et comparez pose droite, largeur, diagonale, Point de Hongrie et bâton rompu en temps réel.",
+      title: PAGES['simulateur'].titre,
+      description: PAGES['simulateur'].description,
       path: 'outils/simulateur-pose.html',
       depth: 1,
       css: ['css/pages/tools.css'],
@@ -1271,9 +1340,9 @@ function buildProjet() {
         <div class="wrap-wide page-hero__grid">
           <div>
             <p class="eyebrow">Mon projet</p>
-            <h1 class="page-hero__title">Décrivez votre projet</h1>
+            <h1 class="page-hero__title">${PAGES['projet'].h1}</h1>
           </div>
-          <p class="page-hero__lead">Quelques informations suffisent à comprendre un chantier : la pièce, le support, le rendu recherché et le délai.</p>
+          <p class="page-hero__lead">${PAGES['projet'].chapo}</p>
         </div>
       </header>
 
@@ -1300,9 +1369,8 @@ function buildProjet() {
   write(
     'projet/index.html',
     layout({
-      title: 'Décrire un projet de pose de parquet | Pose Parquet',
-      description:
-        "Décrivez votre projet de parquet en quatre étapes — pièce, surface, motif, besoin, délai — et voyez vers qui vous tourner : Premibel pour le parquet, Allure Design pour la pose en Île-de-France.",
+      title: PAGES['projet'].titre,
+      description: PAGES['projet'].description,
       path: 'projet/index.html',
       depth: 1,
       css: ['css/pages/project.css', 'components/project-form/project-form.css'],
@@ -1453,7 +1521,7 @@ function buildApropos() {
               </div>
               ${callout('key', 'Ce que ce site ne fait pas', `<ul>
           <li>Aucune publicité, aucun panier, aucun paiement, aucun prix.</li>
-          <li>Aucun envoi automatique : une personne relit chaque demande avant tout contact.</li>
+          <li>Aucune coordonnée demandée : vous choisissez de poursuivre auprès du partenaire proposé.</li>
           <li>Aucun lien produit sur un parquet de démonstration, qui n'existe pas en vente.</li>
           <li>Aucune revente de coordonnées.</li>
         </ul>`)}
@@ -1501,7 +1569,7 @@ function buildApropos() {
 
             <h3>Dans le Visualiseur</h3>
             <p>Le Visualiseur propose deux sortes de parquets. Les uns sont des références de démonstration, calculées par le moteur, qui ne correspondent à aucun produit précis. Les autres sont relevées sur des fiches réelles de Premibel : celles-là portent un lien vers leur fiche, et le lien le dit avant qu'on clique. Un parquet de démonstration n'en a pas, et n'en aura pas — proposer d'acheter ce qui n'existe pas serait la pire chose que nous puissions faire.</p>
-            <p>Décrire un projet par le formulaire n'engage à rien et ne déclenche aucun envoi automatique : le formulaire demande de quoi vous avez besoin et où se situe le projet, une orientation est proposée, et <strong>une personne la confirme ou la corrige</strong> avant tout contact.</p>
+            <p>Décrire un projet par le formulaire n'engage à rien. À partir de votre besoin et de votre département, <strong>une orientation est calculée immédiatement</strong>, sans vous demander de coordonnées. Vous choisissez ensuite de consulter les parquets de Premibel ou de poursuivre votre projet auprès d’Allure Design selon votre localisation.</p>
             ${key('<p>Ce que cette relation ne change pas : les guides, les fiches motif et les tutoriels sont écrits pour répondre à une question, pas pour amener à un produit. Un lien s’ajoute à un texte quand il l’éclaire ; il ne l’a jamais commandé.</p>')}
           </div>
         </div>
@@ -1697,6 +1765,7 @@ function buildGabaritsApercu() {
       aside: asideTuto({ tools: ['%%PP_OUTILS%%'] }),
       jsonldType: 'HowTo',
     }),
+    article: editorialPage(item({}), { section: 'blog', sectionLabel: 'Blog', dir: 'blog/', aside: asideGuide() }),
   };
   for (const [nom, html] of Object.entries(gabarits)) ecrireTexte(path.join(ROOT, 'data', 'apercu', `${nom}.tpl`), reperes(html));
 }
@@ -1722,6 +1791,15 @@ function buildHome() {
           url: SITE.domain,
           inLanguage: 'fr-FR',
           description: SITE.baseline,
+          publisher: { '@id': `${SITE.domain}/#organisation` },
+        },
+        {
+          '@context': 'https://schema.org',
+          '@type': 'Organization',
+          '@id': `${SITE.domain}/#organisation`,
+          name: SITE.name,
+          url: SITE.domain,
+          logo: `${SITE.domain}/assets/icons/icon-512.png`,
         },
       ],
       body,
@@ -1781,14 +1859,19 @@ function buildMeta() {
     ...MOTIFS.map(article('motifs')),
     page('tutoriels/index.html', '0.8'),
     ...TUTOS.map(article('tutoriels')),
+    ...(ARTICLES.length ? [page('blog/index.html', '0.7'), ...ARTICLES.map(article('blog'))] : []),
     page('inspiration/index.html', '0.8'),
     page('outils/index.html', '0.8'),
     page('outils/visualiseur.html', '0.9'),
     page('outils/simulateur-pose.html', '0.8'),
+    page('outils/studio.html', '0.8'),
     page('projet/index.html', '0.7'),
     page('contact/index.html', '0.5'),
     page('a-propos/index.html', '0.5'),
     page('a-propos/methode-editoriale.html', '0.5'),
+    page('mentions-legales/index.html', '0.3'),
+    page('confidentialite/index.html', '0.3'),
+    page('plan-du-site/index.html', '0.3'),
   ];
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -1880,6 +1963,8 @@ function buildDataIndex() {
 /* Les assets sont construits en premier : le HTML a besoin de leurs empreintes.
    Toutes les feuilles de page entrent dans le bundle unique, dans l'ordre où
    elles étaient chargées auparavant — la cascade est donc identique. */
+/* Le nuancier du Mode Plan suit le catalogue Premibel : regénéré avant d'empaqueter les scripts. */
+require('./plan-teintes').ecrirePlanTeintes();
 const build = buildAssets(ROOT, {
   pageCss: [
     'css/pages/listing.css',
@@ -1910,6 +1995,7 @@ buildHome();
 buildGuides();
 buildMotifs();
 buildTutos();
+buildBlog();
 /*
  * Le contrat Inspiration → Studio est vérifié AVANT d'écrire la page : une
  * carte qui se déclare essayable en montrant une autre photo que celle que le
@@ -1923,6 +2009,25 @@ buildProjet();
 buildContact();
 buildApropos();
 buildMethode();
+buildPagesLegales(write, { GUIDES, TUTOS, MOTIFS, ARTICLES });
+/*
+ * Pages légales incomplètes : signalé à chaque build, BLOQUANT en production.
+ * Un site ne part pas en ligne avec « [À compléter] » dans ses mentions
+ * légales — l'erreur arrête le workflow avant tout déploiement.
+ */
+{
+  const { A_COMPLETER } = require('./content-pages');
+  const manquants = ['mentions-legales', 'confidentialite'].flatMap((cle) =>
+    (PAGES[cle].champs || [])
+      .filter((d) => String(PAGES[cle].valeurs[d.cle] || '').includes(A_COMPLETER))
+      .map((d) => `${PAGES[cle].nom} → ${d.groupe} → ${d.libelle}`)
+  );
+  if (manquants.length) {
+    const message = `Pages légales à compléter dans WordPress (Pose Parquet → Pages) :\n  - ${manquants.join('\n  - ')}`;
+    if (process.env.SITE_ENVIRONMENT === 'production') throw new Error(message);
+    console.warn(`[pages légales] ${message}`);
+  }
+}
 buildGabaritsApercu();
 build404();
 buildMeta();

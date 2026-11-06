@@ -148,7 +148,9 @@ final class Validator {
 				$chiffres = preg_replace( '/[^0-9+]/', '', $phone );
 				if ( strlen( $phone ) > Fields::MAX_PHONE ) {
 					$errors['phone'] = sprintf( 'Longueur maximale dépassée (%d caractères).', Fields::MAX_PHONE );
-				} elseif ( ! preg_match( '/^(?:\+33|0)[1-9](?:[\s.\-]?\d{2}){4}$/', $phone ) && ! preg_match( '/^\+\d{8,15}$/', $chiffres ) ) {
+				// Le format international est vérifié sur la SAISIE (chiffres et séparateurs seulement), pas sur sa version
+				// réduite aux chiffres : « +33612345678<svg onload=…> » passait, puisque ses seuls chiffres étaient valides.
+				} elseif ( ! preg_match( '/^(?:\+33|0)[1-9](?:[\s.\-]?\d{2}){4}$/', $phone ) && ! ( preg_match( '/^\+[\d\s.\-()]+$/', $phone ) && preg_match( '/^\+\d{8,15}$/', $chiffres ) ) ) {
 					$errors['phone'] = 'Numéro de téléphone invalide.';
 				} else {
 					$data['phone'] = $phone;

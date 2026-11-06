@@ -184,6 +184,7 @@ export async function mountStudio(root) {
         <button class="panel__grab" type="button" data-sheet-toggle aria-label="Agrandir ou réduire le panneau"></button>
         <div class="panel__head">
           <p class="panel__title" data-panel-title>Choisir un parquet</p>
+          <button class="panel__more" type="button" data-sheet-more>Tout voir · rechercher</button>
           <button class="panel__close" type="button" data-panel-close aria-label="Fermer le panneau">${icon(ICONS.close)}</button>
         </div>
         <div class="panel__body">
@@ -350,11 +351,20 @@ export async function mountStudio(root) {
    * choix qu'il vient de refaire.
    */
   let noteMotif = '';
+  /*
+   * La note reste le temps d'être lue, pas davantage : posée sur la photo,
+   * elle masquait le parquet qu'elle commentait jusqu'au prochain choix.
+   */
+  const DUREE_NOTE_MS = 6000;
+  let minuteurNote = 0;
   const poserNote = (message) => {
     noteMotif = message || '';
     setStatus(noteMotif);
+    window.clearTimeout(minuteurNote);
+    if (noteMotif) minuteurNote = window.setTimeout(effacerNote, DUREE_NOTE_MS);
   };
   const effacerNote = () => {
+    window.clearTimeout(minuteurNote);
     if (!noteMotif) return;
     noteMotif = '';
     setStatus('');
@@ -584,6 +594,16 @@ const REGROUPEMENT_MS = 70;
       return;
     }
     setContext(root.dataset.panel);
+  });
+
+  /*
+   * Sur téléphone, la feuille repliée ne montre qu'une rangée : la poignée
+   * pour l'agrandir passait inaperçue, et avec elle la recherche et les
+   * filtres. Un bouton dit en toutes lettres qu'il y a plus à voir.
+   */
+  on(qs('[data-sheet-more]', root), 'click', () => {
+    // Pas de focus sur la recherche : le clavier masquerait la liste qu'on vient d'ouvrir.
+    root.dataset.sheet = 'full';
   });
 
   /** Poignée de la feuille : elle fait défiler les trois niveaux. */
@@ -1042,7 +1062,7 @@ const REGROUPEMENT_MS = 70;
       card.setAttribute('aria-pressed', String(config.pattern === pattern.id));
       const raison = allowed ? '' : raisonIndisponible(item, pattern.label);
       card.innerHTML = `<span class="tile-card__media"></span><span class="tile-card__label">${echapper(pattern.label)}</span>`
-        + (allowed ? '' : `<span class="tile-card__note">Non disponible pour ce parquet</span>`);
+        + (allowed ? '' : `<span class="tile-card__note">Pas pour ce parquet</span>`);
       if (!allowed) {
         // Le libelle visible dit « non disponible » ; le nom accessible nomme
         // la reference, parce qu'un lecteur d'ecran ne voit pas quel parquet
@@ -1915,7 +1935,7 @@ const REGROUPEMENT_MS = 70;
           .map((v) => ({
             ...v,
             config: normaliserConfig(v.config, catalog.get(v.config.materialId)).config,
-          }));
+          })).slice(0, MAX_VERSIONS);
       }
     } catch (error) {
       void error;

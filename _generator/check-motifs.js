@@ -287,14 +287,13 @@ verifier(
 /* §6 — L'accueil                                                      */
 /* ------------------------------------------------------------------ */
 
-titre('Accueil : les paires écrites à la main sont encore valides');
+titre('Accueil : les paires de la vitrine sont valides');
 
-const preview = lire('js/scene/preview.js');
-const bloc = preview.match(/const CHIPS = \[([\s\S]*?)\];/);
-verifier('les paires de l’aperçu sont repérables', Boolean(bloc));
-if (bloc) {
-  const pairs = [...bloc[1].matchAll(/material:\s*'([^']+)',\s*pattern:\s*'([^']+)'/g)];
-  verifier(`${pairs.length} paires déclarées`, pairs.length > 0);
+const VITRINE = require('../js/scene/vitrine.js');
+verifier('l’aperçu tire ses paires de la vitrine', /choisirPuces|VITRINE/.test(lire('js/scene/preview.js')));
+{
+  const pairs = VITRINE.choisirVitrine((id) => proposees.find((f) => f.id === id) || null).map((p) => [null, p.material, p.pattern]);
+  verifier(`${pairs.length} paires choisies (une par motif)`, pairs.length === VITRINE.VITRINE.length);
   for (const [, id, motif] of pairs) {
     const fiche = proposees.find((f) => f.id === id);
     verifier(

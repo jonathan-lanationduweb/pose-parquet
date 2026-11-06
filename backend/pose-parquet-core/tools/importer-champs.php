@@ -39,8 +39,10 @@ if ( ! is_array( $donnees ) || (int) ( $donnees['version'] ?? 0 ) !== 1 ) {
 }
 
 $import = new PoseParquet\Core\Contenus\Importer();
-$compte = $import->champs( $donnees );
+// Les pages nouvelles du site d'abord (créées, jamais écrasées), puis leurs champs.
+$nouvelles = $import->pages_manquantes( $donnees );
+$compte    = $import->champs( $donnees );
 foreach ( $import->journal() as $ligne ) {
 	echo $ligne, PHP_EOL;
 }
-printf( "Champs : %d pages, %d réglages « Mon site », %d valeurs nouvelles (aucune saisie écrasée).\n", $compte['pages'], $compte['site'], $compte['ajoutes'] );
+printf( "Pages créées : %d. Champs : %d pages, %d réglages « Mon site », %d valeurs nouvelles (aucune saisie écrasée).\n", $nouvelles, $compte['pages'], $compte['site'], $compte['ajoutes'] );

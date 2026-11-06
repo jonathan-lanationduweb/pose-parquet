@@ -155,3 +155,31 @@
 /* Colonne latérale des listings : le titre garde sa ligne, la durée passe dessous si besoin. */
 .listing-side .cluster-list a { flex-wrap: wrap; row-gap: 0.15rem; }
 .listing-side .cluster-list strong { flex: 1 1 12rem; }
+
+/*
+ * Motifs sur mobile : un défilement horizontal par famille.
+ *
+ * Empilées, les six fiches faisaient une page de plus de 4 000 px où l'on ne
+ * comparait plus rien. On glisse d'un motif à l'autre ; la fiche suivante
+ * dépasse du bord pour dire qu'il y en a d'autres.
+ */
+@media (max-width: 39.99rem) {
+  .motif-family__grid.grid {
+    display: flex;
+    gap: var(--sp-4);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    /* Jusqu'aux bords de l'écran, la première fiche alignée sur le texte. */
+    margin-inline: calc(-1 * var(--gutter));
+    padding: 0 var(--gutter) var(--sp-2);
+    scroll-padding-inline: var(--gutter);
+  }
+  .motif-family__grid.grid::-webkit-scrollbar { display: none; }
+  .motif-family__grid.grid > * {
+    flex: 0 0 78%;
+    scroll-snap-align: start;
+  }
+  .motif-family__grid .pattern-card:hover { transform: none; }
+}

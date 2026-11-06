@@ -142,8 +142,47 @@ function remplacer(tableau, nouveau) {
  * Fusionne l'instantané dans les contenus du dépôt.
  * @returns {{ actif: boolean, maintenance: object|null, avertissements: string[] }}
  */
-function appliquer({ GUIDES, TUTOS, PAGES, INSPIRATION_PHOTOS, PHOTOS }) {
-  const wp = charger();
+/*
+ * Les textes simples venus de WordPress — titres, résumés, FAQ, textes
+ * alternatifs, libellés — sont insérés tels quels dans les gabarits, en texte
+ * comme en attribut, et dans le JSON-LD. Un compte WordPress volé (ou un
+ * WordPress compromis) pouvait y glisser une balise ou fermer un attribut :
+ * du script sur toutes les pages du site public.
+ *
+ * Ces champs n'ont aucune raison de contenir du HTML. Les trois caractères
+ * qui en font sont donc remplacés par leur équivalent typographique, qui se
+ * lit pareil et ne s'interprète jamais : ‹ › ”. Pas d'entités HTML : ces
+ * valeurs servent aussi hors HTML (JSON-LD, sitemap) où « &lt; » se lirait.
+ *
+ * Restent intacts : le corps (`corps`, du HTML déjà filtré par WordPress et
+ * revérifié par valider-wordpress.js), les champs structurés (`champs`,
+ * échappés par textes.js), les adresses et identifiants techniques.
+ */
+const INTACTS = new Set(['corps', 'champs', 'url', 'id', 'fichier', 'sha']);
+function texteSur(valeur, cle = '') {
+  if (INTACTS.has(cle)) return valeur;
+  if (typeof valeur === 'string') {
+    // eslint-disable-next-line no-control-regex
+    return valeur.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').replace(/</g, '‹').replace(/>/g, '›').replace(/"/g, '”');
+  }
+  if (Array.isArray(valeur)) return valeur.map((v) => texteSur(v));
+  if (valeur && typeof valeur === 'object') {
+    return Object.fromEntries(Object.entries(valeur).map(([k, v]) => [k, texteSur(v, k)]));
+  }
+  return valeur;
+}
+
+function appliquer({ GUIDES, TUTOS, ARTICLES = [], PAGES, INSPIRATION_PHOTOS, PHOTOS }) {
+  const brut = charger();
+  // Le site (Mon site) et la maintenance ont leurs propres échappements : on ne les touche pas.
+  const wp = brut && {
+    ...brut,
+    guides: texteSur(brut.guides || []),
+    tutoriels: texteSur(brut.tutoriels || []),
+    articles: texteSur(brut.articles || []),
+    inspirations: texteSur(brut.inspirations || []),
+    pages: texteSur(brut.pages || []),
+  };
   const avertissements = [];
   const avertir = (m) => avertissements.push(m);
   if (!wp) return { actif: false, maintenance: null, avertissements };
@@ -205,6 +244,29 @@ function appliquer({ GUIDES, TUTOS, PAGES, INSPIRATION_PHOTOS, PHOTOS }) {
     }
   }
   remplacer(TUTOS, tutos);
+
+  /* ---- Blog : uniquement WordPress, le dépôt n'a pas d'article ---- */
+  remplacer(
+    ARTICLES,
+    (wp.articles || []).map((a) => {
+      couverture(PHOTOS, a.slug, a.image, avertir);
+      return {
+        slug: a.slug,
+        title: a.titre || `${a.h1} | Pose Parquet`,
+        h1: a.h1,
+        description: a.description,
+        category: a.categorie || '',
+        date: a.date,
+        reading: a.lecture || lectureEstimee(a.corps),
+        excerpt: a.resume,
+        lead: a.intro,
+        faq: Array.isArray(a.faq) ? a.faq : [],
+        tags: [],
+        related: [],
+        body: a.corps,
+      };
+    })
+  );
 
   /* ---- Mon site : identité, en-tête, pied de page, liens commerciaux ---- */
   if (wp.site && typeof wp.site === 'object') {
@@ -344,12 +406,13 @@ async function tirer(url = URL_DEFAUT) {
   const images = [
     ...(d.guides || []).map((x) => x.image),
     ...(d.tutoriels || []).map((x) => x.image),
+    ...(d.articles || []).map((x) => x.image),
     ...(d.inspirations || []).map((x) => x.image),
     d.maintenance && d.maintenance.image,
   ].filter((i) => i && !i.source);
   // Images de la médiathèque insérées dans un corps : l'export a réécrit leur
   // adresse en ../assets/images/wp-<id>.jpg, quelle que soit leur origine.
-  images.push(...[...(d.guides || []), ...(d.tutoriels || []), ...(d.pages || [])].flatMap((x) => x.medias || []));
+  images.push(...[...(d.guides || []), ...(d.tutoriels || []), ...(d.articles || []), ...(d.pages || [])].flatMap((x) => x.medias || []));
   let n = 0;
   for (const image of images) {
     const nom = nomWp(image);
@@ -373,7 +436,7 @@ async function tirer(url = URL_DEFAUT) {
   }
   fs.mkdirSync(path.dirname(INSTANTANE), { recursive: true });
   fs.writeFileSync(INSTANTANE, `${JSON.stringify({ ...d, genere: undefined }, null, 1)}\n`);
-  console.log(`data/wordpress/contenus.json : ${d.guides.length} guides, ${d.tutoriels.length} tutoriels, ${d.inspirations.length} inspirations, ${d.pages.length} pages ; maintenance ${d.maintenance && d.maintenance.actif ? 'ACTIVÉE' : 'désactivée'} ; ${n} image(s) nouvelle(s).`);
+  console.log(`data/wordpress/contenus.json : ${d.guides.length} guides, ${d.tutoriels.length} tutoriels, ${(d.articles || []).length} articles, ${d.inspirations.length} inspirations, ${d.pages.length} pages ; maintenance ${d.maintenance && d.maintenance.actif ? 'ACTIVÉE' : 'désactivée'} ; ${n} image(s) nouvelle(s).`);
 }
 
 if (require.main === module) {
@@ -388,4 +451,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { appliquer, charger, pageMaintenance, tirer, INSTANTANE };
+module.exports = { appliquer, charger, pageMaintenance, tirer, INSTANTANE, texteSur };

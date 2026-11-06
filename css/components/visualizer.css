@@ -172,7 +172,8 @@
 .seg button[aria-pressed="true"] { background: var(--c-ink); color: var(--text-invert); }
 
 /* Teintes : la pastille porte la couleur réellement utilisée au rendu. */
-.tone-swatches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; }
+/* Une pastille par teinte Premibel : la grille se remplit selon la largeur disponible. */
+.tone-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.2rem, 1fr)); gap: 0.4rem; }
 .tone-swatch {
   display: flex;
   align-items: center;
