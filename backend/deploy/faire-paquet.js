@@ -11,7 +11,7 @@ if (!['plugin', 'site'].includes(type) || !argument) {
 const destination = path.resolve(argument);
 if (fs.existsSync(destination)) throw new Error('Le dossier cible existe déjà : utiliser un nouveau dossier, rien ne sera effacé.');
 const manifeste = [];
-const publicDirs = ['a-propos', 'contact', 'guides', 'inspiration', 'motifs', 'outils', 'projet', 'tutoriels'];
+const publicDirs = ['a-propos', 'blog', 'confidentialite', 'contact', 'guides', 'inspiration', 'mentions-legales', 'motifs', 'outils', 'plan-du-site', 'projet', 'tutoriels'];
 const assetDirs = ['dist', 'fonts', 'icons', 'images', 'materials', 'textures', 'videos'];
 const publicFiles = ['index.html', '404.html', 'maintenance.html', 'config.js', 'robots.txt', 'sitemap.xml', 'site.webmanifest'];
 const dataFiles = ['catalogue-etat.json', 'contenus.json', 'material-profiles.json', 'parquets.json', 'products.premibel.json', 'render-families.json', 'room-tours.json'];
