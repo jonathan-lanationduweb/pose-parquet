@@ -22,16 +22,32 @@ const { faq, faqJsonLd, tip } = require('./ui');
 const { ICON } = require('./home');
 
 const STUDIO_URL = 'studio.html';
+// Titres Google, descriptions et titre affiché : réglables dans WordPress (Pages).
+const { PAGES } = require('./content-pages');
 
 function buildStudioPage(write) {
   write(
     'outils/studio.html',
     appLayout({
-      title: 'Visualiseur Parquet · Pose Parquet',
-      description:
-        'Visualiseur Parquet : choisissez une pièce, essayez des parquets, comparez jusqu’à trois rendus. Tout est calculé dans votre navigateur.',
+      title: PAGES['studio'].titre,
+      description: PAGES['studio'].description,
+      h1: 'Studio : essayer un parquet dans une pièce',
       path: 'outils/studio.html',
       depth: 1,
+      jsonld: [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'WebApplication',
+          name: PAGES['studio'].titre.replace(/\s*[·|]\s*Pose Parquet$/, ''),
+          description: PAGES['studio'].description,
+          url: `${SITE.domain}/outils/studio.html`,
+          applicationCategory: 'DesignApplication',
+          operatingSystem: 'Navigateur web',
+          inLanguage: 'fr-FR',
+          isAccessibleForFree: true,
+          offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+        },
+      ],
     })
   );
 }
@@ -46,7 +62,10 @@ function buildProductPage(write) {
     'outils/visualiseur-produit.html',
     appLayout({
       app: 'product',
+      // Prototype en validation, atteignable par lien : seul outil hors de l'index.
+      robots: 'noindex, follow',
       title: 'Visualiseur produit · Pose Parquet',
+      h1: 'Visualiseur produit',
       description:
         'Essayez cinq références Premibel dans une pièce : la pièce occupe l’écran, le parquet change à chaque clic, tout est calculé dans votre navigateur.',
       path: 'outils/visualiseur-produit.html',
@@ -122,7 +141,7 @@ function buildVisualiseurPage(write) {
         <div class="wrap-wide landing-hero__grid">
           <div class="landing-hero__text">
             <p class="eyebrow">Visualiseur Parquet · outil gratuit</p>
-            <h1 class="landing-hero__title">Visualisez votre parquet dans votre pièce.</h1>
+            <h1 class="landing-hero__title">${PAGES['visualiseur'].h1}</h1>
             <p class="landing-hero__lead">Importez une photo, choisissez un parquet, comparez plusieurs rendus. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée, ni conservée.</p>
             <div class="landing-hero__actions">
               <a class="btn btn--lg" href="${STUDIO_URL}"><span>Visualiser mon parquet</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
@@ -210,9 +229,8 @@ function buildVisualiseurPage(write) {
   write(
     'outils/visualiseur.html',
     layout({
-      title: 'Visualiser un parquet dans sa pièce | Pose Parquet',
-      description:
-        'Essayez un parquet dans votre pièce : importez une photo, choisissez une matière et un motif. Tout se calcule dans votre navigateur, rien n’est envoyé.',
+      title: PAGES['visualiseur'].titre,
+      description: PAGES['visualiseur'].description,
       path: 'outils/visualiseur.html',
       depth: 1,
       css: ['css/pages/tools.css'],

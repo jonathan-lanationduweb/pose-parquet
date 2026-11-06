@@ -52,7 +52,7 @@ final class Apercu {
 		'woff2' => 'font/woff2',
 	];
 	/** Les types de contenu qui ont une page d'article sur le site. */
-	public const GABARITS = [ Types::GUIDE => 'guide', Types::TUTORIEL => 'tutoriel' ];
+	public const GABARITS = [ Types::GUIDE => 'guide', Types::TUTORIEL => 'tutoriel', Types::ARTICLE => 'article' ];
 
 	public static function register(): void {
 		add_action( 'admin_post_' . self::ACTION, [ self::class, 'afficher' ] );
@@ -78,6 +78,17 @@ final class Apercu {
 
 	/** Le dossier local du site, s'il est réglé et ressemble bien au site. */
 	public static function dossier(): ?string {
+		/*
+		 * Jamais sur un serveur. Ce réglage sert au poste de développement : il
+		 * active la publication locale (Node lance `_generator/publier.js` du
+		 * dossier) et une route publique de fichiers. Sur un serveur, un compte
+		 * administrateur volé aurait pu le faire pointer vers ses propres
+		 * scripts — de l'exécution de code, même là où l'édition de fichiers est
+		 * interdite. Sur un serveur, on publie par GitHub.
+		 */
+		if ( \PoseParquet\Core\Security\Environnement::sur_serveur() ) {
+			return null;
+		}
 		$d = SitePublic::dossier();
 		if ( $d === '' ) {
 			return null;
@@ -129,7 +140,7 @@ final class Apercu {
 		if ( $racine && is_readable( $racine . '/data/apercu/' . $nom . '.tpl' ) ) {
 			return (string) file_get_contents( $racine . '/data/apercu/' . $nom . '.tpl' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		}
-		$r = wp_remote_get( SitePublic::url() . 'data/apercu/' . $nom . '.tpl', [ 'timeout' => 6 ] );
+		$r = \PoseParquet\Core\Admin\SitePublic::lire( SitePublic::url() . 'data/apercu/' . $nom . '.tpl', [ 'timeout' => 6 ] );
 		return ! is_wp_error( $r ) && (int) wp_remote_retrieve_response_code( $r ) === 200 ? (string) wp_remote_retrieve_body( $r ) : null;
 	}
 
@@ -147,6 +158,15 @@ final class Apercu {
 		nocache_headers();
 		header( 'X-Robots-Tag: noindex, nofollow' );
 		header( 'Content-Type: text/html; charset=utf-8' );
+		/*
+		 * Bac à sable : la page est servie depuis le domaine de l'administration,
+		 * avec les scripts du site public. Sans isolement, un script du gabarit
+		 * distant (ou glissé dans un contenu) s'exécutait avec la session de
+		 * l'éditeur — lire un jeton, créer un compte. `sandbox` sans
+		 * `allow-same-origin` lui donne une origine opaque : il tourne, mais ne
+		 * touche ni aux cookies ni à l'administration.
+		 */
+		header( 'Content-Security-Policy: sandbox allow-scripts allow-popups allow-popups-to-escape-sandbox' );
 		echo self::remplir( $html, $post ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- chaque valeur est échappée dans remplir().
 		exit;
 	}
@@ -189,7 +209,7 @@ final class Apercu {
 				'%%PP_CORPS%%'       => $corps,
 			]
 		);
-		$base     = self::base() . ( $post->post_type === Types::TUTORIEL ? 'tutoriels/' : 'guides/' );
+		$base     = self::base() . ( [ Types::TUTORIEL => 'tutoriels/', Types::ARTICLE => 'blog/' ][ $post->post_type ] ?? 'guides/' );
 		$bandeau  = '<div style="position:fixed;left:0;right:0;bottom:0;z-index:1000;padding:10px 16px;background:#46594A;color:#fff;font:600 13px/1.4 system-ui,sans-serif;text-align:center">'
 			. esc_html( $post->post_status === 'publish' ? __( 'Aperçu de la version enregistrée — pas encore reconstruite sur le site public.', 'pose-parquet-core' ) : __( 'Aperçu — brouillon non publié, visible par vous seul.', 'pose-parquet-core' ) )
 			. ( $src ? '' : ' · ' . esc_html__( 'Image de couverture manquante.', 'pose-parquet-core' ) )

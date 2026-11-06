@@ -4,15 +4,16 @@ name: Déployer sur GitHub Pages
 # Ce workflow ne s'exécute qu'une fois GitHub Pages activé sur le dépôt
 # (Settings → Pages → Source : GitHub Actions).
 #
-# DEUX VARIABLES DE DÉPÔT pilotent ce déploiement
+# TROIS VARIABLES DE DÉPÔT pilotent ce déploiement
 # (Settings → Secrets and variables → Actions → Variables) :
 #
 #   SITE_ENVIRONMENT   'production' ou 'staging'. Absente = staging.
+#   WP_EXPORT_URL      export HTTPS WordPress ; obligatoire en production.
 #   API_BASE_URL       racine REST du backend, ex.
 #                      https://admin.pose-parquet.com/wp-json/pose-parquet/v1
-#                      Absente = le formulaire affiche son indisponibilité.
+#                      Facultative pour le parcours d’orientation sans enregistrement.
 #
-# Aucune des deux n'est un secret : ce sont des adresses publiques. Elles sont
+# Aucune de ces variables n'est un secret : ce sont des adresses publiques. Elles sont
 # des VARIABLES et non des valeurs écrites dans le dépôt parce qu'elles
 # décrivent un environnement, pas le produit — et parce qu'un environnement
 # doit pouvoir changer sans relecture de code.
@@ -27,6 +28,11 @@ on:
   # docs/backend/publication-wordpress.md.
   repository_dispatch:
     types: [wordpress-publish]
+  # Chaque nuit (02:17 UTC, hors des heures pleines de GitHub) : catalogue
+  # Premibel resynchronisé, références retirées chez Premibel désactivées,
+  # site et sitemap republiés. Voir l'étape « Synchroniser le catalogue ».
+  schedule:
+    - cron: '17 2 * * *'
 
 permissions:
   contents: read
@@ -53,7 +59,7 @@ jobs:
       API_BASE_URL: ${{ vars.API_BASE_URL }}
       # Export public des contenus WordPress publiés, ex.
       # https://admin.pose-parquet.com/wp-json/pose-parquet/v1/contenus
-      # Absente = le site est publié tel qu'il est dans le dépôt.
+      # Absente en staging = reconstruction depuis l’instantané du dépôt.
       WP_EXPORT_URL: ${{ vars.WP_EXPORT_URL }}
 
     steps:
@@ -70,10 +76,26 @@ jobs:
       # que ce soit : une erreur structurante fait échouer le job ICI, avant
       # tout artefact, et le site en ligne reste celui d'avant.
       - name: Installer Node
-        if: env.WP_EXPORT_URL != ''
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Vérifier la configuration avant toute publication
+        run: node _generator/config-deploiement.js --verifier
+
+      # Le catalogue Premibel est relu à CHAQUE déploiement (nuit, push,
+      # publication WordPress) : un push ne republie donc jamais une référence
+      # que Premibel a retirée entre-temps. Pillow sert aux vignettes des
+      # nouvelles références. En cas d'échec (Premibel injoignable, export
+      # suspect), sync-premibel.js n'écrit rien : le site part du dernier
+      # catalogue valide du dépôt, et l'avertissement reste visible ici.
+      - name: Installer Pillow (vignettes du catalogue)
+        run: python3 -m pip install --quiet --disable-pip-version-check 'pillow==11.0.0'
+
+      - name: Synchroniser le catalogue Premibel
+        continue-on-error: true
+        timeout-minutes: 10
+        run: node _generator/sync-premibel.js
 
       - name: Tirer le contenu WordPress, valider, construire
         if: env.WP_EXPORT_URL != ''
@@ -82,63 +104,15 @@ jobs:
           SITE_ROOT: ${{ github.workspace }}
         run: node _generator/contenus.js "$WP_EXPORT_URL"
 
-      - name: Préparer l'artefact
-        run: |
-          rm -rf _site
-          mkdir _site
-          # Ce qui est publié est le SITE, et rien d'autre.
-          #
-          # `.kilo/` n'a jamais pu suivre — c'est un arbre de travail Git, que
-          # `checkout` ne restitue pas. Il est exclu et contrôlé quand même :
-          # une exclusion ne coûte rien, et un artefact fabriqué ailleurs qu'ici
-          # (rsync depuis un poste, par exemple) emporterait 35 Mo d'une vieille
-          # copie du site.
-          #
-          # Étaient publiés jusqu'ici, sans que ce soit voulu : docs/ (348 Ko de
-          # documentation interne, dont l'architecture de sécurité et les seuils
-          # d'anti-spam), design/, .claude/, .vscode/ et le README. Aucune page
-          # du site ne renvoie vers l'un d'eux — vérifié — et aucun n'a de
-          # raison d'être lisible publiquement.
-          #
-          # S'y ajoutent js/, css/ et components/ : ce sont les SOURCES du
-          # build, 928 Ko, et aucune page servie ne les demande. Les pages
-          # chargent assets/dist/ — un arbre complet où le générateur a recopié
-          # ces mêmes fichiers sous une empreinte de contenu. Vérifié le
-          # 14/09/2026 : dans le HTML publié, zéro src/href vers js/ ou css/, et
-          # la seule référence à components/ vient de
-          # components/project-form/project-form.html, page d'aperçu interne qui
-          # n'est ni liée ni au sitemap. Dans le JS distribué, les imports
-          # « ../../js/… » et « ./components/… » sont relatifs et résolvent À
-          # L'INTÉRIEUR de assets/dist/ : ils ne sortent jamais de l'arbre.
-          #
-          # Ce qui reste, et pourquoi :
-          #   assets/   dist (pages, JS, CSS), fonts (url() des @font-face), images, icônes
-          #   data/     lu à l'exécution : catalogue, scènes, familles de rendu
-          #   config.js adresse du backend, réécrit plus bas au déploiement
-          rsync -a \
-                --exclude '.git' \
-                --exclude '.gitattributes' \
-                --exclude '.gitignore' \
-                --exclude '.github' \
-                --exclude '.claude' \
-                --exclude '.vscode' \
-                --exclude '.kilo' \
-                --exclude '_generator' \
-                --exclude '_calibrage' \
-                --exclude '_site' \
-                --exclude 'backend' \
-                --exclude 'docs' \
-                --exclude 'design' \
-                --exclude 'node_modules' \
-                --exclude 'serve.js' \
-                --exclude '.*.tmp' \
-                --exclude 'README.md' \
-                --exclude 'CREDITS.md' \
-                --exclude '/js' \
-                --exclude '/css' \
-                --exclude '/components' \
-                ./ _site/
-          touch _site/.nojekyll
+      - name: Reconstruire aussi lorsque WordPress est absent en préproduction
+        if: env.WP_EXPORT_URL == ''
+        env:
+          SITE_ROOT: ${{ github.workspace }}
+          GIT_OPTIONAL_LOCKS: '0'
+        run: node _generator/build.js
+
+      - name: Préparer l'artefact par liste autorisée
+        run: node backend/deploy/faire-paquet.js site _site
 
       - name: Vérifier que rien d'interne n'a suivi
         run: |
@@ -221,23 +195,8 @@ jobs:
       # Un seul fichier est réécrit, et il ne contient que de la configuration.
       # Le code métier (js/forms/api-config.js) n'est jamais touché par un
       # déploiement : il lit window.POSE_PARQUET_CONFIG, que ce fichier pose.
-      - name: Brancher l'API si une adresse est déclarée
-        run: |
-          if [ -z "$API_BASE_URL" ]; then
-            echo "Aucune variable API_BASE_URL : le formulaire projet affichera son indisponibilité."
-            exit 0
-          fi
-          case "$API_BASE_URL" in
-            https://*) ;;
-            *) echo "::error::API_BASE_URL doit être en HTTPS (reçu : $API_BASE_URL)"; exit 1 ;;
-          esac
-          cat > _site/config.js <<EOF
-          /* Écrit par le déploiement — voir .github/workflows/deploy-pages.yml. */
-          window.POSE_PARQUET_CONFIG = window.POSE_PARQUET_CONFIG || {};
-          window.POSE_PARQUET_CONFIG.apiBaseUrl = "$API_BASE_URL";
-          EOF
-          echo "API branchée sur $API_BASE_URL"
-          grep -q 'apiBaseUrl' _site/config.js || { echo "::error::config.js non écrit"; exit 1; }
+      - name: Écrire la configuration publique sans interpolation de code
+        run: node _generator/config-deploiement.js _site
 
       # Les fichiers du dépôt décrivent toujours la PRODUCTION : canoniques en
       # pose-parquet.com, robots en « index, follow », sitemap complet. C'est
@@ -285,7 +244,7 @@ jobs:
         run: |
           echo "SITE_ENVIRONMENT=production : déploiement traité comme la production."
           if [ ! -f CNAME ]; then
-            echo "::warning::SITE_ENVIRONMENT vaut production mais aucun CNAME n'est présent : le site sera servi sur *.github.io avec des canoniques pointant ailleurs."
+            echo "::warning::CNAME de production absent."
           fi
           grep -qF '<meta name="robots" content="index, follow" />' _site/index.html \
             || { echo "::error::L'accueil n'est pas indexable — vérifier _generator/layout.js"; exit 1; }

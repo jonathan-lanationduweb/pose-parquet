@@ -42,7 +42,7 @@ $liens = static function ( array $c ): string {
 		return '<a href="' . esc_url( \PoseParquet\Core\Maintenance\Reglages::url() ) . '">' . esc_html__( 'Maintenance', 'pose-parquet-core' ) . '</a>';
 	}
 	$post = null;
-	if ( in_array( $c['type'], [ Types::GUIDE, Types::TUTORIEL, Types::INSPIRATION ], true ) ) {
+	if ( in_array( $c['type'], [ Types::GUIDE, Types::TUTORIEL, Types::INSPIRATION, Types::ARTICLE ], true ) ) {
 		$post = get_page_by_path( (string) ( $c['cle'] ?? '' ), OBJECT, $c['type'] );
 	} elseif ( $c['type'] === Types::PAGE ) {
 		$ids  = get_posts( [ 'post_type' => Types::PAGE, 'post_status' => 'any', 'meta_key' => '_pp_cle', 'meta_value' => (string) ( $c['cle'] ?? '' ), 'fields' => 'ids', 'posts_per_page' => 1 ] ); // phpcs:ignore WordPress.DB.SlowDBQuery

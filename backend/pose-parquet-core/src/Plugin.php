@@ -86,6 +86,8 @@ final class Plugin {
 		 * l'événement ne se produit pas.
 		 */
 		Queue::register();
+		// Sites partenaires : contrôle planifié (wp-cron) toutes les 15 minutes.
+		\PoseParquet\Core\Partenaires\Surveillance::register();
 
 		// Contenus éditoriaux : types déclarés partout (l'export REST en a besoin),
 		// écrans seulement dans l'administration.
@@ -134,5 +136,6 @@ final class Plugin {
 	 */
 	public static function deactivate(): void {
 		Queue::purger();
+		\PoseParquet\Core\Partenaires\Surveillance::deplanifier();
 	}
 }

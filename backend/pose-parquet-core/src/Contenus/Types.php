@@ -30,18 +30,21 @@ final class Types {
 	public const TUTORIEL    = 'pp_tutoriel';
 	public const INSPIRATION = 'pp_inspiration';
 	public const PAGE        = 'pp_page';
+	/** Les articles du blog : même édition que les guides, publiés sous /blog/. */
+	public const ARTICLE     = 'pp_article';
 
 	public const CAT_GUIDE    = 'pp_guide_categorie';
 	public const CAT_TUTORIEL = 'pp_tutoriel_categorie';
+	public const CAT_ARTICLE  = 'pp_article_categorie';
 
 	/** @return string[] */
 	public static function all(): array {
-		return [ self::GUIDE, self::TUTORIEL, self::INSPIRATION, self::PAGE ];
+		return [ self::GUIDE, self::TUTORIEL, self::INSPIRATION, self::PAGE, self::ARTICLE ];
 	}
 
 	/** Types qui ont une image de couverture obligatoire « en principe » (avertissement, pas blocage). */
 	public static function avec_couverture( string $type ): bool {
-		return in_array( $type, [ self::GUIDE, self::TUTORIEL, self::INSPIRATION ], true );
+		return in_array( $type, [ self::GUIDE, self::TUTORIEL, self::INSPIRATION, self::ARTICLE ], true );
 	}
 
 	public static function register(): void {
@@ -99,6 +102,25 @@ final class Types {
 					'all_items'          => __( 'Guides', 'pose-parquet-core' ),
 					'item_published'     => __( 'Guide publié.', 'pose-parquet-core' ),
 					'item_updated'       => __( 'Guide mis à jour.', 'pose-parquet-core' ),
+				],
+				[ 'title', 'editor', 'excerpt', 'thumbnail', 'revisions' ]
+			)
+		);
+
+		register_post_type(
+			self::ARTICLE,
+			self::args(
+				[
+					'name'               => __( 'Articles', 'pose-parquet-core' ),
+					'singular_name'      => __( 'Article', 'pose-parquet-core' ),
+					'add_new'            => __( 'Ajouter un article', 'pose-parquet-core' ),
+					'add_new_item'       => __( 'Ajouter un article', 'pose-parquet-core' ),
+					'edit_item'          => __( 'Modifier l’article', 'pose-parquet-core' ),
+					'new_item'           => __( 'Nouvel article', 'pose-parquet-core' ),
+					'search_items'       => __( 'Rechercher un article', 'pose-parquet-core' ),
+					'not_found'          => __( 'Aucun article.', 'pose-parquet-core' ),
+					'not_found_in_trash' => __( 'Aucun article dans la corbeille.', 'pose-parquet-core' ),
+					'all_items'          => __( 'Articles', 'pose-parquet-core' ),
 				],
 				[ 'title', 'editor', 'excerpt', 'thumbnail', 'revisions' ]
 			)
@@ -196,6 +218,7 @@ final class Types {
 		];
 		register_taxonomy( self::CAT_GUIDE, [ self::GUIDE ], $cat( __( 'Catégories de guides', 'pose-parquet-core' ), __( 'Catégorie', 'pose-parquet-core' ) ) );
 		register_taxonomy( self::CAT_TUTORIEL, [ self::TUTORIEL ], $cat( __( 'Catégories de tutoriels', 'pose-parquet-core' ), __( 'Catégorie', 'pose-parquet-core' ) ) );
+		register_taxonomy( self::CAT_ARTICLE, [ self::ARTICLE ], $cat( __( 'Catégories d’articles', 'pose-parquet-core' ), __( 'Catégorie', 'pose-parquet-core' ) ) );
 
 		foreach ( Champs::definitions() as $type => $champs ) {
 			foreach ( $champs as $cle => $def ) {
@@ -219,6 +242,7 @@ final class Types {
 		return match ( $type ) {
 			self::GUIDE    => self::CAT_GUIDE,
 			self::TUTORIEL => self::CAT_TUTORIEL,
+			self::ARTICLE  => self::CAT_ARTICLE,
 			default        => null,
 		};
 	}

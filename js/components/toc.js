@@ -22,6 +22,11 @@ export function initToc(root) {
   });
 
   const links = qsa('a', list);
+  // Sommaire mobile (replié en haut de l'article) : la barre dit où l'on en est, et se referme après un choix.
+  const courant = qs('[data-toc-courant]', root);
+  if (root.tagName === 'DETAILS') {
+    links.forEach((link) => on(link, 'click', () => { root.open = false; }));
+  }
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -34,6 +39,26 @@ export function initToc(root) {
     { rootMargin: '-15% 0px -70% 0px', threshold: 0 }
   );
   headings.forEach((heading) => observer.observe(heading));
+
+  /*
+   * La section courante de la barre mobile : le dernier titre passé sous la
+   * barre. Calculée au défilement plutôt que par l'observateur ci-dessus, qui
+   * ne voit qu'une bande étroite de l'écran et rate une section entière après
+   * un grand saut (lien du sommaire, retour en arrière).
+   */
+  if (courant) {
+    let prevu = false;
+    const majCourant = () => {
+      prevu = false;
+      const seuil = root.getBoundingClientRect().bottom + 24;
+      let actuel = null;
+      headings.forEach((heading) => { if (heading.getBoundingClientRect().top <= seuil) actuel = heading; });
+      const texte = actuel ? actuel.dataset.tocLabel || actuel.textContent : '';
+      if (courant.textContent !== texte) courant.textContent = texte;
+    };
+    on(window, 'scroll', () => { if (!prevu) { prevu = true; window.requestAnimationFrame(majCourant); } }, { passive: true });
+    majCourant();
+  }
 }
 
 /** Barre de progression de lecture. */

@@ -57,7 +57,7 @@
 - **Réponses d'erreur** : format `{code, message, fields}`, jamais de SQL, de
   chemin, de trace ni d'écho des données saisies (l'email n'est jamais
   renvoyé — testé).
-- **Journal** : `Logger` n'écrit que si `WP_DEBUG`, et retire du contexte
+- **Journal** : `Logger` écrit les erreurs/alertes dans le journal PHP, même sans `WP_DEBUG`, et retire du contexte
   `email`, `phone`, `first_name`/`firstName`, `last_name`/`lastName`,
   `message`, `city`, `ip`, toute clé qui transporterait un corps entier
   (`payload`, `body`, `input`, `data`, `fields`), et les clés techniques

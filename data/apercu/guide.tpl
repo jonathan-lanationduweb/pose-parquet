@@ -32,10 +32,15 @@
     <link rel="manifest" href="../site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../assets/dist/site.070ddff7ad.css" />
-    <script type="module" src="../assets/dist/ced9b1be6d/js/main.js"></script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/index.html"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://pose-parquet.com/guides/"},{"@type":"ListItem","position":3,"name":"%%PP_H1%%","item":"https://pose-parquet.com/"}]}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"%%PP_H1%%","description":"%%PP_DESCRIPTION%%","inLanguage":"fr-FR","datePublished":"2001-01-01","dateModified":"2001-01-01","author":{"@type":"Organization","name":"Pose Parquet","url":"https://pose-parquet.com/a-propos/"},"publisher":{"@type":"Organization","name":"Pose Parquet"},"mainEntityOfPage":"https://pose-parquet.com/guides/apercu.html"}</script>
+    <link rel="stylesheet" href="../assets/dist/site.5382f6b607.css" />
+    <!-- Adresse du backend, définissable au déploiement sans toucher au code.
+         Script classique et non module : il s'exécute avant les modules, donc
+         avant que api-config.js ne lise window.POSE_PARQUET_CONFIG. Pas
+         d'empreinte dans le nom — c'est ce qui permet de le remplacer. -->
+    <script src="../config.js"></script>
+    <script type="module" src="../assets/dist/730454e46f/js/main.js"></script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://pose-parquet.com/guides/"},{"@type":"ListItem","position":3,"name":"%%PP_H1%%"}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"%%PP_H1%%","description":"%%PP_DESCRIPTION%%","image":"https://pose-parquet.com/assets/images/og-default.jpg","inLanguage":"fr-FR","datePublished":"2001-01-01","dateModified":"2001-01-01","author":{"@type":"Organization","name":"Pose Parquet","url":"https://pose-parquet.com/a-propos/"},"publisher":{"@type":"Organization","name":"Pose Parquet"},"mainEntityOfPage":"https://pose-parquet.com/guides/apercu.html"}</script>
   </head>
   <body class="page">
     <a class="skip-link" href="#contenu">Aller au contenu</a>
@@ -107,6 +112,11 @@
 
       <div class="wrap-wide">
         
+
+        <details class="toc-mobile" data-toc data-toc-for="article-content">
+          <summary class="toc-mobile__barre"><span class="toc-mobile__titre">Sommaire</span><span class="toc-mobile__courant" data-toc-courant></span></summary>
+          <ol></ol>
+        </details>
 
         %%PP_COUVERTURE%%
         <div class="article-layout">
@@ -214,6 +224,12 @@
           -->
           <p class="footer__orientation"><strong>Premibel</strong> pour les références de parquet, <strong>Allure&nbsp;Design</strong> pour la pose et la rénovation en Île-de-France : Pose Parquet oriente selon le besoin. <a href="../a-propos/#liens-commerciaux">Nos liens commerciaux</a></p>
           <p>Photographies sous licence Pexels</p>
+          <!-- Les pages obligatoires et pratiques, sur toutes les pages : c'est là qu'on les cherche. -->
+          <ul class="footer__legal">
+            <li><a href="../mentions-legales/">Mentions légales</a></li>
+            <li><a href="../confidentialite/">Confidentialité et cookies</a></li>
+            <li><a href="../plan-du-site/">Plan du site</a></li>
+          </ul>
         </div>
       </div>
     </footer>

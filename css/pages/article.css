@@ -107,3 +107,128 @@
 
 /* Les tableaux larges défilent, ils n’élargissent pas la page */
 .article-layout, .article-layout > *, .prose { min-width: 0; }
+
+/* Une carte à la fois sur mobile, avec le bord de la suivante visible. */
+@media (max-width: 47.99rem) {
+  .related__cards {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: calc(100% - 1.5rem);
+    gap: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 0;
+    padding: 0.25rem 0 0.9rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+  .related__cards > .card { min-width: 0; scroll-snap-align: start; }
+}
+
+/*
+ * Sommaire sur mobile et tablette.
+ *
+ * La colonne latérale passe sous l'article en dessous de 64rem : son sommaire
+ * arrivait après le dernier paragraphe, là où il ne sert plus. Ici, une barre
+ * repliée en tête d'article, qui reste sous l'en-tête pendant la lecture et
+ * dit dans quelle section on se trouve. Un choix la referme.
+ */
+.toc-mobile { display: none; }
+@media (max-width: 63.99rem) {
+  .article-aside .toc { display: none; }
+  .toc-mobile {
+    display: block;
+    position: sticky;
+    top: calc(var(--header-h) + 0.5rem);
+    z-index: calc(var(--z-header) - 1);
+    margin-bottom: var(--sp-6);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+    box-shadow: 0 6px 18px rgba(20, 18, 14, 0.06);
+  }
+  .toc-mobile__barre {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    min-height: 2.9rem;
+    padding: 0.55rem var(--sp-4);
+    cursor: pointer;
+    list-style: none;
+  }
+  .toc-mobile__barre::-webkit-details-marker { display: none; }
+  .toc-mobile__barre::after {
+    content: "";
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-left: auto;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform var(--dur-1) var(--ease-out);
+  }
+  .toc-mobile[open] .toc-mobile__barre::after { transform: rotate(225deg) translateY(-2px); }
+  .toc-mobile__titre {
+    flex: none;
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eyebrow);
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .toc-mobile__courant {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+  .toc-mobile ol {
+    list-style: none;
+    margin: 0;
+    padding: 0 var(--sp-4) var(--sp-3);
+    max-height: min(60svh, 26rem);
+    overflow: auto;
+    border-top: 1px solid var(--line);
+  }
+  .toc-mobile a {
+    display: block;
+    padding: 0.6rem 0;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+  }
+  .toc-mobile li:last-child a { border-bottom: 0; }
+  .toc-mobile a[data-active="true"] { color: var(--text); font-weight: 600; }
+  .toc-mobile .toc__sub a { padding-left: var(--sp-4); font-size: 0.88rem; }
+}
+/* Un titre visé depuis le sommaire ne doit pas finir caché sous la barre. */
+@media (max-width: 63.99rem) {
+  .prose h2, .prose h3 { scroll-margin-top: calc(var(--header-h) + 4.5rem); }
+}
+
+/* Pages légales : fiches « libellé : valeur » (éditeur, hébergeur, responsable). */
+.legal-fiche {
+  display: grid;
+  grid-template-columns: minmax(10rem, 14rem) minmax(0, 1fr);
+  gap: 0;
+  margin: var(--sp-4) 0 var(--sp-6);
+  border-top: 1px solid var(--line);
+}
+.legal-fiche dt,
+.legal-fiche dd {
+  margin: 0;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.legal-fiche dt { color: var(--text-muted); font-size: 0.92rem; padding-right: var(--sp-4); }
+@media (max-width: 40rem) {
+  .legal-fiche { grid-template-columns: minmax(0, 1fr); }
+  .legal-fiche dt { border-bottom: 0; padding-bottom: 0; }
+  .legal-fiche dd { padding-top: 0.15rem; }
+}
+.legal h3 { margin-top: var(--sp-5); font-size: 1.05rem; font-family: var(--font-sans); font-weight: 600; }

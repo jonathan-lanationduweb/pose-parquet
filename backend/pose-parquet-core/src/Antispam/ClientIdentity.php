@@ -41,7 +41,31 @@ final class ClientIdentity {
 		 */
 		$ip = (string) apply_filters( 'pose_parquet_client_ip', $ip );
 
-		return self::hash( $ip );
+		return self::hash( self::regrouper( $ip ) );
+	}
+
+	/**
+	 * Une adresse IPv6 compte pour son réseau /64.
+	 *
+	 * Un abonné reçoit en général tout un /64 : 2^64 adresses. Comptées une à
+	 * une, la limite de débit ne s'appliquait plus — un robot changeait
+	 * d'adresse à chaque envoi. Le /64 est l'unité qu'un fournisseur attribue :
+	 * c'est elle qui identifie un client. IPv4 reste compté à l'adresse.
+	 */
+	public static function regrouper( string $ip ): string {
+		$ip = trim( $ip );
+		if ( ! str_contains( $ip, ':' ) ) {
+			return $ip;
+		}
+		$binaire = @inet_pton( $ip ); // phpcs:ignore WordPress.PHP.NoSilencedErrors -- adresse invalide : on garde la chaîne.
+		if ( $binaire === false || strlen( $binaire ) !== 16 ) {
+			return $ip;
+		}
+		// Une IPv4 encapsulée (::ffff:a.b.c.d) reste une IPv4.
+		if ( str_starts_with( $binaire, str_repeat( "\0", 10 ) . "\xff\xff" ) ) {
+			return (string) inet_ntop( substr( $binaire, 12 ) );
+		}
+		return (string) inet_ntop( substr( $binaire, 0, 8 ) . str_repeat( "\0", 8 ) ) . '/64';
 	}
 
 	/** Le même condensat pour la même adresse tant que les sels du site ne changent pas. */

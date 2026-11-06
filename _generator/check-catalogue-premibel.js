@@ -158,10 +158,14 @@ const appJs = fs.readFileSync(path.join(RACINE, 'js/studio/app.js'), 'utf8');
 verifier('une démonstration ouverte par lien est signalée « Démonstration »', /selected__status--demo">Démonstration/.test(appJs));
 
 titre('Accueil : la sélection éditoriale');
-const preview = fs.readFileSync(path.join(RACINE, 'js/scene/preview.js'), 'utf8');
-const bloc = preview.match(/const CHIPS = \[([\s\S]*?)\];/);
-const paires = bloc ? [...bloc[1].matchAll(/material:\s*'([^']+)',\s*pattern:\s*'([^']+)'/g)].map((m) => ({ id: m[1], motif: m[2] })) : [];
-verifier(`${paires.length} références sur l'accueil`, paires.length === 3);
+// La vitrine choisit, pour chaque motif, la première référence encore en vente (js/scene/vitrine.js).
+const VITRINE = require('../js/scene/vitrine.js');
+const paires = VITRINE.choisirVitrine((id) => fiches.find((x) => x.id === id) || null).map((p) => ({ id: p.material, motif: p.pattern }));
+verifier(`${paires.length} références sur l'accueil, une par motif`, paires.length === VITRINE.VITRINE.length);
+for (const { pattern, candidats } of VITRINE.VITRINE) {
+  const sautees = candidats.slice(0, candidats.findIndex((c) => paires.some((p) => p.id === c))).filter(Boolean);
+  if (sautees.length) console.log(`       à noter : vitrine « ${pattern} » — ${sautees.join(', ')} retiré(s) chez Premibel, remplacé(s) automatiquement`);
+}
 for (const { id, motif } of paires) {
   const f = fiches.find((x) => x.id === id);
   verifier(`accueil ${id} : référence Premibel active`, Boolean(f && f.active), f ? '' : 'absente du fichier');

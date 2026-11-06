@@ -137,7 +137,26 @@
     margin: 0 0.55rem;
     color: var(--line-strong);
   }
-  .footer__col a { padding-block: 0.15rem; }
+  /* Cible au doigt : 24 px de haut, c'était trop serré entre deux lignes de liens.
+     La hauteur gagnée vient du lien lui-même, pas de l'espace entre les lignes. */
+  .footer__col a { display: inline-block; padding-block: 0.55rem; }
+  .footer__nav { gap: 0; }
+  .footer__col ul { gap: 0; }
 
   .footer__bottom { gap: 0.2rem 1rem; padding-top: 0.8rem; }
+}
+
+/* Pages légales et plan du site : une ligne discrète, en bas de chaque page. */
+.footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.footer__legal a { color: inherit; text-decoration: underline; text-underline-offset: 0.2em; text-decoration-color: var(--line-strong); }
+.footer__legal a:hover { text-decoration-color: currentColor; }
+@media (max-width: 40rem) {
+  .footer__legal a { display: inline-block; padding-block: 0.45rem; }
 }

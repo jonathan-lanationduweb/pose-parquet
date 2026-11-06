@@ -55,6 +55,7 @@ final class Export {
 			'maintenance'  => Maintenance::pour_export(),
 			'guides'       => array_map( [ self::class, 'article' ], self::publies( Types::GUIDE ) ),
 			'tutoriels'    => array_map( [ self::class, 'article' ], self::publies( Types::TUTORIEL ) ),
+			'articles'     => array_map( [ self::class, 'article' ], self::publies( Types::ARTICLE ) ),
 			'inspirations' => array_values( array_filter( array_map( [ self::class, 'inspiration' ], self::publies( Types::INSPIRATION ) ) ) ),
 			'pages'        => array_map( [ self::class, 'page' ], self::publies( Types::PAGE ) ),
 			// « Mon site » : identité, en-tête, pied de page, liens commerciaux.
@@ -130,11 +131,12 @@ final class Export {
 		$out    = [
 			'slug'        => $p->post_name,
 			'titre'       => self::meta( $p, Champs::META_TITLE ),
-			'h1'          => (string) $p->post_title, // titre BRUT : get_the_title() appliquerait la typographie de WordPress (apostrophes courbes…) et changerait le texte publié.
+			// Titre BRUT (get_the_title() changerait la typographie), mais SANS balise : le site l'insère tel quel dans ses pages.
+			'h1'          => wp_strip_all_tags( (string) $p->post_title ),
 			'description' => self::meta( $p, Champs::META_DESCRIPTION ),
 			'categorie'   => is_array( $termes ) && $termes ? $termes[0]->name : '',
 			'date'        => mysql2date( 'Y-m-d', $p->post_date, false ),
-			'resume'      => (string) $p->post_excerpt,
+			'resume'      => wp_strip_all_tags( (string) $p->post_excerpt ),
 			'intro'       => self::meta( $p, Champs::INTRO ),
 			'lecture'     => self::meta( $p, '_pp_lecture' ),
 			'faq'         => self::json( $p, '_pp_faq' ),
@@ -148,7 +150,7 @@ final class Export {
 		if ( $p->post_type === Types::GUIDE ) {
 			$out['tags']    = self::json( $p, '_pp_tags' );
 			$out['related'] = self::json( $p, '_pp_related' );
-		} else {
+		} elseif ( $p->post_type === Types::TUTORIEL ) {
 			$out['duree']  = self::meta( $p, '_pp_duree' );
 			$out['niveau'] = self::meta( $p, '_pp_niveau' );
 			$out['outils'] = array_values( array_filter( explode( "\n", self::meta( $p, '_pp_outils' ) ) ) );
@@ -165,7 +167,7 @@ final class Export {
 		return [
 			'id'           => (int) self::meta( $p, '_pp_pexels' ),
 			'cle'          => $p->post_name,
-			'titre'        => (string) $p->post_title,
+			'titre'        => wp_strip_all_tags( (string) $p->post_title ),
 			'phrase'       => $phrase,
 			'piece'        => self::meta( $p, '_pp_piece' ),
 			'motif'        => self::meta( $p, '_pp_motif' ),

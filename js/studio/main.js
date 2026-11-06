@@ -8,6 +8,7 @@
 import { ready, qs } from '../utils/dom.js';
 import { mountStudio } from './app.js';
 import { initContexteLead } from '../forms/lead-context.js';
+import { surveillerPartenaires } from '../commerce/partenaires.js';
 
 ready(() => {
   /*
@@ -19,6 +20,8 @@ ready(() => {
    * js/forms/lead-context.js.
    */
   initContexteLead();
+  // Un partenaire en panne ou en maintenance n'est plus proposé (liens masqués).
+  surveillerPartenaires();
 
   const root = qs('[data-studio]');
   if (!root) return;

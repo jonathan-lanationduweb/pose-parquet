@@ -2,6 +2,8 @@
  * Aide du visualiseur : trois phrases, pas un manuel.
  * Chargée à la demande — elle ne pèse rien tant qu'on ne l'ouvre pas.
  */
+import { activateDialog } from '../utils/dialog.js';
+const reopen = new WeakMap();
 const STEPS = [
   ['Choisissez une pièce', 'Une pièce d’exemple, ou votre propre photo. Elle reste dans votre navigateur.'],
   ['Essayez les parquets', 'Un clic sur une référence et tout le sol change. Motif et orientation suivent.'],
@@ -11,12 +13,13 @@ const STEPS = [
 export function openHelp(root) {
   const existing = root.querySelector('.studio__help');
   if (existing) {
-    existing.hidden = false;
+    reopen.get(existing)();
     return;
   }
   const dialog = document.createElement('div');
   dialog.className = 'studio__help';
   dialog.setAttribute('role', 'dialog');
+  dialog.setAttribute('aria-modal', 'true');
   dialog.setAttribute('aria-label', 'Comment ça marche');
   dialog.innerHTML = `
     <div class="help__card">
@@ -27,12 +30,18 @@ export function openHelp(root) {
       <p class="help__note">Aucune photo n’est envoyée sur un serveur. Les rendus sont des simulations : ils donnent une direction, pas l’aspect exact d’une référence commerciale.</p>
       <button class="btn btn--solid btn--sm" type="button" data-close>J’ai compris</button>
     </div>`;
-  dialog.querySelector('[data-close]').addEventListener('click', () => {
+  let releaseDialog = null;
+  const close = () => {
     dialog.hidden = true;
-  });
-  dialog.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') dialog.hidden = true;
-  });
+    releaseDialog?.();
+    releaseDialog = null;
+  };
+  const open = () => {
+    dialog.hidden = false;
+    if (!releaseDialog) releaseDialog = activateDialog(dialog, { onClose: close });
+  };
+  dialog.querySelector('[data-close]').addEventListener('click', close);
   root.appendChild(dialog);
-  window.setTimeout(() => dialog.querySelector('[data-close]').focus({ preventScroll: true }), 40);
+  reopen.set(dialog, open);
+  open();
 }

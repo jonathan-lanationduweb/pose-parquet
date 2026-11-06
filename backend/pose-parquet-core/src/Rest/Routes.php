@@ -29,6 +29,8 @@ final class Routes {
 		\PoseParquet\Core\Contenus\Export::route( self::NAMESPACE );
 		// Fichiers publics du site (dossier local) : éditeur et aperçu sans serveur de développement.
 		\PoseParquet\Core\Contenus\Apercu::route( self::NAMESPACE );
+		// Disponibilité des sites partenaires, lue par le site public (lecture seule).
+		\PoseParquet\Core\Partenaires\Surveillance::route( self::NAMESPACE );
 		register_rest_route(
 			self::NAMESPACE,
 			'/health',

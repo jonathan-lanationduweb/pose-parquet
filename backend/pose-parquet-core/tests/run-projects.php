@@ -136,7 +136,10 @@ $verifie( 'colonne reference nullable', ( $par_nom['reference']['Null'] ?? '' ) 
 $verifie( 'colonnes d’état des emails présentes (schéma 3)', isset( $par_nom['internal_mail_status'], $par_nom['internal_mail_sent_at'], $par_nom['visitor_mail_status'], $par_nom['visitor_mail_sent_at'] ) );
 $verifie( 'défaut pending sur les états d’email', ( $par_nom['internal_mail_status']['Default'] ?? '' ) === 'pending' && ( $par_nom['visitor_mail_status']['Default'] ?? '' ) === 'pending' );
 $verifie( 'adresse de réception configurée par défaut (admin_email)', Settings::is_configured() && Settings::notification_email() === get_option( 'admin_email' ) );
-$verifie( 'confirmation visiteur activée par défaut', Settings::visitor_confirmation_enabled() );
+$verifie( 'confirmation visiteur désactivée par défaut (pas de relais d’emails vers une adresse saisie)', Settings::defaults()[ Settings::KEY_VISITOR_CONFIRMATION ] === false );
+// Les scénarios qui suivent éprouvent les DEUX emails (interne et accusé visiteur) : l'accusé est activé pour eux,
+// comme le ferait un administrateur. La fin du script efface les réglages (retour aux défauts).
+Settings::update( [ Settings::KEY_VISITOR_CONFIRMATION => true ] );
 $verifie( 'pp_projects est InnoDB (transactions)', $repo->supports_transactions() );
 $verifie( 'aucune ligne sans référence avant les tests', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['projects']} WHERE reference IS NULL" ) === 0 ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 

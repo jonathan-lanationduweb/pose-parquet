@@ -76,23 +76,23 @@ WordPress ; une publication sans nouvelles depuis 10 minutes est close en
 Le WordPress distant n'a ni le dépôt ni Node. La chaîne :
 
     WordPress « Publier le site »
-      → POST https://api.github.com/repos/jonathan-lanationduweb/pose-parquet/dispatches
-        { "event_type": "wordpress-publish", "client_payload": { "demande_le": <date>, "par": <id utilisateur> } }
-      → .github/workflows/deploy-pages.yml (déclencheur repository_dispatch)
+      → POST https://api.github.com/repos/jonathan-lanationduweb/pose-parquet/actions/workflows/deploy-pages.yml/dispatches
+        { "ref": "main" }
+      → .github/workflows/deploy-pages.yml (déclencheur workflow_dispatch)
       → node _generator/contenus.js "$WP_EXPORT_URL"   (export → validation → build)
       → contrôles de l'artefact → déploiement GitHub Pages
-      → WordPress lit GET /repos/…/actions/runs?event=repository_dispatch&per_page=1
+      → WordPress lit GET /repos/…/actions/runs?event=workflow_dispatch&per_page=1
         et clôt la publication : succès seulement quand le run est « completed / success ».
 
 Le signal ne transporte AUCUN contenu : le workflow va chercher l'export lui-même.
 
 #### Prérequis (à faire par le propriétaire du dépôt — non faisables depuis WordPress)
 
-1. **Le workflow sur la branche par défaut.** Un `repository_dispatch` ne
-   déclenche QUE les workflows de la branche par défaut (`main`). Tant que la
-   version de `deploy-pages.yml` qui écoute `wordpress-publish` n'y est pas,
-   GitHub répond 204 mais ne lance rien ; WordPress le détecte après trois
-   minutes et affiche « aucun workflow n'a démarré ».
+1. **Le workflow sur la branche publiée.** `deploy-pages.yml` doit exister
+   sur `main` avec le déclencheur `workflow_dispatch` (c'est le cas). Sans lui,
+   GitHub ne lance rien ; WordPress le détecte après trois minutes et affiche
+   « aucun workflow n'a démarré ». Autre workflow ou autre branche :
+   `POSE_PARQUET_GITHUB_WORKFLOW` et `POSE_PARQUET_GITHUB_REF` dans wp-config.php.
 2. **Un WordPress joignable depuis Internet.** Les runners GitHub tirent
    `WP_EXPORT_URL` et téléchargent les images téléversées (`/wp-content/uploads/`).
    Un WordPress local (`pose-parquet-dev.local`) ne l'est pas : la
@@ -103,9 +103,12 @@ Le signal ne transporte AUCUN contenu : le workflow va chercher l'export lui-mê
 
 - **Quoi** : un *fine-grained personal access token* GitHub (ou, mieux pour
   une équipe, une GitHub App installée sur ce seul dépôt), restreint au dépôt
-  `jonathan-lanationduweb/pose-parquet`, permissions **Contents : read and
-  write** (exigée par l'API pour `repository_dispatch`) et **Actions : read**
-  (suivre le run). Rien d'autre ; expiration courte (90 jours) recommandée.
+  `jonathan-lanationduweb/pose-parquet`, une seule permission :
+  **Actions : read and write** (lancer le workflow, suivre le run).
+  **Surtout pas « Contents »** : ce jeton vit sur le serveur WordPress ; s'il
+  fuyait, un droit d'écriture sur le code permettrait de pousser un
+  générateur piégé, construit puis mis en ligne par le workflow. Expiration
+  courte (90 jours) recommandée.
 - **Où** : UNIQUEMENT dans le `wp-config.php` du WordPress distant :
 
       define( 'POSE_PARQUET_GITHUB_REPO', 'jonathan-lanationduweb/pose-parquet' );
@@ -115,9 +118,11 @@ Le signal ne transporte AUCUN contenu : le workflow va chercher l'export lui-mê
 
   Jamais dans la base, jamais dans le dépôt, jamais dans GitHub (le workflow
   n'en a pas besoin), jamais dans le navigateur (testé : absent de la page).
-- **Ce qu'il permet** : déclencher les workflows du dépôt et lire leurs runs.
-  Avec « Contents : write », il pourrait aussi écrire dans le dépôt : c'est la
-  raison de préférer une GitHub App ou un jeton à durée courte.
+- **Ce qu'il permet** : relancer un workflow existant du dépôt et lire ses
+  runs. Rien d'autre : ni lire, ni modifier le code. Le pire usage d'un jeton
+  volé est donc de relancer un déploiement du code déjà présent sur `main`.
+- **Protéger `main`** (Settings → Branches) : exiger une revue et interdire le
+  push forcé. Même un jeton plus large ne pourrait alors pas y écrire seul.
 - **Révocation** : GitHub → Settings → Developer settings → Personal access
   tokens → Fine-grained tokens → le jeton → *Revoke* ; puis retirer la
   constante de `wp-config.php` (le bouton passe alors en « aucune

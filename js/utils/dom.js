@@ -26,13 +26,9 @@ export function mountAll(selector, factory, scope = document) {
  */
 export function trapFocus(container, event) {
   const roots = Array.isArray(container) ? container : [container];
+  const selector = 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
   const focusables = roots
-    .flatMap((root) =>
-      qsa(
-        'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])',
-        root
-      )
-    )
+    .flatMap(root => [...(root.matches(selector) ? [root] : []), ...qsa(selector, root)])
     .filter((el) => el.offsetParent !== null);
   if (!focusables.length) return;
   const first = focusables[0];

@@ -53,6 +53,8 @@
   gap: clamp(1.75rem, 1rem + 2.5vw, 3rem);
 }
 
+.hero .eyebrow { color: #fff; text-shadow: 0 1px 5px rgba(0, 0, 0, 0.65); }
+
 .hero__title {
   font-size: var(--fs-display);
   line-height: var(--lh-display);

@@ -10,10 +10,13 @@ import { initNav, markCurrentNav } from './components/nav.js';
 import { initReveal } from './animations/reveal.js';
 import { initContexteLead } from './forms/lead-context.js';
 import { brancherLiens as brancherAllure } from './commerce/allure.js';
+import { surveillerPartenaires } from './commerce/partenaires.js';
 
 const has = (selector) => Boolean(qs(selector));
 
 async function boot() {
+  // Sans attendre : masque les liens d'un partenaire en panne dès que l'état arrive.
+  surveillerPartenaires();
   initNav();
   markCurrentNav();
   initReveal();

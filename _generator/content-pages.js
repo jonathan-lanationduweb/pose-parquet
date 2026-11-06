@@ -29,7 +29,7 @@ const PAGES = {
     "h1": "Un média pratique sur la pose du parquet",
     "chapo": "Pose Parquet documente ce qui se décide avant la première lame : le support, le sens, le motif, la méthode.",
     "titre": "À propos de Pose Parquet, média sur la pose du parquet",
-    "description": "Pose Parquet aide à comprendre la pose du parquet, à préparer son projet et à trouver les références adaptées : guides, motifs, tutoriels et outils de visualisation."
+    "description": "Pose Parquet aide à comprendre la pose du parquet et à préparer son projet : guides, motifs, tutoriels et outils de visualisation gratuits."
   },
   "methode-editoriale": {
     "nom": "Notre méthode",
@@ -82,10 +82,80 @@ const PAGES = {
     "ordre": 7,
     "h1": "Nous écrire",
     "chapo": "Une question sur un contenu, une erreur à corriger, ou un chantier à préparer : chaque demande a son chemin, et les retours de terrain sont bienvenus.",
-    "titre": "Contact | Pose Parquet",
+    "titre": "Contacter Pose Parquet : question ou correction",
     "description": "Contacter l'équipe éditoriale de Pose Parquet : question, correction, proposition de contenu ou d'outil."
+  },
+  /*
+   * Pages dont le SEO était écrit en dur dans le générateur. Les valeurs par
+   * défaut sont les textes publiés jusqu'ici, à l'identique : rien ne change
+   * sur le site tant que personne ne les modifie dans WordPress.
+   * `h1` / `chapo` à null : l'en-tête est une composition (outil plein écran),
+   * seul son SEO se règle ici.
+   */
+  "motifs": {
+    "nom": "Motifs",
+    "adresse": "/motifs/",
+    "ordre": 8,
+    "h1": "Six façons de dessiner un sol",
+    "chapo": "Le motif décide du caractère de la pièce autant que l'essence du bois. Chaque fiche détaille le rendu, les contraintes de pose, le niveau de chutes attendu — un ordre de grandeur, jamais un calcul — et les pièces adaptées.",
+    "titre": "Motifs de pose du parquet : lesquels choisir | Pose Parquet",
+    "description": "Pose droite, dans la longueur, dans la largeur, diagonale, Point de Hongrie, bâton rompu : rendu, chutes, difficulté et pièces adaptées pour chaque motif."
+  },
+  "visualiseur": {
+    "nom": "Visualiseur (présentation)",
+    "adresse": "/outils/visualiseur.html",
+    "ordre": 9,
+    "h1": "Visualisez votre parquet dans votre pièce.",
+    "chapo": null,
+    "titre": "Visualiser un parquet dans sa pièce | Pose Parquet",
+    "description": "Essayez un parquet dans votre pièce : importez une photo, choisissez une matière et un motif. Tout se calcule dans votre navigateur, rien n’est envoyé."
+  },
+  "studio": {
+    "nom": "Studio (Visualiseur plein écran)",
+    "adresse": "/outils/studio.html",
+    "ordre": 10,
+    "h1": null,
+    "chapo": null,
+    "titre": "Visualiseur Parquet · Pose Parquet",
+    "description": "Visualiseur Parquet : choisissez une pièce, essayez des parquets, comparez jusqu’à trois rendus. Tout est calculé dans votre navigateur."
+  },
+  "simulateur": {
+    "nom": "Mode Plan (simulateur)",
+    "adresse": "/outils/simulateur-pose.html",
+    "ordre": 11,
+    "h1": "Une pièce. Plusieurs directions.",
+    "chapo": "Vue du dessus, à l'échelle : renseignez vos dimensions, placez la fenêtre et l'entrée, comparez les motifs. Les quantités affichées sont des estimations indicatives.",
+    "titre": "Simulateur de sens de pose du parquet | Pose Parquet",
+    "description": "Simulateur gratuit : dessinez votre pièce, placez la fenêtre et comparez pose droite, largeur, diagonale, Point de Hongrie et bâton rompu en temps réel."
+  },
+  "projet": {
+    "nom": "Mon projet (formulaire)",
+    "adresse": "/projet/",
+    "ordre": 12,
+    "h1": "Décrivez votre projet",
+    "chapo": "Quelques informations suffisent à comprendre un chantier : la pièce, le support, le rendu recherché et le délai.",
+    "titre": "Décrire un projet de pose de parquet | Pose Parquet",
+    "description": "Décrivez votre projet de parquet en quatre étapes et voyez vers qui vous tourner : Premibel pour le parquet, Allure Design pour la pose en Île-de-France."
   }
 };
+
+/*
+ * Les six fiches motif : leur SEO, leur titre et leur chapô se règlent aussi
+ * dans WordPress (le corps de la fiche reste celui du dépôt). Clé
+ * « motif-<slug> », valeurs par défaut prises dans content-motifs.js.
+ */
+const { MOTIFS: FICHES_MOTIF } = require('./content-motifs');
+FICHES_MOTIF.forEach((m, i) => {
+  PAGES[`motif-${m.slug}`] = {
+    nom: `Motif : ${m.h1}`,
+    adresse: `/motifs/${m.slug}.html`,
+    ordre: 20 + i,
+    h1: m.h1,
+    chapo: m.lead,
+    titre: m.title,
+    description: m.description,
+  };
+});
 
 /*
  * CHAMPS STRUCTURÉS — les blocs éditoriaux pilotés depuis WordPress.
@@ -125,7 +195,7 @@ PAGES['accueil'].champs = [
   projet('projet_eyebrow', 'Surtitre', 'texte', 60, 'Votre projet'),
   projet('projet_titre', 'Titre', 'texte', 120, 'Un projet à concrétiser ?'),
   projet('projet_texte', 'Texte', 'long', 400, 'Décrivez votre pièce, votre parquet et votre besoin. Pose Parquet qualifie votre demande et vous oriente, selon le projet, vers Premibel, Allure Design ou les deux.'),
-  projet('projet_points', 'Points rassurants (un par ligne)', 'lignes', 600, ['Quatre étapes courtes, aucune coordonnée demandée.', '« Je ne sais pas » est une réponse valable partout.', 'Aucun démarchage : vos coordonnées servent uniquement à répondre.', 'L’orientation est relue et confirmée par une personne avant tout contact.'].join('\n')),
+  projet('projet_points', 'Points rassurants (un par ligne)', 'lignes', 600, ['Quatre étapes courtes, aucune coordonnée demandée.', '« Je ne sais pas » est une réponse valable partout.', 'Votre projet est qualifié selon votre besoin et votre localisation.', 'À la fin, vous êtes orienté vers Premibel, Allure Design ou les deux selon votre projet.'].join('\n')),
   projet('projet_cta', 'Bouton principal', 'texte', 40, 'Décrire mon projet'),
   projet('projet_cta2', 'Bouton secondaire', 'texte', 40, 'Visualiser mon parquet'),
 ];
@@ -214,9 +284,116 @@ PAGES['contact'].champs = [
   r3('r3_cta', 'Bouton projet', 'texte', 40, 'Décrire mon projet'),
 ];
 
+/*
+ * PAGES LÉGALES.
+ *
+ * Les informations que seul l'éditeur connaît (raison sociale, SIREN,
+ * adresse, directeur de la publication, hébergeur du WordPress, durée de
+ * conservation) sont livrées avec la valeur A_COMPLETER : rien n'est inventé.
+ * Tant qu'il en reste une, la validation de publication le signale, et
+ * REFUSE la publication en production (valider-wordpress.js) : le site ne
+ * peut pas partir en ligne avec des mentions légales incomplètes.
+ *
+ * Les textes par défaut décrivent ce que fait réellement le site (vérifié
+ * dans le code au 05/11/2026) : aucun cookie de mesure ni de publicité,
+ * aucun script tiers, un formulaire sans coordonnées. Ce sont des modèles à
+ * faire relire : ils ne remplacent pas un conseil juridique.
+ */
+const A_COMPLETER = '[À compléter]';
+PAGES['mentions-legales'] = {
+  nom: 'Mentions légales',
+  adresse: '/mentions-legales/',
+  ordre: 30,
+  h1: 'Mentions légales',
+  chapo: 'Qui édite ce site, qui l’héberge, et à qui appartiennent ses contenus.',
+  titre: 'Mentions légales | Pose Parquet',
+  description: 'Mentions légales du site Pose Parquet : éditeur, directeur de la publication, hébergement, propriété intellectuelle et crédits.',
+};
+const ed = c('Éditeur du site');
+const heb = c('Hébergement');
+const pi = c('Propriété intellectuelle et crédits');
+PAGES['mentions-legales'].champs = [
+  ed('editeur_nom', 'Raison sociale (ou nom)', 'texte', 120, A_COMPLETER),
+  ed('editeur_forme', 'Forme juridique et capital', 'texte', 160, A_COMPLETER, 'Ex. : SAS au capital de 1 000 €. Entrepreneur individuel : « Entrepreneur individuel ».'),
+  ed('editeur_adresse', 'Adresse du siège', 'lignes', 300, A_COMPLETER, 'Une ligne par ligne d’adresse.'),
+  ed('editeur_siren', 'SIREN / RCS', 'texte', 120, A_COMPLETER, 'Ex. : RCS Paris 123 456 789.'),
+  ed('editeur_tva', 'N° de TVA intracommunautaire', 'texte', 60, '', 'Facultatif : laisser vide si non concerné.'),
+  ed('editeur_email', 'Email de contact', 'texte', 120, A_COMPLETER),
+  ed('editeur_tel', 'Téléphone', 'texte', 40, '', 'Facultatif.'),
+  ed('directeur', 'Directeur de la publication', 'texte', 120, A_COMPLETER, 'La personne responsable des contenus publiés.'),
+  heb('heb_site_nom', 'Hébergeur du site public', 'texte', 120, 'GitHub, Inc. (GitHub Pages)'),
+  heb('heb_site_adresse', 'Adresse de l’hébergeur du site', 'lignes', 300, '88 Colin P. Kelly Jr. Street\nSan Francisco, CA 94107\nÉtats-Unis'),
+  heb('heb_wp_nom', 'Hébergeur des données (WordPress)', 'texte', 120, A_COMPLETER, 'Là où sont stockées les demandes du formulaire projet.'),
+  heb('heb_wp_adresse', 'Adresse de cet hébergeur', 'lignes', 300, A_COMPLETER),
+  pi('pi_texte', 'Propriété intellectuelle', 'long', 1200, 'Les textes, schémas, outils et la mise en page de ce site sont protégés par le droit d’auteur. Toute reproduction, même partielle, sans autorisation écrite de l’éditeur est interdite, à l’exception des courtes citations accompagnées de leur source.'),
+  pi('credits', 'Crédits photographiques', 'riche', 600, 'Photographies : **Pexels**, sous la licence Pexels. Schémas et rendus du Visualiseur : réalisés par Pose Parquet ; les rendus sont des simulations, présentées comme telles.'),
+  pi('liens_texte', 'Liens commerciaux', 'lien', 600, 'Ce site oriente vers Premibel (références de parquet) et Allure Design (pose et rénovation en Île-de-France). Ces liens sont expliqués sur la page [À propos].', 'Le texte entre crochets devient le lien vers À propos.'),
+];
+
+PAGES['confidentialite'] = {
+  nom: 'Confidentialité et cookies',
+  adresse: '/confidentialite/',
+  ordre: 31,
+  h1: 'Confidentialité et cookies',
+  chapo: 'Ce que ce site enregistre, pourquoi, combien de temps, et vos droits. En bref : pas de cookie de mesure ni de publicité, et un formulaire qui ne demande ni nom, ni email, ni téléphone.',
+  titre: 'Confidentialité et cookies | Pose Parquet',
+  description: 'Données personnelles et cookies sur Pose Parquet : formulaire sans coordonnées, aucun cookie publicitaire ni de mesure d’audience, vos droits RGPD.',
+};
+const resp = c('Responsable du traitement');
+const form = c('Le formulaire « Mon projet »');
+const nav = c('Cookies et stockage dans votre navigateur');
+const droits = c('Vos droits');
+PAGES['confidentialite'].champs = [
+  resp('responsable', 'Responsable du traitement', 'texte', 160, A_COMPLETER, 'En général, l’éditeur du site (voir Mentions légales).'),
+  resp('contact_rgpd', 'Contact pour vos données', 'texte', 120, A_COMPLETER, 'Une adresse email qui répond aux demandes RGPD.'),
+  form('form_donnees', 'Données collectées', 'lignes', 1200, [
+    'Le département du projet, pour savoir qui peut intervenir.',
+    'Le type de logement, la pièce, la surface et le support existant.',
+    'Le type de parquet, le sens de pose et le style recherchés.',
+    'Votre besoin (parquet, pose, rénovation…) et votre délai.',
+    'Le cas échéant, la configuration préparée dans le Visualiseur (pièce, parquet, motif) — jamais votre photo, qui ne quitte pas votre navigateur.',
+    'La page par laquelle vous êtes arrivé sur le site et son origine (lien, campagne).',
+  ].join('\n')),
+  form('form_pas', 'Ce qui n’est pas demandé', 'riche', 400, 'Le formulaire ne demande **ni nom, ni email, ni téléphone**.'),
+  form('form_finalite', 'Pourquoi', 'long', 600, 'Ces réponses servent à comprendre votre projet et à vous orienter vers la bonne solution : Premibel pour le choix du parquet, Allure Design pour la pose en Île-de-France. Elles permettent aussi de mesurer, sans vous identifier, d’où viennent les demandes.'),
+  form('form_base', 'Base légale', 'long', 400, 'L’intérêt légitime de l’éditeur à comprendre et orienter les demandes qui lui sont adressées.'),
+  form('form_destinataires', 'Qui y a accès', 'long', 600, 'Les réponses sont enregistrées sur le serveur de l’éditeur et consultées par son équipe. Elles ne sont ni vendues, ni transmises automatiquement à Premibel ou à Allure Design : c’est vous qui choisissez de les contacter, depuis l’écran de fin.'),
+  form('form_duree', 'Durée de conservation', 'texte', 200, A_COMPLETER, 'Ex. : « 3 ans à compter de la demande ».'),
+  form('form_securite', 'Protection contre les abus', 'long', 600, 'Pour limiter les envois automatisés, votre adresse IP est transformée en empreinte non réversible, conservée quelques heures au plus. Elle n’est jamais enregistrée en clair avec votre demande.'),
+  nav('nav_resume', 'En résumé', 'riche', 400, 'Ce site ne dépose **aucun cookie de mesure d’audience ni de publicité** et ne charge aucun service tiers. Il n’affiche donc pas de bandeau de consentement : il n’a rien à vous demander.'),
+  nav('nav_liste', 'Ce qui est enregistré dans votre navigateur', 'lignes', 1200, [
+    'Visualiseur et Mode Plan : vos derniers réglages (pièce, parquet, motif, dimensions), pour les retrouver à votre prochaine visite. Rien n’est envoyé.',
+    'Origine de la visite : la page d’arrivée et l’éventuelle campagne, le temps de votre visite seulement (effacées à la fermeture de l’onglet).',
+    'Aperçu en maintenance : un cookie technique, uniquement si vous utilisez le lien d’aperçu pendant une maintenance.',
+  ].join('\n')),
+  nav('nav_effacer', 'Les effacer', 'long', 400, 'Ces éléments s’effacent depuis les réglages de votre navigateur (données de site). Le site continue de fonctionner sans eux.'),
+  droits('droits_texte', 'Vos droits', 'long', 800, 'Vous disposez d’un droit d’accès, de rectification, d’effacement, de limitation et d’opposition sur les données qui vous concernent. Le formulaire ne recueillant ni nom ni email, indiquez la référence de votre demande (affichée à la fin du formulaire) pour que nous la retrouvions.'),
+  droits('droits_cnil', 'Réclamation', 'long', 400, 'Si vous estimez que vos droits ne sont pas respectés, vous pouvez adresser une réclamation à la CNIL (www.cnil.fr).'),
+];
+
+PAGES['blog'] = {
+  nom: 'Blog',
+  adresse: '/blog/',
+  ordre: 13,
+  h1: 'Le blog',
+  chapo: 'Actualités, retours de chantier et réponses aux questions qui reviennent souvent.',
+  titre: 'Blog : actualités et conseils parquet | Pose Parquet',
+  description: 'Les articles de Pose Parquet : actualités, retours de chantier et conseils pratiques pour choisir et poser son parquet.',
+};
+
+PAGES['plan-du-site'] = {
+  nom: 'Plan du site',
+  adresse: '/plan-du-site/',
+  ordre: 32,
+  h1: 'Plan du site',
+  chapo: 'Toutes les pages de Pose Parquet, rubrique par rubrique.',
+  titre: 'Plan du site | Pose Parquet',
+  description: 'Plan du site Pose Parquet : guides, motifs de pose, tutoriels, inspiration, outils et pages pratiques.',
+};
+
 for (const page of Object.values(PAGES)) {
   if (page.champs) page.valeurs = defauts(page.champs);
 }
 
-module.exports = { PAGES };
+module.exports = { PAGES, A_COMPLETER };
 

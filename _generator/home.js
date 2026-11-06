@@ -2,7 +2,24 @@
 const { SITE } = require('./layout');
 const { picture } = require('./responsive');
 const { NB_PIECES, scene } = require('./scenes');
-const { NB_PREMIBEL_VISU, NB_MOTIFS, enLettres, mentionRendu } = require('./catalogue');
+const { NB_PREMIBEL_VISU, NB_MOTIFS, enLettres, mentionRendu, CATALOGUE } = require('./catalogue');
+const { choisirVitrine } = require('../js/scene/vitrine.js');
+const MOTIFS_PARQUETS = require('../data/parquets.json').patterns;
+
+/**
+ * La première puce de la vitrine de l'accueil, choisie comme le navigateur la
+ * choisira (js/scene/vitrine.js) : la légende écrite dans la page nomme donc
+ * la référence que l'aperçu peint, même après un retrait chez Premibel.
+ */
+function legendeVitrine() {
+  const fiches = new Map(CATALOGUE.proposes.map((f) => [f.id, f]));
+  const [puce] = choisirVitrine((id) => fiches.get(id) || null);
+  if (!puce) throw new Error('Vitrine de l’accueil : aucune référence Premibel proposée (js/scene/vitrine.js).');
+  const fiche = fiches.get(puce.material);
+  const motif = (MOTIFS_PARQUETS.find((m) => m.id === puce.pattern) || { label: puce.pattern }).label.toLowerCase();
+  const mention = mentionRendu(puce.material);
+  return `${fiche.name}, ${motif}${mention ? ` (${mention})` : ''}`;
+}
 const { GUIDES } = require('./content-guides');
 const { MOTIFS } = require('./content-motifs');
 const { TUTOS } = require('./content-tutos');
@@ -331,7 +348,7 @@ function apercuSquelette(id, base = '') {
                 <span class="vzp__handle" aria-hidden="true"></span>
               </div>
               <figcaption class="vzp__caption">
-                <span data-caption>Chêne naturel Houston, lames droites${mentionRendu('CHENF39031') ? ` (${mentionRendu('CHENF39031')})` : ''}</span> — rendu calculé dans votre navigateur.
+                <span data-caption>${legendeVitrine()}</span> — rendu calculé dans votre navigateur.
                 <span data-credit>${credit}</span>
               </figcaption>
             </figure>
@@ -601,4 +618,4 @@ function buildHomeBody() {
   ].join('\n\n');
 }
 
-module.exports = { buildHomeBody, apercuSquelette, ICON, SITE };
+module.exports = { buildHomeBody, apercuSquelette, legendeVitrine, ICON, SITE };

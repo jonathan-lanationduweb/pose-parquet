@@ -62,7 +62,7 @@ final class Socle {
 		if ( in_array( (string) $ecran->post_type, \PoseParquet\Core\Contenus\Types::all(), true ) ) {
 			return true;
 		}
-		return in_array( (string) $ecran->taxonomy, [ \PoseParquet\Core\Contenus\Types::CAT_GUIDE, \PoseParquet\Core\Contenus\Types::CAT_TUTORIEL ], true );
+		return in_array( (string) $ecran->taxonomy, [ \PoseParquet\Core\Contenus\Types::CAT_GUIDE, \PoseParquet\Core\Contenus\Types::CAT_TUTORIEL, \PoseParquet\Core\Contenus\Types::CAT_ARTICLE ], true );
 	}
 
 	public static function register(): void {

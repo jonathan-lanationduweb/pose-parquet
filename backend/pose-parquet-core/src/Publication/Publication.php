@@ -16,9 +16,9 @@
  *           `node _generator/publier.js` (export → validation → build), en
  *           tâche de fond, avec un délai maximal. En cas d'échec du build, le
  *           script rétablit le site précédent.
- *   github  production : WordPress n'a ni le dépôt ni Node. Il envoie un
- *           `repository_dispatch` à GitHub (jeton dans wp-config.php, jamais
- *           dans le navigateur) ; le workflow de déploiement tire l'export,
+ *   github  production : WordPress n'a ni le dépôt ni Node. Il lance le
+ *           workflow de déploiement (`workflow_dispatch`, jeton dans
+ *           wp-config.php, jamais dans le navigateur) ; le workflow de déploiement tire l'export,
  *           valide, construit et ne déploie que si tout a réussi — le site en
  *           ligne n'est jamais remplacé par un build raté.
  *   aucune  ni l'un ni l'autre : le bouton est désactivé et dit pourquoi.
@@ -58,6 +58,9 @@ final class Publication {
 	/** Au-delà, une publication sans nouvelles est considérée comme interrompue. */
 	public const DELAI_MAX   = 600;
 	public const EVENEMENT_GITHUB = 'wordpress-publish';
+	/** Workflow lancé et branche visée, en mode GitHub (constantes de wp-config.php pour les changer). */
+	public const WORKFLOW_GITHUB = 'deploy-pages.yml';
+	public const BRANCHE_GITHUB  = 'main';
 	/** Sans run GitHub visible après ce délai, le déclenchement n'a rien démarré : on le dit. */
 	public const DELAI_DEMARRAGE_GITHUB = 180;
 
@@ -85,6 +88,7 @@ final class Publication {
 
 	public static function register(): void {
 		add_action( 'admin_post_' . self::ACTION, [ self::class, 'publier' ] );
+		add_action( 'admin_notices', [ self::class, 'rappel_editorial' ] );
 	}
 
 	/* ================================================================== */
@@ -172,7 +176,7 @@ final class Publication {
 		if ( $racine && is_readable( $racine . '/data/wordpress/contenus.json' ) ) {
 			$corps = (string) file_get_contents( $racine . '/data/wordpress/contenus.json' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		} else {
-			$r = wp_remote_get( SitePublic::url() . 'data/wordpress/contenus.json', [ 'timeout' => 6 ] );
+			$r = \PoseParquet\Core\Admin\SitePublic::lire( SitePublic::url() . 'data/wordpress/contenus.json', [ 'timeout' => 6 ] );
 			if ( ! is_wp_error( $r ) && (int) wp_remote_retrieve_response_code( $r ) === 200 ) {
 				$corps = (string) wp_remote_retrieve_body( $r );
 			}
@@ -218,6 +222,7 @@ final class Publication {
 		$listes = [
 			'guides'       => [ 'slug', __( 'Guide', 'pose-parquet-core' ), \PoseParquet\Core\Contenus\Types::GUIDE ],
 			'tutoriels'    => [ 'slug', __( 'Tutoriel', 'pose-parquet-core' ), \PoseParquet\Core\Contenus\Types::TUTORIEL ],
+			'articles'     => [ 'slug', __( 'Article', 'pose-parquet-core' ), \PoseParquet\Core\Contenus\Types::ARTICLE ],
 			'inspirations' => [ 'cle', __( 'Inspiration', 'pose-parquet-core' ), \PoseParquet\Core\Contenus\Types::INSPIRATION ],
 			'pages'        => [ 'cle', __( 'Page', 'pose-parquet-core' ), \PoseParquet\Core\Contenus\Types::PAGE ],
 		];
@@ -320,7 +325,7 @@ final class Publication {
 	 *
 	 * @return array{code:string,message:string}
 	 */
-	public static function lancer( int $utilisateur ): array {
+	public static function lancer( int $utilisateur, bool $catalogue = false ): array {
 		$mode = self::mode();
 		if ( $mode === 'aucune' ) {
 			return [ 'code' => 'indisponible', 'message' => __( 'Aucune publication configurée sur cette installation.', 'pose-parquet-core' ) ];
@@ -331,7 +336,8 @@ final class Publication {
 		if ( ! add_option( self::VERROU, $verrou, '', false ) ) {
 			return [ 'code' => 'en_cours', 'message' => __( 'Une publication est déjà en cours.', 'pose-parquet-core' ) ];
 		}
-		$ok = $mode === 'local' ? self::lancer_local() : self::lancer_github( $utilisateur );
+		// En GitHub, chaque déploiement resynchronise déjà le catalogue : rien à transmettre.
+		$ok = $mode === 'local' ? self::lancer_local( $catalogue ) : self::lancer_github( $utilisateur );
 		if ( ! $ok['ok'] ) {
 			self::terminer( [ 'statut' => 'echec', 'raison' => $ok['raison'], 'duree' => 0 ] );
 			return [ 'code' => 'echec', 'message' => $ok['raison'] ];
@@ -340,7 +346,7 @@ final class Publication {
 	}
 
 	/** @return array{ok:bool,raison:string} */
-	private static function lancer_local(): array {
+	private static function lancer_local( bool $catalogue = false ): array {
 		$node   = self::node();
 		$script = self::script();
 		if ( ! $node || ! $script ) {
@@ -350,7 +356,7 @@ final class Publication {
 		@unlink( $fichier ); // phpcs:ignore WordPress.PHP.NoSilencedErrors, WordPress.WP.AlternativeFunctions.unlink_unlink
 		$export = rest_url( 'pose-parquet/v1/contenus' );
 		// Commande FERMÉE : quatre valeurs, toutes calculées ici, toutes échappées.
-		$args = implode( ' ', array_map( 'escapeshellarg', [ $node, $script, '--etat', $fichier, '--export', $export ] ) );
+		$args = implode( ' ', array_map( 'escapeshellarg', array_merge( [ $node, $script, '--etat', $fichier, '--export', $export ], $catalogue ? [ '--catalogue' ] : [] ) ) );
 		if ( DIRECTORY_SEPARATOR === '\\' ) {
 			$commande = 'start "" /B ' . $args . ' > NUL 2>&1';
 		} else {
@@ -370,8 +376,25 @@ final class Publication {
 		if ( ! $gh ) {
 			return [ 'ok' => false, 'raison' => __( 'Publication GitHub non configurée (wp-config.php).', 'pose-parquet-core' ) ];
 		}
+		/*
+		 * `workflow_dispatch` et non plus `repository_dispatch`.
+		 *
+		 * L'API exigeait pour `repository_dispatch` un jeton « Contents : read
+		 * and write » : un droit d'ÉCRIRE DANS LE CODE du dépôt. Ce jeton vit
+		 * dans le wp-config.php du WordPress distant ; un WordPress compromis
+		 * l'aurait livré, et avec lui la possibilité de pousser un générateur
+		 * piégé que le workflow aurait construit et mis en ligne.
+		 * `workflow_dispatch` ne demande que « Actions : read and write » :
+		 * lancer un workflow existant, sur une branche existante, sans jamais
+		 * toucher au code. Le workflow l'accepte déjà (déclencheur manuel).
+		 */
+		$workflow = defined( 'POSE_PARQUET_GITHUB_WORKFLOW' ) ? (string) POSE_PARQUET_GITHUB_WORKFLOW : self::WORKFLOW_GITHUB;
+		$branche  = defined( 'POSE_PARQUET_GITHUB_REF' ) ? (string) POSE_PARQUET_GITHUB_REF : self::BRANCHE_GITHUB;
+		if ( ! preg_match( '/^[A-Za-z0-9_.-]+\.ya?ml$/', $workflow ) || ! preg_match( '#^[A-Za-z0-9_./-]+$#', $branche ) ) {
+			return [ 'ok' => false, 'raison' => __( 'Workflow ou branche GitHub invalide (wp-config.php).', 'pose-parquet-core' ) ];
+		}
 		$r = wp_remote_post(
-			'https://api.github.com/repos/' . $gh['repo'] . '/dispatches',
+			'https://api.github.com/repos/' . $gh['repo'] . '/actions/workflows/' . $workflow . '/dispatches',
 			[
 				'timeout' => 10,
 				'headers' => [
@@ -380,7 +403,8 @@ final class Publication {
 					'X-GitHub-Api-Version' => '2022-11-28',
 					'User-Agent'           => 'pose-parquet-core',
 				],
-				'body'    => (string) wp_json_encode( [ 'event_type' => self::EVENEMENT_GITHUB, 'client_payload' => [ 'demande_le' => gmdate( 'c' ), 'par' => $utilisateur ] ] ),
+				// Aucune donnée transmise au workflow : il n'en lit aucune, et rien de WordPress ne doit pouvoir l'orienter.
+				'body'    => (string) wp_json_encode( [ 'ref' => $branche ] ),
 			]
 		);
 		$code = is_wp_error( $r ) ? 0 : (int) wp_remote_retrieve_response_code( $r );
@@ -408,13 +432,11 @@ final class Publication {
 			}
 			/*
 			 * GitHub a accepté le signal (204) mais AUCUN run n'apparaît : le
-			 * workflow de la branche par défaut n'écoute pas repository_dispatch
-			 * (« wordpress-publish »). Un repository_dispatch ne déclenche que
-			 * les workflows de la branche par défaut. On le dit au lieu
-			 * d'attendre dix minutes en silence.
+			 * workflow de la branche visée n'accepte pas le déclenchement
+			 * manuel. On le dit au lieu d'attendre dix minutes en silence.
 			 */
 			if ( ! $run && $age > self::DELAI_DEMARRAGE_GITHUB ) {
-				self::terminer( [ 'statut' => 'echec', 'raison' => __( 'GitHub a reçu le signal mais aucun workflow n’a démarré : la branche par défaut du dépôt doit contenir deploy-pages.yml avec le déclencheur repository_dispatch « wordpress-publish ». Le site en ligne n’a pas changé.', 'pose-parquet-core' ), 'duree' => $age ] );
+				self::terminer( [ 'statut' => 'echec', 'raison' => __( 'GitHub a reçu le signal mais aucun workflow n’a démarré : la branche publiée doit contenir deploy-pages.yml avec le déclencheur workflow_dispatch. Le site en ligne n’a pas changé.', 'pose-parquet-core' ), 'duree' => $age ] );
 				return;
 			}
 		} else {
@@ -438,7 +460,7 @@ final class Publication {
 			return null;
 		}
 		$r = wp_remote_get(
-			'https://api.github.com/repos/' . $gh['repo'] . '/actions/runs?event=repository_dispatch&per_page=1',
+			'https://api.github.com/repos/' . $gh['repo'] . '/actions/runs?event=workflow_dispatch&per_page=1',
 			[ 'timeout' => 8, 'headers' => [ 'Accept' => 'application/vnd.github+json', 'Authorization' => 'Bearer ' . $gh['jeton'], 'User-Agent' => 'pose-parquet-core' ] ]
 		);
 		$run = json_decode( (string) wp_remote_retrieve_body( $r ), true )['workflow_runs'][0] ?? null;
@@ -517,7 +539,7 @@ final class Publication {
 		echo '<div class="adm-statut adm-statut--' . esc_attr( $variante ) . '"><span class="dashicons ' . esc_attr( $icone ) . '" aria-hidden="true"></span><div>';
 		echo '<strong class="adm-statut__phrase">' . esc_html( $phrase ) . '</strong>';
 		if ( $e['statut'] === 'en_cours' && $e['etape'] !== '' ) {
-			$etapes = [ 'export' => __( 'export et validation', 'pose-parquet-core' ), 'validation' => __( 'validation', 'pose-parquet-core' ), 'build' => __( 'construction du site', 'pose-parquet-core' ), 'ci' => __( 'workflow GitHub', 'pose-parquet-core' ) ];
+			$etapes = [ 'catalogue' => __( 'synchronisation du catalogue Premibel', 'pose-parquet-core' ), 'export' => __( 'export et validation', 'pose-parquet-core' ), 'validation' => __( 'validation', 'pose-parquet-core' ), 'build' => __( 'construction du site', 'pose-parquet-core' ), 'ci' => __( 'workflow GitHub', 'pose-parquet-core' ) ];
 			echo '<span class="adm-statut__detail">' . esc_html( sprintf( /* translators: %s : étape */ __( 'Étape : %s', 'pose-parquet-core' ), $etapes[ $e['etape'] ] ?? $e['etape'] ) ) . '</span>';
 		}
 		echo '<span class="adm-statut__detail">' . esc_html( sprintf( /* translators: %s : date */ __( 'Dernière publication : %s', 'pose-parquet-core' ), self::date( $e['derniere'] ) ) ) . '</span>';
@@ -575,6 +597,13 @@ final class Publication {
 	}
 
 	/** Une ligne d'avertissement réutilisable (Mon site, maintenance) quand il y a quelque chose à publier. */
+	public static function rappel_editorial(): void {
+		if ( ! current_user_can( Capabilities::MANAGE_SETTINGS ) ) return;
+		$screen = get_current_screen();
+		if ( ! $screen || ! in_array( $screen->post_type, \PoseParquet\Core\Contenus\Types::all(), true ) ) return;
+		self::rappel();
+	}
+
 	public static function rappel(): void {
 		$e = self::etat();
 		if ( ! in_array( $e['statut'], [ 'modifications', 'echec' ], true ) ) {

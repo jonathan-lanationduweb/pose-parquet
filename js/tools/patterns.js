@@ -173,7 +173,9 @@ export function patternThumb(id, size = { w: 120, h: 90 }) {
   const ctx = { length: size.w, width: size.h, plankWidth: 8, plankLength: 34 };
   const pattern = getPattern(id);
   const planks = pattern.build(ctx);
-  const uid = `thumb-${id}-${Math.round(size.w)}`;
+  // L'identifiant du motif RETENU, jamais celui reçu : `id` peut venir d'un
+  // attribut de la page, et il finit ici dans du HTML.
+  const uid = `thumb-${pattern.id}-${Math.round(size.w)}`;
   const shapes = planks
     .map(
       (plank) =>

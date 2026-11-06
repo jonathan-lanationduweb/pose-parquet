@@ -300,3 +300,34 @@ body.immersive .pv-tools:hover, body.immersive .pv-bar:hover, body.immersive .pv
   .pv-zoom { display: none; }
   .grid, .gal { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Titre de page lisible par les moteurs et lecteurs d'écran, invisible à l'écran. */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/*
+ * Partenaire indisponible (panne ou maintenance, contrôlé par WordPress toutes
+ * les 15 minutes, voir js/commerce/partenaires.js) : ses liens disparaissent.
+ */
+/* Boutons et liens d'action (ils ont une classe) : retirés. */
+html[data-premibel-indisponible] a[href*="premibel.fr"][class],
+html[data-allure-indisponible] a[href*="allure-design.com"][class] {
+  display: none !important;
+}
+/* Lien dans une phrase ou un tableau : le nom reste, il n'est plus cliquable. */
+html[data-premibel-indisponible] a[href*="premibel.fr"]:not([class]),
+html[data-allure-indisponible] a[href*="allure-design.com"]:not([class]) {
+  pointer-events: none;
+  cursor: default;
+  color: inherit;
+  text-decoration: none;
+}

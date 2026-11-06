@@ -72,7 +72,7 @@ function valider(d) {
   const avertissements = [];
   const avertir = (m) => avertissements.push(m);
 
-  for (const [liste, nom] of [['guides', 'guide'], ['tutoriels', 'tutoriel']]) {
+  for (const [liste, nom] of [['guides', 'guide'], ['tutoriels', 'tutoriel'], ['articles', 'article']]) {
     const vus = new Set();
     for (const a of d[liste] || []) {
       const lieu = `${nom} « ${a.slug || '?'} »`;
@@ -81,7 +81,8 @@ function valider(d) {
       vus.add(a.slug);
       if (!String(a.h1 || '').trim()) erreurs.push(`${lieu} : titre requis.`);
       if (!String(a.corps || '').trim()) erreurs.push(`${lieu} : contenu vide.`);
-      if (/<script|\son[a-z]+=|javascript:/i.test(String(a.corps || ''))) erreurs.push(`${lieu} : script ou lien javascript dans le contenu.`);
+      // `[\s"'/]` et non `\s` seul : « <img/src=x/onerror=…> » passait sous l'ancien motif.
+      if (/<script|[\s"'/]on[a-z]+\s*=|javascript:/i.test(String(a.corps || ''))) erreurs.push(`${lieu} : script ou lien javascript dans le contenu.`);
       if (!a.image) avertir(`${lieu} : image manquante (la carte s'affiche sans photo).`);
       validerSeo(lieu, a.titre, a.description, avertir, erreurs);
     }
@@ -89,6 +90,10 @@ function valider(d) {
   for (const i of d.inspirations || []) {
     if (!String(i.titre || '').trim()) erreurs.push(`inspiration « ${i.cle || '?'} » : titre requis.`);
     if (!i.image) avertir(`inspiration « ${i.titre || i.cle} » : sans image, elle ne sera pas publiée.`);
+  }
+  // Le corps des pages passe le même contrôle que celui des guides : il est publié de la même façon.
+  for (const p of d.pages || []) {
+    if (typeof p.corps === 'string' && /<script|[\s"'/]on[a-z]+\s*=|javascript:/i.test(p.corps)) erreurs.push(`page « ${p.cle} » : script ou lien javascript dans le contenu.`);
   }
   for (const p of d.pages || []) {
     const page = PAGES[p.cle];

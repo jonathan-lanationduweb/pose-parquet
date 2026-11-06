@@ -140,7 +140,8 @@ function footer(p) {
   const groups = [
     {
       title: T.texte(R.pied_col_comprendre),
-      links: [...lien('guides/', 'guides'), ...lien('motifs/', 'motifs'), ...lien('tutoriels/', 'tutoriels')],
+      // Le blog n'apparaît qu'à partir du premier article publié.
+      links: [...lien('guides/', 'guides'), ...lien('motifs/', 'motifs'), ...lien('tutoriels/', 'tutoriels'), ...(require('./content-blog').ARTICLES.length ? [['blog/', 'Blog']] : [])],
     },
     {
       title: T.texte(R.pied_col_outils),
@@ -204,6 +205,12 @@ function footer(p) {
           -->
           ${destinations.length ? `<p class="footer__orientation">${destinations.join(', ')} : ${T.texte(R.pied_orientation)} <a href="${p}a-propos/#liens-commerciaux">${T.texte(R.pied_liens_commerciaux)}</a></p>` : ''}
           <p>${T.texte(R.pied_credits)}</p>
+          <!-- Les pages obligatoires et pratiques, sur toutes les pages : c'est là qu'on les cherche. -->
+          <ul class="footer__legal">
+            <li><a href="${p}mentions-legales/">Mentions légales</a></li>
+            <li><a href="${p}confidentialite/">Confidentialité et cookies</a></li>
+            <li><a href="${p}plan-du-site/">Plan du site</a></li>
+          </ul>
         </div>
       </div>
     </footer>`;
@@ -235,7 +242,7 @@ function breadcrumb(p, trail) {
       '@type': 'ListItem',
       position: index + 1,
       name: item.label,
-      item: `${SITE.domain}/${item.href || ''}`,
+      ...(item.href ? { item: `${SITE.domain}/${item.href.replace(/index\.html$/, '')}` } : {}),
     })),
   };
   return {
@@ -262,7 +269,8 @@ function layout(page) {
   // `page.css` reste accepté pour la lisibilité des appels, sans effet.
   const build = assets();
   const jsonld = (page.jsonld || [])
-    .map((data) => `\n    <script type="application/ld+json">${JSON.stringify(data)}</script>`)
+    // « < » échappé en \u003c : aucune valeur ne peut fermer la balise (« </script> »). Même JSON pour les moteurs.
+    .map((data) => `\n    <script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`)
     .join('');
   const ogImage = page.ogImage
     ? `${SITE.domain}/${page.ogImage}`
@@ -314,7 +322,8 @@ ${favicon(p, build)}
         .map((bundle) => `\n    <link rel="stylesheet" href="${p}${bundle.url}" />`)
         .join('')
     }${
-      page.runtimeConfig
+      // Toutes les pages : l'état des sites partenaires se lit sur le backend.
+      page.runtimeConfig !== false
         ? `
     <!-- Adresse du backend, définissable au déploiement sans toucher au code.
          Script classique et non module : il s'exécute avant les modules, donc
@@ -373,18 +382,35 @@ function appLayout(page) {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>${page.title}</title>
     <meta name="description" content="${page.description}" />
-    <meta name="robots" content="noindex, follow" />
+    <meta name="robots" content="${page.robots || 'index, follow'}" />
     <link rel="canonical" href="${canonical}" />
     <meta name="theme-color" content="#101214" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="${SITE.name}" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:title" content="${page.title}" />
+    <meta property="og:description" content="${page.description}" />
+    <meta property="og:url" content="${canonical}" />
+    <meta property="og:image" content="${SITE.domain}/${page.ogImage || 'assets/images/og-default.jpg'}" />
+    <meta name="twitter:card" content="summary_large_image" />${
+      (page.jsonld || [])
+        // « < » échappé en <, comme dans layout() : aucune valeur ne peut fermer la balise.
+        .map((data) => `\n    <script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`)
+        .join('')
+    }
 ${favicon(p, build)}
     <link rel="apple-touch-icon" href="${p}assets/icons/apple-touch-icon.png?v=${build.icons}" />
     <link rel="manifest" href="${p}site.webmanifest?v=${build.icons}" />
     <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/${POLICE_TEXTE}" crossorigin />
     <link rel="preload" as="fetch" href="${p}data/parquets.json" crossorigin />
     <link rel="stylesheet" href="${p}${css}" />
+    <!-- Adresse du backend (état des sites partenaires), remplaçable au déploiement. -->
+    <script src="${p}config.js"></script>
     <script type="module" src="${p}${js}"></script>
   </head>
   <body class="app${produit ? ' app--product' : ''}">
+    <!-- L'outil occupe tout l'écran : son titre reste lisible par les moteurs et les lecteurs d'écran. -->
+    <h1 class="visually-hidden">${page.h1 || page.title}</h1>
     <div ${mount} data-base="${p}">
       <noscript>
         <p class="studio__noscript">Le visualiseur a besoin de JavaScript pour calculer le rendu dans votre navigateur.

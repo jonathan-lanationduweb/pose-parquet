@@ -81,6 +81,31 @@ final class Importer {
 	 * @param array<string,mixed> $d contenu de import.json
 	 * @return array{pages:int,site:int,ajoutes:int}
 	 */
+	/**
+	 * Crée les pages que le site a gagnées depuis le dernier import, et elles
+	 * seules. Une page déjà présente n'est pas touchée : ses textes sont des
+	 * saisies. C'est ce qui permet d'ajouter une page (mentions légales, blog…)
+	 * sur un WordPress en service sans écraser le reste.
+	 *
+	 * @param array<string,mixed> $d contenu de import.json
+	 */
+	public function pages_manquantes( array $d ): int {
+		$crees = 0;
+		foreach ( (array) ( $d['pages'] ?? [] ) as $p ) {
+			$cle = sanitize_key( (string) ( $p['cle'] ?? '' ) );
+			if ( $cle === '' ) {
+				continue;
+			}
+			$ids = get_posts( [ 'post_type' => Types::PAGE, 'post_status' => 'any', 'meta_key' => '_pp_cle', 'meta_value' => $cle, 'posts_per_page' => 1, 'fields' => 'ids' ] ); // phpcs:ignore WordPress.DB.SlowDBQuery
+			if ( $ids ) {
+				continue;
+			}
+			$this->page( $p );
+			++$crees;
+		}
+		return $crees;
+	}
+
 	public function champs( array $d ): array {
 		$compte = [ 'pages' => 0, 'site' => 0, 'ajoutes' => 0 ];
 		foreach ( (array) ( $d['pages'] ?? [] ) as $p ) {

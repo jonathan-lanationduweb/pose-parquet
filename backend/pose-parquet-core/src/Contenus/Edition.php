@@ -98,6 +98,7 @@ final class Edition {
 			Types::GUIDE       => 'guides/',
 			Types::TUTORIEL    => 'tutoriels/',
 			Types::INSPIRATION => 'inspirations/',
+			Types::ARTICLE     => 'blog/',
 			Types::PAGE        => 'a-propos/',
 		][ $type ] ?? null;
 		if ( $dossier === null ) {

@@ -25,6 +25,7 @@ import { estIdf, regionDe } from '../../js/forms/departements.js';
 import { orientation, recapitulatif, lienVisualiseur, contexteClic, evenementClic, LIBELLES } from '../../js/forms/orientation.js';
 import { echapper } from '../../js/utils/dom.js';
 import { emettre } from '../../js/analytics/events.js';
+import { etatPartenaires } from '../../js/commerce/partenaires.js';
 
 const uid = () => Math.random().toString(36).slice(2, 8);
 
@@ -207,7 +208,7 @@ function prefillFromPlan(form) {
   return true;
 }
 
-function prefillFromStudio(form) {
+function prefillFromStudio(form, base = '../') {
   const params = new URLSearchParams(window.location.search);
   const lu = readHandoffParams(params);
   if (!lu.present) return false;
@@ -235,10 +236,47 @@ function prefillFromStudio(form) {
   // un sens de pose : c'est une reprise, et l'appelant doit le savoir.
   if (!parts.length) return Boolean(orientation);
 
-  const note = document.createElement('p');
-  note.className = 'pf__from-studio';
-  note.textContent = `Reprise de votre simulation : ${parts.join(' · ')}. Votre photo n’a pas été transmise.`;
-  form.prepend(note);
+  /*
+   * « Votre choix » : ce que le visiteur a composé dans le Studio, en carte.
+   *
+   * Une phrase de reprise ne montrait qu'un nom ; arrivé du Visualiseur, on
+   * doit REVOIR son parquet avant de décrire son chantier. La vignette vient
+   * du catalogue publié (jamais de l'URL), chargée seulement dans ce cas-là.
+   */
+  const carte = document.createElement('div');
+  carte.className = 'pf-choix';
+  const details = [
+    motif ? MOTIF_LABELS[motif] || motif : '',
+    motif === 'lames' && ANGLE_LABELS[String(angle)] ? ANGLE_LABELS[String(angle)] : '',
+    lu.sceneLabel || '',
+  ].filter(Boolean);
+  carte.innerHTML = `
+    <div class="pf-choix__visuel" data-pf-vignette hidden></div>
+    <div class="pf-choix__texte">
+      <p class="pf-choix__eyebrow">Votre choix dans le Visualiseur</p>
+      <p class="pf-choix__nom">${echapper(lu.productLabel || MOTIF_LABELS[motif] || motif || 'Votre simulation')}</p>
+      ${details.length ? `<p class="pf-choix__details">${echapper(details.join(' · '))}</p>` : ''}
+      <a class="pf-choix__lien" href="${echapper(lienVisualiseur(base, lu))}">Modifier dans le Visualiseur</a>
+    </div>
+    <p class="pf-choix__note">Votre photo est restée dans votre navigateur.</p>`;
+  form.prepend(carte);
+
+  if (lu.productId) {
+    fetch(`${base}data/products.premibel.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((catalogue) => {
+        const p = catalogue && (catalogue.produits || []).find((x) => x.id === lu.productId || x.sku === lu.productId);
+        const hote = carte.querySelector('[data-pf-vignette]');
+        if (!p || !p.thumbnail || !hote) return;
+        const img = document.createElement('img');
+        img.src = `${base}${p.thumbnail}`;
+        img.alt = '';
+        img.decoding = 'async';
+        img.addEventListener('load', () => { hote.hidden = false; });
+        hote.appendChild(img);
+      })
+      .catch(() => {});
+  }
 
   const message = form.querySelector('textarea[name="message"]');
   if (message && !message.value) message.value = `Simulation réalisée dans le Studio : ${parts.join(', ')}.`;
@@ -387,7 +425,7 @@ export function mountProjectForm(root, options = {}) {
    * arrive du Studio ou du Mode Plan, pas des deux. L'ordre donne malgré tout
    * la priorité au Studio, qui porte l'information la plus riche.
    */
-  if (!prefillFromStudio(form)) prefillFromPlan(form);
+  if (!prefillFromStudio(form, base)) prefillFromPlan(form);
 
   /* ---- Contexte de la visite, lu une fois ---- */
 
@@ -725,12 +763,13 @@ export function mountProjectForm(root, options = {}) {
   async function montrerOrientation(donnees, qualification, reference) {
     const departement = String(donnees.get('departement') || '').trim().toUpperCase();
     const idf = estIdf(departement);
-    const produit = await produitDuStudio();
-    // Les liens commerciaux réglés dans WordPress (Mon site), écrits sur la page par le build.
+    const [produit, partenaires] = await Promise.all([produitDuStudio(), etatPartenaires()]);
+    // Les liens commerciaux réglés dans WordPress (Mon site), écrits sur la page par le build,
+    // moins un partenaire que la surveillance a trouvé en panne ou en maintenance.
     const liens = {
       premibelUrl: root.dataset.premibelUrl || '',
-      premibelActif: root.dataset.premibelActif !== '0',
-      allureActif: root.dataset.allureActif !== '0',
+      premibelActif: root.dataset.premibelActif !== '0' && partenaires.premibel,
+      allureActif: root.dataset.allureActif !== '0' && partenaires.allure,
     };
     const vue = orientation({ destination: qualification.leadDestination, besoin: qualification.leadNeed, idf, produit, liens });
     const lignes = recapitulatif({

@@ -23,7 +23,7 @@
     <meta property="og:title" content="Erreurs à éviter avant de poser un parquet | Pose Parquet" />
     <meta property="og:description" content="Acclimatation oubliée, joints périphériques trop justes, support mal mesuré, commande sans marge : les huit erreurs les plus fréquentes et comment les éviter." />
     <meta property="og:url" content="https://pose-parquet.com/guides/erreurs-a-eviter-avant-de-poser.html" />
-    <meta property="og:image" content="https://pose-parquet.com/assets/images/og-default.jpg" />
+    <meta property="og:image" content="https://pose-parquet.com/assets/images/cover-erreurs-a-eviter-avant-de-poser.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="../assets/icons/favicon.svg?v=ed0c249f93" type="image/svg+xml" />
     <link rel="icon" href="../assets/icons/favicon-32.png?v=ed0c249f93" sizes="32x32" type="image/png" />
@@ -32,10 +32,15 @@
     <link rel="manifest" href="../site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../assets/dist/site.070ddff7ad.css" />
-    <script type="module" src="../assets/dist/ced9b1be6d/js/main.js"></script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/index.html"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://pose-parquet.com/guides/"},{"@type":"ListItem","position":3,"name":"Les erreurs à éviter avant de poser un parquet","item":"https://pose-parquet.com/"}]}</script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Les erreurs à éviter avant de poser un parquet","description":"Acclimatation oubliée, joints périphériques trop justes, support mal mesuré, commande sans marge : les huit erreurs les plus fréquentes et comment les éviter.","inLanguage":"fr-FR","datePublished":"2026-08-10","dateModified":"2026-08-10","author":{"@type":"Organization","name":"Pose Parquet","url":"https://pose-parquet.com/a-propos/"},"publisher":{"@type":"Organization","name":"Pose Parquet"},"mainEntityOfPage":"https://pose-parquet.com/guides/erreurs-a-eviter-avant-de-poser.html"}</script>
+    <link rel="stylesheet" href="../assets/dist/site.5382f6b607.css" />
+    <!-- Adresse du backend, définissable au déploiement sans toucher au code.
+         Script classique et non module : il s'exécute avant les modules, donc
+         avant que api-config.js ne lise window.POSE_PARQUET_CONFIG. Pas
+         d'empreinte dans le nom — c'est ce qui permet de le remplacer. -->
+    <script src="../config.js"></script>
+    <script type="module" src="../assets/dist/730454e46f/js/main.js"></script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://pose-parquet.com/guides/"},{"@type":"ListItem","position":3,"name":"Les erreurs à éviter avant de poser un parquet"}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Les erreurs à éviter avant de poser un parquet","description":"Acclimatation oubliée, joints périphériques trop justes, support mal mesuré, commande sans marge : les huit erreurs les plus fréquentes et comment les éviter.","image":"https://pose-parquet.com/assets/images/cover-erreurs-a-eviter-avant-de-poser.jpg","inLanguage":"fr-FR","datePublished":"2026-08-10","dateModified":"2026-08-10","author":{"@type":"Organization","name":"Pose Parquet","url":"https://pose-parquet.com/a-propos/"},"publisher":{"@type":"Organization","name":"Pose Parquet"},"mainEntityOfPage":"https://pose-parquet.com/guides/erreurs-a-eviter-avant-de-poser.html"}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Combien de temps faut-il acclimater un parquet ?","acceptedAnswer":{"@type":"Answer","text":"48 heures minimum pour un contrecollé, 72 heures pour un massif, paquets fermés, à plat, dans la pièce de destination chauffée à température d'usage."}},{"@type":"Question","name":"Quel jeu périphérique faut-il laisser ?","acceptedAnswer":{"@type":"Answer","text":"8 à 10 mm sur toute la périphérie pour une pose flottante, et davantage sur les grandes longueurs : comptez environ 1,5 mm par mètre de largeur de pièce."}},{"@type":"Question","name":"Combien de parquet commander en plus ?","acceptedAnswer":{"@type":"Answer","text":"Prévoyez 7 à 10 % de plus pour une pose droite, 12 à 15 % pour une diagonale ou un motif, et gardez une réserve d'un demi-paquet pour les réparations futures."}}]}</script>
   </head>
   <body class="page">
@@ -114,6 +119,11 @@
                 width="1400" height="875" fetchpriority="high" decoding="async"  />
             </picture>
         </div>
+
+        <details class="toc-mobile" data-toc data-toc-for="article-content">
+          <summary class="toc-mobile__barre"><span class="toc-mobile__titre">Sommaire</span><span class="toc-mobile__courant" data-toc-courant></span></summary>
+          <ol></ol>
+        </details>
 
         <div class="article-layout">
           <article class="prose" id="article-content">
@@ -219,7 +229,7 @@
 
         <section class="related" aria-labelledby="related-title">
         <h2 id="related-title" class="section-head">À lire ensuite</h2>
-        <div class="grid grid--3">
+        <div class="grid grid--3 related__cards" tabindex="0" role="group" aria-label="Articles à lire ensuite">
           <article class="card" data-tags="preparation poser" data-reveal>
             <div class="card__media">
               <picture>
@@ -343,6 +353,12 @@
           -->
           <p class="footer__orientation"><strong>Premibel</strong> pour les références de parquet, <strong>Allure&nbsp;Design</strong> pour la pose et la rénovation en Île-de-France : Pose Parquet oriente selon le besoin. <a href="../a-propos/#liens-commerciaux">Nos liens commerciaux</a></p>
           <p>Photographies sous licence Pexels</p>
+          <!-- Les pages obligatoires et pratiques, sur toutes les pages : c'est là qu'on les cherche. -->
+          <ul class="footer__legal">
+            <li><a href="../mentions-legales/">Mentions légales</a></li>
+            <li><a href="../confidentialite/">Confidentialité et cookies</a></li>
+            <li><a href="../plan-du-site/">Plan du site</a></li>
+          </ul>
         </div>
       </div>
     </footer>
