@@ -89,8 +89,19 @@ jobs:
       # nouvelles références. En cas d'échec (Premibel injoignable, export
       # suspect), sync-premibel.js n'écrit rien : le site part du dernier
       # catalogue valide du dépôt, et l'avertissement reste visible ici.
+      # Python de l'action officielle : celui d'Ubuntu refuse `pip install`
+      # hors environnement virtuel (PEP 668). Ni Python ni Pillow ne peuvent
+      # bloquer un déploiement : sans eux, seules les vignettes des
+      # NOUVELLES références manquent, et le site se publie quand même.
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        continue-on-error: true
+        with:
+          python-version: '3.12'
+
       - name: Installer Pillow (vignettes du catalogue)
-        run: python3 -m pip install --quiet --disable-pip-version-check 'pillow==11.0.0'
+        continue-on-error: true
+        run: python -m pip install --quiet --disable-pip-version-check 'pillow==11.0.0'
 
       - name: Synchroniser le catalogue Premibel
         continue-on-error: true
