@@ -141,8 +141,10 @@ function footer(p) {
       <div class="wrap-wide footer__inner">
         <div class="footer__top">
           <div class="footer__brand">
-            ${symbol('footer__mark')}
-            <p class="footer__wordmark">${nomFort} <span>${nomSuite}</span></p>
+            ${R.logo && R.logo.chemin
+              ? `<a class="footer__logo-lien" href="${p}index.html" aria-label="${T.attribut(R.nom)}, accueil"><img class="footer__logo" src="${p}${T.attribut(R.logo.chemin)}" alt="" width="${R.logo.largeur}" height="${R.logo.hauteur}" loading="lazy" decoding="async" /></a>`
+              : `${symbol('footer__mark')}
+            <p class="footer__wordmark">${nomFort} <span>${nomSuite}</span></p>`}
             <p class="footer__baseline">${T.texte(R.pied_presentation)}</p>
           </div>
           <nav class="footer__nav" aria-label="Pied de page">

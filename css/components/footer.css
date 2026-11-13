@@ -125,3 +125,9 @@
 @media (max-width: 40rem) {
   .footer__legal a { display: inline-block; padding-block: 0.45rem; }
 }
+
+.footer__logo-lien { display: inline-block; }
+.footer__logo { display: block; width: auto; height: 5.5rem; max-width: 13rem; object-fit: contain; }
+@media (max-width: 40rem) {
+  .footer__logo { height: 4.5rem; max-width: 10.5rem; }
+}
