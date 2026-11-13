@@ -32,6 +32,10 @@ const SITE_CHAMPS = [
   ...nav('contact', 'Contact', 'Navigation (menu mobile)'),
 
 
+  {"cle": "bandeau_titre", "groupe": "Bandeau « Votre projet » (bas de page)", "libelle": "Titre", "type": "texte", "max": 120, "defaut": "Un projet de pose à préparer ?"},
+  {"cle": "bandeau_texte", "groupe": "Bandeau « Votre projet » (bas de page)", "libelle": "Texte", "type": "long", "max": 400, "defaut": "Décrivez votre pièce, votre support et le rendu recherché en quatre étapes, sans laisser vos coordonnées : vous voyez aussitôt vers qui vous tourner."},
+  {"cle": "bandeau_bouton_projet", "groupe": "Bandeau « Votre projet » (bas de page)", "libelle": "Bouton projet", "type": "texte", "max": 60, "defaut": "Décrire mon projet"},
+  {"cle": "bandeau_bouton_visualiseur", "groupe": "Bandeau « Votre projet » (bas de page)", "libelle": "Bouton Visualiseur", "type": "texte", "max": 60, "defaut": "Visualiser mon parquet"},
   { cle: 'pied_presentation', groupe: 'Pied de page', libelle: 'Texte de présentation', type: 'long', max: 160, defaut: 'Guides et outils pour réussir la pose de son parquet.' },
   { cle: 'pied_mention', groupe: 'Pied de page', libelle: 'Mention (après ©)', type: 'texte', max: 120, defaut: '2026 Pose Parquet — guides et outils pour préparer son projet.' },
   { cle: 'pied_premibel', groupe: 'Pied de page', libelle: 'Mention Premibel (après son nom)', type: 'texte', max: 120, defaut: 'pour les références de parquet' },

@@ -30773,3 +30773,13 @@ Palette reprise de la maquette « pose-parquet-accueil-nouveau-logo.pdf », vale
 
 Contrastes vérifiés (WCAG AA, 4,5:1 minimum) : texte 13,4:1, texte discret 5,3:1, accent 5,3:1, blanc sur accent 6,1:1. Sur la carte la plus foncée (`#cda87f`), le texte passe en `#403d38` (4,9:1).
 
+## Textes modifiables dans WordPress (13 novembre 2026)
+
+Tous les textes ajoutés depuis les maquettes PDF sont des champs de « Pose Parquet → Pages » : accueil (Visualiseur, quatre décisions, guides et tutoriels, focus motif, inspiration et légendes des photos, mots du bandeau défilant, FAQ), Tutoriels, Motifs et Guides (blocs, cartes, listes d'outillage, FAQ, titre du bandeau final). Le bandeau « Votre projet » commun à toutes les pages se règle dans « Mon site » (groupe « Bandeau « Votre projet » »).
+
+- Valeur par défaut de chaque champ : le texte d'origine, à l'identique ; la conversion a été vérifiée en comparant les 37 pages générées avant et après, au caractère près.
+- `_generator/nombres.js` remplace dans tout texte saisi `{guides}`, `{motifs}`, `{tutoriels}`, `{parquets}`, `{motifs_outils}`, `{motifs_studio}` par les nombres réels ; suffixe `_lettres` pour l'écrire en lettres, majuscule initiale (`{Guides_lettres}`) pour commencer une phrase.
+- Champs « Laisser vide pour masquer… » (questions de FAQ, cartes, repères, étapes, textes de liens) : vides, l'élément disparaît de la page et des données FAQ envoyées à Google. Les autres champs vidés reprennent leur valeur par défaut.
+- Listes : une ligne par élément ; outillage et légendes au format « Nom — précision ».
+- Aucun HTML n'est accepté dans ces champs : un export qui en contient est refusé en entier et le site reste tel qu'il était.
+
