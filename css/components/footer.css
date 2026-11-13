@@ -56,7 +56,7 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
   gap: clamp(1.25rem, 1rem + 1.5vw, 2.5rem);
 }
-.footer__col h2 {
+.footer__col-titre {
   margin: 0 0 0.7rem;
   font-family: var(--font-sans);
   font-size: var(--fs-xs);
@@ -115,7 +115,7 @@
   .footer__baseline { margin-top: 0.35rem; max-width: 40ch; }
 
   .footer__nav { grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
-  .footer__col h2 {
+  .footer__col-titre {
     position: absolute;
     width: 1px;
     height: 1px;

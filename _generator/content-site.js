@@ -35,7 +35,7 @@ const SITE_CHAMPS = [
   { cle: 'favicon', groupe: 'Identité', libelle: 'Favicon', type: 'image', defaut: 0, aide: 'Aucun : les icônes générées depuis le symbole. Image carrée, PNG conseillé.' },
 
   /* En-tête */
-  { cle: 'cta_projet', groupe: 'En-tête', libelle: 'Bouton « Votre projet » : libellé', type: 'texte', max: 30, defaut: 'Votre projet' },
+  { cle: 'cta_projet', groupe: 'En-tête', libelle: 'Bouton « Votre projet » : libellé', type: 'texte', max: 30, defaut: 'Décrire mon projet' },
   { cle: 'cta_projet_afficher', groupe: 'En-tête', libelle: 'Bouton « Votre projet » : afficher', type: 'oui-non', defaut: true },
   { cle: 'menu_cta_projet', groupe: 'En-tête', libelle: 'Menu mobile : bouton projet', type: 'texte', max: 40, defaut: 'Décrire mon projet' },
   { cle: 'menu_cta_visualiseur', groupe: 'En-tête', libelle: 'Menu mobile : bouton Visualiseur', type: 'texte', max: 40, defaut: 'Visualiser mon parquet' },

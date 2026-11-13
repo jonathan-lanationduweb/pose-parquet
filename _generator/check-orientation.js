@@ -114,7 +114,7 @@ verifier('sans produit : « Découvrir les parquets Premibel » → catalogue', 
 const piege = O.orientation({ destination: 'premibel', besoin: 'produit', idf: true, produit: { id: 'X', url: 'https://premibel.fr.exemple.com/x' } });
 verifier('adresse de fiche hors domaine Premibel : ignorée, catalogue à la place', piege.etapes[0].cta.url === O.PREMIBEL_CATALOGUE);
 verifier('la fiche vient du catalogue publié, jamais de l’URL de la page', /fetch\(`\$\{base\}data\/products\.premibel\.json`/.test(formulaire) && /url: p\.productUrl/.test(formulaire));
-verifier('liens sortants dans un nouvel onglet, sans opener', /target="_blank" rel="noopener" data-suivi=/.test(formulaire));
+verifier('liens sortants dans un nouvel onglet, sans opener, marqués « sponsored »', /target="_blank" rel="sponsored noopener" data-suivi=/.test(formulaire));
 
 /* ------------------------------------------------------------------ */
 titre('Récapitulatif et Visualiseur');

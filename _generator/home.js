@@ -3,6 +3,7 @@ const { SITE } = require('./layout');
 const { picture } = require('./responsive');
 const { NB_PIECES, scene } = require('./scenes');
 const { NB_PREMIBEL_VISU, NB_MOTIFS, enLettres, mentionRendu, CATALOGUE } = require('./catalogue');
+const { INSPIRATION_PHOTOS } = require('./photos');
 const { choisirVitrine } = require('../js/scene/vitrine.js');
 const MOTIFS_PARQUETS = require('../data/parquets.json').patterns;
 
@@ -32,6 +33,25 @@ const { PAGES } = require('./content-pages');
 const { REGLAGES } = require('./content-site');
 const T = require('./textes');
 const V = () => PAGES['accueil'].valeurs;
+
+/**
+ * Les nombres des textes saisis dans WordPress : {guides}, {motifs},
+ * {parquets}, {motifs_outils} — ou en lettres, suffixe `_lettres`. Ils viennent
+ * des sources, comme tous les chiffres de cette page (voir check-chiffres).
+ */
+const nombres = (texte) => {
+  const n = {
+    guides: GUIDES.length,
+    motifs: MOTIFS.length,
+    parquets: NB_PREMIBEL_VISU,
+    motifs_outils: NB_MOTIFS_PLAN,
+  };
+  return String(texte == null ? '' : texte).replace(/\{(guides|motifs|parquets|motifs_outils)(_lettres)?\}/g, (_, cle, lettres) =>
+    lettres ? enLettres(n[cle]) : String(n[cle])
+  );
+};
+/** Un texte saisi, nombres résolus. */
+const champ = (cle) => nombres(V()[cle]);
 
 /*
  * Les chiffres de cette page ne sont plus écrits à la main.
@@ -77,28 +97,28 @@ const ICON = {
  */
 const ENTREES = [
   {
-    verbe: 'Comprendre',
+    verbe: 'Comprendre la pose',
     texte: 'Support, sens de pose, massif ou contrecollé : ce qui se décide avant de commander.',
     href: 'guides/',
     meta: () => `${GUIDES.length} guides`,
     tone: 'mineral',
   },
   {
-    verbe: 'Choisir',
-    texte: 'De la pose droite au Point de Hongrie : le motif fait le caractère de la pièce.',
+    verbe: 'Choisir son motif',
+    texte: 'De la pose droite au point de Hongrie : le motif fait le caractère de la pièce.',
     href: 'motifs/',
     meta: () => `${MOTIFS.length} motifs`,
     tone: 'sage',
   },
   {
-    verbe: 'Visualiser',
+    verbe: 'Visualiser chez soi',
     texte: 'Votre photo, un parquet, un motif : le sol change à chaque clic.',
     href: 'outils/studio.html',
-    meta: () => `${NB_PREMIBEL_VISU} parquets à essayer`,
+    meta: () => `${NB_PREMIBEL_VISU} parquets`,
     tone: 'slate',
   },
   {
-    verbe: 'Préparer mon projet',
+    verbe: 'Préparer son chantier',
     texte: 'Quatre étapes courtes pour cadrer la pièce, le support et le besoin.',
     href: 'projet/',
     meta: () => 'Sans engagement',
@@ -137,36 +157,33 @@ const MARQUEE = [
 ];
 
 function heroSection() {
+  // La ligne d'orientation : gras permis, le texte entre crochets mène à « Nos liens commerciaux ».
+  const orientation = T.riche(champ('hero_orientation')).replace(/\[([^\]]+)\]/, (_, l) => `<a href="a-propos/#liens-commerciaux">${l}</a>`);
   return `      <section class="hero" data-hero>
         <div class="hero__media" data-hero-media>
           ${picture('hero-wide', { alt: 'Grande pièce vide au parquet clair traversée par la lumière', sizes: '100vw', priority: true })}
           <video muted loop playsinline preload="none" data-src="" aria-hidden="true"></video>
         </div>
         <div class="wrap-wide hero__inner">
-          <p class="eyebrow">${T.texte(V().hero_eyebrow)}</p>
-          <h1 class="hero__title">${T.riche(V().hero_titre)}</h1>
+          <p class="eyebrow">${T.texte(champ('hero_eyebrow'))}</p>
+          <h1 class="hero__title">${T.riche(champ('hero_titre'))}</h1>
           <div class="hero__row">
             <div>
-              <!--
-                Le chapeau porte la relation, sans logo ni bouton de plus : ce
-                que fait Pose Parquet d'abord, puis vers qui il oriente. Un
-                visiteur doit savoir avant de défiler où trouver un parquet et
-                qui peut le poser — le pied de page ne suffisait pas.
-              -->
-              <p class="hero__lead">${T.riche(V().hero_texte)}</p>
+              <p class="hero__lead">${T.riche(champ('hero_texte'))}</p>
               <div class="hero__actions">
-                <a class="btn btn--light btn--lg" href="guides/"><span>${T.texte(V().hero_cta_guides)}</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
-                <a class="btn btn--outline-light btn--lg" href="outils/studio.html"><span>${T.texte(V().hero_cta_visualiseur)}</span></a>
+                <a class="btn btn--light btn--lg" href="outils/studio.html"><span>${T.texte(champ('hero_cta_visualiseur'))}</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+                <a class="btn btn--outline-light btn--lg" href="guides/"><span>${T.texte(champ('hero_cta_guides'))}</span></a>
               </div>
+              <p class="hero__orientation">${orientation}</p>
             </div>
             <ul class="hero__meta">
-              <li><b>${NB_MOTIFS_PLAN}</b> motifs simulés</li>
+              <li><b>${MOTIFS.length}</b> motifs détaillés</li>
               <li><b>${GUIDES.length}</b> guides pratiques</li>
-              <li><b>${NB_PIECES}</b> pièces d’exemple</li>
+              <li><b>${NB_PREMIBEL_VISU}</b> parquets à essayer</li>
             </ul>
           </div>
         </div>
-        <a class="hero__scroll" href="#parcours">Découvrir ${ICON.down}</a>
+        <a class="hero__scroll" href="#pourquoi">Découvrir ${ICON.down}</a>
       </section>
 
       <div class="marquee" aria-hidden="true">
@@ -176,6 +193,25 @@ function heroSection() {
             .join('\n          ')}
         </div>
       </div>`;
+}
+
+/** Pourquoi ce site : le problème d'abord, puis qui parle et comment il gagne sa vie. */
+function pourquoiSection() {
+  return `      <section class="section section--compact" id="pourquoi" aria-labelledby="pourquoi-title">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">${T.texte(champ('pourquoi_eyebrow'))}</p>
+              <h2 id="pourquoi-title">${T.texte(champ('pourquoi_titre'))}</h2>
+            </div>
+            <div class="pourquoi__texte">
+              <p class="lead">${T.texte(champ('pourquoi_texte1'))}</p>
+              <p>${T.riche(champ('pourquoi_texte2'))}</p>
+              <p><a class="link-arrow" href="a-propos/methode-editoriale.html">${T.texte(champ('pourquoi_lien'))} ${ICON.arrow}</a></p>
+            </div>
+          </div>
+        </div>
+      </section>`;
 }
 
 function parcoursSection() {
@@ -193,9 +229,9 @@ function parcoursSection() {
           <div class="section-head section-head__row section-head__row--tight">
             <div>
               <p class="eyebrow">Par où commencer</p>
-              <h2 id="parcours-title">Comprendre, choisir, visualiser, préparer.</h2>
+              <h2 id="parcours-title">Les ${enLettres(ENTREES.length)} décisions à prendre avant de poser votre parquet.</h2>
             </div>
-            <p class="lead">Quatre étapes d’un même chantier. Commencez par celle qui vous concerne aujourd’hui.</p>
+            <p class="lead">Elles se prennent dans cet ordre. Commencez par celle qui vous concerne aujourd’hui.</p>
           </div>
           <div class="entries">
             ${entrees}
@@ -229,17 +265,18 @@ function orientationSection() {
   const routes = [
     REGLAGES.premibel_afficher
       ? `            <article class="route">
-              <p class="route__label">${T.texte(REGLAGES.premibel_libelle)}</p>
-              <h3 class="route__title">${T.texte(v.premibel_titre)}</h3>
-              <p class="route__text">${T.texte(v.premibel_texte)}</p>
-              <a class="link-arrow route__cta" href="${T.attribut(REGLAGES.premibel_url)}" rel="noopener">${T.texte(v.premibel_cta)} <span class="route__host">${T.texte(T.hote(REGLAGES.premibel_url))}</span> ${ICON.arrow}</a>
+              <p class="route__label">${T.texte(v.premibel_titre)}</p>
+              <h3 class="route__title">${T.texte(v.premibel_sous_titre)}</h3>
+              <p class="route__text">${T.riche(v.premibel_texte)}</p>
+              <!-- Lien commercial rémunéré : « sponsored », comme Google le demande. -->
+              <a class="link-arrow route__cta" href="${T.attribut(REGLAGES.premibel_url)}" rel="sponsored noopener">${T.texte(v.premibel_cta)} <span class="route__host">${T.texte(T.hote(REGLAGES.premibel_url))}</span> ${ICON.arrow}</a>
             </article>`
       : '',
     REGLAGES.allure_afficher
       ? `            <article class="route">
-              <p class="route__label">${T.texte(REGLAGES.allure_libelle)}</p>
-              <h3 class="route__title">${T.texte(v.allure_titre)}</h3>
-              <p class="route__text">${T.texte(v.allure_texte)}</p>
+              <p class="route__label">${T.texte(v.allure_titre)}</p>
+              <h3 class="route__title">${T.texte(v.allure_sous_titre)}</h3>
+              <p class="route__text">${T.riche(v.allure_texte)}</p>
               <a class="link-arrow route__cta" href="projet/?besoin=pose">${T.texte(v.allure_cta)} ${ICON.arrow}</a>
             </article>`
       : '',
@@ -266,23 +303,23 @@ function simulatorSection() {
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
-              <p class="eyebrow">Visualiseur · outil</p>
-              <h2 id="sim-title">Essayez votre parquet dans votre pièce.</h2>
+              <p class="eyebrow">Outil gratuit · aucune inscription</p>
+              <h2 id="sim-title">Visualisez votre parquet chez vous, à partir d’une photo.</h2>
             </div>
             <div>
-              <p class="lead">Importez une photo, choisissez un parquet et comparez plusieurs rendus. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée ni conservée.</p>
+              <p class="lead">Importez une photo de votre pièce, choisissez parmi ${NB_PREMIBEL_VISU} références et comparez les motifs au curseur. ${enLettres(MOTIFS.length).replace(/^./, (c) => c.toUpperCase())} motifs sont documentés sur le site, dont ${enLettres(NB_MOTIFS_PLAN)} simulables dans nos outils. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée, ni stockée, ni analysée par un service tiers.</p>
               <p class="u-mt-5 u-actions">
                 <!-- « data-vz-open » : js/scene/preview.js enrichit ce lien avec la
                      configuration affichée dans l'aperçu, pour que le Studio
                      s'ouvre sur ce que le visiteur regarde et non sur un état par
                      défaut. L'adresse ci-dessous reste valable telle quelle si le
                      script ne s'exécute pas — le lien n'est jamais cassé. -->
-                <a class="btn" href="outils/studio.html" data-vz-open><span>Visualiser mon parquet</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+                <a class="btn" href="outils/studio.html" data-vz-open><span>Ouvrir le simulateur</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
                 <a class="link-arrow" href="outils/simulateur-pose.html">Mode Plan : comparer les sens de pose ${ICON.arrow}</a>
-                <a class="link-arrow" href="outils/">Tous les outils ${ICON.arrow}</a>
               </p>
             </div>
           </div>
+          <p class="sim-note"><strong>Votre photo reste sur votre appareil.</strong> Contrairement aux simulateurs des fabricants, aucun envoi vers un serveur, aucun compte à créer, aucun catalogue imposé.</p>
           <!-- Scène de l'avant/après : une scène VALIDÉE sur les cinq critères de
                _calibrage/scene-review.html, et la mieux placée pour une première
                impression.
@@ -423,10 +460,10 @@ function immersiveSection() {
         <div class="wrap-wide dossier__inner">
           <div class="dossier__head" data-reveal>
             <p class="eyebrow eyebrow--plain">Focus motif · 04</p>
-            <h2 id="focus-title">Le Point de Hongrie,<br />une flèche au sol.</h2>
+            <h2 id="focus-title">Le point de Hongrie,<br />une flèche au sol.</h2>
             <div class="cluster">
-              <a class="btn btn--light" href="motifs/point-de-hongrie.html"><span>Découvrir le motif</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
-              <a class="link-arrow dossier__all" href="motifs/">Les ${enLettres(MOTIFS.length)} motifs ${ICON.arrow}</a>
+              <a class="btn btn--light" href="motifs/point-de-hongrie.html"><span>Le guide du point de Hongrie</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+              <a class="link-arrow dossier__all" href="motifs/">Les ${MOTIFS.length} motifs de pose ${ICON.arrow}</a>
             </div>
           </div>
           <ol class="dossier__notes" data-reveal data-reveal-delay="90">
@@ -439,7 +476,7 @@ function immersiveSection() {
 function carouselGallery() {
   const slides = GALLERY.map(
     (item) => `<div class="carousel__slide">
-              <a class="shot" href="inspiration/">
+              <a class="shot" href="inspiration/#${INSPIRATION_PHOTOS[Number(item.img.replace('inspi-', '')) - 1].image}">
                 ${picture(item.img, { alt: `${item.cat} — ${item.title}`, sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw' })}
                 <span class="shot__caption">
                   <span class="shot__cat">${item.cat}</span>
@@ -462,7 +499,7 @@ function carouselGallery() {
           <div class="section-head section-head__row section-head__row--tight">
             <div>
               <p class="eyebrow">Inspiration</p>
-              <h2 id="inspi-title">Voir avant de choisir.</h2>
+              <h2 id="inspi-title">${enLettres(GALLERY.length).replace(/^./, (c) => c.toUpperCase())} pièces, ${enLettres(GALLERY.length)} motifs de parquet en situation.</h2>
             </div>
             <div class="carousel__controls">
               <span class="carousel__count" data-carousel-count>01 / ${String(GALLERY.length).padStart(2, '0')}</span>
@@ -532,14 +569,14 @@ function lectureSection() {
           <div class="section-head section-head__row section-head__row--tight">
             <div>
               <p class="eyebrow">Guides et tutoriels</p>
-              <h2 id="editorial-title">Comprendre, puis poser.</h2>
+              <h2 id="editorial-title">Guides et tutoriels de pose de parquet.</h2>
             </div>
-            <p class="lead">Les guides tranchent les décisions d’achat ; les tutoriels déroulent le chantier, outillage et contrôles compris.</p>
+            <p class="lead">Les guides tranchent les décisions d’achat. Les tutoriels déroulent le chantier, outillage et points de contrôle compris.</p>
           </div>
           <div class="duo-rows">
             <div class="duo-rows__col">
               <div class="duo-rows__head">
-                <h3 id="cluster-title">Décider avant de commander</h3>
+                <h3 id="cluster-title">Guides : décider avant de commander</h3>
                 <a class="link-arrow" href="guides/">Les ${GUIDES.length} guides ${ICON.arrow}</a>
               </div>
               <div class="read-rows">
@@ -548,7 +585,7 @@ function lectureSection() {
             </div>
             <div class="duo-rows__col">
               <div class="duo-rows__head">
-                <h3 id="tuto-title">Passer au geste</h3>
+                <h3 id="tuto-title">Tutoriels : poser soi-même, étape par étape</h3>
                 <a class="link-arrow" href="tutoriels/">Tous les tutoriels ${ICON.arrow}</a>
               </div>
               <div class="read-rows">
@@ -566,15 +603,15 @@ function projectSection() {
         <div class="wrap-wide">
           <div class="feature feature--wide-media">
             <div class="feature__body">
-              <p class="eyebrow">${T.texte(V().projet_eyebrow)}</p>
-              <h2 id="projet-title">${T.texte(V().projet_titre)}</h2>
-              <p class="feature__lead">${T.texte(V().projet_texte)}</p>
+              <p class="eyebrow">${T.texte(champ('projet_eyebrow'))}</p>
+              <h2 id="projet-title">${T.texte(champ('projet_titre'))}</h2>
+              <p class="feature__lead">${T.texte(champ('projet_texte'))}</p>
               <ul class="feature__list">
-                ${T.lignes(V().projet_points).map((l) => `<li>${ICON.check}<span>${T.texte(l)}</span></li>`).join('\n                ')}
+                ${T.lignes(champ('projet_points')).map((l) => `<li>${ICON.check}<span>${T.texte(l)}</span></li>`).join('\n                ')}
               </ul>
               <div class="cluster">
-                <a class="btn" href="projet/"><span>${T.texte(V().projet_cta)}</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
-                <a class="btn btn--ghost" href="outils/studio.html"><span>${T.texte(V().projet_cta2)}</span></a>
+                <a class="btn" href="projet/"><span>${T.texte(champ('projet_cta'))}</span>${ICON.arrow.replace('<svg', '<svg class="btn__icon"')}</a>
+                <a class="btn btn--ghost" href="outils/studio.html"><span>${T.texte(champ('projet_cta2'))}</span></a>
               </div>
             </div>
             <div class="feature__media" data-reveal>
@@ -585,6 +622,86 @@ function projectSection() {
       </section>`;
 }
 
+/**
+ * Questions fréquentes : les six questions qui reviennent avant un chantier.
+ * Chaque réponse se suffit à elle-même (elle part telle quelle dans les
+ * données FAQPage pour Google) ; le lien vers la page qui approfondit est
+ * affiché à côté, pas dans la réponse.
+ */
+const FAQ_ACCUEIL = () => [
+  {
+    q: 'Faut-il poser le parquet dans le sens de la lumière ou perpendiculairement à la fenêtre ?',
+    a: 'Les deux formulations décrivent le même geste, ce qui explique la confusion fréquente. Les rayons entrent perpendiculairement au plan de la fenêtre : poser « dans le sens de la lumière » revient donc à orienter les lames perpendiculairement au mur qui porte la fenêtre. Les joints filent alors dans l’axe des rayons et se remarquent beaucoup moins.',
+    lien: ['guides/quel-sens-de-pose-choisir.html', 'Le guide complet du sens de pose'],
+  },
+  {
+    q: 'Dans quel sens poser un parquet dans un couloir ?',
+    a: 'Dans la longueur, parallèlement aux murs. Une pose en travers multiplie les coupes, hache visuellement le passage et raccourcit l’espace. C’est le seul cas courant où la géométrie prime sur la lumière : un couloir se pose dans son axe, même si la fenêtre se trouve à son extrémité.',
+  },
+  {
+    q: 'Quelle est la différence entre bâton rompu et point de Hongrie ?',
+    a: 'Le bâton rompu assemble des lames à bouts droits, posées perpendiculairement les unes aux autres : les extrémités se décalent et forment un zigzag. Le point de Hongrie utilise des lames coupées en biais qui se rejoignent bout à bout en une pointe continue. Il exige des lames gauches et droites, en quantités égales.',
+    lien: ['motifs/', `Les ${MOTIFS.length} motifs de pose`],
+  },
+  {
+    q: 'Combien de chutes faut-il prévoir ?',
+    a: 'Comptez de l’ordre de 5 % en pose droite et 10 à 15 % en diagonale ou en point de Hongrie, ces motifs multipliant les coupes d’angle en périphérie. Prévoyez la marge au moment de la commande : un complément acheté plus tard peut provenir d’un autre bain de teinte.',
+  },
+  {
+    q: 'Peut-on poser du parquet sur du carrelage ?',
+    a: 'En pose flottante, c’est généralement possible si le carrelage est sain, adhérent et suffisamment plan. Contrôlez la planéité à la règle de deux mètres et vérifiez la hauteur disponible sous les portes et aux seuils : c’est le point qui bloque le plus souvent le projet, pas le support lui-même.',
+    lien: ['guides/preparer-son-sol-avant-la-pose.html', 'Préparer son sol avant la pose'],
+  },
+  {
+    q: 'Le simulateur est-il vraiment gratuit, et ma photo est-elle envoyée quelque part ?',
+    a: `Le simulateur est gratuit et ne demande aucune inscription. Votre photo n’est ni envoyée, ni stockée, ni analysée par un service tiers : le rendu est calculé dans votre navigateur, sur votre appareil. Vous disposez de ${NB_PREMIBEL_VISU} références et de ${enLettres(NB_MOTIFS)} motifs de pose, avec un comparateur avant / après.`,
+    lien: ['outils/studio.html', 'Ouvrir le simulateur'],
+  },
+];
+
+function faqSection() {
+  const items = FAQ_ACCUEIL();
+  return `      <section class="section section--compact" aria-labelledby="faq-title">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row section-head__row--tight">
+            <div>
+              <p class="eyebrow">Questions fréquentes</p>
+              <h2 id="faq-title">Questions fréquentes sur la pose de parquet.</h2>
+            </div>
+            <p class="lead">${enLettres(items.length).replace(/^./, (c) => c.toUpperCase())} questions qui reviennent avant chaque chantier, et les réponses que nous donnons.</p>
+          </div>
+          <div class="accordion faq-accueil" data-multiple="false">
+            ${items
+              .map(
+                (item, index) => `<div class="accordion__item" data-open="${index === 0 ? 'true' : 'false'}">
+              <h3><button class="accordion__trigger" type="button" aria-expanded="${index === 0}">
+                <span>${item.q}</span><span class="accordion__icon" aria-hidden="true"></span>
+              </button></h3>
+              <div class="accordion__panel"><div><p>${item.a}</p>${item.lien ? `<p><a class="link-arrow" href="${item.lien[0]}">${item.lien[1]} ${ICON.arrow}</a></p>` : ''}</div></div>
+            </div>`
+              )
+              .join('\n            ')}
+          </div>
+        </div>
+      </section>`;
+}
+
+/*
+ * L'ORDRE DE L'ACCUEIL — maquette du 12/11/2026 (pose-parquet-nouvelle-accueil.pdf).
+ *
+ *   1. Hero                  — la promesse, simulateur d'abord
+ *   2. Pourquoi ce site      — le problème, qui parle, comment il gagne sa vie
+ *   3. Visualiseur           — l'outil principal, remonté
+ *   4. Par où commencer      — les quatre décisions
+ *   5. Guides et tutoriels
+ *   6. Focus motif           — le point de Hongrie
+ *   7. Inspiration           — huit photos, huit liens distincts
+ *   8. Questions fréquentes  — avec données FAQPage
+ *   9. Après le choix        — Premibel (lien « sponsored »), Allure Design
+ *  10. Votre projet          — la conversion
+ *
+ * L'ordre précédent (V2) est décrit ci-dessous pour mémoire.
+ */
 /*
  * L'ORDRE DE L'ACCUEIL — V2.
  *
@@ -608,14 +725,16 @@ function projectSection() {
 function buildHomeBody() {
   return [
     heroSection(),
-    parcoursSection(),
-    orientationSection(),
+    pourquoiSection(),
     simulatorSection(),
-    carouselGallery(),
-    immersiveSection(),
+    parcoursSection(),
     lectureSection(),
+    immersiveSection(),
+    carouselGallery(),
+    faqSection(),
+    orientationSection(),
     projectSection(),
   ].join('\n\n');
 }
 
-module.exports = { buildHomeBody, apercuSquelette, legendeVitrine, ICON, SITE };
+module.exports = { buildHomeBody, apercuSquelette, legendeVitrine, FAQ_ACCUEIL, ICON, SITE };

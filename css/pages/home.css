@@ -171,3 +171,41 @@
 
 /* Le bloc projet conclut : un chapeau sous le titre. */
 .feature__lead { margin: 0; font-size: var(--fs-lead); color: var(--text-soft); max-width: 48ch; }
+
+/* ---------- Accueil, maquette du 12/11/2026 ---------- */
+
+/* Hero : la ligne qui dit vers qui l'on oriente, sous les deux boutons. */
+.hero__orientation {
+  margin: var(--sp-4) 0 0;
+  max-width: 52ch;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
+}
+.hero__orientation strong { color: #fff; font-weight: 600; }
+.hero__orientation a { color: #fff; text-underline-offset: 0.2em; }
+
+/* Pourquoi ce site : deux paragraphes, puis le lien vers la méthode. */
+.pourquoi__texte { display: grid; gap: var(--sp-3); }
+.pourquoi__texte p { margin: 0; max-width: 62ch; }
+.pourquoi__texte p:not(.lead) { color: var(--text-soft); line-height: 1.6; }
+
+/* Visualiseur : la promesse de confidentialité, en encadré discret. */
+.sim-note {
+  margin: 0 0 var(--sp-5);
+  padding: var(--sp-3) var(--sp-4);
+  border-left: 3px solid var(--accent);
+  background: var(--surface, rgba(255, 255, 255, 0.55));
+  border-radius: 0 var(--radius-sm, 6px) var(--radius-sm, 6px) 0;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  color: var(--text-soft);
+  max-width: 78ch;
+}
+.sim-note strong { color: var(--text); font-weight: 600; }
+
+/* Questions fréquentes : largeur de lecture, lien d'approfondissement sous la réponse. */
+.faq-accueil { max-width: 62rem; }
+.faq-accueil .accordion__panel p + p { margin-top: var(--sp-3); }
+/* Le titre se lit avec le texte : aligné en haut, pas au pied des paragraphes. */
+#pourquoi .section-head__row { align-items: start; }

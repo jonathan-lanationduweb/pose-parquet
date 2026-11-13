@@ -77,7 +77,8 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
  */
 .section--compact { padding-block: clamp(2.25rem, 1.25rem + 3vw, 3.75rem); }
 .section--compact .section-head { margin-bottom: clamp(1.25rem, 0.9rem + 1.4vw, 2rem); }
-.section--compact h2 { font-size: var(--fs-h3); }
+/* Pas de H2 réduit ici : un titre de section garde la taille d'un H2 partout,
+   sinon il devient plus petit que ses propres sous-titres (H3). */
 .section--compact .lead { font-size: var(--fs-base); }
 .section--alt { background: var(--bg-alt); }
 .section--mineral { background: var(--tint-mineral); }
