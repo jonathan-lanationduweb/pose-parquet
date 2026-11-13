@@ -8,18 +8,18 @@ const PHOTOS = {
   },
   'cover-poser-parquet-sens-de-la-lumiere': {
     id: 18707513, w: 1400, h: 875, credit: 'sanket mahind',
-    alt: "Ombre d'une fenêtre projetée sur le parquet d'une pièce vide",
+    alt: 'Tache de soleil sur le mur d’une pièce vide au parquet sombre',
   },
   'cover-preparer-son-sol-avant-la-pose': {
     id: 37121398, w: 1400, h: 875, credit: 'Sài Gòn Công Ty CP',
-    alt: 'Ouvrier lissant une chape à la truelle mécanique avant la pose du sol',
+    alt: 'Ouvrier tirant une chape de béton frais à la règle vibrante',
   },
   'cover-point-de-hongrie-ou-baton-rompu': {
     id: 15066939, w: 1400, h: 875, credit: 'Magda Ehlers',
 
 
 
-    alt: 'Gros plan sur un parquet de chêne ancien posé en bâton rompu, lames à bouts carrés',
+    alt: 'Gros plan sur un parquet ancien posé en bâton rompu, lames à bouts carrés',
   },
 
 
@@ -37,7 +37,7 @@ const PHOTOS = {
   },
   'cover-sens-de-pose-piece-etroite': {
     id: 7031616, w: 1400, h: 875, credit: 'Max Vakhtbovych',
-    alt: 'Pièce allongée aux murs blancs et au parquet clair, baies vitrées au fond',
+    alt: 'Pièce allongée aux murs blancs et au parquet foncé, baies vitrées au fond',
   },
 
 
@@ -51,11 +51,11 @@ const PHOTOS = {
   },
   'cover-pose-longueur': {
     id: 8146330, w: 1400, h: 875, credit: 'Max Vakhtbovych',
-    alt: 'Pièce vide et moderne dont les lames filent dans la longueur',
+    alt: 'Pièce vide aux murs gris et parquet clair en lames, armoire à portes miroir',
   },
   'cover-pose-largeur': {
     id: 8146337, w: 1400, h: 875, credit: 'Max Vakhtbovych',
-    alt: 'Pièce vide et minimaliste dont les lames traversent la largeur',
+    alt: 'Pièce vide aux murs gris et parquet clair en lames, meuble télé blanc et porte-fenêtre',
   },
 
 
@@ -67,13 +67,13 @@ const PHOTOS = {
 
   'cover-point-de-hongrie': {
     id: 7587872, w: 1400, h: 613, crop: 'bottom', credit: 'Max Vakhtbovych',
-    alt: 'Parquet de frêne clair en point de Hongrie, lames biseautées se rejoignant en pointe le long d’un joint central',
+    alt: 'Pièce aux murs bleus, parquet clair en point de Hongrie filant vers la baie vitrée',
   },
 
 
   'cover-baton-rompu': {
     id: 16101859, w: 1400, h: 875, credit: 'Francesca Cruccu',
-    alt: 'Lumière rasante sur un parquet ancien posé en bâton rompu',
+    alt: 'Soleil rasant et ombre d’un cadre de miroir sur un parquet posé en bâton rompu',
   },
 
 
@@ -94,7 +94,7 @@ const PHOTOS = {
 
   'preparation-ragreage': {
     id: 11806489, w: 1400, h: 875, credit: 'Vladimir Srajber',
-    alt: 'Ragréage frais en cours de mise en œuvre sur un sol intérieur',
+    alt: 'Mortier étalé à la taloche crantée, croisillons de nivellement bleus en place',
   },
   'massif-contrecolle': {
     id: 7504591, w: 1400, h: 875, credit: 'cottonbro studio',
@@ -111,7 +111,7 @@ const PHOTOS = {
 
   'hero-wide': {
     id: 13702811, w: 2200, h: 1300, credit: 'Curtis Adams',
-    alt: 'Grande pièce vide au parquet clair, arches et lumière naturelle',
+    alt: 'Grande pièce vide aux murs crème et niches en arcade, parquet couleur miel posé en bâton rompu',
   },
 
 
@@ -121,11 +121,11 @@ const PHOTOS = {
   },
   'immersive-parcours': {
     id: 18707513, w: 2000, h: 1400, credit: 'sanket mahind',
-    alt: 'Pièce vide au parquet clair traversée par l ombre d une fenêtre',
+    alt: 'Tache de soleil sur le mur d’une pièce vide au parquet sombre',
   },
   'tile-preparer': {
     id: 11806489, w: 1000, h: 900, credit: 'Vladimir Srajber',
-    alt: 'Ragréage en cours sur un sol intérieur',
+    alt: 'Mortier étalé à la taloche crantée, croisillons de nivellement bleus en place',
   },
   'tile-poser': {
     id: 4263067, w: 1000, h: 900, credit: 'K',
@@ -133,7 +133,7 @@ const PHOTOS = {
   },
   'tile-motif': {
     id: 15066939, w: 1000, h: 900, credit: 'Magda Ehlers',
-    alt: 'Parquet de chêne ancien posé en bâton rompu, vu de dessus',
+    alt: 'Parquet ancien posé en bâton rompu, vu de dessus',
   },
   'tile-renover': {
     id: 11126101, w: 1000, h: 900, credit: 'Pexels',
@@ -141,7 +141,7 @@ const PHOTOS = {
   },
   'projet-visuel': {
     id: 6835181, w: 1400, h: 1100, credit: 'Max Vakhtbovych',
-    alt: 'Pièce lumineuse au parquet clair, baies vitrées',
+    alt: 'Pièce vide aux stores blancs, parquet couleur miel en lames droites',
   },
 
 
@@ -155,7 +155,7 @@ const PHOTOS = {
   },
   'room-chambre': {
     id: 7587859, w: 1600, h: 1067, credit: 'Max Vakhtbovych',
-    alt: 'Chambre aux murs bleus ouverte sur le jardin',
+    alt: 'Chambre aux murs bleus ouverte sur le jardin, parquet en point de Hongrie',
   },
   'room-salon': {
     id: 7027842, w: 1600, h: 1067, credit: 'Curtis Adams',

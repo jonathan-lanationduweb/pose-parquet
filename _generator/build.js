@@ -71,14 +71,17 @@ const write = (relPath, content) => {
 <html lang="fr">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Page déplacée</title>
     <meta name="robots" content="noindex, follow" />
     <link rel="canonical" href="${absolue}" />
     <meta http-equiv="refresh" content="0; url=${cible}" />
   </head>
   <body>
-    <h1>Page déplacée</h1>
-    <p>Cette page a changé d’adresse : <a href="${cible}">${absolue}</a>.</p>
+    <main>
+      <h1>Page déplacée</h1>
+      <p>Cette page a changé d’adresse : <a href="${cible}">${absolue}</a>.</p>
+    </main>
   </body>
 </html>
 `

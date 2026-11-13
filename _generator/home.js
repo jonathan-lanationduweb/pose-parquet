@@ -104,7 +104,7 @@ function heroSection() {
   const orientation = T.riche(champ('hero_orientation')).replace(/\[([^\]]+)\]/, (_, l) => `<a href="a-propos/#liens-commerciaux">${l}</a>`);
   return `      <section class="hero" data-hero>
         <div class="hero__media" data-hero-media>
-          ${picture('hero-wide', { alt: 'Grande pièce vide au parquet clair traversée par la lumière', sizes: '100vw', priority: true })}
+          ${picture('hero-wide', { alt: 'Grande pièce vide aux murs crème et niches en arcade, parquet couleur miel posé en bâton rompu', sizes: '100vw', priority: true })}
           <video muted loop playsinline preload="none" data-src="" aria-hidden="true"></video>
         </div>
         <div class="wrap-wide hero__inner">
@@ -360,7 +360,7 @@ function carouselGallery() {
   const slides = GALLERY().map(
     (item) => `<div class="carousel__slide">
               <a class="shot" href="inspiration/#${INSPIRATION_PHOTOS[Number(item.img.replace('inspi-', '')) - 1].image}">
-                ${picture(item.img, { alt: T.attribut(`${item.cat} — ${item.title}`), sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw' })}
+                ${picture(item.img, { alt: T.attribut(INSPIRATION_PHOTOS[Number(item.img.replace('inspi-', '')) - 1].alt), sizes: '(min-width: 75rem) 26rem, (min-width: 48rem) 45vw, 92vw' })}
                 <span class="shot__caption">
                   <span class="shot__cat">${T.texte(item.cat)}</span>
                   <span class="shot__title">${T.texte(item.title)}</span>
@@ -480,7 +480,7 @@ function projectSection() {
               </div>
             </div>
             <div class="feature__media" data-reveal>
-              ${picture('projet-visuel', { alt: 'Pièce lumineuse au parquet clair', sizes: '(min-width: 60rem) 45rem, 94vw' })}
+              ${picture('projet-visuel', { alt: 'Pièce vide aux stores blancs, parquet couleur miel en lames droites', sizes: '(min-width: 60rem) 45rem, 94vw' })}
             </div>
           </div>
         </div>

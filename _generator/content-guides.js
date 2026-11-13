@@ -238,7 +238,7 @@ const GUIDES = [
         <li><strong>Défauts diffus sur toute la surface</strong> : ragréage autolissant, en respectant l'épaisseur minimale du produit.</li>
         <li><strong>Sol très irrégulier ou plancher bois ancien</strong> : panneautage en contreplaqué ou en OSB vissé, qui redonne un plan de pose homogène.</li>
       </ul>
-      ${figure(img('preparation-ragreage.jpg'), 'Ragréage frais en cours de mise en œuvre sur un sol intérieur', "Le ragréage rattrape les défauts du support : c'est lui qui donne au parquet un plan de pose homogène.")}
+      ${figure(img('preparation-ragreage.jpg'), 'Mortier étalé à la taloche crantée, croisillons de nivellement bleus en place', "Le ragréage rattrape les défauts du support : c'est lui qui donne au parquet un plan de pose homogène.")}
 
       <h2 id="humidite">Gérer l'humidité</h2>
       <p>L'humidité est la cause la plus fréquente des sinistres. Deux sources à distinguer : l'humidité résiduelle du support et les remontées capillaires, notamment sur dalle en rez-de-chaussée sans coupure de capillarité.</p>
