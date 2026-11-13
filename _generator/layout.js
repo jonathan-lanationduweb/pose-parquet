@@ -357,7 +357,7 @@ ${favicon(p, build)}
   </head>
   <body class="app${produit ? ' app--product' : ''}">
 
-    <div ${mount} data-base="${p}"${REGLAGES.logo && REGLAGES.logo.chemin ? ` data-logo="${p}${T.attribut(REGLAGES.logo.chemin)}"` : ''}>
+    <div ${mount} role="main" id="contenu" data-base="${p}"${REGLAGES.logo && REGLAGES.logo.chemin ? ` data-logo="${p}${T.attribut(REGLAGES.logo.chemin)}"` : ''}>
       <h1 class="app-loading-title">${page.h1 || page.title}</h1>
       <noscript>
         <p class="studio__noscript">Le visualiseur a besoin de JavaScript pour calculer le rendu dans votre navigateur.

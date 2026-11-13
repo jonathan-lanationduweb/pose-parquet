@@ -141,7 +141,7 @@ export async function mountStudio(root) {
 
 
 
-        <a class="stage__product" data-product-link hidden target="_blank" rel="noopener"></a>
+        <span data-product-slot hidden></span>
         <button class="stage__room" type="button" data-change-room>
           <span class="stage__room-thumb" data-room-thumb></span>
           <span>Changer de pièce</span>
@@ -205,7 +205,12 @@ export async function mountStudio(root) {
   const variantsHost = qs('[data-variants]', root);
   const addBtn = qs('[data-add]', root);
   const projectCta = qs('[data-project-cta]', root);
-  const productLink = qs('[data-product-link]', root);
+  const productSlot = qs('[data-product-slot]', root);
+  const productLink = document.createElement('a');
+  productLink.className = 'stage__product';
+  productLink.dataset.productLink = '';
+  productLink.target = '_blank';
+  productLink.rel = 'sponsored noopener';
   const compareBtn = qs('[data-compare]', root);
   const compareLabel = qs('[data-compare-label]', root);
   const panelTitle = qs('[data-panel-title]', root);
@@ -930,13 +935,12 @@ const REGROUPEMENT_MS = 70;
 
     const fiche = ficheProduit(material() && material().product);
     if (!fiche) {
-      productLink.hidden = true;
-      productLink.removeAttribute('href');
+      productLink.remove();
       return;
     }
     productLink.href = fiche.url;
     productLink.textContent = fiche.libelle;
-    productLink.hidden = false;
+    if (!productLink.isConnected && productSlot) productSlot.after(productLink);
   }
 
   on(productLink, 'click', () => suivreClic(material() && material().product, 'studio'));

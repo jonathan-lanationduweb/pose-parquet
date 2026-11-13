@@ -38,7 +38,7 @@
 
 
     <script src="../config.js"></script>
-    <script type="module" src="../assets/dist/0df6f1038e/js/main.js"></script>
+    <script type="module" src="../assets/dist/45063aad89/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://pose-parquet.com/blog/"},{"@type":"ListItem","position":3,"name":"%%PP_H1%%"}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"%%PP_H1%%","description":"%%PP_DESCRIPTION%%","image":"https://pose-parquet.com/assets/images/og-default.jpg","inLanguage":"fr-FR","datePublished":"2001-01-01","author":{"@type":"Organization","name":"Pose Parquet","url":"https://pose-parquet.com/a-propos/"},"publisher":{"@type":"Organization","name":"Pose Parquet"},"mainEntityOfPage":"https://pose-parquet.com/blog/apercu.html"}</script>
   </head>
