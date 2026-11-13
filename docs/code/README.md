@@ -30746,3 +30746,10 @@ sortie d&#x27;erreur, la synchronisation le reprend tel quel dans son rapport.
 - `css/components/header.css` : le logo fait 4,25 rem de haut sur ordinateur et 3,4 rem sur téléphone. Sur la photo sombre de l'accueil, tant que la page n'a pas défilé, il passe en blanc (`filter: brightness(0) invert(1)`) pour rester lisible ; il reprend ses couleurs ensuite et sur toutes les autres pages.
 - Pied de page (`_generator/layout.js`, `css/components/footer.css`) : quand un logo est réglé dans WordPress, il remplace le symbole et le nom écrit en texte, avec un lien vers l'accueil ; 5,5 rem de haut sur ordinateur, 4,5 rem sur téléphone. Sans logo, le symbole et le nom reviennent.
 
+## Favicon et icônes (13 novembre 2026)
+
+- Source : `_generator/icones/symbole-maison.webp`, le symbole seul du logo (la maison et les trois lames).
+- `python _generator/icones-maison.py` fabrique toutes les icônes dans `assets/icons/` (favicon 16, 24, 32 et 48 px, `apple-touch-icon.png` 180 px sur fond crème, `icon-192.png`, `icon-512.png`, `icon-512-dark.png` sur fond sombre, `maskable-512.png` avec marge de sécurité) et `favicon.ico` à la racine. Le dessin est rogné de ses marges vides puis centré dans le carré.
+- À relancer seulement si le symbole change ; le build ne régénère pas les icônes. `_generator/make-icons.js` (ancien symbole à trois lames) n'est plus utilisé.
+- Un favicon téléversé dans WordPress (Mon site → Identité → Favicon) reste prioritaire sur ces icônes.
+
