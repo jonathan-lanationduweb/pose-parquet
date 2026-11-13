@@ -31,3 +31,5 @@
 .contact-route .btn, .contact-route .link-arrow { justify-self: start; }
 .contact-route--projet { background: var(--tint-sage); border-color: transparent; }
 .contact-card--note { max-width: 46rem; }
+
+[data-project-form]:not(:has(> .pf)) { min-height: 35rem; }

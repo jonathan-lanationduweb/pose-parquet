@@ -264,3 +264,7 @@
   .visualizer__group-title { font-size: 0.82rem; }
   .visualizer__canvas { touch-action: pan-y; }
 }
+
+[data-visualizer]:not([data-mode="compact"]):empty { min-height: 87.5rem; }
+@media (min-width: 48rem) { [data-visualizer]:not([data-mode="compact"]):empty { min-height: 93rem; } }
+@media (min-width: 62rem) { [data-visualizer]:not([data-mode="compact"]):empty { min-height: 62rem; } }

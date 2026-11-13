@@ -30806,3 +30806,13 @@ Plus aucune couleur froide dans le CSS ni dans les dessins (Mode Plan, schémas 
 - Sections alternées : « Quel motif pour quelle pièce » (Motifs), « Dans quel ordre les lire » (Guides), « Quel tutoriel pour quel chantier » (Tutoriels) en `section--alt` ; « À lire ensuite » des articles en bande crème pleine largeur (`css/pages/article.css`).
 - Vignettes de motifs (`js/tools/patterns.js`) dessinées en tons de chêne au lieu du gris-beige.
 
+## Stabilité de la mise en page au chargement (PageSpeed, 13 novembre 2026)
+
+Les éléments construits par JavaScript réservent leur place dans le HTML, pour qu'aucun bloc ne saute pendant le chargement (Cumulative Layout Shift) :
+
+- Formulaire « Mon projet » : `[data-project-form]` réserve 35 rem tant que le formulaire n'est pas monté (`css/pages/project.css`).
+- Mode Plan : `[data-visualizer]` (hors version compacte) réserve 87,5 rem sur téléphone, 93 rem sur tablette, 62 rem sur ordinateur tant qu'il est vide (`css/components/visualizer.css`).
+- Aperçu avant/après de la page « Visualiser ma pièce » : le squelette est écrit dans la page (`apercuSquelette`), comme sur l'accueil ; les pastilles réservent leur hauteur tant qu'elles sont vides (`css/components/visualizer-photo.css`).
+
+Mesure locale après correction : 0 sur toutes les pages, 0,01 à 0,02 pour le Studio et le visualiseur produit (seuil Google : 0,1).
+

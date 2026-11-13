@@ -5,7 +5,7 @@ const { MAX_VERSIONS } = require('../js/studio/app.js');
 
 const MAJ_PIECES = NB_PIECES_LETTRES.charAt(0).toUpperCase() + NB_PIECES_LETTRES.slice(1);
 const { faq, faqJsonLd, tip } = require('./ui');
-const { ICON } = require('./home');
+const { ICON, apercuSquelette } = require('./home');
 
 const STUDIO_URL = 'studio.html';
 
@@ -128,7 +128,7 @@ function buildVisualiseurPage(write) {
             </ul>
           </div>
           <div class="landing-hero__demo">
-            <div data-vz-preview data-room="sejour" data-base="../"></div>
+            ${apercuSquelette('sejour', '../')}
           </div>
         </div>
       </header>

@@ -32,8 +32,8 @@
     <link rel="manifest" href="../../site.webmanifest?v=273889a7e3" />
     <link rel="preload" as="font" type="font/woff2" href="../../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../../assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../../assets/dist/site.63ca8786b0.css" />
-    <link rel="stylesheet" href="../../assets/dist/scene.4933430dba.css" />
+    <link rel="stylesheet" href="../../assets/dist/site.9987aea2b2.css" />
+    <link rel="stylesheet" href="../../assets/dist/scene.7a8424529e.css" />
 
 
 
@@ -109,7 +109,28 @@
             </ul>
           </div>
           <div class="landing-hero__demo">
-            <div data-vz-preview data-room="sejour" data-base="../../"></div>
+            <div class="vzp" data-vz-preview data-room="sejour" data-base="../../" data-reveal>
+            <figure class="vzp__figure">
+              <div class="vzp__stage" data-stage>
+                <img class="vzp__photo" data-photo loading="lazy" decoding="async"
+                  width="1600" height="1067"
+                  src="../../assets/images/room-sejour.jpg" alt="Séjour vide et lumineux ouvert sur une salle à manger" />
+
+
+                <canvas class="vzp__canvas" data-canvas aria-hidden="true"></canvas>
+                <span class="vzp__tag vzp__tag--before">Avant</span>
+                <span class="vzp__tag vzp__tag--after">Après</span>
+                <input class="vzp__range" type="range" min="3" max="97" value="52"
+                  aria-label="Curseur de comparaison entre la pièce d’origine et le parquet simulé" data-range />
+                <span class="vzp__handle" aria-hidden="true"></span>
+              </div>
+              <figcaption class="vzp__caption">
+                <span data-caption>Chêne Colza 150x15, lames droites (rendu indicatif)</span> — rendu calculé dans votre navigateur.
+                <span data-credit>Photo : Curtis Adams / Pexels.</span>
+              </figcaption>
+            </figure>
+            <div class="vzp__chips" role="group" aria-label="Aperçu d’autres finitions" data-chips></div>
+          </div>
           </div>
         </div>
       </header>
