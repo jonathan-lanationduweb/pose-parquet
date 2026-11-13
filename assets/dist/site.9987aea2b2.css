@@ -1720,7 +1720,8 @@ body[data-drawer-open="true"] { overflow: hidden; }
 }
 .breadcrumb + .page-hero,
 .breadcrumb + .article-header,
-.breadcrumb + .tool-hero {
+.breadcrumb + .tool-hero,
+.breadcrumb + .landing-hero {
   background: var(--bg-alt);
   padding-bottom: clamp(2.5rem, 2rem + 2vw, 4rem);
 }
@@ -2824,6 +2825,8 @@ body[data-drawer-open="true"] { overflow: hidden; }
 .contact-route .btn, .contact-route .link-arrow { justify-self: start; }
 .contact-route--projet { background: var(--tint-sage); border-color: transparent; }
 .contact-card--note { max-width: 46rem; }
+
+[data-project-form]:not(:has(> .pf)) { min-height: 35rem; }
 
 .home-sim { border-radius: var(--r-block); overflow: hidden; }
 @media (min-width: 62rem) {

@@ -25,7 +25,8 @@
 }
 .breadcrumb + .page-hero,
 .breadcrumb + .article-header,
-.breadcrumb + .tool-hero {
+.breadcrumb + .tool-hero,
+.breadcrumb + .landing-hero {
   background: var(--bg-alt);
   padding-bottom: clamp(2.5rem, 2rem + 2vw, 4rem);
 }

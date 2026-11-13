@@ -430,3 +430,6 @@
 .vzp__chip-photo { width: 1.5rem; height: 1.5rem; border-radius: 50%; object-fit: cover; flex: none; background: #fff; box-shadow: inset 0 0 0 1px var(--line); }
 .vzp__chip[aria-pressed="true"] { border-color: var(--accent); background: var(--c-sage-pale); color: var(--text); }
 
+.vzp__chips:empty { min-height: 9.4rem; }
+@media (min-width: 48rem) { .vzp__chips:empty { min-height: 5.4rem; } }
+
