@@ -919,7 +919,7 @@ const REGROUPEMENT_MS = 70;
     // ici, parce qu'elle entre dans un attribut entre guillemets.
     const lien =
       fiche.source === 'premibel' && fiche.productUrl
-        ? `<a class="selected__ref" href="${echapper(fiche.productUrl)}" target="_blank" rel="noopener">Voir la référence${
+        ? `<a class="selected__ref" href="${echapper(fiche.productUrl)}" target="_blank" rel="sponsored noopener">Voir la référence${
             fiche.sku ? ` <span>${echapper(fiche.sku)}</span>` : ''
           }</a>`
         : '';

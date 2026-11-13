@@ -14,7 +14,7 @@ const T = require('./textes');
 const images = require('./images');
 const { PHOTOS, INSPIRATION_PHOTOS } = require('./photos');
 const { exigeCoherence } = require('./check-inspiration');
-const { buildHomeBody, apercuSquelette } = require('./home');
+const { buildHomeBody, apercuSquelette, FAQ_ACCUEIL } = require('./home');
 const { buildVisualiseurPage } = require('./visualiseur');
 const { resolveSources } = require('./sources');
 const { NB_PIECES, PIECES, HORS_BIBLIOTHEQUE } = require('./scenes');
@@ -223,12 +223,12 @@ function relatedBlock(slugs, base) {
       </section>`;
 }
 
-function ctaBand(base) {
+function ctaBand(base, titre = 'Un projet de pose à préparer ?') {
   return `<section class="section">
       <div class="wrap">
         <div class="cta-band" data-reveal>
           <div>
-            <h2>Un projet de pose à préparer ?</h2>
+            <h2>${titre}</h2>
             <p>Décrivez votre pièce, votre support et le rendu recherché en quatre étapes, sans laisser vos coordonnées : vous voyez aussitôt vers qui vous tourner.</p>
           </div>
           <div class="cta-band__actions">
@@ -727,46 +727,138 @@ function buildTutos() {
   });
 
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'Tutoriels' }]);
+
+  /* Maquette du 13/11/2026 (pose-parquet-page-tutoriels.pdf). Les phrases de
+     présentation propres à cette page ; à défaut, le résumé du tutoriel. */
+  const ACCROCHES = {
+    'poser-un-parquet-flottant': 'Le tutoriel de référence : sous-couche, jeu de dilatation, coupes de périphérie et plinthes, avec les points de contrôle à chaque étape.',
+    'coller-un-parquet-contrecolle': 'La pose la plus stable et la plus silencieuse, compatible plancher chauffant.',
+    'reussir-le-calepinage': 'Le traçage qui décide de tout : axes, coupes de rive, départ du motif.',
+  };
+  const accroche = (t) => ACCROCHES[t.slug] || t.excerpt;
+  const lienTuto = (slug) => (TUTOS.some((t) => t.slug === slug) ? `${slug}.html` : './');
+
+  const SITUATIONS = [
+    {
+      quand: 'Sol neuf, ragréé ou carrelage sain',
+      titre: 'Pose flottante',
+      texte: 'La plus rapide et la plus accessible. Les lames se clipsent sans adhérer au support : rien n’est définitif, et c’est la seule pose réaliste sans expérience.',
+      slug: 'poser-un-parquet-flottant',
+    },
+    {
+      quand: 'Plancher chauffant, grande surface, confort acoustique',
+      titre: 'Pose collée',
+      texte: 'Plus stable, plus silencieuse, sans jeu entre les lames et meilleure conductrice de chaleur. En contrepartie, elle ne pardonne aucune improvisation.',
+      slug: 'coller-un-parquet-contrecolle',
+    },
+    {
+      quand: 'Point de Hongrie, bâton rompu ou diagonale',
+      titre: 'Calepinage d’abord',
+      texte: 'Un motif en V ou en biais se trace avant de se poser. Une heure de traçage évite deux jours de rattrapage, quel que soit le mode de pose retenu.',
+      slug: 'reussir-le-calepinage',
+    },
+  ];
+
+  const REPERES = [
+    ['L’outillage réellement nécessaire', 'Maillet, cale de frappe, tire-lame, cales de dilatation : ce qu’il faut sortir avant de commencer, et ce dont on peut se passer.'],
+    ['Le déroulé du chantier', 'Les étapes dans l’ordre, de la sous-couche aux plinthes, avec ce qui se joue à chacune.'],
+    ['Les points de contrôle', 'Ce qu’il faut vérifier avant de passer à la suite, tant que c’est encore rattrapable.'],
+    ['Les erreurs coûteuses', 'Celles qui obligent à déposer : jeu de dilatation oublié, support mal préparé, lames mal réparties.'],
+  ];
+
+  const OUTILS_COMMUNS = [
+    ['Mètre, équerre et crayon de menuisier', 'pour le traçage et le report des coupes'],
+    ['Règle de deux mètres', 'pour contrôler la planéité du support'],
+    ['Cales de dilatation', 'pour tenir le jeu en périphérie'],
+    ['Maillet blanc et cale de frappe', 'pour assembler sans marquer la lame'],
+    ['Tire-lame', 'pour les dernières rangées, contre le mur'],
+    ['Scie', 'sauteuse, circulaire ou égoïne selon l’épaisseur'],
+  ];
+  const OUTILS_SELON = [
+    ['Sous-couche et bande périphérique', 'pose flottante'],
+    ['Spatule crantée et colle adaptée', 'pose collée'],
+    ['Cordeau ou laser de traçage', 'motifs en V et diagonale'],
+    ['Scie à araser', 'pour passer sous les huisseries'],
+    ['Genouillères', 'un chantier de 20 m² se fait à genoux'],
+  ];
+  const listeOutils = (items) => `<ul class="outillage__liste">
+                ${items.map(([nom, detail]) => `<li><strong>${nom}</strong> — ${detail}</li>`).join('\n                ')}
+              </ul>`;
+
+  const FAQ_TUTOS = [
+    {
+      q: 'Peut-on poser un parquet soi-même ?',
+      a: 'Une pose flottante en lames droites est à la portée d’un bricoleur méthodique : les lames se clipsent et rien n’est définitif. La pose collée et les motifs en V demandent de l’expérience, parce qu’une erreur de traçage ou d’encollage ne se rattrape plus une fois la colle prise.',
+    },
+    {
+      q: 'Combien de temps faut-il pour poser 20 m² de parquet ?',
+      a: 'Comptez environ une journée en pose flottante et un à deux jours en pose collée, auxquels s’ajoute la préparation du support — souvent le poste le plus long. Un motif en point de Hongrie peut doubler ce temps.',
+    },
+    {
+      q: 'Quel outillage faut-il pour poser un parquet flottant ?',
+      a: 'Un mètre, une équerre, un crayon, des cales de dilatation, un maillet blanc avec sa cale de frappe, un tire-lame pour les dernières rangées et une scie. Une règle de deux mètres sert à contrôler la planéité du support avant de commencer.',
+    },
+    {
+      q: 'Faut-il laisser le parquet s’acclimater avant la pose ?',
+      a: 'Oui. Les paquets restent fermés dans la pièce où le parquet sera posé, à température d’usage, 48 heures au minimum — davantage pour du massif. Poser des lames qui n’ont pas atteint l’hygrométrie du logement expose à des jeux ou à des tuilages.',
+    },
+    {
+      q: 'Quel jeu de dilatation laisser en périphérie ?',
+      a: 'De l’ordre de 8 à 10 mm contre chaque mur et autour de tout point fixe — tuyaux, huisseries, seuils — davantage sur les grandes largeurs. Les plinthes le masquent ensuite. C’est l’oubli qui oblige le plus souvent à tout déposer.',
+    },
+  ];
+
+  const une = TUTOS.find((x) => x.slug === 'poser-un-parquet-flottant') || TUTOS.find((x) => aUneCouverture(x.slug)) || TUTOS[0];
+  const autres = TUTOS.filter((x) => x !== une);
+
   const body = `      ${crumbs.html}
       <header class="page-hero">
         <div class="wrap-wide page-hero__grid">
           <div>
             <p class="eyebrow">Tutoriels</p>
-            <h1 class="page-hero__title">${PAGES['tutoriels'].h1}</h1>
+            <h1 class="page-hero__title">${T.texte(PAGES['tutoriels'].h1)}</h1>
           </div>
-          <p class="page-hero__lead">${PAGES['tutoriels'].chapo}</p>
+          <p class="page-hero__lead">${T.texte(PAGES['tutoriels'].chapo)}</p>
         </div>
       </header>
 
       <section class="section section--flush-top" aria-labelledby="tuto-liste">
         <div class="wrap">
           <h2 class="visually-hidden" id="tuto-liste">Tous les tutoriels</h2>
-          <!--
-            UN TUTORIEL À LA UNE, LES AUTRES EN LISTE.
-
-            Trois cartes de même poids, dont deux en aplat vide — leurs
-            photographies justes n'existent pas encore (IMAGE_REQUIRED dans
-            photos.js). La carte illustrée passe à la une ; les deux autres
-            deviennent des lignes, où l'absence d'image ne se remarque pas.
-          -->
           <div class="listing-featured">
-            ${(() => {
-              const une = TUTOS.find((x) => aUneCouverture(x.slug)) || TUTOS[0];
-              const autres = TUTOS.filter((x) => x !== une);
-              return `<article class="feature-card${aUneCouverture(une.slug) ? '' : ' feature-card--attente'}" data-reveal>
+            <article class="feature-card${aUneCouverture(une.slug) ? '' : ' feature-card--attente'}" data-reveal>
               ${aUneCouverture(une.slug) ? picture(`cover-${une.slug}`, { base: '../', alt: '', sizes: '(min-width: 60rem) 45rem, 94vw', priority: true }) : ''}
               <p class="eyebrow">${une.level} · ${une.duration}</p>
               <h2><a href="${une.slug}.html">${une.h1}</a></h2>
-              <p>${une.excerpt}</p>
+              <p>${accroche(une)}</p>
             </article>
             <div class="listing-side">
-              <div class="cluster-list">
-                ${autres.map((x) => `<a href="${x.slug}.html"><strong>${x.h1}</strong><span>${x.level} · ${x.duration}</span></a>`).join('\n                ')}
+              <div class="cluster-list cluster-list--accroche">
+                ${autres.map((x) => `<a href="${x.slug}.html"><strong>${x.h1}</strong><span>${x.level} · ${x.duration}</span><em>${accroche(x)}</em></a>`).join('\n                ')}
               </div>
-              ${tip('<p>Avant de poser, vérifiez la planéité et l’humidité du support : c’est la cause de la plupart des désordres. <a href="../guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a>.</p>')}
-            </div>`;
-            })()}
+              ${tip('<p>Avant de poser, vérifiez la planéité et l’humidité du support : c’est la cause de la plupart des désordres. Laissez aussi les lames s’acclimater dans la pièce, paquets fermés, 48 heures au minimum. <a href="../guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a>.</p>')}
+            </div>
           </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="tuto-choix">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Par où commencer</p>
+              <h2 id="tuto-choix">Quel tutoriel pour quel chantier ?</h2>
+            </div>
+            <p class="lead">Le choix se fait sur le support et sur le motif, pas sur le parquet. Trois situations couvrent la grande majorité des chantiers.</p>
+          </div>
+          <div class="situations">
+            ${SITUATIONS.map((x) => `<a class="situation" href="${lienTuto(x.slug)}">
+              <span class="situation__quand">${x.quand}</span>
+              <h3 class="situation__titre">${x.titre}</h3>
+              <p class="situation__texte">${x.texte}</p>
+            </a>`).join('\n            ')}
+          </div>
+          <p class="situations__note">Poser sur un carrelage existant est possible en pose flottante, si le support est sain, adhérent et suffisamment plan — <a href="../guides/preparer-son-sol-avant-la-pose.html">voir le guide de préparation du sol</a>.</p>
         </div>
       </section>
 
@@ -775,20 +867,40 @@ function buildTutos() {
           <div class="section-head section-head__row">
             <div>
               <p class="eyebrow">Ce que vous trouverez</p>
-              <h2 id="tuto-methode">Un tutoriel, quatre repères</h2>
+              <h2 id="tuto-methode">Un tutoriel de pose, quatre repères</h2>
             </div>
             <p class="lead">Tous suivent la même trame, pour que vous puissiez travailler avec la page ouverte à côté de vous.</p>
           </div>
           <ol class="steps-grid">
-            <li><span class="steps-grid__num">01</span><strong>L’outillage réellement nécessaire</strong><span>Ce qu’il faut sortir avant de commencer, et ce dont on peut se passer.</span></li>
-            <li><span class="steps-grid__num">02</span><strong>Le déroulé du chantier</strong><span>Les étapes dans l’ordre, avec ce qui se joue à chacune.</span></li>
-            <li><span class="steps-grid__num">03</span><strong>Les points de contrôle</strong><span>Ce qu’il faut vérifier avant de passer à la suite, tant que c’est rattrapable.</span></li>
-            <li><span class="steps-grid__num">04</span><strong>Les erreurs coûteuses</strong><span>Celles qui obligent à déposer, et comment les éviter.</span></li>
+            ${REPERES.map(([titre, texte], i) => `<li><span class="steps-grid__num">0${i + 1}</span><strong>${titre}</strong><span>${texte}</span></li>`).join('\n            ')}
           </ol>
         </div>
       </section>
 
-      <section class="section" aria-labelledby="tuto-outil">
+      <section class="section section--alt section--flush-top" aria-labelledby="tuto-outillage">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Avant d’ouvrir le premier paquet</p>
+              <h2 id="tuto-outillage">L’outillage à prévoir</h2>
+            </div>
+            <p class="lead">Rien d’exotique, mais rien d’optionnel non plus : la moitié des reprises viennent d’un outil manquant qu’on a remplacé par un autre.</p>
+          </div>
+          <div class="outillage">
+            <div>
+              <h3 class="outillage__titre">Indispensable, quelle que soit la pose</h3>
+              ${listeOutils(OUTILS_COMMUNS)}
+            </div>
+            <div>
+              <h3 class="outillage__titre">En plus, selon le type de pose</h3>
+              ${listeOutils(OUTILS_SELON)}
+            </div>
+          </div>
+          <p class="outillage__note">Le détail, format par format, figure au début de chaque tutoriel.</p>
+        </div>
+      </section>
+
+      <section class="section section--mineral" aria-labelledby="tuto-outil">
         <div class="wrap-wide">
           <div class="tool-block">
             <div class="tool-block__media">
@@ -797,7 +909,7 @@ function buildTutos() {
             <div class="tool-block__body">
               <p class="tool-block__num">Avant de commencer</p>
               <h2 class="tool-block__title" id="tuto-outil">Voir le résultat avant de couper la première lame</h2>
-              <p class="lead">Le sens de pose et le motif se décident sur le papier, mais se jugent à l’œil. Essayez-les sur une photo de votre pièce.</p>
+              <p class="lead">Le sens de pose et le motif se décident sur le papier, mais se jugent à l’œil. Essayez-les sur une photo de votre pièce : le rendu est calculé dans votre navigateur, votre photo n’est ni envoyée ni conservée.</p>
               <div class="cluster">
                 <a class="btn" href="../outils/visualiseur.html">Visualiser mon parquet</a>
                 <a class="link-arrow" href="../guides/">Lire les guides</a>
@@ -806,7 +918,25 @@ function buildTutos() {
           </div>
         </div>
       </section>
-      ${ctaBand('../')}`;
+
+      <section class="section" aria-labelledby="tuto-faq">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Questions fréquentes</p>
+              <h2 id="tuto-faq">Poser soi-même : les questions qui reviennent</h2>
+            </div>
+            <p class="lead">Cinq points qui décident souvent si l’on pose soi-même ou si l’on fait appel à un professionnel.</p>
+          </div>
+          <div class="faq-grille">
+            ${FAQ_TUTOS.map((x) => `<div class="faq-grille__item">
+              <h3>${x.q}</h3>
+              <p>${x.a}</p>
+            </div>`).join('\n            ')}
+          </div>
+        </div>
+      </section>
+      ${ctaBand('../', 'Faire poser son parquet : décrivez votre projet en 4 étapes')}`;
 
   write(
     'tutoriels/index.html',
@@ -817,7 +947,7 @@ function buildTutos() {
       path: 'tutoriels/index.html',
       depth: 1,
       css: ['css/pages/listing.css'],
-      jsonld: [crumbs.jsonld],
+      jsonld: [crumbs.jsonld, faqJsonLd(FAQ_TUTOS)],
       body,
     })
   );
@@ -941,7 +1071,7 @@ function carteInspiration(item, { variante = 'grille', priority = false } = {}) 
                 ${corps}
               </button>`;
   const classes = `insp-card insp-card--${variante}`;
-  return `<article class="${classes}" data-tags="${item.tags}">
+  return `<article class="${classes}" id="${item.image}" data-tags="${item.tags}">
               ${surface}
             </article>`;
 }
@@ -1484,7 +1614,7 @@ function buildApropos() {
   // fait quoi), sans lien.
   const nomLie = (cle) =>
     REGLAGES[`${cle}_afficher`]
-      ? `<a href="${T.attribut(REGLAGES[`${cle}_url`])}" rel="noopener">${T.texte(REGLAGES[`${cle}_libelle`])}</a>`
+      ? `<a href="${T.attribut(REGLAGES[`${cle}_url`])}" rel="sponsored noopener">${T.texte(REGLAGES[`${cle}_libelle`])}</a>`
       : T.texte(REGLAGES[`${cle}_libelle`]);
   const presentation = [
     `<h2 id="pourquoi">${T.texte(v.pres1_titre)}</h2>`,
@@ -1595,7 +1725,7 @@ function buildMethode() {
   const v = PAGES['methode-editoriale'].valeurs;
   const lienPartenaire = (cle) =>
     REGLAGES[`${cle}_afficher`]
-      ? `<a href="${T.attribut(REGLAGES[`${cle}_url`])}" rel="noopener">${T.texte(REGLAGES[`${cle}_libelle`])}</a>`
+      ? `<a href="${T.attribut(REGLAGES[`${cle}_url`])}" rel="sponsored noopener">${T.texte(REGLAGES[`${cle}_libelle`])}</a>`
       : T.texte(REGLAGES[`${cle}_libelle`]);
   const crumbs = breadcrumb('../', [
     { label: 'Accueil', href: 'index.html' },
@@ -1801,6 +1931,7 @@ function buildHome() {
           url: SITE.domain,
           logo: `${SITE.domain}/assets/icons/icon-512.png`,
         },
+        faqJsonLd(FAQ_ACCUEIL()),
       ],
       body,
     })

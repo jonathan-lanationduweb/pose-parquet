@@ -90,7 +90,7 @@ titre('Pages construites');
 const accueil = lire('index.html');
 const cssVz = lire('css/components/visualizer-photo.css');
 verifier('accueil : le bloc Visualiseur prend la largeur réelle de la scène et se centre', /\.vzp \{ max-width: min\(76rem, calc\(min\(70svh, 620px\) \* 1\.6\)\); \}/.test(cssVz));
-verifier('hero : deux phrases, sans « ; » isolé en début de ligne', /Premibel<\/strong>\. Pour la pose/.test(accueil) && !/<\/strong> ; pour la pose/.test(accueil));
+verifier('hero : la ligne d’orientation nomme les deux partenaires, sans « ; » isolé', /class="hero__orientation">[^<]*<strong>Premibel<\/strong> pour les références/.test(accueil) && !/<\/strong> ; pour la pose/.test(accueil));
 verifier('hero : « Île-de-France » ne se coupe pas', /<span class="u-nowrap">Île-de-France<\/span>/.test(accueil) && /\.u-nowrap \{ white-space: nowrap; \}/.test(lire('css/global.css')));
 const projet = lire('projet/index.html');
 verifier('projet : titre « Décrivez votre projet »', /<h1 class="page-hero__title">Décrivez votre projet<\/h1>/.test(projet));

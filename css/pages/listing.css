@@ -39,7 +39,7 @@
 .feature-card:hover img { transform: scale(1.04); }
 .feature-card .eyebrow { color: rgba(255,255,255,0.78); margin: 0; }
 .feature-card h2, .feature-card h3 {
-  font-size: clamp(1.9rem, 1.3rem + 2.6vw, 3.4rem);
+  font-size: min(var(--fs-h2), clamp(1.9rem, 1.3rem + 2.6vw, 3.4rem));
   color: #fff;
   max-width: 16ch;
 }
@@ -108,7 +108,7 @@
 .motif-family { display: grid; gap: var(--sp-5); }
 .motif-family + .motif-family { margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem); padding-top: clamp(2rem, 1.25rem + 2vw, 3rem); border-top: 1px solid var(--line); }
 .motif-family__head { display: grid; gap: var(--sp-3); max-width: 62ch; }
-.motif-family__head h2 { margin: 0; font-size: var(--fs-h3); }
+.motif-family__head h2 { margin: 0; font-size: var(--fs-h2); }
 .motif-family__head p { margin: 0; color: var(--text-soft); }
 @media (min-width: 62rem) {
   .motif-family--v { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); align-items: start; }
@@ -117,7 +117,8 @@
 /* ---------- Méthode : principes ---------- */
 .method-intro { display: grid; gap: var(--sp-5) var(--sp-7); }
 @media (min-width: 52rem) { .method-intro { grid-template-columns: 1fr 1fr; } }
-.method-intro h2 { font-size: var(--fs-h4); margin: 0 0 var(--sp-2); }
+/* Deux sections (H2) : taille H2, comme les autres titres de section. */
+.method-intro h2 { font-size: var(--fs-h2); line-height: var(--lh-h2); margin: 0 0 var(--sp-2); }
 .method-intro p { margin: 0; color: var(--text-soft); }
 .principles {
   display: grid;
@@ -183,3 +184,63 @@
   }
   .motif-family__grid .pattern-card:hover { transform: none; }
 }
+
+/* ---------- Tutoriels, maquette du 13/11/2026 ---------- */
+
+/* Liste des autres tutoriels : titre, niveau, puis une phrase. */
+.cluster-list--accroche a { flex-wrap: wrap; row-gap: 0.25rem; }
+.cluster-list--accroche em {
+  flex-basis: 100%;
+  font-style: normal;
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  color: var(--text-soft);
+}
+
+/* Quel tutoriel pour quel chantier : trois cartes cliquables. */
+.situations { display: grid; gap: var(--sp-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); }
+.situation {
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  padding: var(--sp-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius, 10px);
+  background: var(--surface, #fff);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.situation:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+.situation__quand {
+  font-size: var(--fs-xs);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.situation__titre { margin: 0; }
+.situation__texte { margin: 0; font-size: var(--fs-sm); line-height: 1.55; color: var(--text-soft); }
+.situations__note { margin: var(--sp-4) 0 0; font-size: var(--fs-sm); color: var(--text-soft); }
+
+/* L'outillage : deux listes côte à côte, une ligne par outil. */
+.outillage { display: grid; gap: var(--sp-5) clamp(2rem, 5vw, 5rem); grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+.outillage__titre {
+  margin: 0 0 var(--sp-3);
+  font-family: var(--font-sans);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.outillage__liste { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.outillage__liste li { padding: 0.7rem 0; border-bottom: 1px solid var(--line); font-size: var(--fs-sm); line-height: 1.5; color: var(--text-soft); }
+.outillage__liste strong { color: var(--text); font-weight: 600; }
+.outillage__note { margin: var(--sp-4) 0 0; font-size: var(--fs-sm); color: var(--text-muted); }
+
+/* Questions fréquentes : deux colonnes de réponses, toutes visibles. */
+.faq-grille { display: grid; gap: var(--sp-5) clamp(2rem, 5vw, 5rem); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 48rem) { .faq-grille { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.faq-grille__item { padding-top: var(--sp-4); border-top: 1px solid var(--line); }
+.faq-grille__item h3 { margin: 0 0 0.5rem; font-family: var(--font-sans); font-size: var(--fs-base, 1rem); font-weight: 600; line-height: 1.4; }
+.faq-grille__item p { margin: 0; font-size: var(--fs-sm); line-height: 1.6; color: var(--text-soft); }

@@ -35,10 +35,10 @@ const NAV = [
   { href: 'tutoriels/', cle: 'tutoriels', section: 'tutoriels' },
   { href: 'inspiration/', cle: 'inspiration', section: 'inspiration' },
   { href: 'outils/', cle: 'outils', section: 'outils' },
+  { href: 'a-propos/', cle: 'a_propos', section: 'a-propos' },
 ];
 
 const DRAWER_EXTRA = [
-  { href: 'a-propos/', cle: 'a_propos', section: 'a-propos' },
   { href: 'contact/', cle: 'contact', section: 'contact' },
 ];
 
@@ -171,8 +171,8 @@ function footer(p) {
           <nav class="footer__nav" aria-label="Pied de page">
             ${groups
               .map(
-                (group) => `<div class="footer__col">
-              <h2>${group.title}</h2>
+                (group, i) => `<div class="footer__col" role="group" aria-labelledby="pied-col-${i}">
+              <p class="footer__col-titre" id="pied-col-${i}">${group.title}</p>
               <ul>
                 ${group.links.map(([href, label]) => `<li><a href="${p}${href}">${label}</a></li>`).join('')}
               </ul>

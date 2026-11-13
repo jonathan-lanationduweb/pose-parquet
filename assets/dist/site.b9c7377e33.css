@@ -363,7 +363,8 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
  */
 .section--compact { padding-block: clamp(2.25rem, 1.25rem + 3vw, 3.75rem); }
 .section--compact .section-head { margin-bottom: clamp(1.25rem, 0.9rem + 1.4vw, 2rem); }
-.section--compact h2 { font-size: var(--fs-h3); }
+/* Pas de H2 réduit ici : un titre de section garde la taille d'un H2 partout,
+   sinon il devient plus petit que ses propres sous-titres (H3). */
 .section--compact .lead { font-size: var(--fs-base); }
 .section--alt { background: var(--bg-alt); }
 .section--mineral { background: var(--tint-mineral); }
@@ -809,7 +810,7 @@ body[data-drawer-open="true"] { overflow: hidden; }
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
   gap: clamp(1.25rem, 1rem + 1.5vw, 2.5rem);
 }
-.footer__col h2 {
+.footer__col-titre {
   margin: 0 0 0.7rem;
   font-family: var(--font-sans);
   font-size: var(--fs-xs);
@@ -868,7 +869,7 @@ body[data-drawer-open="true"] { overflow: hidden; }
   .footer__baseline { margin-top: 0.35rem; max-width: 40ch; }
 
   .footer__nav { grid-template-columns: minmax(0, 1fr); gap: 0.5rem; }
-  .footer__col h2 {
+  .footer__col-titre {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -2661,7 +2662,7 @@ body[data-drawer-open="true"] { overflow: hidden; }
 @media (min-width: 58rem) {
   .cta-band { grid-template-columns: 1.4fr auto; align-items: center; gap: var(--sp-7); }
 }
-.cta-band h2 { font-size: var(--fs-h3); max-width: 20ch; }
+.cta-band h2 { font-size: var(--fs-h2); max-width: 20ch; }
 .cta-band p { color: #b9beb9; margin-top: var(--sp-3); max-width: 48ch; }
 .cta-band::after {
   content: "";
@@ -2800,7 +2801,7 @@ body[data-drawer-open="true"] { overflow: hidden; }
 .feature-card:hover img { transform: scale(1.04); }
 .feature-card .eyebrow { color: rgba(255,255,255,0.78); margin: 0; }
 .feature-card h2, .feature-card h3 {
-  font-size: clamp(1.9rem, 1.3rem + 2.6vw, 3.4rem);
+  font-size: min(var(--fs-h2), clamp(1.9rem, 1.3rem + 2.6vw, 3.4rem));
   color: #fff;
   max-width: 16ch;
 }
@@ -2869,7 +2870,7 @@ body[data-drawer-open="true"] { overflow: hidden; }
 .motif-family { display: grid; gap: var(--sp-5); }
 .motif-family + .motif-family { margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem); padding-top: clamp(2rem, 1.25rem + 2vw, 3rem); border-top: 1px solid var(--line); }
 .motif-family__head { display: grid; gap: var(--sp-3); max-width: 62ch; }
-.motif-family__head h2 { margin: 0; font-size: var(--fs-h3); }
+.motif-family__head h2 { margin: 0; font-size: var(--fs-h2); }
 .motif-family__head p { margin: 0; color: var(--text-soft); }
 @media (min-width: 62rem) {
   .motif-family--v { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); align-items: start; }
@@ -2878,7 +2879,8 @@ body[data-drawer-open="true"] { overflow: hidden; }
 /* ---------- Méthode : principes ---------- */
 .method-intro { display: grid; gap: var(--sp-5) var(--sp-7); }
 @media (min-width: 52rem) { .method-intro { grid-template-columns: 1fr 1fr; } }
-.method-intro h2 { font-size: var(--fs-h4); margin: 0 0 var(--sp-2); }
+/* Deux sections (H2) : taille H2, comme les autres titres de section. */
+.method-intro h2 { font-size: var(--fs-h2); line-height: var(--lh-h2); margin: 0 0 var(--sp-2); }
 .method-intro p { margin: 0; color: var(--text-soft); }
 .principles {
   display: grid;
@@ -2944,6 +2946,66 @@ body[data-drawer-open="true"] { overflow: hidden; }
   }
   .motif-family__grid .pattern-card:hover { transform: none; }
 }
+
+/* ---------- Tutoriels, maquette du 13/11/2026 ---------- */
+
+/* Liste des autres tutoriels : titre, niveau, puis une phrase. */
+.cluster-list--accroche a { flex-wrap: wrap; row-gap: 0.25rem; }
+.cluster-list--accroche em {
+  flex-basis: 100%;
+  font-style: normal;
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  color: var(--text-soft);
+}
+
+/* Quel tutoriel pour quel chantier : trois cartes cliquables. */
+.situations { display: grid; gap: var(--sp-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); }
+.situation {
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  padding: var(--sp-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius, 10px);
+  background: var(--surface, #fff);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.situation:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+.situation__quand {
+  font-size: var(--fs-xs);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.situation__titre { margin: 0; }
+.situation__texte { margin: 0; font-size: var(--fs-sm); line-height: 1.55; color: var(--text-soft); }
+.situations__note { margin: var(--sp-4) 0 0; font-size: var(--fs-sm); color: var(--text-soft); }
+
+/* L'outillage : deux listes côte à côte, une ligne par outil. */
+.outillage { display: grid; gap: var(--sp-5) clamp(2rem, 5vw, 5rem); grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+.outillage__titre {
+  margin: 0 0 var(--sp-3);
+  font-family: var(--font-sans);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.outillage__liste { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.outillage__liste li { padding: 0.7rem 0; border-bottom: 1px solid var(--line); font-size: var(--fs-sm); line-height: 1.5; color: var(--text-soft); }
+.outillage__liste strong { color: var(--text); font-weight: 600; }
+.outillage__note { margin: var(--sp-4) 0 0; font-size: var(--fs-sm); color: var(--text-muted); }
+
+/* Questions fréquentes : deux colonnes de réponses, toutes visibles. */
+.faq-grille { display: grid; gap: var(--sp-5) clamp(2rem, 5vw, 5rem); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 48rem) { .faq-grille { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.faq-grille__item { padding-top: var(--sp-4); border-top: 1px solid var(--line); }
+.faq-grille__item h3 { margin: 0 0 0.5rem; font-family: var(--font-sans); font-size: var(--fs-base, 1rem); font-weight: 600; line-height: 1.4; }
+.faq-grille__item p { margin: 0; font-size: var(--fs-sm); line-height: 1.6; color: var(--text-soft); }
 
 /* Gabarit éditorial : guide, tutoriel, page motif */
 .article-header {
@@ -3276,13 +3338,14 @@ body[data-drawer-open="true"] { overflow: hidden; }
 .tool-main__points li { display: grid; gap: 0.15rem; font-size: var(--fs-sm); color: var(--text-soft); }
 .tool-main__points strong { font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; color: var(--text); }
 
-.tool-block--secondary .tool-block__title { font-size: var(--fs-h3); }
+/* Titre de section : taille H2, comme partout (hiérarchie lisible par Google). */
+.tool-block--secondary .tool-block__title { font-size: var(--fs-h2); }
 
 .tools-next__inner { display: grid; gap: var(--sp-5); }
 @media (min-width: 62rem) {
   .tools-next__inner { grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr); align-items: start; }
 }
-.tools-next__title { font-size: var(--fs-h4); margin: 0; }
+.tools-next__title { font-size: var(--fs-h2); margin: 0; }
 .tools-next__lead { margin: var(--sp-2) 0 0; font-size: var(--fs-sm); color: var(--text-muted); max-width: 38ch; }
 .roadmap--compact { gap: 0 var(--sp-5); grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); }
 .roadmap--compact .roadmap__item { padding-block: 0.6rem; font-size: var(--fs-xs); }
@@ -3504,4 +3567,42 @@ body[data-drawer-open="true"] { overflow: hidden; }
 
 /* Le bloc projet conclut : un chapeau sous le titre. */
 .feature__lead { margin: 0; font-size: var(--fs-lead); color: var(--text-soft); max-width: 48ch; }
+
+/* ---------- Accueil, maquette du 12/11/2026 ---------- */
+
+/* Hero : la ligne qui dit vers qui l'on oriente, sous les deux boutons. */
+.hero__orientation {
+  margin: var(--sp-4) 0 0;
+  max-width: 52ch;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
+}
+.hero__orientation strong { color: #fff; font-weight: 600; }
+.hero__orientation a { color: #fff; text-underline-offset: 0.2em; }
+
+/* Pourquoi ce site : deux paragraphes, puis le lien vers la méthode. */
+.pourquoi__texte { display: grid; gap: var(--sp-3); }
+.pourquoi__texte p { margin: 0; max-width: 62ch; }
+.pourquoi__texte p:not(.lead) { color: var(--text-soft); line-height: 1.6; }
+
+/* Visualiseur : la promesse de confidentialité, en encadré discret. */
+.sim-note {
+  margin: 0 0 var(--sp-5);
+  padding: var(--sp-3) var(--sp-4);
+  border-left: 3px solid var(--accent);
+  background: var(--surface, rgba(255, 255, 255, 0.55));
+  border-radius: 0 var(--radius-sm, 6px) var(--radius-sm, 6px) 0;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  color: var(--text-soft);
+  max-width: 78ch;
+}
+.sim-note strong { color: var(--text); font-weight: 600; }
+
+/* Questions fréquentes : largeur de lecture, lien d'approfondissement sous la réponse. */
+.faq-accueil { max-width: 62rem; }
+.faq-accueil .accordion__panel p + p { margin-top: var(--sp-3); }
+/* Le titre se lit avec le texte : aligné en haut, pas au pied des paragraphes. */
+#pourquoi .section-head__row { align-items: start; }
 

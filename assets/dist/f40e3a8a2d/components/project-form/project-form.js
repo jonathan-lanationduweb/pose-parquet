@@ -810,7 +810,7 @@ export function mountProjectForm(root, options = {}) {
         <h3 class="pf-dest__nom">${echapper(etape.entreprise)}</h3>
         <p class="pf-dest__texte">${echapper(etape.texte)}</p>
         ${etape.produit ? ficheProduit(etape.produit) : ''}
-        ${etape.cta ? `<a class="btn ${etape.numero === 1 || vue.etapes.length > 1 ? 'btn--accent' : 'btn--ghost'} pf-dest__cta" href="${echapper(etape.cta.url)}" target="_blank" rel="noopener" data-suivi="${etape.cible}">${echapper(etape.cta.libelle)}</a>` : ''}
+        ${etape.cta ? `<a class="btn ${etape.numero === 1 || vue.etapes.length > 1 ? 'btn--accent' : 'btn--ghost'} pf-dest__cta" href="${echapper(etape.cta.url)}" target="_blank" rel="sponsored noopener" data-suivi="${etape.cible}">${echapper(etape.cta.libelle)}</a>` : ''}
       </article>`;
     // Ce que le Visualiseur a préparé : référence, SKU, motif, orientation, pièce. Jamais la photo.
     const configStudio = [

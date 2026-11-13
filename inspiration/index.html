@@ -32,14 +32,14 @@
     <link rel="manifest" href="../site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../assets/dist/site.5382f6b607.css" />
+    <link rel="stylesheet" href="../assets/dist/site.b9c7377e33.css" />
     <link rel="stylesheet" href="../assets/dist/spotlight.eebb971c2b.css" />
     <!-- Adresse du backend, définissable au déploiement sans toucher au code.
          Script classique et non module : il s'exécute avant les modules, donc
          avant que api-config.js ne lise window.POSE_PARQUET_CONFIG. Pas
          d'empreinte dans le nom — c'est ce qui permet de le remplacer. -->
     <script src="../config.js"></script>
-    <script type="module" src="../assets/dist/730454e46f/js/main.js"></script>
+    <script type="module" src="../assets/dist/f40e3a8a2d/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/"},{"@type":"ListItem","position":2,"name":"Inspiration"}]}</script>
   </head>
   <body class="page">
@@ -56,10 +56,11 @@
             <li><a class="nav__link" href="../tutoriels/" data-nav-section="tutoriels">Tutoriels</a></li>
             <li><a class="nav__link" href="../inspiration/" data-nav-section="inspiration">Inspiration</a></li>
             <li><a class="nav__link" href="../outils/" data-nav-section="outils">Outils</a></li>
+            <li><a class="nav__link" href="../a-propos/" data-nav-section="a-propos">À propos</a></li>
           </ul>
         </nav>
         <div class="header__actions">
-          <a class="header__cta" href="../projet/"><span>Votre projet</span></a>
+          <a class="header__cta" href="../projet/"><span>Décrire mon projet</span></a>
           <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false"
             aria-controls="menu-mobile" aria-label="Ouvrir le menu">
             <span></span><span></span><span></span>
@@ -126,7 +127,7 @@
           </div>
           <p class="eyebrow spotlight__une">À la une</p>
           <div class="insp-grid" id="galerie" data-filtered="false">
-            <article class="insp-card insp-card--une" data-tags="hongrie chambre">
+            <article class="insp-card insp-card--une" id="room-chambre-parisienne" data-tags="hongrie chambre">
               <a class="insp-card__surface" href="../outils/studio.html?piece=chambre-parisienne&parquet=chene-naturel&motif=point-de-hongrie&orientation=0">
                 <span class="insp-card__media"><picture>
               <source type="image/webp" srcset="../assets/images/room-chambre-parisienne-640.webp 640w, ../assets/images/room-chambre-parisienne-1120.webp 1120w, ../assets/images/room-chambre-parisienne-1600.webp 1600w" sizes="(min-width: 62rem) min(66vw, 1040px), (min-width: 48rem) 58vw, 100vw" />
@@ -141,7 +142,7 @@
                 </div>
               </a>
             </article>
-            <article class="insp-card insp-card--voisine" data-tags="baton-rompu sejour">
+            <article class="insp-card insp-card--voisine" id="room-piece-arcades" data-tags="baton-rompu sejour">
               <a class="insp-card__surface" href="../outils/studio.html?piece=piece-arcades&parquet=chene-naturel&motif=baton-rompu&orientation=0">
                 <span class="insp-card__media"><picture>
               <source type="image/webp" srcset="../assets/images/room-piece-arcades-640.webp 640w, ../assets/images/room-piece-arcades-1120.webp 1120w, ../assets/images/room-piece-arcades-1600.webp 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 42vw, 100vw" />
@@ -156,7 +157,7 @@
                 </div>
               </a>
             </article>
-            <article class="insp-card insp-card--grille" data-tags="droite sejour">
+            <article class="insp-card insp-card--grille" id="room-sejour" data-tags="droite sejour">
               <a class="insp-card__surface" href="../outils/studio.html?piece=sejour&parquet=chene-dore&motif=lames&orientation=0">
                 <span class="insp-card__media"><picture>
               <source type="image/webp" srcset="../assets/images/room-sejour-640.webp 640w, ../assets/images/room-sejour-1120.webp 1120w, ../assets/images/room-sejour-1600.webp 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" />
@@ -171,7 +172,7 @@
                 </div>
               </a>
             </article>
-            <article class="insp-card insp-card--grille" data-tags="droite cuisine">
+            <article class="insp-card insp-card--grille" id="room-cuisine-ouverte" data-tags="droite cuisine">
               <a class="insp-card__surface" href="../outils/studio.html?piece=cuisine-ouverte&parquet=chene-fume&motif=lames&orientation=0">
                 <span class="insp-card__media"><picture>
               <source type="image/webp" srcset="../assets/images/room-cuisine-ouverte-640.webp 640w, ../assets/images/room-cuisine-ouverte-1120.webp 1120w, ../assets/images/room-cuisine-ouverte-1600.webp 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" />
@@ -186,7 +187,7 @@
                 </div>
               </a>
             </article>
-            <article class="insp-card insp-card--grille" data-tags="hongrie couloir">
+            <article class="insp-card insp-card--grille" id="room-couloir-bleu" data-tags="hongrie couloir">
               <a class="insp-card__surface" href="../outils/studio.html?piece=couloir-enfilade&parquet=chene-naturel&motif=point-de-hongrie&orientation=0">
                 <span class="insp-card__media"><picture>
               <source type="image/webp" srcset="../assets/images/room-couloir-bleu-640.webp 640w, ../assets/images/room-couloir-bleu-1120.webp 1120w, ../assets/images/room-couloir-bleu-1600.webp 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" />
@@ -201,7 +202,7 @@
                 </div>
               </a>
             </article>
-            <article class="insp-card insp-card--grille" data-tags="droite chambre">
+            <article class="insp-card insp-card--grille" id="room-chambre-claire" data-tags="droite chambre">
               <a class="insp-card__surface" href="../outils/studio.html?piece=chambre-claire&parquet=chene-brun&motif=lames&orientation=0">
                 <span class="insp-card__media"><picture>
               <source type="image/webp" srcset="../assets/images/room-chambre-claire-640.webp 640w, ../assets/images/room-chambre-claire-1120.webp 1120w, ../assets/images/room-chambre-claire-1600.webp 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" />
@@ -216,7 +217,7 @@
                 </div>
               </a>
             </article>
-            <article class="insp-card insp-card--grille" data-tags="droite sejour">
+            <article class="insp-card insp-card--grille" id="room-salon-angle" data-tags="droite sejour">
               <a class="insp-card__surface" href="../outils/studio.html?piece=salon-angle&parquet=chene-tabac&motif=lames&orientation=0">
                 <span class="insp-card__media"><picture>
               <source type="image/webp" srcset="../assets/images/room-salon-angle-640.webp 640w, ../assets/images/room-salon-angle-1120.webp 1120w, ../assets/images/room-salon-angle-1600.webp 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" />
@@ -231,7 +232,7 @@
                 </div>
               </a>
             </article>
-            <article class="insp-card insp-card--grille" data-tags="droite couloir">
+            <article class="insp-card insp-card--grille" id="room-entree-cadree" data-tags="droite couloir">
               <a class="insp-card__surface" href="../outils/studio.html?piece=entree-cadree&parquet=chene-miel&motif=lames&orientation=0">
                 <span class="insp-card__media"><picture>
               <source type="image/webp" srcset="../assets/images/room-entree-cadree-640.webp 640w, ../assets/images/room-entree-cadree-1120.webp 1120w, ../assets/images/room-entree-cadree-1600.webp 1600w" sizes="(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 50vw, 42vw" />
@@ -314,18 +315,18 @@
             <p class="footer__baseline">Guides et outils pour réussir la pose de son parquet.</p>
           </div>
           <nav class="footer__nav" aria-label="Pied de page">
-            <div class="footer__col">
-              <h2>Comprendre</h2>
+            <div class="footer__col" role="group" aria-labelledby="pied-col-0">
+              <p class="footer__col-titre" id="pied-col-0">Comprendre</p>
               <ul>
                 <li><a href="../guides/">Guides</a></li><li><a href="../motifs/">Motifs</a></li><li><a href="../tutoriels/">Tutoriels</a></li>
               </ul>
-            </div><div class="footer__col">
-              <h2>Outils</h2>
+            </div><div class="footer__col" role="group" aria-labelledby="pied-col-1">
+              <p class="footer__col-titre" id="pied-col-1">Outils</p>
               <ul>
                 <li><a href="../outils/studio.html">Visualiser ma pièce</a></li><li><a href="../outils/simulateur-pose.html">Mode Plan</a></li><li><a href="../inspiration/">Inspiration</a></li>
               </ul>
-            </div><div class="footer__col">
-              <h2>À propos</h2>
+            </div><div class="footer__col" role="group" aria-labelledby="pied-col-2">
+              <p class="footer__col-titre" id="pied-col-2">À propos</p>
               <ul>
                 <li><a href="../a-propos/methode-editoriale.html">Notre méthode</a></li><li><a href="../contact/">Contact</a></li><li><a href="../projet/">Votre projet</a></li>
               </ul>

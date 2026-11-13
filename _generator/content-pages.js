@@ -53,8 +53,8 @@ const PAGES = {
     "nom": "Tutoriels",
     "adresse": "/tutoriels/",
     "ordre": 4,
-    "h1": "Le geste, étape par étape",
-    "chapo": "Des déroulés de chantier détaillés, avec l'outillage nécessaire, les points de contrôle et les erreurs qui coûtent cher.",
+    "h1": "Poser son parquet soi-même : le geste, étape par étape",
+    "chapo": "Des déroulés de chantier détaillés : l'outillage nécessaire, les étapes dans l'ordre, les points de contrôle et les erreurs qui coûtent cher. De la pose flottante à la pose collée.",
     "titre": "Tutoriels de pose de parquet pas à pas | Pose Parquet",
     "description": "Tutoriels détaillés : poser un parquet flottant, coller un contrecollé, réussir son calepinage. Outillage, étapes et points de contrôle."
   },
@@ -174,30 +174,43 @@ const { defauts } = require('./textes');
 const c = (groupe) => (cle, libelle, type, max, defaut, aide) => ({ cle, groupe, libelle, type, max, defaut, ...(aide ? { aide } : {}) });
 
 const hero = c('En-tête (hero)');
+const pourquoi = c('Section « Pourquoi ce site »');
 const passerelle = c('Section passerelle (Premibel / Allure Design)');
 const projet = c('Section projet (fin de page)');
+/* Dans les textes de l'accueil, {guides}, {motifs}, {parquets}, {motifs_outils}
+   (ou {guides_lettres}, {motifs_lettres}, {motifs_outils_lettres}) sont
+   remplacés au build par les nombres réels : aucun chiffre ne se périme. */
+const NOMBRES = 'Nombres calculés : {guides}, {motifs}, {parquets}, {motifs_outils} — ou en lettres : {guides_lettres}, {motifs_lettres}, {motifs_outils_lettres}.';
 PAGES['accueil'].champs = [
-  hero('hero_eyebrow', 'Surtitre', 'texte', 60, 'Guides · Motifs · Outils'),
-  hero('hero_titre', 'Titre', 'riche', 140, 'Un parquet bien posé commence *avant* la première lame.'),
-  hero('hero_texte', 'Texte introductif', 'riche', 500, 'Guides, inspirations et outils pour choisir votre parquet, le voir chez vous et préparer votre projet. Pour les références, nous orientons vers **Premibel**. Pour la pose et la rénovation en Île-de-France, vers **Allure Design**.'),
-  hero('hero_cta_guides', 'Bouton guides', 'texte', 40, 'Explorer les guides'),
-  hero('hero_cta_visualiseur', 'Bouton Visualiseur', 'texte', 40, 'Visualiser mon parquet'),
+  hero('hero_eyebrow', 'Surtitre', 'texte', 60, 'Média indépendant sur la pose de parquet'),
+  hero('hero_titre', 'Titre', 'riche', 140, 'Poser un parquet : tout se décide *avant* la première lame.'),
+  hero('hero_texte', 'Texte introductif', 'riche', 500, 'Sens de pose, motif, support, massif ou contrecollé : {guides_lettres} guides pour trancher avant de commander. Puis un simulateur gratuit pour voir le rendu dans votre pièce, à partir d’une photo — qui ne quitte jamais votre navigateur.', NOMBRES),
+  hero('hero_cta_visualiseur', 'Bouton principal (simulateur)', 'texte', 60, 'Essayer le simulateur — gratuit'),
+  hero('hero_cta_guides', 'Bouton secondaire (guides)', 'texte', 60, 'Lire les {guides} guides', NOMBRES),
+  hero('hero_orientation', 'Ligne d’orientation', 'riche', 300, 'Nous orientons vers **Premibel** pour les références et **Allure Design** pour la pose en Île-de-France. [Pourquoi ?]', 'Le texte entre crochets devient le lien vers « Nos liens commerciaux » (À propos).'),
+  pourquoi('pourquoi_eyebrow', 'Surtitre', 'texte', 60, 'Pourquoi ce site'),
+  pourquoi('pourquoi_titre', 'Titre', 'texte', 120, 'Un parquet, ça se répare mal.'),
+  pourquoi('pourquoi_texte1', 'Paragraphe 1', 'long', 800, 'Huit erreurs reviennent en boucle sur les chantiers de parquet. Toutes se corrigent avant la pose, aucune après. Un sens de lame mal choisi, un support mal préparé, un calepinage approximatif : des décisions de quelques minutes qui se regardent pendant quinze ans.'),
+  pourquoi('pourquoi_texte2', 'Paragraphe 2', 'long', 1000, 'Pose Parquet est un média indépendant français consacré à la pose de parquet. Le site publie des guides, des fiches de motifs et des tutoriels, et met à disposition un simulateur gratuit permettant de visualiser un parquet dans sa propre pièce. Pose Parquet ne vend pas de parquet et n’en pose pas : il oriente vers Premibel pour les références et vers Allure Design pour la pose en Île-de-France, et perçoit une rémunération à ce titre.'),
+  pourquoi('pourquoi_lien', 'Lien vers la méthode', 'texte', 60, 'Notre méthode éditoriale'),
   passerelle('passerelle_eyebrow', 'Surtitre', 'texte', 60, 'Après le choix'),
-  passerelle('passerelle_titre', 'Titre', 'texte', 120, 'Du choix du parquet à sa réalisation.'),
-  passerelle('passerelle_intro', 'Introduction', 'long', 300, 'Pose Parquet vous aide à définir votre besoin, puis vous oriente vers la bonne solution.'),
-  passerelle('premibel_titre', 'Premibel : titre', 'texte', 80, 'Trouver votre parquet'),
-  passerelle('premibel_texte', 'Premibel : texte', 'long', 300, 'Références, essences, teintes et motifs : le catalogue de parquets et le showroom de Premibel.'),
-  passerelle('premibel_cta', 'Premibel : lien', 'texte', 40, 'Découvrir les parquets', 'Mène à l’adresse générale de Premibel (Mon site → Liens commerciaux).'),
-  passerelle('allure_titre', 'Allure Design : titre', 'texte', 80, 'Faire poser ou rénover'),
-  passerelle('allure_texte', 'Allure Design : texte', 'long', 300, 'Pose de parquet, rénovation intérieure et aménagement, à Paris et en Île-de-France.'),
-  passerelle('allure_cta', 'Allure Design : lien', 'texte', 40, 'Préparer mon projet', 'Mène au formulaire projet, réglé sur la pose.'),
-  passerelle('mixte', 'Besoin mixte', 'lien', 300, 'Besoin du parquet et de la pose ? [Décrivez votre projet] : nous vous orientons vers les solutions adaptées.', 'Le texte entre crochets devient le lien vers le formulaire projet (parquet + pose).'),
+  passerelle('passerelle_titre', 'Titre', 'texte', 120, 'Où acheter son parquet, et qui peut le poser.'),
+  passerelle('passerelle_intro', 'Introduction', 'long', 300, 'Nous ne vendons pas de parquet et nous n’en posons pas. Nous vous aidons à savoir ce qu’il vous faut, puis nous vous adressons à ceux qui le font.'),
+  passerelle('premibel_titre', 'Premibel : étiquette', 'texte', 80, 'Trouver votre parquet'),
+  passerelle('premibel_sous_titre', 'Premibel : titre', 'texte', 100, 'Références, essences, teintes et motifs'),
+  passerelle('premibel_texte', 'Premibel : texte', 'long', 300, 'Le catalogue de parquets et le showroom de Premibel, notre partenaire pour les références produit.'),
+  passerelle('premibel_cta', 'Premibel : lien', 'texte', 40, 'Voir le catalogue Premibel', 'Mène à l’adresse générale de Premibel (Mon site → Liens commerciaux).'),
+  passerelle('allure_titre', 'Allure Design : étiquette', 'texte', 80, 'Faire poser ou rénover'),
+  passerelle('allure_sous_titre', 'Allure Design : titre', 'texte', 100, 'Pose de parquet à Paris et en Île-de-France'),
+  passerelle('allure_texte', 'Allure Design : texte', 'long', 300, 'Pose de parquet, rénovation intérieure et aménagement par Allure Design, notre partenaire pose en Île-de-France.'),
+  passerelle('allure_cta', 'Allure Design : lien', 'texte', 40, 'Décrire mon projet de pose', 'Mène au formulaire projet, réglé sur la pose.'),
+  passerelle('mixte', 'Besoin mixte', 'lien', 300, 'Besoin du parquet et de la pose ? [Décrivez votre projet] : nous vous orientons vers les deux.', 'Le texte entre crochets devient le lien vers le formulaire projet (parquet + pose).'),
   projet('projet_eyebrow', 'Surtitre', 'texte', 60, 'Votre projet'),
-  projet('projet_titre', 'Titre', 'texte', 120, 'Un projet à concrétiser ?'),
-  projet('projet_texte', 'Texte', 'long', 400, 'Décrivez votre pièce, votre parquet et votre besoin. Pose Parquet qualifie votre demande et vous oriente, selon le projet, vers Premibel, Allure Design ou les deux.'),
-  projet('projet_points', 'Points rassurants (un par ligne)', 'lignes', 600, ['Quatre étapes courtes, aucune coordonnée demandée.', '« Je ne sais pas » est une réponse valable partout.', 'Votre projet est qualifié selon votre besoin et votre localisation.', 'À la fin, vous êtes orienté vers Premibel, Allure Design ou les deux selon votre projet.'].join('\n')),
-  projet('projet_cta', 'Bouton principal', 'texte', 40, 'Décrire mon projet'),
-  projet('projet_cta2', 'Bouton secondaire', 'texte', 40, 'Visualiser mon parquet'),
+  projet('projet_titre', 'Titre', 'texte', 120, 'Faire poser son parquet : décrivez votre projet en 4 étapes.'),
+  projet('projet_texte', 'Texte', 'long', 400, 'Quatre questions courtes sur votre pièce, votre support et votre besoin. Aucune coordonnée demandée. À la fin, vous repartez avec une fiche projet claire — surface, support, motif, contraintes.'),
+  projet('projet_points', 'Points rassurants (un par ligne)', 'lignes', 600, ['Quatre étapes courtes, aucune coordonnée demandée.', '« Je ne sais pas » est une réponse valable partout.', 'Votre projet est qualifié selon votre besoin et votre localisation.', 'Vous repartez avec une fiche projet exploitable, même si vous faites poser ailleurs.'].join('\n')),
+  projet('projet_cta', 'Bouton principal', 'texte', 60, 'Décrire mon projet — 4 min, sans coordonnées'),
+  projet('projet_cta2', 'Bouton secondaire', 'texte', 40, 'Essayer le simulateur'),
 ];
 
 const pres = c('Présentation de Pose Parquet');
