@@ -32,7 +32,7 @@
     <link rel="manifest" href="../site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../assets/dist/site.b9c7377e33.css" />
+    <link rel="stylesheet" href="../assets/dist/site.9174dce596.css" />
     <!-- Adresse du backend, définissable au déploiement sans toucher au code.
          Script classique et non module : il s'exécute avant les modules, donc
          avant que api-config.js ne lise window.POSE_PARQUET_CONFIG. Pas
@@ -40,6 +40,7 @@
     <script src="../config.js"></script>
     <script type="module" src="../assets/dist/f40e3a8a2d/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/"},{"@type":"ListItem","position":2,"name":"Motifs"}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quel motif de parquet choisir pour une petite pièce ?","acceptedAnswer":{"@type":"Answer","text":"La diagonale et le bâton rompu agrandissent visuellement une petite pièce en cassant les lignes parallèles des murs. À l’inverse, un point de Hongrie y paraît souvent trop chargé : la pointe a besoin de longueur pour se lire. Si le budget compte, une pose droite dans le plus grand axe reste la solution la plus sûre."}},{"@type":"Question","name":"Quel motif de parquet coûte le plus cher à poser ?","acceptedAnswer":{"@type":"Answer","text":"Le point de Hongrie, pour trois raisons qui se cumulent : les lames sont coupées à l’onglet et se commandent en versions gauche et droite, le traçage ne tolère aucun écart, et les chutes sont nettement supérieures à une pose droite. Le bâton rompu offre un rendu graphique proche pour un coût de pose sensiblement moindre."}},{"@type":"Question","name":"Point de Hongrie ou bâton rompu : lequel choisir ?","acceptedAnswer":{"@type":"Answer","text":"Le point de Hongrie pour une pièce longue et dégagée, quand le budget suit et que la pointe peut filer dans l’axe. Le bâton rompu pour un rendu graphique plus accessible, plus tolérant au traçage et mieux adapté aux pièces irrégulières ou de taille moyenne."}},{"@type":"Question","name":"Combien de chutes faut-il prévoir selon le motif ?","acceptedAnswer":{"@type":"Answer","text":"Comptez de l’ordre de 5 % en pose droite, 10 % en bâton rompu et 10 à 15 % en diagonale ou en point de Hongrie : ces motifs multiplient les coupes d’angle en périphérie. Prévoyez la marge dès la commande, un complément acheté plus tard pouvant provenir d’un autre bain de teinte."}},{"@type":"Question","name":"Peut-on poser un point de Hongrie en parquet flottant ?","acceptedAnswer":{"@type":"Answer","text":"Des systèmes à clipser conçus pour ce motif existent, mais la pose collée reste la référence. Un motif en V multiplie les assemblages, et les jeux qui se cumulent en pose flottante finissent par se voir le long des pointes. Vérifiez toujours ce que le fabricant autorise pour la référence choisie."}}]}</script>
   </head>
   <body class="page">
     <a class="skip-link" href="#contenu">Aller au contenu</a>
@@ -93,75 +94,130 @@
         <div class="wrap-wide page-hero__grid">
           <div>
             <p class="eyebrow">Motifs de pose</p>
-            <h1 class="page-hero__title">Six façons de dessiner un sol</h1>
+            <h1 class="page-hero__title">Six motifs de pose de parquet, six façons de dessiner un sol</h1>
           </div>
           <p class="page-hero__lead">Le motif décide du caractère de la pièce autant que l'essence du bois. Chaque fiche détaille le rendu, les contraintes de pose, le niveau de chutes attendu — un ordre de grandeur, jamais un calcul — et les pièces adaptées.</p>
         </div>
       </header>
-
       <section class="section section--flush-top" aria-labelledby="motifs-droits">
         <div class="wrap">
-          <!--
-            DEUX FAMILLES, PAS SIX CARTES DE MÊME POIDS.
-
-            La grille alignait six fiches identiques, puis une section entière
-            reprenait deux d'entre elles pour les comparer. Les motifs se
-            rangent pourtant d'eux-mêmes : quatre façons d'orienter des lames
-            droites, et deux motifs en V qui se confondent. La seconde famille
-            porte donc la comparaison, et la section séparée disparaît.
-          -->
           <div class="motif-family">
             <div class="motif-family__head">
-              <h2 id="motifs-droits">Lames droites : choisir une direction</h2>
-              <p>Le même parquet, posé dans un sens ou un autre : c’est la direction qui allonge, élargit ou dynamise la pièce.</p>
+              <h2 id="motifs-droits">Lames droites : choisir le sens de pose</h2>
+              <p>Le même parquet, posé dans un sens ou un autre : c’est la direction des lames qui allonge, élargit ou dynamise la pièce. Elle décide aussi du nombre de coupes, donc des chutes à prévoir.</p>
             </div>
             <div class="grid grid--4 motif-family__grid">
               <a class="pattern-card" href="pose-droite.html" data-reveal>
                 <div class="pattern-card__viz" data-pattern-thumb="longueur"></div>
                 <h3>Pose droite</h3>
-                <p>Le motif de référence : sobre, économique, compatible avec tous les formats.</p>
-                <span class="mono">Chutes faibles</span>
+                <p>Toutes les lames parallèles, à joints décalés. Le motif de référence : sobre, économique, compatible avec tous les formats.</p>
+                <span class="mono">Chutes faibles · ≈ 5 %</span>
               </a>
               <a class="pattern-card" href="pose-longueur.html" data-reveal>
                 <div class="pattern-card__viz" data-pattern-thumb="longueur"></div>
                 <h3>Pose dans la longueur</h3>
-                <p>L'orientation par défaut, qui prolonge l'espace et limite les coupes.</p>
-                <span class="mono">Chutes faibles</span>
+                <p>La pose droite orientée dans le plus grand axe de la pièce. Elle prolonge l’espace et limite les coupes.</p>
+                <span class="mono">Chutes faibles · ≈ 5 %</span>
               </a>
               <a class="pattern-card" href="pose-largeur.html" data-reveal>
                 <div class="pattern-card__viz" data-pattern-thumb="largeur"></div>
                 <h3>Pose dans la largeur</h3>
-                <p>Une correction visuelle assumée pour les pièces trop longues.</p>
-                <span class="mono">Chutes faibles</span>
+                <p>La pose droite orientée en travers. Une correction visuelle assumée pour les pièces trop longues.</p>
+                <span class="mono">Chutes faibles · 5 à 8 %</span>
               </a>
               <a class="pattern-card" href="pose-diagonale.html" data-reveal>
                 <div class="pattern-card__viz" data-pattern-thumb="diagonale"></div>
                 <h3>Pose en diagonale</h3>
-                <p>Un motif qui agrandit et rattrape les murs faux — au prix de chutes sensiblement plus élevées.</p>
-                <span class="mono">Chutes élevées</span>
+                <p>Les lames à 45° des murs. Un motif qui agrandit et rattrape les murs faux — au prix de chutes sensiblement plus élevées.</p>
+                <span class="mono">Chutes élevées · 10 à 15 %</span>
               </a>
             </div>
           </div>
-
           <div class="motif-family motif-family--v" aria-labelledby="motifs-v">
             <div class="motif-family__head">
-              <h2 id="motifs-v">Les motifs en V : deux dessins souvent confondus</h2>
-              <p>Point de Hongrie et bâton rompu dessinent tous deux un V. Le premier coupe ses lames à l’onglet et file en pointe continue ; le second pose des lames droites à angle droit, en escalier.</p>
+              <h2 id="motifs-v">Point de Hongrie et bâton rompu : deux dessins souvent confondus</h2>
+              <p>Les deux dessinent un V. Le point de Hongrie coupe ses lames à l’onglet et file en pointe continue ; le bâton rompu pose des lames droites à angle droit, en escalier. Le premier coûte plus cher à poser, le second pardonne davantage au traçage.</p>
               <p><a class="link-arrow" href="../guides/point-de-hongrie-ou-baton-rompu.html">Lire le comparatif complet<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a></p>
             </div>
             <div class="grid grid--2 motif-family__grid">
               <a class="pattern-card" href="point-de-hongrie.html" data-reveal>
                 <div class="pattern-card__viz" data-pattern-thumb="point-de-hongrie"></div>
                 <h3>Point de Hongrie</h3>
-                <p>Des pointes continues, un axe impitoyable : le motif le plus exigeant.</p>
-                <span class="mono">Chutes élevées</span>
+                <p>Des lames coupées à l’onglet, des pointes continues, un axe impitoyable : le motif le plus exigeant à poser.</p>
+                <span class="mono">Chutes élevées · 10 à 15 %</span>
               </a>
               <a class="pattern-card" href="baton-rompu.html" data-reveal>
                 <div class="pattern-card__viz" data-pattern-thumb="baton-rompu"></div>
                 <h3>Bâton rompu</h3>
-                <p>Des lames droites, un rendu tressé : le motif graphique le plus accessible.</p>
-                <span class="mono">Chutes modérées</span>
+                <p>Des lames droites assemblées à angle droit, un rendu tressé : le motif graphique le plus accessible.</p>
+                <span class="mono">Chutes modérées · ≈ 10 %</span>
               </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="motifs-pieces">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Le bon motif au bon endroit</p>
+              <h2 id="motifs-pieces">Quel motif pour quelle pièce ?</h2>
+            </div>
+            <p class="lead">Le motif se choisit sur la forme de la pièce et sur la lumière, pas sur le catalogue. Trois situations couvrent la plupart des projets.</p>
+          </div>
+          <div class="situations">
+            <a class="situation" href="pose-longueur.html">
+              <span class="situation__quand">Pièce étroite, couloir, enfilade</span>
+              <h3 class="situation__titre">Lames dans la longueur</h3>
+              <p class="situation__texte">Les lames filent dans le plus grand axe : l’espace se prolonge et les coupes se raréfient. C’est aussi l’option la plus économique, en pose comme en matière.</p>
+            </a>
+            <a class="situation" href="pose-diagonale.html">
+              <span class="situation__quand">Petite pièce, murs non parallèles</span>
+              <h3 class="situation__titre">Diagonale ou bâton rompu</h3>
+              <p class="situation__texte">Casser les lignes parallèles des murs agrandit visuellement la pièce et masque un angle faux. En contrepartie, les coupes d’angle se multiplient et les chutes augmentent.</p>
+            </a>
+            <a class="situation" href="point-de-hongrie.html">
+              <span class="situation__quand">Grand séjour, pièce de caractère</span>
+              <h3 class="situation__titre">Point de Hongrie</h3>
+              <p class="situation__texte">La pointe continue guide le regard vers le fond de la pièce. Il lui faut de la longueur et un axe net pour se lire : en petite pièce, le motif paraît chargé.</p>
+            </a>
+          </div>
+          <p class="situations__note">La lumière tranche les cas ambigus. Les rayons entrent perpendiculairement au plan de la fenêtre : poser « dans le sens de la lumière » revient donc à orienter les lames perpendiculairement au mur qui porte la fenêtre, et les joints s’y remarquent beaucoup moins. <a href="../guides/quel-sens-de-pose-choisir.html">Le guide du sens de pose</a> →</p>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="motifs-faq">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Questions fréquentes</p>
+              <h2 id="motifs-faq">Choisir son motif : les questions qui reviennent</h2>
+            </div>
+            <p class="lead">Cinq arbitrages que presque tous les projets rencontrent.</p>
+          </div>
+          <div class="faq-grille">
+            <div class="faq-grille__item">
+              <h3>Quel motif de parquet choisir pour une petite pièce ?</h3>
+              <p>La diagonale et le bâton rompu agrandissent visuellement une petite pièce en cassant les lignes parallèles des murs. À l’inverse, un point de Hongrie y paraît souvent trop chargé : la pointe a besoin de longueur pour se lire. Si le budget compte, une pose droite dans le plus grand axe reste la solution la plus sûre.</p>
+            </div>
+            <div class="faq-grille__item">
+              <h3>Quel motif de parquet coûte le plus cher à poser ?</h3>
+              <p>Le point de Hongrie, pour trois raisons qui se cumulent : les lames sont coupées à l’onglet et se commandent en versions gauche et droite, le traçage ne tolère aucun écart, et les chutes sont nettement supérieures à une pose droite. Le bâton rompu offre un rendu graphique proche pour un coût de pose sensiblement moindre.</p>
+            </div>
+            <div class="faq-grille__item">
+              <h3>Point de Hongrie ou bâton rompu : lequel choisir ?</h3>
+              <p>Le point de Hongrie pour une pièce longue et dégagée, quand le budget suit et que la pointe peut filer dans l’axe. Le bâton rompu pour un rendu graphique plus accessible, plus tolérant au traçage et mieux adapté aux pièces irrégulières ou de taille moyenne.</p>
+              <p class="faq-grille__lien"><a class="link-arrow" href="../guides/point-de-hongrie-ou-baton-rompu.html">Le comparatif complet <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a></p>
+            </div>
+            <div class="faq-grille__item">
+              <h3>Combien de chutes faut-il prévoir selon le motif ?</h3>
+              <p>Comptez de l’ordre de 5 % en pose droite, 10 % en bâton rompu et 10 à 15 % en diagonale ou en point de Hongrie : ces motifs multiplient les coupes d’angle en périphérie. Prévoyez la marge dès la commande, un complément acheté plus tard pouvant provenir d’un autre bain de teinte.</p>
+            </div>
+            <div class="faq-grille__item">
+              <h3>Peut-on poser un point de Hongrie en parquet flottant ?</h3>
+              <p>Des systèmes à clipser conçus pour ce motif existent, mais la pose collée reste la référence. Un motif en V multiplie les assemblages, et les jeux qui se cumulent en pose flottante finissent par se voir le long des pointes. Vérifiez toujours ce que le fabricant autorise pour la référence choisie.</p>
+              <p class="faq-grille__lien"><a class="link-arrow" href="../tutoriels/coller-un-parquet-contrecolle.html">Coller un parquet contrecollé <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a></p>
             </div>
           </div>
         </div>
@@ -170,7 +226,7 @@
       <div class="wrap">
         <div class="cta-band" data-reveal>
           <div>
-            <h2>Un projet de pose à préparer ?</h2>
+            <h2>Faire poser son parquet : décrivez votre projet en 4 étapes</h2>
             <p>Décrivez votre pièce, votre support et le rendu recherché en quatre étapes, sans laisser vos coordonnées : vous voyez aussitôt vers qui vous tourner.</p>
           </div>
           <div class="cta-band__actions">
