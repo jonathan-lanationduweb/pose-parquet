@@ -433,6 +433,8 @@ html[data-allure-indisponible] a[href*="allure-design.com"]:not([class]) {
   align-self: center;
   flex: none;
 }
+.brand > picture { display: contents; }
+.brand > picture > source { display: none; }
 .brand__logo {
   display: block;
   align-self: center;
@@ -721,6 +723,8 @@ body[data-drawer-open="true"] { overflow: hidden; }
 }
 
 .footer__logo-lien { display: inline-block; }
+.footer__logo-lien > picture { display: contents; }
+.footer__logo-lien > picture > source { display: none; }
 .footer__logo { display: block; width: auto; height: 5.5rem; max-width: 13rem; object-fit: contain; }
 @media (max-width: 40rem) {
   .footer__logo { height: 4.5rem; max-width: 10.5rem; }

@@ -7,7 +7,7 @@ import {
   raisonIndisponible,
   messageAdaptation,
 } from '../scene/motifs-regles.js';
-import { loadImage, loadFile } from '../scene/image-loader.js';
+import { loadFile, loadSceneImage, variantesScene } from '../scene/image-loader.js';
 import { createFloorEditor, problemeCadre } from '../scene/editor.js';
 import { composeRender, downloadCanvas } from '../scene/export.js';
 import { createSceneRenderer } from '../scene/renderer.js';
@@ -70,7 +70,7 @@ export async function mountStudio(root) {
     <header class="studio__bar">
       <a class="studio__back" href="${base}" data-back>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-        ${root.dataset.logo ? `<img class="studio__logo" src="${root.dataset.logo}" alt="Pose Parquet" width="480" height="233" />` : '<span><strong>Pose</strong> Parquet</span>'}
+        ${root.dataset.logo ? `${root.dataset.logoWebp ? `<picture><source type="image/webp" srcset="${root.dataset.logoWebp}" />` : ''}<img class="studio__logo" src="${root.dataset.logo}" alt="Pose Parquet" width="480" height="233" />${root.dataset.logoWebp ? '</picture>' : ''}` : '<span><strong>Pose</strong> Parquet</span>'}
       </a>
       <h1 class="studio__project">Visualiseur Parquet<span data-project></span></h1>
       <div class="studio__tools">
@@ -540,7 +540,7 @@ const REGROUPEMENT_MS = 70;
 
 
     media.style.setProperty('--ratio', `${width} / ${height}`);
-    if (file) photo.src = `${base}assets/images/${file}`;
+    if (file) photo.src = variantesScene(base, file, window.innerWidth < 600)[0];
     if (alt) photo.alt = alt;
     root.dataset.state = 'edit';
   }
@@ -565,8 +565,7 @@ const REGROUPEMENT_MS = 70;
 
 
       const petit = window.innerWidth < 600;
-      const fichier = petit ? scene.image.file.replace(/\.jpg$/, '-1120.jpg') : scene.image.file;
-      const prepared = await loadImage(`${base}assets/images/${fichier}`).catch(() => loadImage(`${base}assets/images/${scene.image.file}`));
+      const prepared = await loadSceneImage(base, scene.image.file, petit);
       renderer.setScene(scene, prepared);
       sceneId = id;
 

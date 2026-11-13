@@ -10,6 +10,11 @@ const POLICE_TEXTE = aPrecharger('Inter');
 
 const { REGLAGES } = require('./content-site');
 const T = require('./textes');
+const { logoWebp } = require('./images-webp');
+const avecWebp = (p, chemin, img) => {
+  const webp = logoWebp(chemin);
+  return webp ? `<picture><source type="image/webp" srcset="${p}${T.attribut(webp)}" />${img}</picture>` : img;
+};
 
 const SITE = {
   get name() {
@@ -69,7 +74,7 @@ function header(p) {
 
   const [nomFort, nomSuite] = motsDuNom();
   const logo = REGLAGES.logo && REGLAGES.logo.chemin
-    ? `<img class="brand__logo" src="${p}${T.attribut(REGLAGES.logo.chemin)}" alt="" width="${REGLAGES.logo.largeur}" height="${REGLAGES.logo.hauteur}" />`
+    ? avecWebp(p, REGLAGES.logo.chemin, `<img class="brand__logo" src="${p}${T.attribut(REGLAGES.logo.chemin)}" alt="" width="${REGLAGES.logo.largeur}" height="${REGLAGES.logo.hauteur}" />`)
     : `${mark}<strong>${nomFort}</strong><span>${nomSuite}</span>`;
   const ctaProjet = REGLAGES.cta_projet_afficher
     ? `\n          <a class="header__cta" href="${p}projet/"><span>${T.texte(REGLAGES.cta_projet)}</span></a>`
@@ -143,7 +148,7 @@ function footer(p) {
         <div class="footer__top">
           <div class="footer__brand">
             ${R.logo && R.logo.chemin
-              ? `<a class="footer__logo-lien" href="${p}index.html" aria-label="${T.attribut(R.nom)}, accueil"><img class="footer__logo" src="${p}${T.attribut(R.logo.chemin)}" alt="" width="${R.logo.largeur}" height="${R.logo.hauteur}" loading="lazy" decoding="async" /></a>`
+              ? `<a class="footer__logo-lien" href="${p}index.html" aria-label="${T.attribut(R.nom)}, accueil">${avecWebp(p, R.logo.chemin, `<img class="footer__logo" src="${p}${T.attribut(R.logo.chemin)}" alt="" width="${R.logo.largeur}" height="${R.logo.hauteur}" loading="lazy" decoding="async" />`)}</a>`
               : `${symbol('footer__mark')}
             <p class="footer__wordmark">${nomFort} <span>${nomSuite}</span></p>`}
             <p class="footer__baseline">${T.texte(R.pied_presentation)}</p>
@@ -357,7 +362,7 @@ ${favicon(p, build)}
   </head>
   <body class="app${produit ? ' app--product' : ''}">
 
-    <div ${mount} role="main" id="contenu" data-base="${p}"${REGLAGES.logo && REGLAGES.logo.chemin ? ` data-logo="${p}${T.attribut(REGLAGES.logo.chemin)}"` : ''}>
+    <div ${mount} role="main" id="contenu" data-base="${p}"${REGLAGES.logo && REGLAGES.logo.chemin ? ` data-logo="${p}${T.attribut(REGLAGES.logo.chemin)}"${logoWebp(REGLAGES.logo.chemin) ? ` data-logo-webp="${p}${T.attribut(logoWebp(REGLAGES.logo.chemin))}"` : ''}` : ''}>
       <h1 class="app-loading-title">${page.h1 || page.title}</h1>
       <noscript>
         <p class="studio__noscript">Le visualiseur a besoin de JavaScript pour calculer le rendu dans votre navigateur.

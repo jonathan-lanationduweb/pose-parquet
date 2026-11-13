@@ -14,6 +14,28 @@ export function loadImage(src) {
 }
 
 
+export function variantesScene(base, file, petit = false) {
+  const dossier = `${base}assets/images/`;
+  if (!/\.jpg$/i.test(file)) return [dossier + file];
+  const racine = file.replace(/\.jpg$/i, '');
+  const taille = petit ? '1120' : '1600';
+  return [`${dossier}${racine}-${taille}.webp`, `${dossier}${racine}-${taille}.jpg`, dossier + file];
+}
+
+
+export async function loadSceneImage(base, file, petit = false) {
+  let erreur = null;
+  for (const src of variantesScene(base, file, petit)) {
+    try {
+      return { ...(await loadImage(src)), src };
+    } catch (e) {
+      erreur = e;
+    }
+  }
+  throw erreur;
+}
+
+
 export function prepare(img) {
 
 

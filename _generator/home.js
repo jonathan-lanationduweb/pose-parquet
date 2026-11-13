@@ -281,7 +281,7 @@ function apercuSquelette(id, base = '') {
               <div class="vzp__stage" data-stage>
                 <img class="vzp__photo" data-photo loading="lazy" decoding="async"
                   width="${img.width}" height="${img.height}"
-                  src="${base}assets/images/${img.file}" alt="${img.alt}" />
+                  src="${base}assets/images/${img.file.replace(/\.jpg$/, '-1600.webp')}" alt="${img.alt}" />
 
 
                 <canvas class="vzp__canvas" data-canvas aria-hidden="true"></canvas>

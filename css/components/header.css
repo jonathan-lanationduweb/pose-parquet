@@ -42,6 +42,8 @@
   align-self: center;
   flex: none;
 }
+.brand > picture { display: contents; }
+.brand > picture > source { display: none; }
 .brand__logo {
   display: block;
   align-self: center;

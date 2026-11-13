@@ -84,7 +84,7 @@ const dimensionsPng = (fichier) => {
 function logoRogne(nom, avertir) {
   const source = path.join(IMAGES, nom);
   const cible = path.join(IMAGES, `${path.basename(nom, path.extname(nom))}-rogne.png`);
-  if (!fs.existsSync(cible)) {
+  if (!fs.existsSync(cible) || !fs.existsSync(cible.replace(/\.png$/, '.webp'))) {
     const { spawnSync } = require('child_process');
     const script = path.join(__dirname, 'rogner-logo.py');
     const ok = ['python', 'python3', 'py'].some((python) => spawnSync(python, [script, source, cible], { timeout: 60000 }).status === 0);

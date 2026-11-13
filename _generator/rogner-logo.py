@@ -21,6 +21,7 @@ def rogner(source, destination):
     if rogne.width > LARGEUR_MAX:
         rogne = rogne.resize((LARGEUR_MAX, round(rogne.height * LARGEUR_MAX / rogne.width)), Image.LANCZOS)
     rogne.save(destination, 'PNG', optimize=True)
+    rogne.save(destination.rsplit('.', 1)[0] + '.webp', 'WEBP', quality=90, method=6)
     print(rogne.width, rogne.height)
 
 

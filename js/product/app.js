@@ -3,7 +3,7 @@ import { analyzeScene, loadSceneIndex, scenesBibliotheque } from '../scene/analy
 import { motifParDefaut } from '../scene/motifs-regles.js';
 import { ficheProduit, suivreClic } from '../commerce/premibel.js';
 import { emettre } from '../analytics/events.js';
-import { loadImage, loadFile } from '../scene/image-loader.js';
+import { loadFile, loadSceneImage } from '../scene/image-loader.js';
 import { createSceneRenderer } from '../scene/renderer.js';
 import { quandCartesPretes } from '../scene/material.js';
 import { loadCatalog, swatchFor } from '../studio/catalog.js';
@@ -126,7 +126,7 @@ export async function mountProduct(root) {
   root.className = 'pv';
   root.innerHTML = `
     <header class="pv__header">
-      <a class="pv__brand" href="${base}">${root.dataset.logo ? `<img class="pv__logo" src="${root.dataset.logo}" alt="Pose Parquet" width="480" height="233" />` : '<span class="pv__mark">✦</span>'}<span class="pv__name"><h1 class="pv__title">Visualiseur Parquet</h1><small>Visualisez. Imaginez. Réalisez.</small></span></a>
+      <a class="pv__brand" href="${base}">${root.dataset.logo ? `${root.dataset.logoWebp ? `<picture><source type="image/webp" srcset="${root.dataset.logoWebp}" />` : ''}<img class="pv__logo" src="${root.dataset.logo}" alt="Pose Parquet" width="480" height="233" />${root.dataset.logoWebp ? '</picture>' : ''}` : '<span class="pv__mark">✦</span>'}<span class="pv__name"><h1 class="pv__title">Visualiseur Parquet</h1><small>Visualisez. Imaginez. Réalisez.</small></span></a>
       <button class="hbtn" type="button" data-h-rooms>${svg(ICON.room)}<span>Changer de pièce</span></button>
       <button class="hbtn" type="button" data-h-fav aria-pressed="false">${heart(false)}<span>Favoris</span><span class="cnt" data-fav-count hidden>0</span></button>
       <button class="hbtn hbtn--icon" type="button" data-h-menu aria-expanded="false" aria-label="Menu">${svg(ICON.menu)}</button>
@@ -413,7 +413,7 @@ export async function mountProduct(root) {
         const stem = r.file.replace(/\.jpg$/, '');
         const on = !importee() && state.room && r.id === state.room.id;
         return `<button class="gal__card" type="button" data-room="${r.id}" aria-pressed="${on}">
-          <span class="gal__ph"><img alt="" src="${base}assets/images/${stem}-640.jpg" decoding="async" />${on ? `<span class="gal__tick">${svg(ICON.tick, 12)}</span>` : ''}</span>
+          <span class="gal__ph"><picture><source type="image/webp" srcset="${base}assets/images/${stem}-640.webp" /><img alt="" src="${base}assets/images/${stem}-640.jpg" decoding="async" /></picture>${on ? `<span class="gal__tick">${svg(ICON.tick, 12)}</span>` : ''}</span>
           <b>${txt(r.label)}</b><span>${txt(r.highlight || '')}</span></button>`;
       }).join('')}
     </div>`;
@@ -430,7 +430,7 @@ export async function mountProduct(root) {
     paintChrome();
     try {
       const scene = await analyzeScene({ sceneId: id, base });
-      const prepared = await loadImage(`${base}assets/images/${scene.image.file}`);
+      const prepared = await loadSceneImage(base, scene.image.file, window.innerWidth < 600);
       if (intent !== state.intent) return;
       renderer.setScene(scene, prepared);
       libererPhoto();
