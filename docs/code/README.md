@@ -30738,3 +30738,10 @@ Codes de sortie : 0 succ�s (WebP sur la sortie standard) ; 2 source illisible
 ou format non pris en charge ; 3 Pillow absent. Le message d&#x27;erreur va sur la
 sortie d&#x27;erreur, la synchronisation le reprend tel quel dans son rapport.
 </pre>
+
+## Logo de l'en-tête (ajout du 13 novembre 2026)
+
+- `_generator/rogner-logo.py` retire les marges transparentes (ou blanches) autour du logo téléversé dans WordPress (Mon site → Identité), garde un souffle de 2 % et réduit l'image à 480 px de large au plus. Sans ce rognage, un logo livré avec 25 % de vide autour s'affichait réduit d'autant dans l'en-tête.
+- `_generator/wordpress.js` (`logoRogne`) fabrique cette version une seule fois, sous le nom `assets/images/wp-<id>-rogne.png`, puis la réutilise. Ses dimensions sont lues dans l'en-tête du PNG. Sans Python ni Pillow, le logo d'origine est affiché tel quel et un avertissement le signale au build. Pour changer de logo, il suffit d'en téléverser un nouveau : il porte un autre identifiant, donc un autre fichier rogné.
+- `css/components/header.css` : le logo fait 4,25 rem de haut sur ordinateur et 3,4 rem sur téléphone. Sur la photo sombre de l'accueil, tant que la page n'a pas défilé, il passe en blanc (`filter: brightness(0) invert(1)`) pour rester lisible ; il reprend ses couleurs ensuite et sur toutes les autres pages.
+
