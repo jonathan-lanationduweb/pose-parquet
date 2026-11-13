@@ -68,9 +68,9 @@ export async function mountStudio(root) {
   root.dataset.sheet = 'peek';
   root.innerHTML = `
     <header class="studio__bar">
-      <a class="studio__back" href="${base}index.html" data-back>
+      <a class="studio__back" href="${base}" data-back>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-        <span><strong>Pose</strong> Parquet</span>
+        ${root.dataset.logo ? `<img class="studio__logo" src="${root.dataset.logo}" alt="Pose Parquet" width="480" height="233" />` : '<span><strong>Pose</strong> Parquet</span>'}
       </a>
       <h1 class="studio__project">Visualiseur Parquet<span data-project></span></h1>
       <div class="studio__tools">
@@ -81,8 +81,8 @@ export async function mountStudio(root) {
           <div class="studio__dropdown" data-dropdown hidden>
             <button type="button" data-fix>Délimiter le sol</button>
             <button type="button" data-advanced>Réglages avancés</button>
-            <a href="${base}outils/simulateur-pose.html">Passer au Mode Plan</a>
-            <a href="${base}outils/visualiseur.html">À propos du visualiseur</a>
+            <a href="${base}outils/simulateur-pose/">Passer au Mode Plan</a>
+            <a href="${base}outils/visualiseur/">À propos du visualiseur</a>
           </div>
         </div>
       </div>
