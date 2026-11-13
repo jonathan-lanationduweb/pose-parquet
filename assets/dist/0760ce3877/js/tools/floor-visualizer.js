@@ -557,7 +557,7 @@ export class FloorVisualizer {
     const label = svgEl('text', {
       x: (seg.x1 + seg.x2) / 2,
       y: (seg.y1 + seg.y2) / 2,
-      fill: '#4c6570',
+      fill: '#4a463f',
       stroke: '#f6f4ef',
       'stroke-width': size * 0.28,
       'stroke-linejoin': 'round',
@@ -584,7 +584,7 @@ export class FloorVisualizer {
     const arc = svgEl('path', {
       d: `M ${cx} ${cy} L ${cx + (horizontal ? swingRadius : 0)} ${cy + (horizontal ? 0 : swingRadius)} A ${swingRadius} ${swingRadius} 0 0 1 ${cx + (horizontal ? 0 : dx)} ${cy + (horizontal ? dy : 0)}`,
       fill: 'none',
-      stroke: '#6d7b84',
+      stroke: '#6e5f52',
       'stroke-width': 2,
       'stroke-dasharray': '6 5',
     });
@@ -603,14 +603,14 @@ export class FloorVisualizer {
       y1: width + offset,
       x2: length,
       y2: width + offset,
-      stroke: '#a5afb5',
+      stroke: '#b9a993',
       'stroke-width': 1.6,
     });
     const lengthLabel = svgEl('text', {
       x: length / 2,
       y: width + offset,
       dy: size * 0.95,
-      fill: '#6d7b84',
+      fill: '#6e5f52',
       'font-size': size,
       'font-family': 'ui-monospace, monospace',
       'text-anchor': 'middle',
@@ -622,14 +622,14 @@ export class FloorVisualizer {
       y1: 0,
       x2: -offset,
       y2: width,
-      stroke: '#a5afb5',
+      stroke: '#b9a993',
       'stroke-width': 1.6,
     });
     const widthLabel = svgEl('text', {
       x: -offset,
       y: width / 2,
       dy: -size * 0.4,
-      fill: '#6d7b84',
+      fill: '#6e5f52',
       'font-size': size,
       'font-family': 'ui-monospace, monospace',
       'text-anchor': 'middle',

@@ -64,13 +64,14 @@
 .toc__sub a { padding-left: calc(var(--sp-4) + 0.9rem); font-size: 0.83rem; }
 .callout {
   border-radius: var(--r-card);
-  --cl-bg: var(--c-sage-pale);
-  --cl-bd: #dfc5a3;
-  --cl-fg: var(--c-sage-deep);
+  --cl-bg: #f0e3d2;
+  --cl-bd: transparent;
+  --cl-fg: var(--accent);
   margin: var(--sp-6) 0;
   padding: var(--sp-5);
   background: var(--cl-bg);
   border: 1px solid var(--cl-bd);
+  border-left: 3px solid var(--accent);
   border-radius: var(--r-md);
 }
 .callout__label {

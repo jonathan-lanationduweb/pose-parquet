@@ -9,7 +9,7 @@
         </g>
       </g>
       <rect width="340" height="220" fill="none" stroke="#1c1e1d" stroke-width="2" />
-      <text x="170" y="254" text-anchor="middle" font-family="ui-monospace, monospace" font-size="18" fill="#6d7b84">Longueur</text>
+      <text x="170" y="254" text-anchor="middle" font-family="ui-monospace, monospace" font-size="18" fill="#6e5f52">Longueur</text>
     </g><g transform="translate(380, 20)">
       <g clip-path="url(#clip-c1)">
         <rect width="340" height="220" fill="#e6e2d9" />
@@ -18,7 +18,7 @@
         </g>
       </g>
       <rect width="340" height="220" fill="none" stroke="#1c1e1d" stroke-width="2" />
-      <text x="170" y="254" text-anchor="middle" font-family="ui-monospace, monospace" font-size="18" fill="#6d7b84">Largeur</text>
+      <text x="170" y="254" text-anchor="middle" font-family="ui-monospace, monospace" font-size="18" fill="#6e5f52">Largeur</text>
     </g><g transform="translate(740, 20)">
       <g clip-path="url(#clip-c2)">
         <rect width="340" height="220" fill="#e6e2d9" />
@@ -27,6 +27,6 @@
         </g>
       </g>
       <rect width="340" height="220" fill="none" stroke="#1c1e1d" stroke-width="2" />
-      <text x="170" y="254" text-anchor="middle" font-family="ui-monospace, monospace" font-size="18" fill="#6d7b84">Diagonale</text>
+      <text x="170" y="254" text-anchor="middle" font-family="ui-monospace, monospace" font-size="18" fill="#6e5f52">Diagonale</text>
     </g>
 </svg>
