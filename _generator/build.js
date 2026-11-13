@@ -7,6 +7,12 @@ const { MOTIFS } = require('./content-motifs');
 const { TUTOS } = require('./content-tutos');
 const { ARTICLES } = require('./content-blog');
 const { PAGES } = require('./content-pages');
+const { nombres } = require('./nombres');
+const champPage = (page) => (cle) => nombres((PAGES[page].valeurs || {})[cle]);
+const vt = champPage('tutoriels');
+const vm = champPage('motifs');
+const vg = champPage('guides');
+const outils = (texte) => T.lignes(texte).map((l) => { const i = l.indexOf(' — '); return i < 0 ? [l, ''] : [l.slice(0, i), l.slice(i + 3)]; });
 const { buildPagesLegales } = require('./pages-legales');
 const { REGLAGES } = require('./content-site');
 const T = require('./textes');
@@ -196,17 +202,17 @@ function relatedBlock(slugs, base) {
       </section>`;
 }
 
-function ctaBand(base, titre = 'Un projet de pose à préparer ?') {
+function ctaBand(base, titre) {
   return `<section class="section">
       <div class="wrap">
         <div class="cta-band" data-reveal>
           <div>
-            <h2>${titre}</h2>
-            <p>Décrivez votre pièce, votre support et le rendu recherché en quatre étapes, sans laisser vos coordonnées : vous voyez aussitôt vers qui vous tourner.</p>
+            <h2>${T.texte(titre || REGLAGES.bandeau_titre)}</h2>
+            <p>${T.texte(REGLAGES.bandeau_texte)}</p>
           </div>
           <div class="cta-band__actions">
-            <a class="btn btn--light" href="${base}projet/">Décrire mon projet</a>
-            <a class="btn btn--outline-light" href="${base}outils/studio.html">Visualiser mon parquet</a>
+            <a class="btn btn--light" href="${base}projet/">${T.texte(REGLAGES.bandeau_bouton_projet)}</a>
+            <a class="btn btn--outline-light" href="${base}outils/studio.html">${T.texte(REGLAGES.bandeau_bouton_visualiseur)}</a>
           </div>
         </div>
       </div>
@@ -419,12 +425,6 @@ function buildBlog() {
 }
 
 
-const nombresGuides = (texte) =>
-  String(texte == null ? '' : texte)
-    .replace(/\{guides\}/g, String(GUIDES.length))
-    .replace(/\{guides_lettres\}/g, enLettres(GUIDES.length))
-    .replace(/\{Guides_lettres\}/g, enLettres(GUIDES.length).replace(/^./, (c) => c.toUpperCase()));
-
 function buildGuides() {
   GUIDES.forEach((guide) => {
     const aside = asideGuide();
@@ -438,41 +438,41 @@ function buildGuides() {
   const lienGuide = (slug, repli) => (GUIDES.some((g) => g.slug === slug) ? `${slug}.html` : repli);
   const ORDRE_GUIDES = [
     {
-      titre: 'Avant de commander',
-      texte: 'Massif ou contrecollé, largeur de lame, essence, motif et sens de pose : ce qui se décide sur le papier et ne se rattrape plus une fois la commande partie.',
+      titre: vg('etape1_titre'),
+      texte: vg('etape1_texte'),
       href: lienGuide('parquet-massif-ou-contrecolle', './'),
     },
     {
-      titre: 'Avant la première lame',
-      texte: 'Planéité, humidité, ragréage, acclimatation des lames dans la pièce : la plupart des désordres viennent du support, pas du parquet.',
+      titre: vg('etape2_titre'),
+      texte: vg('etape2_texte'),
       href: lienGuide('preparer-son-sol-avant-la-pose', './'),
     },
     {
-      titre: 'Au moment de poser',
-      texte: 'Calepinage, coupes de rive, jeu de dilatation en périphérie : les gestes qui décident du rendu fini, et que les tutoriels déroulent pas à pas.',
+      titre: vg('etape3_titre'),
+      texte: vg('etape3_texte'),
       href: '../tutoriels/',
     },
   ];
   const FAQ_GUIDES = [
     {
-      q: 'Par quel guide commencer ?',
-      a: 'Par le sens de pose si la pièce est déjà choisie, par la préparation du support si le chantier est proche. Les deux se lisent en moins de vingt minutes, et ce sont les deux décisions qu’on ne reprend pas après coup.',
+      q: vg('faq1_q'),
+      a: vg('faq1_r'),
     },
     {
-      q: 'Quel parquet choisir pour un plancher chauffant ?',
-      a: 'Un contrecollé de faible épaisseur, posé collé : il transmet mieux la chaleur et bouge moins qu’un massif. Vérifiez la résistance thermique admise et le mode de pose que le fabricant autorise pour la référence retenue.',
+      q: vg('faq2_q'),
+      a: vg('faq2_r'),
     },
     {
-      q: 'Peut-on poser du parquet dans une cuisine ou une salle de bains ?',
-      a: 'En cuisine, oui, avec une finition résistante et des joints soignés près des points d’eau. En salle de bains, cela demande une essence adaptée et une pose collée étanche : le guide de préparation détaille les contrôles.',
+      q: vg('faq3_q'),
+      a: vg('faq3_r'),
     },
     {
-      q: 'Faut-il poncer un ancien parquet ou le remplacer ?',
-      a: 'Un massif se ponce plusieurs fois tant que l’épaisseur au-dessus des rainures le permet. Un contrecollé n’offre que l’épaisseur de son parement, souvent deux à quatre millimètres : au-delà, c’est un remplacement.',
+      q: vg('faq4_q'),
+      a: vg('faq4_r'),
     },
     {
-      q: 'Combien de temps prévoir entre la commande et la pose ?',
-      a: 'Comptez l’acclimatation des lames dans la pièce, 48 heures au minimum, et le séchage d’un ragréage s’il y en a un. C’est ce délai, et non la pose elle-même, qui décale le plus souvent un chantier.',
+      q: vg('faq5_q'),
+      a: vg('faq5_r'),
     },
   ];
 
@@ -484,10 +484,10 @@ function buildGuides() {
       <header class="page-hero">
         <div class="wrap-wide page-hero__grid">
           <div>
-            <p class="eyebrow">Guides</p>
+            <p class="eyebrow">${T.texte(vg('surtitre'))}</p>
             <h1 class="page-hero__title">${T.texte(PAGES['guides'].h1)}</h1>
           </div>
-          <p class="page-hero__lead">${T.texte(nombresGuides(PAGES['guides'].chapo))}</p>
+          <p class="page-hero__lead">${T.texte(nombres(PAGES['guides'].chapo))}</p>
         </div>
       </header>
 
@@ -511,7 +511,7 @@ function buildGuides() {
                   )
                   .join('\n                ')}
               </div>
-              ${tip('<p>Chaque guide se termine par un simulateur ou une checklist : de quoi passer de la lecture à la décision.</p>')}
+              ${tip(`<p>${T.texte(vg('conseil'))}</p>`)}
             </div>
           </div>
 
@@ -535,16 +535,16 @@ function buildGuides() {
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
-              <p class="eyebrow">Par où commencer</p>
-              <h2 id="guides-ordre">Dans quel ordre les lire ?</h2>
+              <p class="eyebrow">${T.texte(vg('ordre_surtitre'))}</p>
+              <h2 id="guides-ordre">${T.texte(vg('ordre_titre'))}</h2>
             </div>
-            <p class="lead">Les guides suivent l’ordre d’un chantier. Chaque étape ferme des options que la suivante ne rouvrira pas.</p>
+            <p class="lead">${T.texte(vg('ordre_intro'))}</p>
           </div>
           <div class="situations">
-            ${ORDRE_GUIDES.map((x, i) => `<a class="situation" href="${x.href}">
+            ${ORDRE_GUIDES.filter((x) => x.titre).map((x, i) => `<a class="situation" href="${x.href}">
               <span class="situation__quand">0${i + 1}</span>
-              <h3 class="situation__titre">${x.titre}</h3>
-              <p class="situation__texte">${x.texte}</p>
+              <h3 class="situation__titre">${T.texte(x.titre)}</h3>
+              <p class="situation__texte">${T.texte(x.texte)}</p>
             </a>`).join('\n            ')}
           </div>
         </div>
@@ -554,20 +554,20 @@ function buildGuides() {
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
-              <p class="eyebrow">Questions fréquentes</p>
-              <h2 id="guides-faq">Avant de choisir son parquet</h2>
+              <p class="eyebrow">${T.texte(vg('faq_surtitre'))}</p>
+              <h2 id="guides-faq">${T.texte(vg('faq_titre'))}</h2>
             </div>
-            <p class="lead">Cinq questions qui reviennent avant la lecture des guides, et les réponses courtes.</p>
+            <p class="lead">${T.texte(vg('faq_intro'))}</p>
           </div>
           <div class="faq-grille">
-            ${FAQ_GUIDES.map((x) => `<div class="faq-grille__item">
-              <h3>${x.q}</h3>
-              <p>${x.a}</p>
+            ${FAQ_GUIDES.filter((x) => x.q).map((x) => `<div class="faq-grille__item">
+              <h3>${T.texte(x.q)}</h3>
+              <p>${T.texte(x.a)}</p>
             </div>`).join('\n            ')}
           </div>
         </div>
       </section>
-      ${ctaBand('../', 'Faire poser son parquet : décrivez votre projet en 4 étapes')}`;
+      ${ctaBand('../', vg('bandeau_titre'))}`;
 
   write(
     'guides/index.html',
@@ -578,7 +578,7 @@ function buildGuides() {
       path: 'guides/index.html',
       depth: 1,
       css: ['css/pages/listing.css'],
-      jsonld: [crumbs.jsonld, faqJsonLd(FAQ_GUIDES)],
+      jsonld: [crumbs.jsonld, faqJsonLd(FAQ_GUIDES.filter((x) => x.q))],
       body,
     })
   );
@@ -648,67 +648,67 @@ function buildMotifs() {
 
 
   const CARTES_MOTIFS = {
-    'pose-droite': ['Toutes les lames parallèles, à joints décalés. Le motif de référence : sobre, économique, compatible avec tous les formats.', 'Chutes faibles · ≈ 5 %'],
-    'pose-longueur': ['La pose droite orientée dans le plus grand axe de la pièce. Elle prolonge l’espace et limite les coupes.', 'Chutes faibles · ≈ 5 %'],
-    'pose-largeur': ['La pose droite orientée en travers. Une correction visuelle assumée pour les pièces trop longues.', 'Chutes faibles · 5 à 8 %'],
-    'pose-diagonale': ['Les lames à 45° des murs. Un motif qui agrandit et rattrape les murs faux — au prix de chutes sensiblement plus élevées.', 'Chutes élevées · 10 à 15 %'],
-    'point-de-hongrie': ['Des lames coupées à l’onglet, des pointes continues, un axe impitoyable : le motif le plus exigeant à poser.', 'Chutes élevées · 10 à 15 %'],
-    'baton-rompu': ['Des lames droites assemblées à angle droit, un rendu tressé : le motif graphique le plus accessible.', 'Chutes modérées · ≈ 10 %'],
+    'pose-droite': [vm('carte_pose_droite_texte'), vm('carte_pose_droite_chutes')],
+    'pose-longueur': [vm('carte_pose_longueur_texte'), vm('carte_pose_longueur_chutes')],
+    'pose-largeur': [vm('carte_pose_largeur_texte'), vm('carte_pose_largeur_chutes')],
+    'pose-diagonale': [vm('carte_pose_diagonale_texte'), vm('carte_pose_diagonale_chutes')],
+    'point-de-hongrie': [vm('carte_point_de_hongrie_texte'), vm('carte_point_de_hongrie_chutes')],
+    'baton-rompu': [vm('carte_baton_rompu_texte'), vm('carte_baton_rompu_chutes')],
   };
   const carteMotif = (motif) => {
     const [texte, chutes] = CARTES_MOTIFS[motif.slug] || [motif.excerpt, `Chutes ${motif.stats[0][1].split(' (')[0]}`];
     return `<a class="pattern-card" href="${motif.slug}.html" data-reveal>
                 <div class="pattern-card__viz" data-pattern-thumb="${motif.pattern}"></div>
                 <h3>${motifName(motif)}</h3>
-                <p>${texte}</p>
-                <span class="mono">${chutes}</span>
+                <p>${T.texte(texte)}</p>
+                <span class="mono">${T.texte(chutes)}</span>
               </a>`;
   };
   const lienMotif = (slug) => (MOTIFS.some((m) => m.slug === slug) ? `${slug}.html` : './');
 
   const PIECES_MOTIFS = [
     {
-      quand: 'Pièce étroite, couloir, enfilade',
-      titre: 'Lames dans la longueur',
-      texte: 'Les lames filent dans le plus grand axe : l’espace se prolonge et les coupes se raréfient. C’est aussi l’option la plus économique, en pose comme en matière.',
+      quand: vm('piece1_quand'),
+      titre: vm('piece1_titre'),
+      texte: vm('piece1_texte'),
       slug: 'pose-longueur',
     },
     {
-      quand: 'Petite pièce, murs non parallèles',
-      titre: 'Diagonale ou bâton rompu',
-      texte: 'Casser les lignes parallèles des murs agrandit visuellement la pièce et masque un angle faux. En contrepartie, les coupes d’angle se multiplient et les chutes augmentent.',
+      quand: vm('piece2_quand'),
+      titre: vm('piece2_titre'),
+      texte: vm('piece2_texte'),
       slug: 'pose-diagonale',
     },
     {
-      quand: 'Grand séjour, pièce de caractère',
-      titre: 'Point de Hongrie',
-      texte: 'La pointe continue guide le regard vers le fond de la pièce. Il lui faut de la longueur et un axe net pour se lire : en petite pièce, le motif paraît chargé.',
+      quand: vm('piece3_quand'),
+      titre: vm('piece3_titre'),
+      texte: vm('piece3_texte'),
       slug: 'point-de-hongrie',
     },
   ];
 
   const FAQ_MOTIFS = [
     {
-      q: 'Quel motif de parquet choisir pour une petite pièce ?',
-      a: 'La diagonale et le bâton rompu agrandissent visuellement une petite pièce en cassant les lignes parallèles des murs. À l’inverse, un point de Hongrie y paraît souvent trop chargé : la pointe a besoin de longueur pour se lire. Si le budget compte, une pose droite dans le plus grand axe reste la solution la plus sûre.',
+      q: vm('faq1_q'),
+      a: vm('faq1_r'),
     },
     {
-      q: 'Quel motif de parquet coûte le plus cher à poser ?',
-      a: 'Le point de Hongrie, pour trois raisons qui se cumulent : les lames sont coupées à l’onglet et se commandent en versions gauche et droite, le traçage ne tolère aucun écart, et les chutes sont nettement supérieures à une pose droite. Le bâton rompu offre un rendu graphique proche pour un coût de pose sensiblement moindre.',
+      q: vm('faq2_q'),
+      a: vm('faq2_r'),
     },
     {
-      q: 'Point de Hongrie ou bâton rompu : lequel choisir ?',
-      a: 'Le point de Hongrie pour une pièce longue et dégagée, quand le budget suit et que la pointe peut filer dans l’axe. Le bâton rompu pour un rendu graphique plus accessible, plus tolérant au traçage et mieux adapté aux pièces irrégulières ou de taille moyenne.',
-      lien: ['../guides/point-de-hongrie-ou-baton-rompu.html', 'Le comparatif complet'],
+      q: vm('faq3_q'),
+      a: vm('faq3_r'),
+      lien: ['../guides/point-de-hongrie-ou-baton-rompu.html', vm('faq3_lien')],
     },
     {
-      q: 'Combien de chutes faut-il prévoir selon le motif ?',
-      a: 'Comptez de l’ordre de 5 % en pose droite, 10 % en bâton rompu et 10 à 15 % en diagonale ou en point de Hongrie : ces motifs multiplient les coupes d’angle en périphérie. Prévoyez la marge dès la commande, un complément acheté plus tard pouvant provenir d’un autre bain de teinte.',
+      q: vm('faq4_q'),
+      a: vm('faq4_r'),
     },
     {
-      q: 'Peut-on poser un point de Hongrie en parquet flottant ?',
-      a: 'Des systèmes à clipser conçus pour ce motif existent, mais la pose collée reste la référence. Un motif en V multiplie les assemblages, et les jeux qui se cumulent en pose flottante finissent par se voir le long des pointes. Vérifiez toujours ce que le fabricant autorise pour la référence choisie.',
-      lien: ['../tutoriels/coller-un-parquet-contrecolle.html', 'Coller un parquet contrecollé'],
+      q: vm('faq5_q'),
+      a: vm('faq5_r'),
+      lien: ['../tutoriels/coller-un-parquet-contrecolle.html', vm('faq5_lien')],
     },
   ];
 
@@ -716,7 +716,7 @@ function buildMotifs() {
       <header class="page-hero">
         <div class="wrap-wide page-hero__grid">
           <div>
-            <p class="eyebrow">Motifs de pose</p>
+            <p class="eyebrow">${T.texte(vm('surtitre'))}</p>
             <h1 class="page-hero__title">${T.texte(PAGES['motifs'].h1)}</h1>
           </div>
           <p class="page-hero__lead">${T.texte(PAGES['motifs'].chapo)}</p>
@@ -726,8 +726,8 @@ function buildMotifs() {
         <div class="wrap">
           <div class="motif-family">
             <div class="motif-family__head">
-              <h2 id="motifs-droits">Lames droites : choisir le sens de pose</h2>
-              <p>Le même parquet, posé dans un sens ou un autre : c’est la direction des lames qui allonge, élargit ou dynamise la pièce. Elle décide aussi du nombre de coupes, donc des chutes à prévoir.</p>
+              <h2 id="motifs-droits">${T.texte(vm('famille1_titre'))}</h2>
+              <p>${T.texte(vm('famille1_texte'))}</p>
             </div>
             <div class="grid grid--4 motif-family__grid">
               ${MOTIFS.filter((m) => !MOTIFS_EN_V.includes(m.slug)).map(carteMotif).join('\n              ')}
@@ -735,9 +735,9 @@ function buildMotifs() {
           </div>
           <div class="motif-family motif-family--v" aria-labelledby="motifs-v">
             <div class="motif-family__head">
-              <h2 id="motifs-v">Point de Hongrie et bâton rompu : deux dessins souvent confondus</h2>
-              <p>Les deux dessinent un V. Le point de Hongrie coupe ses lames à l’onglet et file en pointe continue ; le bâton rompu pose des lames droites à angle droit, en escalier. Le premier coûte plus cher à poser, le second pardonne davantage au traçage.</p>
-              <p>${linkArrow('../guides/point-de-hongrie-ou-baton-rompu.html', 'Lire le comparatif complet')}</p>
+              <h2 id="motifs-v">${T.texte(vm('famille2_titre'))}</h2>
+              <p>${T.texte(vm('famille2_texte'))}</p>
+              <p>${linkArrow('../guides/point-de-hongrie-ou-baton-rompu.html', vm('famille2_lien'))}</p>
             </div>
             <div class="grid grid--2 motif-family__grid">
               ${MOTIFS.filter((m) => MOTIFS_EN_V.includes(m.slug)).map(carteMotif).join('\n              ')}
@@ -750,19 +750,19 @@ function buildMotifs() {
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
-              <p class="eyebrow">Le bon motif au bon endroit</p>
-              <h2 id="motifs-pieces">Quel motif pour quelle pièce ?</h2>
+              <p class="eyebrow">${T.texte(vm('pieces_surtitre'))}</p>
+              <h2 id="motifs-pieces">${T.texte(vm('pieces_titre'))}</h2>
             </div>
-            <p class="lead">Le motif se choisit sur la forme de la pièce et sur la lumière, pas sur le catalogue. Trois situations couvrent la plupart des projets.</p>
+            <p class="lead">${T.texte(vm('pieces_intro'))}</p>
           </div>
           <div class="situations">
-            ${PIECES_MOTIFS.map((x) => `<a class="situation" href="${lienMotif(x.slug)}">
-              <span class="situation__quand">${x.quand}</span>
-              <h3 class="situation__titre">${x.titre}</h3>
-              <p class="situation__texte">${x.texte}</p>
+            ${PIECES_MOTIFS.filter((x) => x.titre).map((x) => `<a class="situation" href="${lienMotif(x.slug)}">
+              <span class="situation__quand">${T.texte(x.quand)}</span>
+              <h3 class="situation__titre">${T.texte(x.titre)}</h3>
+              <p class="situation__texte">${T.texte(x.texte)}</p>
             </a>`).join('\n            ')}
           </div>
-          <p class="situations__note">La lumière tranche les cas ambigus. Les rayons entrent perpendiculairement au plan de la fenêtre : poser « dans le sens de la lumière » revient donc à orienter les lames perpendiculairement au mur qui porte la fenêtre, et les joints s’y remarquent beaucoup moins. <a href="../guides/quel-sens-de-pose-choisir.html">Le guide du sens de pose</a> →</p>
+          <p class="situations__note">${T.lien(vm('pieces_note'), '../guides/quel-sens-de-pose-choisir.html')}</p>
         </div>
       </section>
 
@@ -770,21 +770,21 @@ function buildMotifs() {
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
-              <p class="eyebrow">Questions fréquentes</p>
-              <h2 id="motifs-faq">Choisir son motif : les questions qui reviennent</h2>
+              <p class="eyebrow">${T.texte(vm('faq_surtitre'))}</p>
+              <h2 id="motifs-faq">${T.texte(vm('faq_titre'))}</h2>
             </div>
-            <p class="lead">Cinq arbitrages que presque tous les projets rencontrent.</p>
+            <p class="lead">${T.texte(vm('faq_intro'))}</p>
           </div>
           <div class="faq-grille">
-            ${FAQ_MOTIFS.map((x) => `<div class="faq-grille__item">
-              <h3>${x.q}</h3>
-              <p>${x.a}</p>${x.lien ? `
-              <p class="faq-grille__lien"><a class="link-arrow" href="${x.lien[0]}">${x.lien[1]} ${ICON.arrow}</a></p>` : ''}
+            ${FAQ_MOTIFS.filter((x) => x.q).map((x) => `<div class="faq-grille__item">
+              <h3>${T.texte(x.q)}</h3>
+              <p>${T.texte(x.a)}</p>${x.lien && x.lien[1] ? `
+              <p class="faq-grille__lien"><a class="link-arrow" href="${x.lien[0]}">${T.texte(x.lien[1])} ${ICON.arrow}</a></p>` : ''}
             </div>`).join('\n            ')}
           </div>
         </div>
       </section>
-      ${ctaBand('../', 'Faire poser son parquet : décrivez votre projet en 4 étapes')}`;
+      ${ctaBand('../', vm('bandeau_titre'))}`;
   write(
     'motifs/index.html',
     layout({
@@ -793,7 +793,7 @@ function buildMotifs() {
       path: 'motifs/index.html',
       depth: 1,
       css: ['css/pages/listing.css'],
-      jsonld: [crumbs.jsonld, faqJsonLd(FAQ_MOTIFS)],
+      jsonld: [crumbs.jsonld, faqJsonLd(FAQ_MOTIFS.filter((x) => x.q))],
       body,
     })
   );
@@ -850,80 +850,67 @@ function buildTutos() {
 
 
   const ACCROCHES = {
-    'poser-un-parquet-flottant': 'Le tutoriel de référence : sous-couche, jeu de dilatation, coupes de périphérie et plinthes, avec les points de contrôle à chaque étape.',
-    'coller-un-parquet-contrecolle': 'La pose la plus stable et la plus silencieuse, compatible plancher chauffant.',
-    'reussir-le-calepinage': 'Le traçage qui décide de tout : axes, coupes de rive, départ du motif.',
+    'poser-un-parquet-flottant': vt('accroche_flottant'),
+    'coller-un-parquet-contrecolle': vt('accroche_colle'),
+    'reussir-le-calepinage': vt('accroche_calepinage'),
   };
   const accroche = (t) => ACCROCHES[t.slug] || t.excerpt;
   const lienTuto = (slug) => (TUTOS.some((t) => t.slug === slug) ? `${slug}.html` : './');
 
   const SITUATIONS = [
     {
-      quand: 'Sol neuf, ragréé ou carrelage sain',
-      titre: 'Pose flottante',
-      texte: 'La plus rapide et la plus accessible. Les lames se clipsent sans adhérer au support : rien n’est définitif, et c’est la seule pose réaliste sans expérience.',
+      quand: vt('situation1_quand'),
+      titre: vt('situation1_titre'),
+      texte: vt('situation1_texte'),
       slug: 'poser-un-parquet-flottant',
     },
     {
-      quand: 'Plancher chauffant, grande surface, confort acoustique',
-      titre: 'Pose collée',
-      texte: 'Plus stable, plus silencieuse, sans jeu entre les lames et meilleure conductrice de chaleur. En contrepartie, elle ne pardonne aucune improvisation.',
+      quand: vt('situation2_quand'),
+      titre: vt('situation2_titre'),
+      texte: vt('situation2_texte'),
       slug: 'coller-un-parquet-contrecolle',
     },
     {
-      quand: 'Point de Hongrie, bâton rompu ou diagonale',
-      titre: 'Calepinage d’abord',
-      texte: 'Un motif en V ou en biais se trace avant de se poser. Une heure de traçage évite deux jours de rattrapage, quel que soit le mode de pose retenu.',
+      quand: vt('situation3_quand'),
+      titre: vt('situation3_titre'),
+      texte: vt('situation3_texte'),
       slug: 'reussir-le-calepinage',
     },
   ];
 
   const REPERES = [
-    ['L’outillage réellement nécessaire', 'Maillet, cale de frappe, tire-lame, cales de dilatation : ce qu’il faut sortir avant de commencer, et ce dont on peut se passer.'],
-    ['Le déroulé du chantier', 'Les étapes dans l’ordre, de la sous-couche aux plinthes, avec ce qui se joue à chacune.'],
-    ['Les points de contrôle', 'Ce qu’il faut vérifier avant de passer à la suite, tant que c’est encore rattrapable.'],
-    ['Les erreurs coûteuses', 'Celles qui obligent à déposer : jeu de dilatation oublié, support mal préparé, lames mal réparties.'],
+    [vt('repere1_titre'), vt('repere1_texte')],
+    [vt('repere2_titre'), vt('repere2_texte')],
+    [vt('repere3_titre'), vt('repere3_texte')],
+    [vt('repere4_titre'), vt('repere4_texte')],
   ];
 
-  const OUTILS_COMMUNS = [
-    ['Mètre, équerre et crayon de menuisier', 'pour le traçage et le report des coupes'],
-    ['Règle de deux mètres', 'pour contrôler la planéité du support'],
-    ['Cales de dilatation', 'pour tenir le jeu en périphérie'],
-    ['Maillet blanc et cale de frappe', 'pour assembler sans marquer la lame'],
-    ['Tire-lame', 'pour les dernières rangées, contre le mur'],
-    ['Scie', 'sauteuse, circulaire ou égoïne selon l’épaisseur'],
-  ];
-  const OUTILS_SELON = [
-    ['Sous-couche et bande périphérique', 'pose flottante'],
-    ['Spatule crantée et colle adaptée', 'pose collée'],
-    ['Cordeau ou laser de traçage', 'motifs en V et diagonale'],
-    ['Scie à araser', 'pour passer sous les huisseries'],
-    ['Genouillères', 'un chantier de 20 m² se fait à genoux'],
-  ];
+  const OUTILS_COMMUNS = outils(vt('outillage_communs'));
+  const OUTILS_SELON = outils(vt('outillage_selon'));
   const listeOutils = (items) => `<ul class="outillage__liste">
-                ${items.map(([nom, detail]) => `<li><strong>${nom}</strong> — ${detail}</li>`).join('\n                ')}
+                ${items.map(([nom, detail]) => `<li><strong>${T.texte(nom)}</strong>${detail ? ` — ${T.texte(detail)}` : ''}</li>`).join('\n                ')}
               </ul>`;
 
   const FAQ_TUTOS = [
     {
-      q: 'Peut-on poser un parquet soi-même ?',
-      a: 'Une pose flottante en lames droites est à la portée d’un bricoleur méthodique : les lames se clipsent et rien n’est définitif. La pose collée et les motifs en V demandent de l’expérience, parce qu’une erreur de traçage ou d’encollage ne se rattrape plus une fois la colle prise.',
+      q: vt('faq1_q'),
+      a: vt('faq1_r'),
     },
     {
-      q: 'Combien de temps faut-il pour poser 20 m² de parquet ?',
-      a: 'Comptez environ une journée en pose flottante et un à deux jours en pose collée, auxquels s’ajoute la préparation du support — souvent le poste le plus long. Un motif en point de Hongrie peut doubler ce temps.',
+      q: vt('faq2_q'),
+      a: vt('faq2_r'),
     },
     {
-      q: 'Quel outillage faut-il pour poser un parquet flottant ?',
-      a: 'Un mètre, une équerre, un crayon, des cales de dilatation, un maillet blanc avec sa cale de frappe, un tire-lame pour les dernières rangées et une scie. Une règle de deux mètres sert à contrôler la planéité du support avant de commencer.',
+      q: vt('faq3_q'),
+      a: vt('faq3_r'),
     },
     {
-      q: 'Faut-il laisser le parquet s’acclimater avant la pose ?',
-      a: 'Oui. Les paquets restent fermés dans la pièce où le parquet sera posé, à température d’usage, 48 heures au minimum — davantage pour du massif. Poser des lames qui n’ont pas atteint l’hygrométrie du logement expose à des jeux ou à des tuilages.',
+      q: vt('faq4_q'),
+      a: vt('faq4_r'),
     },
     {
-      q: 'Quel jeu de dilatation laisser en périphérie ?',
-      a: 'De l’ordre de 8 à 10 mm contre chaque mur et autour de tout point fixe — tuyaux, huisseries, seuils — davantage sur les grandes largeurs. Les plinthes le masquent ensuite. C’est l’oubli qui oblige le plus souvent à tout déposer.',
+      q: vt('faq5_q'),
+      a: vt('faq5_r'),
     },
   ];
 
@@ -934,7 +921,7 @@ function buildTutos() {
       <header class="page-hero">
         <div class="wrap-wide page-hero__grid">
           <div>
-            <p class="eyebrow">Tutoriels</p>
+            <p class="eyebrow">${T.texte(vt('surtitre'))}</p>
             <h1 class="page-hero__title">${T.texte(PAGES['tutoriels'].h1)}</h1>
           </div>
           <p class="page-hero__lead">${T.texte(PAGES['tutoriels'].chapo)}</p>
@@ -943,19 +930,19 @@ function buildTutos() {
 
       <section class="section section--flush-top" aria-labelledby="tuto-liste">
         <div class="wrap">
-          <h2 class="visually-hidden" id="tuto-liste">Tous les tutoriels</h2>
+          <h2 class="visually-hidden" id="tuto-liste">${T.texte(vt('liste_titre'))}</h2>
           <div class="listing-featured">
             <article class="feature-card${aUneCouverture(une.slug) ? '' : ' feature-card--attente'}" data-reveal>
               ${aUneCouverture(une.slug) ? picture(`cover-${une.slug}`, { base: '../', alt: '', sizes: '(min-width: 60rem) 45rem, 94vw', priority: true }) : ''}
               <p class="eyebrow">${une.level} · ${une.duration}</p>
               <h2><a href="${une.slug}.html">${une.h1}</a></h2>
-              <p>${accroche(une)}</p>
+              <p>${T.texte(accroche(une))}</p>
             </article>
             <div class="listing-side">
               <div class="cluster-list cluster-list--accroche">
-                ${autres.map((x) => `<a href="${x.slug}.html"><strong>${x.h1}</strong><span>${x.level} · ${x.duration}</span><em>${accroche(x)}</em></a>`).join('\n                ')}
+                ${autres.map((x) => `<a href="${x.slug}.html"><strong>${x.h1}</strong><span>${x.level} · ${x.duration}</span><em>${T.texte(accroche(x))}</em></a>`).join('\n                ')}
               </div>
-              ${tip('<p>Avant de poser, vérifiez la planéité et l’humidité du support : c’est la cause de la plupart des désordres. Laissez aussi les lames s’acclimater dans la pièce, paquets fermés, 48 heures au minimum. <a href="../guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a>.</p>')}
+              ${tip(`<p>${T.lien(vt('conseil'), '../guides/preparer-son-sol-avant-la-pose.html')}</p>`)}
             </div>
           </div>
         </div>
@@ -965,19 +952,19 @@ function buildTutos() {
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
-              <p class="eyebrow">Par où commencer</p>
-              <h2 id="tuto-choix">Quel tutoriel pour quel chantier ?</h2>
+              <p class="eyebrow">${T.texte(vt('choix_surtitre'))}</p>
+              <h2 id="tuto-choix">${T.texte(vt('choix_titre'))}</h2>
             </div>
-            <p class="lead">Le choix se fait sur le support et sur le motif, pas sur le parquet. Trois situations couvrent la grande majorité des chantiers.</p>
+            <p class="lead">${T.texte(vt('choix_intro'))}</p>
           </div>
           <div class="situations">
-            ${SITUATIONS.map((x) => `<a class="situation" href="${lienTuto(x.slug)}">
-              <span class="situation__quand">${x.quand}</span>
-              <h3 class="situation__titre">${x.titre}</h3>
-              <p class="situation__texte">${x.texte}</p>
+            ${SITUATIONS.filter((x) => x.titre).map((x) => `<a class="situation" href="${lienTuto(x.slug)}">
+              <span class="situation__quand">${T.texte(x.quand)}</span>
+              <h3 class="situation__titre">${T.texte(x.titre)}</h3>
+              <p class="situation__texte">${T.texte(x.texte)}</p>
             </a>`).join('\n            ')}
           </div>
-          <p class="situations__note">Poser sur un carrelage existant est possible en pose flottante, si le support est sain, adhérent et suffisamment plan — <a href="../guides/preparer-son-sol-avant-la-pose.html">voir le guide de préparation du sol</a>.</p>
+          <p class="situations__note">${T.lien(vt('choix_note'), '../guides/preparer-son-sol-avant-la-pose.html')}</p>
         </div>
       </section>
 
@@ -985,13 +972,13 @@ function buildTutos() {
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
-              <p class="eyebrow">Ce que vous trouverez</p>
-              <h2 id="tuto-methode">Un tutoriel de pose, quatre repères</h2>
+              <p class="eyebrow">${T.texte(vt('reperes_surtitre'))}</p>
+              <h2 id="tuto-methode">${T.texte(vt('reperes_titre'))}</h2>
             </div>
-            <p class="lead">Tous suivent la même trame, pour que vous puissiez travailler avec la page ouverte à côté de vous.</p>
+            <p class="lead">${T.texte(vt('reperes_intro'))}</p>
           </div>
           <ol class="steps-grid">
-            ${REPERES.map(([titre, texte], i) => `<li><span class="steps-grid__num">0${i + 1}</span><strong>${titre}</strong><span>${texte}</span></li>`).join('\n            ')}
+            ${REPERES.filter(([titre]) => titre).map(([titre, texte], i) => `<li><span class="steps-grid__num">0${i + 1}</span><strong>${T.texte(titre)}</strong><span>${T.texte(texte)}</span></li>`).join('\n            ')}
           </ol>
         </div>
       </section>
@@ -1000,22 +987,22 @@ function buildTutos() {
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
-              <p class="eyebrow">Avant d’ouvrir le premier paquet</p>
-              <h2 id="tuto-outillage">L’outillage à prévoir</h2>
+              <p class="eyebrow">${T.texte(vt('outillage_surtitre'))}</p>
+              <h2 id="tuto-outillage">${T.texte(vt('outillage_titre'))}</h2>
             </div>
-            <p class="lead">Rien d’exotique, mais rien d’optionnel non plus : la moitié des reprises viennent d’un outil manquant qu’on a remplacé par un autre.</p>
+            <p class="lead">${T.texte(vt('outillage_intro'))}</p>
           </div>
           <div class="outillage">
             <div>
-              <h3 class="outillage__titre">Indispensable, quelle que soit la pose</h3>
+              <h3 class="outillage__titre">${T.texte(vt('outillage_communs_titre'))}</h3>
               ${listeOutils(OUTILS_COMMUNS)}
             </div>
             <div>
-              <h3 class="outillage__titre">En plus, selon le type de pose</h3>
+              <h3 class="outillage__titre">${T.texte(vt('outillage_selon_titre'))}</h3>
               ${listeOutils(OUTILS_SELON)}
             </div>
           </div>
-          <p class="outillage__note">Le détail, format par format, figure au début de chaque tutoriel.</p>
+          <p class="outillage__note">${T.texte(vt('outillage_note'))}</p>
         </div>
       </section>
 
@@ -1026,12 +1013,12 @@ function buildTutos() {
               ${apercuSquelette('chambre', '../')}
             </div>
             <div class="tool-block__body">
-              <p class="tool-block__num">Avant de commencer</p>
-              <h2 class="tool-block__title" id="tuto-outil">Voir le résultat avant de couper la première lame</h2>
-              <p class="lead">Le sens de pose et le motif se décident sur le papier, mais se jugent à l’œil. Essayez-les sur une photo de votre pièce : le rendu est calculé dans votre navigateur, votre photo n’est ni envoyée ni conservée.</p>
+              <p class="tool-block__num">${T.texte(vt('apercu_surtitre'))}</p>
+              <h2 class="tool-block__title" id="tuto-outil">${T.texte(vt('apercu_titre'))}</h2>
+              <p class="lead">${T.texte(vt('apercu_texte'))}</p>
               <div class="cluster">
-                <a class="btn" href="../outils/visualiseur.html">Visualiser mon parquet</a>
-                <a class="link-arrow" href="../guides/">Lire les guides</a>
+                <a class="btn" href="../outils/visualiseur.html">${T.texte(vt('apercu_bouton'))}</a>
+                <a class="link-arrow" href="../guides/">${T.texte(vt('apercu_lien'))}</a>
               </div>
             </div>
           </div>
@@ -1042,20 +1029,20 @@ function buildTutos() {
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
-              <p class="eyebrow">Questions fréquentes</p>
-              <h2 id="tuto-faq">Poser soi-même : les questions qui reviennent</h2>
+              <p class="eyebrow">${T.texte(vt('faq_surtitre'))}</p>
+              <h2 id="tuto-faq">${T.texte(vt('faq_titre'))}</h2>
             </div>
-            <p class="lead">Cinq points qui décident souvent si l’on pose soi-même ou si l’on fait appel à un professionnel.</p>
+            <p class="lead">${T.texte(vt('faq_intro'))}</p>
           </div>
           <div class="faq-grille">
-            ${FAQ_TUTOS.map((x) => `<div class="faq-grille__item">
-              <h3>${x.q}</h3>
-              <p>${x.a}</p>
+            ${FAQ_TUTOS.filter((x) => x.q).map((x) => `<div class="faq-grille__item">
+              <h3>${T.texte(x.q)}</h3>
+              <p>${T.texte(x.a)}</p>
             </div>`).join('\n            ')}
           </div>
         </div>
       </section>
-      ${ctaBand('../', 'Faire poser son parquet : décrivez votre projet en 4 étapes')}`;
+      ${ctaBand('../', vt('bandeau_titre'))}`;
 
   write(
     'tutoriels/index.html',
@@ -1066,7 +1053,7 @@ function buildTutos() {
       path: 'tutoriels/index.html',
       depth: 1,
       css: ['css/pages/listing.css'],
-      jsonld: [crumbs.jsonld, faqJsonLd(FAQ_TUTOS)],
+      jsonld: [crumbs.jsonld, faqJsonLd(FAQ_TUTOS.filter((x) => x.q))],
       body,
     })
   );

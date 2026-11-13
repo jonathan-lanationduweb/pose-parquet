@@ -117,7 +117,8 @@ function valeurChamp(def, v, avertir, lieu) {
     }
     return { chemin: `assets/images/${nom}`, type: TYPES_IMAGE[path.extname(nom)] || 'image/png', largeur: v.largeur || 0, hauteur: v.hauteur || 0 };
   }
-  return typeof v === 'string' && v.trim() ? v : undefined;
+  if (typeof v === 'string' && !v.trim()) return def.masquable ? '' : undefined;
+  return typeof v === 'string' ? v : undefined;
 }
 
 

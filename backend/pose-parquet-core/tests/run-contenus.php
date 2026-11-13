@@ -174,7 +174,7 @@ $verifie( 'clé hors schéma ignorée', ! array_key_exists( 'intrus', $v ) );
 
 $accueil = get_posts( [ 'post_type' => Types::PAGE, 'meta_key' => '_pp_cle', 'meta_value' => 'accueil', 'fields' => 'ids', 'posts_per_page' => 1 ] );
 $a_propos = get_posts( [ 'post_type' => Types::PAGE, 'meta_key' => '_pp_cle', 'meta_value' => 'a-propos', 'fields' => 'ids', 'posts_per_page' => 1 ] );
-$verifie( 'accueil : 29 champs importés (hero, pourquoi, passerelle, projet)', $accueil && count( Export::schema_page( get_post( (int) $accueil[0] ) ) ) === 29 );
+$verifie( 'accueil : 93 champs importés (toutes les sections)', $accueil && count( Export::schema_page( get_post( (int) $accueil[0] ) ) ) === 93 );
 $verifie( 'À propos : champs structurés, plus de corps libre', $a_propos && count( Export::schema_page( get_post( (int) $a_propos[0] ) ) ) === 20 && get_post_meta( (int) $a_propos[0], '_pp_corps_editable', true ) === '0' );
 $export = Export::donnees();
 $pages  = array_column( $export['pages'], null, 'cle' );
