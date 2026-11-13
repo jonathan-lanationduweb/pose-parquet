@@ -3006,6 +3006,7 @@ body[data-drawer-open="true"] { overflow: hidden; }
 .faq-grille__item { padding-top: var(--sp-4); border-top: 1px solid var(--line); }
 .faq-grille__item h3 { margin: 0 0 0.5rem; font-family: var(--font-sans); font-size: var(--fs-base, 1rem); font-weight: 600; line-height: 1.4; }
 .faq-grille__item p { margin: 0; font-size: var(--fs-sm); line-height: 1.6; color: var(--text-soft); }
+.faq-grille__item .faq-grille__lien { margin-top: var(--sp-2); }
 
 /* Gabarit éditorial : guide, tutoriel, page motif */
 .article-header {

@@ -613,48 +613,98 @@ function buildMotifs() {
 
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'Motifs' }]);
   const MOTIFS_EN_V = ['point-de-hongrie', 'baton-rompu'];
-  const carteMotif = (motif) => `<a class="pattern-card" href="${motif.slug}.html" data-reveal>
+  /* Maquette du 14/11/2026 (pose-parquet-page-motifs.pdf) : la phrase et le
+     niveau de chutes affichés sur la carte, propres à cette page. */
+  const CARTES_MOTIFS = {
+    'pose-droite': ['Toutes les lames parallèles, à joints décalés. Le motif de référence : sobre, économique, compatible avec tous les formats.', 'Chutes faibles · ≈ 5 %'],
+    'pose-longueur': ['La pose droite orientée dans le plus grand axe de la pièce. Elle prolonge l’espace et limite les coupes.', 'Chutes faibles · ≈ 5 %'],
+    'pose-largeur': ['La pose droite orientée en travers. Une correction visuelle assumée pour les pièces trop longues.', 'Chutes faibles · 5 à 8 %'],
+    'pose-diagonale': ['Les lames à 45° des murs. Un motif qui agrandit et rattrape les murs faux — au prix de chutes sensiblement plus élevées.', 'Chutes élevées · 10 à 15 %'],
+    'point-de-hongrie': ['Des lames coupées à l’onglet, des pointes continues, un axe impitoyable : le motif le plus exigeant à poser.', 'Chutes élevées · 10 à 15 %'],
+    'baton-rompu': ['Des lames droites assemblées à angle droit, un rendu tressé : le motif graphique le plus accessible.', 'Chutes modérées · ≈ 10 %'],
+  };
+  const carteMotif = (motif) => {
+    const [texte, chutes] = CARTES_MOTIFS[motif.slug] || [motif.excerpt, `Chutes ${motif.stats[0][1].split(' (')[0]}`];
+    return `<a class="pattern-card" href="${motif.slug}.html" data-reveal>
                 <div class="pattern-card__viz" data-pattern-thumb="${motif.pattern}"></div>
                 <h3>${motifName(motif)}</h3>
-                <p>${motif.excerpt}</p>
-                <span class="mono">Chutes ${motif.stats[0][1].split(' (')[0]}</span>
+                <p>${texte}</p>
+                <span class="mono">${chutes}</span>
               </a>`;
+  };
+  const lienMotif = (slug) => (MOTIFS.some((m) => m.slug === slug) ? `${slug}.html` : './');
+
+  const PIECES_MOTIFS = [
+    {
+      quand: 'Pièce étroite, couloir, enfilade',
+      titre: 'Lames dans la longueur',
+      texte: 'Les lames filent dans le plus grand axe : l’espace se prolonge et les coupes se raréfient. C’est aussi l’option la plus économique, en pose comme en matière.',
+      slug: 'pose-longueur',
+    },
+    {
+      quand: 'Petite pièce, murs non parallèles',
+      titre: 'Diagonale ou bâton rompu',
+      texte: 'Casser les lignes parallèles des murs agrandit visuellement la pièce et masque un angle faux. En contrepartie, les coupes d’angle se multiplient et les chutes augmentent.',
+      slug: 'pose-diagonale',
+    },
+    {
+      quand: 'Grand séjour, pièce de caractère',
+      titre: 'Point de Hongrie',
+      texte: 'La pointe continue guide le regard vers le fond de la pièce. Il lui faut de la longueur et un axe net pour se lire : en petite pièce, le motif paraît chargé.',
+      slug: 'point-de-hongrie',
+    },
+  ];
+
+  const FAQ_MOTIFS = [
+    {
+      q: 'Quel motif de parquet choisir pour une petite pièce ?',
+      a: 'La diagonale et le bâton rompu agrandissent visuellement une petite pièce en cassant les lignes parallèles des murs. À l’inverse, un point de Hongrie y paraît souvent trop chargé : la pointe a besoin de longueur pour se lire. Si le budget compte, une pose droite dans le plus grand axe reste la solution la plus sûre.',
+    },
+    {
+      q: 'Quel motif de parquet coûte le plus cher à poser ?',
+      a: 'Le point de Hongrie, pour trois raisons qui se cumulent : les lames sont coupées à l’onglet et se commandent en versions gauche et droite, le traçage ne tolère aucun écart, et les chutes sont nettement supérieures à une pose droite. Le bâton rompu offre un rendu graphique proche pour un coût de pose sensiblement moindre.',
+    },
+    {
+      q: 'Point de Hongrie ou bâton rompu : lequel choisir ?',
+      a: 'Le point de Hongrie pour une pièce longue et dégagée, quand le budget suit et que la pointe peut filer dans l’axe. Le bâton rompu pour un rendu graphique plus accessible, plus tolérant au traçage et mieux adapté aux pièces irrégulières ou de taille moyenne.',
+      lien: ['../guides/point-de-hongrie-ou-baton-rompu.html', 'Le comparatif complet'],
+    },
+    {
+      q: 'Combien de chutes faut-il prévoir selon le motif ?',
+      a: 'Comptez de l’ordre de 5 % en pose droite, 10 % en bâton rompu et 10 à 15 % en diagonale ou en point de Hongrie : ces motifs multiplient les coupes d’angle en périphérie. Prévoyez la marge dès la commande, un complément acheté plus tard pouvant provenir d’un autre bain de teinte.',
+    },
+    {
+      q: 'Peut-on poser un point de Hongrie en parquet flottant ?',
+      a: 'Des systèmes à clipser conçus pour ce motif existent, mais la pose collée reste la référence. Un motif en V multiplie les assemblages, et les jeux qui se cumulent en pose flottante finissent par se voir le long des pointes. Vérifiez toujours ce que le fabricant autorise pour la référence choisie.',
+      lien: ['../tutoriels/coller-un-parquet-contrecolle.html', 'Coller un parquet contrecollé'],
+    },
+  ];
+
   const body = `      ${crumbs.html}
       <header class="page-hero">
         <div class="wrap-wide page-hero__grid">
           <div>
             <p class="eyebrow">Motifs de pose</p>
-            <h1 class="page-hero__title">${PAGES['motifs'].h1}</h1>
+            <h1 class="page-hero__title">${T.texte(PAGES['motifs'].h1)}</h1>
           </div>
-          <p class="page-hero__lead">${PAGES['motifs'].chapo}</p>
+          <p class="page-hero__lead">${T.texte(PAGES['motifs'].chapo)}</p>
         </div>
       </header>
-
       <section class="section section--flush-top" aria-labelledby="motifs-droits">
         <div class="wrap">
-          <!--
-            DEUX FAMILLES, PAS SIX CARTES DE MÊME POIDS.
-
-            La grille alignait six fiches identiques, puis une section entière
-            reprenait deux d'entre elles pour les comparer. Les motifs se
-            rangent pourtant d'eux-mêmes : quatre façons d'orienter des lames
-            droites, et deux motifs en V qui se confondent. La seconde famille
-            porte donc la comparaison, et la section séparée disparaît.
-          -->
           <div class="motif-family">
             <div class="motif-family__head">
-              <h2 id="motifs-droits">Lames droites : choisir une direction</h2>
-              <p>Le même parquet, posé dans un sens ou un autre : c’est la direction qui allonge, élargit ou dynamise la pièce.</p>
+              <h2 id="motifs-droits">Lames droites : choisir le sens de pose</h2>
+              <p>Le même parquet, posé dans un sens ou un autre : c’est la direction des lames qui allonge, élargit ou dynamise la pièce. Elle décide aussi du nombre de coupes, donc des chutes à prévoir.</p>
             </div>
             <div class="grid grid--4 motif-family__grid">
               ${MOTIFS.filter((m) => !MOTIFS_EN_V.includes(m.slug)).map(carteMotif).join('\n              ')}
             </div>
           </div>
-
           <div class="motif-family motif-family--v" aria-labelledby="motifs-v">
             <div class="motif-family__head">
-              <h2 id="motifs-v">Les motifs en V : deux dessins souvent confondus</h2>
-              <p>Point de Hongrie et bâton rompu dessinent tous deux un V. Le premier coupe ses lames à l’onglet et file en pointe continue ; le second pose des lames droites à angle droit, en escalier.</p>
+              <h2 id="motifs-v">Point de Hongrie et bâton rompu : deux dessins souvent confondus</h2>
+              <p>Les deux dessinent un V. Le point de Hongrie coupe ses lames à l’onglet et file en pointe continue ; le bâton rompu pose des lames droites à angle droit, en escalier. Le premier coûte plus cher à poser, le second pardonne davantage au traçage.</p>
               <p>${linkArrow('../guides/point-de-hongrie-ou-baton-rompu.html', 'Lire le comparatif complet')}</p>
             </div>
             <div class="grid grid--2 motif-family__grid">
@@ -663,9 +713,46 @@ function buildMotifs() {
           </div>
         </div>
       </section>
-      ${ctaBand('../')}`;
 
+      <section class="section" aria-labelledby="motifs-pieces">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Le bon motif au bon endroit</p>
+              <h2 id="motifs-pieces">Quel motif pour quelle pièce ?</h2>
+            </div>
+            <p class="lead">Le motif se choisit sur la forme de la pièce et sur la lumière, pas sur le catalogue. Trois situations couvrent la plupart des projets.</p>
+          </div>
+          <div class="situations">
+            ${PIECES_MOTIFS.map((x) => `<a class="situation" href="${lienMotif(x.slug)}">
+              <span class="situation__quand">${x.quand}</span>
+              <h3 class="situation__titre">${x.titre}</h3>
+              <p class="situation__texte">${x.texte}</p>
+            </a>`).join('\n            ')}
+          </div>
+          <p class="situations__note">La lumière tranche les cas ambigus. Les rayons entrent perpendiculairement au plan de la fenêtre : poser « dans le sens de la lumière » revient donc à orienter les lames perpendiculairement au mur qui porte la fenêtre, et les joints s’y remarquent beaucoup moins. <a href="../guides/quel-sens-de-pose-choisir.html">Le guide du sens de pose</a> →</p>
+        </div>
+      </section>
 
+      <section class="section" aria-labelledby="motifs-faq">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Questions fréquentes</p>
+              <h2 id="motifs-faq">Choisir son motif : les questions qui reviennent</h2>
+            </div>
+            <p class="lead">Cinq arbitrages que presque tous les projets rencontrent.</p>
+          </div>
+          <div class="faq-grille">
+            ${FAQ_MOTIFS.map((x) => `<div class="faq-grille__item">
+              <h3>${x.q}</h3>
+              <p>${x.a}</p>${x.lien ? `
+              <p class="faq-grille__lien"><a class="link-arrow" href="${x.lien[0]}">${x.lien[1]} ${ICON.arrow}</a></p>` : ''}
+            </div>`).join('\n            ')}
+          </div>
+        </div>
+      </section>
+      ${ctaBand('../', 'Faire poser son parquet : décrivez votre projet en 4 étapes')}`;
   write(
     'motifs/index.html',
     layout({
@@ -674,7 +761,7 @@ function buildMotifs() {
       path: 'motifs/index.html',
       depth: 1,
       css: ['css/pages/listing.css'],
-      jsonld: [crumbs.jsonld],
+      jsonld: [crumbs.jsonld, faqJsonLd(FAQ_MOTIFS)],
       body,
     })
   );
