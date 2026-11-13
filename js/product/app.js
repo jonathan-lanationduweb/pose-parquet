@@ -126,7 +126,7 @@ export async function mountProduct(root) {
   root.className = 'pv';
   root.innerHTML = `
     <header class="pv__header">
-      <a class="pv__brand" href="${base}index.html"><span class="pv__mark">✦</span><span class="pv__name"><h1 class="pv__title">Visualiseur Parquet</h1><small>Visualisez. Imaginez. Réalisez.</small></span></a>
+      <a class="pv__brand" href="${base}">${root.dataset.logo ? `<img class="pv__logo" src="${root.dataset.logo}" alt="Pose Parquet" width="480" height="233" />` : '<span class="pv__mark">✦</span>'}<span class="pv__name"><h1 class="pv__title">Visualiseur Parquet</h1><small>Visualisez. Imaginez. Réalisez.</small></span></a>
       <button class="hbtn" type="button" data-h-rooms>${svg(ICON.room)}<span>Changer de pièce</span></button>
       <button class="hbtn" type="button" data-h-fav aria-pressed="false">${heart(false)}<span>Favoris</span><span class="cnt" data-fav-count hidden>0</span></button>
       <button class="hbtn hbtn--icon" type="button" data-h-menu aria-expanded="false" aria-label="Menu">${svg(ICON.menu)}</button>
@@ -187,8 +187,8 @@ export async function mountProduct(root) {
       <button class="mi" type="button" data-menu-import>Importer une photo</button>
       <button class="mi" type="button" data-menu-rooms>Choisir une pièce</button>
       <div class="sepm"></div>
-      <a class="mi" href="${base}outils/studio.html">Ouvrir le Studio complet</a>
-      <a class="mi" href="${base}outils/visualiseur.html">À propos du visualiseur</a>
+      <a class="mi" href="${base}outils/studio/">Ouvrir le Studio complet</a>
+      <a class="mi" href="${base}outils/visualiseur/">À propos du visualiseur</a>
     </div>`;
 
   const $ = (sel) => qs(sel, root);
