@@ -58,6 +58,7 @@
    "description": "Lumière, longueur de la pièce, circulation : découvrez les critères pour choisir le bon sens de pose de votre parquet.",
    "categorie": "Sens de pose",
    "date": "2026-08-24",
+   "modifie": "2026-11-13",
    "resume": "Cinq critères suffisent à trancher, et ils ne se valent pas. Voici l'ordre dans lequel les regarder.",
    "intro": "Le sens de pose se décide avant la première lame et ne se rattrape pas. Cinq critères permettent de trancher dans presque toutes les situations : la lumière, les proportions de la pièce, la circulation, le support et le motif retenu.",
    "lecture": "9 min",
@@ -130,6 +131,7 @@
    "description": "Faut-il poser le parquet dans le sens de la lumière ? Comprenez l'effet des fenêtres sur l'orientation des lames.",
    "categorie": "Sens de pose",
    "date": "2026-08-20",
+   "modifie": "2026-11-13",
    "resume": "La règle la plus citée du parquet. Encore faut-il savoir ce qu'elle recouvre et quand elle cesse d'être vraie.",
    "intro": "« Poser dans le sens de la lumière » est la règle la plus répétée du parquet. Elle repose sur un phénomène optique très concret, mais elle connaît des exceptions qu'il vaut mieux identifier avant de commander les lames.",
    "lecture": "6 min",
@@ -202,6 +204,7 @@
    "description": "Planéité, humidité, nettoyage et ragréage : découvrez comment préparer votre support avant de poser un parquet.",
    "categorie": "Préparation",
    "date": "2026-08-18",
+   "modifie": "2026-11-13",
    "resume": "La plupart des désordres viennent du support, pas du parquet. Voici les contrôles à mener avant la première lame.",
    "intro": "Un parquet ne corrige jamais les défauts du sol sur lequel il est posé : il les révèle. La préparation du support représente l'essentiel du travail invisible d'un chantier réussi.",
    "lecture": "10 min",
@@ -274,6 +277,7 @@
    "description": "Comparez le point de Hongrie et le bâton rompu : forme des lames, rendu esthétique, contraintes de pose et techniques.",
    "categorie": "Motifs",
    "date": "2026-08-14",
+   "modifie": "2026-11-13",
    "resume": "Une coupe d'onglet sépare ces deux motifs. Elle change le rendu, le prix et la pose.",
    "intro": "On les confond souvent, alors qu'un seul détail les sépare : la coupe des extrémités. Ce détail change le dessin au sol, la mise en œuvre et le budget.",
    "lecture": "7 min",
@@ -346,6 +350,7 @@
    "description": "Support mal préparé, mauvais sens de pose, humidité : découvrez les erreurs fréquentes avant la pose d'un parquet.",
    "categorie": "Préparation",
    "date": "2026-08-10",
+   "modifie": "2026-11-13",
    "resume": "Huit erreurs reviennent en boucle sur les chantiers. Toutes se corrigent avant la pose, aucune après.",
    "intro": "Les erreurs coûteuses ne se produisent pas pendant la pose, mais dans les jours qui la précèdent. Voici les huit plus fréquentes, dans l'ordre où elles surviennent.",
    "lecture": "8 min",
@@ -418,6 +423,7 @@
    "description": "Massif ou contrecollé ? Comparez la structure, la stabilité, les techniques de pose et les contraintes de chaque parquet.",
    "categorie": "Comprendre",
    "date": "2026-08-06",
+   "modifie": "2026-11-13",
    "resume": "Le débat porte rarement sur le bon terrain : ce qui change vraiment, c'est la stabilité dimensionnelle.",
    "intro": "Massif et contrecollé sont deux parquets à part entière : dans les deux cas, la couche visible est en bois noble. Ce qui les sépare tient à leur structure, et donc à leur comportement une fois posés.",
    "lecture": "8 min",
@@ -490,6 +496,7 @@
    "description": "Pose en longueur ou en largeur ? Découvrez comment orienter les lames dans un couloir selon sa forme et la lumière.",
    "categorie": "Sens de pose",
    "date": "2026-08-02",
+   "modifie": "2026-11-13",
    "resume": "Le couloir est le seul espace où la règle de la lumière passe au second plan.",
    "intro": "Un couloir est un espace de passage, étroit et souvent peu éclairé. La question du sens de pose s'y résout autrement que dans une pièce de vie.",
    "lecture": "5 min",
@@ -558,6 +565,7 @@
    "description": "Comment orienter un parquet dans une pièce longue ou étroite ? Découvrez les effets visuels des différentes poses.",
    "categorie": "Sens de pose",
    "date": "2026-07-29",
+   "modifie": "2026-11-13",
    "resume": "Poser dans la largeur élargit vraiment — à condition d'en accepter les coupes.",
    "intro": "Dans une pièce dont la longueur dépasse 1,6 fois la largeur, le sens de pose devient un outil de correction visuelle. Encore faut-il mesurer ce que l'on gagne et ce que l'on paie.",
    "lecture": "5 min",
@@ -628,6 +636,7 @@
    "description": "Découvrez les étapes pour poser un parquet flottant : préparation du sol, sous-couche, assemblage des lames et finitions.",
    "categorie": "Tutoriel",
    "date": "2026-08-16",
+   "modifie": "2026-11-13",
    "resume": "Le tutoriel de référence : de la sous-couche aux plinthes, avec les points de contrôle.",
    "intro": "La pose flottante est la plus accessible : les lames s'emboîtent sans être fixées au support. Sa réussite tient entièrement à la préparation et au calepinage.",
    "lecture": "9 min",
@@ -696,6 +705,7 @@
    "description": "Apprenez les étapes de la pose collée d'un parquet contrecollé : préparation du support, encollage et mise en place des lames.",
    "categorie": "Tutoriel",
    "date": "2026-08-16",
+   "modifie": "2026-11-13",
    "resume": "La pose la plus stable et la plus silencieuse — et la moins tolérante à l'improvisation.",
    "intro": "La pose collée en plein offre la meilleure stabilité, le meilleur confort acoustique et la compatibilité avec le chauffage au sol. En contrepartie, elle ne pardonne aucune approximation.",
    "lecture": "8 min",
@@ -729,6 +739,7 @@
    "description": "Apprenez à réaliser un calepinage de parquet : calcul des rangées, alignement des lames et anticipation des découpes.",
    "categorie": "Tutoriel",
    "date": "2026-08-16",
+   "modifie": "2026-11-13",
    "resume": "Une heure de traçage évite deux jours de rattrapage.",
    "intro": "Le calepinage est le plan de pose : il fixe l'axe de départ, la répartition des coupes et le nombre de lames. Il se trace au sol, avant la première lame.",
    "lecture": "6 min",
@@ -1237,6 +1248,7 @@
  "pages": [
   {
    "cle": "accueil",
+   "modifie": "2026-11-13",
    "adresse": "/",
    "h1": null,
    "chapo": null,
@@ -1342,6 +1354,7 @@
   },
   {
    "cle": "a-propos",
+   "modifie": "2026-11-13",
    "adresse": "/a-propos/",
    "h1": "Un média pratique sur la pose du parquet",
    "chapo": "Pose Parquet documente ce qui se décide avant la première lame : le support, le sens, le motif, la méthode.",
@@ -1374,6 +1387,7 @@
   },
   {
    "cle": "methode-editoriale",
+   "modifie": "2026-11-13",
    "adresse": "/a-propos/methode-editoriale.html",
    "h1": "Notre méthode éditoriale",
    "chapo": "Comment les contenus de ce site sont écrits, vérifiés et corrigés — et ce que nous ne prétendons pas être.",
@@ -1418,6 +1432,7 @@
   },
   {
    "cle": "guides",
+   "modifie": "2026-11-13",
    "adresse": "/guides/",
    "h1": "Guides de pose de parquet : comprendre avant de poser",
    "chapo": "Choix du parquet, préparation du support, sens de pose, motifs et finitions. {Guides_lettres} guides écrits pour être utiles sur le chantier, pas pour remplir une page — chacun se lit en moins de dix minutes.",
@@ -1455,6 +1470,7 @@
   },
   {
    "cle": "tutoriels",
+   "modifie": "2026-11-13",
    "adresse": "/tutoriels/",
    "h1": "Poser son parquet soi-même : le geste, étape par étape",
    "chapo": "Des déroulés de chantier détaillés : l'outillage nécessaire, les étapes dans l'ordre, les points de contrôle et les erreurs qui coûtent cher. De la pose flottante à la pose collée.",
@@ -1524,6 +1540,7 @@
   },
   {
    "cle": "inspiration",
+   "modifie": "2026-11-13",
    "adresse": "/inspiration/",
    "h1": "Des sols, des directions, des ambiances",
    "chapo": "Une sélection d’ambiances, classées par motif et par type de pièce : la légende donne le motif et la teinte que la photographie montre. Chaque pièce calibrée s’ouvre dans le Studio — sur cette photographie même — pour y essayer d’autres parquets.",
@@ -1534,6 +1551,7 @@
   },
   {
    "cle": "outils",
+   "modifie": "2026-11-13",
    "adresse": "/outils/",
    "h1": "Une boîte à outils, pas une brochure",
    "chapo": "Deux outils disponibles, gratuits, sans inscription : voir un parquet dans sa pièce, puis comparer les sens de pose sur un plan à l’échelle.",
@@ -1544,6 +1562,7 @@
   },
   {
    "cle": "contact",
+   "modifie": "2026-11-13",
    "adresse": "/contact/",
    "h1": "Nous écrire",
    "chapo": "Une question sur un contenu, une erreur à corriger, ou un chantier à préparer : chaque demande a son chemin, et les retours de terrain sont bienvenus.",
@@ -1568,6 +1587,7 @@
   },
   {
    "cle": "motifs",
+   "modifie": "2026-11-13",
    "adresse": "/motifs/",
    "h1": "Six motifs de pose de parquet, six façons de dessiner un sol",
    "chapo": "Le motif décide du caractère de la pièce autant que l'essence du bois. Chaque fiche détaille le rendu, les contraintes de pose, le niveau de chutes attendu — un ordre de grandeur, jamais un calcul — et les pièces adaptées.",
@@ -1627,6 +1647,7 @@
   },
   {
    "cle": "visualiseur",
+   "modifie": "2026-11-13",
    "adresse": "/outils/visualiseur.html",
    "h1": "Visualisez votre parquet dans votre pièce.",
    "chapo": "",
@@ -1637,6 +1658,7 @@
   },
   {
    "cle": "studio",
+   "modifie": "2026-11-13",
    "adresse": "/outils/studio.html",
    "h1": null,
    "chapo": null,
@@ -1647,6 +1669,7 @@
   },
   {
    "cle": "simulateur",
+   "modifie": "2026-11-13",
    "adresse": "/outils/simulateur-pose.html",
    "h1": "Une pièce. Plusieurs directions.",
    "chapo": "Vue du dessus, à l'échelle : renseignez vos dimensions, placez la fenêtre et l'entrée, comparez les motifs. Les quantités affichées sont des estimations indicatives.",
@@ -1657,6 +1680,7 @@
   },
   {
    "cle": "projet",
+   "modifie": "2026-11-13",
    "adresse": "/projet/",
    "h1": "Décrivez votre projet",
    "chapo": "Quelques informations suffisent à comprendre un chantier : la pièce, le support, le rendu recherché et le délai.",
@@ -1667,6 +1691,7 @@
   },
   {
    "cle": "blog",
+   "modifie": "2026-11-05",
    "adresse": "/blog/",
    "h1": "Le blog",
    "chapo": "Actualités, retours de chantier et réponses aux questions qui reviennent souvent.",
@@ -1677,6 +1702,7 @@
   },
   {
    "cle": "motif-pose-droite",
+   "modifie": "2026-11-13",
    "adresse": "/motifs/pose-droite.html",
    "h1": "La pose droite",
    "chapo": "Lames parallèles à un mur, joints décalés d'une rangée à l'autre : la pose droite est le motif le plus répandu, et le plus économique en matière et en temps.",
@@ -1687,6 +1713,7 @@
   },
   {
    "cle": "motif-pose-longueur",
+   "modifie": "2026-11-13",
    "adresse": "/motifs/pose-longueur.html",
    "h1": "La pose dans la longueur",
    "chapo": "Poser dans la longueur consiste à aligner les lames sur le grand côté de la pièce. C'est l'orientation la plus fréquente, et souvent la plus économe en coupes.",
@@ -1697,6 +1724,7 @@
   },
   {
    "cle": "motif-pose-largeur",
+   "modifie": "2026-11-13",
    "adresse": "/motifs/pose-largeur.html",
    "h1": "La pose dans la largeur",
    "chapo": "Poser dans la largeur revient à traverser la pièce. Le regard bute sur les lignes de joints, ce qui raccourcit visuellement l'espace.",
@@ -1707,6 +1735,7 @@
   },
   {
    "cle": "motif-pose-diagonale",
+   "modifie": "2026-11-13",
    "adresse": "/motifs/pose-diagonale.html",
    "h1": "La pose en diagonale",
    "chapo": "La pose en diagonale reprend le principe de la pose droite, mais à 45° des murs. Le regard n'a plus de ligne de référence : la pièce paraît plus large et les murs non parallèles se font oublier.",
@@ -1717,6 +1746,7 @@
   },
   {
    "cle": "motif-point-de-hongrie",
+   "modifie": "2026-11-13",
    "adresse": "/motifs/point-de-hongrie.html",
    "h1": "Le Point de Hongrie",
    "chapo": "Le Point de Hongrie assemble des lames coupées en biais à leurs extrémités — le plus souvent à 45°, parfois à 30° ou 60°. Les pointes se rejoignent en colonnes parfaitement alignées : c'est ce qui le distingue du bâton rompu.",
@@ -1727,6 +1757,7 @@
   },
   {
    "cle": "motif-baton-rompu",
+   "modifie": "2026-11-13",
    "adresse": "/motifs/baton-rompu.html",
    "h1": "Le bâton rompu",
    "chapo": "Le bâton rompu assemble des lames droites, bout contre chant, à angle droit. Le dessin forme des décrochés en escalier, très reconnaissables.",
@@ -1737,6 +1768,7 @@
   },
   {
    "cle": "mentions-legales",
+   "modifie": "2026-11-13",
    "adresse": "/mentions-legales/",
    "h1": "Mentions légales",
    "chapo": "Qui édite ce site, qui l’héberge, et à qui appartiennent ses contenus.",
@@ -1764,6 +1796,7 @@
   },
   {
    "cle": "confidentialite",
+   "modifie": "2026-11-13",
    "adresse": "/confidentialite/",
    "h1": "Confidentialité et cookies",
    "chapo": "Ce que ce site enregistre, pourquoi, combien de temps, et vos droits. En bref : pas de cookie de mesure ni de publicité, et un formulaire qui ne demande ni nom, ni email, ni téléphone.",
@@ -1790,6 +1823,7 @@
   },
   {
    "cle": "plan-du-site",
+   "modifie": "2026-11-13",
    "adresse": "/plan-du-site/",
    "h1": "Plan du site",
    "chapo": "Toutes les pages de Pose Parquet, rubrique par rubrique.",

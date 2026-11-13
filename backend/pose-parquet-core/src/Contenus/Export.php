@@ -123,6 +123,7 @@ final class Export {
 			'description' => self::meta( $p, Champs::META_DESCRIPTION ),
 			'categorie'   => is_array( $termes ) && $termes ? $termes[0]->name : '',
 			'date'        => mysql2date( 'Y-m-d', $p->post_date, false ),
+			'modifie'     => mysql2date( 'Y-m-d', $p->post_modified, false ),
 			'resume'      => wp_strip_all_tags( (string) $p->post_excerpt ),
 			'intro'       => self::meta( $p, Champs::INTRO ),
 			'lecture'     => self::meta( $p, '_pp_lecture' ),
@@ -180,6 +181,7 @@ final class Export {
 		$corps    = $editable ? Html::medias( Html::corps( $p ), $medias ) : null;
 		$out      = [
 			'cle'         => self::meta( $p, '_pp_cle' ),
+			'modifie'     => mysql2date( 'Y-m-d', $p->post_modified, false ),
 			'adresse'     => self::meta( $p, '_pp_adresse' ),
 
 
