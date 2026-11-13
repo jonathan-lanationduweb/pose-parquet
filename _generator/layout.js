@@ -199,7 +199,7 @@ function footer(p) {
 function favicon(p, build) {
   const f = REGLAGES.favicon;
   if (f && f.chemin) return `    <link rel="icon" href="${p}${T.attribut(f.chemin)}" type="${T.attribut(f.type)}" />`;
-  return `    <link rel="icon" href="${p}assets/icons/favicon.svg?v=${build.icons}" type="image/svg+xml" />
+  return `    <link rel="icon" href="${p}assets/icons/favicon-48.png?v=${build.icons}" sizes="48x48" type="image/png" />
     <link rel="icon" href="${p}assets/icons/favicon-32.png?v=${build.icons}" sizes="32x32" type="image/png" />
     <link rel="icon" href="${p}assets/icons/favicon-16.png?v=${build.icons}" sizes="16x16" type="image/png" />`;
 }
