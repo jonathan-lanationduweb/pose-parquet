@@ -191,7 +191,7 @@ body[data-drawer-open="true"] .header__cta { display: none; }
 
 .drawer__footer { display: grid; gap: var(--sp-3); }
 .drawer__footer .btn { width: 100%; }
-.drawer__meta { font-size: var(--fs-sm); color: #9aa79c; }
+.drawer__meta { font-size: var(--fs-sm); color: #b39f86; }
 
 body[data-drawer-open="true"] { overflow: hidden; }
 

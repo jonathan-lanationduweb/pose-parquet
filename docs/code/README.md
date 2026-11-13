@@ -30753,3 +30753,23 @@ sortie d&#x27;erreur, la synchronisation le reprend tel quel dans son rapport.
 - À relancer seulement si le symbole change ; le build ne régénère pas les icônes. `_generator/make-icons.js` (ancien symbole à trois lames) n'est plus utilisé.
 - Un favicon téléversé dans WordPress (Mon site → Identité → Favicon) reste prioritaire sur ces icônes.
 
+## Couleurs (13 novembre 2026)
+
+Palette reprise de la maquette « pose-parquet-accueil-nouveau-logo.pdf », valeurs lues dans le PDF lui-même. Les noms des variables de `css/tokens.css` sont restés (`--c-sage`, `--c-slate`…) pour ne rien casser ; seules leurs valeurs ont changé.
+
+| Rôle | Couleur |
+| --- | --- |
+| Fond de page | `#f4ede4` |
+| Fond alterné | `#fbf8f4` |
+| Cartes | `#fffdfa` |
+| Section minérale | `#eceadf` |
+| Texte | `#262321` |
+| Texte doux | `#4a463f` |
+| Texte discret | `#6e5f52` |
+| Sections sombres | `#1b1a18` |
+| Accent (brun du logo) | `#89562b` |
+| Cartes « quatre décisions » (bois, du clair au foncé) | `#f3e6d6`, `#ebd8bf`, `#dfc5a3`, `#cda87f` |
+| Traits | `#e3d7c7`, `#cbb89f` |
+
+Contrastes vérifiés (WCAG AA, 4,5:1 minimum) : texte 13,4:1, texte discret 5,3:1, accent 5,3:1, blanc sur accent 6,1:1. Sur la carte la plus foncée (`#cda87f`), le texte passe en `#403d38` (4,9:1).
+

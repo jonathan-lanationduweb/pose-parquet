@@ -264,7 +264,7 @@ function layout(page) {
 
     <meta name="robots" content="${page.robots || 'index, follow'}" />
     <link rel="canonical" href="${canonical}" />
-    <meta name="theme-color" content="#f2efe8" />
+    <meta name="theme-color" content="#f4ede4" />
     <meta property="og:type" content="${page.ogType || 'website'}" />
     <meta property="og:site_name" content="${SITE.name}" />
     <meta property="og:locale" content="fr_FR" />
