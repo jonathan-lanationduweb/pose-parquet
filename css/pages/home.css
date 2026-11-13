@@ -171,3 +171,5 @@
 #pourquoi .section-head__row { align-items: start; }
 
 .entry--clay .entry__num, .entry--clay .entry__text { color: var(--c-ink-2); }
+
+.section--orientation { background: var(--bg-alt); }

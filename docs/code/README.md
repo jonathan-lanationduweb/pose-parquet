@@ -30783,3 +30783,20 @@ Tous les textes ajoutés depuis les maquettes PDF sont des champs de « Pose Par
 - Listes : une ligne par élément ; outillage et légendes au format « Nom — précision ».
 - Aucun HTML n'est accepté dans ces champs : un export qui en contient est refusé en entier et le site reste tel qu'il était.
 
+## Palette « chêne » (13 novembre 2026, remplace le tableau précédent)
+
+| Rôle | Couleur |
+| --- | --- |
+| Fond de page | `#fbf8f4` |
+| Sections alternées (`.section--alt`, « Où acheter », pied de page) | `#f4ede4` |
+| Section Visualiseur, encadrés latéraux (`.section--mineral`, `--c-mineral`) | `#eadfd2` |
+| Bandeaux sombres (`--bg-invert`) | `#262321` |
+| Texte | `#262321` |
+| Texte discret | `#6e5f52` |
+| Traits | `rgba(38, 35, 33, 0.14)` et `rgba(38, 35, 33, 0.3)` |
+| Accent / accent vif | `#89562b` / `#c69463` |
+| Encadré « Conseil » | fond `#f0e3d2`, filet gauche 3 px `#89562b` |
+| Quatre décisions (étapes 1 à 4) | `#f3e6d6`, `#ebd8bf`, `#dfc5a3`, `#cda87f` |
+
+Plus aucune couleur froide dans le CSS ni dans les dessins (Mode Plan, schémas des guides, Studio, galerie), à une exception volontaire : la vitre des fenêtres (`#7aa7b8`) dans les plans, qui doit se lire comme une vitre. Contrastes WCAG AA vérifiés sur chaque fond (minimum 4,7:1).
+

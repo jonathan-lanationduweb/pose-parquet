@@ -1,5 +1,5 @@
 .site-footer {
-  background: var(--bg);
+  background: var(--bg-alt);
   border-top: 1px solid var(--line);
   padding-block: clamp(2rem, 1.4rem + 2vw, 3rem) clamp(1rem, 0.8rem + 0.6vw, 1.5rem);
 }

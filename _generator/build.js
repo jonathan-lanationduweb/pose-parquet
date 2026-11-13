@@ -91,7 +91,7 @@ function proportionsFigure() {
         </g>
       </g>
       <rect width="${w}" height="${h}" fill="none" stroke="#1c1e1d" stroke-width="2" />
-      <text x="${w / 2}" y="${h + 34}" text-anchor="middle" font-family="ui-monospace, monospace" font-size="18" fill="#6d7b84">${cell.caption}</text>
+      <text x="${w / 2}" y="${h + 34}" text-anchor="middle" font-family="ui-monospace, monospace" font-size="18" fill="#6e5f52">${cell.caption}</text>
     </g>`
     )
     .join('')}
