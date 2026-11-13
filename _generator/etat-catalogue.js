@@ -1,21 +1,3 @@
-/**
- * État du catalogue Premibel, publié pour l'administration WordPress.
- *
- *   node _generator/build.js  →  data/catalogue-etat.json
- *
- * WordPress (Pose Parquet → Catalogue Premibel) le LIT sur le site public : il
- * ne synchronise rien et ne modifie aucun produit. Le catalogue reste piloté
- * par `node _generator/sync-premibel.js`, puis le build.
- *
- * Les chiffres viennent des modules qui font foi — aucune règle n'est
- * réécrite ici :
- *   - statuts de rendu EFFECTIFS (profils de matière appliqués) : catalogue.js ;
- *   - rapport de la dernière synchronisation : data/products.premibel.json ;
- *   - photos partagées entre références : vignettes-qualite.js, comme
- *     check-catalogue-premibel.js.
- *
- * Déterministe (aucune date de build) : même source, mêmes octets.
- */
 const fs = require('fs');
 const path = require('path');
 
@@ -32,7 +14,7 @@ function etatCatalogue() {
   const statuts = { ready: 0, approximate: 0, unavailable: 0 };
   for (const f of fiches) statuts[f.visualStatus] = (statuts[f.visualStatus] || 0) + 1;
 
-  // Photos partagées : même calcul que check-catalogue-premibel.js.
+
   const actives = (doc.produits || []).filter((p) => p.active !== false);
   const index = JSON.parse(fs.readFileSync(path.join(__dirname, 'premibel-thumbs.json'), 'utf8'));
   const ecartees = new Set(actives.filter((p) => p.thumbnailIssue === 'placeholder').map((p) => p.sku));

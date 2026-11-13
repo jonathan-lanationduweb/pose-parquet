@@ -1,27 +1,18 @@
-/* =========================================================
-   Design tokens — Pose Parquet
-   Direction : éditorial graphique, blocs pleine largeur,
-   très grande typographie serif, aplats minéraux.
-   ========================================================= */
-
 :root {
-  /* ---- Couleurs de base ---- */
-  --c-bone:        #f2efe8; /* blanc cassé, fond principal */
-  --c-paper:       #fbf9f5; /* surfaces claires */
-  --c-mineral:     #e3ded4; /* aplat minéral */
+  --c-bone:        #f2efe8;
+  --c-paper:       #fbf9f5;
+  --c-mineral:     #e3ded4;
   --c-mineral-2:   #d5cfc3;
-  --c-ink:         #16181a; /* charbon */
+  --c-ink:         #16181a;
   --c-ink-2:       #2b3134;
-  --c-slate:       #6c7a80; /* gris bleuté */
+  --c-slate:       #6c7a80;
   --c-slate-pale:  #ccd8dc;
-  --c-sage:        #8ba088; /* vert sauge */
+  --c-sage:        #8ba088;
   --c-sage-deep:   #46594a;
   --c-sage-pale:   #dae2d4;
-  --c-clay:        #c07f5e; /* accent terre cuite, usage rare */
+  --c-clay:        #c07f5e;
   --c-clay-pale:   #eed9cb;
   --c-white:       #ffffff;
-
-  /* ---- Rôles ---- */
   --bg:            var(--c-bone);
   --bg-alt:        var(--c-paper);
   --bg-invert:     var(--c-ink);
@@ -35,16 +26,9 @@
   --line:          #dcd6ca;
   --line-strong:   #c3bcac;
   --focus:         #2f6f5e;
-
-  /* ---- Typographie ---- */
   --font-display: "Instrument Serif", "Iowan Old Style", Georgia, "Times New Roman", serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
-
-  /* Échelle typographique fluide.
-     Chaque niveau a sa propre pente : les très grands titres grandissent vite,
-     le texte courant presque pas. Les pentes sont volontairement douces pour
-     que la zone 768–1280 px — celle où l'on regarde le plus — reste juste. */
   --fs-display: clamp(2.9rem, 2.1rem + 3.6vw, 6rem);
   --fs-h1:      clamp(2.2rem, 1.7rem + 2.4vw, 4.2rem);
   --fs-h2:      clamp(1.9rem, 1.5rem + 1.9vw, 3.4rem);
@@ -54,8 +38,6 @@
   --fs-base:    1rem;
   --fs-sm:      0.875rem;
   --fs-xs:      0.75rem;
-
-  /* Interlignes : plus le corps est grand, plus l'interligne se resserre */
   --lh-display: 0.94;
   --lh-h1:      1.03;
   --lh-h2:      1.07;
@@ -67,14 +49,10 @@
   --tracking-h1: -0.018em;
   --tracking-h2: -0.014em;
   --tracking-eyebrow: 0.16em;
-
-  /* Longueurs de ligne : le confort de lecture, pas la largeur du conteneur */
-  --measure:       68ch;  /* texte courant */
-  --measure-lead:  50ch;  /* chapeau */
-  --measure-title: 20ch;  /* grand titre éditorial */
-  --measure-short: 36ch;  /* texte de carte */
-
-  /* ---- Espacements ---- */
+  --measure:       68ch;
+  --measure-lead:  50ch;
+  --measure-title: 20ch;
+  --measure-short: 36ch;
   --sp-1: 0.25rem;
   --sp-2: 0.5rem;
   --sp-3: 0.75rem;
@@ -84,92 +62,40 @@
   --sp-7: 3rem;
   --sp-8: 4.5rem;
   --sp-9: 6.5rem;
-  /**
-   * Respiration verticale d'une section.
-   *
-   * Elle valait clamp(4.5rem, 2rem + 8vw, 10rem) : 147 px de chaque côté à
-   * 1440, 160 à 1920. Deux sections voisines mettaient donc 320 px de vide
-   * entre leurs contenus, et 392 avec la marge d'un en-tête de section —
-   * mesuré sur /tutoriels/ en 1920 x 1080 : un trou continu de 396 px entre
-   * le dernier bouton d'une section et le titre de la suivante. À l'écran,
-   * cela ne se lit pas comme de l'air, mais comme une page qui s'est arrêtée.
-   *
-   * La pente compte autant que le plafond : 8vw faisait grossir le vide plus
-   * vite que le texte, si bien que le défaut empirait précisément là où
-   * l'écran est le plus large. 4vw suit mieux la mesure de lecture, et le
-   * plafond tombe à 6rem.
-   */
   --section-y: clamp(3.25rem, 1.5rem + 4vw, 6rem);
-
-  /* ---- Grille ---- */
   --wrap: 1180px;
   --wrap-wide: 1560px;
   --wrap-text: 42rem;
   --gutter: clamp(1.25rem, 0.5rem + 2.6vw, 3.5rem);
-
-  /* ---- Formes ----
-     Trois rayons, pas sept. L'échelle précédente comptait 4, 10, 16, 22, 28 et
-     34 px : à l'usage, personne ne distingue 28 de 34, et l'écart finit par se
-     lire comme une négligence plutôt que comme une intention. Les anciens noms
-     survivent en alias pour ne pas réécrire toutes les feuilles, mais ils ne
-     désignent plus que trois valeurs réelles.
-
-       sm  détails : puces, champs, petits médias
-       md  cartes, images, panneaux
-       lg  grands blocs, sections immersives                                */
   --r-sm: 8px;
   --r-md: 16px;
   --r-lg: 28px;
   --r-pill: 100px;
-  /* Alias historiques → une des trois valeurs ci-dessus */
   --r-xs: var(--r-sm);
   --r-media: var(--r-md);
   --r-card: var(--r-lg);
   --r-block: var(--r-lg);
-
-  /* ---- Ombres ----
-     Très peu d'ombres, et jamais sur une carte posée dans le flux : elles sont
-     réservées à ce qui flotte réellement au-dessus du contenu — menu déroulant,
-     panneau coulissant, feuille modale. Une ombre douce sur chaque bloc est la
-     signature la plus sûre d'une interface générée sans intention.           */
   --shadow-1: 0 1px 2px rgba(22, 24, 26, 0.05);
   --shadow-2: 0 18px 40px -26px rgba(22, 24, 26, 0.5);
   --shadow-3: 0 40px 80px -40px rgba(22, 24, 26, 0.55);
-
-  /* ---- Mouvement ---- */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --dur-1: 150ms;
   --dur-2: 280ms;
   --dur-3: 520ms;
   --dur-4: 900ms;
-
-  /* ---- En-tête ----
-   * Hauteur calculée, pas estimée. `--header-h` valait 76px en dur ; mesuré, le
-   * header fait 72,8 px à 320 de large et 89,6 px au-delà de 1600. Il se
-   * décompose exactement en `contenu + 2 × padding` : le contenu est constant
-   * (44 à 44,75 px), le padding est fluide et fait toute la variation. On nomme
-   * donc le padding, `.site-header` l'utilise, et la hauteur s'en déduit — les
-   * deux ne peuvent plus diverger. 2,8rem = la mesure arrondie au-dessus, pour
-   * que le dégagement ne soit jamais court (marge : 0,8 px au pire). */
   --header-pad: clamp(0.9rem, 0.6rem + 0.8vw, 1.4rem);
   --header-h: calc(2.8rem + 2 * var(--header-pad));
-
-  /* ---- Divers ---- */
   --z-header: 100;
   --z-drawer: 200;
   --z-modal: 300;
 }
-
-/* Aplats de section réutilisables */
 :root {
   --tint-sage: var(--c-sage-pale);
   --tint-slate: var(--c-slate-pale);
   --tint-mineral: var(--c-mineral);
   --tint-clay: var(--c-clay-pale);
 }
-
-/* Motifs graphiques issus du calepinage */
 :root {
   --plank-lines: repeating-linear-gradient(
     to bottom,

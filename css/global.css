@@ -1,5 +1,3 @@
-/* Styles globaux : typographie, liens, focus, utilitaires de composition */
-
 html {
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--header-h) + 1.5rem);
@@ -42,43 +40,18 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 }
 
 ::selection { background: var(--c-sage-pale); color: var(--c-ink); }
-
-/* ---------- Conteneurs ---------- */
 .wrap { width: 100%; max-width: var(--wrap); margin-inline: auto; padding-inline: var(--gutter); }
 .wrap-wide { width: 100%; max-width: var(--wrap-wide); margin-inline: auto; padding-inline: var(--gutter); }
 .wrap-text { width: 100%; max-width: var(--wrap-text); margin-inline: auto; padding-inline: var(--gutter); }
-
-/* Longueur de ligne : au-delà d’environ 75 signes, l’œil perd la ligne suivante. */
 .measure { max-width: var(--measure); }
 .measure-short { max-width: var(--measure-short); }
 
 .section { padding-block: var(--section-y); position: relative; }
 .section--flush-top { padding-top: 0; }
-/* Première section d'une page, sans hero ni fil d'Ariane devant elle pour
-   dégager l'en-tête fixe. Seule la 404 est dans ce cas, et son « Erreur 404 »
-   passait dessous sur 9 formats sur 11. On ajoute la hauteur de l'en-tête au
-   rythme normal, rien de plus : l'écart visible vaut alors `--section-y`, comme
-   entre deux sections ailleurs. */
 .section--below-header { padding-top: calc(var(--header-h) + var(--section-y)); }
 .section--tight { padding-block: clamp(3rem, 1.5rem + 5vw, 6rem); }
-/**
- * Trois poids de section, pas un seul.
- *
- * Toutes les sections avaient le même rythme vertical et le même en-tête : la
- * page d'accueil donnait treize écrans de blocs premium, tous d'égale
- * importance, et la hiérarchie éditoriale disparaissait.
- *
- *   signature   hero, Visualiseur, dossier plein cadre — pleine respiration
- *   (défaut)    contenu : guides, inspiration
- *   --compact   navigation éditoriale : tutoriels, outils, dossier
- *
- * « compact » ne veut pas dire serré : la page garde sa respiration. Cela veut
- * dire que ces sections ne réclament pas la même attention qu'un dossier.
- */
 .section--compact { padding-block: clamp(2.25rem, 1.25rem + 3vw, 3.75rem); }
 .section--compact .section-head { margin-bottom: clamp(1.25rem, 0.9rem + 1.4vw, 2rem); }
-/* Pas de H2 réduit ici : un titre de section garde la taille d'un H2 partout,
-   sinon il devient plus petit que ses propres sous-titres (H3). */
 .section--compact .lead { font-size: var(--fs-base); }
 .section--alt { background: var(--bg-alt); }
 .section--mineral { background: var(--tint-mineral); }
@@ -86,8 +59,6 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 .section--dark { background: var(--bg-invert); color: var(--text-invert); }
 .section--dark h1, .section--dark h2, .section--dark h3 { color: var(--text-invert); }
 .section--dark .lead { color: #c4c9c3; }
-
-/* ---------- Micro-typographie éditoriale ---------- */
 .eyebrow {
   font-family: var(--font-sans);
   font-size: var(--fs-xs);
@@ -131,11 +102,6 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 
 .text-muted { color: var(--text-muted); }
 .mono { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; }
-
-/* En-tête de section : titre large + accroche décalée */
-/* 72 px séparaient un titre de section de son contenu à 1920. Ajoutés aux
-   deux marges de section, ils portaient le vide entre deux sections à près de
-   400 px. L'en-tête doit annoncer ce qui suit, pas s'en éloigner. */
 .section-head { margin-bottom: clamp(1.75rem, 1.1rem + 2vw, 3rem); }
 .section-head__row {
   display: grid;
@@ -147,8 +113,6 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
   .section-head__row--tight { grid-template-columns: minmax(0, 1fr) auto; }
 }
 .section-head h2 { max-width: 16ch; }
-
-/* ---------- Utilitaires ---------- */
 .visually-hidden {
   position: absolute !important;
   width: 1px; height: 1px;
@@ -187,16 +151,10 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 
 .grid { display: grid; gap: var(--sp-5); }
 .grid--2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
-/* Séries de cartes : toutes les rangées à la même hauteur, pas seulement
-   celles d'une même ligne. Une grille de cartes doit se lire comme une grille. */
 .grid--3 { grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); grid-auto-rows: 1fr; }
 .grid--4 { grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); grid-auto-rows: 1fr; }
 .grid--3 > *, .grid--4 > * { height: 100%; }
-
-/* Composition asymétrique */
 .split { display: grid; gap: clamp(2rem, 4vw, 5rem); align-items: center; }
-/* Deux colonnes de hauteurs très différentes : centrer la courte au milieu de
-   la longue laisse un grand vide en haut et en bas. */
 .split--top { align-items: start; }
 @media (min-width: 62rem) {
   .split { grid-template-columns: 1fr 1fr; }
@@ -204,45 +162,20 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
   .split--wide-right { grid-template-columns: 0.65fr 1.35fr; }
   .split--reverse > :first-child { order: 2; }
 }
-
-/* Gabarit article */
 .article-layout { display: grid; gap: clamp(2rem, 4vw, 4rem); align-items: start; }
 @media (min-width: 64rem) {
-  /**
-   * La colonne d'article épouse la mesure de lecture au lieu de prendre tout
-   * l'espace restant.
-   *
-   * Avec `minmax(0, 1fr)` elle valait 844 px à 1920, alors que `.prose` est
-   * plafonné à 68ch (≈ 700 px) : 144 px de vide s'installaient entre la fin du
-   * texte et la gouttière, ce qui éloignait la colonne latérale du texte
-   * qu'elle accompagne — sans rien apporter.
-   *
-   * Le bloc reste centré : l'ensemble se lit comme un tout, et non comme deux
-   * colonnes séparées par un couloir.
-   */
   .article-layout {
     grid-template-columns: minmax(0, var(--measure)) 17rem;
     justify-content: center;
   }
 }
-
-/* Média plein cadre */
 .media-fill { position: relative; overflow: hidden; border-radius: var(--r-media); background: var(--c-mineral); }
 .media-fill img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-/* Un nom composé qui ne se coupe pas sur son trait d'union (« Île-de- / France »). */
 .u-nowrap { white-space: nowrap; }
-
-/*
- * Partenaire indisponible (panne ou maintenance, contrôlé par WordPress toutes
- * les 15 minutes, voir js/commerce/partenaires.js) : ses liens disparaissent.
- */
-/* Boutons et liens d'action (ils ont une classe) : retirés. */
 html[data-premibel-indisponible] a[href*="premibel.fr"][class],
 html[data-allure-indisponible] a[href*="allure-design.com"][class] {
   display: none !important;
 }
-/* Lien dans une phrase ou un tableau : le nom reste, il n'est plus cliquable. */
 html[data-premibel-indisponible] a[href*="premibel.fr"]:not([class]),
 html[data-allure-indisponible] a[href*="allure-design.com"]:not([class]) {
   pointer-events: none;

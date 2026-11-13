@@ -1,6 +1,3 @@
-/* Blocs de composition : cartes en aplat, sections immersives, citations */
-
-/* ---------- Cartes en aplat (parcours principal) ---------- */
 .tiles {
   display: grid;
   gap: clamp(1rem, 0.5rem + 1.4vw, 1.75rem);
@@ -12,8 +9,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-5);
-  /* Hauteur réduite : 28 rem par tuile faisaient 814 px de section sur un
-     écran large, pour quatre liens de trois lignes. */
   min-height: clamp(17rem, 13rem + 9vw, 22.5rem);
   padding: clamp(1.4rem, 1rem + 1.2vw, 2rem);
   border-radius: var(--r-card);
@@ -46,18 +41,8 @@
 .tile__more { margin-top: auto; display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.88rem; font-weight: 500; }
 .tile__more svg { width: 0.95em; height: 0.95em; transition: transform var(--dur-2) var(--ease-out); }
 .tile:hover .tile__more svg { transform: translateX(5px); }
-
-/*
- * Deux colonnes de `list-row` sous un seul chapeau de section.
- *
- * Les deux listes éditoriales de l'accueil — le dossier « sens de pose » et
- * les tutoriels — se suivaient en deux sections identiques. Elles partagent
- * désormais un titre ; chacune garde le sien, en `h3`.
- */
 .duo-rows {
   display: grid;
-  /* Sur téléphone les deux colonnes s'empilent : l'écart entre elles fait
-     alors double emploi avec la respiration des listes. */
   gap: clamp(1.5rem, 0.5rem + 3vw, 3.5rem);
 }
 @media (min-width: 62rem) {
@@ -74,16 +59,6 @@
   border-bottom: 1px solid var(--c-line, rgba(22, 24, 26, 0.12));
 }
 .duo-rows__head h3 { margin: 0; font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem); }
-
-/*
- * Une `list-row` en demi-largeur ne tient pas sur quatre colonnes.
- *
- * Au-dessus de 55 rem, `.list-row` aligne numéro, titre, résumé et durée sur
- * une seule ligne — très bien sur toute la largeur de la page, illisible dans
- * une colonne de 660 px : « Poser un parquet flottant, étape par étape »
- * repassait sur quatre lignes à côté d'un résumé lui-même à six. Dans
- * `.duo-rows`, la ligne reste empilée, et le titre descend d'un cran.
- */
 .duo-rows .list-row__title { font-size: clamp(1.2rem, 1.02rem + 0.55vw, 1.55rem); }
 @media (min-width: 55rem) {
   .duo-rows .list-row {
@@ -96,29 +71,17 @@
   .duo-rows .list-row__text  { grid-area: 2 / 2; margin-top: 0.4rem; }
   .duo-rows .list-row__meta  { grid-area: 3 / 2; margin-top: 0.3rem; white-space: nowrap; }
 }
-
-/* Média intégré à la carte, façon vignette pleine largeur */
 .tile__media {
   margin: 0 calc(-1 * clamp(1.4rem, 1rem + 1.2vw, 2rem)) calc(-1 * clamp(1.4rem, 1rem + 1.2vw, 2rem));
   height: clamp(7rem, 4rem + 7vw, 9.5rem);
   overflow: hidden;
 }
-
-/*
- * Sur téléphone, les quatre tuiles se suivent en colonne et leurs vignettes
- * ajoutaient à elles seules près de 600 px avant le premier vrai contenu.
- * Elles sont décoratives — `alt` vide, aucune information qu'on perde. On
- * garde les quatre entrées, on retire ce qui ne fait que pousser le reste
- * vers le bas.
- */
 @media (max-width: 47.99rem) {
   .tile__media { display: none; }
   .tile { min-height: 0; gap: var(--sp-4); }
 }
 .tile__media img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-4) var(--ease-out); }
 .tile:hover .tile__media img { transform: scale(1.06); }
-
-/* Carte sans photo : motif de calepinage animé */
 .tile__pattern {
   position: relative;
   margin: 0 calc(-1 * clamp(1.4rem, 1rem + 1.2vw, 2rem)) calc(-1 * clamp(1.4rem, 1rem + 1.2vw, 2rem));
@@ -144,11 +107,6 @@
 .tile:hover .tile__pattern span:nth-child(1) { transform: skewX(-14deg) translateX(6px); }
 .tile:hover .tile__pattern span:nth-child(2) { transform: skewX(-14deg) translateX(-4px); }
 .tile:hover .tile__pattern span:nth-child(3) { transform: skewX(-14deg) translateX(10px); }
-
-/* ---------- Dossier plein cadre : image + bas de page éditorial ----------
-   Le texte ne flotte pas au milieu de la photo : il se range en bas, titre à
-   gauche puis trois points en rangée séparés par un filet. Le regard entre par
-   l'image, descend vers le titre, balaie les points. */
 .dossier {
   position: relative;
   isolation: isolate;
@@ -160,8 +118,6 @@
 }
 .dossier__bg { position: absolute; inset: 0; z-index: -2; overflow: hidden; }
 .dossier__bg img { width: 100%; height: 100%; object-fit: cover; }
-/* Voile plus dense en bas, là où le texte se pose ; presque nul en haut, pour
-   ne pas éteindre la photo. */
 .dossier::after {
   content: "";
   position: absolute; inset: 0; z-index: -1;
@@ -193,21 +149,6 @@
 @media (min-width: 62rem) {
   .dossier__notes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-/**
- * Sur téléphone, la photo redevient une photo.
- *
- * La version précédente posait les trois points sur l'image dans un seul
- * panneau sombre voilé. Mesuré à 390 px : 429 px de panneau pour 810 px de
- * section, soit 53 % — le parquet, qui est le sujet, passait sous un rectangle
- * gris sur plus de la moitié de la hauteur. Une section « focus motif » qui
- * cache le motif ne remplit pas son office.
- *
- * La composition mobile est donc franchement différente, pas rétrécie : une
- * bande photographique nette porte l'accroche et le bouton, puis les trois
- * points descendent sur le fond de la page, en liste éditoriale séparée par
- * des filets — numéro discret en marge, titre, texte court. Pas de cartes :
- * cette section est un bas de page de dossier, pas un tableau de bord.
- */
 @media (max-width: 61.99rem) {
   .dossier {
     --bande: min(62svh, 500px);
@@ -216,11 +157,6 @@
     padding-block: 0 clamp(1.5rem, 1rem + 3vw, 2.5rem);
     color: var(--text);
   }
-  /* Pas de `background` sur la section : elle porte `isolation: isolate` et la
-     photo vit en `z-index: -2`, donc sous le fond de son propre élément. Lui
-     donner un fond la masquerait. Sous la bande, le fond de la page suffit. */
-  /* L'image et son voile s'arrêtent au bas de la bande, pas au bas de la
-     section : c'est ce qui libère le fond de page pour les trois points. */
   .dossier__bg,
   .dossier::after { bottom: auto; height: var(--bande); }
   .dossier::after {
@@ -239,10 +175,6 @@
     border-top: 0;
     color: var(--text);
   }
-  /* Même composition que `.list-row` : numéro discret, titre, texte, tout au
-     même bord gauche. Deux listes éditoriales sur la même page ne doivent pas
-     s'indenter différemment — mesuré, l'une commençait à 20 px et l'autre à
-     65. */
   .dossier__note {
     grid-template-columns: minmax(0, 1fr);
     gap: 0.1rem;
@@ -254,8 +186,6 @@
   .dossier__note h3 { color: var(--text); font-size: 1.08rem; line-height: 1.2; }
   .dossier__note p { color: var(--text-soft); max-width: none; font-size: 0.94rem; margin-top: 0.25rem; }
 }
-
-/* ---------- Alternance texte / image ---------- */
 .feature {
   display: grid;
   gap: clamp(2rem, 1.5rem + 4vw, 5rem);
@@ -279,8 +209,6 @@
 .feature__list { display: grid; gap: var(--sp-4); list-style: none; margin: 0; padding: 0; }
 .feature__list li { display: flex; gap: 0.85rem; align-items: flex-start; color: var(--text-soft); }
 .feature__list svg { width: 1.1em; height: 1.1em; flex: none; margin-top: 0.3em; color: var(--accent-soft); }
-
-/* Petite photo ronde insérée dans le flux d'un titre */
 .inline-photo {
   display: inline-block;
   width: clamp(3.2rem, 2rem + 4vw, 5.5rem);
@@ -291,8 +219,6 @@
   margin-inline: 0.35em;
   transform: translateY(-0.08em);
 }
-
-/* ---------- Citation ---------- */
 .quote-block { display: grid; gap: var(--sp-6); }
 @media (min-width: 62rem) {
   .quote-block { grid-template-columns: minmax(0, 0.4fr) minmax(0, 1fr); gap: clamp(2rem, 6vw, 7rem); }
@@ -305,8 +231,6 @@
   letter-spacing: var(--tracking-display);
 }
 .quote-block cite { display: block; margin-top: var(--sp-5); font-style: normal; font-size: var(--fs-sm); color: var(--text-muted); }
-
-/* ---------- Chiffres clés ---------- */
 .figures { display: grid; gap: clamp(1.5rem, 1rem + 2vw, 3rem); grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); }
 .figure-item { border-top: 1px solid var(--line); padding-top: var(--sp-4); }
 .figure-item strong {
@@ -320,8 +244,6 @@
 .figure-item span { display: block; margin-top: var(--sp-3); font-size: 0.92rem; color: var(--text-soft); }
 .section--dark .figure-item { border-color: rgba(255,255,255,0.2); }
 .section--dark .figure-item span { color: #b8bfb9; }
-
-/* ---------- Bandeau projet ---------- */
 .cta-band {
   position: relative;
   overflow: hidden;
@@ -351,30 +273,6 @@
   background: var(--chevron-lines);
   transform: rotate(6deg);
 }
-
-/* ---------- Liste éditoriale (tutoriels, clusters) ---------- */
-
-/**
- * Une seule colonne sur téléphone, quatre à partir de 55rem.
- *
- * La version précédente n'avait pas de composition mobile : elle gardait une
- * grille `3.2rem minmax(0, 1fr)` et laissait les quatre enfants se placer
- * automatiquement. Le numéro et le titre remplissaient la première ligne, puis
- * **le résumé retombait en deuxième ligne, première colonne** — soit une
- * colonne de 51 px. Mesuré à 390 px : un résumé de 51 px de large pour 390 px
- * de haut, coupé en plein mot (« référen / ce »). La section entière faisait
- * 1436 px pour trois entrées, ce qui repoussait le pied de page très loin.
- *
- * Ce n'était donc ni une affaire de taille de police ni une affaire de césure :
- * c'était une grille desktop restée active, et un placement automatique qui
- * envoyait le texte le plus long dans la colonne la plus étroite.
- *
- * Sur téléphone la composition suit l'ordre de lecture — numéro discret,
- * titre, méta, résumé pleine largeur — et l'ordre du DOM a été aligné dessus,
- * ce qui sert aussi la lecture d'écran. Sur grand écran chaque enfant reçoit sa
- * colonne **explicitement** : c'est ce qui permet de garder la disposition
- * d'origine (numéro | titre | résumé | méta) malgré le nouvel ordre du DOM.
- */
 .list-rows { display: grid; border-top: 1px solid var(--line); }
 .list-row {
   display: grid;
@@ -388,7 +286,6 @@
 .list-row__num { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); }
 .list-row__title { font-family: var(--font-display); font-size: clamp(1.35rem, 1.1rem + 1.2vw, 2rem); line-height: 1.08; letter-spacing: var(--tracking-display); }
 .list-row__meta { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); }
-/* Le résumé respire un peu plus que la méta, qui appartient encore au titre. */
 .list-row__text { color: var(--text-soft); font-size: 0.94rem; margin: 0.35rem 0 0; }
 
 @media (min-width: 55rem) {
@@ -397,8 +294,6 @@
     gap: 0.4rem var(--sp-5);
     align-items: center;
   }
-  /* La ligne est imposée aux quatre : sans elle, placer la méta en colonne 4
-     avant le résumé en colonne 3 renverrait ce dernier à la ligne suivante. */
   .list-row__num   { grid-area: 1 / 1; }
   .list-row__title { grid-area: 1 / 2; }
   .list-row__text  { grid-area: 1 / 3; margin-top: 0; }
@@ -407,8 +302,6 @@
 .list-row:hover { padding-left: 0.9rem; }
 .list-row svg { width: 1.1rem; height: 1.1rem; transition: transform var(--dur-2) var(--ease-out); }
 .list-row:hover svg { transform: translateX(5px); }
-
-/* ---------- Bloc outils ---------- */
 .tool-card {
   display: grid;
   gap: var(--sp-4);
@@ -432,8 +325,6 @@
   .list-row { transition: none; }
   .tile:hover { transform: none; }
 }
-
-/* Blocs d'outil : média large + argumentaire */
 .tool-blocks { display: grid; gap: clamp(3rem, 2rem + 5vw, 6rem); }
 .tool-block { display: grid; gap: clamp(1.25rem, 1rem + 1.5vw, 2.5rem); align-items: center; }
 @media (min-width: 60rem) {
@@ -471,9 +362,6 @@
   border-radius: var(--r-pill);
   background: var(--c-sage-deep);
 }
-
-
-/* Repères numérotés (ce que contient un tutoriel, une méthode) */
 .steps-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
@@ -497,12 +385,6 @@
 }
 .steps-grid strong { font-size: 1.02rem; font-weight: 600; }
 .steps-grid li > span:last-child { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
-
-/* ---------- Page Outils : le Visualiseur domine ----------
-   Trois blocs de poids égal se concurrencent et personne ne sait par où
-   commencer. Le premier outil prend donc plus de place et plus de contraste ;
-   le second reste un bloc normal ; la feuille de route passe en section
-   compacte. La hiérarchie se voit avant d'être lue. */
 .tool-block--lead .tool-block__title { font-size: var(--fs-h1); }
 .tool-block--lead .tool-block__media { border-radius: var(--r-lg); }
 @media (min-width: 62rem) {

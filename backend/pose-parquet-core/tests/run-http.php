@@ -1,16 +1,6 @@
 <?php
-/**
- * Vérifications en HTTP réel : ce que rest_do_request() ne peut pas prouver —
- * les en-têtes effectivement envoyés (CORS, preflight) et le comportement du
- * serveur face aux méthodes.
- *
- *   php tests/run-http.php http://pose-parquet-dev.local
- *
- * Sans WordPress chargé : le script est un client. Il crée une demande (201)
- * puis la signale pour nettoyage par run-projects (préfixe « HttpTest »).
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -27,20 +17,14 @@ $verifie = static function ( string $libelle, bool $ok, string $detail = '' ) us
 	echo ( $ok ? '  OK   ' : '  KO   ' ) . $libelle . ( ! $ok && $detail ? " — $detail" : '' ) . "\n";
 };
 
-/**
- * Créations réussies depuis cette adresse, comptées au vol.
- *
- * La limite de débit se juge sur ce total, pas sur un nombre écrit à la main :
- * ajouter ou retirer un test qui crée une demande ne doit pas casser la
- * section qui vérifie le quota.
- */
+
+
 $creations = 0;
 
-/**
- * @return array{status:int,headers:array<string,string>,body:string}
- */
+
+
 $appel = static function ( string $method, string $route, array $entetes = [], ?string $corps = null ) use ( $base, &$creations ): array {
-	// Une route REST passe par ?rest_route= ; un chemin de fichier s'appelle tel quel.
+
 	$url  = str_starts_with( $route, '/wp-content/' ) ? $base . $route : $base . '/?rest_route=' . $route;
 	$hdrs = '';
 	foreach ( $entetes as $k => $v ) {
@@ -60,7 +44,7 @@ $appel = static function ( string $method, string $route, array $entetes = [], ?
 	foreach ( $raw as $ligne ) {
 		if ( preg_match( '#^HTTP/\S+\s+(\d{3})#', $ligne, $m ) ) {
 			$status  = (int) $m[1];
-			$headers = []; // une redirection : on ne garde que la dernière réponse
+			$headers = [];
 		} elseif ( str_contains( $ligne, ':' ) ) {
 			[ $k, $v ] = explode( ':', $ligne, 2 );
 			$k = strtolower( trim( $k ) );
@@ -74,27 +58,10 @@ $appel = static function ( string $method, string $route, array $entetes = [], ?
 };
 
 $json = static fn( array $d ): string => (string) json_encode( $d, JSON_UNESCAPED_UNICODE );
-/*
- * La requete de reference.
- *
- * La qualification commerciale y figure au lieu d'avoir sa propre section, et
- * ce n'est pas de la paresse : la route limite a cinq creations par heure et
- * par identite, et la suite compte precisement sur ce budget — la section
- * « Limite de debit » verifie qu'elle atteint 429 apres quatre creations.
- * Une section supplementaire qui creerait pour son compte ferait tomber en
- * 429 tout ce qui la suit.
- *
- * Les valeurs sont celles relevees dans le navigateur au terme d'un parcours
- * reel : entree sur un guide avec cinq parametres de campagne, passage par le
- * Studio sur une reference Premibel, arrivee sur le formulaire. Chaque
- * creation de cette suite les emporte donc, et leur acceptation se verifie a
- * chaque 201.
- *
- * `productId` est en MAJUSCULES a dessein : c'est la forme des quatorze
- * references reelles, et la regle du front l'ecartait silencieusement.
- */
+
+
 $requete = [
-	/* Departement seul : la region s'en deduit cote serveur, Ile-de-France ici. */
+
 	'department' => '75', 'housingType' => 'appartement', 'roomType' => 'chambre', 'surface' => 12,
 	'supportType' => 'dalle', 'parquetType' => 'massif', 'installationType' => 'longueur', 'timeframe' => 'urgent',
 	'firstName' => 'HttpTest', 'lastName' => 'HttpTest', 'email' => 'httptest@example.com', 'phone' => '0612345678', 'consent' => true,
@@ -131,33 +98,14 @@ foreach ( [ 'POST', 'PUT', 'DELETE' ] as $m ) {
 	$r = $appel( $m, '/pose-parquet/v1/form-token', [ 'Content-Type' => 'application/json' ], '{}' );
 	$verifie( "$m /form-token → 404", $r['status'] === 404, (string) $r['status'] );
 }
-/*
- * « Immédiat » doit vraiment l'être.
- *
- * Le jeton réutilisé ici était celui demandé une quinzaine de lignes plus haut,
- * avant six allers-retours HTTP. Sur une machine chargée, ces six requêtes
- * dépassent les deux secondes d'âge minimum : le jeton n'était alors plus jeune,
- * le serveur acceptait la demande, et le test signalait une faille d'anti-spam
- * là où il n'y avait qu'une machine lente. Pire, la création involontaire
- * consommait un jeton et un quota, ce qui faisait échouer les deux sections
- * suivantes pour une raison encore différente.
- *
- * On redemande donc un jeton juste avant, et l'assertion ne mesure plus que ce
- * qu'elle prétend mesurer.
- */
+
+
 $rt_frais    = $appel( 'GET', '/pose-parquet/v1/form-token' );
 $token_jeune = (string) ( ( json_decode( $rt_frais['body'], true ) ?: [] )['token'] ?? '' );
 $r = $appel( 'POST', $route, [ 'Content-Type' => 'application/json' ], $json( $requete + [ 'formToken' => $token_jeune ] ) );
 $verifie( 'POST immédiat après le jeton → 422 form_token_invalid (trop rapide)', $r['status'] === 422 && str_contains( $r['body'], 'form_token_invalid' ), $r['status'] . ' ' . substr( $r['body'], 0, 160 ) );
-/*
- * Réserve de jetons.
- *
- * Un jeton ne sert plus qu'une fois : chaque création en consomme un, et
- * réutiliser celui de la requête précédente ferait échouer la suivante pour
- * la mauvaise raison. On en demande donc une poignée d'avance — ils sont
- * indépendants et valent deux heures — puis on attend UNE fois l'âge minimum
- * plutôt que deux secondes par envoi.
- */
+
+
 $pool          = [];
 $remplir_pool  = static function ( int $combien ) use ( &$pool, $appel ): void {
 	for ( $i = 0; $i < $combien; $i++ ) {
@@ -167,7 +115,7 @@ $remplir_pool  = static function ( int $combien ) use ( &$pool, $appel ): void {
 			$pool[] = (string) $dt['token'];
 		}
 	}
-	sleep( 2 ); // âge minimum exigé par le serveur
+	sleep( 2 );
 };
 $remplir_pool( 14 );
 $jeton = static function () use ( &$pool, $remplir_pool ): string {
@@ -178,17 +126,13 @@ $jeton = static function () use ( &$pool, $remplir_pool ): string {
 };
 $requete['formToken'] = $jeton();
 
-/** Corps d'une requête valide, avec un jeton neuf à chaque appel. */
+
 $corps = static fn( array $extra = [] ): string => $json( array_merge( $requete, [ 'formToken' => $jeton() ], $extra ) );
 
 echo "\n== Qualification commerciale ==\n";
 
-/*
- * Trois listes fermees, verifiees au bout du fil.
- *
- * Aucun de ces appels ne cree : un 422 ne consomme pas le quota de creations,
- * et la section n'entame donc pas le budget de celles qui suivent.
- */
+
+
 foreach ( [ 'leadSource' => 'depuis-la-lune', 'leadNeed' => 'jacuzzi', 'leadDestination' => 'concurrent' ] as $champ => $valeur ) {
 	$r = $appel( 'POST', $route, [ 'Content-Type' => 'application/json' ], $corps( [ $champ => $valeur ] ) );
 	$verifie( "{$champ} hors liste → 422", $r['status'] === 422 && str_contains( $r['body'], $champ ), $r['status'] . ' ' . substr( $r['body'], 0, 160 ) );
@@ -216,13 +160,8 @@ $r = $appel( 'OPTIONS', $route, [ 'Origin' => $bad_origin, 'Access-Control-Reque
 $verifie( 'OPTIONS origine inconnue : aucun Access-Control-Allow-Origin', ! isset( $r['headers']['access-control-allow-origin'] ), $r['headers']['access-control-allow-origin'] ?? '' );
 $verifie( 'OPTIONS origine inconnue : jamais « * »', ( $r['headers']['access-control-allow-origin'] ?? '' ) !== '*' );
 
-/*
- * Le poste de développement n'est plus une origine par défaut. Ce que ce
- * test constate dépend donc du site interrogé : autorisé s'il se déclare
- * `local` (WP_ENVIRONMENT_TYPE) ou s'il liste l'origine dans
- * POSE_PARQUET_ALLOWED_ORIGINS, refusé sinon. Les deux réponses sont justes ;
- * la seule qui ne le serait pas est « autorisé sans que rien ne le déclare ».
- */
+
+
 $r = $appel( 'OPTIONS', $route, [ 'Origin' => 'http://localhost:5180', 'Access-Control-Request-Method' => 'POST' ] );
 $localhost_autorise = ( $r['headers']['access-control-allow-origin'] ?? '' ) === 'http://localhost:5180';
 $verifie( 'localhost:5180 : ' . ( $localhost_autorise ? 'autorisé — le site se déclare de développement' : 'refusé — le site ne se déclare pas de développement' ), true );
@@ -246,15 +185,8 @@ $r = $appel( 'POST', $route, [ 'Content-Type' => 'application/json' ], $corps( [
 $verifie( 'status injecté → 422', $r['status'] === 422 );
 $r = $appel( 'POST', $route, [ 'Content-Type' => 'application/json' ], $corps( [ 'message' => str_repeat( 'x', 40000 ) ] ) );
 $verifie( 'corps de 40 Ko → 413', $r['status'] === 413, (string) $r['status'] );
-/*
- * Type de contenu : le cœur de la correction.
- *
- * En text/plain, le navigateur n'émet pas de préflight — la requête part donc
- * sans que CORS ait eu son mot à dire. C'était le chemin par lequel un site
- * tiers pouvait faire créer une demande depuis le navigateur d'un visiteur.
- * Un curl, lui, passera toujours : ce refus ferme la soumission par
- * navigateur, pas les scripts, dont s'occupent le jeton et la limite de débit.
- */
+
+
 echo "\n== Type de contenu ==\n";
 $avant_type = $corps();
 foreach ( [
@@ -271,20 +203,13 @@ $r = $appel( 'POST', $route, [], $avant_type );
 $verifie( 'sans Content-Type → 415', $r['status'] === 415, $r['status'] . ' ' . substr( $r['body'], 0, 120 ) );
 $verifie( '415 : Cache-Control no-store et X-Request-Id', ( $r['headers']['cache-control'] ?? '' ) === 'no-store' && isset( $r['headers']['x-request-id'] ) );
 $verifie( '415 : aucune donnée saisie en écho', ! str_contains( $r['body'], 'httptest@example.com' ) && ! str_contains( $r['body'], 'HttpTest' ) );
-/*
- * Le type attendu, avec son paramètre de jeu de caractères. On le prouve par
- * un refus de validation plutôt que par une création : un 422 dit que le
- * corps a bien été lu et validé — donc que le type est passé — sans consommer
- * une des cinq créations horaires dont la dernière section a besoin.
- */
+
+
 $r = $appel( 'POST', $route, [ 'Content-Type' => 'application/json; charset=utf-8' ], $corps( [ 'surface' => 5000 ] ) );
 $verifie( 'application/json; charset=utf-8 : accepté et lu (422 de validation, pas 415)', $r['status'] === 422 && str_contains( $r['body'], 'validation_failed' ), $r['status'] . ' ' . substr( $r['body'], 0, 160 ) );
 
-/*
- * Usage unique : le même jeton, deux fois. La première crée, la seconde est
- * refusée avec le code que le front sait traiter — il redemande un jeton et
- * retente une fois.
- */
+
+
 echo "\n== Jeton à usage unique ==\n";
 $unique = $jeton();
 $r = $appel( 'POST', $route, [ 'Content-Type' => 'application/json' ], $json( array_merge( $requete, [ 'formToken' => $unique ] ) ) );
@@ -292,19 +217,13 @@ $verifie( 'jeton neuf → 201', $r['status'] === 201, $r['status'] . ' ' . subst
 $r = $appel( 'POST', $route, [ 'Content-Type' => 'application/json' ], $json( array_merge( $requete, [ 'formToken' => $unique ] ) ) );
 $verifie( 'même jeton réutilisé → 422 form_token_invalid', $r['status'] === 422 && str_contains( $r['body'], 'form_token_invalid' ), $r['status'] . ' ' . substr( $r['body'], 0, 160 ) );
 $verifie( 'le refus ne renvoie pas le jeton', ! str_contains( $r['body'], substr( $unique, 0, 24 ) ) );
-// Un jeton neuf repasse aussitôt : c'est ce que fait le front après ce refus.
-// Prouvé par un 422 de validation, pour ne pas dépenser une création.
+
+
 $r = $appel( 'POST', $route, [ 'Content-Type' => 'application/json' ], $corps( [ 'surface' => 5000 ] ) );
 $verifie( 'un jeton neuf repasse la garde (422 de validation, pas form_token_invalid)', $r['status'] === 422 && str_contains( $r['body'], 'validation_failed' ), $r['status'] . ' ' . substr( $r['body'], 0, 160 ) );
 
-/*
- * Concurrence : quatre requêtes vraiment simultanées, un seul jeton.
- *
- * C'est le test qui a condamné la réservation par simple lecture-écriture de
- * transient : elle laissait passer deux créations sur la moitié des essais.
- * D'où le verrou nommé MySQL dans FormToken::consume(). Le contrôle reste ici
- * pour que la régression se voie, et non pour qu'on la redécouvre en ligne.
- */
+
+
 if ( function_exists( 'curl_multi_init' ) ) {
 	$simultane = $jeton();
 	$charge    = $json( array_merge( $requete, [ 'formToken' => $simultane ] ) );
@@ -361,12 +280,10 @@ foreach ( [ 'GET', 'PUT', 'PATCH', 'DELETE' ] as $m ) {
 	$verifie( "$m /projects → 404", $r['status'] === 404, (string) $r['status'] );
 }
 
-/*
- * En dernier : cette section épuise volontairement le quota de l'adresse
- * appelante, donc tout POST qui la suivrait recevrait 429.
- */
+
+
 echo "\n== Limite de débit (défaut : 5 créations / heure) ==\n";
-// Des créations ont déjà réussi depuis cette adresse ; on continue jusqu'au 429.
+
 $deja    = $creations;
 $statuts = [];
 for ( $i = 0; $i < 8 && ! in_array( 429, $statuts, true ); $i++ ) {

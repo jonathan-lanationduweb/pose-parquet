@@ -1,18 +1,6 @@
 <?php
-/**
- * Les contenus éditoriaux du site : guides, tutoriels, inspirations, pages.
- *
- * WordPress devient la source éditoriale ; le site public, lui, reste généré
- * par le dépôt (`_generator/`), qui lit ces contenus par l'export
- * `GET /pose-parquet/v1/contenus` (voir Contenus\Export). WordPress ne sert
- * donc AUCUNE page publique de ces types : `public => false`, pas de
- * réécriture d'adresse, pas d'archive. Il ne fait que les éditer.
- *
- * Écrans : ceux de WordPress, sans page builder. L'éditeur classique (TinyMCE
- * et « Ajouter un média ») plutôt que l'éditeur de blocs : la maquette validée
- * le montre, et un éditeur de blocs offrirait des mises en page que le site
- * public ne sait pas rendre. Le design reste celui du code.
- */
+
+
 
 declare(strict_types=1);
 
@@ -30,19 +18,19 @@ final class Types {
 	public const TUTORIEL    = 'pp_tutoriel';
 	public const INSPIRATION = 'pp_inspiration';
 	public const PAGE        = 'pp_page';
-	/** Les articles du blog : même édition que les guides, publiés sous /blog/. */
+
 	public const ARTICLE     = 'pp_article';
 
 	public const CAT_GUIDE    = 'pp_guide_categorie';
 	public const CAT_TUTORIEL = 'pp_tutoriel_categorie';
 	public const CAT_ARTICLE  = 'pp_article_categorie';
 
-	/** @return string[] */
+
 	public static function all(): array {
 		return [ self::GUIDE, self::TUTORIEL, self::INSPIRATION, self::PAGE, self::ARTICLE ];
 	}
 
-	/** Types qui ont une image de couverture obligatoire « en principe » (avertissement, pas blocage). */
+
 	public static function avec_couverture( string $type ): bool {
 		return in_array( $type, [ self::GUIDE, self::TUTORIEL, self::INSPIRATION, self::ARTICLE ], true );
 	}
@@ -56,17 +44,15 @@ final class Types {
 		return in_array( $type, self::all(), true ) ? false : $utiliser;
 	}
 
-	/**
-	 * @param array<string,string> $l libellés propres au type
-	 * @param string[]             $supports
-	 */
+
+
 	private static function args( array $l, array $supports, array $extra = [] ): array {
 		return array_merge(
 			[
 				'labels'              => $l,
 				'public'              => false,
 				'show_ui'             => true,
-				// Le menu est construit par Admin\Menu, dans l'ordre de la maquette.
+
 				'show_in_menu'        => false,
 				'show_in_admin_bar'   => false,
 				'show_in_nav_menus'   => false,
@@ -159,7 +145,7 @@ final class Types {
 					'not_found_in_trash' => __( 'Aucune inspiration dans la corbeille.', 'pose-parquet-core' ),
 					'all_items'          => __( 'Inspirations', 'pose-parquet-core' ),
 				],
-				// Pas d'éditeur de contenu : une carte, pas un article.
+
 				[ 'title', 'thumbnail' ]
 			)
 		);
@@ -179,12 +165,8 @@ final class Types {
 				],
 				[ 'title', 'editor', 'excerpt', 'revisions' ],
 				[
-					/*
-					 * Les pages du site sont celles que le code sait construire
-					 * (accueil, à propos, contact…) : on modifie leurs textes,
-					 * on n'en crée pas — une page ajoutée ici ne serait publiée
-					 * nulle part. D'où « do_not_allow » pour la création.
-					 */
+
+
 					'capabilities' => [ 'create_posts' => 'do_not_allow' ],
 				]
 			)
@@ -206,8 +188,8 @@ final class Types {
 			'show_admin_column' => false,
 			'hierarchical'      => true,
 			'rewrite'           => false,
-			// La boîte de sélection est la nôtre (une liste déroulante, comme
-			// dans la maquette), pas les cases à cocher de WordPress.
+
+
 			'meta_box_cb'       => false,
 			'capabilities'      => [
 				'manage_terms' => Capabilities::EDIT_CONTENTS,
@@ -237,7 +219,7 @@ final class Types {
 		}
 	}
 
-	/** La taxonomie de catégorie d'un type, ou null. */
+
 	public static function taxonomie( string $type ): ?string {
 		return match ( $type ) {
 			self::GUIDE    => self::CAT_GUIDE,

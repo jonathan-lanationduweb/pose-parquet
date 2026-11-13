@@ -1,10 +1,6 @@
 <?php
-/**
- * Accusé de réception au visiteur : sa référence, un résumé d'une ligne,
- * pas de promesse de délai, pas de prix, pas de discours.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -20,11 +16,11 @@ final class VisitorConfirmation {
 		return 'Votre demande Pose Parquet a bien été reçue';
 	}
 
-	/** @param array<string,mixed> $project ligne de pp_projects */
+
 	public static function body( array $project ): string {
 		$p = static fn( string $k ): string => isset( $project[ $k ] ) ? (string) $project[ $k ] : '';
 
-		// Un résumé court : pièce, surface, pose — ce que la personne a dit, rien de plus.
+
 		$morceaux = array_filter( [
 			Labels::of( 'room_type', $p( 'room_type' ) ),
 			$p( 'surface' ) !== '' ? rtrim( rtrim( number_format( (float) $p( 'surface' ), 2, ',', ' ' ), '0' ), ',' ) . ' m²' : '',

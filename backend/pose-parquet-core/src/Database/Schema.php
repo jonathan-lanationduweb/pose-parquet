@@ -1,27 +1,6 @@
 <?php
-/**
- * Schéma des tables métier — la seule description de la structure des données.
- *
- * Trois tables, toutes préfixées par le préfixe WordPress du site (`$wpdb->prefix`,
- * jamais `wp_` en dur) :
- *
- *   pp_projects          une demande de projet, telle que remplie par le visiteur
- *   pp_project_history   chaque changement de statut d'une demande
- *   pp_project_notes     les notes internes de l'équipe sur une demande
- *
- * Les demandes NE sont PAS des articles WordPress. Un CPT aurait imposé
- * wp_posts + wp_postmeta pour des données tabulaires simples : requêtes de
- * filtrage lourdes, export pénible, aucune contrainte de type. Une table par
- * concept, des colonnes typées, des index sur ce qu'on filtre.
- *
- * Le SQL est écrit pour dbDelta(), qui compare le schéma déclaré à la table
- * existante et applique la différence — c'est ce qui rend l'activation
- * idempotente et les évolutions de schéma possibles sans migration manuelle.
- * dbDelta est pointilleux sur la forme : deux espaces entre le nom et le type
- * sont interdits, chaque champ sur sa ligne, `KEY` et non `INDEX`.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -33,11 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Schema {
 
-	/**
-	 * Noms logiques → nom complet de table. Toujours passer par ici.
-	 *
-	 * @return array<string,string>
-	 */
+
+
 	public static function tables(): array {
 		global $wpdb;
 		return [
@@ -47,7 +23,7 @@ final class Schema {
 		];
 	}
 
-	/** Nom complet d'une table à partir de son nom logique. */
+
 	public static function table( string $name ): string {
 		$tables = self::tables();
 		if ( ! isset( $tables[ $name ] ) ) {
@@ -56,61 +32,15 @@ final class Schema {
 		return $tables[ $name ];
 	}
 
-	/**
-	 * Instructions CREATE TABLE au format dbDelta, une par table.
-	 *
-	 * @return string[]
-	 */
+
+
 	public static function statements(): array {
 		global $wpdb;
 		$t       = self::tables();
 		$charset = $wpdb->get_charset_collate();
 
-		/*
-		 * pp_projects.
-		 *
-		 * `reference` : identifiant lisible PP-AAAA-NNNNNN dérivé de `id` (voir
-		 * Projects\Reference) ; unique, c'est ce que le client et l'équipe se
-		 * communiquent. Nullable parce qu'il n'existe qu'après l'insertion — la
-		 * ligne est insérée, l'id connu, la référence posée, le tout dans une
-		 * transaction : aucune ligne validée n'a de référence NULL (schéma 2).
-		 * `status` : voir Projects\Status. `surface` en m² avec deux décimales.
-		 * `style` : ambiance choisie dans le formulaire (schéma 2).
-		 * `visualizer_config` : JSON tel que produit par le Visualiseur, stocké
-		 * tel quel et jamais interprété par le plugin — le rendu reste côté front.
-		 * `*_mail_status` / `*_mail_sent_at` (schéma 3) : sort de la notification
-		 * interne et de la confirmation visiteur — pending / sent / failed /
-		 * skipped, voir Mail\Notifier. Un état, jamais le contenu de l'email.
-		 *
-		 * Qualification commerciale (schema 4). `lead_source` : la famille de la
-		 * page d'ENTREE — `source_url` dit celle de l'envoi, presque toujours
-		 * /projet/, ce qui n'apprend rien. `entry_page` : ce chemin d'entree en
-		 * clair. `lead_need` : ce que la demande cherche. `lead_destination` :
-		 * vers qui l'orienter, une RECOMMANDATION qu'un humain confirme.
-		 *
-		 * Six colonnes et non un JSON. Les trois `lead_*` sont precisement ce
-		 * sur quoi l'administration filtre ; un JSON_EXTRACT ne s'indexe pas, et
-		 * « montre-moi les demandes a orienter vers Premibel » ferait alors un
-		 * parcours complet de table. Les deux `utm_*` rejoignent une serie deja
-		 * en colonnes : en ranger deux ailleurs que les trois autres n'aurait
-		 * decrit aucune realite. `lead_destination` porte un index, c'est le
-		 * filtre quotidien.
-		 *
-		 * `lead_destination_auto` (schema 5) : ce que la regle a recommande a la
-		 * creation, et qui ne bouge plus jamais. `lead_destination` porte la
-		 * decision en vigueur, qu'un gestionnaire peut corriger. Comparer les deux
-		 * repond a « cette demande a-t-elle ete reorientee par un humain, et
-		 * depuis quoi ? » sans avoir a relire les notes.
-		 *
-		 * Une colonne plutot qu'un recalcul a l'affichage : recalculer aurait
-		 * demande de reecrire la regle en PHP, donc de la tenir a jour dans deux
-		 * langages, et aurait fait mentir les vieilles demandes le jour ou la
-		 * regle change. Ce qui est ecrit est ce qui a ete decide ce jour-la.
-		 *
-		 * Les champs de projet sont des VARCHAR courts et non des ENUM SQL : les
-		 * valeurs possibles sont des listes éditoriales du front (types de pièce,
-		 * de support…) qui évolueront sans qu'on veuille modifier une table.
-		 */
+
+
 		$projects = "CREATE TABLE {$t['projects']} (
   id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   reference varchar(20) DEFAULT NULL,
@@ -164,11 +94,8 @@ final class Schema {
   KEY lead_destination (lead_destination)
 ) $charset;";
 
-		/*
-		 * pp_project_history : un enregistrement par transition de statut.
-		 * `user_id` 0 = action automatique (création par le formulaire, robot).
-		 * `old_status` NULL à la création. `comment` libre et facultatif.
-		 */
+
+
 		$history = "CREATE TABLE {$t['history']} (
   id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   project_id bigint(20) unsigned NOT NULL,
@@ -182,9 +109,8 @@ final class Schema {
   KEY created_at (created_at)
 ) $charset;";
 
-		/*
-		 * pp_project_notes : notes internes, jamais visibles du client.
-		 */
+
+
 		$notes = "CREATE TABLE {$t['notes']} (
   id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   project_id bigint(20) unsigned NOT NULL,
@@ -199,14 +125,8 @@ final class Schema {
 		return [ $projects, $history, $notes ];
 	}
 
-	/**
-	 * Les tables existent-elles réellement ? Nom logique → booléen.
-	 *
-	 * Interroge information_schema plutôt que SHOW TABLES LIKE : pas de motif à
-	 * échapper, et le nom est comparé exactement.
-	 *
-	 * @return array<string,bool>
-	 */
+
+
 	public static function status(): array {
 		global $wpdb;
 		$out = [];

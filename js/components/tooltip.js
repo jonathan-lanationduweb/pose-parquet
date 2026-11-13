@@ -1,6 +1,6 @@
 import { qsa, on } from '../utils/dom.js';
 
-/** Infobulle sur terme technique : survol, focus et clavier. */
+
 export function initTooltips() {
   qsa('[data-tip]').forEach((tip) => {
     const bubble = document.createElement('span');

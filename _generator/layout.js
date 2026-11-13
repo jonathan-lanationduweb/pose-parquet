@@ -1,20 +1,12 @@
-/* Gabarit HTML commun : head, header, footer. Génère des fichiers statiques. */
 const { assets } = require('./assets');
 const { aPrecharger } = require('./polices');
 
-/*
- * Les deux polices prechargees, lues dans css/fonts.css au lieu d'etre
- * nommees ici. Un renommage de fichier ne peut plus laisser un <link
- * rel="preload"> pointer dans le vide. Voir _generator/polices.js.
- */
+
+
 const POLICE_TITRE = aPrecharger('Instrument Serif');
 const POLICE_TEXTE = aPrecharger('Inter');
-/*
- * « Mon site » (WordPress) : identité, libellés de l'en-tête et du pied de
- * page, liens commerciaux. Les valeurs par défaut et le schéma sont dans
- * content-site.js ; WordPress les remplace avant tout rendu (wordpress.js).
- * Ici, seulement la MANIÈRE de les afficher.
- */
+
+
 const { REGLAGES } = require('./content-site');
 const T = require('./textes');
 
@@ -28,7 +20,7 @@ const SITE = {
   },
 };
 
-/* Les adresses suivent l'arborescence : WordPress règle le libellé et l'affichage. */
+
 const NAV = [
   { href: 'guides/', cle: 'guides', section: 'guides' },
   { href: 'motifs/', cle: 'motifs', section: 'motifs' },
@@ -45,24 +37,14 @@ const DRAWER_EXTRA = [
 const visibles = (liste) =>
   liste.filter((item) => REGLAGES[`nav_${item.cle}_afficher`]).map((item) => ({ ...item, label: T.texte(REGLAGES[`nav_${item.cle}`]) }));
 
-/** Le nom du site en logotype texte : premier mot en valeur, la suite atténuée. */
+
 const motsDuNom = () => {
   const [premier, ...suite] = String(REGLAGES.nom).split(' ');
   return [T.texte(premier), T.texte(suite.join(' '))];
 };
 
-/**
- * Le symbole d'identité — Concept C : trois lames verticales inégales,
- * traversées par des ruptures diagonales décalées.
- *
- * La géométrie est **générée** par _generator/make-icons.js, qui la tient de
- * mesures faites au pixel sur la planche validée. Une seule source pour le
- * favicon, les icônes d'application et l'interface : le symbole ne peut donc
- * pas diverger d'un support à l'autre.
- *
- * Il est employé avec parcimonie — en-tête, pied de page, favicon — et jamais
- * en motif décoratif répété : c'est sa rareté qui lui donne sa force.
- */
+
+
 const SYMBOL_PATH = 'M0 0H0.3396V0.5584L0 0.6396ZM0 0.6599L0.3396 0.5787V1H0ZM0.4057 0H0.7453V0.2437L0.4057 0.3249ZM0.4057 0.3452L0.7453 0.264V1H0.4057ZM0.8208 0H1V0.5584L0.8208 0.6012ZM0.8208 0.6215L1 0.5787V1H0.8208Z';
 const symbol = (className) =>
   `<svg class="${className}" viewBox="0 0 106 197" fill="currentColor" aria-hidden="true"><g transform="scale(106 197)"><path d="${SYMBOL_PATH}"/></g></svg>`;
@@ -118,29 +100,24 @@ function header(p) {
       <div class="drawer__footer">
         <a class="btn btn--light btn--block" href="${p}projet/"><span>${T.texte(REGLAGES.menu_cta_projet)}</span>${arrow}</a>
         <a class="btn btn--outline-light btn--block" href="${p}outils/studio.html"><span>${T.texte(REGLAGES.menu_cta_visualiseur)}</span></a>
-        <!-- « Média indépendant · aucune vente en ligne » figurait aussi ici.
-             L'information est utile, mais répétée en tête de menu sur chaque
-             page elle prend un ton défensif. Elle reste dans le pied de page et
-             développée sur la page À propos, c'est-à-dire là où on la cherche. -->
+
+
+
+
         <p class="drawer__meta">${T.texte(REGLAGES.menu_note)}</p>
       </div>
     </div>`;
 }
 
-/**
- * Pied de page compact.
- *
- * Trois groupes de liens, pas l'arborescence complète : le pied de page sert
- * à rebondir, pas à refaire la navigation. La signature typographique reste,
- * mais serrée — elle signe la page au lieu d'en ouvrir une seconde.
- */
+
+
 function footer(p) {
   const R = REGLAGES;
   const lien = (href, cle) => (R[`pied_${cle}_afficher`] ? [[href, T.texte(R[`pied_${cle}`])]] : []);
   const groups = [
     {
       title: T.texte(R.pied_col_comprendre),
-      // Le blog n'apparaît qu'à partir du premier article publié.
+
       links: [...lien('guides/', 'guides'), ...lien('motifs/', 'motifs'), ...lien('tutoriels/', 'tutoriels'), ...(require('./content-blog').ARTICLES.length ? [['blog/', 'Blog']] : [])],
     },
     {
@@ -153,7 +130,7 @@ function footer(p) {
     },
   ].filter((group) => group.links.length);
 
-  // La mention d'orientation : une destination désactivée n'y figure plus.
+
   const destinations = [
     R.premibel_afficher ? `<strong>${T.riche(R.premibel_libelle)}</strong> ${T.texte(R.pied_premibel)}` : '',
     R.allure_afficher ? `<strong>${T.riche(R.allure_libelle)}</strong> ${T.texte(R.pied_allure)}` : '',
@@ -182,30 +159,30 @@ function footer(p) {
           </nav>
         </div>
         <div class="footer__bottom">
-          <!--
-            « Média indépendant, aucune vente en ligne » figurait ici.
 
-            La première moitié n'est plus exacte : le site oriente vers les
-            références de Premibel quand elles existent, et un lecteur qui
-            découvrirait ce lien après coup aurait raison de se sentir trompé.
-            La seconde reste vraie — rien ne se vend ni ne se paie ici — mais
-            énoncée seule elle laissait entendre la première.
 
-            Le pied de page ne développe pas : il renvoie à la page qui le
-            fait, une fois, sobrement.
-          -->
+
+
+
+
+
+
+
+
+
+
           <p>&copy; ${T.texte(R.pied_mention)}</p>
-          <!--
-            Deux destinations nommées, une ligne, pas de logo.
 
-            Le pied de page dit vers QUI l'on oriente et pour QUOI ; le détail
-            — la zone, ce que la relation ne change pas — est à la page qui
-            l'explique. Écrire trois phrases ici en ferait une réclame en bas
-            de 32 pages.
-          -->
+
+
+
+
+
+
+
           ${destinations.length ? `<p class="footer__orientation">${destinations.join(', ')} : ${T.texte(R.pied_orientation)} <a href="${p}a-propos/#liens-commerciaux">${T.texte(R.pied_liens_commerciaux)}</a></p>` : ''}
           <p>${T.texte(R.pied_credits)}</p>
-          <!-- Les pages obligatoires et pratiques, sur toutes les pages : c'est là qu'on les cherche. -->
+
           <ul class="footer__legal">
             <li><a href="${p}mentions-legales/">Mentions légales</a></li>
             <li><a href="${p}confidentialite/">Confidentialité et cookies</a></li>
@@ -216,7 +193,7 @@ function footer(p) {
     </footer>`;
 }
 
-/** Le favicon : celui de « Mon site » s'il est choisi, sinon les icônes générées du symbole. */
+
 function favicon(p, build) {
   const f = REGLAGES.favicon;
   if (f && f.chemin) return `    <link rel="icon" href="${p}${T.attribut(f.chemin)}" type="${T.attribut(f.type)}" />`;
@@ -251,25 +228,16 @@ function breadcrumb(p, trail) {
   };
 }
 
-/**
- * @param {object} page
- * @param {string} page.title       balise <title>
- * @param {string} page.description meta description
- * @param {string} page.path        chemin canonique (ex. 'guides/x.html')
- * @param {number} page.depth       0 = racine, 1 = sous-dossier
- * @param {string} page.body        contenu HTML du <main>
- * @param {string[]} [page.css]     feuilles additionnelles, relatives à la racine
- * @param {object[]} [page.jsonld]  données structurées
- * @param {boolean} [page.runtimeConfig] charge config.js (adresse du backend)
- */
+
+
 function layout(page) {
   const p = page.depth === 0 ? '' : '../';
   const canonical = `${SITE.domain}/${page.path}`.replace(/index\.html$/, '');
-  // Les feuilles de page sont déjà dans le bundle : plus rien à charger ici.
-  // `page.css` reste accepté pour la lisibilité des appels, sans effet.
+
+
   const build = assets();
   const jsonld = (page.jsonld || [])
-    // « < » échappé en \u003c : aucune valeur ne peut fermer la balise (« </script> »). Même JSON pour les moteurs.
+
     .map((data) => `\n    <script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`)
     .join('');
   const ogImage = page.ogImage
@@ -283,15 +251,15 @@ function layout(page) {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>${page.title}</title>
     <meta name="description" content="${page.description}" />
-    <!-- Balise robots toujours explicite. Sa valeur par défaut est « index,
-         follow » : les fichiers du dépôt décrivent la production, et c'est le
-         déploiement qui marque une préproduction — voir
-         .github/workflows/deploy-pages.yml et docs/seo-environnements.md. Un
-         noindex écrit ici par prudence finirait tôt ou tard copié en production.
 
-         Une page peut cependant demander autre chose par « page.robots », et
-         une seule le fait : la 404. Elle n'est pas une préproduction, elle n'a
-         simplement rien à indexer — c'est un état d'erreur, pas un contenu. -->
+
+
+
+
+
+
+
+
     <meta name="robots" content="${page.robots || 'index, follow'}" />
     <link rel="canonical" href="${canonical}" />
     <meta name="theme-color" content="#f2efe8" />
@@ -309,26 +277,20 @@ ${favicon(p, build)}
     <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/${POLICE_TITRE}" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/${POLICE_TEXTE}" crossorigin />
     <link rel="stylesheet" href="${p}${build.css}" />${
-      /*
-       * Feuilles rattachées par marqueur.
-       *
-       * On regarde ce que la page CONTIENT, pas ce qu'elle a déclaré. Une
-       * déclaration s'oublie ; un marqueur est l'attribut de montage du
-       * composant lui-même, et il ne peut pas manquer sans que le composant
-       * manque aussi. Voir BUNDLES_PAGE dans assets.js.
-       */
+
+
       (build.pageBundles || [])
         .filter((bundle) => page.body.includes(bundle.marqueur))
         .map((bundle) => `\n    <link rel="stylesheet" href="${p}${bundle.url}" />`)
         .join('')
     }${
-      // Toutes les pages : l'état des sites partenaires se lit sur le backend.
+
       page.runtimeConfig !== false
         ? `
-    <!-- Adresse du backend, définissable au déploiement sans toucher au code.
-         Script classique et non module : il s'exécute avant les modules, donc
-         avant que api-config.js ne lise window.POSE_PARQUET_CONFIG. Pas
-         d'empreinte dans le nom — c'est ce qui permet de le remplacer. -->
+
+
+
+
     <script src="${p}config.js"></script>`
         : ''
     }
@@ -345,28 +307,10 @@ ${page.body}
 `;
 }
 
-/**
- * Gabarit « application » : le Visualiseur Parquet.
- *
- * Pas d'en-tête éditorial, pas de pied de page, pas de fil d'Ariane. La page
- * ne contient qu'un point de montage : l'interface est construite par
- * js/studio/main.js. Le référencement du sujet vit sur la landing
- * /outils/visualiseur.html, à laquelle cette page renvoie — l'application
- * elle-même n'a rien à indexer.
- */
-/**
- * Coquille d'une APPLICATION : pas de prose, pas de pied de page.
- *
- * Deux applications partagent cette coquille et ne different que par leurs
- * assets et leur point de montage :
- *
- *   studio   outils/studio.html            [data-studio]   js/studio/main.js
- *   product  outils/visualiseur-produit.html [data-product] js/product/main.js
- *
- * Le Visualiseur produit n'est pas une iframe autour du Studio : il importe
- * les memes modules de scene et de rendu, dans la meme page. Voir
- * docs/product-visualizer-integration-v1.md.
- */
+
+
+
+
 function appLayout(page) {
   const p = page.depth === 0 ? '' : '../';
   const build = assets();
@@ -394,7 +338,7 @@ function appLayout(page) {
     <meta property="og:image" content="${SITE.domain}/${page.ogImage || 'assets/images/og-default.jpg'}" />
     <meta name="twitter:card" content="summary_large_image" />${
       (page.jsonld || [])
-        // « < » échappé en <, comme dans layout() : aucune valeur ne peut fermer la balise.
+
         .map((data) => `\n    <script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`)
         .join('')
     }
@@ -404,14 +348,14 @@ ${favicon(p, build)}
     <link rel="preload" as="font" type="font/woff2" href="${p}assets/fonts/${POLICE_TEXTE}" crossorigin />
     <link rel="preload" as="fetch" href="${p}data/parquets.json" crossorigin />
     <link rel="stylesheet" href="${p}${css}" />
-    <!-- Adresse du backend (état des sites partenaires), remplaçable au déploiement. -->
+
     <script src="${p}config.js"></script>
     <script type="module" src="${p}${js}"></script>
   </head>
   <body class="app${produit ? ' app--product' : ''}">
-    <!-- L'outil occupe tout l'écran : son titre reste lisible par les moteurs et les lecteurs d'écran. -->
-    <h1 class="visually-hidden">${page.h1 || page.title}</h1>
+
     <div ${mount} data-base="${p}">
+      <h1 class="app-loading-title">${page.h1 || page.title}</h1>
       <noscript>
         <p class="studio__noscript">Le visualiseur a besoin de JavaScript pour calculer le rendu dans votre navigateur.
         Vous pouvez lire la présentation de l’outil sur la page

@@ -1,4 +1,3 @@
-/* Hero immersif : photographie plein cadre, titre monumental */
 .hero {
   position: relative;
   min-height: min(100svh, 980px);
@@ -27,8 +26,6 @@
 @keyframes hero-zoom { to { transform: scale(1); } }
 .hero__media video { position: absolute; inset: 0; opacity: 0; transition: opacity var(--dur-4) var(--ease-out); }
 .hero__media video[data-ready="true"] { opacity: 1; }
-
-/* Voile : lisibilité du texte en bas de l'image */
 .hero::after {
   content: "";
   position: absolute;
@@ -40,14 +37,6 @@
 
 .hero__inner {
   width: 100%;
-  /*
-   * Le `max()` en tête n'est pas une précaution de style : mesuré à 320 et
-   * 360 px de large, la ligne « Guides · Motifs · Outils » commençait à 64 px
-   * du haut alors que l'en-tête fixe descend à 73 — ses neuf premiers pixels
-   * passaient dessous. La marge du haut ne peut donc pas dépendre seulement
-   * d'une part de la largeur : elle doit d'abord dégager la hauteur de
-   * l'en-tête, quelle que soit la fenêtre.
-   */
   padding-block: max(clamp(2.5rem, 1rem + 6vw, 6rem), calc(var(--header-h) + 1.5rem)) clamp(2.5rem, 1rem + 4vw, 4.5rem);
   display: grid;
   gap: clamp(1.75rem, 1rem + 2.5vw, 3rem);
@@ -77,8 +66,6 @@
   margin: 0;
 }
 .hero__actions { margin-top: var(--sp-5); display: flex; flex-wrap: wrap; gap: var(--sp-3); }
-
-/* Bandeau de métadonnées bas de hero */
 .hero__meta {
   display: flex;
   flex-wrap: wrap;
@@ -106,8 +93,6 @@
 @media (min-width: 60rem) { .hero__scroll { display: inline-flex; } }
 .hero__scroll svg { width: 16px; height: 16px; animation: scroll-bob 2.4s var(--ease-in-out) infinite; }
 @keyframes scroll-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
-
-/* Entrée du hero */
 .hero__inner > *,
 .hero__scroll { animation: hero-rise var(--dur-4) var(--ease-out) both; }
 .hero__inner > *:nth-child(1) { animation-delay: 120ms; }
@@ -121,8 +106,6 @@
   .hero__inner > *, .hero__scroll { animation: none; }
   .hero__scroll svg { animation: none; }
 }
-
-/* Bandeau défilant sous le hero */
 .marquee {
   border-block: 1px solid var(--line);
   overflow: hidden;
@@ -152,8 +135,6 @@
 @media (prefers-reduced-motion: reduce) {
   .marquee__track { animation: none; }
 }
-
-/* Hero de page interne */
 .page-hero {
   padding-top: calc(var(--header-h) + clamp(2.5rem, 1rem + 5vw, 6rem));
   padding-bottom: clamp(2rem, 1rem + 3vw, 4rem);

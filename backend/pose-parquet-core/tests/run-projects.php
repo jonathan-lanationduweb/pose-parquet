@@ -1,18 +1,6 @@
 <?php
-/**
- * Tests du lot 2 contre un WordPress réel : création de demande par l'API.
- *
- *   php tests/run-projects.php <racine WordPress>
- *
- * Couvre : POST valide (201, ligne, référence, historique, consent_at
- * serveur), refus 422 sans écriture, champs injectés, JSON illisible, corps
- * géant, service dégradé (503), migration 1 → 2 avec données conservées,
- * concurrence (références uniques sous plusieurs processus), méthodes
- * interdites, fonctions CORS, journal sans donnée personnelle. Nettoie ce
- * qu'il crée. Code de sortie 1 au premier échec.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -46,19 +34,19 @@ if ( ! is_plugin_active( $plugin ) ) {
 }
 PoseParquet\Core\Plugin::boot();
 do_action( 'rest_api_init' );
-wp_set_current_user( 0 ); // tout ce qui suit est un visiteur anonyme
-require_once ABSPATH . 'wp-admin/includes/template.php'; // do_settings_sections, submit_button
+wp_set_current_user( 0 );
+require_once ABSPATH . 'wp-admin/includes/template.php';
 
-// Identité réseau de test et limites de débit très hautes : la section dédiée les abaisse.
+
 $_SERVER['REMOTE_ADDR'] = '203.0.113.10';
 $limites_test           = [ 'window' => 3600, 'attempts' => 100000, 'successes' => 100000 ];
 add_filter( 'pose_parquet_rate_limits', static function () use ( &$limites_test ): array {
 	return $limites_test;
 } );
 
-// Aucun vrai email : pre_wp_mail court-circuite wp_mail() et rend $mail_result.
+
 $mails_envoyes = [];
-$mail_result   = true; // bool, ou callable(int $index_dans_le_post): bool
+$mail_result   = true;
 $mail_index    = 0;
 add_filter( 'pre_wp_mail', static function ( $null, array $atts ) use ( &$mails_envoyes, &$mail_result, &$mail_index ) {
 	$mails_envoyes[] = $atts;
@@ -66,25 +54,13 @@ add_filter( 'pre_wp_mail', static function ( $null, array $atts ) use ( &$mails_
 	$mail_index++;
 	return (bool) $r;
 }, 10, 2 );
-// Closures et non fonctions fléchées : celles-ci figeraient le tableau à sa création.
+
 $compte_mails = static function () use ( &$mails_envoyes ): int {
 	return count( $mails_envoyes );
 };
 
-/*
- * Les notifications sont MISES EN FILE, plus envoyées pendant la requête.
- *
- * `DISABLE_WP_CRON` vaut `true` sur ce WordPress, et on ne le réactive pas :
- * rien ne part tout seul. Chaque scénario qui regarde un email doit donc
- * vider la file lui-même, exactement comme le fera le cron système en
- * production. C'est plus verbeux, et c'est fidèle : un test qui trouverait
- * l'email parti sans avoir fait tourner l'ordonnanceur testerait autre chose
- * que ce qui tourne en production.
- *
- * Les réessais sont programmés dans le futur (5 min, 30 min, 2 h) : un appel
- * ne déclenche donc qu'UNE tentative par envoi, ce qui est exactement ce
- * qu'on veut observer.
- */
+
+
 $vider_file = static function (): array {
 	return Queue::executer_echeances();
 };
@@ -100,7 +76,7 @@ $dernier_mail = static function ( int $depuis_la_fin = 1 ) use ( &$mails_envoyes
 
 $tables = Schema::tables();
 $repo   = new Repository();
-$crees  = []; // identifiants à supprimer en fin de script
+$crees  = [];
 
 $poster = static function ( string $corps, array $entetes = [] ): WP_REST_Response {
 	$req = new WP_REST_Request( 'POST', '/pose-parquet/v1/projects' );
@@ -112,24 +88,17 @@ $poster = static function ( string $corps, array $entetes = [] ): WP_REST_Respon
 	return rest_do_request( $req );
 };
 $poster_json = static fn( array $donnees ): WP_REST_Response => $poster( (string) wp_json_encode( $donnees ) );
-$nb_lignes   = static fn(): int => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['projects']}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$nb_lignes   = static fn(): int => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['projects']}" );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Pré-requis' );
 
-/*
- * Partir d'une file vide.
- *
- * Les notifications sont désormais différées, et `run-http.php` en laisse
- * derrière lui : ses demandes mettent des envois en file que personne ne
- * traite. Le premier `vider_file()` de ce script les prenait alors au passage,
- * et le scénario « exactement deux emails » en comptait douze — un test qui
- * dépend de ce qui a tourné avant lui ne mesure plus rien.
- */
+
+
 Queue::purger();
 $verifie( 'file des notifications vide au départ', Queue::etat()['total'] === 0, wp_json_encode( Queue::etat() ) );
 $verifie( 'schéma au niveau ' . POSE_PARQUET_DB_VERSION, Installer::installed_version() === POSE_PARQUET_DB_VERSION, (string) Installer::installed_version() );
-$colonnes = $wpdb->get_results( "DESCRIBE {$tables['projects']}", ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$colonnes = $wpdb->get_results( "DESCRIBE {$tables['projects']}", ARRAY_A );
 $par_nom  = array_column( $colonnes, null, 'Field' );
 $verifie( 'colonne style présente', isset( $par_nom['style'] ) );
 $verifie( 'colonne reference nullable', ( $par_nom['reference']['Null'] ?? '' ) === 'YES' );
@@ -137,13 +106,13 @@ $verifie( 'colonnes d’état des emails présentes (schéma 3)', isset( $par_no
 $verifie( 'défaut pending sur les états d’email', ( $par_nom['internal_mail_status']['Default'] ?? '' ) === 'pending' && ( $par_nom['visitor_mail_status']['Default'] ?? '' ) === 'pending' );
 $verifie( 'adresse de réception configurée par défaut (admin_email)', Settings::is_configured() && Settings::notification_email() === get_option( 'admin_email' ) );
 $verifie( 'confirmation visiteur désactivée par défaut (pas de relais d’emails vers une adresse saisie)', Settings::defaults()[ Settings::KEY_VISITOR_CONFIRMATION ] === false );
-// Les scénarios qui suivent éprouvent les DEUX emails (interne et accusé visiteur) : l'accusé est activé pour eux,
-// comme le ferait un administrateur. La fin du script efface les réglages (retour aux défauts).
+
+
 Settings::update( [ Settings::KEY_VISITOR_CONFIRMATION => true ] );
 $verifie( 'pp_projects est InnoDB (transactions)', $repo->supports_transactions() );
-$verifie( 'aucune ligne sans référence avant les tests', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['projects']} WHERE reference IS NULL" ) === 0 ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$verifie( 'aucune ligne sans référence avant les tests', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['projects']} WHERE reference IS NULL" ) === 0 );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'POST valide' );
 $avant   = $nb_lignes();
 $t0      = time();
@@ -157,25 +126,20 @@ $verifie( 'Cache-Control: no-store', ( $reponse->get_headers()['Cache-Control'] 
 $verifie( 'X-Request-Id présent (16 hex)', (bool) preg_match( '/^[0-9a-f]{16}$/', $reponse->get_headers()['X-Request-Id'] ?? '' ) );
 $verifie( 'une ligne de plus', $nb_lignes() === $avant + 1 );
 
-/*
- * Ce que la réponse promet : rien.
- *
- * C'est le cœur du changement. Le visiteur reçoit son 201 sans qu'aucun
- * `wp_mail()` n'ait été appelé — mesuré ici, pas supposé — et les deux
- * états sont `pending`, ce qui est la vérité : accepté, pas encore tenté.
- */
+
+
 $verifie( 'aucun email pendant la requête', $compte_mails() === 0, (string) $compte_mails() );
 $ligne_neuve = $repo->find_by_reference( (string) $corps['reference'] );
 $verifie( 'états à pending juste après le 201', $ligne_neuve && $ligne_neuve['internal_mail_status'] === 'pending' && $ligne_neuve['visitor_mail_status'] === 'pending' );
-$verifie( 'la réponse annonce pending, pas sent', ( $corps['mails']['internal'] ?? '' ) === '' || true ); // la réponse publique ne porte pas les états
+$verifie( 'la réponse annonce pending, pas sent', ( $corps['mails']['internal'] ?? '' ) === '' || true );
 $file_avant = Queue::etat();
 $verifie( 'deux événements planifiés', $file_avant['total'] >= 2, wp_json_encode( $file_avant ) );
 
-/* `$bilan` est deja la cloture de synthese de pp_test_outils() : ne pas l'ecraser. */
+
 $passe_file = $vider_file();
 $verifie( 'la file traite les deux envois', $passe_file['traites'] >= 2, wp_json_encode( $passe_file ) );
 
-/* Emails du POST valide : deux tentatives, l'interne puis la confirmation. */
+
 $verifie( 'exactement deux emails tentés (interne + visiteur)', $compte_mails() === 2, (string) $compte_mails() );
 $interne = $dernier_mail( 2 );
 $visiteur = $dernier_mail( 1 );
@@ -228,7 +192,7 @@ if ( $ligne ) {
 	$verifie( 'historique : created_at = celui de la demande', ( $ev['created_at'] ?? '' ) === $ligne['created_at'] );
 }
 
-/* Departement francilien : la region doit en etre deduite, pas recue. */
+
 $reponse2 = $poster_json( pp_requete_valide( [ 'department' => '75', 'city' => null, 'style' => null, 'message' => null, 'sourceUrl' => null ] ) );
 $verifie( 'POST minimal (obligatoires seuls) → 201', $reponse2->get_status() === 201, wp_json_encode( $reponse2->get_data() ) );
 $ligne2 = $repo->find_by_reference( (string) ( $reponse2->get_data()['reference'] ?? '' ) );
@@ -239,11 +203,11 @@ if ( $ligne2 ) {
 	$verifie( 'références distinctes et croissantes', $ligne2['reference'] !== $ligne['reference'] && (int) $ligne2['id'] > (int) $ligne['id'] );
 }
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Refus sans écriture' );
 $avant = $nb_lignes();
-$hist_avant = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-$vider_file(); // partir d'une file vide : le compte ci-dessous ne doit porter que sur cette section
+$hist_avant = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" );
+$vider_file();
 $mails_avant_refus = $compte_mails();
 
 $r = $poster_json( pp_requete_valide( [ 'email' => 'pas-un-email' ] ) );
@@ -252,8 +216,8 @@ $verifie( 'email invalide → 422', $r->get_status() === 422 );
 $verifie( 'format d’erreur { code, message, fields }', ( $d['code'] ?? '' ) === 'validation_failed' && isset( $d['message'], $d['fields'] ) );
 $verifie( 'fields.email renseigné', isset( ( (array) $d['fields'] )['email'] ) );
 
-// Le consentement n'est plus obligatoire (coordonnées facultatives) : le refus
-// « champ obligatoire absent » se vérifie sur le département.
+
+
 $r = $poster_json( pp_requete_valide( [ 'department' => null ] ) );
 $verifie( 'département absent → 422', $r->get_status() === 422 );
 $r = $poster_json( pp_requete_valide( [ 'consent' => false ] ) );
@@ -271,11 +235,11 @@ foreach ( [ 'status' => 'completed', 'reference' => 'PP-2026-999999', 'createdAt
 }
 $verifie( 'aucune référence PP-2026-999999 créée', $repo->find_by_reference( 'PP-2026-999999' ) === null );
 
-// Un corps JSON illisible est intercepté par WordPress lui-même (rest_invalid_json)
-// quand le Content-Type est application/json.
+
+
 $r = $poster( '{"zone": "idf", ' );
 $verifie( 'JSON illisible (application/json) → 400', $r->get_status() === 400 && in_array( $r->get_data()['code'] ?? '', [ 'invalid_json', 'rest_invalid_json' ], true ), wp_json_encode( $r->get_data() ) );
-// Un autre type de contenu n'est plus lu du tout : le refus précède le corps.
+
 $req_txt = new WP_REST_Request( 'POST', '/pose-parquet/v1/projects' );
 $req_txt->set_header( 'Content-Type', 'text/plain' );
 $req_txt->set_body( '{"zone": "idf", ' );
@@ -309,18 +273,14 @@ if ( $r->get_status() === 201 ) {
 }
 
 $verifie( 'aucune ligne créée par les refus', $nb_lignes() === $avant, $nb_lignes() . ' vs ' . $avant );
-$verifie( 'aucun historique orphelin créé par les refus', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" ) === $hist_avant + 2 ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-$vider_file(); // les deux créations de cette section ont mis quatre envois en file
+$verifie( 'aucun historique orphelin créé par les refus', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" ) === $hist_avant + 2 );
+$vider_file();
 $verifie( 'aucun email tenté pour un refus (2 créations × 2 emails seulement)', $compte_mails() === $mails_avant_refus + 4, (string) ( $compte_mails() - $mails_avant_refus ) );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Projet sans coordonnées (formulaire « Décrivez votre projet »)' );
-/*
- * Depuis le 06/10/2026, le formulaire public ne demande plus aucune donnée
- * personnelle : il qualifie un projet pour orienter vers Premibel ou Allure
- * Design. Le serveur doit l'enregistrer sans consentement inventé ni accusé
- * de réception impossible.
- */
+
+
 $vider_file();
 $mails_avant_anonyme = $compte_mails();
 $r = $poster_json( pp_requete_valide( [ 'firstName' => null, 'lastName' => null, 'email' => null, 'phone' => null, 'consent' => null, 'message' => null ] ) );
@@ -330,22 +290,19 @@ if ( $r->get_status() === 201 ) {
 	$crees[] = (int) $l['id'];
 	$verifie( 'aucune donnée personnelle stockée', $l['first_name'] === '' && $l['last_name'] === '' && $l['email'] === '' && $l['phone'] === '' );
 	$verifie( 'sans consentement : consent_at reste NULL', $l['consent_at'] === null, (string) $l['consent_at'] );
-	// L'état est figé à la mise en file, en base : on relit la ligne.
+
 	$etat_visiteur = (string) ( $repo->find_by_id( (int) $l['id'] )['visitor_mail_status'] ?? '' );
 	$verifie( 'sans adresse : accusé de réception « skipped », pas un échec', $etat_visiteur === 'skipped', $etat_visiteur );
 	$vider_file();
 	$verifie( 'seule la notification interne est tentée', $compte_mails() === $mails_avant_anonyme + 1, (string) ( $compte_mails() - $mails_avant_anonyme ) );
 }
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Type de contenu exigé' );
-/*
- * Le refus doit précéder tout le reste : ni ligne, ni historique, ni courrier.
- * C'est ce qui ferme la soumission inter-origines « simple » — celle qui, en
- * text/plain, ne déclenche aucun préflight et se moquait donc des en-têtes CORS.
- */
+
+
 $avant      = $nb_lignes();
-$hist_avant = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$hist_avant = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" );
 $mails_avant = $compte_mails();
 $corps_valide = (string) wp_json_encode( pp_requete_valide() );
 
@@ -374,11 +331,11 @@ $r = $poster_type( '', $corps_valide );
 $verifie( 'Content-Type vide → 415', $r->get_status() === 415, (string) $r->get_status() );
 
 $verifie( 'aucune ligne créée par les types refusés', $nb_lignes() === $avant );
-$verifie( 'aucun historique créé', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" ) === $hist_avant ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$verifie( 'aucun historique créé', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" ) === $hist_avant );
 $verifie( 'aucun courrier parti', $compte_mails() === $mails_avant );
 $verifie( 'la réponse 415 ne contient ni champ ni donnée saisie', ! str_contains( (string) wp_json_encode( $r->get_data() ), 'Dupont' ) && ! str_contains( (string) wp_json_encode( $r->get_data() ), '@' ) );
 
-// Et le type attendu passe, avec ou sans paramètre.
+
 $r = $poster_type( 'application/json', (string) wp_json_encode( pp_requete_valide() ) );
 $verifie( 'application/json → 201', $r->get_status() === 201, (string) $r->get_status() );
 $crees[] = (int) ( $repo->find_by_reference( $r->get_data()['reference'] ?? '' )['id'] ?? 0 );
@@ -389,7 +346,7 @@ $r = $poster_type( 'APPLICATION/JSON', (string) wp_json_encode( pp_requete_valid
 $verifie( 'casse du type tolérée (APPLICATION/JSON) → 201', $r->get_status() === 201, (string) $r->get_status() );
 $crees[] = (int) ( $repo->find_by_reference( $r->get_data()['reference'] ?? '' )['id'] ?? 0 );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Jeton à usage unique' );
 $jeton_unique = FormToken::issue( time() - 10 );
 $avant        = $nb_lignes();
@@ -403,7 +360,7 @@ $verifie( 'deuxième utilisation du MÊME jeton → 422 form_token_invalid', $r-
 $verifie( 'le refus nomme le champ formToken (le front sait renouveler)', isset( ( (array) $r->get_data()['fields'] )['formToken'] ) );
 $verifie( 'une seule ligne créée par les deux envois', $nb_lignes() === $avant + 1 );
 
-// Deux jetons distincts restent deux créations possibles.
+
 $r1 = $poster_json( pp_requete_valide( [ 'formToken' => FormToken::issue( time() - 10 ) ] ) );
 $r2 = $poster_json( pp_requete_valide( [ 'formToken' => FormToken::issue( time() - 10 ) ] ) );
 $verifie( 'deux jetons différents → deux créations', $r1->get_status() === 201 && $r2->get_status() === 201 );
@@ -411,7 +368,7 @@ foreach ( [ $r1, $r2 ] as $rr ) {
 	$crees[] = (int) ( $repo->find_by_reference( $rr->get_data()['reference'] ?? '' )['id'] ?? 0 );
 }
 
-// Un refus de validation ne doit pas coûter le jeton : on corrige et on renvoie.
+
 $jeton_corrige = FormToken::issue( time() - 10 );
 $r = $poster_json( pp_requete_valide( [ 'formToken' => $jeton_corrige, 'email' => 'pas-un-email' ] ) );
 $verifie( 'champ invalide → 422 validation_failed', $r->get_status() === 422 && ( $r->get_data()['code'] ?? '' ) === 'validation_failed' );
@@ -420,7 +377,7 @@ $r = $poster_json( pp_requete_valide( [ 'formToken' => $jeton_corrige ] ) );
 $verifie( 'correction envoyée avec le même jeton → 201', $r->get_status() === 201, $r->get_status() . ' ' . wp_json_encode( $r->get_data() ) );
 $crees[] = (int) ( $repo->find_by_reference( $r->get_data()['reference'] ?? '' )['id'] ?? 0 );
 
-// Les fonctions elles-mêmes.
+
 $j = FormToken::issue( time() - 10 );
 $verifie( 'consume() rend true une fois, false ensuite', FormToken::consume( $j ) === true && FormToken::consume( $j ) === false );
 $verifie( 'is_consumed() le voit', FormToken::is_consumed( $j ) );
@@ -428,10 +385,10 @@ FormToken::release( $j );
 $verifie( 'release() le rend réutilisable', ! FormToken::is_consumed( $j ) && FormToken::consume( $j ) === true );
 $verifie( 'un jeton illisible ne se réserve pas', FormToken::consume( 'n’importe quoi' ) === false && FormToken::consume( null ) === false );
 $verifie( 'un jeton expiré ne se réserve pas', FormToken::consume( FormToken::issue( time() - 7300 ) ) === false );
-$verifie( 'la clé stockée ne contient ni le jeton ni le nonce', (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE %s", '%' . $wpdb->esc_like( explode( '.', $j )[2] ) . '%' ) ) === 0 ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$verifie( 'la clé stockée ne contient ni le jeton ni le nonce', (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE %s", '%' . $wpdb->esc_like( explode( '.', $j )[2] ) . '%' ) ) === 0 );
 $verifie( 'deux jetons du même instant ont deux clés distinctes', FormToken::consume( FormToken::issue( time() - 10 ) ) && FormToken::consume( FormToken::issue( time() - 10 ) ) );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Journal et réponses sans donnée personnelle' );
 $journal = defined( 'WP_DEBUG_LOG' ) && is_string( WP_DEBUG_LOG ) ? WP_DEBUG_LOG : WP_CONTENT_DIR . '/debug.log';
 $marque  = 'sentinelle' . wp_rand( 1000, 9999 );
@@ -449,22 +406,22 @@ $verifie( 'le journal contient une trace « Demande créée » avec project_id',
 $verifie( 'la réponse 422 ne renvoie pas l’email saisi', ! str_contains( (string) wp_json_encode( $r_ko->get_data() ), $marque ) );
 $verifie( 'la réponse 422 ne contient ni SQL ni chemin', ! preg_match( '/SELECT|INSERT|wp-content|' . preg_quote( str_replace( '\\', '/', ABSPATH ), '/' ) . '/i', str_replace( '\\', '/', (string) wp_json_encode( $r_ko->get_data() ) ) ) );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Service dégradé' );
-update_option( Installer::OPTION_DB_VERSION, 1 ); // schéma en retard : on n'écrit pas
+update_option( Installer::OPTION_DB_VERSION, 1 );
 $avant = $nb_lignes();
 $r     = $poster_json( pp_requete_valide() );
 $verifie( 'schéma en retard → 503 service_unavailable', $r->get_status() === 503 && ( $r->get_data()['code'] ?? '' ) === 'service_unavailable', (string) $r->get_status() );
 $verifie( 'aucune ligne écrite en mode dégradé', $nb_lignes() === $avant );
 update_option( Installer::OPTION_DB_VERSION, POSE_PARQUET_DB_VERSION );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Migration 1 → ' . POSE_PARQUET_DB_VERSION . ' avec données' );
-// On remet la table dans l'état du schéma 1 : reference NOT NULL, ni style ni états d'email.
-$wpdb->query( "ALTER TABLE {$tables['projects']} DROP COLUMN style, DROP COLUMN internal_mail_status, DROP COLUMN internal_mail_sent_at, DROP COLUMN visitor_mail_status, DROP COLUMN visitor_mail_sent_at" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-$wpdb->query( "ALTER TABLE {$tables['projects']} MODIFY reference varchar(20) NOT NULL" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+$wpdb->query( "ALTER TABLE {$tables['projects']} DROP COLUMN style, DROP COLUMN internal_mail_status, DROP COLUMN internal_mail_sent_at, DROP COLUMN visitor_mail_status, DROP COLUMN visitor_mail_sent_at" );
+$wpdb->query( "ALTER TABLE {$tables['projects']} MODIFY reference varchar(20) NOT NULL" );
 update_option( Installer::OPTION_DB_VERSION, 1 );
-$verifie( 'état v1 reproduit (style absent)', ! in_array( 'style', $wpdb->get_col( "DESCRIBE {$tables['projects']}", 0 ), true ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$verifie( 'état v1 reproduit (style absent)', ! in_array( 'style', $wpdb->get_col( "DESCRIBE {$tables['projects']}", 0 ), true ) );
 $now = current_time( 'mysql', true );
 $wpdb->insert( $tables['projects'], [ 'reference' => 'PP-TEST-MIG001', 'status' => 'new', 'first_name' => 'Migr', 'created_at' => $now, 'updated_at' => $now ] );
 $id_mig  = (int) $wpdb->insert_id;
@@ -473,7 +430,7 @@ $total   = $nb_lignes();
 
 Installer::maybe_upgrade();
 
-$par_nom = array_column( $wpdb->get_results( "DESCRIBE {$tables['projects']}", ARRAY_A ), null, 'Field' ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$par_nom = array_column( $wpdb->get_results( "DESCRIBE {$tables['projects']}", ARRAY_A ), null, 'Field' );
 $verifie( 'version enregistrée = ' . POSE_PARQUET_DB_VERSION, Installer::installed_version() === POSE_PARQUET_DB_VERSION );
 $verifie( 'colonne style ajoutée', isset( $par_nom['style'] ) && str_starts_with( $par_nom['style']['Type'], 'varchar(40)' ) );
 $verifie( 'colonnes d’état des emails ajoutées', isset( $par_nom['internal_mail_status'], $par_nom['visitor_mail_sent_at'] ) );
@@ -486,7 +443,7 @@ $verifie( 'ancienne ligne : états d’email = pending (aucun envoi n’a eu lie
 Installer::maybe_upgrade();
 $verifie( 'seconde exécution sans effet ni erreur', Installer::installed_version() === POSE_PARQUET_DB_VERSION && $wpdb->last_error === '' );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Concurrence : références uniques' );
 $ouvriers = 6;
 $chacun   = 5;
@@ -515,12 +472,12 @@ $verifie( "$ouvriers × $chacun références produites", count( $refs ) === $ouv
 $verifie( 'aucun échec de création', ! array_filter( $refs, static fn( string $r ): bool => str_starts_with( $r, 'ECHEC' ) ) );
 $verifie( 'toutes les références sont uniques', count( array_unique( $refs ) ) === count( $refs ) );
 $verifie( 'toutes au bon format', ! array_filter( $refs, static fn( string $r ): bool => ! Reference::is_valid( $r ) ) );
-$ids_conc = $wpdb->get_col( "SELECT id FROM {$tables['projects']} WHERE last_name LIKE 'Concurrence %'" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-$verifie( 'chaque demande concurrente a exactement un événement d’historique', $ids_conc && (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']} WHERE project_id IN (" . implode( ',', array_map( 'intval', $ids_conc ) ) . ')' ) === count( $ids_conc ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-$verifie( 'aucune ligne sans référence après la concurrence', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['projects']} WHERE reference IS NULL" ) === 0 ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$ids_conc = $wpdb->get_col( "SELECT id FROM {$tables['projects']} WHERE last_name LIKE 'Concurrence %'" );
+$verifie( 'chaque demande concurrente a exactement un événement d’historique', $ids_conc && (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']} WHERE project_id IN (" . implode( ',', array_map( 'intval', $ids_conc ) ) . ')' ) === count( $ids_conc ) );
+$verifie( 'aucune ligne sans référence après la concurrence', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['projects']} WHERE reference IS NULL" ) === 0 );
 $crees = array_merge( $crees, array_map( 'intval', $ids_conc ) );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Méthodes' );
 foreach ( [ 'GET', 'PUT', 'PATCH', 'DELETE' ] as $m ) {
 	$r = rest_do_request( new WP_REST_Request( $m, '/pose-parquet/v1/projects' ) );
@@ -533,7 +490,7 @@ foreach ( [ 'POST', 'PUT', 'DELETE' ] as $m ) {
 	$verifie( "$m /form-token → 404", $r->get_status() === 404, (string) $r->get_status() );
 }
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Route form-token' );
 $r = rest_do_request( new WP_REST_Request( 'GET', '/pose-parquet/v1/form-token' ) );
 $d = $r->get_data();
@@ -544,7 +501,7 @@ $verifie( 'Cache-Control: no-store', ( $r->get_headers()['Cache-Control'] ?? '' 
 $verifie( 'réponse minuscule (< 300 octets) et sans secret', strlen( (string) wp_json_encode( $d ) ) < 300 && ! str_contains( (string) wp_json_encode( $d ), wp_salt( 'nonce' ) ) );
 $verifie( 'deux jetons successifs différents (nonce)', $d['token'] !== rest_do_request( new WP_REST_Request( 'GET', '/pose-parquet/v1/form-token' ) )->get_data()['token'] );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Jeton temporel' );
 $verifie( 'jeton émis il y a 10 s : valide', FormToken::verify( FormToken::issue( time() - 10 ) ) === '' );
 $verifie( 'jeton émis à l’instant : trop jeune (early)', FormToken::verify( FormToken::issue() ) === FormToken::EARLY );
@@ -573,17 +530,17 @@ $verifie( 'POST avec jeton expiré → 422', $r->get_status() === 422 && str_con
 $verifie( 'la réponse ne renvoie ni le jeton ni le secret', ! str_contains( (string) wp_json_encode( $r->get_data() ), substr( $jeton, 0, 20 ) ) && ! str_contains( (string) wp_json_encode( $r->get_data() ), wp_salt( 'nonce' ) ) );
 $verifie( 'aucune ligne créée par les jetons refusés', $nb_lignes() === $avant );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Pot de miel' );
 $avant = $nb_lignes();
-$hist_avant = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$hist_avant = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" );
 $mails_avant = $compte_mails();
 $r = $poster_json( pp_requete_valide( [ 'website' => 'http://spam.example' ] ) );
 $verifie( 'website rempli → 422 submission_rejected', $r->get_status() === 422 && ( $r->get_data()['code'] ?? '' ) === 'submission_rejected', wp_json_encode( $r->get_data() ) );
 $verifie( 'message générique, sans « honeypot »', ! stripos( (string) wp_json_encode( $r->get_data() ), 'honeypot' ) && ! stripos( (string) wp_json_encode( $r->get_data() ), 'website' ) );
 $r = $poster_json( pp_requete_valide( [ 'website' => ' x' ] ) );
 $verifie( 'website « x » → 422', $r->get_status() === 422 );
-$verifie( 'aucune ligne, aucun historique, aucun email', $nb_lignes() === $avant && (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" ) === $hist_avant && $compte_mails() === $mails_avant ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$verifie( 'aucune ligne, aucun historique, aucun email', $nb_lignes() === $avant && (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" ) === $hist_avant && $compte_mails() === $mails_avant );
 $r = $poster_json( pp_requete_valide( [ 'website' => '' ] ) );
 $verifie( 'website vide → 201 (champ technique accepté, non « inconnu »)', $r->get_status() === 201, wp_json_encode( $r->get_data() ) );
 if ( $r->get_status() === 201 ) {
@@ -592,7 +549,7 @@ if ( $r->get_status() === 201 ) {
 	$verifie( 'website et formToken absents de la ligne stockée', ! isset( $l['website'], $l['formToken'] ) && ! str_contains( (string) wp_json_encode( $l ), 'v1.' ) );
 }
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Limite de débit' );
 $limiter = new RateLimiter();
 $_SERVER['REMOTE_ADDR'] = '198.51.100.7';
@@ -627,9 +584,9 @@ if ( $r5->get_status() === 201 ) {
 }
 $verifie( 'condensats distincts, 32 hex, sans l’adresse', $client_a !== $client_b && preg_match( '/^[a-f0-9]{32}$/', $client_a ) && ! str_contains( $client_a, '198' ) );
 $verifie( 'même adresse → même condensat', ClientIdentity::hash( '198.51.100.7' ) === $client_a );
-$cles = $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE '%transient%pp_rl_%'" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$cles = $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE '%transient%pp_rl_%'" );
 $verifie( 'transients nommés par condensat, jamais par adresse', count( $cles ) >= 2 && ! array_filter( $cles, static fn( string $k ): bool => str_contains( $k, '198.51' ) || str_contains( $k, '203.0' ) ) );
-$valeurs = $wpdb->get_col( "SELECT option_value FROM {$wpdb->options} WHERE option_name LIKE '_transient_pp_rl_%'" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$valeurs = $wpdb->get_col( "SELECT option_value FROM {$wpdb->options} WHERE option_name LIKE '_transient_pp_rl_%'" );
 $verifie( 'transients sans donnée personnelle (compteur et date seulement)', ! array_filter( $valeurs, static fn( string $v ): bool => str_contains( $v, '@' ) || str_contains( $v, 'Test' ) || str_contains( $v, '198.51' ) ) );
 $verifie( 'clé de transient : condensat seulement', $limiter->key( $client_a, RateLimiter::ATTEMPTS ) === 'pp_rl_a_' . $client_a );
 add_filter( 'pose_parquet_client_ip', static fn(): string => '192.0.2.99' );
@@ -641,7 +598,7 @@ $verifie( 'X-Forwarded-For ignoré par défaut', ( static function () use ( $cli
 	unset( $_SERVER['HTTP_X_FORWARDED_FOR'] );
 	return $id === $client_b;
 } )() );
-// Expiration de la fenêtre : 1 seconde, puis on attend.
+
 $limites_test = [ 'window' => 1, 'attempts' => 1, 'successes' => 1 ];
 $_SERVER['REMOTE_ADDR'] = '198.51.100.9';
 $limiter->forget( ClientIdentity::resolve() );
@@ -658,22 +615,16 @@ foreach ( [ $ra, $rc ] as $rr ) {
 $limites_test = [ 'window' => 3600, 'attempts' => 100000, 'successes' => 100000 ];
 $_SERVER['REMOTE_ADDR'] = '203.0.113.10';
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Emails : échecs non destructifs' );
-$mail_result = false; // wp_mail() rend false pour tout
+$mail_result = false;
 $avant = $nb_lignes();
-$hist_avant = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$hist_avant = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$tables['history']}" );
 $r = $poster_json( pp_requete_valide( [ 'email' => 'echec.total@example.com' ] ) );
 $verifie( 'deux emails en échec : POST → 201 quand même', $r->get_status() === 201 && isset( $r->get_data()['reference'] ), wp_json_encode( $r->get_data() ) );
 $verifie( 'la réponse ne dit rien des emails', count( (array) $r->get_data() ) === 2 );
-/*
- * Quatre passages : la première tentative, puis les trois réessais.
- *
- * `executer_echeances()` ne prend que les événements dûs, et un réessai est
- * programmé dans cinq minutes. On déclenche donc les tentatives suivantes
- * directement, comme l'ordonnanceur le fera le moment venu, pour observer ce
- * qui nous intéresse : l'état n'est `failed` qu'au bout des quatre.
- */
+
+
 $ref_echec = (string) $r->get_data()['reference'];
 $id_echec  = (int) $repo->find_by_reference( $ref_echec )['id'];
 $vider_file();
@@ -696,7 +647,7 @@ Queue::traiter( $id_echec, 'internal', Queue::MAX_TENTATIVES + 1, 'test' );
 $verifie( 'un envoi définitivement en échec ne repart pas tout seul', $repo->find_by_id( $id_echec )['internal_mail_status'] === 'failed' );
 
 $mail_index  = 0;
-$mail_result = static fn( int $i ): bool => $i === 0; // interne OK, visiteur KO
+$mail_result = static fn( int $i ): bool => $i === 0;
 $r  = $poster_json( pp_requete_valide() );
 $id = $r->get_status() === 201 ? (int) $repo->find_by_reference( (string) $r->get_data()['reference'] )['id'] : 0;
 if ( $id ) {
@@ -710,7 +661,7 @@ $l = $id ? $repo->find_by_id( $id ) : null;
 $verifie( 'interne OK / visiteur KO : 201, sent / failed', $l && $l['internal_mail_status'] === 'sent' && $l['visitor_mail_status'] === 'failed' );
 
 $mail_index  = 0;
-$mail_result = static fn( int $i ): bool => $i === 1; // interne KO, visiteur OK
+$mail_result = static fn( int $i ): bool => $i === 1;
 $r  = $poster_json( pp_requete_valide() );
 $id = $r->get_status() === 201 ? (int) $repo->find_by_reference( (string) $r->get_data()['reference'] )['id'] : 0;
 if ( $id ) {
@@ -728,7 +679,7 @@ $contenu = is_file( $journal ) ? (string) file_get_contents( $journal ) : '';
 $verifie( 'journal : « Email non envoyé » avec mail_type et error_code', str_contains( $contenu, 'Email non envoyé' ) && str_contains( $contenu, '"mail_type":"visitor"' ) && str_contains( $contenu, '"error_code":"wp_mail_false"' ) );
 $verifie( 'journal : ni email, ni nom, ni corps de mail', ! str_contains( $contenu, 'echec.total' ) && ! str_contains( $contenu, 'Automatique' ) && ! str_contains( $contenu, 'Nouvelle demande Pose Parquet —' ) && ! str_contains( $contenu, '<table' ) );
 
-/* Confirmation désactivée. */
+
 Settings::update( [ Settings::KEY_VISITOR_CONFIRMATION => false ] );
 $mails_avant = $compte_mails();
 $r = $poster_json( pp_requete_valide() );
@@ -740,8 +691,8 @@ $vider_file();
 $l = $l ? $repo->find_by_id( (int) $l['id'] ) : null;
 $verifie( 'confirmation désactivée : un seul email (interne), visitor_mail_status = skipped', $compte_mails() === $mails_avant + 1 && $l && $l['visitor_mail_status'] === 'skipped' && $l['internal_mail_status'] === 'sent' );
 $verifie( 'confirmation désactivée : rien n’a même été mis en file pour le visiteur', ( static function () use ( $l ): bool {
-	// La file globale porte les réessais des sections précédentes : on ne
-	// regarde donc que les événements de CETTE demande.
+
+
 	if ( ! $l ) {
 		return false;
 	}
@@ -757,7 +708,7 @@ $verifie( 'confirmation désactivée : rien n’a même été mis en file pour l
 } )() );
 Settings::update( [ Settings::KEY_VISITOR_CONFIRMATION => true ] );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Emails : pas de doublon' );
 $mails_avant = $compte_mails();
 $r = $poster_json( pp_requete_valide() );
@@ -768,13 +719,8 @@ $vider_file();
 $verifie( 'un POST = exactement 2 appels à wp_mail', $compte_mails() === $mails_avant + 2, (string) ( $compte_mails() - $mails_avant ) );
 $verifie( 'destinataires distincts (interne ≠ visiteur)', ( $dernier_mail( 2 )['to'] ?? '' ) !== ( $dernier_mail( 1 )['to'] ?? '' ) );
 
-/*
- * L'idempotence, là où elle se joue vraiment.
- *
- * Une file rejoue : double passage du cron, événement dupliqué, bouton
- * cliqué deux fois. La garantie ne vient pas de la file mais de la colonne :
- * un envoi déjà `sent` ne repart pas, quoi qu'on lui demande.
- */
+
+
 $id_doublon = (int) $repo->find_by_reference( (string) $r->get_data()['reference'] )['id'];
 $avant_rejeu = $compte_mails();
 $vider_file();
@@ -796,18 +742,11 @@ $verifie( 'une demande inexistante ne fait rien', ( static function () use ( $co
 	Queue::traiter( 999999999, 'internal', 1, 'test' );
 	return $compte_mails() === $n;
 } )() );
-// Le plugin n'envoie pas sur événement : un hook enregistré deux fois enverrait deux fois.
+
 $sources = array_map( 'file_get_contents', array_merge( glob( POSE_PARQUET_DIR . '/src/*/*.php' ) ?: [], [ POSE_PARQUET_DIR . '/src/Plugin.php' ] ) );
 $verifie( 'aucun hook du plugin sur wp_mail / pre_wp_mail / phpmailer_init', ! preg_grep( "/add_(action|filter)\(\s*'(wp_mail|pre_wp_mail|phpmailer_init)/", $sources ) );
-/*
- * « Un seul appel » doit vouloir dire un appel, pas une mention.
- *
- * La recherche portait sur le texte brut des fichiers : depuis que
- * Mail\Diagnostics nomme `wp_mail()` dans un message d’administration, ce texte
- * apparaît deux fois alors que l’appel reste unique. On retire donc chaînes et
- * commentaires avant de compter — l’assertion devient celle qu’elle prétendait
- * être, et elle échouerait toujours sur un second appel réel.
- */
+
+
 $sans_litteraux = static function ( string $code ): string {
 	$sortie = '';
 	foreach ( token_get_all( $code ) as $jeton ) {
@@ -815,7 +754,7 @@ $sans_litteraux = static function ( string $code ): string {
 			$sortie .= $jeton;
 			continue;
 		}
-		// Un espace plutôt que rien : deux identifiants ne doivent pas se coller.
+
 		$sortie .= in_array( $jeton[0], [ T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE, T_COMMENT, T_DOC_COMMENT, T_INLINE_HTML ], true )
 			? ' '
 			: $jeton[1];
@@ -831,7 +770,7 @@ $verifie(
 	implode( ', ', array_map( static fn( int $i ): string => basename( ( array_merge( glob( POSE_PARQUET_DIR . '/src/*/*.php' ) ?: [], [ POSE_PARQUET_DIR . '/src/Plugin.php' ] ) )[ $i ] ), $appelants ) )
 );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Gabarits' );
 $base_row = $repo->find_by_id( (int) $crees[0] ) ?: [];
 $row = array_merge( $base_row, [
@@ -864,12 +803,12 @@ $verifie( 'confirmation : prénom échappé, référence, pas de balise active',
 $verifie( 'confirmation : texte lisible sans style (Bonjour, Nous avons bien reçu, Pose Parquet)', str_contains( wp_strip_all_tags( $html_v ), 'Nous avons bien reçu votre demande' ) && str_contains( wp_strip_all_tags( $html_v ), 'Pose Parquet' ) );
 $verifie( 'confirmation sans prénom : « Bonjour, »', str_contains( VisitorConfirmation::body( array_merge( $row, [ 'first_name' => '' ] ) ), 'Bonjour,' ) );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Réglages' );
 $comptes = get_users( [ 'role' => 'administrator', 'number' => 1 ] );
 wp_set_current_user( $comptes ? $comptes[0]->ID : 0 );
-// Settings::register() n'est branché que sur une requête d'administration : ici on
-// reproduit ce contexte, ce script n'étant pas WP_ADMIN.
+
+
 Settings::register();
 $defaut = Settings::notification_email();
 $ok = Settings::update( [ Settings::KEY_NOTIFICATION_EMAIL => 'equipe@example.com' ] );
@@ -879,7 +818,7 @@ $verifie( 'la nouvelle adresse est utilisée pour l’interne', ( static functio
 	if ( $r->get_status() === 201 ) {
 		$crees[] = (int) $repo->find_by_reference( (string) $r->get_data()['reference'] )['id'];
 	}
-	$vider_file(); // l'email part par la file, pas pendant la requête
+	$vider_file();
 	return ( $dernier_mail( 2 )['to'] ?? '' ) === 'equipe@example.com';
 } )() );
 global $wp_settings_errors;
@@ -895,13 +834,13 @@ $verifie( 'capability exigée par options.php = pp_manage_settings', apply_filte
 $abonne = get_role( 'subscriber' );
 $verifie( 'abonné : pas la capability → refusé par options.php', $abonne && ! $abonne->has_cap( Capabilities::MANAGE_SETTINGS ) );
 $verifie( 'nonce invalide : refusé (wp_verify_nonce false sur l’action de la page)', ! wp_verify_nonce( 'bidon', Settings::GROUP . '-options' ) );
-// Ce que `admin_init` déclenche pour nous, sans réveiller les en-têtes
-// d'administration de WordPress (impossibles à poser depuis un script CLI).
+
+
 Settings::register_settings();
 ob_start();
 Settings::render();
 $page = (string) ob_get_clean();
-// settings_fields() écrit ses attributs en guillemets simples : on compare sans en dépendre.
+
 $page_nq = str_replace( "'", '"', $page );
 $verifie( 'page Réglages : nonce, option_page, action options.php', str_contains( $page_nq, 'name="_wpnonce"' ) && str_contains( $page_nq, 'name="option_page" value="' . Settings::GROUP . '"' ) && str_contains( $page_nq, 'options.php' ) );
 $verifie( 'page Réglages : deux champs et pas un de plus', str_contains( $page, 'name="pose_parquet_settings[notification_email]"' ) && str_contains( $page, 'name="pose_parquet_settings[visitor_confirmation]"' ) && substr_count( $page, '<input type="email"' ) === 1 && substr_count( $page, '<input type="checkbox"' ) === 1 && substr_count( $page_nq, 'name="pose_parquet_settings[' ) === 2 );
@@ -911,7 +850,7 @@ $verifie( 'visiteur anonyme : rendu de la page refusé', ! current_user_can( Cap
 delete_option( Settings::OPTION );
 $verifie( 'option supprimée → retour au défaut (admin_email)', Settings::notification_email() === $defaut );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'CORS (fonctions)' );
 foreach ( Cors::DEFAULT_ORIGINS as $o ) {
 	$verifie( "origine $o autorisée", Cors::is_allowed( $o ) );
@@ -920,17 +859,11 @@ $verifie( 'barre finale tolérée', Cors::is_allowed( 'https://pose-parquet.com/
 $verifie( 'casse du schéma/hôte tolérée', Cors::is_allowed( 'HTTPS://POSE-PARQUET.COM' ) );
 $verifie( 'autre port refusé', ! Cors::is_allowed( 'http://localhost:5181' ) );
 
-/*
- * Le poste de développement n'est plus autorisé par défaut : il l'était sur
- * toute installation sans POSE_PARQUET_ALLOWED_ORIGINS, production comprise.
- * Il revient quand le site se déclare local — et pas autrement.
- */
+
+
 $verifie( 'localhost:5180 absent des origines par défaut', ! in_array( 'http://localhost:5180', Cors::DEFAULT_ORIGINS, true ) );
-/*
- * Ce que le site répond pour localhost dépend de ce qu'il déclare être, et
- * le test ne doit pas supposer l'environnement de la machine qui le lance :
- * il vérifie la correspondance entre la déclaration et la décision.
- */
+
+
 $dev_declare = in_array( wp_get_environment_type(), [ 'local', 'development' ], true );
 $verifie( 'localhost:5180 autorisé si et seulement si le site se déclare de développement (ici « ' . wp_get_environment_type() . ' »)', Cors::is_allowed( 'http://localhost:5180' ) === $dev_declare );
 $verifie( '127.0.0.1:5180 suit exactement la même règle', Cors::is_allowed( 'http://127.0.0.1:5180' ) === $dev_declare );
@@ -958,35 +891,32 @@ $verifie( 'concerne /pose-parquet/v1/projects', Cors::concerns( '/pose-parquet/v
 $verifie( 'ne concerne pas /wp/v2/posts', ! Cors::concerns( '/wp/v2/posts' ) );
 $verifie( 'filtre rest_pre_serve_request branché', has_filter( 'rest_pre_serve_request', [ Cors::class, 'serve' ] ) === 20 );
 
-/*
- * Le chemin recommandé pour un poste de développement : la liste déclarée
- * dans wp-config.php. Ce test vient en dernier de la section — une constante
- * ne se défait pas, et elle remplace la liste par défaut pour la suite.
- */
+
+
 define( 'POSE_PARQUET_ALLOWED_ORIGINS', [ 'http://localhost:5180', 'https://pose-parquet.com' ] );
 $verifie( 'POSE_PARQUET_ALLOWED_ORIGINS : localhost redevient autorisé', Cors::is_allowed( 'http://localhost:5180' ) );
 $verifie( 'POSE_PARQUET_ALLOWED_ORIGINS : la liste déclarée remplace le défaut', ! Cors::is_allowed( 'https://www.pose-parquet.com' ) && Cors::is_allowed( 'https://pose-parquet.com' ) );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Nettoyage' );
-// Les demandes laissées par run-http.php (client sans base) sont reprises ici.
-$crees = array_merge( $crees, array_map( 'intval', $wpdb->get_col( "SELECT id FROM {$tables['projects']} WHERE last_name = 'HttpTest'" ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+$crees = array_merge( $crees, array_map( 'intval', $wpdb->get_col( "SELECT id FROM {$tables['projects']} WHERE last_name = 'HttpTest'" ) ) );
 $crees = array_unique( array_filter( $crees ) );
 foreach ( $crees as $id ) {
 	$wpdb->delete( $tables['history'], [ 'project_id' => $id ], [ '%d' ] );
 	$wpdb->delete( $tables['projects'], [ 'id' => $id ], [ '%d' ] );
 }
 $verifie( count( $crees ) . ' lignes de test supprimées', true );
-// Compteurs de débit (ceux de ce script et ceux laissés par run-http.php) et réglages : remis à zéro.
-$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_pp_rl_%' OR option_name LIKE '_transient_timeout_pp_rl_%'" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-// Réservations de jetons : elles expireraient seules en deux heures, mais un
-// script de test ne laisse pas derrière lui ce qu'il a écrit.
-$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_pp_ft_%' OR option_name LIKE '_transient_timeout_pp_ft_%'" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_pp_rl_%' OR option_name LIKE '_transient_timeout_pp_rl_%'" );
+
+
+$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_pp_ft_%' OR option_name LIKE '_transient_timeout_pp_ft_%'" );
 delete_option( Settings::OPTION );
-$verifie( 'compteurs de débit effacés', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE '%pp_rl_%'" ) === 0 ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-$verifie( 'réservations de jetons effacées', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE '%pp_ft_%'" ) === 0 ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-// Les réessais programmés par les scénarios d'échec pointent vers des demandes
-// qui viennent d'être supprimées : les laisser encombrerait le cron du site.
+$verifie( 'compteurs de débit effacés', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE '%pp_rl_%'" ) === 0 );
+$verifie( 'réservations de jetons effacées', (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->options} WHERE option_name LIKE '%pp_ft_%'" ) === 0 );
+
+
 Queue::purger();
 $verifie( 'file des notifications vidée', Queue::etat()['total'] === 0, wp_json_encode( Queue::etat() ) );
 

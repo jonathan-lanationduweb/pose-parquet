@@ -1,22 +1,6 @@
 <?php
-/**
- * « Mon site » : identité, en-tête, pied de page, liens commerciaux.
- *
- * Même principe que les réglages du socle Expert Parquet, mais sans page
- * builder : on règle des TEXTES, des choix (afficher ou non) et deux images.
- * Les champs eux-mêmes viennent du dépôt du site (_generator/content-site.js),
- * importés une fois (tools/importer-champs.php) : le site sait ce qu'il peut
- * afficher, WordPress ne fait que le remplir. La structure HTML/CSS reste
- * celle du front.
- *
- * Présentation : quatre onglets (Identité, En-tête & navigation, Pied de
- * page, Liens commerciaux). Les paires « libellé + afficher » se lisent en
- * LISTE compacte, une ligne par entrée, au lieu d'un champ puis d'une case
- * empilés. Chaque onglet a son propre formulaire et n'enregistre que ses
- * champs : les autres onglets ne sont jamais touchés.
- *
- * Deux options : le schéma (OPTION_SCHEMA) et les valeurs (OPTION).
- */
+
+
 
 declare(strict_types=1);
 
@@ -43,12 +27,12 @@ final class MonSite {
 		add_action( 'admin_post_' . self::ACTION, [ self::class, 'enregistrer' ] );
 	}
 
-	/** @return array<int,array<string,mixed>> */
+
 	public static function schema(): array {
 		return Structure::schema( get_option( self::OPTION_SCHEMA, [] ) );
 	}
 
-	/** Les valeurs en vigueur : celles saisies, complétées des valeurs par défaut du dépôt. */
+
 	public static function valeurs(): array {
 		$v = get_option( self::OPTION, [] );
 		return array_merge( Structure::defauts( self::schema() ), is_array( $v ) ? $v : [] );
@@ -58,15 +42,15 @@ final class MonSite {
 		return admin_url( 'admin.php?page=' . self::PAGE . ( $onglet !== '' ? '&onglet=' . $onglet : '' ) );
 	}
 
-	/** @return array<string,mixed>|null pour l'export ; null tant que rien n'est importé. */
+
 	public static function pour_export(): ?array {
 		$schema = self::schema();
 		return $schema ? Structure::pour_export( $schema, self::valeurs() ) : null;
 	}
 
-	/* ------------------------------------------------------------ onglets */
 
-	/** @return array<string,string> */
+
+
 	public static function onglets(): array {
 		return [
 			'identite' => __( 'Identité', 'pose-parquet-core' ),
@@ -76,7 +60,7 @@ final class MonSite {
 		];
 	}
 
-	/** L'onglet d'un groupe du schéma (les groupes sont nommés dans content-site.js). */
+
 	public static function onglet_du_groupe( string $groupe ): string {
 		foreach ( [ 'Identité' => 'identite', 'En-tête' => 'entete', 'Navigation' => 'entete', 'Pied de page' => 'pied', 'Liens commerciaux' => 'liens' ] as $debut => $onglet ) {
 			if ( str_starts_with( $groupe, $debut ) ) {
@@ -86,13 +70,13 @@ final class MonSite {
 		return 'autres';
 	}
 
-	/** Les champs d'un onglet, dans l'ordre du schéma. */
+
 	private static function champs_de( array $schema, string $onglet ): array {
 		return array_values( array_filter( $schema, static fn( array $d ): bool => self::onglet_du_groupe( $d['groupe'] ) === $onglet ) );
 	}
 
 	private static function onglet_courant( array $schema ): string {
-		$o = isset( $_GET['onglet'] ) ? sanitize_key( wp_unslash( $_GET['onglet'] ) ) : 'identite'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$o = isset( $_GET['onglet'] ) ? sanitize_key( wp_unslash( $_GET['onglet'] ) ) : 'identite';
 		$possibles = array_keys( self::onglets() );
 		if ( self::champs_de( $schema, 'autres' ) ) {
 			$possibles[] = 'autres';
@@ -100,7 +84,7 @@ final class MonSite {
 		return in_array( $o, $possibles, true ) ? $o : 'identite';
 	}
 
-	/* ------------------------------------------------------------ enregistrement */
+
 
 	public static function enregistrer(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
@@ -110,9 +94,9 @@ final class MonSite {
 		$schema = self::schema();
 		$onglet = isset( $_POST['pp_onglet'] ) ? sanitize_key( wp_unslash( $_POST['pp_onglet'] ) ) : '';
 		$champs = self::champs_de( $schema, $onglet );
-		$recu   = isset( $_POST['pp_site'] ) && is_array( $_POST['pp_site'] ) ? wp_unslash( $_POST['pp_site'] ) : []; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Structure::nettoyer, champ par champ.
+		$recu   = isset( $_POST['pp_site'] ) && is_array( $_POST['pp_site'] ) ? wp_unslash( $_POST['pp_site'] ) : [];
 		$avant  = self::valeurs();
-		// Seuls les champs de l'onglet envoyé sont lus ; les autres gardent leur valeur.
+
 		[ $valeurs, $refus ] = Structure::nettoyer( $champs, $recu, $avant );
 		update_option( self::OPTION, array_merge( $avant, $valeurs ), false );
 		if ( $refus ) {
@@ -122,7 +106,7 @@ final class MonSite {
 		exit;
 	}
 
-	/* ------------------------------------------------------------ rendu */
+
 
 	public static function render(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
@@ -147,8 +131,8 @@ final class MonSite {
 				echo '<li>' . esc_html( (string) $r ) . '</li>';
 			}
 			echo '</ul></div>';
-		} elseif ( isset( $_GET['pp-site'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			// Court : ce qui s'est passé, puis l'étape suivante en lien.
+		} elseif ( isset( $_GET['pp-site'] ) ) {
+
 			echo '<div class="notice notice-success is-dismissible"><p><strong>' . esc_html__( 'Modifications enregistrées.', 'pose-parquet-core' ) . '</strong> <a href="' . esc_url( \PoseParquet\Core\Publication\Publication::url() ) . '">' . esc_html__( 'Publier le site →', 'pose-parquet-core' ) . '</a></p></div>';
 		}
 		if ( ! $schema ) {
@@ -156,7 +140,7 @@ final class MonSite {
 			return;
 		}
 
-		// Onglets WordPress natifs ; ils défilent horizontalement sur mobile.
+
 		$onglets = self::onglets();
 		if ( self::champs_de( $schema, 'autres' ) ) {
 			$onglets['autres'] = __( 'Autres', 'pose-parquet-core' );
@@ -185,7 +169,7 @@ final class MonSite {
 		echo '</form></div>';
 	}
 
-	/** Un champ par sa clé. */
+
 	private static function par_cle( array $champs, string $cle ): ?array {
 		foreach ( $champs as $d ) {
 			if ( $d['cle'] === $cle ) {
@@ -203,7 +187,7 @@ final class MonSite {
 		Socle::carte_fermer();
 	}
 
-	/* -- Identité ------------------------------------------------------ */
+
 
 	private static function onglet_identite( array $champs, array $valeurs ): void {
 		$images = array_values( array_filter( $champs, static fn( array $d ): bool => $d['type'] === 'image' ) );
@@ -227,21 +211,19 @@ final class MonSite {
 		echo '</div></div>';
 	}
 
-	/**
-	 * Une carte de marque : le logo (ou le nom), la baseline, le favicon.
-	 * D'après les réglages enregistrés ; pas une maquette du site.
-	 */
+
+
 	private static function apercu( array $v ): void {
 		$nom      = (string) ( $v['nom'] ?? '' );
 		$mots     = explode( ' ', $nom, 2 );
 		$logo     = absint( $v['logo'] ?? 0 ) ? (string) wp_get_attachment_image_url( absint( $v['logo'] ), 'medium' ) : '';
 		$favicon  = absint( $v['favicon'] ?? 0 ) ? (string) wp_get_attachment_image_url( absint( $v['favicon'] ), 'thumbnail' ) : '';
-		// Le symbole du site, tel qu'il est dessiné dans l'en-tête public (même tracé).
+
 		$symbole  = '<svg class="adm-marque__symbole" viewBox="0 0 106 197" fill="currentColor" aria-hidden="true"><g transform="scale(106 197)"><path d="M0 0H0.3396V0.5584L0 0.6396ZM0 0.6599L0.3396 0.5787V1H0ZM0.4057 0H0.7453V0.2437L0.4057 0.3249ZM0.4057 0.3452L0.7453 0.264V1H0.4057ZM0.8208 0H1V0.5584L0.8208 0.6012ZM0.8208 0.6215L1 0.5787V1H0.8208Z"/></g></svg>';
 		Socle::carte_ouvrir( __( 'Aperçu de la marque', 'pose-parquet-core' ) );
 		echo '<div class="adm-marque">';
 		echo '<div class="adm-marque__nom">';
-		echo $logo // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé ici.
+		echo $logo
 			? '<img class="adm-marque__logo" src="' . esc_url( $logo ) . '" alt="" />'
 			: $symbole . '<strong>' . esc_html( $mots[0] ) . '</strong> <span>' . esc_html( $mots[1] ?? '' ) . '</span>';
 		echo '</div>';
@@ -252,20 +234,20 @@ final class MonSite {
 		echo '<dl class="adm-etat">';
 		echo '<dt>' . esc_html__( 'Logo', 'pose-parquet-core' ) . '</dt><dd>' . esc_html( $logo ? __( 'Image', 'pose-parquet-core' ) : __( 'Symbole et nom du site', 'pose-parquet-core' ) ) . '</dd>';
 		echo '<dt>' . esc_html__( 'Favicon', 'pose-parquet-core' ) . '</dt><dd class="adm-marque__favicon">';
-		echo $favicon ? '<img src="' . esc_url( $favicon ) . '" alt="" width="16" height="16" />' : '<span class="adm-marque__favicon-symbole">' . $symbole . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé ici.
+		echo $favicon ? '<img src="' . esc_url( $favicon ) . '" alt="" width="16" height="16" />' : '<span class="adm-marque__favicon-symbole">' . $symbole . '</span>';
 		echo '</dd></dl>';
 		echo '<p class="adm-carte__aide">' . esc_html__( 'D’après les réglages enregistrés. Le rendu exact est celui du site après publication.', 'pose-parquet-core' ) . '</p>';
 		Socle::carte_fermer();
 	}
 
-	/* -- Listes « libellé + afficher » --------------------------------- */
 
-	/** Le nom d'une entrée, tiré de son libellé de schéma (« Guides : libellé » → « Guides »). */
+
+
 	private static function nom_entree( string $libelle ): string {
 		return (string) preg_replace( '/\s*:\s*(libellé|afficher)$/u', '', $libelle );
 	}
 
-	/** Une ligne de liste : nom, champ texte, case « Affiché » si le schéma la prévoit. */
+
 	private static function ligne( array $d, ?array $affiche, array $valeurs, string $nom = '' ): void {
 		$id = 'pp-s-' . $d['cle'];
 		echo '<tr><th scope="row"><label for="' . esc_attr( $id ) . '">' . esc_html( $nom !== '' ? $nom : self::nom_entree( $d['libelle'] ) ) . '</label></th>';
@@ -279,12 +261,8 @@ final class MonSite {
 		echo '</td></tr>';
 	}
 
-	/**
-	 * Une liste compacte : chaque champ texte, avec sa case « _afficher »
-	 * quand elle existe.
-	 *
-	 * @param array<int,array<string,mixed>> $champs
-	 */
+
+
 	private static function liste( array $champs, array $tous, array $valeurs, string $entete = '' ): void {
 		echo '<table class="adm-liste">';
 		if ( $entete !== '' ) {
@@ -300,7 +278,7 @@ final class MonSite {
 		echo '</tbody></table>';
 	}
 
-	/* -- En-tête & navigation ------------------------------------------ */
+
 
 	private static function onglet_entete( array $champs, array $valeurs ): void {
 		$groupe = static fn( string $g ): array => array_values( array_filter( $champs, static fn( array $d ): bool => $d['groupe'] === $g ) );
@@ -334,7 +312,7 @@ final class MonSite {
 		echo '</div>';
 	}
 
-	/* -- Pied de page --------------------------------------------------- */
+
 
 	private static function onglet_pied( array $champs, array $valeurs ): void {
 		$textes = array_values( array_filter( $champs, static fn( array $d ): bool => $d['groupe'] === 'Pied de page' ) );
@@ -348,7 +326,7 @@ final class MonSite {
 		echo '</div>';
 		Socle::carte_fermer();
 
-		// Les colonnes : un titre (pied_col_*), puis ses liens jusqu'au titre suivant.
+
 		$colonnes = [];
 		foreach ( $liens as $d ) {
 			if ( str_starts_with( $d['cle'], 'pied_col_' ) ) {
@@ -360,7 +338,7 @@ final class MonSite {
 		echo '<div class="adm-colonnes-3">';
 		foreach ( $colonnes as $i => $col ) {
 			$t = $col['titre'];
-			Socle::carte_ouvrir( sprintf( /* translators: 1: numéro, 2: titre */ __( 'Colonne %1$d — %2$s', 'pose-parquet-core' ), $i + 1, (string) ( $valeurs[ $t['cle'] ] ?? $t['defaut'] ) ) );
+			Socle::carte_ouvrir( sprintf(   __( 'Colonne %1$d — %2$s', 'pose-parquet-core' ), $i + 1, (string) ( $valeurs[ $t['cle'] ] ?? $t['defaut'] ) ) );
 			echo '<table class="adm-liste adm-liste--etroite"><tbody>';
 			self::ligne( $t, null, $valeurs, __( 'Titre', 'pose-parquet-core' ) );
 			foreach ( $col['liens'] as $d ) {
@@ -374,7 +352,7 @@ final class MonSite {
 		echo '</div>';
 	}
 
-	/* -- Liens commerciaux ----------------------------------------------- */
+
 
 	private static function onglet_liens( array $champs, array $valeurs ): void {
 		echo '<p class="adm-note">' . esc_html__( 'Ces liens alimentent les mentions et les boutons prévus dans le site.', 'pose-parquet-core' ) . '</p>';
@@ -384,7 +362,7 @@ final class MonSite {
 			if ( ! $siens ) {
 				continue;
 			}
-			// « Actif » quand le lien est affiché sur le site ; rien sinon.
+
 			$affiche = false;
 			foreach ( $siens as $d ) {
 				if ( $d['type'] === 'oui-non' ) {
@@ -393,7 +371,7 @@ final class MonSite {
 			}
 			Socle::carte_ouvrir( $titre, '', $affiche ? Socle::badge( __( 'Actif', 'pose-parquet-core' ), 'ok' ) : '' );
 			foreach ( $siens as $d ) {
-				// Le libellé dans la carte n'a plus besoin de répéter le nom du partenaire.
+
 				$d['libelle'] = (string) preg_replace( '/^[^:]+:\s*/u', '', $d['libelle'] );
 				$d['libelle'] = $d['type'] === 'oui-non' ? __( 'Afficher sur le site', 'pose-parquet-core' ) : ucfirst( $d['libelle'] );
 				Structure::champ( $d, $valeurs[ $d['cle'] ] ?? $d['defaut'], 'pp_site' );

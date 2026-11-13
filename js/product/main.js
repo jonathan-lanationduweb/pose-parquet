@@ -1,26 +1,13 @@
-/**
- * Point d'entrée du Visualiseur produit.
- *
- * Même règle que le Studio : l'application ne charge que ce dont elle a
- * besoin, et un échec de démarrage se dit à l'écran au lieu de laisser une
- * page vide.
- */
 import { ready, qs } from '../utils/dom.js';
 import { mountProduct } from './app.js';
 import { initContexteLead } from '../forms/lead-context.js';
 import { surveillerPartenaires } from '../commerce/partenaires.js';
 
 ready(() => {
-  /*
-   * Le contexte de visite, avant tout le reste.
-   *
-   * Il enregistre la page d'entrée et les paramètres de campagne s'ils sont
-   * là, pour que la demande envoyée trois pages plus loin sache encore d'où
-   * vient la personne. Rien ne part sur le réseau : voir
-   * js/forms/lead-context.js.
-   */
+
+
   initContexteLead();
-  // Un partenaire en panne ou en maintenance n'est plus proposé (liens masqués).
+
   surveillerPartenaires();
 
   const root = qs('[data-product]');

@@ -1,4 +1,3 @@
-/** Detection centralisee de la preference de mouvement reduit. */
 const query = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 export const prefersReducedMotion = () => query.matches;

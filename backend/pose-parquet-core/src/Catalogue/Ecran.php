@@ -1,13 +1,6 @@
 <?php
-/**
- * « Catalogue Premibel » : un écran de CONSULTATION.
- *
- * Le catalogue n'est pas géré dans WordPress. Il est synchronisé depuis
- * Premibel par le dépôt du site (`node _generator/sync-premibel.js`), puis
- * le build publie son état dans `data/catalogue-etat.json`. Cet écran lit ce
- * fichier sur le site public et l'affiche : aucun produit ne s'édite ici, et
- * WordPress ne lance pas la synchronisation (il n'a pas accès au générateur).
- */
+
+
 
 declare(strict_types=1);
 
@@ -36,7 +29,7 @@ final class Ecran {
 		add_action( 'admin_post_' . self::VERIFIER, [ self::class, 'verifier' ] );
 	}
 
-	/** « Mettre à jour maintenant » : resynchronise le catalogue Premibel puis republie le site. */
+
 	public static function synchroniser(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
 			wp_die( '', '', [ 'response' => 403 ] );
@@ -48,7 +41,7 @@ final class Ecran {
 		exit;
 	}
 
-	/** « Vérifier maintenant » : contrôle immédiat des sites partenaires. */
+
 	public static function verifier(): void {
 		if ( ! current_user_can( Capabilities::EDIT_CONTENTS ) ) {
 			wp_die( '', '', [ 'response' => 403 ] );
@@ -59,14 +52,14 @@ final class Ecran {
 		exit;
 	}
 
-	/** Un bouton dans son petit formulaire POST (nonce compris). */
+
 	private static function bouton( string $action, string $libelle, string $icone, string $classe = 'adm-bouton adm-bouton--petit' ): string {
 		return '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="adm-carte__formulaire"><input type="hidden" name="action" value="' . esc_attr( $action ) . '">'
 			. wp_nonce_field( $action, '_wpnonce', true, false )
 			. '<button type="submit" class="' . esc_attr( $classe ) . '"><span class="dashicons ' . esc_attr( $icone ) . '" aria-hidden="true"></span>' . esc_html( $libelle ) . '</button></form>';
 	}
 
-	/** La carte « Sites partenaires » : disponibles ou retirés, et pourquoi. */
+
 	private static function carte_partenaires(): void {
 		$etat   = Surveillance::etat_brut();
 		$lignes = [];
@@ -83,15 +76,15 @@ final class Ecran {
 			$quand = wp_date( 'j F à H:i', (int) ( $e['verifie'] ?? time() ) );
 			if ( ! empty( $e['disponible'] ) ) {
 				$texte    = (int) $e['echecs'] > 0
-					/* translators: 1: raison, 2: date */
+
 					? sprintf( __( 'Disponible — un contrôle raté (%1$s), à confirmer. Vérifié le %2$s', 'pose-parquet-core' ), (string) $e['raison'], $quand )
-					/* translators: %s : date */
+
 					: sprintf( __( 'Disponible — vérifié le %s', 'pose-parquet-core' ), $quand );
 				$lignes[] = [ $p['nom'], $texte, (int) $e['echecs'] > 0 ? 'attente' : 'ok' ];
 			} else {
 				$lignes[] = [
 					$p['nom'],
-					/* translators: 1: raison, 2: date */
+
 					sprintf( __( 'Retiré du site : %1$s. Depuis le %2$s', 'pose-parquet-core' ), (string) $e['raison'], wp_date( 'j F à H:i', (int) ( $e['depuis'] ?? time() ) ) ),
 					'ko',
 				];
@@ -99,7 +92,7 @@ final class Ecran {
 		}
 		Socle::carte_ouvrir( __( 'Sites partenaires', 'pose-parquet-core' ) );
 		Socle::etat( $lignes, __( 'Contrôle automatique toutes les 15 minutes. Un site en panne ou en maintenance n’est plus proposé aux visiteurs (liens masqués, formulaire réorienté) ; il revient dès qu’il répond de nouveau.', 'pose-parquet-core' ) );
-		echo self::bouton( self::VERIFIER, __( 'Vérifier maintenant', 'pose-parquet-core' ), 'dashicons-update' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé dans bouton().
+		echo self::bouton( self::VERIFIER, __( 'Vérifier maintenant', 'pose-parquet-core' ), 'dashicons-update' );
 		Socle::carte_fermer();
 	}
 
@@ -108,20 +101,17 @@ final class Ecran {
 		return $local ? $local . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'catalogue-etat.json' : SitePublic::url() . 'data/catalogue-etat.json';
 	}
 
-	/**
-	 * L'état publié, mis en cache cinq minutes.
-	 *
-	 * @return array{ok:bool,donnees?:array<string,mixed>,erreur?:string}
-	 */
+
+
 	public static function lire(): array {
 		$cache = get_transient( self::TRANSIENT );
 		if ( is_array( $cache ) ) {
 			return [ 'ok' => true, 'donnees' => $cache ];
 		}
-		// Le dossier local du site s'il est réglé (développement), sinon le site public.
+
 		$local = \PoseParquet\Core\Contenus\Apercu::dossier();
 		if ( $local && is_readable( $local . '/data/catalogue-etat.json' ) ) {
-			$corps = (string) file_get_contents( $local . '/data/catalogue-etat.json' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			$corps = (string) file_get_contents( $local . '/data/catalogue-etat.json' );
 		} else {
 			$r = \PoseParquet\Core\Admin\SitePublic::lire( self::url_fichier(), [ 'timeout' => 6, 'redirection' => 2 ] );
 			if ( is_wp_error( $r ) ) {
@@ -167,7 +157,7 @@ final class Ecran {
 		if ( ! $etat['ok'] ) {
 			echo '<p class="adm-avertissement">' . esc_html(
 				sprintf(
-					/* translators: 1: URL, 2: erreur */
+
 					__( 'État du catalogue indisponible : le site public n’a pas répondu (%2$s) à l’adresse %1$s. Vérifiez l’adresse du site public dans Réglages.', 'pose-parquet-core' ),
 					self::url_fichier(),
 					(string) $etat['erreur']
@@ -180,7 +170,7 @@ final class Ecran {
 		$i = (array) ( $d['images'] ?? [] );
 		$g = (array) ( $d['photosPartagees'] ?? [] );
 
-		// Le nombre de références d'abord, en grand ; les autres mesures à sa suite.
+
 		echo '<div class="adm-chiffres adm-chiffres--principal">';
 		Socle::chiffre( __( 'Références', 'pose-parquet-core' ), self::nombre( $d['produits'] ?? null ) );
 		Socle::chiffre( __( 'Visualisables', 'pose-parquet-core' ), self::nombre( $d['visualisables'] ?? null ) );
@@ -189,7 +179,7 @@ final class Ecran {
 		Socle::chiffre( __( 'Non visualisables', 'pose-parquet-core' ), self::nombre( $s['unavailable'] ?? null ) );
 		echo '</div>';
 
-		// Deux blocs de même poids, puis la synchronisation en pleine largeur.
+
 		echo '<div class="adm-colonnes-2">';
 		Socle::carte_ouvrir( __( 'État de synchronisation', 'pose-parquet-core' ) );
 		$date = isset( $d['derniereSynchro'] ) ? strtotime( (string) $d['derniereSynchro'] ) : false;
@@ -219,7 +209,7 @@ final class Ecran {
 		Socle::carte_fermer();
 		echo '</div>';
 
-		// La synchronisation : comment elle se lance, d'où l'écran lit l'état.
+
 		$relire = '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="adm-carte__formulaire"><input type="hidden" name="action" value="' . esc_attr( self::ACTUALISER ) . '">'
 			. wp_nonce_field( self::ACTUALISER, '_wpnonce', true, false )
 			. '<button type="submit" class="adm-bouton adm-bouton--petit"><span class="dashicons dashicons-image-rotate" aria-hidden="true"></span>' . esc_html__( 'Relire l’état publié', 'pose-parquet-core' ) . '</button></form>';
@@ -227,10 +217,10 @@ final class Ecran {
 		echo '<div class="adm-sync">';
 		echo '<div><div class="adm-info"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span><span>' . esc_html__( 'Mise à jour automatique chaque nuit : le catalogue est relu chez Premibel, les références qui n’y sont plus visibles sont retirées, puis le site est republié (et son sitemap avec, pour Google). Les prix ne sont jamais importés.', 'pose-parquet-core' ) . '</span></div>';
 		if ( current_user_can( Capabilities::MANAGE_SETTINGS ) && \PoseParquet\Core\Publication\Publication::mode() !== 'aucune' ) {
-			echo self::bouton( self::SYNCHRONISER, __( 'Mettre à jour maintenant', 'pose-parquet-core' ), 'dashicons-update', 'adm-bouton adm-bouton--petit adm-bouton--plein' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé dans bouton().
+			echo self::bouton( self::SYNCHRONISER, __( 'Mettre à jour maintenant', 'pose-parquet-core' ), 'dashicons-update', 'adm-bouton adm-bouton--petit adm-bouton--plein' );
 		}
-		echo $relire . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé ci-dessus.
-		// Le détail technique, replié : la commande et le fichier lu.
+		echo $relire . '</div>';
+
 		echo '<details class="adm-details adm-details--technique"><summary>' . esc_html__( 'Détails techniques', 'pose-parquet-core' ) . '</summary>';
 		echo '<pre class="adm-commande"><code>' . esc_html( (string) ( $d['commande'] ?? 'node _generator/sync-premibel.js' ) ) . '</code></pre>';
 		echo '<p class="adm-carte__aide">' . esc_html__( 'Lu sur :', 'pose-parquet-core' ) . ' <code>' . esc_html( self::url_fichier() ) . '</code></p></details>';

@@ -1,19 +1,6 @@
 <?php
-/**
- * Ce que le site public reçoit de WordPress : `GET /pose-parquet/v1/contenus`.
- *
- *   WordPress (édition)  →  cet export (JSON)  →  _generator/wordpress.js
- *                        →  instantané data/wordpress/contenus.json
- *                        →  build du site, design inchangé  →  déploiement
- *
- * Le site reste STATIQUE : il n'appelle jamais WordPress au chargement d'une
- * page. Le générateur tire cet export avant de construire. Si WordPress est
- * indisponible, le site publié ne bouge pas.
- *
- * Public et en lecture seule : n'y figure que ce qui est publié — donc déjà
- * destiné à être lu par tout le monde. Aucun brouillon, aucun projet, aucune
- * donnée personnelle, aucun identifiant d'utilisateur.
- */
+
+
 
 declare(strict_types=1);
 
@@ -47,7 +34,7 @@ final class Export {
 		return $reponse;
 	}
 
-	/** @return array<string,mixed> */
+
 	public static function donnees(): array {
 		return [
 			'version'      => self::VERSION,
@@ -58,12 +45,12 @@ final class Export {
 			'articles'     => array_map( [ self::class, 'article' ], self::publies( Types::ARTICLE ) ),
 			'inspirations' => array_values( array_filter( array_map( [ self::class, 'inspiration' ], self::publies( Types::INSPIRATION ) ) ) ),
 			'pages'        => array_map( [ self::class, 'page' ], self::publies( Types::PAGE ) ),
-			// « Mon site » : identité, en-tête, pied de page, liens commerciaux.
+
 			'site'         => \PoseParquet\Core\Site\MonSite::pour_export(),
 		];
 	}
 
-	/** @return \WP_Post[] */
+
 	private static function publies( string $type ): array {
 		return get_posts(
 			[
@@ -80,13 +67,13 @@ final class Export {
 		return (string) get_post_meta( $p->ID, $cle, true );
 	}
 
-	/** @return array<mixed>|null */
+
 	private static function json( \WP_Post $p, string $cle ): ?array {
 		$d = json_decode( self::meta( $p, $cle ), true );
 		return is_array( $d ) ? $d : null;
 	}
 
-	/** @return array<string,mixed>|null */
+
 	public static function image( int $id ): ?array {
 		if ( $id <= 0 || ! wp_attachment_is_image( $id ) ) {
 			return null;
@@ -109,9 +96,9 @@ final class Export {
 
 		return [
 			'id'      => $id,
-			// Image venue du dépôt à l'import : le site garde ses déclinaisons
-			// optimisées d'origine (aucun octet ne change) tant qu'elle n'est
-			// pas remplacée.
+
+
+
 			'source'  => (string) get_post_meta( $id, '_pp_source_key', true ) ?: null,
 			'url'     => $url,
 			'largeur' => (int) ( $meta['width'] ?? 0 ),
@@ -122,7 +109,7 @@ final class Export {
 		];
 	}
 
-	/** @return array<string,mixed> */
+
 	public static function article( \WP_Post $p ): array {
 		$tax    = Types::taxonomie( $p->post_type );
 		$termes = $tax ? get_the_terms( $p, $tax ) : [];
@@ -131,7 +118,7 @@ final class Export {
 		$out    = [
 			'slug'        => $p->post_name,
 			'titre'       => self::meta( $p, Champs::META_TITLE ),
-			// Titre BRUT (get_the_title() changerait la typographie), mais SANS balise : le site l'insère tel quel dans ses pages.
+
 			'h1'          => wp_strip_all_tags( (string) $p->post_title ),
 			'description' => self::meta( $p, Champs::META_DESCRIPTION ),
 			'categorie'   => is_array( $termes ) && $termes ? $termes[0]->name : '',
@@ -158,7 +145,7 @@ final class Export {
 		return $out;
 	}
 
-	/** @return array<string,mixed>|null une carte, ou null si elle est incomplète (pas de texte court). */
+
 	public static function inspiration( \WP_Post $p ): ?array {
 		$phrase = trim( self::meta( $p, '_pp_phrase' ) );
 		if ( $phrase === '' ) {
@@ -186,7 +173,7 @@ final class Export {
 		];
 	}
 
-	/** @return array<string,mixed> */
+
 	public static function page( \WP_Post $p ): array {
 		$editable = self::meta( $p, '_pp_corps_editable' ) === '1';
 		$medias   = [];
@@ -194,8 +181,8 @@ final class Export {
 		$out      = [
 			'cle'         => self::meta( $p, '_pp_cle' ),
 			'adresse'     => self::meta( $p, '_pp_adresse' ),
-			// Le titre de la liste est le NOM de la page (« À propos ») ; le titre
-			// affiché sur le site est un champ à part.
+
+
 			'h1'          => self::meta( $p, '_pp_textes' ) === '1' ? self::meta( $p, '_pp_h1' ) : null,
 			'chapo'       => self::meta( $p, '_pp_textes' ) === '1' ? (string) $p->post_excerpt : null,
 			'titre'       => self::meta( $p, Champs::META_TITLE ),
@@ -213,12 +200,12 @@ final class Export {
 		return $out;
 	}
 
-	/** Le schéma des champs structurés d'une page (reçu du dépôt à l'import). */
+
 	public static function schema_page( \WP_Post $p ): array {
 		return Structure::schema( get_post_meta( $p->ID, '_pp_champs_def', true ) );
 	}
 
-	/** Les valeurs saisies, complétées des valeurs par défaut. */
+
 	public static function valeurs_page( \WP_Post $p, array $schema ): array {
 		$v = json_decode( (string) get_post_meta( $p->ID, '_pp_champs', true ), true );
 		return array_merge( Structure::defauts( $schema ), is_array( $v ) ? $v : [] );

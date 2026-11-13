@@ -1,21 +1,14 @@
-/**
- * État partagé entre le visualiseur photo et le mode plan.
- *
- * Volontairement minimal : un objet, des abonnés, une persistance locale.
- * Les deux outils lisent et écrivent les mêmes clés, ce qui permet de
- * choisir un motif dans le visualiseur et de le retrouver en mode plan.
- */
 const KEY = 'pose-parquet:visualiseur';
 
 const DEFAULTS = {
-  pattern: 'lames', // lames | point-de-hongrie | baton-rompu
+  pattern: 'lames',
   tone: 'naturel',
-  plankWidth: 0.14, // mètres
-  angle: 0, // degrés
-  scale: 1, // multiplicateur d'échelle du motif
+  plankWidth: 0.14,
+  angle: 0,
+  scale: 1,
 };
 
-/** Correspondance des identifiants de motif entre les deux outils. */
+
 export const PATTERN_TO_PLAN = {
   lames: 'longueur',
   'point-de-hongrie': 'point-de-hongrie',
@@ -52,7 +45,7 @@ export function setState(patch, options = {}) {
   try {
     window.localStorage.setItem(KEY, JSON.stringify(state));
   } catch (error) {
-    void error; // navigation privée : on continue sans persistance
+    void error;
   }
 }
 

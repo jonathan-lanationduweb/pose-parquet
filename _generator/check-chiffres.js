@@ -1,32 +1,3 @@
-/**
- * Contrôle : les nombres écrits dans les pages sont-ils ceux que le site offre ?
- *
- *   node _generator/check-chiffres.js
- *
- * POURQUOI CE CONTRÔLE EXISTE. L'audit du 28/09/2026 a trouvé deux promesses
- * fausses, et aucune n'était détectable par les contrôles existants :
- *
- *   « 10 pièces d'exemple »  le Studio en proposait 9. Le nombre ÉTAIT
- *                            calculé — mais avec une règle différente de
- *                            celle du front, qui écarte les scènes marquées
- *                            `showInRoomLibrary: false`. Deux comptes justes,
- *                            chacun selon sa propre règle, et un écart qui
- *                            porte un nom : `couloir-enfilade`.
- *
- *   « Douze parquets »       le tiroir en présentait 26. Celui-là était écrit
- *                            à la main, et personne n'avait de raison d'y
- *                            revenir en ajoutant quatorze références Premibel.
- *
- * Les deux formes d'erreur sont couvertes ici :
- *
- *   §1  la source : le générateur et le front comptent-ils la même chose ?
- *   §2  les pages : le nombre imprimé est-il celui de la source ?
- *   §3  la régression : un nombre est-il réapparu en dur dans une phrase qui
- *       décrit une donnée technique ?
- *
- * Ce contrôle lit les pages CONSTRUITES. Il faut donc l'exécuter après
- * `node _generator/build.js`.
- */
 const fs = require('fs');
 const path = require('path');
 
@@ -56,7 +27,7 @@ function titre(t) {
   console.log(`\n== ${t} ==`);
 }
 
-/** Les pages publiées, avec leur texte visible (balises et scripts retirés). */
+
 const horsParcours = exclusions(['assets', 'backend', 'docs', 'design', 'components']);
 function pages(dossier = RACINE, prefixe = '', out = []) {
   for (const e of fs.readdirSync(dossier, { withFileTypes: true })) {
@@ -79,9 +50,9 @@ const texteDe = (html) =>
     .replace(/&nbsp;/g, ' ')
     .replace(/\s+/g, ' ');
 
-/* ------------------------------------------------------------------ */
-/* §1 — La source : générateur et front comptent la même chose         */
-/* ------------------------------------------------------------------ */
+
+
+
 
 titre('Source : le générateur applique la règle du front');
 
@@ -93,7 +64,7 @@ verifier(
   `générateur ${NB_PIECES}, front ${bibliothequeFront.length}`
 );
 
-// Le piège d'origine : compter les publiables au lieu des offertes.
+
 const publiables = REGLES.scenesPubliques(idx).length;
 verifier(
   `pièces : les scènes hors bibliothèque ne sont pas comptées (${HORS_BIBLIOTHEQUE.length} écartée(s) : ${HORS_BIBLIOTHEQUE.map((s) => s.id).join(', ') || 'aucune'})`,
@@ -111,20 +82,14 @@ verifier(
   CATALOGUE.rejetes.every((f) => !require('../js/scene/product.js').estProposable(f))
 );
 
-/* ------------------------------------------------------------------ */
-/* §2 — Les pages impriment bien ce que la source dit                  */
-/* ------------------------------------------------------------------ */
+
+
+
 
 titre('Pages : le nombre imprimé est celui de la source');
 
-/**
- * Cherche « <nombre> <libellé> » dans le texte visible de toutes les pages et
- * vérifie que le nombre trouvé est le bon, partout.
- *
- * @param {string} libelle       ce qui suit le nombre, en expression régulière
- * @param {number} attendu       la valeur que la source donne
- * @param {string} nom           intitulé du contrôle
- */
+
+
 function nombreAnnonce(libelle, attendu, nom) {
   const motif = new RegExp(`(\\d+)\\s+${libelle}`, 'gi');
   const trouves = [];
@@ -143,8 +108,8 @@ function nombreAnnonce(libelle, attendu, nom) {
 
 nombreAnnonce('pièces d[’\']exemple', NB_PIECES, 'pièces d’exemple');
 nombreAnnonce('parquets à essayer', NB_PREMIBEL_VISU, 'parquets Premibel à essayer');
-/* Toute autre mention « N parquets » ne peut valoir que l'un des deux chiffres
-   publics : les démonstrations ne sont plus comptées nulle part. */
+
+
 {
   const autres = PAGES.flatMap((p) => [...texteDe(p.html).matchAll(/(\d+)\s+parquets(?!\s+de\s+démonstration)/gi)].map((m) => ({ page: p.chemin, v: Number(m[1]) })));
   const horsCompte = autres.filter((x) => x.v !== NB_PREMIBEL_VISU && x.v !== NB_PREMIBEL);
@@ -156,14 +121,8 @@ nombreAnnonce('motifs simulés', NB_MOTIFS_PLAN, 'motifs simulés');
 nombreAnnonce('références Premibel', NB_PREMIBEL_VISU, 'références Premibel du visualiseur');
 nombreAnnonce('en rendu fidèle', NB_PREMIBEL_FIDELE, 'références en rendu fidèle');
 
-/*
- * Les nombres écrits en toutes lettres : mêmes promesses, autre orthographe.
- *
- * On ne retient que les MOTS-NOMBRES. Un premier jet attrapait n'importe quel
- * mot précédant le libellé et se plaignait de « les pièces d'exemple » dans
- * une réponse de FAQ — un contrôle qui crie sur du français normal finit par
- * être ignoré, ce qui est pire que pas de contrôle.
- */
+
+
 const EN_LETTRES = ['zéro', 'une', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix'];
 const motPieces = EN_LETTRES[NB_PIECES] || String(NB_PIECES);
 const MOTS_NOMBRES = new Set([...EN_LETTRES, 'un', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'vingt', 'trente']);
@@ -179,17 +138,14 @@ verifier(
   lettres.filter((x) => x.mot !== motPieces).map((x) => `${x.page} dit « ${x.mot} »`).join(', ')
 );
 
-/* ------------------------------------------------------------------ */
-/* §3 — Régression : plus de nombre en dur dans ces phrases            */
-/* ------------------------------------------------------------------ */
+
+
+
 
 titre('Régression : aucun nombre technique réécrit à la main');
 
-/*
- * On relit les SOURCES du générateur, pas les pages : c'est là que le nombre
- * en dur s'écrit. Un littéral collé devant l'un de ces libellés est refusé,
- * même s'il se trouve juste aujourd'hui — il ne le restera pas.
- */
+
+
 const SOURCES = fs
   .readdirSync(path.join(RACINE, '_generator'))
   .filter((n) => n.endsWith('.js') && n !== 'check-chiffres.js')
@@ -206,8 +162,8 @@ const LIBELLES_SURVEILLES = [
 
 const enDur = [];
 for (const { nom, code } of SOURCES) {
-  // Le code, sans les commentaires : un exemple dans une explication est
-  // légitime, et le refuser pousserait à moins commenter.
+
+
   const sansCommentaires = code.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ');
   for (const libelle of LIBELLES_SURVEILLES) {
     const motif = new RegExp(`(?:>|\\s)(\\d+)\\s+${libelle.replace(/[’']/g, "[’']")}`, 'gi');
@@ -220,7 +176,7 @@ verifier(
   enDur.join(' | ')
 );
 
-/* ------------------------------------------------------------------ */
+
 
 console.log('');
 if (echecs.length) {

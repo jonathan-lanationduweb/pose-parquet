@@ -1,22 +1,6 @@
 <?php
-/**
- * L'écran « Ajouter / Modifier » des contenus, tel que la maquette le montre.
- *
- *   colonne principale          colonne de droite
- *   ─────────────────           ─────────────────
- *   Titre                        Publication   (celle de WordPress)
- *   Image de couverture          Catégorie     (liste déroulante)
- *   Résumé                       Référencement (meta title, meta description, slug)
- *   Contenu (éditeur classique)
- *
- * Tout passe par les écrans de WordPress : le bouton Publier, les brouillons,
- * les révisions, la médiathèque. Ce module n'ajoute que des champs, et chaque
- * enregistrement est contrôlé : jeton (nonce), droit sur CE contenu, liste
- * fermée de champs, nettoyage par type (Champs::nettoyer).
- *
- * Présentation : les composants du socle commun (adm-champ, adm-image,
- * adm-bloc), comme l'édition d'Expert Parquet.
- */
+
+
 
 declare(strict_types=1);
 
@@ -48,23 +32,11 @@ final class Edition {
 		add_filter( 'wp_insert_post_data', [ self::class, 'corps_inchange' ], 10, 2 );
 	}
 
-	/**
-	 * Un corps qu'on n'a pas touché reste tel quel.
-	 *
-	 * L'éditeur visuel réécrit TOUJOURS le HTML qu'il charge : il retire les
-	 * paragraphes (wpautop), normalise les espaces, ajoute un « &nbsp; »
-	 * initial. Enregistrer un guide pour changer son résumé suffisait donc à
-	 * transformer son corps — et, publié, le site changeait sans que personne
-	 * ne l'ait voulu. Le navigateur dit si le corps a été modifié
-	 * (admin.js : TinyMCE `isDirty()`, ou le texte de l'onglet Code) ; s'il ne
-	 * l'a pas été, le corps enregistré est remis tel qu'il était.
-	 *
-	 * @param array<string,mixed> $data    données « slashées » de wp_insert_post
-	 * @param array<string,mixed> $postarr
-	 */
+
+
 	public static function corps_inchange( array $data, array $postarr ): array {
 		$id = (int) ( $postarr['ID'] ?? 0 );
-		if ( ! $id || empty( $_POST['pp_corps_inchange'] ) || ! in_array( (string) ( $data['post_type'] ?? '' ), Types::all(), true ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- jeton vérifié ci-dessous.
+		if ( ! $id || empty( $_POST['pp_corps_inchange'] ) || ! in_array( (string) ( $data['post_type'] ?? '' ), Types::all(), true ) ) {
 			return $data;
 		}
 		if ( ! isset( $_POST[ self::NONCE ] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::NONCE ] ) ), self::NONCE_ACTION ) || ! current_user_can( 'edit_post', $id ) ) {
@@ -74,20 +46,8 @@ final class Edition {
 		return $data;
 	}
 
-	/**
-	 * Les illustrations des articles importés gardent leurs chemins du site
-	 * (« ../assets/images/guide-x.jpg ») : c'est ce que le site publie, et le
-	 * générateur les reprend tels quels. Dans l'éditeur, ce chemin relatif
-	 * pointerait vers wp-admin et l'image serait cassée.
-	 *
-	 * On donne à l'éditeur la BASE du site public pour ce type de contenu
-	 * (`document_base_url`) : il résout « ../assets/… » sur le vrai site et
-	 * affiche l'image, sans réécrire le HTML enregistré (convert_urls désactivé)
-	 * et sans copier un seul fichier dans la médiathèque. Les images ajoutées
-	 * depuis la médiathèque ont une adresse absolue : la base ne les touche pas.
-	 *
-	 * @param array<string,mixed> $init
-	 */
+
+
 	public static function base_des_images( array $init, string $editeur_id = '' ): array {
 		if ( $editeur_id !== 'content' ) {
 			return $init;
@@ -104,25 +64,19 @@ final class Edition {
 		if ( $dossier === null ) {
 			return $init;
 		}
-		// Le dossier local du site s'il est réglé (route en lecture seule), sinon le site public.
+
 		$init['document_base_url'] = Apercu::base() . $dossier;
-		// Ne jamais réécrire les adresses existantes à l'enregistrement.
+
 		$init['relative_urls']      = false;
 		$init['remove_script_host'] = false;
 		$init['convert_urls']       = false;
-		// Les icônes des encadrés (callout) sont des SVG en ligne : l'éditeur ne les gardait pas.
-		// Liste fermée, la même que Html::autorise() à l'enregistrement : svg (ses attributs de tracé) et path[d], rien d'autre.
+
+
 		$init['extended_valid_elements'] = trim( ( (string) ( $init['extended_valid_elements'] ?? '' ) ) . ',svg[class|viewbox|viewBox|fill|stroke|stroke-width|stroke-linecap|stroke-linejoin|aria-hidden|width|height],path[d]', ',' );
-		/*
-		 * « svg[path] » et non « +svg[path] » : le préfixe + AJOUTE des enfants à
-		 * une liste existante, or un élément déclaré par extended_valid_elements
-		 * n'en a pas encore — TinyMCE plantait à l'initialisation (« Cannot set
-		 * properties of undefined (setting 'path') ») et l'onglet Visuel restait
-		 * vide sur tous les guides et tutoriels. Sans préfixe, la liste des
-		 * enfants de svg est DÉFINIE : path, et seulement path.
-		 */
+
+
 		$init['valid_children']          = trim( ( (string) ( $init['valid_children'] ?? '' ) ) . ',+p[svg],+span[svg],svg[path]', ',' );
-		// Dans l'éditeur seulement (la feuille du site n'y est pas) : l'icône à la taille du texte, l'encadré repérable.
+
 		$init['content_style'] = trim( ( (string) ( $init['content_style'] ?? '' ) ) . ' svg{width:1.1em;height:1.1em;vertical-align:-0.18em;margin-right:0.35em;}aside{margin:1em 0;padding:0.6em 1em;border-left:3px solid #b7c6b3;background:#f4f6f2;}.callout__label{font-weight:600;margin:0 0 0.3em;}' );
 		return $init;
 	}
@@ -135,21 +89,17 @@ final class Edition {
 		return self::est_notre( $post ) ? __( 'Titre', 'pose-parquet-core' ) : $texte;
 	}
 
-	/**
-	 * Pages du site : seul « À propos » a un texte libre que le site sait
-	 * placer (sa colonne de texte). Les autres pages ont une structure de
-	 * sections écrite dans le code : on y modifie le titre, le chapô et le SEO,
-	 * pas un corps qui ne serait affiché nulle part.
-	 */
+
+
 	public static function editeur_des_pages(): void {
-		$id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
 		$post = $id ? get_post( $id ) : null;
 		if ( $post && $post->post_type === Types::PAGE && get_post_meta( $id, '_pp_corps_editable', true ) !== '1' ) {
 			remove_post_type_support( Types::PAGE, 'editor' );
 		}
 	}
 
-	/** Colonne de droite : on retire ce que la maquette ne montre pas, on ajoute Catégorie et SEO. */
+
 	public static function boites( \WP_Post $post ): void {
 		$type = $post->post_type;
 		foreach ( [ 'postexcerpt', 'postimagediv', 'slugdiv', 'authordiv', 'commentstatusdiv', 'commentsdiv', 'trackbacksdiv', 'postcustom' ] as $boite ) {
@@ -157,8 +107,8 @@ final class Edition {
 			remove_meta_box( $boite, $type, 'side' );
 			remove_meta_box( $boite, $type, 'advanced' );
 		}
-		// Ordre de la maquette : Publication (WordPress), Catégorie, SEO — puis
-		// les détails propres au type.
+
+
 		if ( Types::taxonomie( $type ) ) {
 			add_meta_box( 'pp_categorie', __( 'Catégorie', 'pose-parquet-core' ), [ self::class, 'boite_categorie' ], $type, 'side', 'default' );
 		}
@@ -173,11 +123,11 @@ final class Edition {
 		}
 	}
 
-	/** Un champ de formulaire, d'après sa définition. Tout est échappé. */
+
 	private static function champ( string $cle, array $def, string $valeur ): void {
 		$id   = 'pp-' . trim( $cle, '_' );
 		$name = 'pp_champ[' . $cle . ']';
-		// Longueurs conseillées, comme le compteur du socle (titre 60, description 160).
+
 		$conseil  = [ Champs::META_TITLE => 60, Champs::META_DESCRIPTION => 160 ][ $cle ] ?? 0;
 		$compteur = $conseil ? ' data-adm-compteur="' . $conseil . '"' : '';
 		$libelle  = [ Champs::META_TITLE => __( 'Titre SEO', 'pose-parquet-core' ), Champs::META_DESCRIPTION => __( 'Meta description', 'pose-parquet-core' ) ][ $cle ] ?? (string) ( $def['label'] ?? $cle );
@@ -215,7 +165,7 @@ final class Edition {
 		}
 	}
 
-	/** Colonne principale, entre le titre et l'éditeur. */
+
 	public static function colonne_principale( \WP_Post $post ): void {
 		if ( ! self::est_notre( $post ) ) {
 			return;
@@ -234,7 +184,7 @@ final class Edition {
 			$id_image = (int) get_post_thumbnail_id( $post );
 			$src      = $id_image ? wp_get_attachment_image_url( $id_image, 'large' ) : '';
 			$titre    = $type === Types::INSPIRATION ? __( 'Image', 'pose-parquet-core' ) : __( 'Image de couverture', 'pose-parquet-core' );
-			// Bloc image du socle : en-tête (libellé + actions), aperçu 16/9.
+
 			echo '<div class="adm-bloc adm-image" id="pp-image" data-pp-couverture>';
 			echo '<div class="adm-image__entete"><h2 class="adm-bloc__titre">' . esc_html( $titre ) . '</h2><span class="adm-image__actions">';
 			echo '<button type="button" class="adm-bouton adm-bouton--petit" data-pp-choisir><span class="dashicons dashicons-format-image" aria-hidden="true"></span><span data-pp-choisir-texte>' . esc_html( $src ? __( 'Remplacer l’image', 'pose-parquet-core' ) : __( 'Choisir une image', 'pose-parquet-core' ) ) . '</span></button>';
@@ -264,9 +214,9 @@ final class Edition {
 		if ( $textes && post_type_supports( $type, 'excerpt' ) ) {
 			$libelle = $type === Types::PAGE ? __( 'Chapô', 'pose-parquet-core' ) : __( 'Résumé', 'pose-parquet-core' );
 			echo '<div class="adm-bloc"><h2 class="adm-bloc__titre"><label for="excerpt">' . esc_html( $libelle ) . '</label></h2>';
-			// Valeur BRUTE : `$post` est préparé dans le contexte « edit », où WordPress a
-			// déjà échappé le résumé ; l'échapper encore doublait l'échappement à chaque
-			// enregistrement (' → &#039; → &amp;#039;).
+
+
+
 			echo '<textarea id="excerpt" name="excerpt" rows="3" class="adm-resume">' . esc_textarea( (string) get_post_field( 'post_excerpt', $post->ID, 'raw' ) ) . '</textarea></div>';
 		}
 
@@ -329,7 +279,7 @@ final class Edition {
 		if ( $post->post_type === Types::PAGE ) {
 			$adresse = (string) get_post_meta( $post->ID, '_pp_adresse', true );
 			echo '<p class="adm-note">' . esc_html__( 'Adresse fixe :', 'pose-parquet-core' ) . ' <code>' . esc_html( $adresse !== '' ? $adresse : '—' ) . '</code></p>';
-			return; // L'adresse d'une page du site est fixe.
+			return;
 		}
 		echo '<p class="adm-champ"><label for="pp-slug">' . esc_html__( 'Slug', 'pose-parquet-core' ) . '</label>';
 		echo '<input type="text" class="widefat" id="pp-slug" name="post_name" value="' . esc_attr( $post->post_name ) . '" />';
@@ -356,10 +306,8 @@ final class Edition {
 		}
 	}
 
-	/**
-	 * Enregistrement : jeton, droit sur CE contenu, liste fermée, nettoyage.
-	 * Rien d'autre que les champs déclarés dans Champs n'est lu.
-	 */
+
+
 	public static function enregistrer( int $post_id, \WP_Post $post ): void {
 		if ( ! isset( $_POST[ self::NONCE ] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST[ self::NONCE ] ) ), self::NONCE_ACTION ) ) {
 			return;
@@ -371,7 +319,7 @@ final class Edition {
 			return;
 		}
 
-		$recu = isset( $_POST['pp_champ'] ) && is_array( $_POST['pp_champ'] ) ? wp_unslash( $_POST['pp_champ'] ) : []; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- nettoyé champ par champ ci-dessous.
+		$recu = isset( $_POST['pp_champ'] ) && is_array( $_POST['pp_champ'] ) ? wp_unslash( $_POST['pp_champ'] ) : [];
 		foreach ( Champs::pour( $post->post_type ) as $cle => $def ) {
 			if ( ( $def['ui'] ?? 'cache' ) === 'cache' || ! array_key_exists( $cle, $recu ) ) {
 				continue;
@@ -380,11 +328,11 @@ final class Edition {
 			update_post_meta( $post_id, $cle, wp_slash( $valeur ) );
 		}
 
-		// Champs structurés d'une page : schéma du dépôt, nettoyage champ par champ.
+
 		if ( $post->post_type === Types::PAGE && isset( $_POST['pp_structure'] ) && is_array( $_POST['pp_structure'] ) ) {
 			$schema = Export::schema_page( $post );
 			if ( $schema ) {
-				[ $valeurs, $refus ] = Structure::nettoyer( $schema, wp_unslash( $_POST['pp_structure'] ), Export::valeurs_page( $post, $schema ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Structure::nettoyer.
+				[ $valeurs, $refus ] = Structure::nettoyer( $schema, wp_unslash( $_POST['pp_structure'] ), Export::valeurs_page( $post, $schema ) );
 				update_post_meta( $post_id, '_pp_champs', wp_slash( (string) wp_json_encode( $valeurs, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) ) );
 				if ( $refus ) {
 					set_transient( 'pp_refus_' . get_current_user_id(), $refus, 5 * MINUTE_IN_SECONDS );
@@ -392,7 +340,7 @@ final class Edition {
 			}
 		}
 
-		// Image : un identifiant de la médiathèque, et seulement une image.
+
 		if ( Types::avec_couverture( $post->post_type ) && isset( $_POST['pp_couverture'] ) ) {
 			$image = absint( $_POST['pp_couverture'] );
 			if ( $image && wp_attachment_is_image( $image ) ) {
@@ -402,7 +350,7 @@ final class Edition {
 			}
 		}
 
-		// Catégorie : un terme existant de la bonne taxonomie, ou aucune.
+
 		$tax = Types::taxonomie( $post->post_type );
 		if ( $tax && isset( $_POST['pp_categorie'] ) ) {
 			$terme = absint( $_POST['pp_categorie'] );
@@ -414,10 +362,8 @@ final class Edition {
 		}
 	}
 
-	/**
-	 * Avertissements, jamais bloquants : un contenu sans image se publie, mais
-	 * on dit clairement ce que le site affichera.
-	 */
+
+
 	public static function avertissements(): void {
 		$ecran = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 		if ( ! $ecran || $ecran->base !== 'post' || ! in_array( $ecran->post_type, Types::all(), true ) ) {
@@ -443,7 +389,7 @@ final class Edition {
 		}
 	}
 
-	/** Crédit photo, dans la fiche d'un média : il est affiché sur le site. */
+
 	public static function champ_credit( array $champs, \WP_Post $piece ): array {
 		if ( ! wp_attachment_is_image( $piece->ID ) || ! current_user_can( Capabilities::EDIT_CONTENTS ) ) {
 			return $champs;

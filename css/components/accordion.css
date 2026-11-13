@@ -1,4 +1,3 @@
-/* Accordeon (FAQ) */
 .accordion { border-top: 1px solid var(--line); }
 .accordion__item { border-bottom: 1px solid var(--line); }
 .accordion__trigger {

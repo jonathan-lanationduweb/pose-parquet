@@ -1,22 +1,3 @@
-/**
- * Visualiseur produit — interface, direction V2.
- *
- * LA PIÈCE EST LE PRODUIT. Au repos, trois objets flottants seulement :
- *
- *   capsule haute      Avant | Après · Comparer · Plein écran
- *   barre produit      vignette, nom, motif · largeur, référence, actions
- *   zoom               en bas à droite, discret
- *
- * Rien de permanent sur les côtés. Tout le reste — catalogue, personnaliser,
- * pièces — vit dans un tiroir qui monte du bas et laisse la pièce visible.
- *
- * Les contrôles FLOTTENT : blanc chaud translucide, léger flou, bord d'un
- * pixel, ombre presque absente. Le contraste vient de la photographie, de la
- * typographie et des espacements — pas de rectangles blancs.
- *
- * Grille : 4 / 8 / 12 / 16 / 24 / 32.
- */
-
 :root {
   --ui: #f7f6f3;
   --ui-t: rgba(247, 246, 243, 0.86);
@@ -53,8 +34,6 @@ body.app--product {
 .pv [hidden] { display: none !important; }
 .pv button { font: inherit; color: inherit; cursor: pointer; background: none; border: 0; padding: 0; }
 .pv button:focus-visible, .pv a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-/* Ce qui flotte sur la photo. */
 .float {
   background: var(--ui-t);
   backdrop-filter: blur(14px) saturate(1.1);
@@ -62,8 +41,6 @@ body.app--product {
   border: 1px solid var(--ui-line);
   box-shadow: var(--shadow);
 }
-
-/* ---------------- En-tête ---------------- */
 .pv__header {
   height: var(--bar-h); flex: 0 0 var(--bar-h);
   display: flex; align-items: center; gap: 8px; padding: 0 16px 0 20px;
@@ -71,9 +48,8 @@ body.app--product {
 }
 .pv__brand { display: flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; margin-right: auto; }
 .pv__mark { width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-size: 13px; }
-.pv__name b { display: block; font: 500 18px/1 var(--font-display); letter-spacing: -0.01em; }
-/* 0,75rem plutôt que 11px : un pixel en dur ignore le réglage de taille de
-   texte du navigateur, et cette ligne se lit — ce n'est pas un ornement. */
+.app-loading-title { margin: 1rem; font: 500 1rem/1.4 var(--font-sans); }
+.pv__title { margin: 0; display: block; font: 500 18px/1 var(--font-display); letter-spacing: -0.01em; }
 .pv__name small { display: block; font-size: 0.75rem; color: var(--ink-3); margin-top: 3px; letter-spacing: 0.01em; }
 .hbtn {
   display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px;
@@ -82,12 +58,8 @@ body.app--product {
 }
 .hbtn:hover { background: rgba(28, 28, 26, 0.05); color: var(--ink); }
 .hbtn--icon { width: 36px; padding: 0; justify-content: center; }
-/* Pastille de comptage : elle reste petite — elle tient dans 18 px — mais en
-   rem, donc elle suit le réglage du navigateur au lieu de l'ignorer. */
 .hbtn .cnt { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent); color: #fff; font-size: 0.6875rem; display: grid; place-items: center; }
 .hbtn[aria-pressed="true"] { color: var(--accent); }
-
-/* ---------------- Scène ---------------- */
 .pv__stage { flex: 1; min-height: 0; position: relative; overflow: hidden; background: var(--stage); cursor: grab; touch-action: none; }
 .pv__stage.grabbing { cursor: grabbing; }
 .pv-scene, .pv-clip { position: absolute; inset: 0; }
@@ -97,8 +69,6 @@ body.app--product {
 .pv-split::after { content: ""; position: absolute; top: 50%; left: 50%; width: 34px; height: 34px; margin: -17px; border-radius: 50%; background: var(--ui-t); border: 1px solid var(--ui-line); box-shadow: var(--shadow); backdrop-filter: blur(10px); }
 .pv-split::before { content: ""; position: absolute; top: 50%; left: 50%; width: 9px; height: 9px; margin: -5px; border: 1.6px solid var(--ink); border-width: 0 1.6px 1.6px 0; transform: rotate(-45deg); z-index: 1; }
 .pv-tag { position: absolute; top: 76px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: rgba(28, 28, 26, 0.72); color: #fff; font-size: 12px; font-weight: 600; z-index: 4; pointer-events: none; }
-
-/* ---------------- Capsule haute ---------------- */
 .pv-tools {
   position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
   display: flex; align-items: center; gap: 4px; height: 46px; padding: 0 6px;
@@ -115,8 +85,6 @@ body.app--product {
 .pv-tools > button[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); }
 .pv-tools > button.ico { width: 34px; padding: 0; justify-content: center; }
 .pv-tools .sep { width: 1px; height: 18px; background: var(--ui-line); margin: 0 2px; }
-
-/* ---------------- Barre produit ---------------- */
 .pv-bar {
   position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%);
   display: flex; align-items: center; gap: 16px; height: 76px; padding: 0 16px 0 12px;
@@ -147,8 +115,6 @@ body.app--product {
 .bar__side { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .bar__tag { width: 24px; height: 24px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 600; flex: 0 0 auto; }
 .bar__vs { color: var(--ink-3); display: grid; place-items: center; }
-
-/* ---------------- Zoom ---------------- */
 .pv-zoom {
   position: absolute; right: 16px; bottom: 20px; display: flex; align-items: center; gap: 2px; height: 34px; padding: 0 4px;
   border-radius: 17px; z-index: 6;
@@ -161,20 +127,11 @@ body.app--product {
 .pv-zoom button:disabled { opacity: 0.3; cursor: default; }
 .pv-zoom .sep { width: 1px; height: 14px; background: var(--ui-line); margin: 0 3px; }
 .pv-zoom [data-level] { min-width: 48px; font-variant-numeric: tabular-nums; }
-
-/* Pendant un déplacement, le chrome s'efface un peu. */
 body.panning .pv-bar, body.panning .pv-zoom, body.panning .pv-tools, body.panning .pv-note.on { opacity: 0.35; }
 
 .pv-toast { position: absolute; left: 50%; bottom: 112px; transform: translate(-50%, 8px); padding: 8px 14px; border-radius: 10px; background: rgba(28, 28, 26, 0.88); color: #fff; font-size: 13px; opacity: 0; transition: opacity 160ms, transform 160ms; z-index: 12; pointer-events: none; }
-/* Le message reste lisible quand le tiroir est ouvert : il passe au-dessus. */
 body.drawer-open .pv-toast { bottom: calc(44% + 112px); }
 .pv-toast.on { opacity: 1; transform: translate(-50%, 0); }
-
-/* ---------------- Note : ce qui manque, sans barrer la route ----------------
-   Une photo personnelle n'a pas de sol connu. Ça se dit en deux lignes, en bas
-   à gauche, au-dessus de la barre produit — et ça s'efface. Rien n'est
-   couvert : `pointer-events` ne vit que sur la note elle-même, jamais sur la
-   pièce, et la note ne dépasse jamais 2 lignes de texte. */
 .pv-note {
   position: absolute; left: 24px; bottom: 112px; z-index: 11;
   display: flex; align-items: flex-start; gap: 8px;
@@ -189,10 +146,7 @@ body.drawer-open .pv-toast { bottom: calc(44% + 112px); }
 .pv-note p { margin: 0; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
 .pv-note button { flex: none; width: 24px; height: 24px; border-radius: 8px; display: grid; place-items: center; color: var(--ink-3); }
 .pv-note button:hover { background: rgba(28, 28, 26, 0.06); color: var(--ink); }
-/* Le tiroir monte : la note reste visible au-dessus de lui. */
 body.drawer-open .pv-note { bottom: calc(44% + 112px); }
-
-/* ---------------- Le tiroir ---------------- */
 .pv-drawer {
   position: absolute; left: 0; right: 0; bottom: 0; height: 44%; min-height: 320px; max-height: 60%;
   display: flex; flex-direction: column; z-index: 10;
@@ -219,8 +173,6 @@ body.drawer-open .pv-bar { bottom: calc(44% + 16px); }
 .chip:hover { border-color: var(--ink-3); color: var(--ink); }
 .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
 .chip:disabled { opacity: 0.35; cursor: default; }
-
-/* cartes produit : la matière domine, le texte se tait */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
 .pcard { position: relative; text-align: left; display: grid; gap: 2px; padding: 0; border-radius: 14px; }
 .pcard__tex { display: block; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; background: #d9d4ca; margin-bottom: 8px; transition: box-shadow var(--t-card), transform var(--t-card) var(--ease); }
@@ -232,8 +184,6 @@ body.drawer-open .pv-bar { bottom: calc(44% + 16px); }
 .pcard__tick { position: absolute; top: 10px; left: 10px; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; }
 .pcard__hh { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; border-radius: 50%; background: rgba(247, 246, 243, 0.9); display: grid; place-items: center; color: var(--ink-2); }
 .pcard__hh[aria-pressed="true"] { color: var(--accent); }
-
-/* galerie de pièces */
 .gal { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
 .gal__card { position: relative; text-align: left; display: grid; gap: 2px; border-radius: 14px; }
 .gal__ph { display: block; aspect-ratio: 3 / 2; border-radius: 12px; overflow: hidden; background: #d9d4ca; margin-bottom: 8px; transition: box-shadow var(--t-card), transform var(--t-card) var(--ease); }
@@ -246,8 +196,6 @@ body.drawer-open .pv-bar { bottom: calc(44% + 16px); }
 .gal__card--import { display: grid; place-content: center; text-align: center; gap: 6px; aspect-ratio: 3 / 2; border-radius: 12px; border: 1px dashed var(--ink-3); color: var(--ink-2); align-self: start; }
 .gal__card--import b { color: var(--ink); }
 .gal__card--import:hover { border-color: var(--ink); color: var(--ink); }
-
-/* personnaliser */
 .cus { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px 40px; }
 .cus__sect h3 { margin: 0 0 12px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
 .cus__sect h3 + .chips + h3 { margin-top: 8px; }
@@ -260,14 +208,10 @@ body.drawer-open .pv-bar { bottom: calc(44% + 16px); }
 .or:hover { border-color: var(--ink-3); }
 .or[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); color: var(--accent); }
 .or[aria-pressed="true"] b { color: var(--accent); }
-
-/* ---------------- Menu ---------------- */
 .pv-menu { position: fixed; top: calc(var(--bar-h) + 8px); right: 12px; width: 240px; background: var(--ui); border: 1px solid var(--ui-line); border-radius: 12px; box-shadow: var(--shadow); padding: 6px; z-index: 30; display: grid; gap: 1px; }
 .pv-menu .mi { display: block; width: 100%; text-align: left; padding: 10px 12px; border-radius: 8px; font-size: 14px; color: var(--ink); text-decoration: none; }
 .pv-menu .mi:hover { background: rgba(28, 28, 26, 0.05); }
 .pv-menu .sepm { height: 1px; background: var(--ui-line); margin: 4px 8px; }
-
-/* ---------------- Plein écran ---------------- */
 body.immersive .pv__header { display: none !important; }
 body.immersive .pv-bar { height: 64px; bottom: 16px; }
 body.immersive .bar__sw--lg { width: 40px; height: 40px; }
@@ -275,8 +219,6 @@ body.immersive .bar__ref { display: none; }
 body.immersive .pv-menu { top: 12px; }
 body.immersive.calm .pv-tools, body.immersive.calm .pv-bar, body.immersive.calm .pv-zoom, body.immersive.calm .pv-note.on { opacity: 0.35; }
 body.immersive .pv-tools:hover, body.immersive .pv-bar:hover, body.immersive .pv-zoom:hover { opacity: 1; }
-
-/* ---------------- Écrans étroits ---------------- */
 @media (max-width: 1439px) {
   .grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
 }
@@ -300,8 +242,6 @@ body.immersive .pv-tools:hover, body.immersive .pv-bar:hover, body.immersive .pv
   .pv-zoom { display: none; }
   .grid, .gal { grid-template-columns: repeat(2, 1fr); }
 }
-
-/* Titre de page lisible par les moteurs et lecteurs d'écran, invisible à l'écran. */
 .visually-hidden {
   position: absolute !important;
   width: 1px;
@@ -313,17 +253,10 @@ body.immersive .pv-tools:hover, body.immersive .pv-bar:hover, body.immersive .pv
   white-space: nowrap;
   border: 0;
 }
-
-/*
- * Partenaire indisponible (panne ou maintenance, contrôlé par WordPress toutes
- * les 15 minutes, voir js/commerce/partenaires.js) : ses liens disparaissent.
- */
-/* Boutons et liens d'action (ils ont une classe) : retirés. */
 html[data-premibel-indisponible] a[href*="premibel.fr"][class],
 html[data-allure-indisponible] a[href*="allure-design.com"][class] {
   display: none !important;
 }
-/* Lien dans une phrase ou un tableau : le nom reste, il n'est plus cliquable. */
 html[data-premibel-indisponible] a[href*="premibel.fr"]:not([class]),
 html[data-allure-indisponible] a[href*="allure-design.com"]:not([class]) {
   pointer-events: none;

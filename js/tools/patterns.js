@@ -1,14 +1,3 @@
-/**
- * Registre des motifs de pose.
- *
- * Chaque motif expose :
- *  - id / label / short : identité éditoriale
- *  - build(ctx) : renvoie la liste des lames (polygones) en centimètres,
- *    dans le repère de la pièce (origine en haut à gauche, X = longueur).
- *  - advice(ctx) : conseil pédagogique contextuel.
- *
- * Ajouter un motif = ajouter une entrée dans PATTERNS, rien d'autre.
- */
 import { seeded } from '../utils/dom.js';
 
 const rotate = ([x, y], angleDeg, [cx, cy]) => {
@@ -25,7 +14,7 @@ const rect = (x, y, w, h) => [
   [x, y + h],
 ];
 
-/** Rangées de lames droites, joints décalés, orientables. */
+
 function straightRows(ctx, angleDeg) {
   const { length, width, plankWidth, plankLength } = ctx;
   const cx = length / 2;
@@ -37,7 +26,7 @@ function straightRows(ctx, angleDeg) {
   const rows = Math.ceil((reach * 2) / plankWidth) + 2;
   for (let r = 0; r < rows; r += 1) {
     const y = cy - reach + r * plankWidth;
-    // Joints décalés d'un tiers de lame d'une rangée à l'autre
+
     const offset = (r % 3) * (plankLength / 3);
     const cols = Math.ceil((reach * 2) / plankLength) + 2;
     for (let c = 0; c < cols; c += 1) {
@@ -51,10 +40,8 @@ function straightRows(ctx, angleDeg) {
   return planks;
 }
 
-/**
- * Bâton rompu : lames à angle droit, bout contre chant.
- * Réseau généré par les vecteurs (L, L) et (W, -W), puis pivoté à 45°.
- */
+
+
 function herringbone(ctx) {
   const { length, width, plankWidth: w, plankLength: l } = ctx;
   const cx = length / 2;
@@ -77,16 +64,14 @@ function herringbone(ctx) {
   return planks;
 }
 
-/**
- * Point de Hongrie : lames coupées à 45°, joints alignés en colonnes.
- * Chaque colonne empile deux parallélogrammes symétriques.
- */
+
+
 function chevron(ctx) {
   const { length, width, plankWidth: w, plankLength: l } = ctx;
   const cx = length / 2;
   const cy = width / 2;
-  const run = l / Math.SQRT2; // projection horizontale de la lame
-  const step = w * Math.SQRT2; // décalage vertical entre deux lames
+  const run = l / Math.SQRT2;
+  const step = w * Math.SQRT2;
   const reach = Math.hypot(length, width) / 2 + l;
   const random = seeded(Math.round(length * 5 + width * 17 + w * 3));
   const planks = [];
@@ -168,13 +153,13 @@ export const PATTERNS = [
 
 export const getPattern = (id) => PATTERNS.find((pattern) => pattern.id === id) || PATTERNS[0];
 
-/** Miniature SVG d'un motif, utilisée dans les listes et les sélecteurs. */
+
 export function patternThumb(id, size = { w: 120, h: 90 }) {
   const ctx = { length: size.w, width: size.h, plankWidth: 8, plankLength: 34 };
   const pattern = getPattern(id);
   const planks = pattern.build(ctx);
-  // L'identifiant du motif RETENU, jamais celui reçu : `id` peut venir d'un
-  // attribut de la page, et il finit ici dans du HTML.
+
+
   const uid = `thumb-${pattern.id}-${Math.round(size.w)}`;
   const shapes = planks
     .map(

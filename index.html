@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Pose Parquet — Comprendre et réussir la pose de son parquet</title>
     <meta name="description" content="Média pratique et boîte à outils sur la pose du parquet : guides, motifs, tutoriels, inspiration et un simulateur de sens de pose gratuit." />
-    <!-- Balise robots toujours explicite. Sa valeur par défaut est « index,
-         follow » : les fichiers du dépôt décrivent la production, et c'est le
-         déploiement qui marque une préproduction — voir
-         .github/workflows/deploy-pages.yml et docs/seo-environnements.md. Un
-         noindex écrit ici par prudence finirait tôt ou tard copié en production.
 
-         Une page peut cependant demander autre chose par « page.robots », et
-         une seule le fait : la 404. Elle n'est pas une préproduction, elle n'a
-         simplement rien à indexer — c'est un état d'erreur, pas un contenu. -->
+
+
+
+
+
+
+
+
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://pose-parquet.com/" />
     <meta name="theme-color" content="#f2efe8" />
@@ -32,14 +32,14 @@
     <link rel="manifest" href="site.webmanifest?v=ed0c249f93" />
     <link rel="preload" as="font" type="font/woff2" href="assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="assets/dist/site.9174dce596.css" />
-    <link rel="stylesheet" href="assets/dist/scene.8a51f44f53.css" />
-    <!-- Adresse du backend, définissable au déploiement sans toucher au code.
-         Script classique et non module : il s'exécute avant les modules, donc
-         avant que api-config.js ne lise window.POSE_PARQUET_CONFIG. Pas
-         d'empreinte dans le nom — c'est ce qui permet de le remplacer. -->
+    <link rel="stylesheet" href="assets/dist/site.e5b89770b2.css" />
+    <link rel="stylesheet" href="assets/dist/scene.669cb3b244.css" />
+
+
+
+
     <script src="config.js"></script>
-    <script type="module" src="assets/dist/f40e3a8a2d/js/main.js"></script>
+    <script type="module" src="assets/dist/f875f479c5/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Pose Parquet","url":"https://pose-parquet.com","inLanguage":"fr-FR","description":"Comprendre, préparer, visualiser et réussir la pose de son parquet.","publisher":{"@id":"https://pose-parquet.com/#organisation"}}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","@id":"https://pose-parquet.com/#organisation","name":"Pose Parquet","url":"https://pose-parquet.com","logo":"https://pose-parquet.com/assets/icons/icon-512.png"}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Faut-il poser le parquet dans le sens de la lumière ou perpendiculairement à la fenêtre ?","acceptedAnswer":{"@type":"Answer","text":"Les deux formulations décrivent le même geste, ce qui explique la confusion fréquente. Les rayons entrent perpendiculairement au plan de la fenêtre : poser « dans le sens de la lumière » revient donc à orienter les lames perpendiculairement au mur qui porte la fenêtre. Les joints filent alors dans l’axe des rayons et se remarquent beaucoup moins."}},{"@type":"Question","name":"Dans quel sens poser un parquet dans un couloir ?","acceptedAnswer":{"@type":"Answer","text":"Dans la longueur, parallèlement aux murs. Une pose en travers multiplie les coupes, hache visuellement le passage et raccourcit l’espace. C’est le seul cas courant où la géométrie prime sur la lumière : un couloir se pose dans son axe, même si la fenêtre se trouve à son extrémité."}},{"@type":"Question","name":"Quelle est la différence entre bâton rompu et point de Hongrie ?","acceptedAnswer":{"@type":"Answer","text":"Le bâton rompu assemble des lames à bouts droits, posées perpendiculairement les unes aux autres : les extrémités se décalent et forment un zigzag. Le point de Hongrie utilise des lames coupées en biais qui se rejoignent bout à bout en une pointe continue. Il exige des lames gauches et droites, en quantités égales."}},{"@type":"Question","name":"Combien de chutes faut-il prévoir ?","acceptedAnswer":{"@type":"Answer","text":"Comptez de l’ordre de 5 % en pose droite et 10 à 15 % en diagonale ou en point de Hongrie, ces motifs multipliant les coupes d’angle en périphérie. Prévoyez la marge au moment de la commande : un complément acheté plus tard peut provenir d’un autre bain de teinte."}},{"@type":"Question","name":"Peut-on poser du parquet sur du carrelage ?","acceptedAnswer":{"@type":"Answer","text":"En pose flottante, c’est généralement possible si le carrelage est sain, adhérent et suffisamment plan. Contrôlez la planéité à la règle de deux mètres et vérifiez la hauteur disponible sous les portes et aux seuils : c’est le point qui bloque le plus souvent le projet, pas le support lui-même."}},{"@type":"Question","name":"Le simulateur est-il vraiment gratuit, et ma photo est-elle envoyée quelque part ?","acceptedAnswer":{"@type":"Answer","text":"Le simulateur est gratuit et ne demande aucune inscription. Votre photo n’est ni envoyée, ni stockée, ni analysée par un service tiers : le rendu est calculé dans votre navigateur, sur votre appareil. Vous disposez de 203 références et de trois motifs de pose, avec un comparateur avant / après."}}]}</script>
@@ -49,7 +49,7 @@
     <header class="site-header" data-header data-over="false" data-scrolled="false">
       <div class="wrap-wide site-header__inner">
         <a class="brand" href="index.html" aria-label="Pose Parquet, accueil">
-          <svg class="brand__mark" viewBox="0 0 106 197" fill="currentColor" aria-hidden="true"><g transform="scale(106 197)"><path d="M0 0H0.3396V0.5584L0 0.6396ZM0 0.6599L0.3396 0.5787V1H0ZM0.4057 0H0.7453V0.2437L0.4057 0.3249ZM0.4057 0.3452L0.7453 0.264V1H0.4057ZM0.8208 0H1V0.5584L0.8208 0.6012ZM0.8208 0.6215L1 0.5787V1H0.8208Z"/></g></svg><strong>Pose</strong><span>Parquet</span>
+          <img class="brand__logo" src="assets/images/wp-246.png" alt="" width="1774" height="887" />
         </a>
         <nav class="nav" aria-label="Navigation principale">
           <ul class="nav__list">
@@ -83,10 +83,10 @@
       <div class="drawer__footer">
         <a class="btn btn--light btn--block" href="projet/"><span>Décrire mon projet</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
         <a class="btn btn--outline-light btn--block" href="outils/studio.html"><span>Visualiser mon parquet</span></a>
-        <!-- « Média indépendant · aucune vente en ligne » figurait aussi ici.
-             L'information est utile, mais répétée en tête de menu sur chaque
-             page elle prend un ton défensif. Elle reste dans le pied de page et
-             développée sur la page À propos, c'est-à-dire là où on la cherche. -->
+
+
+
+
         <p class="drawer__meta">Guides, motifs et outils</p>
       </div>
     </div>
@@ -173,41 +173,41 @@
             <div>
               <p class="lead">Importez une photo de votre pièce, choisissez parmi 203 références et comparez les motifs au curseur. Six motifs sont documentés sur le site, dont cinq simulables dans nos outils. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée, ni stockée, ni analysée par un service tiers.</p>
               <p class="u-mt-5 u-actions">
-                <!-- « data-vz-open » : js/scene/preview.js enrichit ce lien avec la
-                     configuration affichée dans l'aperçu, pour que le Studio
-                     s'ouvre sur ce que le visiteur regarde et non sur un état par
-                     défaut. L'adresse ci-dessous reste valable telle quelle si le
-                     script ne s'exécute pas — le lien n'est jamais cassé. -->
+
+
+
+
+
                 <a class="btn" href="outils/studio.html" data-vz-open><span>Ouvrir le simulateur</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
                 <a class="link-arrow" href="outils/simulateur-pose.html">Mode Plan : comparer les sens de pose <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
               </p>
             </div>
           </div>
           <p class="sim-note"><strong>Votre photo reste sur votre appareil.</strong> Contrairement aux simulateurs des fabricants, aucun envoi vers un serveur, aucun compte à créer, aucun catalogue imposé.</p>
-          <!-- Scène de l'avant/après : une scène VALIDÉE sur les cinq critères de
-               _calibrage/scene-review.html, et la mieux placée pour une première
-               impression.
 
-               « chambre » tenait ce rôle à l'époque où elle était la seule
-               validée. Elle ne l'est plus : au manifeste, « sejour » est passée
-               validated en géométrie ET en visuel. Le choix se joue donc
-               maintenant sur ce que la photo montre, et « sejour » gagne sur les
-               trois points qui comptent ici — un séjour plutôt qu'une pièce aux
-               murs bleus, une lumière chaude plutôt que froide, et 35,4 % de
-               l'image en sol contre 26,3 %.
 
-               Elle a surtout **deux zones de sol** : le séjour et la salle à
-               manger derrière l'ouverture changent ensemble. C'est la meilleure
-               démonstration possible que le rendu est calculé, et non une image
-               retouchée d'avance. -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           <div class="vzp" data-vz-preview data-room="sejour" data-base="" data-reveal>
             <figure class="vzp__figure">
               <div class="vzp__stage" data-stage>
                 <img class="vzp__photo" data-photo loading="lazy" decoding="async"
                   width="1600" height="1067"
                   src="assets/images/room-sejour.jpg" alt="Séjour vide et lumineux ouvert sur une salle à manger" />
-                <!-- Couche visuelle d'une figure qui porte deja sa description
-                     dans la legende : rien a annoncer une seconde fois. -->
+
+
                 <canvas class="vzp__canvas" data-canvas aria-hidden="true"></canvas>
                 <span class="vzp__tag vzp__tag--before">Avant</span>
                 <span class="vzp__tag vzp__tag--after">Après</span>
@@ -403,13 +403,7 @@
         </div>
       </section>
 
-      <!--
-        Carrousel LIBRE, et non plus piloté par le défilement. Figé à l'écran
-        pendant que la molette faisait avancer les vignettes, il coûtait
-        2 228 px de page sur un écran de 1 440 pour huit images — le plus long
-        bloc de l'accueil, devant le Visualiseur. Libre, il défile au doigt,
-        à la souris et aux flèches, et la page Inspiration montre le reste.
-      -->
+
       <section class="section section--dark" data-carousel aria-labelledby="inspi-title">
         <div>
         <div class="wrap-wide">
@@ -603,7 +597,7 @@
               <p class="route__label">Trouver votre parquet</p>
               <h3 class="route__title">Références, essences, teintes et motifs</h3>
               <p class="route__text">Le catalogue de parquets et le showroom de Premibel, notre partenaire pour les références produit.</p>
-              <!-- Lien commercial rémunéré : « sponsored », comme Google le demande. -->
+
               <a class="link-arrow route__cta" href="https://www.premibel.fr/" rel="sponsored noopener">Voir le catalogue Premibel <span class="route__host">premibel.fr</span> <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
             </article>
             <article class="route">
@@ -674,30 +668,30 @@
           </nav>
         </div>
         <div class="footer__bottom">
-          <!--
-            « Média indépendant, aucune vente en ligne » figurait ici.
 
-            La première moitié n'est plus exacte : le site oriente vers les
-            références de Premibel quand elles existent, et un lecteur qui
-            découvrirait ce lien après coup aurait raison de se sentir trompé.
-            La seconde reste vraie — rien ne se vend ni ne se paie ici — mais
-            énoncée seule elle laissait entendre la première.
 
-            Le pied de page ne développe pas : il renvoie à la page qui le
-            fait, une fois, sobrement.
-          -->
+
+
+
+
+
+
+
+
+
+
           <p>&copy; 2026 Pose Parquet — guides et outils pour préparer son projet.</p>
-          <!--
-            Deux destinations nommées, une ligne, pas de logo.
 
-            Le pied de page dit vers QUI l'on oriente et pour QUOI ; le détail
-            — la zone, ce que la relation ne change pas — est à la page qui
-            l'explique. Écrire trois phrases ici en ferait une réclame en bas
-            de 32 pages.
-          -->
+
+
+
+
+
+
+
           <p class="footer__orientation"><strong>Premibel</strong> pour les références de parquet, <strong>Allure&nbsp;Design</strong> pour la pose et la rénovation en Île-de-France : Pose Parquet oriente selon le besoin. <a href="a-propos/#liens-commerciaux">Nos liens commerciaux</a></p>
           <p>Photographies sous licence Pexels</p>
-          <!-- Les pages obligatoires et pratiques, sur toutes les pages : c'est là qu'on les cherche. -->
+
           <ul class="footer__legal">
             <li><a href="mentions-legales/">Mentions légales</a></li>
             <li><a href="confidentialite/">Confidentialité et cookies</a></li>

@@ -537,3 +537,9 @@ téléchargée.
 Le site est indépendant. Un unique lien éditorial vers `premibel.fr` figure
 dans le guide « Parquet massif ou contrecollé », là où il complète réellement
 le propos. La V2 fera évoluer ce point — c'est précisément son objet.
+
+## Documentation du code
+
+Les explications auparavant placées en commentaires sont regroupées dans [le README du code](docs/code/README.md). Les en-têtes interprétés par WordPress et les lignes de lancement du système restent dans leurs fichiers.
+
+Chaque page publique possède un seul H1. Dans le Studio et le visualiseur produit, le titre initial est remplacé par le titre visible de l’application au montage JavaScript ; le texte masqué du Studio a été supprimé.

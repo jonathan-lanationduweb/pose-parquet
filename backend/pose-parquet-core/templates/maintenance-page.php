@@ -1,17 +1,11 @@
 <?php
-/**
- * Page publique de maintenance (servie par WordPress en 503, ou en aperçu).
- *
- * @var array  $m       réglages (Maintenance\Reglages::lire)
- * @var string $image   URL de l'image de fond, ou vide
- * @var string $polices URL du dossier des polices du plugin
- * @var array  $liens   liens à afficher
- */
+
+
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-$css = (string) file_get_contents( POSE_PARQUET_DIR . '/assets/maintenance.css' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- fichier local du plugin.
+$css = (string) file_get_contents( POSE_PARQUET_DIR . '/assets/maintenance.css' );
 ?><!doctype html>
 <html lang="fr">
 <head>
@@ -22,7 +16,7 @@ $css = (string) file_get_contents( POSE_PARQUET_DIR . '/assets/maintenance.css' 
 <style>
 @font-face { font-family: "Instrument Serif"; font-style: normal; font-weight: 400; font-display: swap; src: url("<?php echo esc_url( $polices . 'instrument-serif-400-3.woff2' ); ?>") format("woff2"); }
 @font-face { font-family: "Inter"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("<?php echo esc_url( $polices . 'inter-var-1.woff2' ); ?>") format("woff2"); }
-<?php echo $css; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- feuille de style du plugin, pas une saisie. ?>
+<?php echo $css;  ?>
 </style>
 </head>
 <body>

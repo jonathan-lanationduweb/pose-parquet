@@ -1,45 +1,6 @@
-/**
- * Interface du Visualiseur Parquet.
- *
- * Une seule règle de composition, et tout en découle : **la pièce est le
- * sujet.** Le chrome — barre, panneau, actions — est mince, sombre, et ne
- * concurrence jamais la photo. Aucune marge éditoriale, aucun héros, aucun pied
- * de page : on est dans une application, pas dans un article.
- *
- * Trois décisions structurent cette feuille.
- *
- * 1. **La photo n'est pas dans une carte.** Pas de grande boîte arrondie posée
- *    sur un fond beige avec des contrôles dessous : la photo *est* la surface de
- *    travail, à fleur du cadre. Les rayons et les bordures ne servent que
- *    lorsqu'ils structurent réellement quelque chose.
- *
- * 2. **Une action = un contexte.** Parquet, Motif et Orientation ne cohabitent
- *    jamais empilés dans une colonne. Le panneau n'affiche qu'un contexte à la
- *    fois, et quand aucun n'est demandé il se referme entièrement : la pièce
- *    reprend toute la largeur et l'écran devient très calme.
- *
- * 3. **Le pourtour est charbon, pas crème.** Une photo d'intérieur se juge sur
- *    fond sombre ; le blanc cassé du site lui vole sa clarté et fausse la
- *    lecture des teintes de bois. Le site éditorial reste crème, l'application
- *    passe au charbon — et le catalogue, lui, reste clair pour que les matières
- *    se lisent. Aucun réglage n'est proposé : ce n'est pas une préférence, c'est
- *    une condition de lecture.
- */
-
-/* ================================================================== */
-/* Base                                                               */
-/* ================================================================== */
-
 body.app {
   margin: 0;
   height: 100svh;
-  /* L'application ne défile pas, et ce n'est plus « sauf quand la hauteur
-     devient critique ». Quand la hauteur se resserre, c'est la MISE EN PAGE
-     qui se compacte — deux colonnes, panneau à défilement interne, barre
-     flottante — de sorte que tout tienne encore dans une vue. Le défilement de
-     page n'est plus qu'un dernier recours sous 480 px de large, où deux
-     colonnes sont impossibles. Voir les deux requêtes de hauteur en fin de
-     feuille : elles partagent désormais le même seuil, 34rem. */
   overflow: hidden;
   background: var(--c-ink);
   color: var(--text);
@@ -64,21 +25,12 @@ body.app {
 
 .studio {
   --bar-h: 3rem;
-  /* Cible tactile de référence. Les icônes restent petites ; c'est la zone
-     sensible qui grandit. */
   --touch: 2.75rem;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  /* Hauteur définie, et non min-height : sans cela la rangée du plan de
-     travail se dimensionnerait sur le contenu du catalogue — plusieurs
-     milliers de pixels — et la photo se retrouverait centrée dans le vide. */
   height: 100svh;
   background: var(--c-ink);
 }
-
-/* ================================================================== */
-/* Barre d'application                                                */
-/* ================================================================== */
 
 .studio__bar {
   display: flex;
@@ -106,7 +58,11 @@ body.app {
 .studio__back span { white-space: nowrap; }
 .studio__back:hover { background: rgba(255, 255, 255, 0.08); }
 
+.app-loading-title { margin: 1rem; font: 400 1rem/1.4 var(--font-sans); }
 .studio__project {
+  min-width: 0;
+  font-family: inherit;
+  font-weight: 400;
   margin: 0 auto 0 0;
   padding-left: clamp(0.5rem, 1.5vw, 1rem);
   font-size: 0.9rem;
@@ -142,7 +98,6 @@ body.app {
   padding: 0.3rem;
   border-radius: var(--r-md);
   background: #1c1f21;
-  /* Une des rares ombres justifiées : cet élément flotte réellement. */
   box-shadow: var(--shadow-3);
 }
 .studio__dropdown > * {
@@ -161,10 +116,6 @@ body.app {
   cursor: pointer;
 }
 .studio__dropdown > *:hover { background: rgba(255, 255, 255, 0.09); }
-
-/* ================================================================== */
-/* Écran de départ                                                    */
-/* ================================================================== */
 
 .studio__start { display: none; overflow: auto; background: var(--bg); }
 .studio[data-state="start"] .studio__start { display: block; }
@@ -197,36 +148,11 @@ body.app {
   margin: clamp(1.25rem, 3vw, 2rem) 0;
 }
 .start__or { color: var(--text-muted); font-size: 0.95rem; }
-
-/**
- * Bibliothèque de pièces : une colonne, puis deux, puis trois.
- *
- * `auto-fill` en `minmax(17rem, 1fr)` donnait quatre cartes par ligne au-delà
- * de 1100 px, et les vignettes devenaient trop petites pour distinguer une
- * pièce d'une autre — ce qui est précisément à quoi sert cet écran. Les
- * paliers sont donc explicites : la largeur d'une carte est un choix, pas le
- * reste d'une division.
- *
- * Toutes les cartes partagent le même gabarit — même ratio 3/2, donc même
- * hauteur, même dégradé, même position de titre. Rien n'est laissé au contenu.
- */
 .start__rooms {
   display: grid;
   grid-template-columns: 1fr;
   gap: clamp(0.75rem, 1.5vw, 1.25rem);
 }
-/**
- * Deux cartes par ligne dès 24rem, et non 40rem.
- *
- * À une carte par ligne, six à huit pièces demandent deux à trois écrans de
- * défilement pour être vues : l'écran de choix devient un couloir. À deux
- * cartes, la vignette fait encore 169 px de large à 390 px de fenêtre — assez
- * pour reconnaître une pièce — et tout le lot tient en un écran et demi.
- *
- * En dessous de 24rem (320 et 360 px), on reste à une colonne : deux vignettes
- * de 130 px ne se distinguent plus l'une de l'autre, et l'écran de choix perd
- * sa raison d'être.
- */
 @media (min-width: 24rem) {
   .start__rooms { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -256,7 +182,6 @@ body.app {
   font-weight: 500;
   text-align: left;
 }
-/* Ce que la pièce met à l'épreuve : la seule ligne qui aide à choisir. */
 .room-card__quoi {
   display: block;
   margin-top: 0.2rem;
@@ -273,30 +198,11 @@ body.app {
   color: rgba(255, 255, 255, 0.75);
 }
 .room-card:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
-
-/**
- * Carte a deux colonnes : le nom seul.
- *
- * Entre 24 et 40rem la carte fait 169 x 113 px. Le bandeau de titre, avec sa
- * phrase secondaire et son compte de zones, mesurait 186 px : il debordait de
- * 73 px et rognait le titre par le haut. Le nom suffit a choisir une piece a
- * cette taille ; la phrase revient des qu il y a la place.
- */
 @media (min-width: 24rem) and (max-width: 39.99rem) {
   .room-card__quoi,
   .room-card__zones { display: none; }
   .room-card__label { padding: 1.6rem 0.7rem 0.55rem; font-size: 0.95rem; line-height: 1.15; }
 }
-
-/* ================================================================== */
-/* Plan de travail                                                    */
-/* ================================================================== */
-
-/**
- * Deux colonnes, dont la seconde vaut zéro quand aucun contexte n'est ouvert.
- * C'est le mécanisme qui rend la pièce plein cadre : le panneau ne réserve pas
- * sa place « au cas où ».
- */
 .studio__main {
   position: relative;
   display: grid;
@@ -317,7 +223,6 @@ body.app {
   display: grid;
   place-items: center;
   min-height: 0;
-  /* Pas de marge décorative : la photo va au bord du cadre. */
   padding: 0;
   overflow: hidden;
 }
@@ -327,7 +232,6 @@ body.app {
   display: block;
   max-width: 100%;
   max-height: 100%;
-  /* Aucun rayon, aucun cadre : la photo n'est pas une carte. */
   overflow: hidden;
   touch-action: pan-y;
 }
@@ -339,10 +243,6 @@ body.app {
   max-height: calc(100svh - var(--bar-h));
   width: auto;
   height: auto;
-  /* `--ratio` est posé par `reserverScene()` dès que la scène est connue.
-     Sans lui, un canvas encore vierge mesure 300 × 150 et la pièce
-     s'affichait en vignette avant de sauter à sa taille réelle. Il sert aussi
-     de filet si le moteur peint à une autre résolution que celle déclarée. */
   aspect-ratio: var(--ratio, 3 / 2);
 }
 .stage__photo {
@@ -354,8 +254,6 @@ body.app {
 }
 .stage__media[data-ba="true"] .stage__canvas { clip-path: inset(0 0 0 var(--ba)); }
 .studio__stage[data-editing="true"] { cursor: crosshair; }
-
-/* ---- Avant / après ---- */
 .stage__ba { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
 .stage__range {
   position: absolute;
@@ -375,8 +273,6 @@ body.app {
   width: 2px;
   background: rgba(255, 255, 255, 0.9);
 }
-/* Poignée franche mais pas énorme : 40 px, assez pour le pouce, assez discrète
-   pour ne pas masquer la zone que l'on compare. */
 .stage__handle::after {
   content: "";
   position: absolute;
@@ -444,22 +340,6 @@ body.app {
   border-radius: var(--r-pill);
   background: var(--c-mineral) center / cover no-repeat;
 }
-
-/*
- * Le lien vers la fiche du parquet regardé.
- *
- * En haut à DROITE, en face du sélecteur de pièce : les deux disent ce qu'on
- * regarde — cette pièce-ci, ce parquet-là — quand la barre du bas dit ce qu'on
- * en fait. La symétrie n'est pas décorative, elle range deux informations de
- * même nature au même niveau.
- *
- * Une pastille sobre et non un bouton plein : c'est une sortie du site, pas
- * l'action que le Studio attend de vous. Elle se lit, elle ne réclame pas.
- *
- * `max-width` la borne au tiers de l'image : « Voir ce parquet chez Premibel »
- * tient sur une ligne à 390 px, et un libellé plus long se coupe proprement
- * au lieu de traverser la photographie.
- */
 .stage__product {
   position: absolute;
   top: 0.75rem;
@@ -481,12 +361,6 @@ body.app {
 .stage__product:hover,
 .stage__product:focus-visible { background: rgba(16, 18, 19, 0.9); }
 .stage__product[hidden] { display: none; }
-
-/*
- * Sous 560 px, le sélecteur de pièce et la fiche ne tiennent plus côte à côte
- * sans se chevaucher. La fiche passe dessous, alignée à gauche comme lui :
- * deux lignes empilées plutôt que deux pastilles qui se marchent dessus.
- */
 @media (max-width: 559px) {
   .stage__product {
     top: calc(0.75rem + var(--touch) + 0.4rem);
@@ -495,10 +369,6 @@ body.app {
     max-width: calc(100% - 1.5rem);
   }
 }
-
-/* ================================================================== */
-/* Panneau contextuel                                                 */
-/* ================================================================== */
 
 .studio__panel {
   grid-column: 2;
@@ -556,8 +426,6 @@ body.app {
   cursor: pointer;
 }
 .panel__link:hover { color: var(--text); border-color: var(--line-strong); }
-
-/* ---- Matière sélectionnée, en tête du contexte Parquet ---- */
 .selected {
   display: flex;
   align-items: center;
@@ -577,10 +445,6 @@ body.app {
 .selected__text strong { font-size: 1rem; }
 .selected__text span { font-size: 0.82rem; color: var(--text-muted); }
 
-/* ================================================================== */
-/* Catalogue de matières                                              */
-/* ================================================================== */
-
 .cat__head { display: grid; gap: 0.5rem; margin-bottom: 0.8rem; }
 .cat__search {
   display: flex;
@@ -596,8 +460,6 @@ body.app {
 .cat__search input {
   flex: 1;
   min-width: 0;
-  /* L'input remplit la pilule : sans cela la zone sensible ne fait que la
-     hauteur du texte, et le tour de la pilule ne déclenche rien. */
   align-self: stretch;
   border: 0;
   background: none;
@@ -619,16 +481,6 @@ body.app {
   cursor: pointer;
 }
 .cat__filter[aria-pressed="true"] { background: var(--c-ink); border-color: var(--c-ink); color: #fff; }
-
-/**
- * Une carte de parquet est d'abord **une matière**.
- *
- * Grande vignette, nom court dessous, rien d'autre : la finition et la largeur
- * de lame vivent dans l'en-tête du contexte, pas répétées douze fois. Toutes
- * les cartes ont exactement le même gabarit — même ratio, même hauteur de
- * libellé — pour que la grille se lise comme un nuancier et non comme un
- * formulaire.
- */
 .cat__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
@@ -661,19 +513,10 @@ body.app {
   font-size: 0.85rem;
   font-weight: 500;
   line-height: 1.25;
-  /* Hauteur fixe : un nom sur deux lignes ne décale pas la carte voisine. */
   min-height: 2.5em;
   color: var(--text);
 }
 .cat__card:hover .cat__media { box-shadow: inset 0 0 0 1px var(--line-strong); }
-
-/**
- * État actif : un filet charbon franc et une petite coche.
- *
- * Pas de grosse bordure colorée — le nuancier doit rester un nuancier, et
- * l'accent sauge entrerait en concurrence avec les teintes de bois qu'il est
- * censé mettre en valeur.
- */
 .cat__card[aria-pressed="true"] .cat__media { box-shadow: inset 0 0 0 2px var(--c-ink); }
 .cat__card[aria-pressed="true"]::after {
   content: "";
@@ -689,8 +532,6 @@ body.app {
 }
 .cat__card[aria-pressed="true"] .cat__label { font-weight: 600; }
 .cat__empty { color: var(--text-muted); font-size: 0.9rem; }
-
-/* ---------- Catalogue complet : vues, outils, filtres ---------- */
 .cat__views { display: flex; gap: 0.25rem; padding: 0.2rem; border-radius: var(--r-pill); background: var(--c-mineral); }
 .cat__view {
   flex: 1 1 auto;
@@ -739,8 +580,6 @@ body.app {
 .cat__select select { width: 100%; }
 .cat__reset { justify-self: start; padding: 0; border: 0; background: none; font: inherit; font-size: 0.8rem; color: var(--text-soft); text-decoration: underline; text-underline-offset: 0.15em; cursor: pointer; min-height: 1.75rem; }
 .cat__count { margin: 0; font-size: 0.78rem; color: var(--text-muted); }
-
-/* ---------- Carte : photo commerciale, caractéristiques, statut, action ---------- */
 .cat__grid { align-items: start; }
 .cat__card {
   display: grid;
@@ -799,13 +638,6 @@ body.app {
 .cat__card:hover .cat__cta { text-decoration-color: currentColor; }
 .cat__card--unavailable .cat__photo { opacity: 0.94; }
 a.cat__card:focus-visible, button.cat__card:focus-visible { outline: 2px solid var(--c-ink); outline-offset: 2px; border-radius: var(--r-sm); }
-
-/* ================================================================== */
-/* Motifs et orientation                                              */
-/* ================================================================== */
-
-/* Les trois motifs doivent être identifiables sans lire : vignette large,
-   même gabarit, libellé court. */
 .tile-grid { display: grid; gap: 0.5rem; }
 .tile-card {
   position: relative;
@@ -832,30 +664,7 @@ a.cat__card:focus-visible, button.cat__card:focus-visible { outline: 2px solid v
 .tile-card:hover .tile-card__media { box-shadow: inset 0 0 0 1px var(--line-strong); }
 .tile-card[aria-pressed="true"] .tile-card__media { box-shadow: inset 0 0 0 2px var(--c-ink); }
 .tile-card[aria-pressed="true"] .tile-card__label { font-weight: 600; }
-
-/*
- * Motif indisponible pour la référence choisie.
- *
- * On atténue, on ne cache pas : le motif existe, il n'existe pas POUR CE
- * PARQUET, et masquer la carte laisserait croire le contraire. L'attribut
- * `disabled` fait déjà le travail sérieux — clic refusé, tabulation
- * sautée, « indisponible » annoncé par les lecteurs d'écran ; ces règles
- * ne font que le rendre visible.
- *
- * 0.55 et non 0.4 : la vignette et le libellé doivent rester LISIBLES. Une
- * carte qu'on ne déchiffre plus n'informe pas, elle encombre. Le texte
- * d'explication, lui, garde son contraste plein.
- */
 .tile-card[disabled] { cursor: not-allowed; }
-
-/*
- * L'atténuation porte sur la VIGNETTE et le libellé, pas sur la carte.
- *
- * Un `opacity` posé sur la carte entière aurait aussi pâli la phrase
- * d'explication — exactement le seul élément qui doit rester net, puisque
- * c'est lui qui dit pourquoi. L'opacité se propage aux descendants et ne se
- * rattrape pas : au-dessus de 1, la valeur est simplement bornée.
- */
 .tile-card[disabled] .tile-card__media {
   opacity: 0.5;
   filter: saturate(0.25);
@@ -871,15 +680,6 @@ a.cat__card:focus-visible, button.cat__card:focus-visible { outline: 2px solid v
   font-weight: 400;
   color: var(--text-muted);
 }
-
-/*
- * Pas de couleur seule pour porter l'information.
- *
- * Quelqu'un qui distingue mal les contrastes ne verra pas « cette carte est
- * plus pâle que les autres ». La phrase « Non disponible pour ce parquet »
- * est donc écrite, pas suggérée — et en contraste renforcé, elle reprend
- * tout son poids.
- */
 @media (prefers-contrast: more) {
   .tile-card[disabled] .tile-card__media { filter: saturate(0.1); opacity: 0.45; }
   .tile-card[disabled] .tile-card__label { opacity: 1; }
@@ -901,25 +701,8 @@ a.cat__card:focus-visible, button.cat__card:focus-visible { outline: 2px solid v
 .orient__item svg { width: 1.5rem; height: 1.5rem; }
 .orient__item:hover { border-color: var(--line-strong); }
 .orient__item[aria-pressed="true"] { border-color: var(--c-ink); box-shadow: inset 0 0 0 1px var(--c-ink); color: var(--text); }
-
-/* ================================================================== */
-/* Barre d'actions                                                    */
-/* ================================================================== */
-
-/**
- * Deux groupes, six commandes, pas dix.
- *
- *   [ Parquet | Motif | Orientation ]   ← contextes, un seul à la fois
- *   [ Avant/après ] [ Comparer ] [ Enregistrer ]
- *
- * Elle flotte au-dessus de la pièce : elle ne lui prend aucune bande.
- */
 .studio__actions {
   position: absolute;
-  /* left: 0 / right: 0 et non left: 50 % : avec left: 50 %, la largeur
-     disponible d'un élément absolu se réduit à la moitié droite du cadre, et la
-     barre s'enroulait sur deux ou trois rangées en mangeant le bas de la
-     pièce. Ici elle prend sa largeur naturelle et se centre. */
   left: 0;
   right: 0;
   width: fit-content;
@@ -959,16 +742,6 @@ a.cat__card:focus-visible, button.cat__card:focus-visible { outline: 2px solid v
 }
 .context-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
 .context-btn[aria-pressed="true"] { background: #f4f2ec; color: #16181a; font-weight: 600; }
-
-/**
- * Les variantes retenues sont des pastilles numérotées, pas des étiquettes.
- *
- * Trois chips portant « Chêne Naturel », « Chêne Miel », « Chêne Fumé »
- * faisaient déborder la barre sur trois rangées et mangeaient le bas de la
- * pièce. Le nom reste accessible — title et aria-label — et il est de toute
- * façon affiché en grand dans la vue de comparaison, qui est le seul moment où
- * on en a besoin.
- */
 .actions__variants { display: flex; align-items: center; gap: 0.25rem; }
 .variant {
   position: relative;
@@ -993,8 +766,6 @@ a.cat__card:focus-visible, button.cat__card:focus-visible { outline: 2px solid v
 }
 .variant__dot::before { content: attr(data-index); }
 .variant__name { display: none; }
-/* La croix n'apparaît qu'au survol ou au clavier : on ne propose pas de
-   supprimer en permanence quelque chose qu'on vient d'ajouter. */
 .variant__remove {
   position: absolute;
   inset: 0;
@@ -1011,9 +782,6 @@ a.cat__card:focus-visible, button.cat__card:focus-visible { outline: 2px solid v
 .variant__remove svg { width: 0.95rem; height: 0.95rem; }
 .variant:hover .variant__remove,
 .variant__remove:focus-visible { opacity: 1; }
-
-/* « Ajouter à comparer » n'est pas une commande de premier plan : c'est un
-   geste attaché aux variantes. */
 .variant-add {
   display: grid;
   place-items: center;
@@ -1051,28 +819,12 @@ a.cat__card:focus-visible, button.cat__card:focus-visible { outline: 2px solid v
 .action[disabled] { opacity: 0.4; cursor: not-allowed; }
 .action--primary { background: var(--c-sage); border-color: var(--c-sage); color: #12140f; font-weight: 600; }
 .action--primary:hover:not([disabled]) { background: #9cb098; }
-
-/*
- * « Décrire mon projet » est un lien, pas un bouton : il mène à une autre
- * page, et le clic milieu, l'ouverture dans un nouvel onglet et l'aperçu de
- * l'adresse au survol doivent fonctionner. Il porte donc `.action` pour le
- * dessin, et ces deux lignes pour ce qu'un `<a>` apporte en trop : un
- * soulignement dont on ne veut pas, et un alignement du texte qui ne se règle
- * pas tout seul dans une pilule.
- *
- * Le focus clavier reste celui du site — aucun `outline: none` ici, ce serait
- * rendre le bouton invisible au clavier pour gagner un pixel d'esthétique.
- */
 a.action {
   text-decoration: none;
   justify-content: center;
 }
 a.action:hover { background: rgba(255, 255, 255, 0.1); }
 a.action--primary:hover { background: #9cb098; }
-
-/* ================================================================== */
-/* Tiroir : correction du sol, réglages avancés                        */
-/* ================================================================== */
 
 .studio__drawer {
   position: fixed;
@@ -1131,10 +883,6 @@ a.action--primary:hover { background: #9cb098; }
 }
 .seg-tabs button[aria-pressed="true"] { background: var(--surface); color: var(--text); font-weight: 600; }
 
-/* ================================================================== */
-/* Aide                                                               */
-/* ================================================================== */
-
 .studio__help {
   position: fixed;
   inset: 0;
@@ -1162,10 +910,6 @@ a.action--primary:hover { background: #9cb098; }
 .studio__error { padding: var(--gutter); color: #f4f2ec; }
 .studio__noscript { padding: var(--gutter); color: #f4f2ec; max-width: 40rem; }
 .studio__noscript a { color: #fff; }
-
-/* ================================================================== */
-/* Comparaison — elle devient le contenu principal                    */
-/* ================================================================== */
 
 .cmp {
   position: fixed;
@@ -1223,7 +967,6 @@ a.action--primary:hover { background: #9cb098; }
 .cmp__canvas {
   display: block;
   max-width: 100%;
-  /* Bornée par la fenêtre : la barre, les légendes et le pied restent visibles */
   max-height: calc(100svh - 14rem);
   width: auto;
   margin-inline: auto;
@@ -1253,7 +996,6 @@ a.action--primary:hover { background: #9cb098; }
   background: rgba(255, 255, 255, 0.94);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
-/* Les noms restent très discrets : c'est l'image qu'on regarde. */
 .cmp__tag {
   position: absolute;
   top: 0.8rem;
@@ -1303,20 +1045,12 @@ a.action--primary:hover { background: #9cb098; }
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 .cmp__foot p { margin: 0; font-size: 0.9rem; color: rgba(244, 242, 236, 0.72); }
-
-/* ================================================================== */
-/* Tablette                                                           */
-/* ================================================================== */
-
-/* Paysage : petit panneau latéral, grande pièce — pas un desktop compressé. */
 @media (max-width: 74rem) and (min-width: 48rem) and (orientation: landscape) {
   .studio:not([data-panel="closed"]) .studio__main {
     grid-template-columns: minmax(0, 1fr) clamp(15.5rem, 28vw, 18rem);
   }
   .cat__grid { grid-template-columns: repeat(auto-fill, minmax(5.75rem, 1fr)); }
 }
-
-/* Portrait : la pièce en haut, le panneau en feuille basse. */
 @media (max-width: 64rem) and (min-width: 48rem) and (orientation: portrait) {
   .studio:not([data-panel="closed"]) .studio__main { grid-template-columns: minmax(0, 1fr); }
   .studio__panel {
@@ -1332,47 +1066,15 @@ a.action--primary:hover { background: #9cb098; }
   }
   .studio[data-panel="closed"] .studio__panel { display: none; }
   .studio:not([data-panel="closed"]) .studio__actions { bottom: calc(46svh + 0.8rem); }
-  /* Même principe qu'au téléphone : la photo se centre dans ce qui reste
-     visible au-dessus de la feuille. */
   .studio:not([data-panel="closed"]) .studio__stage { padding-bottom: 46svh; }
   .studio:not([data-panel="closed"]) .stage__canvas { max-height: calc(54svh - var(--bar-h)); }
   .cat__grid { grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr)); }
 }
-
-/* ================================================================== */
-/* Téléphone : la pièce reste visible, toujours                       */
-/* ================================================================== */
-
-/**
- * Feuille basse à trois niveaux. La règle qui commande tout : **on ne cache
- * jamais la pièce.** Même au niveau le plus haut, une bande de photo reste
- * visible ; le plein écran n'existe que si l'utilisateur le demande.
- *
- *   peek  32 svh  — le rail de matières : on essaie six parquets au pouce
- *   half  58 svh  — le catalogue complet
- *   full  86 svh  — sur demande explicite seulement
- */
 @media (max-width: 47.99rem) {
   .studio__bar { padding-inline: 0.25rem; }
   .studio__back span { font-size: 0.92rem; }
-  .studio__project { display: none; }
-
-  /**
-   * Colonne : la pièce en haut, les commandes juste dessous.
-   *
-   * La scène occupait toute la hauteur du cadre et y centrait la photo. Une
-   * photo en 3/2 dans un écran en portrait ne peut pas remplir cette hauteur :
-   * mesuré à 390 × 844, le canvas faisait 260 px dans une scène de 796, soit
-   * **268 px de noir au-dessus et 268 px en dessous**. La barre d'actions, elle,
-   * flottait au bas de l'écran, séparée de la photo par tout ce vide.
-   *
-   * Le remède n'est pas d'agrandir la photo — son rapport est ce qu'il est, et
-   * le déformer ou la rogner serait pire. C'est de **ne plus étirer la scène** :
-   * en colonne flexible, `flex: 0 0 auto` lui donne exactement la hauteur de la
-   * photo, et les commandes reviennent en flux immédiatement dessous. Le vide
-   * ne disparaît pas par magie, il est reporté en bas, sous les commandes, là
-   * où la feuille du catalogue vient l'occuper.
-   */
+  .studio__project { display: block; font-size: 0.72rem; padding-left: 0; border-left: 0; }
+  .studio__project [data-project] { display: none; }
   .studio__main,
   .studio:not([data-panel="closed"]) .studio__main {
     display: flex;
@@ -1380,8 +1082,6 @@ a.action--primary:hover { background: #9cb098; }
     align-items: stretch;
     grid-template-columns: none;
   }
-  /* L'ordre à l'écran est imposé, pas hérité du DOM : dans le balisage la
-     feuille précède les commandes, et en colonne elle serait passée avant. */
   .studio__stage { order: 1; }
   .studio__actions { order: 2; }
   .studio__panel { order: 3; }
@@ -1390,7 +1090,6 @@ a.action--primary:hover { background: #9cb098; }
     flex: 0 0 auto;
     padding-bottom: 0;
   }
-  /* Les commandes ne flottent plus : elles suivent la photo. */
   .studio__actions {
     position: static;
     flex: 0 0 auto;
@@ -1403,13 +1102,6 @@ a.action--primary:hover { background: #9cb098; }
   }
   .stage__canvas { max-height: calc(100svh - var(--bar-h)); }
   .stage__room { top: 0.6rem; left: 0.6rem; font-size: 0.85rem; }
-  /*
-   * Sur téléphone, la feuille de choix couvre le bas de la scène : centré à
-   * 5rem du bas, le message tombait au milieu de la photo, sur le sol même
-   * qu'on venait de choisir. Il passe en petite pastille au pied de la
-   * photo, à gauche — le haut est déjà pris par « Changer de pièce » et
-   * « Voir ce parquet chez Premibel ».
-   */
   .stage__status {
     top: auto;
     bottom: 0.6rem;
@@ -1422,8 +1114,6 @@ a.action--primary:hover { background: #9cb098; }
     line-height: 1.35;
     text-align: left;
   }
-
-  /* La barre d'actions reste flottante et se cale au-dessus de la feuille. */
   .studio__actions {
     left: 0.5rem;
     right: 0.5rem;
@@ -1432,31 +1122,11 @@ a.action--primary:hover { background: #9cb098; }
     justify-content: center;
     gap: 0.3rem 0.4rem;
   }
-  /* Deux rangées, pas trois : les contextes en pleine largeur, puis les
-     commandes. Une barre de trois rangées mangeait un tiers de la photo. */
   .actions__contexts { flex: 1 0 100%; justify-content: center; }
   .context-btn { flex: 1; font-size: 0.9rem; padding: 0 0.5rem; }
-  /* Les pastilles de variantes disparaissent : le nombre de versions retenues
-     est déjà porté par le bouton « Comparer (3) », et sur 390 px chaque
-     commande doit gagner sa place. */
   .actions__variants { display: none; }
-  /**
-   * Les libellés reviennent.
-   *
-   * Ils étaient masqués parce que la barre flottait au-dessus de la photo et
-   * que chaque pixel lui était pris. Maintenant qu'elle est en flux sous la
-   * pièce, la contrainte a disparu — et trois icônes muettes ne sont pas
-   * devinables : une glissière, un empilement de calques et une disquette ne
-   * disent ni « avant / après », ni « comparer », ni « enregistrer ».
-   *
-   * La barre passe volontiers sur deux rangées : mieux vaut deux rangées
-   * comprises qu'une rangée d'énigmes.
-   */
   .action span { display: inline; }
   .action { padding: 0 0.7rem; gap: 0.35rem; }
-  /* `display: contents` : les trois actions deviennent des enfants directs de
-     la barre et s'enroulent donc avec le bouton « + », au lieu de le laisser
-     seul sur une rangée. Trois rangées de commandes tombent à deux. */
   .actions__buttons { display: contents; }
 
   .studio__panel {
@@ -1478,21 +1148,6 @@ a.action--primary:hover { background: #9cb098; }
   .studio[data-sheet="peek"] { --sheet-h: 32svh; }
   .studio[data-sheet="half"] { --sheet-h: 58svh; }
   .studio[data-sheet="full"] { --sheet-h: 86svh; }
-
-  /**
-   * Au niveau « peek », la feuille n'est pas flottante : elle occupe ce qui
-   * reste.
-   *
-   * Remonter la photo en haut du cadre a déplacé le vide, pas supprimé : il
-   * restait 154 px de noir entre les commandes et le catalogue, parce que la
-   * feuille se dimensionnait sur 32svh au lieu de la place disponible. En flux,
-   * troisième élément de la colonne, elle prend exactement le reste — et
-   * l'ordre à l'écran devient celui qu'on veut lire : pièce, commandes,
-   * catalogue.
-   *
-   * Aux niveaux « half » et « full », elle redevient flottante et recouvre la
-   * photo : c'est un geste demandé, pas un état par défaut.
-   */
   .studio[data-sheet="peek"]:not([data-panel="closed"]) .studio__panel {
     position: relative;
     inset: auto;
@@ -1501,12 +1156,9 @@ a.action--primary:hover { background: #9cb098; }
     min-height: 0;
     box-shadow: none;
   }
-
-  /* Poignée : elle fait défiler les trois niveaux, et c'est une vraie cible. */
   .panel__grab {
     display: block;
     width: 100%;
-    /* Cible réelle : c'est le geste le plus fréquent de l'écran mobile. */
     height: 2.75rem;
     border: 0;
     background: none;
@@ -1523,12 +1175,6 @@ a.action--primary:hover { background: #9cb098; }
   }
   .panel__head { min-height: 2.7rem; }
   .panel__body { padding: 0.6rem 0.75rem 0.9rem; }
-
-  /**
-   * Niveau replié : un rail horizontal de matières.
-   * Une grille de deux colonnes remplirait l'écran ; un rail laisse la pièce
-   * respirer et se parcourt au pouce, ce qui est le geste réel.
-   */
   .studio[data-sheet="peek"] .cat__head,
   .studio[data-sheet="peek"] .selected { display: none; }
   .studio[data-sheet="peek"] .cat__grid {
@@ -1540,10 +1186,6 @@ a.action--primary:hover { background: #9cb098; }
     overscroll-behavior-x: contain;
     padding-bottom: 0.25rem;
   }
-  /* La carte ne s'étire plus : `grid-template-rows: 1fr auto` faisait grandir
-     la rangée de l'échantillon jusqu'à la hauteur du rail, alors que son
-     rapport 4/5 en plafonne l'image — d'où plus de cent pixels de vide entre
-     la matière et son nom. */
   .studio[data-sheet="peek"] .cat__card {
     scroll-snap-align: start;
     grid-template-rows: auto auto;
@@ -1555,8 +1197,6 @@ a.action--primary:hover { background: #9cb098; }
 
   .cat__grid { grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr)); }
   .studio__drawer { top: var(--bar-h); width: 100%; }
-
-  /* Comparaison : une vue par écran, balayage horizontal */
   .cmp__grid {
     grid-template-columns: none;
     grid-auto-flow: column;
@@ -1571,58 +1211,15 @@ a.action--primary:hover { background: #9cb098; }
   .cmp__bar { padding-inline: 0.35rem; }
   .cmp__title { font-size: 0.9rem; }
 }
-
-/* ================================================================== */
-/* Hauteur disponible critique                                        */
-/* ================================================================== */
-
-/**
- * DERNIER RECOURS, et seulement sous 480 px de large.
- *
- * Cette requête n'avait aucune condition de largeur, et c'est ce qui a rendu
- * le Visualiseur inutilisable à 1440 × 505. Le raisonnement d'origine — mieux
- * vaut une page qui défile qu'un bouton inatteignable — reste juste ; il ne
- * s'appliquait qu'à la disposition en feuille basse, où le panneau est une
- * bandeau `fixed` au bas de l'écran. Posé sur la disposition à deux colonnes,
- * il faisait exactement le contraire de ce qu'il visait : il dépunaisait le
- * panneau (`position: static`, `max-height: 100svh`), donc le panneau prenait
- * toute la hauteur de vue, donc la barre d'actions rendue statique passait
- * SOUS la ligne de flottaison. Mesuré à 1440 × 505 : les onglets Parquet,
- * Motif et Orientation à y 567 pour 505 px de haut. Le visiteur ne pouvait
- * plus changer de parquet sans deviner que cette page-là défile.
- *
- * La disposition large, elle, tient déjà dans une hauteur quelconque : le
- * `.studio` fait `100svh` en deux rangées, le panneau est une colonne à
- * défilement interne, la barre d'actions flotte au-dessus de la scène. Vérifié
- * à 1440 × 505 en neutralisant cette seule requête : plus de défilement de
- * page, barre d'actions à y 427, canevas de 685 × 457, catalogue qui défile
- * chez lui. Il n'y avait rien à corriger dans la disposition large — il y
- * avait à cesser de la casser.
- *
- * Sous 480 px de large, deux colonnes sont impossibles et le défilement de
- * page redevient la réponse honnête. Entre 480 px et la disposition large,
- * c'est la mise en page compacte en fin de feuille qui prend le relais.
- */
 @media (max-height: 34rem) and (max-width: 29.99rem) {
   body.app { height: auto; min-height: 100svh; overflow: auto; }
   .studio { height: auto; min-height: 100svh; }
   .studio__main { grid-template-rows: auto; }
-  /**
-   * La scène ne s'étire pas sur la rangée, et le catalogue ne l'étire pas.
-   *
-   * Mesuré à 844 × 390 : le panneau devenu statique rendait tout le catalogue
-   * en flux, la rangée montait à 3082 px, et la photo — toujours centrée dans
-   * sa case — se retrouvait à y = 1400. Il fallait défiler un écran et demi
-   * pour voir la pièce qu'on est venu regarder. C'est le même défaut que le
-   * vide noir du téléphone, dans l'autre branche de la feuille.
-   */
   .studio__stage { min-height: 56svh; align-self: start; align-content: start; }
   .stage__canvas { max-height: 56svh; }
   .studio__panel {
     position: static;
     height: auto;
-    /* Le catalogue défile chez lui : sans plafond il commande la hauteur de
-       toute la page. */
     max-height: 100svh;
     overflow: auto;
     align-self: start;
@@ -1631,9 +1228,6 @@ a.action--primary:hover { background: #9cb098; }
   }
   .studio__actions { position: static; margin: 0.5rem auto; left: auto; right: auto; }
 }
-
-/* En paysage téléphone, le panneau passe à droite plutôt qu'en bas : une
-   feuille basse ne laisserait rien voir de la pièce. */
 @media (max-width: 47.99rem) and (orientation: landscape) and (min-height: 20rem) {
   .studio:not([data-panel="closed"]) .studio__main { grid-template-columns: minmax(0, 1fr) 45vw; }
   .studio__panel {
@@ -1655,20 +1249,6 @@ a.action--primary:hover { background: #9cb098; }
   .studio__actions,
   .room-card img { transition: none; }
 }
-
-/* ================================================================== */
-/* Cibles tactiles                                                    */
-/* ================================================================== */
-
-/**
- * Sur pointeur grossier — doigt, stylet — toute commande fait au moins 44 px.
- *
- * Les pilules de la barre mesurent 2,35 rem à la souris : c'est net et compact,
- * et une barre de 54 px de haut mangerait le bas de la pièce pour rien. Mais
- * 38 px au doigt, c'est une cible qu'on rate. On distingue donc les deux cas au
- * lieu d'imposer le pire des deux à tout le monde : les icônes gardent leur
- * taille, seule la zone sensible grandit.
- */
 @media (pointer: coarse) {
   .studio { --touch: 2.75rem; }
   .context-btn,
@@ -1681,19 +1261,9 @@ a.action--primary:hover { background: #9cb098; }
   .variant-add { width: 2.75rem; height: 2.75rem; }
   .variant__remove { width: 2.75rem; height: 2.75rem; }
   .stage__room { min-height: 2.75rem; }
-  /* Les vignettes du catalogue sont déjà de grandes cibles ; on garantit
-     seulement que la plus petite reste confortable. */
   .cat__card { min-height: 2.75rem; }
   .orient__item { min-height: 3rem; }
 }
-
-/**
- * Lien vers la fiche du fabricant.
- *
- * Volontairement discret : pose-parquet.com reste un site editorial, pas une
- * boutique. Pas de bouton d achat, pas de prix — une sortie sobre vers la
- * reference, et seulement quand la reference affichee est reellement celle-la.
- */
 .selected__ref {
   display: inline-flex;
   align-items: baseline;
@@ -1708,37 +1278,6 @@ a.action--primary:hover { background: #9cb098; }
 }
 .selected__ref:hover { color: var(--text); opacity: 1; }
 .selected__ref span { font-family: var(--font-mono); font-size: var(--fs-xs); opacity: 0.75; }
-
-
-/* ================================================================== */
-/* Hauteur serrée : tout tient dans l'écran, sans défilement de page   */
-/* ================================================================== */
-
-/**
- * À 844 × 390, la mise en page « tablette paysage » gardait deux colonnes
- * mais laissait la barre d'actions en flux sous la scène : mesurée à
- * y = 446 pour 390 px de haut, donc invisible sans défiler — les commandes
- * Parquet / Motif / Orientation n'existaient plus. Et dans un panneau de
- * 248 px, la recherche et les filtres du catalogue (256 px de largeur
- * minimale) sortaient de leur colonne.
- *
- * Ici : la scène et le panneau se partagent la largeur, la barre d'actions
- * redevient flottante au bas de la scène, le canevas se plafonne à la hauteur
- * disponible, et le catalogue renonce à sa largeur minimale.
- *
- * LE SEUIL A ÉTÉ RELEVÉ de 30rem à 34rem, et `orientation: landscape` a
- * disparu. Les deux requêtes de hauteur de cette feuille ne s'accordaient
- * pas : le repli qui laisse défiler la page commençait à 34rem (544 px),
- * cette mise en page compacte qui rend le défilement inutile ne commençait
- * qu'à 30rem (480 px). Entre les deux, soixante-quatre pixels de hauteur où
- * la page défilait sans que rien ne rattrape les commandes sorties du cadre.
- * 505 px tombe pile dedans, et c'est là que le défaut a été trouvé.
- * `orientation` était de trop : à 480 px de large et 544 de haut on est
- * presque carré, et cette disposition tient dans les deux sens.
- *
- * Les deux seuils sont désormais le même nombre. S'ils doivent bouger, ils
- * bougent ensemble.
- */
 @media (max-height: 34rem) and (min-width: 30rem) {
   .studio__main,
   .studio:not([data-panel="closed"]) .studio__main {
@@ -1792,62 +1331,15 @@ a.action--primary:hover { background: #9cb098; }
   .cat__search input { min-width: 0; }
   .studio[data-sheet] .cat__head { display: block; }
 }
-
-/**
- * Densification : elle suit la LARGEUR, pas la hauteur.
- *
- * Ce qui précède est une affaire de hauteur — faire tenir la scène, le panneau
- * et la barre dans une vue basse. Réduire les libellés et masquer les variantes
- * est une affaire de largeur, et ces règles étaient dans le même bloc. À
- * 1440 × 505 elles retiraient donc les mots « Avant / après », « Comparer » et
- * « Enregistrer » et les trois pastilles de variantes, alors que la barre
- * mesure 889 px pour 1123 px de scène : il y avait de la place pour tout.
- *
- * LE SEUIL EST MESURÉ, pas choisi au hasard. Avec ses libellés et ses trois
- * pastilles, la barre demande 889 px sur une rangée ; elle vit entre
- * `left: 0.5rem` et `right: 0.5rem`, donc elle dispose de la fenêtre moins
- * 16 px. Sous 960 px de large, elle n'y tient plus et passe à deux rangées, ce
- * qui lui fait manger le coin bas de la pièce — constaté à 844 × 390, où la
- * seconde rangée ne portait que « Enregistrer ». 60rem est donc la largeur en
- * dessous de laquelle il faut densifier, avec 55 px de marge sur la mesure.
- *
- * Les cibles ne rétrécissent pas : `min-height` n'est pas touché ici, et la
- * requête `pointer: coarse` plus haut garde ses 2,75rem au doigt. Ce qui
- * disparaît, ce sont des MOTS et des raccourcis de variantes, jamais une
- * commande : Parquet, Motif, Orientation, Avant/après, Comparer et Enregistrer
- * restent tous cliquables, en icônes.
- */
 @media (max-height: 34rem) and (min-width: 30rem) and (max-width: 59.99rem) {
   .context-btn { font-size: 0.85rem; padding: 0 0.6rem; }
   .action { padding: 0 0.6rem; }
   .action span { display: none; }
   .actions__variants { display: none; }
 }
-
-/* La grille du catalogue se resserre plus tard : à 480 px de panneau il y a
-   encore la place pour des vignettes confortables. */
 @media (max-height: 34rem) and (min-width: 30rem) and (max-width: 47.99rem) {
   .cat__grid { grid-template-columns: repeat(auto-fill, minmax(4.75rem, 1fr)); }
 }
-
-/* ================================================================== */
-/* Retour au doigt, et preferences d'affichage                        */
-/* ================================================================== */
-
-/**
- * Ce qui manquait : la confirmation de l'appui.
- *
- * Les commandes du Studio repondaient au survol et a l'etat actif, mais rien
- * ne se passait entre les deux — au moment ou le doigt touche. Sur un ecran
- * tactile il n'y a pas de survol du tout : l'appui etait donc muet jusqu'a ce
- * que le panneau s'ouvre, et sur un choix qui demande une fabrication de
- * tuile, cet intervalle se compte en secondes.
- *
- * Le retour est volontairement minuscule — 2 % d'echelle, 60 ms — et il porte
- * sur l'ENFONCEMENT, pas sur le relachement : attendre le relachement donne
- * l'impression d'une interface qui reflechit avant de repondre. Ce n'est pas
- * une animation, c'est un accuse de reception.
- */
 .context-btn,
 .action,
 .tile-card,
@@ -1861,7 +1353,6 @@ a.action--primary:hover { background: #9cb098; }
 .panel__close:active {
   transform: scale(0.96);
 }
-/* Les vignettes sont grandes : 0,96 y serait un sursaut. */
 .tile-card:active:not([disabled]) { transform: scale(0.985); }
 .swatch:active:not([disabled]) { transform: scale(0.94); }
 
@@ -1883,20 +1374,6 @@ a.action--primary:hover { background: #9cb098; }
     transform: none;
   }
 }
-
-/**
- * Contraste renforce.
- *
- * `prefers-contrast: more` est demande par quelqu'un qui ne distingue pas
- * assez les limites : on epaissit les contours et on remonte les textes
- * secondaires vers le texte plein. On ne change NI les couleurs de marque, NI
- * la mise en page — ce reglage doit rendre le meme ecran plus lisible, pas un
- * autre ecran.
- *
- * Les valeurs visees sont celles qui manquaient : un contour de 1 px a 28 %
- * d'opacite sur fond sombre passe a 1,5 px a 70 %, et les libelles a
- * `--text-muted` reviennent a `--text-soft`.
- */
 @media (prefers-contrast: more) {
   .context-btn { border: 1.5px solid rgba(255, 255, 255, 0.7); }
   .context-btn[aria-pressed="true"] { border-color: #fff; }
@@ -1909,16 +1386,6 @@ a.action--primary:hover { background: #9cb098; }
   .panel__title { color: var(--text); }
   .stage__status { border: 1.5px solid var(--text); }
 }
-
-/**
- * Transparence reduite.
- *
- * Le Studio pose plusieurs surfaces translucides au-dessus de la photo : la
- * barre du haut, les etiquettes avant/apres, le bandeau d'etat. Sur une photo
- * claire et chargee, ces fonds a 10 ou 18 % laissent passer assez de detail
- * pour rendre le texte difficile. Quand le systeme demande moins de
- * transparence, ces fonds deviennent opaques. Rien d'autre ne bouge.
- */
 @media (prefers-reduced-transparency: reduce) {
   .studio__bar { background: var(--c-ink); backdrop-filter: none; }
   .stage__tag { background: var(--c-ink); color: #fff; }
@@ -1927,16 +1394,10 @@ a.action--primary:hover { background: #9cb098; }
   .context-btn:hover,
   .action:hover:not([disabled]) { background: #2a2d31; }
 }
-
-/* Bande compacte (tiroir replié, mobile) : un sélecteur rapide de parquets à
-   essayer. Les références sans visualisation restent dans le tiroir déplié. */
 .studio[data-sheet="peek"] .cat__card--unavailable { display: none; }
 .studio[data-sheet="peek"] .cat__meta,
 .studio[data-sheet="peek"] .cat__cta { display: none; }
 .studio[data-sheet="peek"] .cat__badge { font-size: 0.56rem; padding: 0.08rem 0.32rem; white-space: nowrap; }
-
-/* L'en-tête du tiroir tient dans la colonne la plus étroite (panneau latéral,
-   320 px) : les vues sont trois cases égales, compteur sous le libellé. */
 .cat__head { min-width: 0; }
 .cat__head > * { min-width: 0; }
 .cat__views { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); border-radius: var(--r-md); }
@@ -1954,8 +1415,6 @@ a.action--primary:hover { background: #9cb098; }
   text-align: center;
 }
 .cat__sort select { max-width: 9.5rem; }
-
-/* Repli sans photo : une étiquette graphique sobre, jamais une texture. */
 .cat__nophoto {
   position: absolute;
   inset: 0;
@@ -1963,7 +1422,6 @@ a.action--primary:hover { background: #9cb098; }
   place-content: center;
   justify-items: center;
   gap: 0.2rem;
-  /* Le bas reste libre : le badge de rendu s'y pose. */
   padding: 0.4rem 0.4rem 1.7rem;
   text-align: center;
   background: var(--c-mineral);
@@ -1976,8 +1434,6 @@ a.action--primary:hover { background: #9cb098; }
 .cat__nophoto-init { font-family: var(--font-display); font-size: 1.6rem; line-height: 1; color: var(--text); }
 .cat__nophoto-txt { font-size: 0.66rem; line-height: 1.25; }
 .cat__nophoto-note { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
-
-/* La sélection dit ce que vaut son rendu, et si c'est une démonstration. */
 .selected__status { font-size: 0.74rem; color: var(--text-muted); }
 .selected__status--demo {
   display: inline-block;
@@ -1987,13 +1443,6 @@ a.action--primary:hover { background: #9cb098; }
   color: var(--text);
   font-weight: 500;
 }
-
-/* ------------------------------------------------------------------ */
-/* Délimiter le sol : toute la photo visible et saisissable            */
-/* ------------------------------------------------------------------ */
-/* Une marge autour de la photo pendant l'édition : une poignée posée au bord
-   de l'image reste entière, au lieu d'être coupée en deux par le cadre. Les
-   coordonnées ne bougent pas — elles sont relues sur la boîte de la photo. */
 .studio__stage[data-editing="true"] { padding: 22px; }
 .studio__stage[data-editing="true"] .stage__media { overflow: visible; }
 .studio__stage[data-editing="true"] .stage__canvas { max-height: calc(100svh - var(--bar-h) - 44px); }
@@ -2005,20 +1454,10 @@ a.action--primary:hover { background: #9cb098; }
   color: #6b3a12;
   font-size: 0.88rem;
 }
-
-/* Grand écran : le tiroir se pose à droite, la photo se range à sa gauche au
-   lieu de passer dessous (les poignées de droite y disparaissaient). */
 @media (min-width: 48rem) {
   .studio[data-drawer="zone"] .studio__stage { padding-right: calc(min(24rem, 100%) + 22px); }
-  /* PHOTO IMPORTÉE : la barre d'actions flottait SUR la photo pendant la
-     délimitation — elle cachait le bas du sol et la poignée de devant à
-     droite, et le tiroir la coupait (« Décrir… » à 1920 × 1032). Le tiroir
-     porte « Terminer » ; la barre revient à la fermeture, comme sur
-     téléphone. Les pièces d'exemple gardent leur barre : leurs poignées sont
-     déjà replacées hors de sa zone (`zoneVisible`, js/studio/app.js). */
   .studio[data-source="photo"][data-drawer="zone"] .studio__actions { display: none; }
 }
-/* Conseil de cadrage : visible seulement quand il sert. */
 .drawer__conseil {
   margin: 0;
   padding: 0.5rem 0.7rem;
@@ -2028,18 +1467,12 @@ a.action--primary:hover { background: #9cb098; }
   color: var(--text);
   font-size: 0.86rem;
 }
-/* Téléphone en paysage : tiroir plus étroit, même principe. */
 @media (max-height: 34rem) and (min-width: 30rem) {
   .studio[data-drawer="zone"] .studio__drawer { width: 17rem; }
-  /* 22 px : la moitié d'une zone de prise. Une poignée posée au bord exact de
-     la photo reste entière à l'écran (à 14 px, elle débordait d'un côté). */
   .studio[data-drawer="zone"] .studio__stage { padding: 22px calc(17rem + 22px) 22px 22px; }
   .studio[data-drawer="zone"] .stage__canvas { max-height: calc(100svh - var(--bar-h) - 44px); }
   .studio[data-drawer="zone"] .studio__actions { display: none; }
 }
-/* Téléphone en portrait : le tiroir devient un panneau bas compact, la photo
-   reste au-dessus, entière — il couvrait tout l'écran et cachait le sol
-   qu'on était en train de délimiter. */
 @media (max-width: 47.99rem) and (min-height: 34.01rem) {
   .studio[data-drawer="zone"] .studio__drawer {
     top: auto;
@@ -2055,13 +1488,8 @@ a.action--primary:hover { background: #9cb098; }
   .studio[data-drawer="zone"] .studio__actions,
   .studio[data-drawer="zone"] .studio__panel { display: none; }
 }
-
-/* Pendant la délimitation, rien ne se pose sur la photo : les pastilles
-   « Changer de pièce » et « Voir ce parquet » couvraient les coins du fond. */
 .studio__stage[data-editing="true"] .stage__room,
 .studio__stage[data-editing="true"] .stage__product { display: none; }
-
-/* Configuration actuelle, séparée du catalogue Premibel qui suit. */
 .selected { flex-wrap: wrap; }
 .selected__eyebrow {
   flex: 0 0 100%;
@@ -2071,7 +1499,6 @@ a.action--primary:hover { background: #9cb098; }
   text-transform: uppercase;
   color: var(--text-muted);
 }
-/* Démonstration : un encadré, pas une fiche. Ni vignette ni cotes de produit. */
 .selected[data-demo="true"] {
   display: grid;
   gap: 0.5rem;
@@ -2082,14 +1509,6 @@ a.action--primary:hover { background: #9cb098; }
 }
 .selected__demo { margin: 0; font-size: 0.88rem; color: var(--text-soft); }
 .selected__choose { justify-self: start; }
-
-/*
- * Feuille repliée sur téléphone : dire qu'il y a plus à voir.
- *
- * La rangée horizontale ne montrait que quatre parquets sur 394, et rien
- * n'indiquait que la poignée ouvrait la recherche et les filtres. On le dit :
- * un bouton dans l'en-tête.
- */
 .panel__more { display: none; }
 @media (max-width: 47.99rem) {
   .studio[data-sheet="peek"][data-panel="parquets"] .panel__more {
@@ -2107,28 +1526,6 @@ a.action--primary:hover { background: #9cb098; }
     white-space: nowrap;
   }
 }
-
-/* ================================================================== */
-/* Téléphone en portrait : la photo plein écran, un tiroir en bas      */
-/* ================================================================== */
-/*
- * La disposition en colonne (photo, deux rangées de commandes, feuille)
- * laissait à la pièce un tiers de l'écran : on regardait des boutons plutôt
- * que son sol. Ici, l'écran appartient à la photo :
- *
- *   - la photo remplit tout l'espace au-dessus du tiroir. Elle garde ses
- *     proportions et déborde sur les côtés (recadrage horizontal seulement) :
- *     le sol, en bas de l'image, reste entier ;
- *   - les trois contextes (Parquet, Motif, Orientation) flottent au pied de
- *     la photo ;
- *   - les actions secondaires deviennent des icônes sur le bord droit ;
- *   - le tiroir porte la rangée de parquets et « Décrire mon projet », en
- *     pleine largeur. Le tirer ouvre la liste complète.
- *
- * Pendant la délimitation du sol (`data-drawer="zone"`), rien de tout cela :
- * les poignées doivent voir la photo entière, et l'on retrouve la
- * disposition en colonne.
- */
 @media (max-width: 47.99rem) and (orientation: portrait) {
   .studio[data-sheet]:not([data-drawer="zone"]) {
     --tiroir: calc(16.75rem + env(safe-area-inset-bottom));
@@ -2138,8 +1535,6 @@ a.action--primary:hover { background: #9cb098; }
     position: relative;
     overflow: hidden;
   }
-
-  /* ---- La photo ---- */
   .studio[data-sheet]:not([data-drawer="zone"]) .studio__stage {
     position: absolute;
     inset: 0 0 var(--tiroir) 0;
@@ -2161,10 +1556,7 @@ a.action--primary:hover { background: #9cb098; }
     max-width: none;
     max-height: none;
   }
-  /* Le message de rendu reste visible malgré le recadrage : il se cale sur la scène, pas sur la photo. */
   .studio[data-sheet]:not([data-drawer="zone"]) .stage__status { bottom: 4rem; }
-
-  /* ---- Les commandes ---- */
   .studio[data-sheet]:not([data-drawer="zone"]) .studio__actions { display: contents; }
   .studio[data-sheet]:not([data-drawer="zone"]) .actions__contexts {
     position: absolute;
@@ -2181,8 +1573,6 @@ a.action--primary:hover { background: #9cb098; }
     backdrop-filter: blur(6px);
   }
   .studio[data-sheet]:not([data-drawer="zone"]) .context-btn { flex: none; min-height: 2.5rem; padding: 0 1rem; font-size: 0.9rem; }
-
-  /* Actions secondaires : des icônes rondes sur le bord droit de la photo. */
   .studio[data-sheet]:not([data-drawer="zone"]) .variant-add,
   .studio[data-sheet]:not([data-drawer="zone"]) [data-toggle-ba],
   .studio[data-sheet]:not([data-drawer="zone"]) [data-compare],
@@ -2211,8 +1601,6 @@ a.action--primary:hover { background: #9cb098; }
   .studio[data-sheet]:not([data-drawer="zone"]) [data-save] span { display: none; }
   .studio[data-sheet]:not([data-drawer="zone"]) [data-toggle-ba][aria-pressed="true"] { background: #f4f2ec; color: #16181a; }
   .studio[data-sheet]:not([data-drawer="zone"]) [data-compare]:disabled { opacity: 0.45; }
-
-  /* L'action principale : pleine largeur, au pied du tiroir, toujours là. */
   .studio[data-sheet]:not([data-drawer="zone"]) [data-project-cta] {
     position: absolute;
     z-index: 60;
@@ -2223,8 +1611,6 @@ a.action--primary:hover { background: #9cb098; }
     min-height: 3rem;
     font-size: 1rem;
   }
-
-  /* ---- Le tiroir ---- */
   .studio[data-sheet]:not([data-drawer="zone"]) .studio__panel,
   .studio[data-sheet="peek"]:not([data-drawer="zone"]):not([data-panel="closed"]) .studio__panel {
     position: fixed;
@@ -2241,19 +1627,14 @@ a.action--primary:hover { background: #9cb098; }
   .studio[data-sheet]:not([data-drawer="zone"]) .panel__grab { height: 1.4rem; }
   .studio[data-sheet]:not([data-drawer="zone"]) .panel__grab::before { margin-top: 0.6rem; }
   .studio[data-sheet]:not([data-drawer="zone"]) .panel__head { min-height: 2.4rem; border-bottom: 0; padding-inline: 0.9rem 0.5rem; }
-  /* La croix ne fermait rien sur téléphone (elle repliait) : la poignée et « Tout voir » suffisent. */
   .studio[data-sheet="peek"]:not([data-drawer="zone"]) .panel__close { display: none; }
-  /* Place réservée au bouton « Décrire mon projet » qui recouvre le pied du tiroir. */
   .studio[data-sheet]:not([data-drawer="zone"]) .panel__body { padding: 0.25rem 0.9rem calc(4.4rem + env(safe-area-inset-bottom)); }
-
-  /* La rangée de parquets : des cartes plus grandes, le nom sur deux lignes entières. */
   .studio[data-sheet="peek"]:not([data-drawer="zone"]) .cat__grid {
     grid-auto-columns: 6.25rem;
     gap: 0.6rem;
     scroll-padding-inline: 0.9rem;
   }
   .studio[data-sheet="peek"]:not([data-drawer="zone"]) .cat__media { aspect-ratio: 1 / 1; border-radius: 0.6rem; }
-  /* Motifs et orientations : des tuiles qui tiennent au-dessus du bouton, la note sur une ligne. */
   .studio[data-sheet="peek"]:not([data-drawer="zone"]) .tile-grid { grid-auto-columns: 7.5rem; gap: 0.6rem; }
   .studio[data-sheet="peek"]:not([data-drawer="zone"]) .tile-card__media { aspect-ratio: 16 / 10; height: auto; }
   .studio[data-sheet="peek"]:not([data-drawer="zone"]) .tile-card__label { font-size: 0.82rem; padding-top: 0.3rem; }
@@ -2264,9 +1645,7 @@ a.action--primary:hover { background: #9cb098; }
     text-overflow: ellipsis;
     font-size: 0.7rem;
   }
-  /* La ligne « Chutes … » passait sous le bouton : elle reste en vue complète. */
   .studio[data-sheet="peek"]:not([data-drawer="zone"]) .panel__view > [data-waste] { display: none; }
-  /* Pas de barres de défilement grises : la rangée se parcourt au doigt. */
   .studio[data-sheet="peek"]:not([data-drawer="zone"]) .panel__body,
   .studio[data-sheet="peek"]:not([data-drawer="zone"]) .cat__grid,
   .studio[data-sheet="peek"]:not([data-drawer="zone"]) .tile-grid { scrollbar-width: none; }
@@ -2283,30 +1662,15 @@ a.action--primary:hover { background: #9cb098; }
     line-height: 1.3;
   }
 }
-
-/*
- * Écran « Changer de pièce » sur téléphone : la disposition plein écran
- * ci-dessus ne doit pas s'y appliquer. Ses règles, plus précises, gardaient la
- * zone photo et le tiroir affichés sous la liste des pièces — un bloc noir et
- * le catalogue par-dessus le bas de l'écran. Mêmes sélecteurs, écrits après :
- * ils l'emportent.
- */
 @media (max-width: 47.99rem) and (orientation: portrait) {
   .studio[data-sheet][data-state="start"]:not([data-drawer="zone"]) .studio__main,
   .studio[data-sheet][data-state="start"]:not([data-drawer="zone"]) .studio__panel,
   .studio[data-sheet][data-panel="closed"]:not([data-drawer="zone"]) .studio__panel { display: none; }
 }
-
-/*
- * Partenaire indisponible (panne ou maintenance, contrôlé par WordPress toutes
- * les 15 minutes, voir js/commerce/partenaires.js) : ses liens disparaissent.
- */
-/* Boutons et liens d'action (ils ont une classe) : retirés. */
 html[data-premibel-indisponible] a[href*="premibel.fr"][class],
 html[data-allure-indisponible] a[href*="allure-design.com"][class] {
   display: none !important;
 }
-/* Lien dans une phrase ou un tableau : le nom reste, il n'est plus cliquable. */
 html[data-premibel-indisponible] a[href*="premibel.fr"]:not([class]),
 html[data-allure-indisponible] a[href*="allure-design.com"]:not([class]) {
   pointer-events: none;

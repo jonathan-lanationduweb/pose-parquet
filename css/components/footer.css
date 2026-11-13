@@ -1,11 +1,3 @@
-/**
- * Pied de page compact.
- *
- * Objectif : signer la page, pas en ouvrir une seconde. Une signature serrée,
- * trois petits groupes de liens, une ligne de mentions. Sur grand écran
- * l'ensemble tient sous ~420 px de haut ; sur téléphone, tout s'empile sans
- * jamais devenir une liste interminable.
- */
 .site-footer {
   background: var(--bg);
   border-top: 1px solid var(--line);
@@ -24,10 +16,6 @@
     gap: clamp(2rem, 4vw, 5rem);
   }
 }
-
-/* Signature : fluide mais bornée, interligne serré, aucune marge superflue */
-/* Le symbole revient une fois en pied de page, discrètement : deux apparitions
-   par page suffisent à installer une identité, dix la banalisent. */
 .footer__mark {
   width: 14px; height: 26px;
   display: block;
@@ -81,19 +69,6 @@
   color: var(--text-muted);
 }
 .footer__bottom p { margin: 0; }
-
-/*
- * La ligne d'orientation commerciale.
- *
- * `flex-basis: 100%` : elle prend sa propre ligne au lieu de se serrer entre
- * le copyright et le crédit photo. C'est une phrase, pas une mention — la
- * comprimer en troisième colonne l'aurait rendue illisible sur tablette,
- * précisément là où elle doit se lire.
- *
- * `max-width` en ch et non en rem : on borne la LONGUEUR DE LIGNE, pas la
- * largeur du bloc, et 78 caractères est la limite au-delà de laquelle l'œil
- * perd le début de la ligne suivante.
- */
 .footer__orientation {
   flex-basis: 100%;
   order: -1;
@@ -102,12 +77,6 @@
   line-height: 1.5;
 }
 .footer__orientation strong { font-weight: 500; color: var(--text); }
-
-/* ---------- Téléphone : trois lignes de liens, pas trois colonnes ----------
-   Empiler les colonnes du bureau donnait un pied de page de 505 px avec un
-   vide sous le dernier groupe. Ici, chaque groupe devient une ligne de liens
-   séparés par un point médian : même contenu, trois fois moins de hauteur.
-   Les intitulés restent dans le DOM pour les lecteurs d'écran. */
 @media (max-width: 40rem) {
   .site-footer { padding-block: var(--sp-5) var(--sp-4); }
   .footer__inner { gap: var(--sp-5); }
@@ -137,16 +106,12 @@
     margin: 0 0.55rem;
     color: var(--line-strong);
   }
-  /* Cible au doigt : 24 px de haut, c'était trop serré entre deux lignes de liens.
-     La hauteur gagnée vient du lien lui-même, pas de l'espace entre les lignes. */
   .footer__col a { display: inline-block; padding-block: 0.55rem; }
   .footer__nav { gap: 0; }
   .footer__col ul { gap: 0; }
 
   .footer__bottom { gap: 0.2rem 1rem; padding-top: 0.8rem; }
 }
-
-/* Pages légales et plan du site : une ligne discrète, en bas de chaque page. */
 .footer__legal {
   display: flex;
   flex-wrap: wrap;

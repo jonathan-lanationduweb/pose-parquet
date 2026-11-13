@@ -1,17 +1,8 @@
-/**
- * Pages légales et plan du site : Mentions légales, Confidentialité et
- * cookies, Plan du site.
- *
- * Les textes viennent de content-pages.js (valeurs par défaut) remplacées par
- * WordPress (Pose Parquet → Pages). Comme ailleurs, WordPress décide QUOI
- * dire, ce fichier décide COMMENT : aucune saisie n'est du HTML, chaque
- * valeur passe par textes.js.
- */
 const { PAGES } = require('./content-pages');
 const { layout, breadcrumb, SITE } = require('./layout');
 const T = require('./textes');
 
-/** En-tête commun : surtitre, titre, chapô. */
+
 function entete(page, surtitre) {
   return `
       <header class="page-hero">
@@ -25,12 +16,12 @@ function entete(page, surtitre) {
       </header>`;
 }
 
-/** Un bloc de la page : titre de section, puis son contenu déjà rendu. */
+
 const section = (id, titre, contenu) => `
           <h2 id="${id}">${T.texte(titre)}</h2>
           ${contenu}`;
 
-/** Une liste « libellé : valeur », sans les lignes vides (champs facultatifs). */
+
 function fiche(lignes) {
   const pleines = lignes.filter(([, v]) => String(v || '').trim());
   return `<dl class="legal-fiche">
@@ -122,11 +113,8 @@ function buildConfidentialite(write) {
   ].join('\n'));
 }
 
-/**
- * Le plan du site : toutes les pages publiques, rubrique par rubrique.
- * Construit à partir des mêmes listes que le reste du site (guides,
- * tutoriels, motifs, articles), donc toujours à jour.
- */
+
+
 function buildPlanDuSite(write, { GUIDES, TUTOS, MOTIFS, ARTICLES = [] }) {
   const lien = (href, label) => `<li><a href="../${href}">${T.texte(label)}</a></li>`;
   const rubriques = [

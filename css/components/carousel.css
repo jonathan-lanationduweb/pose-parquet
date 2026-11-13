@@ -1,4 +1,3 @@
-/* Carrousels : éditorial (guides) et galerie (inspiration) */
 .carousel { position: relative; }
 
 .carousel__viewport {
@@ -10,7 +9,6 @@
   scrollbar-width: none;
   padding-block: 0.25rem 0.5rem;
   cursor: grab;
-  /* Débord plein écran : la slide suivante affleure à droite */
   padding-inline: max(var(--gutter), calc((100vw - var(--wrap-wide)) / 2 + var(--gutter)));
 }
 .carousel__viewport::-webkit-scrollbar { display: none; }
@@ -24,8 +22,6 @@
 }
 @media (min-width: 48rem) { .carousel__slide { width: clamp(20rem, 44vw, 26rem); } }
 @media (min-width: 75rem) { .carousel__slide { width: 27rem; } }
-
-/* ---------- Contrôles ---------- */
 .carousel__controls { display: flex; align-items: center; gap: var(--sp-4); }
 .carousel__count {
   font-family: var(--font-mono);
@@ -62,8 +58,6 @@
   color: var(--text-muted);
 }
 @media (min-width: 62rem) { .carousel__hint { display: inline-flex; align-items: center; gap: 0.5rem; } }
-
-/* ---------- Slide éditoriale ---------- */
 .slide-card {
   position: relative;
   display: flex;
@@ -106,19 +100,6 @@
 .slide-card__link svg { width: 0.95em; height: 0.95em; transition: transform var(--dur-2) var(--ease-out); }
 .slide-card:hover .slide-card__link svg { transform: translateX(5px); }
 .slide-card__meta { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); }
-
-/* ---------- Slide galerie (très visuelle) ----------
-   Un seul gabarit : même largeur, même ratio, même alignement.
-
-   La version précédente combinait un décalage vertical un rang sur deux avec
-   trois ratios alternés tous les trois rangs. Deux rythmes premiers entre eux
-   se superposaient, et le résultat sur huit visuels ne se lisait pas comme une
-   intention mais comme une irrégularité : des cartes plus petites, plus
-   serrées, décalées sans logique apparente.
-
-   Un rail se lit calme quand il est régulier. La variété éditoriale a sa place,
-   mais sur la page Inspiration, où elle peut être structurée et respirer —
-   pas dans un défileur de huit vignettes. */
 .carousel--gallery .carousel__slide { width: clamp(15rem, 76vw, 20rem); }
 @media (min-width: 48rem) { .carousel--gallery .carousel__slide { width: clamp(19rem, 34vw, 24rem); } }
 @media (min-width: 75rem) { .carousel--gallery .carousel__slide { width: 25rem; } }
@@ -162,8 +143,6 @@
   .carousel__viewport { scroll-behavior: auto; }
   .slide-card__media img, .shot img { transition: none; }
 }
-
-/* ---------- Carrousel piloté par le scroll (écrans larges) ---------- */
 .scroll-track { position: relative; }
 .scroll-track[data-scroll-active="true"] { padding-block: 0; }
 .scroll-track[data-scroll-active="true"] .scroll-track__sticky {
@@ -176,17 +155,12 @@
   gap: clamp(1.5rem, 1rem + 2vw, 3rem);
   padding-block: clamp(3rem, 2rem + 4vw, 6rem);
 }
-/* En mode piloté, la piste ne défile plus au doigt : le scroll de page mène */
 .carousel__viewport[data-mode="scroll"] { cursor: default; overflow-x: hidden; }
 .carousel__viewport[data-mode="scroll"] .carousel__slide { scroll-snap-align: none; }
-
-/* Indice visuel : on ne montre la mention « glissez » qu'en mode libre */
 .carousel__viewport[data-mode="scroll"] ~ * .carousel__hint,
 .scroll-track[data-scroll-active="true"] .carousel__hint { display: none; }
 .scroll-track[data-scroll-active="true"] .carousel__hint--scroll { display: inline-flex; }
 .carousel__hint--scroll { display: none; }
-
-/* Le bloc collant doit tenir dans la fenêtre : on cadre les slides en hauteur */
 .scroll-track[data-scroll-active="true"] .scroll-track__sticky {
   height: 100svh;
   padding-block: calc(var(--header-h) + 1rem) clamp(1.5rem, 1rem + 2vw, 3rem);

@@ -1,33 +1,3 @@
-/**
- * Synchronisation du catalogue Premibel — à la construction, jamais dans le navigateur.
- *
- *   node _generator/sync-premibel.js            synchronise et écrit data/products.premibel.json
- *   node _generator/sync-premibel.js --dry-run  synchronise, rapporte, n'écrit rien
- *   node _generator/sync-premibel.js --from <dossier>
- *                                               rejoue des pages déjà téléchargées (raw-1.json…)
- *
- * SOURCE. La Store API WooCommerce de premibel.fr, publique et en lecture seule :
- * https://www.premibel.fr/wp-json/wc/store/v1/products. Elle n'envoie aucun en-tête
- * CORS : un appel depuis la page d'un visiteur est impossible, et c'est voulu.
- * Le visiteur ne lit que le fichier produit ici. Voir docs/premibel-sync-contract.md.
- *
- * GARANTIES.
- *   - Pagination complète : on lit X-WP-Total et X-WP-TotalPages, on demande chaque
- *     page, et l'on vérifie à la fin que le nombre de produits reçus vaut le total
- *     annoncé, sans doublon d'identifiant. Sinon : échec, rien n'est écrit.
- *   - Délai par requête, reprises bornées sur les erreurs transitoires (réseau, 429,
- *     5xx), User-Agent identifiable.
- *   - Aucun prix : `prices`, `price_html`, `on_sale`, les attributs de tarif et de
- *     promotion ne sont jamais lus. Le fichier écrit est contrôlé : une clé de prix
- *     fait échouer l'écriture.
- *   - Écriture atomique (fichier voisin puis renommage) : un échec laisse le dernier
- *     fichier valide en place, et le build continue de l'utiliser.
- *   - Désactivation prudente : une référence connue absente d'une synchronisation
- *     COMPLÈTE passe à `active: false` — jamais supprimée. Si plus d'un quart des
- *     références actives disparaissent d'un coup, la synchronisation refuse (export
- *     tronqué ou changement de structure : un humain doit regarder).
- *   - Doublons de SKU, de slug ou d'identifiant source, SKU vide : échec, pas d'écrasement.
- */
 'use strict';
 
 const fs = require('fs');
@@ -39,23 +9,23 @@ const RACINE = path.join(__dirname, '..');
 const SORTIE = path.join(RACINE, 'data', 'products.premibel.json');
 const PILOTE = path.join(RACINE, 'data', 'products.premibel-pilot.json');
 const FAMILLES = path.join(RACINE, 'data', 'render-families.json');
-/* Vignettes locales : publiées avec le site. L'index du cache, lui, vit dans
-   _generator/, que le déploiement exclut — l'URL source n'est pas servie. */
+
+
 const DOSSIER_VIGNETTES = path.join(RACINE, 'assets', 'images', 'products', 'premibel');
 const CHEMIN_PUBLIC_VIGNETTES = 'assets/images/products/premibel';
 const INDEX_VIGNETTES = path.join(__dirname, 'premibel-thumbs.json');
 const VIGNETTE_MAX_OCTETS = 200 * 1024;
 const VIGNETTE_MIN_OCTETS = 200;
 const VIGNETTES_EN_PARALLELE = 6;
-/* Une source plus lourde que cela n'est pas une vignette : on refuse plutôt
-   que de décoder 20 Mo pour en garder 15 Ko. */
+
+
 const SOURCE_MAX_OCTETS = 8 * 1024 * 1024;
 const TAILLE_VIGNETTE = 324;
 const CONVERTISSEUR = path.join(__dirname, 'vignette-webp.py');
 const EMPREINTES = path.join(__dirname, 'vignette-empreintes.py');
 const QUALITE = require('./vignettes-qualite.js');
 
-/* Surchargeable pour éprouver les échecs réseau (PREMIBEL_ORIGIN=https://invalide.invalid). */
+
 const ORIGINE = process.env.PREMIBEL_ORIGIN || 'https://www.premibel.fr';
 const PRODUITS = `${ORIGINE}/wp-json/wc/store/v1/products`;
 const CATEGORIES = `${ORIGINE}/wp-json/wc/store/v1/products/categories`;
@@ -66,16 +36,12 @@ const PAUSE_ENTRE_PAGES_MS = 400;
 const USER_AGENT = 'PoseParquetCatalogSync/1.0 (+https://pose-parquet.com; synchronisation hebdomadaire en lecture seule)';
 const SEUIL_DISPARITION = 0.25;
 
-/* ------------------------------------------------------------------ */
-/* Règles de données — toutes ici, toutes documentées                  */
-/* ------------------------------------------------------------------ */
 
-/**
- * QU'EST-CE QU'UN PARQUET. Un produit est retenu s'il appartient au sous-arbre de
- * la catégorie « Parquet » (slug `parquet`) ET n'appartient à aucun sous-arbre
- * exclu, ET si ses attributs structurés ne le désignent pas comme autre chose.
- * Le nom n'entre jamais dans la décision.
- */
+
+
+
+
+
 const CATEGORIE_PARQUET = 'parquet';
 const SOUS_ARBRES_EXCLUS = {
   'lames-de-terrasse': 'lame de terrasse (extérieur)',
@@ -91,12 +57,8 @@ const EXCLUSIONS_ATTRIBUT = [
   { taxonomie: 'pa_essence', valeur: 'Composite', raison: 'essence Composite (pas un parquet bois)' },
 ];
 
-/**
- * MOTIFS. Lus dans les catégories de motif de Premibel, et seulement là. Un
- * produit sans catégorie de motif n'est pas supposé « lames » : il reste sans
- * motif, donc sans rendu, et garde son lien vers la fiche. Le chêne ne rend pas
- * possibles tous les motifs : un point de Hongrie se fabrique coupé à l'onglet.
- */
+
+
 const MOTIF_PAR_CATEGORIE = {
   'lames-droites': 'lames',
   'point-de-hongrie': 'point-de-hongrie',
@@ -108,11 +70,8 @@ const MOTIF_PAR_CATEGORIE = {
 };
 const VERSAILLES = new Set(['versailles', 'parquet-flottant-versailles']);
 
-/**
- * TEINTES. Les catégories de couleur de Premibel, ramenées au vocabulaire du
- * Studio (clair, naturel, chaud, foncé) pour que le filtre existant fonctionne.
- * La valeur d'origine est conservée dans `toneSource`.
- */
+
+
 const TEINTE = {
   blanc: 'clair', clair: 'clair',
   naturel: 'naturel', gris: 'naturel',
@@ -120,14 +79,8 @@ const TEINTE = {
   brun: 'fonce', fonce: 'fonce',
 };
 
-/**
- * RENDU — la seule règle qui produit « approximate ». Explicite, et étroite :
- *   chêne + UNE catégorie de couleur + un motif posable + une largeur
- *   → la famille procédurale de même couleur, rendu INDICATIF.
- * Toute autre combinaison reste `unavailable`, avec sa raison. Aucune famille
- * n'est attribuée « à la luminance la plus proche ».
- * `ready` exige une matière capturée et validée (cartes albedo) : aucune à ce jour.
- */
+
+
 const FAMILLE_PAR_COULEUR = {
   blanc: 'chene-craie',
   clair: 'chene-sable',
@@ -139,7 +92,7 @@ const FAMILLE_PAR_COULEUR = {
   fonce: 'chene-tabac',
 };
 
-/** Au-delà, ce n'est plus une lame mais une dalle ou un panneau (même seuil que validateCatalog). */
+
 const LAME_MAX_MM = 400;
 const largeurMm = (v) => {
   const m = String(v).match(/^([\d.]+)\s*(mm|cm|m)$/i);
@@ -147,13 +100,13 @@ const largeurMm = (v) => {
   return Number(m[1]) * { mm: 1, cm: 10, m: 1000 }[m[2].toLowerCase()];
 };
 
-/** Ce qui n'est JAMAIS lu, quoi que l'API renvoie. */
+
 const CLES_INTERDITES = /^(prices?|price_html|on_sale|regular_price|sale_price|tarif|prix|promo)/i;
 const ATTRIBUTS_IGNORES = new Set(['pa_qualite', 'pa_nation_tarif_promo_date_fin', 'pa_codetarif', 'pa_colisage', 'pa_unity', 'pa_type_unity', 'pa_poids_brut']);
 
-/* ------------------------------------------------------------------ */
-/* Réseau                                                              */
-/* ------------------------------------------------------------------ */
+
+
+
 
 const pause = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -209,9 +162,9 @@ function rejouer(dossier) {
   return { produits, categories, total: produits.length, pages: fichiers.length, rejoue: true };
 }
 
-/* ------------------------------------------------------------------ */
-/* Normalisation                                                       */
-/* ------------------------------------------------------------------ */
+
+
+
 
 const decoder = (s) => String(s == null ? '' : s)
   .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
@@ -235,13 +188,8 @@ function attribut(produit, taxonomie) {
   return a.terms.map((t) => decoder(t.name)).join(', ');
 }
 
-/**
- * Casse des noms. Une bonne partie des titres Premibel sont en capitales
- * (« POINT DE HONGRIE ZEUS NATUREL 92X12X520 ») : affichés tels quels dans le
- * Studio, ils crient. Un titre majoritairement en capitales passe en casse de
- * phrase ; le nom d'origine est conservé dans `nameSource`. Les dimensions
- * gardent leur « x » minuscule, et le nom du motif sa majuscule.
- */
+
+
 function casse(nom) {
   const lettres = nom.replace(/[^A-Za-zÀ-ÿ]/g, '');
   const majuscules = lettres.replace(/[^A-ZÀ-Þ]/g, '');
@@ -250,7 +198,7 @@ function casse(nom) {
   return n.charAt(0).toLocaleUpperCase('fr') + n.slice(1);
 }
 
-/** « 14,20mm » → « 14.2mm » ; « 600 à 1820 mm » → « 600 à 1820mm ». L'unité reste celle de la source. */
+
 const dimension = (v) => (v ? v.replace(/(\d),(\d)/g, '$1.$2').replace(/\s+(mm|cm|m)\b/gi, '$1').trim() : null);
 
 function classer(produit, ancetres) {
@@ -315,8 +263,8 @@ function normaliser(produit, slugs, familles) {
     visualStatus,
     visualReason,
     visualFamily,
-    /* URL source, interne : remplacée par la vignette locale avant écriture,
-       jamais publiée. L'image pleine taille n'est pas retenue. */
+
+
     sourceThumbnail: image ? urlPremibel(image.thumbnail || image.src) : null,
     thumbnail: null,
     sample: null,
@@ -328,14 +276,12 @@ function normaliser(produit, slugs, familles) {
   };
 }
 
-/* ------------------------------------------------------------------ */
-/* Vignettes                                                           */
-/* ------------------------------------------------------------------ */
 
-/**
- * Dimensions d'un WebP, lues dans son en-tête — sans dépendance.
- * Rend `null` si le fichier n'est pas un WebP valide (RIFF … WEBP + VP8/VP8L/VP8X).
- */
+
+
+
+
+
 function dimensionsWebp(buf) {
   if (!Buffer.isBuffer(buf) || buf.length < 30) return null;
   if (buf.toString('ascii', 0, 4) !== 'RIFF' || buf.toString('ascii', 8, 12) !== 'WEBP') return null;
@@ -354,7 +300,7 @@ function dimensionsWebp(buf) {
   return null;
 }
 
-/** Le format réel, lu dans le contenu — jamais dans l'extension ni le Content-Type. */
+
 function formatReel(buf) {
   if (!buf || buf.length < 12) return 'vide';
   if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'JPEG';
@@ -365,12 +311,8 @@ function formatReel(buf) {
   return 'inconnu';
 }
 
-/**
- * JPEG, PNG (ou GIF) → WebP carré, par `vignette-webp.py` (Pillow).
- * Seule dépendance de la synchronisation, et seulement pour ces sources : le
- * build n'en a pas besoin. Sans Pillow, l'erreur le dit et la fiche garde son
- * repli graphique.
- */
+
+
 function convertir(buf) {
   const { spawnSync } = require('child_process');
   for (const python of ['python', 'python3', 'py']) {
@@ -383,7 +325,7 @@ function convertir(buf) {
   throw Object.assign(new Error('conversion : Python introuvable'), { definitif: true, etape: 'encode' });
 }
 
-/** Nom de fichier stable : le SKU, réduit aux caractères sûrs. Jamais le titre. */
+
 const nomVignette = (sku) => `${String(sku).replace(/[^A-Za-z0-9_-]/g, '_')}.webp`;
 
 async function telechargerVignette(url) {
@@ -392,8 +334,8 @@ async function telechargerVignette(url) {
     const controle = new AbortController();
     const minuterie = setTimeout(() => controle.abort(), DELAI_MS);
     try {
-      /* Premibel négocie le format : demander du WebP le fait servir tel quel,
-         sans réencodage de notre côté (le générateur n'a aucune dépendance). */
+
+
       const r = await fetch(url, { headers: { 'User-Agent': USER_AGENT, Accept: 'image/webp' }, signal: controle.signal });
       clearTimeout(minuterie);
       if (r.status === 429 || r.status >= 500) throw new Error(`HTTP ${r.status}`);
@@ -407,7 +349,7 @@ async function telechargerVignette(url) {
       if (format === 'WEBP' && dimensionsWebp(recu)) {
         buf = recu;
       } else if (['JPEG', 'PNG', 'GIF'].includes(format)) {
-        /* Original téléversé sans déclinaison WebP : on le convertit nous-mêmes. */
+
         buf = convertir(recu);
         converti = true;
       } else {
@@ -427,14 +369,8 @@ async function telechargerVignette(url) {
   throw derniere;
 }
 
-/**
- * Rend chaque fiche active maîtresse d'une vignette LOCALE, ou de `null`.
- *
- * Cache : une entrée par SKU, `{ source, octets, w, h }`. Si l'URL source n'a
- * pas changé et que le fichier local est un WebP valide, rien n'est téléchargé.
- * Une vignette qui échoue ne fait perdre que sa vignette : la fiche reste, avec
- * `thumbnail: null`, et l'échec est rapporté.
- */
+
+
 async function vignettes(fiches, sec) {
   fs.mkdirSync(DOSSIER_VIGNETTES, { recursive: true });
   const index = fs.existsSync(INDEX_VIGNETTES) ? JSON.parse(fs.readFileSync(INDEX_VIGNETTES, 'utf8')) : {};
@@ -452,8 +388,8 @@ async function vignettes(fiches, sec) {
       const nom = nomVignette(f.sku);
       const local = path.join(DOSSIER_VIGNETTES, nom);
       const connu = index[f.sku];
-      /* Écartée à une passe précédente (placeholder, bandeau) et source inchangée :
-         ni fichier ni téléchargement, la fiche garde son repli graphique. */
+
+
       if (connu && connu.source === source && connu.ecartee) {
         nouvelIndex[f.sku] = connu;
         f.thumbnail = null;
@@ -487,7 +423,7 @@ async function vignettes(fiches, sec) {
   }
   await Promise.all(Array.from({ length: VIGNETTES_EN_PARALLELE }, ouvrier));
   if (!sec) ecarter(aTraiter, nouvelIndex, stats);
-  /* Les fiches inactives gardent leur vignette locale si elle existe déjà. */
+
   for (const f of fiches.filter((x) => !x.active)) {
     delete f.sourceThumbnail;
     if (index[f.sku] && fs.existsSync(path.join(DOSSIER_VIGNETTES, nomVignette(f.sku)))) {
@@ -498,16 +434,8 @@ async function vignettes(fiches, sec) {
   return { stats, nouvelIndex };
 }
 
-/**
- * Empreintes des vignettes locales qui n'en ont pas encore (une passe Python
- * pour toutes), puis mise à l'écart de ce qui ne doit pas s'afficher comme
- * photo produit : visuel « image indisponible », photo à bandeau de prix.
- *
- * La fiche reste au catalogue avec `thumbnail: null` — le Studio montre son
- * repli graphique — et `thumbnailIssue` dit pourquoi. Le fichier local est
- * supprimé : il ne serait plus publié pour rien. L'entrée de cache, elle,
- * reste, marquée `ecartee` : la passe suivante ne retélécharge pas.
- */
+
+
 function ecarter(fiches, index, stats) {
   const sansEmpreinte = fiches.filter((f) => f.thumbnail && index[f.sku] && !index[f.sku].empreinte);
   if (sansEmpreinte.length) {
@@ -536,9 +464,9 @@ function ecarter(fiches, index, stats) {
   }
 }
 
-/* ------------------------------------------------------------------ */
-/* Contrôles avant écriture                                            */
-/* ------------------------------------------------------------------ */
+
+
+
 
 function doublons(fiches) {
   const erreurs = [];
@@ -565,9 +493,9 @@ function sansPrix(objet, chemin = '') {
   return trouves;
 }
 
-/* ------------------------------------------------------------------ */
-/* Programme                                                           */
-/* ------------------------------------------------------------------ */
+
+
+
 
 async function main() {
   const args = process.argv.slice(2);
@@ -579,7 +507,7 @@ async function main() {
   const source = iFrom >= 0 ? rejouer(args[iFrom + 1]) : await telecharger();
   const { produits, categories, total, pages } = source;
 
-  /* Complétude : tout ce qui a été annoncé a été reçu, une fois. */
+
   const ids = new Set(produits.map((p) => p.id));
   if (produits.length !== total) throw new Error(`réponse incomplète : ${produits.length} produits reçus pour ${total} annoncés`);
   if (ids.size !== produits.length) throw new Error(`identifiants en double dans la réponse (${produits.length - ids.size})`);
@@ -596,8 +524,8 @@ async function main() {
   const erreurs = doublons(fiches);
   if (erreurs.length) throw new Error(`doublons ou identités vides — synchronisation refusée :\n  - ${erreurs.slice(0, 20).join('\n  - ')}`);
 
-  /* Couche manuelle : le pilote apporte les familles de rendu choisies à l'œil
-     sur les photos produit, et l'ordre d'affichage. Il ne crée aucune fiche. */
+
+
   const pilote = fs.existsSync(PILOTE) ? JSON.parse(fs.readFileSync(PILOTE, 'utf8')).produits || [] : [];
   const parSku = new Map(fiches.map((f) => [f.sku, f]));
   const dansApi = new Map(produits.map((p) => [decoder(p.sku), p]));
@@ -610,16 +538,15 @@ async function main() {
       if (dansApi.has(sku)) {
         reprises.push(`${m.id} : présent chez Premibel mais exclu (${classer(dansApi.get(sku), ancetres).raison}) — non repris`);
       } else {
-        /* Connu du pilote, absent d'une réponse COMPLÈTE : retiré chez Premibel.
-           On garde la ligne, inactive, pour que ses anciens liens profonds se
-           résolvent en « retiré » plutôt qu'en inconnu. */
+
+
         piloteDisparus.push(sku);
         reprises.push(`${m.id} : absent de l'API Premibel — conservé inactif`);
       }
       continue;
     }
-    /* Motif : la donnée Premibel prime. Le motif saisi au pilote ne sert que si
-       Premibel n'en déclare aucun (fiche rangée seulement en « fin de série »). */
+
+
     if (!f.compatiblePatterns.length && !f.unsupportedPattern && Array.isArray(m.compatiblePatterns) && m.compatiblePatterns.length) {
       f.compatiblePatterns = m.compatiblePatterns.filter((x) => ['lames', 'point-de-hongrie', 'baton-rompu'].includes(x));
       f.defaultPattern = f.compatiblePatterns.includes(m.defaultPattern) ? m.defaultPattern : f.compatiblePatterns[0] || null;
@@ -633,12 +560,12 @@ async function main() {
       f.visualOverride = 'famille choisie sur la photo produit (pilote du 09/09/2026)';
     }
     if (Number.isFinite(m.displayOrder)) f.displayOrder = m.displayOrder;
-    /* Le nom relu à la main au pilote, quand il existe, prime sur la casse automatique. */
+
     if (m.name) f.name = m.name;
     reprises.push(`${m.id} : repris (famille ${f.visualFamily || '—'}, ordre ${f.displayOrder})`);
   }
 
-  /* Disparitions : seulement après une synchronisation complète et contrôlée. */
+
   const precedent = fs.existsSync(SORTIE) ? JSON.parse(fs.readFileSync(SORTIE, 'utf8')) : null;
   const maintenant = new Date().toISOString();
   const inactives = [];
@@ -651,14 +578,14 @@ async function main() {
       throw new Error(`${disparusActifs} références actives sur ${activesAvant} disparaîtraient (> ${SEUIL_DISPARITION * 100} %) : export suspect, synchronisation refusée. Vérifier, puis relancer avec --accepter-disparitions.`);
     }
     for (const p of disparus) {
-      /* Un rejeu de pages locales ne prouve pas sa complétude (pas d'en-tête
-         X-WP-Total) : il ne désactive rien, il recopie l'état précédent. */
+
+
       if (source.rejoue) inactives.push(p);
       else inactives.push({ ...p, active: false, deactivatedAt: p.deactivatedAt || maintenant });
     }
   }
-  /* Première synchronisation : le pilote tient lieu de fichier précédent pour
-     les références qu'il connaissait et que Premibel ne publie plus. */
+
+
   for (const sku of piloteDisparus) {
     if (inactives.some((p) => p.sku === sku)) continue;
     const m = pilote.find((x) => (x.sku || x.id) === sku);
@@ -692,10 +619,10 @@ async function main() {
       telechargees: statsVignettes.telechargees,
       converties: statsVignettes.converties,
       echecs: statsVignettes.echecs.length,
-      /* Détail des échecs, sans URL : la source reste dans le cache, hors du site. */
+
       detailEchecs: statsVignettes.echecs.map((e) => ({ sku: e.sku, etape: e.etape, raison: e.raison, format: e.format || null })),
       locales: compte((f) => f.active && f.thumbnail),
-      /* Écartées : la fiche reste, la photo ne s'affiche pas (repli graphique). */
+
       ecartees: statsVignettes.ecartees.map((e) => ({ sku: e.sku, type: e.type, raison: e.raison })),
       poidsKo: Math.round(statsVignettes.octets / 1024),
     },

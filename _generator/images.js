@@ -1,4 +1,3 @@
-/* Génère des visuels SVG placeholders : compositions d'intérieur abstraites. */
 const path = require('path');
 const { ecrireTexte } = require('./eol');
 
@@ -15,17 +14,15 @@ const PALETTES = [
   { wall: '#e8e6df', wall2: '#dad7ce', floor: '#c6ab8d', plank: '#b1937a', accent: '#5c6d5c', object: '#24282a' },
 ];
 
-/**
- * Composition : mur, sol en perspective avec lames, nappe de lumière,
- * quelques volumes mobiliers. Le tout reste très abstrait et remplaçable.
- */
+
+
 function cover({ w = 1200, h = 750, seed = 1, variant = 0, label = '' }) {
   const random = rng(seed * 977 + 13);
   const pal = PALETTES[variant % PALETTES.length];
   const horizon = h * (0.42 + random() * 0.08);
   const vpx = w * (0.3 + random() * 0.4);
 
-  // Lames en perspective : lignes convergeant vers le point de fuite
+
   const planks = [];
   const count = 14;
   for (let i = 0; i <= count; i += 1) {
@@ -83,7 +80,7 @@ function cover({ w = 1200, h = 750, seed = 1, variant = 0, label = '' }) {
 `;
 }
 
-/** Vignette carrée pour les tutoriels : pictogramme géométrique. */
+
 function tile({ seed = 1, label = '' }) {
   const random = rng(seed * 31 + 7);
   const pal = PALETTES[seed % PALETTES.length];
@@ -125,8 +122,8 @@ function og() {
 `;
 }
 
-/* Les SVG sont ecrits en LF : ce sont des fichiers texte, et leur contenu ne
-   doit pas dependre des fins de ligne des gabarits de ce module. */
+
+
 function write(dir, files) {
   Object.entries(files).forEach(([name, content]) => {
     ecrireTexte(path.join(dir, name), content);

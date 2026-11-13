@@ -1,21 +1,6 @@
 <?php
-/**
- * Le HTML qu'un contenu peut transmettre au site : une liste FERMÉE.
- *
- * L'éditeur classique laisse saisir n'importe quel HTML (onglet « Texte ») ;
- * le site, lui, ne doit recevoir que ce que ses gabarits savent mettre en
- * forme. Pas d'attribut `style`, pas de script, pas de classe inventée : une
- * classe inconnue est retirée, parce qu'elle serait soit inopérante, soit une
- * façon de détourner la mise en page.
- *
- * Les balises et classes admises sont exactement celles des composants des
- * articles du site (_generator/ui.js : encadrés, étapes, figures, tableaux,
- * avant/après, lien fléché) et des balises de texte courantes.
- *
- * Ce filtre s'applique au contenu MODIFIÉ dans WordPress. Un contenu importé
- * et non retouché est rendu tel quel : il vient du dépôt, et le refiltrer
- * changerait des octets sans rien protéger.
- */
+
+
 
 declare(strict_types=1);
 
@@ -27,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Html {
 
-	/** Classes reconnues par la feuille de style du site. */
+
 	public const CLASSES = [
 		'callout', 'callout--warning', 'callout--key', 'callout__label', 'text-muted',
 		'link-arrow', 'steps', 'table-wrap', 'table-compare', 'grid', 'grid--2',
@@ -35,7 +20,7 @@ final class Html {
 		'ba__tag', 'ba__tag--before', 'ba__tag--after', 'ba__handle', 'ba__range',
 	];
 
-	/** @return array<string,array<string,bool>> */
+
 	public static function autorise(): array {
 		$c = [ 'class' => true ];
 		return [
@@ -72,7 +57,7 @@ final class Html {
 
 	public static function filtrer( string $html ): string {
 		$propre = wp_kses( $html, self::autorise(), [ 'http', 'https', 'mailto' ] );
-		// Classes : seules celles du site passent.
+
 		$propre = (string) preg_replace_callback(
 			'/\sclass="([^"]*)"/',
 			static function ( array $m ): string {
@@ -81,23 +66,15 @@ final class Html {
 			},
 			$propre
 		);
-		// Paragraphes vides laissés par l'éditeur visuel (« <p>&nbsp;</p> ») : rien à publier.
+
 		$propre = (string) preg_replace( '#<p>(?:\s|&nbsp;|\x{00A0})*</p>\s*#u', '', $propre );
-		// Un champ de saisie n'a sa place que dans le comparateur avant/après.
+
 		$propre = (string) preg_replace( '/<input(?![^>]*class="[^"]*ba__range)[^>]*>/', '', $propre );
 		return self::attributs_data( $propre );
 	}
 
-	/**
-	 * Les attributs `data-*` ne gardent que des valeurs connues.
-	 *
-	 * Le site les relit en JavaScript : `data-pattern-thumb` finissait dans un
-	 * `innerHTML`, `data-base` dans un lien. Une valeur libre — que `wp_kses`
-	 * laisse passer, encodée — redevenait du HTML ou un `javascript:` une fois
-	 * décodée par le navigateur. Les contenus n'en emploient qu'une poignée :
-	 * un identifiant de motif, un mode, un chemin relatif « ../ ». Tout le reste
-	 * est retiré.
-	 */
+
+
 	private static function attributs_data( string $html ): string {
 		return (string) preg_replace_callback(
 			'/\s(data-(?:pattern-thumb|mode|base|visualizer))(?:="([^"]*)")?/',
@@ -119,11 +96,8 @@ final class Html {
 		);
 	}
 
-	/**
-	 * Le corps à transmettre : tel quel s'il n'a pas été retouché depuis
-	 * l'import, sinon mis en paragraphes (l'éditeur classique enregistre des
-	 * lignes vides, pas des <p>) puis filtré.
-	 */
+
+
 	public static function corps( \WP_Post $post ): string {
 		$brut = (string) $post->post_content;
 		$hash = (string) get_post_meta( $post->ID, '_pp_import_hash', true );
@@ -133,18 +107,8 @@ final class Html {
 		return self::filtrer( wpautop( $brut ) );
 	}
 
-	/**
-	 * Images de la médiathèque insérées dans le corps (bouton « Ajouter un
-	 * média ») : leur adresse est celle de WordPress, que le site public ne
-	 * sert pas. On la remplace par le fichier que `wordpress.js pull` rapatrie
-	 * (`assets/images/wp-<id>.jpg`, chemin relatif comme les illustrations
-	 * importées), et on liste ces images pour qu'il les télécharge.
-	 *
-	 * Les illustrations importées du dépôt (« ../assets/images/… ») ne sont
-	 * pas concernées : elles restent telles quelles, sans copie.
-	 *
-	 * @param array<int,array<string,mixed>> $medias complété des images trouvées
-	 */
+
+
 	public static function medias( string $html, array &$medias ): string {
 		$base = trailingslashit( (string) wp_get_upload_dir()['baseurl'] );
 		$base = (string) preg_replace( '#^https?:#', '', $base );
@@ -157,7 +121,7 @@ final class Html {
 				}
 				$id = attachment_url_to_postid( $src );
 				if ( ! $id ) {
-					// Une taille intermédiaire (photo-1024x683.jpg) : on remonte à l'original.
+
 					$id = attachment_url_to_postid( (string) preg_replace( '/-\d+x\d+(?=\.\w+$)/', '', $src ) );
 				}
 				$image = $id ? Export::image( $id ) : null;

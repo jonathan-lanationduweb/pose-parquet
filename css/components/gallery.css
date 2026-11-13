@@ -1,23 +1,3 @@
-/**
- * Galerie d'inspiration.
- *
- * **Une alternance stricte, pas quatre ratios qui tournent.**
- *
- * La version précédente faisait cycler quatre formats — 3/4, 1/1, 4/5, 5/6 —
- * dans une grille dont le nombre de colonnes variait avec la largeur. Le cycle
- * de quatre et la grille de deux ou trois colonnes ne retombaient jamais au
- * même endroit : selon la fenêtre, une carte se retrouvait seule et minuscule,
- * les hauteurs de rangée sautaient, et les boutons « Essayer ce style » ne
- * s'alignaient plus. L'intention était là, le résultat se lisait comme un
- * accident.
- *
- * Ici, la variété est assumée mais **régulière** : une grille de douze colonnes,
- * une rangée = deux photos, la large occupe sept colonnes et l'étroite cinq, en
- * alternance stricte. Toutes les rangées ont exactement la même hauteur, donc
- * les légendes et les appels à l'action sont alignés d'une rangée à l'autre ;
- * l'asymétrie, elle, est dans la largeur. Ce n'est ni une grille plate ni un
- * masonry approximatif : c'est un rythme qu'on peut nommer.
- */
 .gallery {
   display: grid;
   gap: clamp(1rem, 0.6rem + 1.2vw, 1.75rem);
@@ -27,7 +7,6 @@
 @media (min-width: 48rem) {
   .gallery {
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    /* Hauteur de rangée commune : c'est elle qui garantit l'alignement. */
     grid-auto-rows: clamp(16rem, 26vw, 24rem);
   }
   .gallery__item { grid-column: span 6; }
@@ -49,15 +28,6 @@
   background: none;
   cursor: zoom-in;
 }
-
-/**
- * Carte essayable : la vignette entière est un lien vers le Studio.
- *
- * Elle couvre la carte, donc la zone tactile fait la taille de la carte —
- * c'est ce qui rend l'action atteignable au doigt sans viser la pastille.
- * Le curseur distingue les deux familles de cartes avant même le survol :
- * `pointer` mène au Studio, `zoom-in` agrandit la photo.
- */
 .gallery__open {
   position: absolute;
   inset: 0;
@@ -65,9 +35,6 @@
   cursor: pointer;
 }
 .gallery__item--try { cursor: pointer; }
-
-/* Survol discret : la photo respire, un liséré apparaît. Rien de plus — la
-   direction artistique de la page ne change pas pour un état d'interaction. */
 .gallery__item--try::after {
   content: '';
   position: absolute;
@@ -95,8 +62,6 @@
   color: #fff;
   text-align: left;
 }
-/* Sur une colonne, la hauteur de rangée ne s'applique pas : on redonne un
-   ratio, unique, pour que le défilement reste régulier. */
 @media (max-width: 47.99rem) {
   .gallery__item { aspect-ratio: 4 / 5; }
 }
@@ -137,8 +102,6 @@
   align-items: center;
   gap: 0.35rem;
   margin-top: 0.5rem;
-  /* 44 px : la cible tactile minimale. La carte entière est cliquable, mais
-     la pastille reste atteignable au doigt sans viser. */
   min-height: 2.75rem;
   padding: 0 0.95rem;
   border-radius: var(--r-pill);

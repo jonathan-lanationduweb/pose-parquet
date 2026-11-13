@@ -1,4 +1,3 @@
-/* Infobulle sur terme technique */
 .tip {
   position: relative;
   border-bottom: 1px dotted var(--accent);

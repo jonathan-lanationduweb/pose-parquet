@@ -1,23 +1,3 @@
-/**
- * Mesures de performance du Visualiseur — éteintes par défaut.
- *
- * Le lag a été signalé en ces termes : « le Visualiseur lag ». Un ressenti ne
- * dit pas où, et deviner coûte plus cher que mesurer : on a déjà optimisé un
- * chemin de rendu qui n'était pas le goulot. Ce module pose donc des repères
- * nommés autour des étapes réelles — génération de texture, mips, peinture,
- * changement de produit — et n'existe qu'à la demande.
- *
- * `?perf=1` dans l'URL, ou `window.__perf = true` avant le démarrage, active
- * les mesures. Sinon `mark()` et `mesure()` sont deux fonctions vides : pas de
- * `performance.mark`, pas de tableau qui grossit, pas de branche dans le
- * chemin chaud au-delà d'un test booléen.
- *
- * Les mesures s'appuient sur l'API Performance du navigateur plutôt que sur un
- * chronomètre maison : elles apparaissent dans l'onglet Performance des
- * devtools au même endroit que les tâches longues, ce qui permet de relire une
- * trace sans rejouer la session.
- */
-
 const actif = (() => {
   if (typeof window === 'undefined') return false;
   if (window.__perf === true) return true;
@@ -29,7 +9,7 @@ const actif = (() => {
 })();
 
 const releves = [];
-/** Tâches longues du fil principal : c'est ce qui se ressent comme un blocage. */
+
 const taches = [];
 
 if (actif && typeof PerformanceObserver === 'function') {
@@ -38,33 +18,31 @@ if (actif && typeof PerformanceObserver === 'function') {
       list.getEntries().forEach((e) => taches.push({ debut: Math.round(e.startTime), duree: Math.round(e.duration) }));
     }).observe({ entryTypes: ['longtask'] });
   } catch {
-    /* longtask non pris en charge : les mesures nommées suffisent. */
+
   }
 }
 
 export const perfActif = actif;
 
 export const mark = actif
-  ? (nom) => { try { performance.mark(nom); } catch { /* budget de repères plein */ } }
+  ? (nom) => { try { performance.mark(nom); } catch {   } }
   : () => {};
 
-/**
- * Referme un intervalle et le retient.
- * @returns {number|null} durée en ms, ou null si le repère de départ manque.
- */
+
+
 export const mesure = actif
   ? (nom, debut, fin) => {
     try {
       const e = performance.measure(nom, debut, fin);
       const duree = Math.round(e.duration * 100) / 100;
       releves.push({ nom, duree });
-      // On vide derrière soi.
-      //
-      // Le tampon d'entrées de performance du navigateur est borné : au bout
-      // de quelques milliers de repères il cesse silencieusement d'en
-      // enregistrer, et `measure()` ne trouve plus son repère de départ. Une
-      // session de mesure un peu longue rendait donc un rapport VIDE, ce qui
-      // se lit comme « rien ne s'est passé » alors que tout s'était passé.
+
+
+
+
+
+
+
       performance.clearMeasures(nom);
       performance.clearMarks(fin);
       return duree;
@@ -74,7 +52,7 @@ export const mesure = actif
   }
   : () => null;
 
-/** Chronomètre direct, pour ce qui n'a pas besoin de deux repères. */
+
 export const chrono = actif
   ? (nom, fn) => {
     const t0 = performance.now();
@@ -84,21 +62,14 @@ export const chrono = actif
   }
   : (nom, fn) => fn();
 
-/**
- * Durée mesurée AILLEURS — dans un worker, qui n'a pas accès à ces relevés —
- * et rapportée ici pour figurer dans le même rapport.
- */
+
+
 export const noter = actif
   ? (nom, duree) => { if (Number.isFinite(duree)) releves.push({ nom, duree: Math.round(duree * 100) / 100 }); }
   : () => {};
 
-/**
- * Résumé par nom : nombre d'appels, médiane, maximum, total.
- *
- * La médiane plutôt que la moyenne : le premier rendu d'un matériau coûte dix
- * fois le suivant, et une moyenne mélangerait les deux régimes en un chiffre
- * qui ne décrit ni l'un ni l'autre.
- */
+
+
 export function rapport() {
   const parNom = new Map();
   releves.forEach(({ nom, duree }) => {
@@ -122,7 +93,7 @@ export function rapport() {
   };
 }
 
-/** Vide les relevés : sert à isoler une interaction précise. */
+
 export function raz() {
   releves.length = 0;
   taches.length = 0;
@@ -130,7 +101,7 @@ export function raz() {
     performance.clearMarks();
     performance.clearMeasures();
   } catch {
-    /* rien à vider */
+
   }
 }
 

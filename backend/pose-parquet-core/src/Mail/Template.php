@@ -1,16 +1,6 @@
 <?php
-/**
- * Rendu des gabarits d'email : un fichier PHP dans templates/mail/, des
- * variables, une chaîne HTML en sortie.
- *
- * Les gabarits sont du HTML de courrier : tableau centré de largeur bornée,
- * police système, styles en ligne, aucun script, lisible en texte brut si le
- * client n'affiche pas le style. Toute valeur venant de l'utilisateur passe
- * par esc_html() dans le gabarit — c'est le gabarit qui échappe, au moment
- * d'écrire, pour qu'aucune valeur brute ne soit jamais dans le HTML.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -22,13 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Template {
 
-	/** Largeur du courrier, en pixels : lisible sur mobile, sobre sur bureau. */
+
 	public const WIDTH = 560;
 
-	/**
-	 * @param string              $name  nom du gabarit sans extension (ex. `internal`)
-	 * @param array<string,mixed> $vars  variables disponibles dans le gabarit
-	 */
+
+
 	public static function render( string $name, array $vars ): string {
 		$file = POSE_PARQUET_DIR . '/templates/mail/' . basename( $name ) . '.php';
 		if ( ! is_file( $file ) ) {
@@ -42,10 +30,8 @@ final class Template {
 		] );
 	}
 
-	/**
-	 * Une ligne « libellé / valeur » de tableau, valeur échappée. Vide si la
-	 * valeur est vide : on n'affiche pas ce qui n'a pas été renseigné.
-	 */
+
+
 	public static function row( string $label, ?string $value ): string {
 		$value = trim( (string) $value );
 		if ( $value === '' ) {
@@ -57,7 +43,7 @@ final class Template {
 			. '</tr>';
 	}
 
-	/** Un bloc titré contenant des lignes ; rien si aucune ligne. */
+
 	public static function section( string $title, array $rows ): string {
 		$rows = array_filter( $rows );
 		if ( ! $rows ) {
@@ -67,11 +53,11 @@ final class Template {
 			. '<table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:15px;line-height:1.45;">' . implode( '', $rows ) . '</table>';
 	}
 
-	/** @param array<string,mixed> $vars */
+
 	private static function capture( string $file, array $vars ): string {
 		ob_start();
 		( static function ( string $__file, array $__vars ): void {
-			extract( $__vars, EXTR_SKIP ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
+			extract( $__vars, EXTR_SKIP );
 			require $__file;
 		} )( $file, $vars );
 

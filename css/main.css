@@ -1,4 +1,3 @@
-/* Feuille de style principale : base + composants du design system */
 @import url("./fonts.css");
 @import url("./tokens.css");
 @import url("./reset.css");
@@ -19,29 +18,3 @@
 @import url("./components/prose.css");
 @import url("./components/form.css");
 @import url("./components/misc.css");
-
-/*
- * Ce qui N'EST PLUS ici, et pourquoi.
- *
- * Cette feuille est chargée par les 32 pages du site. Y laisser les styles
- * d'outils faisait payer à un guide de lecture les 13 Ko du Mode Plan, les
- * 15,7 Ko de l'aperçu de scène, les 8 Ko du carrousel Inspiration et les
- * 7,5 Ko du formulaire projet — 51 Ko sur 151, pour des composants qu'il ne
- * contient pas.
- *
- * Ces feuilles sont maintenant des paquets séparés, rattachés à une page par
- * un MARQUEUR présent dans son HTML (voir BUNDLES_PAGE dans
- * _generator/assets.js). Le rattachement est donc automatique : une page qui
- * gagne le composant gagne la feuille, et le générateur échoue si les deux ne
- * concordent pas. Rien à déclarer, rien à oublier.
- *
- *   components/visualizer.css        → data-visualizer      (Mode Plan)
- *   components/visualizer-photo.css  → data-vz-preview      (aperçu de scène)
- *   components/spotlight.css         → class="section spotlight
- *   components/gallery.css           → class="gallery
- *   components/project-form/…        → data-project-form
- *
- * `components/floor-editor.css` a simplement disparu d'ici : aucune page
- * éditoriale n'emploie ses classes, et le Visualiseur Parquet l'importe déjà
- * par css/studio.css.
- */

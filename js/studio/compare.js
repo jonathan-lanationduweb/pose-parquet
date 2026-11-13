@@ -1,13 +1,3 @@
-/**
- * Comparaison de variantes.
- *
- * Deux variantes : curseur (même photo, même cadrage, même masque) ou côte à
- * côte. Trois variantes : trois vues égales sur grand écran, un balayage
- * horizontal sur téléphone — jamais trois vignettes minuscules.
- *
- * À ne pas confondre avec « Avant / après », qui oppose la photo d'origine au
- * parquet posé. Ici, on compare des parquets entre eux — sur la même scène.
- */
 import { echapper } from '../utils/dom.js';
 import { activateDialog } from '../utils/dialog.js';
 const PATTERN_LABELS = {
@@ -60,20 +50,16 @@ export function createCompare(host, { renderer, catalog, paintConfig, onUse, pro
     return { name: material ? material.name : '—', pattern: PATTERN_LABELS[variant.config.pattern] || '' };
   };
 
-  /**
-   * Chaque variante est peinte à partir de la **même scène** : même géométrie,
-   * mêmes masques, même éclairement, même caméra. Seul le matériau change.
-   * C'est ce qui rend la comparaison honnête — et c'est gratuit, puisque tout
-   * ce qui ne dépend que de la photo est calculé une fois pour toutes.
-   */
+
+
   const canvasFor = (variant) => {
     const canvas = document.createElement('canvas');
     canvas.className = 'cmp__canvas';
     const config = paintConfig(variant.config);
-    // Les cartes d'une version comparée peuvent ne pas être en cache — elles
-    // se fabriquent alors dans le worker et `paint` rend `false` en laissant
-    // le canevas vide. Sans cette attente, deux versions sur trois s'affichaient
-    // en noir dans la comparaison (recette globale). On peint dès que c'est prêt.
+
+
+
+
     if (!renderer.paint(canvas, config, null, 1) && renderer.enAttente) {
       canvas.classList.add('is-loading');
       if (renderer.photo) canvas.getContext('2d').drawImage(renderer.photo, 0, 0, canvas.width, canvas.height);
@@ -163,7 +149,7 @@ export function createCompare(host, { renderer, catalog, paintConfig, onUse, pro
     });
     body.appendChild(grid);
 
-    // Compteur « 1 / 3 » pendant le balayage sur petit écran
+
     if (variants.length > 1) {
       count.hidden = false;
       const update = () => {
@@ -203,9 +189,9 @@ export function createCompare(host, { renderer, catalog, paintConfig, onUse, pro
     releaseDialog = null;
   };
   root.querySelector('[data-close]').addEventListener('click', close);
-  // Au niveau du document, pas de la boîte : un Échap tapé alors que le focus
-  // est resté sur la page — le cas d'un clic souris qui l'a déplacé — doit
-  // fermer aussi. Sans effet tant que la boîte est cachée.
+
+
+
 
 
   host.appendChild(root);

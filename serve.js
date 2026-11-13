@@ -1,19 +1,3 @@
-/**
- * Serveur statique minimal (Node, sans dépendance) pour développer en local.
- *
- *   node serve.js                  -> http://localhost:5180 (ce PC seulement)
- *   node serve.js 8080             -> http://localhost:8080
- *   node serve.js 8123 --reseau    -> aussi joignable depuis le réseau local
- *                                     (pour tester sur un téléphone)
- *
- * Par défaut, le serveur n'écoute que sur ce PC : sur un Wi-Fi partagé, tout
- * appareil du réseau pouvait lire le dépôt (y compris .git et backend/) et
- * déposer des fichiers. `--reseau` l'ouvre au réseau local, en lecture seule :
- * le dépôt de fichiers reste réservé à ce PC.
- *
- * Nécessaire car le site utilise des modules ES : le protocole file://
- * bloque leur chargement.
- */
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -23,21 +7,17 @@ const PORT = Number(process.argv.find((a) => /^\d+$/.test(a))) || 5180;
 const RESEAU = process.argv.includes('--reseau');
 const HOTE = RESEAU ? '0.0.0.0' : '127.0.0.1';
 
-/** La requête vient-elle de ce PC ? */
+
 const depuisCePoste = (req) => ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress);
 
-/*
- * En-tête Host : « localhost » ou une adresse IP, jamais un nom de domaine.
- * Une page piégée peut faire pointer un nom qu'elle contrôle vers 127.0.0.1
- * (« DNS rebinding ») et lire ce serveur avec le navigateur du développeur :
- * le nom de domaine dans Host la trahit.
- */
+
+
 const hoteAccepte = (req) => {
   const hote = String(req.headers.host || '').replace(/:\d+$/, '').replace(/^\[|\]$/g, '');
   return hote === 'localhost' || /^\d{1,3}(\.\d{1,3}){3}$/.test(hote) || hote.includes(':');
 };
 
-/** Jamais servi, même en local : l'historique git, le backend, les fichiers cachés. */
+
 const INTERDIT = /(^|\/)(\.[^/]*|backend|node_modules)(\/|$)/i;
 
 const TYPES = {
@@ -60,27 +40,16 @@ const send = (res, status, body, type) => {
   res.end(body);
 };
 
-/**
- * Dépôt d'un fichier produit par le navigateur, réservé au développement.
- *
- * Certains visuels du site sont **calculés par le moteur du visualiseur** :
- * un parquet posé en diagonale, par exemple, ne se trouve pas en photothèque.
- * Le rendu se fait donc dans un canvas, et il faut un moyen d'en récupérer les
- * octets. Sans cela, il fallait faire passer un JPEG en base64 à travers la
- * console, ce qui est absurde.
- *
- * Cette route n'existe que dans `serve.js`, qui n'est pas déployé : GitHub
- * Pages ne sert que des fichiers statiques. Elle refuse tout ce qui sort
- * d'`assets/images/`.
- */
+
+
 const DEPOT_TYPES = new Set(['.jpg', '.jpeg', '.webp', '.png']);
 const DEPOT_MAX = 15 * 1024 * 1024;
 function depot(req, res, url) {
-  // Réservé à ce PC, même quand le serveur est ouvert au réseau.
+
   if (!depuisCePoste(req)) return send(res, 403, 'Dépôt réservé au poste local', TYPES['.txt']);
   const cible = path.join(ROOT, url.replace(/^\/__depot\//, 'assets/images/'));
   const dossier = path.join(ROOT, 'assets', 'images');
-  // `dossier + séparateur` : sans lui, « assets/images-x/ » passait le contrôle.
+
   if (!cible.startsWith(dossier + path.sep)) return send(res, 403, 'Hors assets/images', TYPES['.txt']);
   if (!DEPOT_TYPES.has(path.extname(cible).toLowerCase())) return send(res, 415, 'Images seulement (jpg, webp, png)', TYPES['.txt']);
   const morceaux = [];
@@ -98,17 +67,8 @@ function depot(req, res, url) {
   });
 }
 
-/**
- * Maintenance, comme un vrai serveur la servirait.
- *
- * Quand WordPress l'a activée (assets/maintenance.json, écrit par le build),
- * toute page HTML répond **503 Service Unavailable** avec `Retry-After`, et le
- * corps de maintenance.html. Les fichiers (CSS, JS, images, polices) passent :
- * la page de maintenance en a besoin. Aperçu du vrai site : `?apercu=1`, qui
- * pose le cookie `pp_apercu`. C'est la règle à reproduire sur l'hébergement
- * définitif (voir docs/backend/wordpress-contenus.md) ; GitHub Pages ne sait
- * pas renvoyer de 503.
- */
+
+
 function maintenance(req, res, url) {
   let actif = false;
   try {
@@ -137,7 +97,7 @@ http
     try {
       url = decodeURIComponent(req.url.split('?')[0].split('#')[0]);
     } catch {
-      // Un « % » malformé faisait tomber tout le serveur.
+
       return send(res, 400, 'Adresse invalide', TYPES['.txt']);
     }
     if (req.method === 'PUT' && url.startsWith('/__depot/')) return depot(req, res, url);

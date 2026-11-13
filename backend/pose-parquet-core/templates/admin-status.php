@@ -1,10 +1,6 @@
 <?php
-/**
- * Gabarit de la page « État ». Reçoit `$state` de Admin\Menu::render_status().
- *
- * @var array{plugin_version:string,schema_expected:int,schema_installed:int,installed_at:string,tables:array<string,bool>,caps:array<string,bool>,statuses:array<string,string>,health_url:string} $state
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -25,7 +21,7 @@ $oui_non = static fn( bool $ok ): string => $ok
 		<tbody>
 			<tr><th scope="row"><?php esc_html_e( 'Version du plugin', 'pose-parquet-core' ); ?></th><td><code><?php echo esc_html( $state['plugin_version'] ); ?></code></td></tr>
 			<tr><th scope="row"><?php esc_html_e( 'Schéma de base attendu', 'pose-parquet-core' ); ?></th><td><code><?php echo (int) $state['schema_expected']; ?></code></td></tr>
-			<tr><th scope="row"><?php esc_html_e( 'Schéma de base installé', 'pose-parquet-core' ); ?></th><td><code><?php echo (int) $state['schema_installed']; ?></code> <?php echo $oui_non( $state['schema_installed'] === $state['schema_expected'] ); // phpcs:ignore WordPress.Security.EscapeOutput ?></td></tr>
+			<tr><th scope="row"><?php esc_html_e( 'Schéma de base installé', 'pose-parquet-core' ); ?></th><td><code><?php echo (int) $state['schema_installed']; ?></code> <?php echo $oui_non( $state['schema_installed'] === $state['schema_expected'] );  ?></td></tr>
 			<tr><th scope="row"><?php esc_html_e( 'Installé le (UTC)', 'pose-parquet-core' ); ?></th><td><?php echo esc_html( $state['installed_at'] ?: '—' ); ?></td></tr>
 		</tbody>
 	</table>
@@ -34,7 +30,7 @@ $oui_non = static fn( bool $ok ): string => $ok
 	<table class="widefat striped" style="max-width:40rem">
 		<tbody>
 			<?php foreach ( $state['tables'] as $logical => $ok ) : ?>
-				<tr><th scope="row"><code>pp_<?php echo esc_html( $logical === 'projects' ? 'projects' : 'project_' . $logical ); ?></code></th><td><?php echo $oui_non( $ok ); // phpcs:ignore WordPress.Security.EscapeOutput ?></td></tr>
+				<tr><th scope="row"><code>pp_<?php echo esc_html( $logical === 'projects' ? 'projects' : 'project_' . $logical ); ?></code></th><td><?php echo $oui_non( $ok );  ?></td></tr>
 			<?php endforeach; ?>
 		</tbody>
 	</table>
@@ -43,7 +39,7 @@ $oui_non = static fn( bool $ok ): string => $ok
 	<table class="widefat striped" style="max-width:40rem">
 		<tbody>
 			<?php foreach ( $state['caps'] as $cap => $ok ) : ?>
-				<tr><th scope="row"><code><?php echo esc_html( $cap ); ?></code></th><td><?php echo $oui_non( $ok ); // phpcs:ignore WordPress.Security.EscapeOutput ?></td></tr>
+				<tr><th scope="row"><code><?php echo esc_html( $cap ); ?></code></th><td><?php echo $oui_non( $ok );  ?></td></tr>
 			<?php endforeach; ?>
 		</tbody>
 	</table>
@@ -84,13 +80,13 @@ $oui_non = static fn( bool $ok ): string => $ok
 				<th scope="row"><?php esc_html_e( 'Adresse de réception', 'pose-parquet-core' ); ?></th>
 				<td>
 					<code><?php echo esc_html( $mail['recipient'] ?: '—' ); ?></code><br />
-					<?php echo $oui_non( $mail['explicit'] ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+					<?php echo $oui_non( $mail['explicit'] );  ?>
 					<?php echo $mail['explicit'] ? esc_html__( 'saisie dans les réglages', 'pose-parquet-core' ) : esc_html__( 'héritée de l’adresse d’administration — jamais choisie', 'pose-parquet-core' ); ?>
 				</td>
 			</tr>
 			<tr>
 				<th scope="row"><?php esc_html_e( 'Domaine joignable', 'pose-parquet-core' ); ?></th>
-				<td><?php echo $oui_non( $mail['deliverable'] ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php echo $mail['deliverable'] ? esc_html__( 'domaine ordinaire', 'pose-parquet-core' ) : esc_html__( 'domaine réservé aux tests', 'pose-parquet-core' ); ?></td>
+				<td><?php echo $oui_non( $mail['deliverable'] );  ?> <?php echo $mail['deliverable'] ? esc_html__( 'domaine ordinaire', 'pose-parquet-core' ) : esc_html__( 'domaine réservé aux tests', 'pose-parquet-core' ); ?></td>
 			</tr>
 			<tr>
 				<th scope="row"><?php esc_html_e( 'Transport', 'pose-parquet-core' ); ?></th>
@@ -103,7 +99,7 @@ $oui_non = static fn( bool $ok ): string => $ok
 						</ul>
 						<p class="description" style="margin-top:.4rem"><?php esc_html_e( 'Un transport déclaré n’est pas un email reçu : seule une vraie remise le prouve.', 'pose-parquet-core' ); ?></p>
 					<?php else : ?>
-						<?php echo $oui_non( false ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php esc_html_e( 'aucun transport détecté', 'pose-parquet-core' ); ?>
+						<?php echo $oui_non( false );  ?> <?php esc_html_e( 'aucun transport détecté', 'pose-parquet-core' ); ?>
 					<?php endif; ?>
 				</td>
 			</tr>
@@ -134,14 +130,8 @@ $oui_non = static fn( bool $ok ): string => $ok
 	</table>
 	<p class="description" style="max-width:40rem"><?php esc_html_e( 'Ces états rapportent la réponse de wp_mail(), pas la réception. Un email peut être « envoyé » et finir en indésirable.', 'pose-parquet-core' ); ?></p>
 	<?php
-	/*
-	 * Un lead perdu ne doit pas pouvoir l'être en silence.
-	 *
-	 * Les compteurs ci-dessus disent déjà combien d'envois ont échoué, mais un
-	 * nombre dans un tableau se lit quand on le cherche. Un échec définitif
-	 * mérite une alerte, et un lien direct vers les demandes concernées :
-	 * quelqu'un doit rappeler ces personnes à la main.
-	 */
+
+
 	$echecs_mail  = (int) ( $state['mail_counts']['internal']['failed'] ?? 0 ) + (int) ( $state['mail_counts']['visitor']['failed'] ?? 0 );
 	$attente_mail = (int) ( $state['mail_counts']['internal']['pending'] ?? 0 ) + (int) ( $state['mail_counts']['visitor']['pending'] ?? 0 );
 	$file         = $state['mail_queue'];
@@ -150,7 +140,7 @@ $oui_non = static fn( bool $ok ): string => $ok
 		<div class="notice notice-error inline" style="max-width:40rem;margin:1rem 0">
 			<p>
 				<strong><?php echo esc_html( sprintf(
-					/* translators: %s : nombre de notifications en échec. */
+
 					_n( '%s notification en échec définitif.', '%s notifications en échec définitif.', $echecs_mail, 'pose-parquet-core' ),
 					number_format_i18n( $echecs_mail )
 				) ); ?></strong>
@@ -179,7 +169,7 @@ $oui_non = static fn( bool $ok ): string => $ok
 				<th scope="row"><?php esc_html_e( 'Événements planifiés', 'pose-parquet-core' ); ?></th>
 				<td>
 					<?php echo esc_html( sprintf(
-						/* translators: %1$s : total planifié, %2$s : nombre déjà dû. */
+
 						__( '%1$s au total, dont %2$s déjà dû(s)', 'pose-parquet-core' ),
 						number_format_i18n( (int) $file['total'] ),
 						number_format_i18n( (int) $file['dus'] )
@@ -190,11 +180,11 @@ $oui_non = static fn( bool $ok ): string => $ok
 				<th scope="row"><?php esc_html_e( 'Ordonnanceur', 'pose-parquet-core' ); ?></th>
 				<td>
 					<?php if ( $state['wp_cron_disabled'] ) : ?>
-						<?php echo $oui_non( false ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+						<?php echo $oui_non( false );  ?>
 						<?php esc_html_e( 'DISABLE_WP_CRON est actif : rien ne part tout seul.', 'pose-parquet-core' ); ?>
 						<p class="description"><?php esc_html_e( 'C’est le réglage attendu en production, à condition qu’un cron système appelle wp-cron.php — sinon la file ne se vide jamais.', 'pose-parquet-core' ); ?></p>
 					<?php else : ?>
-						<?php echo $oui_non( true ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+						<?php echo $oui_non( true );  ?>
 						<?php esc_html_e( 'WP-Cron s’exécute au fil des visites.', 'pose-parquet-core' ); ?>
 					<?php endif; ?>
 				</td>
@@ -214,7 +204,7 @@ $oui_non = static fn( bool $ok ): string => $ok
 		<?php esc_html_e( 'Actif : pot de miel, jeton temporel signé, limite de débit.', 'pose-parquet-core' ); ?>
 		<?php
 		echo esc_html( sprintf(
-			/* translators: 1: âge minimum du jeton, 2: durée de vie, 3: créations, 4: tentatives, 5: fenêtre en minutes */
+
 			__( 'Jeton : %1$d s minimum, %2$d s de validité. Débit : %3$d demandes et %4$d tentatives par %5$d min et par identité réseau.', 'pose-parquet-core' ),
 			(int) $state['token_min_age'],
 			(int) $state['token_max_age'],
@@ -227,12 +217,12 @@ $oui_non = static fn( bool $ok ): string => $ok
 
 	<h2><?php esc_html_e( 'Rôle gestionnaire', 'pose-parquet-core' ); ?></h2>
 	<?php if ( ! $state['manager_role'] ) : ?>
-		<p><?php echo $oui_non( false ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php esc_html_e( 'le rôle « Gestionnaire Pose Parquet » n’existe pas.', 'pose-parquet-core' ); ?></p>
+		<p><?php echo $oui_non( false );  ?> <?php esc_html_e( 'le rôle « Gestionnaire Pose Parquet » n’existe pas.', 'pose-parquet-core' ); ?></p>
 	<?php else : ?>
 		<table class="widefat striped" style="max-width:40rem">
 			<tbody>
 				<?php foreach ( $state['manager_caps'] as $cap => $ok ) : ?>
-					<tr><th scope="row"><code><?php echo esc_html( $cap ); ?></code></th><td><?php echo $oui_non( $ok ); // phpcs:ignore WordPress.Security.EscapeOutput ?></td></tr>
+					<tr><th scope="row"><code><?php echo esc_html( $cap ); ?></code></th><td><?php echo $oui_non( $ok );  ?></td></tr>
 				<?php endforeach; ?>
 			</tbody>
 		</table>
@@ -240,16 +230,8 @@ $oui_non = static fn( bool $ok ): string => $ok
 	<?php endif; ?>
 
 	<?php
-	/*
-	 * Réparation des droits.
-	 *
-	 * Le plugin ne repose plus les capabilities à chaque chargement : une
-	 * révocation décidée par un administrateur doit tenir. Le prix de ce choix
-	 * est qu'un droit réellement perdu — extension de gestion de rôles,
-	 * restauration partielle — ne revient plus tout seul. D'où ce bouton, qui
-	 * n'apparaît que lorsqu'il manque effectivement quelque chose, et qui
-	 * n'ajoute jamais que le plancher documenté.
-	 */
+
+
 	?>
 	<?php if ( $state['caps_missing'] ) : ?>
 		<div class="notice notice-warning inline" style="max-width:40rem;margin:1rem 0 0">
@@ -272,7 +254,7 @@ $oui_non = static fn( bool $ok ): string => $ok
 	<h2><?php esc_html_e( 'Projets', 'pose-parquet-core' ); ?></h2>
 	<p>
 		<?php
-		/* translators: %d : nombre de demandes en base. */
+
 		echo esc_html( sprintf( _n( '%d projet enregistré.', '%d projets enregistrés.', (int) $state['projects_count'], 'pose-parquet-core' ), (int) $state['projects_count'] ) );
 		?>
 	</p>

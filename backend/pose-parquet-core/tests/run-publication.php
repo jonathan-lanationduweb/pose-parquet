@@ -1,14 +1,6 @@
 <?php
-/**
- * Suite « Publier le site » (07/10/2026).
- *
- *   php tests/run-publication.php <racine WordPress>
- *
- * Ne lance AUCUNE vraie publication : le mode local n'est pas déclenché ici
- * (la recette Chrome le fait), le mode GitHub est joué contre des réponses
- * simulées (pre_http_request). Le journal, le verrou et la dernière
- * publication sont remis dans l'état trouvé.
- */
+
+
 
 declare(strict_types=1);
 
@@ -51,7 +43,7 @@ delete_option( Publication::VERROU );
 $admins = get_users( [ 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ] );
 $admin  = (int) $admins[0];
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Droits et jeton' );
 require_once ABSPATH . 'wp-admin/includes/user.php';
 $gestionnaire = wp_insert_user( [ 'user_login' => 'pp_pubtest_' . wp_rand(), 'user_pass' => wp_generate_password(), 'role' => Roles::MANAGER, 'user_email' => 'pubtest' . wp_rand() . '@example.test' ] );
@@ -69,7 +61,7 @@ $verifie( 'toujours aucun verrou', get_option( Publication::VERROU ) === false )
 $_POST = $_REQUEST = [];
 wp_delete_user( (int) $gestionnaire );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Workflow fermé' );
 $source = (string) file_get_contents( POSE_PARQUET_DIR . '/src/Publication/Publication.php' );
 $verifie( 'le module ne lit ni $_POST, ni $_GET, ni $_REQUEST (aucun paramètre du navigateur)', ! preg_match( '/\$_(POST|GET|REQUEST)\b/', $source ) );
@@ -84,17 +76,17 @@ if ( is_file( $runner ) ) {
 }
 $verifie( 'dossier d’état interdit au web (.htaccess)', str_contains( (string) file_get_contents( Publication::dossier_etat() . '/.htaccess' ), 'Require all denied' ) );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Concurrence' );
 add_option( Publication::VERROU, [ 'debut' => time(), 'utilisateur' => $admin, 'mode' => 'local', 'maintenance' => false ], '', false );
 $r = Publication::lancer( $admin );
 $verifie( 'publication déjà en cours : seconde demande refusée', $r['code'] === 'en_cours', $r['code'] );
 $verifie( 'état « en cours »', Publication::etat()['statut'] === 'en_cours' );
 update_option( Publication::VERROU, [ 'debut' => time() - Publication::DELAI_MAX - 5, 'utilisateur' => $admin, 'mode' => 'local', 'maintenance' => false ], false );
-// Le fichier d'état d'une vraie publication récente fermerait légitimement ce verrou : on l'écarte le temps du test.
+
 $fichier_etat = Publication::fichier_etat();
 $sauve        = is_file( $fichier_etat ) ? (string) file_get_contents( $fichier_etat ) : null;
-@unlink( $fichier_etat ); // phpcs:ignore
+@unlink( $fichier_etat );
 Publication::synchroniser();
 if ( $sauve !== null ) {
 	file_put_contents( $fichier_etat, $sauve );
@@ -102,7 +94,7 @@ if ( $sauve !== null ) {
 $journal = Publication::memoire()['journal'];
 $verifie( 'publication muette au-delà de dix minutes : close en échec, verrou levé', get_option( Publication::VERROU ) === false && ( $journal[0]['resultat'] ?? '' ) === 'echec' );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Production : GitHub Actions (réponses simulées)' );
 define( 'POSE_PARQUET_PUBLICATION', 'github' );
 define( 'POSE_PARQUET_GITHUB_REPO', 'exemple/pose-parquet' );
@@ -145,7 +137,7 @@ $verifie( 'workflow réussi : journal (date, utilisateur, durée, empreinte), de
 $verifie( 'journal borné à 15 lignes', count( Publication::memoire()['journal'] ) <= 15 );
 $verifie( 'journal : environnement « préproduction GitHub » (staging)', ( $j['environnement'] ?? '' ) === 'staging' );
 
-// Signal accepté (204) mais aucun run : le workflow de la branche par défaut n'écoute pas repository_dispatch.
+
 Publication::lancer( $admin );
 $reponse_runs = [ 'workflow_runs' => [] ];
 Publication::synchroniser();
@@ -157,8 +149,8 @@ Publication::synchroniser();
 $j = Publication::memoire()['journal'][0] ?? [];
 $verifie( 'aucun run après 3 minutes : échec explicite (workflow sans déclencheur manuel)', ( $j['resultat'] ?? '' ) === 'echec' && str_contains( (string) $j['raison'], 'workflow_dispatch' ) && get_option( Publication::VERROU ) === false );
 
-/* ------------------------------------------------------------------ */
-// Remise en état.
+
+
 if ( $memoire_avant === null ) {
 	delete_option( Publication::OPTION );
 } else {

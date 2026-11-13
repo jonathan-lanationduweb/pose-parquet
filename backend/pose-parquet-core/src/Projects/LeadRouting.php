@@ -1,34 +1,6 @@
 <?php
-/**
- * Dire POURQUOI une demande est orientée là où elle l'est.
- *
- * -----------------------------------------------------------------------------
- * CE FICHIER NE DÉCIDE RIEN
- * -----------------------------------------------------------------------------
- *
- * La règle de routage vit à un seul endroit, et c'est `js/forms/lead-context.js`
- * côté front : besoin + zone donnent une destination. Réécrire cette règle ici
- * ferait deux implémentations dans deux langages, qui divergeraient au premier
- * changement — et la seconde servirait justement à expliquer la première.
- *
- * Cette classe LIT ce qui est en base et le met en français. Rien de plus.
- * Elle ne recalcule pas, elle ne corrige pas, elle ne propose pas : si la
- * destination stockée ne correspond pas à ce que la phrase décrit, c'est
- * qu'un humain est passé par là, et c'est précisément ce qu'il faut voir.
- *
- * -----------------------------------------------------------------------------
- * POURQUOI UNE PHRASE PLUTÔT QU'UN CODE
- * -----------------------------------------------------------------------------
- *
- * « Destination : Allure Design » seul laisse le gestionnaire deviner s'il
- * peut faire confiance. « Besoin de pose, projet en Île-de-France » lui donne
- * les deux faits sur lesquels la machine s'est appuyée, et lui permet de
- * contredire la machine en connaissance de cause. Une recommandation dont on
- * ne voit pas le raisonnement finit par être suivie sans être lue, ou ignorée
- * sans être examinée.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -42,35 +14,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class LeadRouting {
 
-	/**
-	 * Le projet est-il en Île-de-France ?
-	 *
-	 * Le DÉPARTEMENT répond, et lui seul. La région stockée en est déduite au
-	 * moment de l'enregistrement ; s'y fier ici reviendrait à lire une copie
-	 * quand l'original est à côté, et à rouvrir la porte aux contradictions
-	 * que ce lot referme.
-	 *
-	 * La liste des huit départements n'est écrite nulle part : elle sort de
-	 * la table de Departements, comme celle du front.
-	 */
+
+
 	public static function en_idf( array $project ): bool {
 		return Departements::est_idf( (string) ( $project['department'] ?? '' ) );
 	}
 
-	/** La région d'une demande, déduite de son département. */
+
 	public static function region( array $project ): string {
 		return Departements::region( (string) ( $project['department'] ?? '' ) );
 	}
 
-	/**
-	 * La phrase qui explique l'orientation.
-	 *
-	 * Rend une chaîne vide quand il n'y a rien à expliquer : une demande
-	 * antérieure au schéma 4 n'a pas été orientée, et lui inventer une raison
-	 * serait pire que de n'en afficher aucune.
-	 *
-	 * @param array<string,mixed> $project ligne de pp_projects
-	 */
+
+
 	public static function raison( array $project ): string {
 		$besoin      = (string) ( $project['lead_need'] ?? '' );
 		$destination = (string) ( $project['lead_destination'] ?? '' );
@@ -107,7 +63,7 @@ final class LeadRouting {
 
 			case 'indetermine':
 				return sprintf(
-					/* translators: %s : « projet en Île-de-France » ou « projet hors Île-de-France ». */
+
 					__( 'Besoin non précisé (%s) : un appel vaudra mieux qu’une règle.', 'pose-parquet-core' ),
 					$zone
 				);
@@ -117,18 +73,14 @@ final class LeadRouting {
 		}
 	}
 
-	/**
-	 * La destination a-t-elle été changée à la main ?
-	 *
-	 * Les deux colonnes partent égales — `Repository::insert_project` recopie
-	 * la recommandation — donc toute différence est le fait d'une personne.
-	 */
+
+
 	public static function corrigee( array $project ): bool {
 		$auto = (string) ( $project['lead_destination_auto'] ?? '' );
 		return $auto !== '' && $auto !== (string) ( $project['lead_destination'] ?? '' );
 	}
 
-	/** « Premibel » plutôt que « premibel », pour la phrase de correction. */
+
 	public static function libelle_auto( array $project ): string {
 		return Labels::of( 'lead_destination', (string) ( $project['lead_destination_auto'] ?? '' ) );
 	}

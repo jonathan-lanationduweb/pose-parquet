@@ -1,17 +1,6 @@
 <?php
-/**
- * Messages d'administration après une action.
- *
- * Une action réussit ou échoue, puis redirige — voir Admin\Actions. Le message
- * doit survivre à cette redirection sans voyager dans l'URL sous forme de
- * texte : seul un CODE passe en paramètre, et il est traduit ici. Une URL ne
- * doit jamais porter la phrase affichée, sinon n'importe qui peut faire dire
- * n'importe quoi à l'administration en envoyant un lien.
- *
- * Les codes inconnus ne produisent aucun message plutôt qu'un message vide.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -23,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Notices {
 
-	/** Nom du paramètre d'URL qui porte le code. */
+
 	public const ARG = 'pp_notice';
 
 	public const STATUS_UPDATED   = 'status_updated';
@@ -41,12 +30,8 @@ final class Notices {
 	public const DEST_UNCHANGED   = 'dest_unchanged';
 	public const CAPS_INCOMPLETE  = 'caps_incomplete';
 
-	/**
-	 * Code → [ type, message ]. Le type est celui des classes WordPress
-	 * (`success`, `warning`, `error`) qui donnent la couleur et le rôle ARIA.
-	 *
-	 * @return array<string,array{0:string,1:string}>
-	 */
+
+
 	private static function messages(): array {
 		return [
 			self::STATUS_UPDATED   => [ 'success', __( 'Statut mis à jour.', 'pose-parquet-core' ) ],
@@ -54,12 +39,12 @@ final class Notices {
 			self::STATUS_STALE     => [ 'warning', __( 'Ce projet a été modifié entre-temps. Rechargez la fiche.', 'pose-parquet-core' ) ],
 			self::NOTE_ADDED       => [ 'success', __( 'Note ajoutée.', 'pose-parquet-core' ) ],
 			self::NOTE_EMPTY       => [ 'error', __( 'La note est vide : rien n’a été enregistré.', 'pose-parquet-core' ) ],
-			/* translators: %s : nombre maximal de caractères. */
+
 			self::NOTE_TOO_LONG    => [ 'error', sprintf( __( 'La note dépasse %s caractères : rien n’a été enregistré.', 'pose-parquet-core' ), number_format_i18n( \PoseParquet\Core\Projects\Notes::MAX_LENGTH ) ) ],
 			self::SAVE_FAILED      => [ 'error', __( 'Impossible d’enregistrer la modification.', 'pose-parquet-core' ) ],
 			self::NOT_FOUND        => [ 'error', __( 'Ce projet n’existe pas ou n’existe plus.', 'pose-parquet-core' ) ],
 			self::CAPS_REPAIRED    => [ 'success', __( 'Les droits du plugin ont été réappliqués.', 'pose-parquet-core' ) ],
-			/* translators: %1$s : nombre d’envois traités, %2$s : nombre restant en file. */
+
 			self::MAIL_QUEUE_RUN   => [ 'success', sprintf( __( 'File des notifications : %1$s envoi(s) traité(s), %2$s en attente.', 'pose-parquet-core' ), number_format_i18n( self::compteur( 'pp_traites' ) ), number_format_i18n( self::compteur( 'pp_restants' ) ) ) ],
 			self::MAIL_QUEUE_EMPTY => [ 'info', __( 'Aucun envoi n’était dû : la file est à jour.', 'pose-parquet-core' ) ],
 			self::DEST_UPDATED     => [ 'success', __( 'Destination mise à jour. Une note interne en garde la trace.', 'pose-parquet-core' ) ],
@@ -68,24 +53,17 @@ final class Notices {
 		];
 	}
 
-	/**
-	 * Un compteur posé dans l'URL par une redirection de `Actions`.
-	 *
-	 * Borné et converti en entier : ce qui sort d'ici ne peut être qu'un
-	 * nombre, et un nombre ne s'échappe pas de travers dans une phrase.
-	 */
+
+
 	private static function compteur( string $cle ): int {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nombre d'affichage, sans effet.
+
 		return isset( $_GET[ $cle ] ) ? max( 0, absint( wp_unslash( $_GET[ $cle ] ) ) ) : 0;
 	}
 
-	/**
-	 * Le message à afficher, lu dans l'URL. Rend `null` s'il n'y en a pas.
-	 *
-	 * @return array{type:string,text:string}|null
-	 */
+
+
 	public static function pending(): ?array {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- lecture d'un code d'affichage, sans effet.
+
 		$code = isset( $_GET[ self::ARG ] ) ? sanitize_key( wp_unslash( $_GET[ self::ARG ] ) ) : '';
 		if ( $code === '' ) {
 			return null;
@@ -99,7 +77,7 @@ final class Notices {
 		return [ 'type' => $messages[ $code ][0], 'text' => $messages[ $code ][1] ];
 	}
 
-	/** Affiche la notice, si l'écran en a une. */
+
 	public static function output( ?array $notice ): void {
 		if ( ! $notice ) {
 			return;

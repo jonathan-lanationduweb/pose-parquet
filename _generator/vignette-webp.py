@@ -1,21 +1,4 @@
-"""
-Convertit une image source (JPEG, PNG, WebP…) en vignette WebP carrée.
-
-    python _generator/vignette-webp.py <taille> < source > vignette.webp
-
-Utilisé par `_generator/sync-premibel.js`, et seulement par lui, pour les
-vignettes que Premibel ne sert pas en WebP (fichier original téléversé, sans
-déclinaison 324 px ni version WebP côté serveur). Le format est lu dans le
-CONTENU, jamais dans l'extension ni dans l'en-tête Content-Type.
-
-Traitement : décodage (Pillow), orientation EXIF appliquée, transparence posée
-sur fond blanc (une photo produit PNG détourée ne doit pas devenir noire),
-recadrage centré au carré, réduction à <taille> px, encodage WebP qualité 80.
-
-Codes de sortie : 0 succès (WebP sur la sortie standard) ; 2 source illisible
-ou format non pris en charge ; 3 Pillow absent. Le message d'erreur va sur la
-sortie d'erreur, la synchronisation le reprend tel quel dans son rapport.
-"""
+pass
 import io
 import sys
 
@@ -30,8 +13,8 @@ donnees = sys.stdin.buffer.read()
 try:
     image = Image.open(io.BytesIO(donnees))
     image.load()
-except Exception as erreur:  # noqa: BLE001 — tout échec de décodage est un refus
-    sys.stderr.write(f"décodage impossible : {erreur}\n")
+except Exception as erreur:
+    sys.stderr.write(f"d�codage impossible : {erreur}\n")
     sys.exit(2)
 
 if image.format not in ("JPEG", "PNG", "WEBP", "GIF"):

@@ -4,8 +4,7 @@
 <meta charset="utf-8" />
 <meta name="robots" content="noindex, nofollow" />
 <title>Calibrer une pièce — outil interne</title>
-<style>
-  :root { color-scheme: dark; }
+<style>:root { color-scheme: dark; }
   body { margin: 0; background: #101212; color: #e8e6df; font: 13px/1.5 ui-monospace, monospace; }
   header { padding: 8px 10px; border-bottom: 1px solid #2a2e2e; }
   #wrap { position: relative; display: block; }
@@ -23,23 +22,7 @@
 <div id="wrap"><canvas id="photo"></canvas><canvas id="over"></canvas></div>
 <pre id="log"></pre>
 
-<script type="module">
-/**
- * Calibrage **scripté** d'une pièce d'exemple.
- *
- * `calibrage.html` sert à calibrer au clic, une scène à la fois. Cette page
- * sert à calibrer au script : elle charge une photo, expose les mesures sur
- * `window.C`, et sait dessiner par-dessus ce qu'elle a mesuré.
- *
- * Ce dernier point est le plus important. Une droite ajustée avec un résidu de
- * 0,4 px peut être parfaitement alignée sur le reflet d'une fenêtre plutôt que
- * sur le pied du mur : le chiffre est bon, la mesure est fausse. `trace()`
- * existe pour qu'aucune valeur n'entre dans data/scenes/ sans avoir été vue
- * posée sur l'image.
- *
- *   ?img=room-couloir.jpg
- */
-import {
+<script type="module">import {
   intersecte, ajusteDroite, focaleParOrthogonalite, quadDepuisPiece,
   pointAuSol, mesureQuad, etendueVisible,
   orientationLocale, fuiteDesLames, piedDeMur, releveColonnes,
@@ -50,17 +33,8 @@ const BASE = '../';
 const $ = (id) => document.getElementById(id);
 const log = (...parts) => { $('log').textContent += parts.join(' ') + '\n'; };
 
-/**
- * Chargement à la résolution **native**, sans passer par `image-loader.js`.
- *
- * Le chargeur du visualiseur réduit l'image à 1100 px de large quand la
- * fenêtre en fait moins de 600 : c'est le bon comportement pour le rendu, et
- * le pire possible pour un outil de mesure. Un résidu de 8 px ne veut pas dire
- * la même chose à 1100 px qu'à 1600 px, et la résolution de travail se serait
- * mise à dépendre de la largeur de la fenêtre — donc les mesures d'une session
- * à l'autre ne seraient plus comparables. Ici la taille de l'image est la
- * taille du fichier, toujours.
- */
+
+
 function chargeNative(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -77,16 +51,8 @@ function chargeNative(src) {
   });
 }
 
-/**
- * `?img=` accepte un nom de fichier d'`assets/images/`, ou un chemin absolu.
- *
- * Le chemin absolu sert à qualifier une photo **avant** de l'importer : une
- * candidate vit dans `_calibrage/_candidates/`, non versionné et non déployé,
- * et ne rejoint `assets/images/` que si le pré-filtre la retient et que sa
- * licence a été vérifiée sur sa page source. Sans cela il faudrait importer
- * pour évaluer, puis nettoyer les rejets — et un fichier oublié finirait
- * crédité nulle part.
- */
+
+
 const demande = new URLSearchParams(location.search).get('img') || 'room-couloir.jpg';
 const fichier = demande.split('/').pop();
 const chemin = demande.startsWith('/') ? demande : `${BASE}assets/images/${demande}`;
@@ -103,20 +69,14 @@ $('over').height = H;
 $('etat').textContent = `${fichier} · ${W}×${H}`;
 log(`${fichier} — ${W}×${H}`);
 
-/* ------------------------------------------------------------------ */
-/* Superposition : voir ce qu'on a mesuré                              */
-/* ------------------------------------------------------------------ */
+
+
+
 
 const g = $('over').getContext('2d');
 
-/**
- * Dessine des objets par-dessus la photo.
- *
- * Accepte des points `{p:{x,y}}`, des droites `{droite:{p,d}}` en pixels, des
- * polygones `{polygone:[...]}` normalisés, et des croix de fuite `{vp:{x,y}}`.
- * Tout est en coordonnées normalisées côté appelant, sauf les droites, qui
- * sortent déjà de `ajusteDroite()` en pixels.
- */
+
+
 function trace(objets, { effacer = true } = {}) {
   if (effacer) g.clearRect(0, 0, W, H);
   const px = (p) => ({ x: p.x * W, y: p.y * H });
@@ -139,8 +99,8 @@ function trace(objets, { effacer = true } = {}) {
       }
     }
     if (o.droite) {
-      // Prolongée jusqu'aux bords : c'est ainsi qu'on voit si elle suit
-      // vraiment l'arête sur toute sa longueur, ou seulement au milieu.
+
+
       const { p, d } = o.droite;
       const t = Math.max(W, H) * 3;
       g.beginPath();
@@ -172,11 +132,8 @@ function trace(objets, { effacer = true } = {}) {
   }
 }
 
-/**
- * Extrait agrandi, en couche fixe, pour juger un bord au pixel.
- * Le volet de prévisualisation réduit la page : sans ce détour, un contour
- * décalé de 3 px est invisible.
- */
+
+
 function apercu(cx, cy, zoom = 3, avecOverlay = true) {
   document.querySelectorAll('#loupe').forEach((n) => n.remove());
   const LW = 780;
@@ -206,44 +163,42 @@ function apercu(cx, cy, zoom = 3, avecOverlay = true) {
 }
 const fermer = () => { document.querySelectorAll('#loupe').forEach((n) => n.remove()); return 'ferme'; };
 
-/* ------------------------------------------------------------------ */
-/* Enchaînements utiles                                                */
-/* ------------------------------------------------------------------ */
 
-/** Relevé de pieds de mur + droite ajustée, en une fois. */
+
+
+
+
 function ligneDuSol(colonnes, y0, y1) {
   const rows = releveColonnes(photo, colonnes, y0, y1);
   const fit = ajusteDroite(rows.map((r) => ({ x: r.x * W, y: r.y * H })));
   return { rows, fit, forces: rows.map((r) => r.force) };
 }
 
-/** Droite ajustée sur des points relevés à la main (normalisés). */
+
 const ligneDepuisPoints = (pts) => ajusteDroite(pts.map((p) => ({ x: p.x * W, y: p.y * H })));
 
-/** Point de fuite de deux droites, en normalisé. */
+
 function fuite(l1, l2) {
   const q = intersecte(l1.p, l1.d, l2.p, l2.d);
   return q ? { x: +(q.x / W).toFixed(4), y: +(q.y / H).toFixed(4) } : null;
 }
 
-/**
- * Calibration complète à partir de deux points de fuite et de trois coins.
- * Renvoie le quadrilatère, la focale, l'horizon et les deux preuves.
- */
+
+
 function calibre({ vpU, vpV, corner, alongU, alongV, hauteurM = 1.5 }) {
   const quad = quadDepuisPiece({ vpU, vpV, corner, alongU, alongV });
   const f = focaleParOrthogonalite(vpU, vpV, W, H);
-  // L'horizon est la droite qui joint les deux fuites horizontales. On ne le
-  // suppose pas : on le lit. Les deux fuites ayant en pratique des y proches,
-  // on retient leur moyenne pondérée par leur éloignement du centre — la plus
-  // lointaine est la mieux contrainte.
+
+
+
+
   const horizon = +((vpU.y + vpV.y) / 2).toFixed(4);
   const camera = { horizonY: horizon, focalPx: f.focalPx, hauteurM, largeur: W, hauteur: H };
   const m = f.focalPx ? mesureQuad(quad, camera) : { ok: false, raison: 'focale indeterminee' };
   return { quad, focale: f, horizon, ecartFuitesY: +Math.abs(vpU.y - vpV.y).toFixed(4), mesure: m, camera };
 }
 
-/** Affinage d'un contour + qualité avant/après. */
+
 function affine(polygone) {
   const affineur = affineurDeContour(photo);
   const qualite = qualiteContour(photo);
@@ -257,15 +212,8 @@ function affine(polygone) {
   };
 }
 
-/**
- * Loupe graduée : elle porte sa propre règle, calculée d'après ses bornes.
- *
- * Sans cette règle, il faut lire les coordonnées sur une grille dessinée dans
- * le repère de l'image, dont les étiquettes tombent presque toujours hors du
- * cadrage de la loupe. Ici les graduations sont toujours visibles et toujours
- * justes : c'est ce qui rend un relevé à l'œil assez précis (± 5 px) pour
- * servir d'entrée à l'affineur, qui cherche à ± 14 px.
- */
+
+
 function loupe(cx, cy, zoom, pasX = 0.02, pasY = 0.02) {
   document.querySelectorAll('#loupe').forEach((n) => n.remove());
   const LW = 780;
@@ -314,7 +262,7 @@ function loupe(cx, cy, zoom, pasX = 0.02, pasY = 0.02) {
   return { x0, x1, y0, y1 };
 }
 
-/** Grille graduée dans le repère de l'image, pour un premier relevé d'ensemble. */
+
 function grille(x0, x1, y0, y1, pas = 0.05) {
   g.clearRect(0, 0, W, H);
   g.lineWidth = 1.4;
@@ -334,15 +282,8 @@ function grille(x0, x1, y0, y1, pas = 0.05) {
   return 'grille';
 }
 
-/**
- * Traque un bord sombre verticalement : à chaque ligne, le minimum de
- * luminance dans une fenêtre autour de la position précédente.
- *
- * Sert à vérifier qu'une ligne droite du monde l'est aussi dans l'image. Un
- * arc systématique — écart positif aux deux bouts, négatif au milieu — est la
- * signature d'une **distorsion en barillet**, que le modèle sténopé de
- * SceneData ne sait pas représenter. C'est ce test qui a écarté room-couloir.
- */
+
+
 function traqueVerticale(xd, yd, yf, fenetre = 4, pas = 5) {
   const d = photo.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, W, H).data;
   const lum = (x, y) => {
@@ -364,7 +305,7 @@ function traqueVerticale(xd, yd, yf, fenetre = 4, pas = 5) {
   return out;
 }
 
-/** Écart signé à la droite ajustée, échantillonné : révèle une courbure. */
+
 function courbure(points) {
   const fit = ajusteDroite(points.map((p) => ({ x: p.x * W, y: p.y * H })));
   if (!fit) return null;
@@ -374,32 +315,20 @@ function courbure(points) {
   return { n, residuMax: fit.residuMax, residuMoyen: fit.residuMoyen, arc: [a(0), a((n / 4) | 0), a((n / 2) | 0), a(((3 * n) / 4) | 0), a(n - 1)] };
 }
 
-/**
- * Traque une arête verticale par le **gradient**, pas par la luminance.
- *
- * `traqueVerticale` suit un minimum de luminance : parfait pour un joint de
- * parquet ou un jambage sombre, inutilisable pour une **marche** de clarté —
- * un placard blanc contre un mur crème, l'arête d'un marbre, un angle de mur.
- * Sur ces bords, elle part en promenade et donne un écart-type d'ajustement de
- * 4 à 10 px, ce qui rendait toute mesure de flèche muette sur quatre photos
- * candidates.
- *
- * Ici on suit le maximum de |dI/dx|, et on **conserve le signe** du saut
- * relevé au départ : sans cela le suivi traverse volontiers une bande claire
- * pour s'accrocher à son autre bord, ce qui fabrique une fausse courbure.
- */
+
+
 function traqueGradient(xd, yd, yf, fenetre = 6, pas = 4) {
   const d = photo.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, W, H).data;
   const lum = (x, y) => {
     const p = ((y | 0) * W + (x | 0)) * 4;
     return 0.2126 * d[p] + 0.7152 * d[p + 1] + 0.0722 * d[p + 2];
   };
-  // Dérivée horizontale, moyennée sur trois lignes pour amortir le bruit.
+
   const grad = (x, y) => (lum(x + 2, y - 1) - lum(x - 2, y - 1)
     + lum(x + 2, y) - lum(x - 2, y)
     + lum(x + 2, y + 1) - lum(x - 2, y + 1)) / 3;
   let x = xd * W;
-  // Signe du saut, relevé une fois au point de départ.
+
   let signe = 0;
   for (let dx = -fenetre; dx <= fenetre; dx += 0.5) {
     const gg = grad(x + dx, yd * H);
@@ -407,8 +336,8 @@ function traqueGradient(xd, yd, yf, fenetre = 6, pas = 4) {
   }
   signe = signe >= 0 ? 1 : -1;
   const out = [];
-  // Même prédiction de pente que pour le suivi horizontal : une arête verticale
-  // vue en perspective n'est pas verticale dans l'image.
+
+
   let pente = 0;
   for (let y = yd * H; y <= yf * H; y += pas) {
     const prediction = x + pente * pas;
@@ -429,11 +358,8 @@ function traqueGradient(xd, yd, yf, fenetre = 6, pas = 4) {
   return out;
 }
 
-/**
- * Même suivi, mais horizontal : on avance en x et on cherche le maximum de
- * |dI/dy|. Sert aux pieds de murs, seuils, plinthes, arêtes de plafond — les
- * lignes horizontales du monde, dont l'intersection donne un point de fuite.
- */
+
+
 function traqueGradientH(yd, xd, xf, fenetre = 6, pas = 4) {
   const d = photo.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, W, H).data;
   const lum = (x, y) => {
@@ -452,18 +378,8 @@ function traqueGradientH(yd, xd, xf, fenetre = 6, pas = 4) {
   signe = signe >= 0 ? 1 : -1;
   const out = [];
   const sens = xf > xd ? 1 : -1;
-  /**
-   * Le suivi **prédit** la pente au lieu de chercher autour du point précédent.
-   *
-   * Une plinthe qui fuit vers l'horizon a une pente de 1,8 dans l'image : elle
-   * se déplace de 5,4 px en y pour 3 px en x, presque la limite d'une fenêtre
-   * de ±7 px. Sans prédiction, la recherche est décentrée à chaque pas,
-   * l'erreur s'accumule et le suivi finit sur le mur — mesuré : 36 et 48 px de
-   * résidu sur les deux plinthes de l'appartement ancien.
-   *
-   * La pente est estimée sur les derniers points acceptés, jamais sur un seul :
-   * un point aberrant décalerait la prédiction de tout le reste du suivi.
-   */
+
+
   let pente = 0;
   for (let x = xd * W; sens > 0 ? x <= xf * W : x >= xf * W; x += pas * sens) {
     const prediction = y + pente * pas * sens;
@@ -484,17 +400,8 @@ function traqueGradientH(yd, xd, xf, fenetre = 6, pas = 4) {
   return out;
 }
 
-/**
- * Flèche d'une arête verticale **choisie** — le test décisif de distorsion.
- *
- * On traque l'arête, on lui ajuste une parabole, et on renvoie l'écart de
- * cette parabole à sa corde au milieu. Une droite du monde réel doit donner
- * une flèche de l'ordre du pixel ; au-delà de 3 px sur une arête bien décrite
- * (écart-type d'ajustement faible), l'objectif déforme.
- *
- * À choisir **loin du centre de l'image** — la distorsion radiale ne déplace
- * rien sur l'axe optique — et **la plus longue possible**.
- */
+
+
 function flecheDe(x, y0, y1, fenetre = 6, pas = 4) {
   const pts = traqueGradient(x, y0, y1, fenetre, pas);
   const n = pts.length;
@@ -533,63 +440,12 @@ function flecheDe(x, y0, y1, fenetre = 6, pas = 4) {
   };
 }
 
-/* ------------------------------------------------------------------ */
-/* Diagnostic préalable : cette photo vaut-elle la peine ?             */
-/* ------------------------------------------------------------------ */
 
-/**
- * Les deux frontières mur/sol sont-elles réellement **lisibles** ?
- *
- * C'est la mesure qui manquait. La passe précédente a calibré une photo au
- * résidu de 1,36 px sur son mur gauche, puis a découvert — après le calibrage
- * — que le pied du mur de droite n'était visible nulle part : secrétaire,
- * radiateur, puis un retour de mur. La scène reste `experimental` pour cette
- * seule raison. Aucune des cinq mesures du dépistage ne l'avait vu, parce
- * qu'aucune ne regardait les frontières.
- *
- * Le principe est volontairement bête. Une frontière mur/sol est une arête
- * **horizontale au sens de l'image** : la luminance change franchement quand
- * on descend. On sème donc, colonne par colonne, les maxima du gradient
- * vertical, puis on cherche dans ce semis les droites qui rassemblent le plus
- * de points — par tirages aléatoires, avec une graine fixe pour que deux
- * mesures de la même photo donnent le même chiffre.
- *
- * Quatre droites sont extraites, pas deux : le haut et le bas d'une même
- * plinthe sont deux arêtes franches et quasi parallèles, et se feraient
- * passer pour « deux directions ». On garde donc la meilleure **paire** dont
- * les angles diffèrent assez pour venir de deux murs différents.
- *
- * ————————————————————————————————————————————————————————————————————
- * RÉSULTAT : la mesure ne marche pas. Elle n’entre pas dans le verdict.
- * ————————————————————————————————————————————————————————————————————
- *
- * Éprouvée sur les quatre scènes dont la vérité est connue, elle en classe
- * trois à l’envers :
- *
- *   séjour (validée)              une seule direction, 6,7 deg d’écart
- *   chambre (validée)             sol 23 %, deux directions trouvées
- *   appartement-ancien (validée)  UNE seule droite : « rejeté »
- *   petite-piece (experimental)   « bon », paire à 26,8 deg, fuite plausible
- *
- * Le tracé posé sur l’image dit pourquoi. Sur petite-piece, les quatre
- * droites suivent le plateau du secrétaire, le dessus du radiateur et un
- * cadre accroché au mur — deux d’entre elles ne touchent même pas le sol.
- * Leur « paire à 26,8 deg » et sa fuite à 0,835/0,475, très proche de la
- * vraie, sont une coïncidence. Rien dans la méthode ne contraint une droite
- * à être une frontière mur/sol : le semis de gradient vertical est dominé
- * par le mobilier et les objets accrochés, qui offrent des arêtes plus
- * franches et plus longues que le pied d’un mur.
- *
- * Le résidu et l’étendue étaient bons. Ils décrivaient bien des droites
- * qui ne décrivaient pas la pièce — la même erreur que `trace()` existe
- * pour attraper, refaite un cran plus haut.
- *
- * La fonction reste, dessinable, parce qu’un semis de droites franches est
- * utile pour se repérer sur une photo qu’on découvre. Mais le contour du
- * sol se juge à l’œil, et l’occultation d’un pied de mur se constate à la
- * loupe. C’est ce qui a été fait pour petite-piece, et c’est ce qui a
- * décidé de son statut.
- */
+
+
+
+
+
 function frontieres() {
   const ctx = photo.getContext('2d', { willReadFrequently: true });
   const data = ctx.getImageData(0, 0, W, H).data;
@@ -598,10 +454,10 @@ function frontieres() {
     return 0.2126 * data[p] + 0.7152 * data[p + 1] + 0.0722 * data[p + 2];
   };
 
-  /* 1. Semis : maxima du gradient vertical, colonne par colonne ------- */
-  // La bande part de 0,32 H — au-dessus, on est dans le mur ou la fenêtre —
-  // et descend jusqu'à 0,97 H. Quatre maxima par colonne au plus : le pied du
-  // mur, les deux arêtes d'une plinthe, un bord de meuble.
+
+
+
+
   const semis = [];
   const yHaut = Math.round(H * 0.32);
   const yBas = Math.round(H * 0.97);
@@ -626,8 +482,8 @@ function frontieres() {
     for (const k of gardes) semis.push({ x, y: k.y, force: k.force });
   }
 
-  /* 2. Quatre droites, par tirages à graine fixe ---------------------- */
-  const TOL = 2.0; // px
+
+  const TOL = 2.0;
   let graine = 20260903;
   const tire = (n) => {
     graine = (graine * 1103515245 + 12345) & 0x7fffffff;
@@ -644,7 +500,7 @@ function frontieres() {
     for (let essai = 0; essai < 3000; essai += 1) {
       const a = restants[tire(restants.length)];
       const b = restants[tire(restants.length)];
-      if (Math.abs(a.x - b.x) < W * 0.25) continue; // deux points proches définissent mal une droite
+      if (Math.abs(a.x - b.x) < W * 0.25) continue;
       const dx = b.x - a.x;
       const dy = b.y - a.y;
       const norme = Math.hypot(dx, dy);
@@ -652,7 +508,7 @@ function frontieres() {
       if (!meilleur || inliers.length > meilleur.length) meilleur = inliers;
     }
     if (!meilleur || meilleur.length < 24) break;
-    // Affinage en moindres carrés totaux, puis recomptage sur la droite affinée.
+
     const brut = ajusteDroite(meilleur);
     const proches = restants.filter((p) => Math.abs((p.x - brut.p.x) * brut.d.y - (p.y - brut.p.y) * brut.d.x) < TOL);
     const fin = ajusteDroite(proches);
@@ -669,12 +525,12 @@ function frontieres() {
       xMoyen: +(fin.p.x / W).toFixed(3),
       yMoyen: +(fin.p.y / H).toFixed(3),
     });
-    // On retire les points consommés, avec une marge : sinon la droite
-    // suivante se recale sur le même bord à un pixel près.
+
+
     restants = restants.filter((p) => Math.abs((p.x - fin.p.x) * fin.d.y - (p.y - fin.p.y) * fin.d.x) >= TOL * 2);
   }
 
-  /* 3. La meilleure paire venant de deux murs différents -------------- */
+
   const ecartAngulaire = (a, b) => {
     let e = Math.abs(a.angleDeg - b.angleDeg) % 180;
     return e > 90 ? 180 - e : e;
@@ -683,7 +539,7 @@ function frontieres() {
   for (let i = 0; i < droites.length; i += 1) {
     for (let j = i + 1; j < droites.length; j += 1) {
       const e = ecartAngulaire(droites[i], droites[j]);
-      if (e < 6) continue; // quasi parallèles : même mur, ou deux arêtes d'une plinthe
+      if (e < 6) continue;
       const score = Math.min(droites[i].etendue, droites[j].etendue);
       if (!paire || score > paire.score) paire = { a: droites[i], b: droites[j], ecartDeg: +e.toFixed(1), score };
     }
@@ -706,26 +562,8 @@ function frontieres() {
   };
 }
 
-/**
- * Qualifie une photo **avant** de la calibrer.
- *
- * Ce n'est pas une analyse d'image intelligente, et ça ne prétend pas l'être.
- * Ce sont cinq mesures, chacune avec un seuil, et un verdict qui n'engage
- * qu'un ordre de priorité. La décision reste humaine : une photo « bon
- * candidat » peut donner un rendu laid, et le contraire arrive aussi.
- *
- * Il existe parce qu'une photo a coûté une demi-journée de calibrage avant de
- * révéler une distorsion en barillet qui rendait l'exercice impossible. La
- * mesure qui l'aurait écartée en trente secondes est la **flèche d'arc** : on
- * traque des arêtes verticales franches — jambages de porte, angles de murs —
- * et on regarde de combien elles s'écartent de leur propre droite. Une droite
- * du monde réel doit être droite dans l'image ; si elle bombe, l'objectif
- * déforme et le modèle sténopé de SceneData ne peut pas décrire la scène.
- *
- * Les seuils ne sont pas inventés : ils sont calés sur les scènes déjà
- * validées d'un côté, sur la scène rejetée de l'autre. Voir
- * docs/photo-lens-distortion.md.
- */
+
+
 function diagnostic({ verbeux = false } = {}) {
   const ctx = photo.getContext('2d', { willReadFrequently: true });
   const data = ctx.getImageData(0, 0, W, H).data;
@@ -734,12 +572,12 @@ function diagnostic({ verbeux = false } = {}) {
     return 0.2126 * data[p] + 0.7152 * data[p + 1] + 0.0722 * data[p + 2];
   };
 
-  /* 1. Résolution ---------------------------------------------------- */
+
   const resolution = { largeur: W, hauteur: H, suffisante: W >= 1200 && H >= 800 };
 
-  /* 2. Arêtes verticales : semis automatique par énergie de gradient -- */
-  // On somme |dI/dx| sur la moitié haute de chaque colonne : les jambages et
-  // les angles de murs y ressortent, le sol n'y est pas.
+
+
+
   const energie = new Float32Array(W);
   for (let x = 2; x < W - 2; x += 1) {
     let s = 0;
@@ -752,15 +590,8 @@ function diagnostic({ verbeux = false } = {}) {
   for (let x = 30; x < W - 30; x += 1) {
     if (energie[x] > energie[x - 1] && energie[x] >= energie[x + 1]) candidates.push({ x, e: energie[x] });
   }
-  /**
-   * Les arêtes loin du centre passent d'abord.
-   *
-   * La distorsion radiale déplace les points le long du rayon depuis le centre
-   * optique : une verticale qui passe près de l'axe reste droite, quelle que
-   * soit la force de la distorsion. Trier sur la seule énergie de gradient
-   * revient donc à échantillonner là où il n'y a rien à voir — c'est ainsi que
-   * le couloir, dont un jambage bombe de 7,4 px, a d'abord été mesuré à 1 px.
-   */
+
+
   candidates.forEach((c) => { c.poids = c.e * (0.35 + Math.abs(c.x / W - 0.5) * 1.6); });
   candidates.sort((a, b) => b.poids - a.poids);
   const retenues = [];
@@ -769,35 +600,16 @@ function diagnostic({ verbeux = false } = {}) {
     if (retenues.every((r) => Math.abs(r.x - c.x) > 60)) retenues.push(c);
   }
 
-  /**
-   * Toutes les arêtes traquées ne valent pas mesure.
-   *
-   * Le traqueur suit le minimum de luminance de ligne en ligne : sur un pli de
-   * rideau ou un bord de meuble, il part en promenade et produit un résidu
-   * énorme. Compter ce résidu comme de la distorsion serait faux, et c'est
-   * exactement ce qui a d'abord fait déclarer le séjour — scène de référence —
-   * « mauvais candidat ».
-   *
-   * Deux critères séparent l'arc optique de la dérive :
-   *
-   *   - **rugosité** : la moyenne quadratique des différences secondes du
-   *     tracé. Un arc de distorsion est lisse, sa rugosité est inférieure au
-   *     pixel ; une dérive zigzague et la fait exploser ;
-   *   - **régularité** : un arc de distorsion reste du même côté de la corde
-   *     sur toute sa longueur. Une dérive change de côté.
-   *
-   * Seules les arêtes lisses ET régulières entrent dans le verdict. Les autres
-   * sont conservées dans le détail, marquées « écartée », pour qu'on voie ce
-   * qui a été ignoré plutôt que de le deviner.
-   */
+
+
   const verticales = retenues.map((c) => {
     const pts = traqueGradient(c.x / W, 0.12, 0.66, 6, 4);
     if (pts.length < 16) return null;
     const n = pts.length;
-    // t normalisé sur la longueur suivie, x en pixels : on ajuste x = a·t² + b·t + c.
+
     const T = pts.map((_, i) => i / (n - 1));
     const X = pts.map((p) => p.x * W);
-    // Moindres carrés à trois inconnues, résolus par les équations normales.
+
     let s0 = n; let s1 = 0; let s2 = 0; let s3 = 0; let s4 = 0;
     let y0 = 0; let y1 = 0; let y2 = 0;
     for (let i = 0; i < n; i += 1) {
@@ -817,8 +629,8 @@ function diagnostic({ verbeux = false } = {}) {
     const a = det3(remplace(0)) / D;
     const b = det3(remplace(1)) / D;
     const cc = det3(remplace(2)) / D;
-    // Résidus de la parabole et de la droite : la part expliquée par la
-    // courbure dit si le bombement est réel ou si le suivi a dérivé.
+
+
     let sseQuad = 0;
     for (let i = 0; i < n; i += 1) sseQuad += (X[i] - (a * T[i] * T[i] + b * T[i] + cc)) ** 2;
     const mt = s1 / n;
@@ -829,21 +641,11 @@ function diagnostic({ verbeux = false } = {}) {
     let sseLin = 0;
     for (let i = 0; i < n; i += 1) sseLin += (X[i] - (mx + pente * (T[i] - mt))) ** 2;
     const partCourbure = sseLin > 1e-6 ? 1 - sseQuad / sseLin : 0;
-    // Flèche : écart de la parabole à sa corde, au milieu. |a| / 4.
+
     const fleche = Math.abs(a) / 4;
     const ecartTypeQuad = Math.sqrt(sseQuad / n);
-    /**
-     * Une arête est exploitable quand la parabole **décrit bien** le tracé.
-     *
-     * Rien de plus. Exiger en plus que la courbure explique l'essentiel de
-     * l'écart à la droite serait à l'envers : sur une photo sans distorsion la
-     * ligne est droite, la parabole n'ajoute donc rien au modèle linéaire et
-     * cette part tombe à 0,13. C'est le signe d'une bonne photo, pas d'une
-     * mauvaise mesure — le séjour, scène de référence, était rejeté par ce
-     * critère.
-     *
-     * `partCourbure` reste affichée, à titre d'information.
-     */
+
+
     const retenue = ecartTypeQuad < 1.5;
     return {
       x: +(c.x / W).toFixed(3),
@@ -861,9 +663,9 @@ function diagnostic({ verbeux = false } = {}) {
   const flecheMediane = fleches.length ? fleches[Math.floor(fleches.length / 2)] : null;
   const flecheMax = fleches.length ? fleches[fleches.length - 1] : null;
 
-  /* 3. Champ d'orientation du sol : une fuite est-elle identifiable ? - */
-  // Si une famille de lignes du sol converge, son angle balaie l'image de
-  // façon monotone. On mesure ce balayage et sa régularité.
+
+
+
   const echantillons = [];
   for (let ny = 0.7; ny <= 0.95; ny += 0.06) {
     for (let nx = 0.15; nx <= 0.85; nx += 0.07) {
@@ -873,7 +675,7 @@ function diagnostic({ verbeux = false } = {}) {
   }
   let balayage = null;
   if (echantillons.length >= 8) {
-    // Régression de l'angle sur x, en repliant les angles pour éviter le saut 0/180.
+
     const base = echantillons[0].angle;
     const plie = echantillons.map((e) => {
       let a = e.angle;
@@ -893,9 +695,9 @@ function diagnostic({ verbeux = false } = {}) {
     balayage = { points: n, penteDegParLargeur: +pente.toFixed(1), correlation: +r.toFixed(3) };
   }
 
-  /* 4. Surface de sol : quelle part de la moitié basse est continue ? - */
-  // Blocs de 24 px comparés à la couleur médiane des blocs du bas. C'est une
-  // indication, pas une segmentation : un tapis ou un meuble comptent contre.
+
+
+
   const pas = 24;
   const blocs = [];
   for (let y = Math.round(H * 0.55); y < H - pas; y += pas) {
@@ -923,7 +725,7 @@ function diagnostic({ verbeux = false } = {}) {
   };
 
 
-  /* 5. Verdict ------------------------------------------------------- */
+
   const griefs = [];
   const reserves = [];
   if (!resolution.suffisante) griefs.push(`résolution ${W}×${H} insuffisante`);
@@ -937,34 +739,13 @@ function diagnostic({ verbeux = false } = {}) {
     reserves.push(`balayage angulaire faible (${balayage.penteDegParLargeur}°, r=${balayage.correlation}) — fuite mal contrainte`);
   }
 
-  // Un « BON CANDIDAT » est un resultat de DEPISTAGE, pas une garantie : le
-  // semis automatique peut tomber sur des aretes qui ne bombent pas. Le test
-  // decisif reste flecheDe() sur une arete franche choisie a l oeil, loin du
-  // centre de l image et la plus longue possible.
+
+
+
+
   const verdict = griefs.length ? 'MAUVAIS CANDIDAT' : reserves.length ? 'À VÉRIFIER' : 'BON CANDIDAT';
-  /**
-   * Le classement à quatre niveaux sert à trancher « calibrer ou pas ».
-   *
-   * EXCELLENT est « aucune réserve », BON « une seule », MOYEN « deux ou
-   * plus », REJETÉ « au moins un grief ». Rien de plus.
-   *
-   * Une grille plus exigeante a été essayée — flèche ≤ 1 px, sol ≥ 30 %,
-   * corrélation du balayage ≥ 0,7 — et jetée : elle ne laissait AUCUNE des
-   * cinq scènes validées atteindre EXCELLENT. Des seuils qu’aucun exemple
-   * connu ne franchit ne mesurent rien ; ils déguisent une préférence en
-   * critère. Les quatre niveaux comptent donc les réserves déjà calées sur
-   * le corpus, et rien d’autre.
-   *
-   * Ce dépistage ne sépare pas le bon du mauvais : séjour, pièce claire,
-   * contraste (validées), couloir et petite-piece (experimental) sortent
-   * toutes BON. Il écarte les photos grossièrement inutilisables — c’est
-   * tout ce qu’on lui demande, et c’est déjà ce qui a fait gagner du temps.
-   *
-   * Les frontières mur/sol n’entrent PAS dans ce classement. Voir
-   * `frontieres()` : la mesure existe, elle a été éprouvée sur les scènes
-   * dont on connaît la vérité, et elle s’est révélée non prédictive. Le
-   * contour du sol reste jugé à l’œil.
-   */
+
+
   const large = !reserves.length;
   const classe = griefs.length ? 'REJETÉ' : large ? 'EXCELLENT' : reserves.length <= 1 ? 'BON' : 'MOYEN';
   const bilan = { fichier, classe, verdict, griefs, reserves, resolution, aretes: { traquees: verticales.length, retenues: utiles.length }, flecheMediane, flecheMax, balayage, surface };
@@ -973,36 +754,8 @@ function diagnostic({ verbeux = false } = {}) {
 }
 
 
-/**
- * La frontière mur/sol est-elle MESURABLE ? — dépistage en trente secondes.
- *
- * `diagnostic()` mesure la distorsion, la résolution, la part de sol et le
- * balayage angulaire. Il ne dit rien de ce qui décide vraiment du coût d'une
- * calibration : peut-on relever le bas des murs ? Sa documentation l'assume,
- * parce que la mesure tentée alors — `frontieres()` — cherchait des droites
- * franches n'importe où et se posait volontiers sur un meuble.
- *
- * Ici, deux principes appris à la calibration de la chambre parisienne :
- *
- *   1. on relève la marche la plus franche de chaque colonne dans le tiers
- *      bas, en luminance ET en teinte — un mur bleu sur un sol de chêne ne
- *      change pas de clarté, il change de teinte, et c'est ce relevé-là qui
- *      a débloqué cette scène ;
- *   2. on cherche les plus longues SÉRIES DE COLONNES VOISINES dont les
- *      points sont alignés. Un mur donne une série continue ; un semis de
- *      bords de meubles n'en donne pas. Une première version de cette
- *      fonction découpait l'image en deux moitiés fixes : elle déclarait
- *      « aucune frontière mesurable » sur la chambre parisienne, dont les
- *      deux plinthes sont pourtant droites à 1 px — parce qu'une moitié
- *      d'image contient trois murs différents, pas un.
- *
- * Deux séries longues et non parallèles = deux directions du sol =
- * quadrilatère prouvable. Une seule = il faudra une autre source pour la
- * seconde direction (joints du sol, ligne de plafond, chevron), ou écarter.
- *
- * Ne remplace pas le regard : une photo mesurable peut être laide, et une
- * carte d'inspiration se juge aussi à l'œil.
- */
+
+
 function mesurabilite({ pas = 0.01, basse = 0.5, haute = 0.995, forceMin = 18, tol = 2.5, longMin = 0.1 } = {}) {
   const ctx = photo.getContext('2d', { willReadFrequently: true });
   const data = ctx.getImageData(0, 0, W, H).data;
@@ -1015,7 +768,7 @@ function mesurabilite({ pas = 0.01, basse = 0.5, haute = 0.995, forceMin = 18, t
     return data[p] - data[p + 2];
   };
 
-  /* 1. Marche la plus franche de chaque colonne. */
+
   const pts = [];
   for (let nx = 0.01; nx <= 0.99; nx += pas) {
     const x = nx * W;
@@ -1034,11 +787,11 @@ function mesurabilite({ pas = 0.01, basse = 0.5, haute = 0.995, forceMin = 18, t
     if (bestY !== null && force >= forceMin) pts.push({ x, y: bestY, nx: +nx.toFixed(3), ny: +(bestY / H).toFixed(4), force: +force.toFixed(1) });
   }
 
-  /* 2. Plus longues séries de colonnes voisines alignées. */
+
   const series = [];
   for (let i = 0; i < pts.length; i += 1) {
     for (let j = pts.length - 1; j > i + 5; j -= 1) {
-      // Colonnes voisines : pas de trou de plus de trois pas dans la série.
+
       let continu = true;
       for (let k = i; k < j; k += 1) if (pts[k + 1].nx - pts[k].nx > pas * 3.5) { continu = false; break; }
       if (!continu) continue;
@@ -1055,13 +808,13 @@ function mesurabilite({ pas = 0.01, basse = 0.5, haute = 0.995, forceMin = 18, t
         pente: +(fit.d.y / fit.d.x).toFixed(4),
         yDe: seg[0].ny, yA: seg[seg.length - 1].ny,
       });
-      break; // la plus longue série partant de i suffit
+      break;
     }
   }
   series.sort((a, b) => b.etendue - a.etendue);
 
-  /* 3. Deux séries retenues : la plus longue, puis la plus longue qui ne la
-        recouvre pas et dont la pente diffère — deux murs, pas deux fois un. */
+
+
   const retenues = [];
   for (const s of series) {
     if (!retenues.length) { retenues.push(s); continue; }

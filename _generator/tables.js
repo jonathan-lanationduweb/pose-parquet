@@ -1,4 +1,3 @@
-/** Préserve le tableau sémantique et nomme les cellules des tableaux larges. */
 function responsiveTables(html) {
   return html.replace(/<table\b([^>]*class="[^"]*\btable-compare\b[^"]*"[^>]*)>([\s\S]*?)<\/table>/g, (table, attrs, body) => {
     const head = body.match(/<thead\b[^>]*>([\s\S]*?)<\/thead>/i);

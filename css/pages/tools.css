@@ -1,13 +1,8 @@
-/* Pages outils */
 .tool-hero { padding-block: var(--sp-6) var(--sp-5); }
 .tool-hero h1 { max-width: 16ch; }
 .tool-shell { padding-bottom: var(--sp-8); }
 .tools-roadmap { margin-top: var(--sp-8); }
 .tools-roadmap ol { display: grid; gap: var(--sp-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); list-style: none; padding: 0; }
-
-/* Feuille de route des outils : lisible, sans effet machine à écrire */
-
-/* Onglets de l'outil (visualiseur / mode plan) */
 .tool-tabs .tabs__list { margin-bottom: clamp(1.25rem, 1rem + 1vw, 2rem); }
 .tool-tabs .tabs__panel { margin-top: 0; }
 .plan-mode__head { display: grid; gap: var(--sp-5); margin-bottom: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
@@ -15,8 +10,6 @@
   .plan-mode__head { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: end; gap: clamp(2rem, 4vw, 4rem); }
 }
 .plan-mode__head h2 { max-width: 15ch; }
-
-/* Feuille de route : liste sobre, pas de cartes */
 .roadmap {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
@@ -34,8 +27,6 @@
   color: var(--text-muted);
 }
 .roadmap__item strong { font-size: 1rem; font-weight: 600; color: var(--text); }
-
-/* Landing du Studio : la démonstration vaut mieux qu'un paragraphe */
 .landing-hero { padding-block: clamp(1.5rem, 1rem + 3vw, 3rem) 0; }
 .landing-hero__grid { display: grid; gap: clamp(1.5rem, 1rem + 3vw, 3.5rem); align-items: center; }
 @media (min-width: 62rem) {
@@ -64,8 +55,6 @@
 }
 .landing-hero__facts b { font-family: var(--font-display); font-size: 1.5rem; color: var(--text); margin-right: 0.3rem; }
 .landing-hero__demo { min-width: 0; }
-
-/* ---------- Page Outils : un outil principal, un outil complémentaire ---------- */
 .page-hero--tools { padding-bottom: clamp(1.25rem, 0.75rem + 1.5vw, 2.5rem); }
 .tool-main {
   display: grid;
@@ -93,8 +82,6 @@
 }
 .tool-main__points li { display: grid; gap: 0.15rem; font-size: var(--fs-sm); color: var(--text-soft); }
 .tool-main__points strong { font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; color: var(--text); }
-
-/* Titre de section : taille H2, comme partout (hiérarchie lisible par Google). */
 .tool-block--secondary .tool-block__title { font-size: var(--fs-h2); }
 
 .tools-next__inner { display: grid; gap: var(--sp-5); }

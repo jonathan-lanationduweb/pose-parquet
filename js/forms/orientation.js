@@ -1,46 +1,15 @@
-/**
- * La fin du parcours « Décrivez votre projet » : une ORIENTATION, pas un
- * accusé de réception.
- *
- * Pose-Parquet n'est pas une troisième entreprise qui reçoit des demandes et
- * rappelle : il comprend le projet, puis montre vers qui se tourner.
- *
- *   parquet                         → Premibel
- *   pose / rénovation, Île-de-France → Allure Design
- *   parquet + pose, Île-de-France    → Premibel ET Allure Design
- *   le reste                         → une précision, jamais un envoi au hasard
- *
- * La destination elle-même est décidée ailleurs, par la règle validée
- * (`destinationRecommandee`, js/forms/lead-context.js). Ce module ne fait que
- * la PRÉSENTER : textes, ordre des étapes, liens. Il est pur — aucun DOM —
- * pour être contrôlé par _generator/check-orientation.js.
- *
- * Vocabulaire : « nous vous orientons vers », jamais « votre demande a été
- * transmise », « nous vous rappellerons » ni « X vous contactera ». Aucune
- * demande ne part chez Premibel ou Allure Design : le visiteur y va lui-même,
- * par un lien. Écrire le contraire serait une promesse que personne ne tient.
- */
 import { DEVIS as ALLURE_DEVIS } from '../commerce/allure.js';
 
-/** La zone d'Allure Design, dans une phrase (« à Paris et en Île-de-France »). */
+
 const A_LA_ZONE = 'à Paris et en Île-de-France';
 import { urlPremibel } from '../commerce/premibel-hotes.js';
 
-/**
- * Le catalogue Premibel (vérifié le 06/10/2026 : « Parquet Massif & Contrecollé :
- * Achat en Ligne »). Adresse de REPLI seulement : la page /projet/ fournit
- * l'adresse générale réglée dans WordPress (Mon site → Liens commerciaux),
- * c'est elle qui sert quand aucune référence précise n'est connue.
- */
+
+
 export const PREMIBEL_CATALOGUE = 'https://www.premibel.fr/parquet/';
 
-/**
- * Les liens commerciaux réglés dans WordPress, lus sur la page (attributs
- * data-* du formulaire, écrits par le build depuis Mon site). Une adresse qui
- * n'est pas sur un domaine Premibel officiel est ignorée.
- *
- * @param {{premibelUrl?:string, premibelActif?:boolean, allureActif?:boolean}} [l]
- */
+
+
 function liensRegles(l = {}) {
   return {
     premibelUrl: urlPremibel(l.premibelUrl || '') || PREMIBEL_CATALOGUE,
@@ -49,7 +18,7 @@ function liensRegles(l = {}) {
   };
 }
 
-/** Libellés lisibles des réponses du formulaire (project-form.config.js). */
+
 export const LIBELLES = {
   besoin: {
     produit: 'Trouver un parquet',
@@ -85,19 +54,15 @@ export const LIBELLES = {
   },
 };
 
-/**
- * Le parquet choisi dans le Visualiseur, s'il a une fiche Premibel.
- * L'adresse n'est retenue que si elle est sur un domaine Premibel officiel.
- *
- * @param {{id?:string, nom?:string, url?:string, motif?:string}|null} produit
- */
+
+
 function produitPremibel(produit) {
   if (!produit || !produit.id) return null;
   const url = urlPremibel(produit.url || '');
   return url ? { ...produit, url } : null;
 }
 
-/** Bloc « Premibel » : une référence précise si on la connaît, l'adresse générale sinon. */
+
 function etapePremibel({ numero, produit, titre, liens, mixte = false }) {
   const p = produitPremibel(produit);
   return {
@@ -109,7 +74,7 @@ function etapePremibel({ numero, produit, titre, liens, mixte = false }) {
       ? 'La référence que vous avez essayée dans le Visualiseur est vendue par Premibel : sa fiche donne le prix, les dimensions et la disponibilité.'
       : 'D’après vos réponses, votre besoin concerne d’abord le choix du parquet. Premibel vend les références que vous pouvez essayer dans le Visualiseur.',
     produit: p ? { id: p.id, sku: p.sku || p.id, nom: p.nom || p.id, motif: p.motif || null, vignette: p.vignette || null } : null,
-    // Lien masqué si Premibel est désactivé dans Mon site : le rôle reste dit, sans lien.
+
     cta: !liens.premibelActif
       ? null
       : p
@@ -118,7 +83,7 @@ function etapePremibel({ numero, produit, titre, liens, mixte = false }) {
   };
 }
 
-/** Bloc « Allure Design » : la pose et la rénovation, en Île-de-France seulement. */
+
 function etapeAllure({ numero, titre, liens }) {
   return {
     numero,
@@ -126,29 +91,20 @@ function etapeAllure({ numero, titre, liens }) {
     entreprise: 'Allure Design',
     titre: titre || 'Faire poser ou rénover',
     texte: `Pose de parquet, rénovation et aménagement intérieur, ${A_LA_ZONE}. Leur page de demande de devis vous permet de décrire le chantier directement.`,
-    // La page de devis officielle (vérifiée le 06/10/2026 : « Demande de Devis | Allure Design »).
+
     cta: liens.allureActif ? { libelle: 'Continuer avec Allure Design', url: ALLURE_DEVIS } : null,
   };
 }
 
-/**
- * Ce que l'écran de fin doit montrer.
- *
- * @param {object} p
- * @param {string} p.destination  premibel | allure_design | mixed | undetermined
- * @param {string} p.besoin       besoin RETENU (lead_need)
- * @param {boolean} p.idf         département en Île-de-France
- * @param {object|null} [p.produit] { id, sku, nom, url, motif, vignette } venu du Visualiseur
- * @param {object} [p.liens]        liens commerciaux réglés dans WordPress (Mon site)
- * @returns {{destination:string, titre:string, intro:string, etapes:object[], note:string|null, prochaine:string, preciser:boolean}}
- */
+
+
 export function orientation({ destination, besoin, idf, produit = null, liens: reglages } = {}) {
   const liens = liensRegles(reglages);
   switch (destination) {
     case 'premibel': {
-      // Parquet + pose hors Île-de-France : la règle validée oriente vers le
-      // produit, et la pose reste à trouver. On le dit, au lieu de laisser
-      // croire que tout le projet est couvert.
+
+
+
       const poseHorsZone = besoin === 'produit-pose' && !idf;
       return {
         destination,
@@ -191,11 +147,8 @@ export function orientation({ destination, besoin, idf, produit = null, liens: r
       };
 
     default: {
-      /*
-       * Rien de certain : on n'envoie pas au hasard. On explique ce qui
-       * manque, et on ne propose que ce qui est vrai pour CE projet : Allure
-       * Design n'apparaît que si le chantier est en Île-de-France.
-       */
+
+
       const horsZone = (besoin === 'pose' || besoin === 'renovation') && !idf;
       const etapes = [etapePremibel({ numero: 1, produit, titre: 'Si vous cherchez d’abord un parquet', liens })];
       if (idf && !horsZone) etapes.push(etapeAllure({ numero: 2, titre: 'Si vous cherchez un poseur', liens }));
@@ -207,7 +160,7 @@ export function orientation({ destination, besoin, idf, produit = null, liens: r
           : 'Vous n’avez pas encore tranché entre le parquet et la pose. Selon ce que vous cherchez d’abord, voici vers qui vous tourner — ou précisez votre besoin.',
         etapes,
         note: null,
-        // Ce que le visiteur peut faire MAINTENANT, selon ce qu'il a répondu.
+
         prochaine: horsZone
           ? 'Pour la pose, adressez-vous à un poseur de votre région. Pour le parquet, Premibel.'
           : 'Précisez ce que vous cherchez d’abord — le parquet ou la pose — pour obtenir une orientation nette.',
@@ -217,12 +170,8 @@ export function orientation({ destination, besoin, idf, produit = null, liens: r
   }
 }
 
-/**
- * Récapitulatif du projet : seulement les réponses connues et parlantes.
- * « Je ne sais pas » et les champs vides n'apparaissent pas.
- *
- * @returns {{libelle:string, valeur:string}[]}
- */
+
+
 export function recapitulatif({ besoin, piece, surface, parquet, orientation: sens, produitNom, motif, angle, departement, region, idf, delai } = {}) {
   const lignes = [];
   const ajouter = (libelle, valeur) => { if (valeur) lignes.push({ libelle, valeur }); };
@@ -237,10 +186,8 @@ export function recapitulatif({ besoin, piece, surface, parquet, orientation: se
   return lignes;
 }
 
-/**
- * Lien de retour vers le Visualiseur, avec la configuration préparée.
- * Jamais la photo : elle n'a pas quitté le navigateur, il n'y a rien à reprendre.
- */
+
+
 export function lienVisualiseur(base, { sceneId, productId, pattern, angle } = {}) {
   const params = new URLSearchParams();
   if (sceneId) params.set('piece', sceneId);
@@ -251,15 +198,13 @@ export function lienVisualiseur(base, { sceneId, productId, pattern, angle } = {
   return `${base}outils/studio.html${q ? `?${q}` : ''}`;
 }
 
-/** Nom de l'événement d'un clic sortant, selon l'entreprise visée. */
+
 export function evenementClic(cible) {
   return cible === 'premibel' ? 'click_premibel' : 'click_allure_design';
 }
 
-/**
- * Contexte NON PERSONNEL d'un clic sortant, pour mesurer le parcours
- * Entrée → Visualiseur → Projet → orientation → clic.
- */
+
+
 export function contexteClic({ cible, besoin, destination, produit, motif, origine, idf, page }) {
   const p = produitPremibel(produit);
   const details = { contexte: 'orientation', page: page || '/projet/', besoin: besoin || '', destination: destination || '', motif: motif || '', origine: origine || '', idf: idf === true ? 'oui' : idf === false ? 'non' : '' };

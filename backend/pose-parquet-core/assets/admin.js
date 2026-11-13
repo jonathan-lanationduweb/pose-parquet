@@ -1,14 +1,3 @@
-/**
- * Pose Parquet — le seul script de l'administration.
- *
- * 1. Choisir une image dans la médiathèque de WordPress (couverture d'un
- *    contenu, fond de la page de maintenance). Téléverser, choisir, remplacer,
- *    retirer : tout se fait dans la fenêtre de la médiathèque elle-même.
- * 2. Les comportements du socle commun (comme Expert Parquet) : compteur de
- *    caractères du référencement (data-adm-compteur) et confirmation des
- *    interrupteurs (data-adm-confirmer).
- * 3. L'invite du champ de recherche des listes (« Rechercher un guide… »).
- */
 (function () {
   'use strict';
   var t = window.ppAdmin || {};
@@ -94,11 +83,8 @@
     });
   });
 
-  /*
-   * Publier le site : le clic désactive le bouton (pas de double envoi).
-   * Pendant une publication, la page se recharge toutes les trois secondes —
-   * c'est le serveur qui relit l'état. Aucun appel réseau dans ce script.
-   */
+
+
   document.querySelectorAll('[data-pp-publier]').forEach(function (form) {
     form.addEventListener('submit', function () {
       var b = form.querySelector('button');
@@ -109,12 +95,8 @@
     setTimeout(function () { window.location.reload(); }, 3000);
   }
 
-  /*
-   * Corps non modifié → le serveur garde l'original (Edition::corps_inchange).
-   * L'éditeur visuel réécrit le HTML qu'il charge : sans ce signal, changer un
-   * résumé transformait aussi le corps. Onglet Visuel : TinyMCE sait s'il a
-   * été modifié ; onglet Code : on compare au texte chargé.
-   */
+
+
   var formulaireArticle = document.getElementById('post');
   var corps = document.getElementById('content');
   if (formulaireArticle && corps && document.querySelector('input[name="pp_contenu_nonce"]')) {
@@ -134,11 +116,8 @@
     });
   }
 
-  /*
-   * Sections d'une page (En-tête, passerelle, projet…) : repliables, comme
-   * les longs formulaires du socle. Ouvertes par défaut ; un vrai bouton dans
-   * la légende, donc au clavier et annoncé (aria-expanded).
-   */
+
+
   document.querySelectorAll('fieldset.adm-structure > legend').forEach(function (legende) {
     var section = legende.parentNode;
     var bouton = document.createElement('button');

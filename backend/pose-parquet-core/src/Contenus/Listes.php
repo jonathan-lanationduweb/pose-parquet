@@ -1,16 +1,6 @@
 <?php
-/**
- * Les listes de contenus, comme la maquette : la liste de WordPress, avec les
- * colonnes Titre, Image, Catégorie, État, Date et un lien « Modifier ».
- *
- * Les filtres Tous / Publiés / Brouillons, la recherche, les actions groupées
- * et la pagination sont ceux de WordPress. On y ajoute un seul filtre :
- * « Image manquante », pour voir d'un coup d'œil les contenus incomplets.
- *
- * Pages du site : à la place de la date de création, l'adresse sur le site et
- * la date de dernière modification — ce qu'on cherche en ouvrant cette liste.
- * Vignettes et badges : composants du socle commun (adm-vignette, adm-badge).
- */
+
+
 
 declare(strict_types=1);
 
@@ -36,10 +26,10 @@ final class Listes {
 		add_filter( 'display_post_states', [ self::class, 'sans_etat_en_titre' ], 10, 2 );
 	}
 
-	/** @param array<string,string> $colonnes */
+
 	public static function colonnes( array $colonnes ): array {
-		$type = isset( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		// L'image d'abord, puis le titre (et ses actions discrètes au survol).
+		$type = isset( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : '';
+
 		$out = [ 'cb' => $colonnes['cb'] ?? '<input type="checkbox" />' ];
 		if ( Types::avec_couverture( $type ) ) {
 			$out['pp_image'] = __( 'Image', 'pose-parquet-core' );
@@ -48,13 +38,13 @@ final class Listes {
 		if ( Types::taxonomie( $type ) ) {
 			$out['pp_categorie'] = __( 'Catégorie', 'pose-parquet-core' );
 		}
-		// Un tutoriel : le temps, le niveau, le nombre d'outils.
+
 		if ( $type === Types::TUTORIEL ) {
 			$out['pp_duree']  = __( 'Temps', 'pose-parquet-core' );
 			$out['pp_niveau'] = __( 'Niveau', 'pose-parquet-core' );
 			$out['pp_outils'] = __( 'Outils', 'pose-parquet-core' );
 		}
-		// Une inspiration se lit d'un coup d'œil : pièce, motif, teinte, parquet, et le lien vers le Studio.
+
 		if ( $type === Types::INSPIRATION ) {
 			$out['pp_piece']   = __( 'Pièce', 'pose-parquet-core' );
 			$out['pp_motif']   = __( 'Motif', 'pose-parquet-core' );
@@ -68,7 +58,7 @@ final class Listes {
 		} elseif ( $type !== Types::INSPIRATION ) {
 			$out['pp_date'] = __( 'Date', 'pose-parquet-core' );
 		}
-		// Pages : « Modifier » en toutes lettres (on n'y crée rien, on modifie). Ailleurs, les actions de ligne suffisent.
+
 		if ( $type === Types::PAGE ) {
 			$out['pp_modifier'] = '<span class="screen-reader-text">' . esc_html__( 'Modifier', 'pose-parquet-core' ) . '</span>';
 		}
@@ -110,7 +100,7 @@ final class Listes {
 				break;
 			case 'pp_outils':
 				$outils = array_filter( array_map( 'trim', preg_split( '/\R/', (string) get_post_meta( $post_id, '_pp_outils', true ) ) ?: [] ) );
-				echo $outils ? esc_html( sprintf( /* translators: %d : nombre */ _n( '%d outil', '%d outils', count( $outils ), 'pose-parquet-core' ), count( $outils ) ) ) : '<span class="adm-discret">—</span>';
+				echo $outils ? esc_html( sprintf(   _n( '%d outil', '%d outils', count( $outils ), 'pose-parquet-core' ), count( $outils ) ) ) : '<span class="adm-discret">—</span>';
 				break;
 			case 'pp_motif':
 				$libelle = (string) get_post_meta( $post_id, '_pp_motif_libelle', true );
@@ -126,7 +116,7 @@ final class Listes {
 				echo $parquet !== '' ? '<span class="adm-discret">' . esc_html( $parquet ) . '</span>' : '—';
 				break;
 			case 'pp_studio':
-				// Le même lien que celui généré dans l'écran d'édition, ouvert sur le site public.
+
 				$scene = (string) get_post_meta( $post_id, '_pp_scene', true );
 				if ( get_post_meta( $post_id, '_pp_studio', true ) === '1' && $scene !== '' ) {
 					$args = [ 'piece' => $scene ];
@@ -150,7 +140,7 @@ final class Listes {
 					'private' => [ __( 'Privé', 'pose-parquet-core' ), 'neutre' ],
 				];
 				[ $libelle, $classe ] = $etats[ $post->post_status ] ?? [ $post->post_status, 'neutre' ];
-				echo \PoseParquet\Core\Admin\Socle::badge( $libelle, $classe ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe.
+				echo \PoseParquet\Core\Admin\Socle::badge( $libelle, $classe );
 				break;
 			case 'pp_date':
 				echo esc_html( date_i18n( 'j M Y', strtotime( $post->post_date ) ) );
@@ -170,9 +160,9 @@ final class Listes {
 		}
 	}
 
-	/** Le filtre « Image manquante », à la suite de Tous / Publiés / Brouillons. */
+
 	public static function vues( array $vues ): array {
-		$type = isset( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$type = isset( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : '';
 		if ( ! Types::avec_couverture( $type ) ) {
 			return $vues;
 		}
@@ -180,7 +170,7 @@ final class Listes {
 		if ( $n === 0 ) {
 			return $vues;
 		}
-		$actif = isset( $_GET[ self::FILTRE_IMAGE ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$actif = isset( $_GET[ self::FILTRE_IMAGE ] );
 		$url   = add_query_arg( [ 'post_type' => $type, self::FILTRE_IMAGE => 'manquante' ], admin_url( 'edit.php' ) );
 		$vues['pp_image'] = '<a href="' . esc_url( $url ) . '"' . ( $actif ? ' class="current" aria-current="page"' : '' ) . '>' . esc_html__( 'Image manquante', 'pose-parquet-core' ) . ' <span class="count">(' . (int) $n . ')</span></a>';
 		return $vues;
@@ -194,17 +184,17 @@ final class Listes {
 		if ( ! is_string( $type ) || ! in_array( $type, Types::all(), true ) ) {
 			return;
 		}
-		if ( $type === Types::PAGE && ! isset( $_GET['orderby'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			// Les pages dans l'ordre du site : Accueil d'abord.
+		if ( $type === Types::PAGE && ! isset( $_GET['orderby'] ) ) {
+
 			$q->set( 'orderby', [ 'menu_order' => 'ASC', 'title' => 'ASC' ] );
 		}
-		if ( isset( $_GET[ self::FILTRE_IMAGE ] ) && Types::avec_couverture( $type ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET[ self::FILTRE_IMAGE ] ) && Types::avec_couverture( $type ) ) {
 			$ids = Images::sans_image( $type );
 			$q->set( 'post__in', $ids ? $ids : [ 0 ] );
 		}
 	}
 
-	/** Lignes : Modifier et Corbeille. Pas de « Modification rapide » ni d'aperçu (aucune page publique ici). */
+
 	public static function actions_de_ligne( array $actions, \WP_Post $post ): array {
 		if ( ! in_array( $post->post_type, Types::all(), true ) ) {
 			return $actions;
@@ -216,7 +206,7 @@ final class Listes {
 		return $actions;
 	}
 
-	/** La corbeille, seule action destructive, en dernier : Modifier · Aperçu · Dupliquer · Corbeille (après Apercu, priorité 20). */
+
 	public static function corbeille_en_dernier( array $actions, \WP_Post $post ): array {
 		if ( in_array( $post->post_type, Types::all(), true ) && isset( $actions['trash'] ) ) {
 			$corbeille = $actions['trash'];
@@ -226,7 +216,7 @@ final class Listes {
 		return $actions;
 	}
 
-	/** L'état est dans sa colonne : pas de « — Brouillon » accolé au titre. */
+
 	public static function sans_etat_en_titre( array $etats, \WP_Post $post ): array {
 		return in_array( $post->post_type, Types::all(), true ) ? [] : $etats;
 	}

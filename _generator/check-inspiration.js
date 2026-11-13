@@ -1,47 +1,3 @@
-/**
- * Vérificateur du contrat Inspiration → Studio.
- *
- *   node _generator/check-inspiration.js
- *
- * Il existe parce qu'une page a un jour affiché huit cartes « Essayer ce
- * style » dont AUCUNE n'ouvrait la pièce montrée. Le défaut n'était pas une
- * faute de frappe : rien, dans le code, ne rapprochait la photo de la carte
- * de la photo de la scène. Ce fichier est ce rapprochement, et il est exécuté
- * par `build.js` avant d'écrire la page — un oubli ne peut donc pas passer.
- *
- * Ce qu'il vérifie, pour chaque carte qui se déclare essayable :
- *
- *   1. `sceneId` est renseigné ;
- *   2. la scène existe dans le manifeste ;
- *   3. sa géométrie ET son rendu sont validés (c'est la règle de publication
- *      du Visualiseur, pas une règle propre à cette page) ;
- *   4. `scene.file` est exactement `${carte.image}.jpg` — la carte montre la
- *      photographie que le Studio ouvrira ;
- *   5. les fichiers existent sur le disque, en original et dans la plus
- *      petite déclinaison réactive : sans quoi la carte afficherait un cadre
- *      vide, ou un `srcset` pointant sur un fichier absent ;
- *   6. `config` ne nomme que des produits et des motifs du catalogue, et une
- *      orientation que le Visualiseur accepte ;
- *   7. la scène est **réellement chargeable** par le Studio : son fichier JSON
- *      se lit, il déclare ce que le moteur consomme — image avec dimensions,
- *      plan avec quadrilatère et mètres, zone avec contour — et les
- *      déclinaisons d'image que le Studio demande existent, dont la 1120 qu'il
- *      charge sous 600 px de fenêtre ;
- *   8. l'adresse produite est celle qu'on croit : mêmes paramètres que
- *      `config`, et `piece` égal à `sceneId`.
- *
- * Le point 7 vient d'un rapport d'essai réel : deux cartes déclarées
- * essayables n'ouvraient pas leur pièce. Le contrat image = image était
- * respecté, la scène était publiable — et le Studio restait sur son écran
- * d'accueil, parce que son démarrage exigeait que le manifeste connaisse la
- * scène et ne disait rien quand ce n'était pas le cas. Vérifier le contrat
- * des données ne suffit pas : il faut vérifier que le chemin de chargement
- * aboutit.
- *
- * `visualizerAvailable: true` signifie donc « essayable », pas « on aimerait ».
- * Une scène en cours de calibration se déclare `false` : la carte reste une
- * inspiration, sans pastille, et personne n'a menti.
- */
 const fs = require('fs');
 const path = require('path');
 const { PHOTOS, INSPIRATION_PHOTOS } = require('./photos');
@@ -52,29 +8,12 @@ const lire = (p) => JSON.parse(fs.readFileSync(path.join(RACINE, p), 'utf8'));
 
 const ORIENTATIONS = [0, 90, 45, -45];
 
-/**
- * Plancher du nombre de cartes essayables.
- *
- * Une carte cesse d'être essayable sans bruit : il suffit qu'une scène soit
- * rétrogradée à la revue, ou qu'un `sceneId` passe à null. Le mécanisme est
- * fait pour ça — mieux vaut une carte muette qu'un faux lien — mais il rend
- * la perte invisible. Ce plancher la rend visible : il vaut le nombre atteint
- * au dernier lot, et la vérification échoue si l'on descend en dessous.
- *
- * À RELEVER quand une inspiration de plus devient essayable, jamais à
- * baisser pour faire passer la vérification. Le jour où les huit y sont, ce
- * nombre vaut 8 et la garde interdit tout retour en arrière.
- */
+
+
 const ESSAYABLES_MINIMUM = 8;
 
-/**
- * L'adresse que `build.js` produira pour cette carte.
- *
- * Dupliquer la construction serait le meilleur moyen de la voir divorcer du
- * générateur ; elle est donc écrite ici sous la même forme, et le contrôle
- * compare ses paramètres à `config`. Si les deux versions divergent un jour,
- * c'est la comparaison qui le dira.
- */
+
+
 function adresseStudio(carte) {
   const c = carte.config || {};
   const params = [
@@ -86,16 +25,8 @@ function adresseStudio(carte) {
   return `../outils/studio.html?${params}`;
 }
 
-/**
- * La scène est-elle chargeable par le Studio ? Rend la liste des griefs.
- *
- * On lit le fichier comme le Studio le lit, et on vérifie ce que le moteur
- * consomme réellement : le quadrilatère et les mètres du plan (c'est d'eux
- * que sort l'homographie), le contour de chaque zone, l'image et ses
- * dimensions. Puis les fichiers image, dont la déclinaison 1120 que
- * `openRoom` demande quand la fenêtre fait moins de 600 px : son absence
- * casserait le mobile sans que rien d'autre le signale.
- */
+
+
 function chargeable(sceneId, entree) {
   const griefs = [];
   let scene;
@@ -145,19 +76,8 @@ function verifie() {
       erreurs.push(`${nom} : aucun champ \`image\`.`);
       continue;
     }
-    /*
-     * La carte et sa photographie doivent désigner le même cliché.
-     *
-     * POURQUOI. Deux cartes avaient gardé l'identifiant Pexels de l'image
-     * précédente après un remplacement — le champ `image` avait changé, le
-     * champ `id` non. Personne ne l'a vu, parce que la page d'inspiration
-     * affiche `image` : elle était juste. Mais `fetch-photos.js` téléchargeait
-     * la vignette `inspi-N` d'après `id`, et le carrousel de l'accueil montrait
-     * donc une autre pièce que la carte, sous la légende de la carte. Le
-     * crédit publié dans CREDITS.md était celui du mauvais photographe.
-     *
-     * Le contrôle est bête et suffit : les deux champs doivent concorder.
-     */
+
+
     const source = PHOTOS[carte.image];
     if (!source) {
       erreurs.push(`${nom} : \`image\` vaut « ${carte.image} », absent de PHOTOS.`);
@@ -176,8 +96,8 @@ function verifie() {
       }
     }
 
-    // Toute carte, essayable ou non, doit afficher un fichier qui existe —
-    // l'original et chacune des largeurs annoncées dans le srcset.
+
+
     const fichiers = [`${carte.image}.jpg`, ...widthsFor(carte.image).map((w) => `${carte.image}-${w}.jpg`)];
     for (const fichier of fichiers) {
       if (!fs.existsSync(path.join(RACINE, 'assets/images', fichier))) {
@@ -225,10 +145,10 @@ function verifie() {
     if (c.orientation !== undefined && !ORIENTATIONS.includes(c.orientation)) {
       erreurs.push(`${nom} : orientation ${c.orientation} non acceptée (${ORIENTATIONS.join(', ')}).`);
     }
-    /* La scène se charge-t-elle vraiment ? */
+
     for (const grief of chargeable(carte.sceneId, scene)) erreurs.push(`${nom} : ${grief}`);
 
-    /* L'adresse produite est-elle celle qu'on croit ? */
+
     const url = adresseStudio(carte);
     const p = new URLSearchParams(url.split('?')[1] || '');
     if (p.get('piece') !== carte.sceneId) erreurs.push(`${nom} : l'adresse produite ouvre « ${p.get('piece')} » et non « ${carte.sceneId} ».`);
@@ -248,24 +168,12 @@ function verifie() {
     );
   }
 
-  /*
-   * Contrôle 9 : TOUTE scène publiable du manifeste se charge, pas seulement
-   * celles qu'une carte d'inspiration ouvre.
-   *
-   * Deux fichiers de scène ont été écrits avec `planes` fermé par un crochet
-   * au lieu d'une accolade, à deux passes différentes. Le JSON ne se parse
-   * plus, le Studio échoue au chargement, et rien ne le disait : le fichier
-   * existe, le manifeste le déclare, la carte pointe dessus. Le premier des
-   * deux a été trouvé à la main après un rendu vide ; le second aurait pu
-   * partir en production. Une scène proposée dans « Changer de pièce » n'est
-   * couverte par aucun autre contrôle — celui-ci la couvre.
-   *
-   * Le coût est nul : c'est un `JSON.parse` par scène.
-   */
+
+
   for (const entree of manifeste.scenes || []) {
     const publiable = entree.geometryStatus === 'validated' && entree.visualStatus === 'validated';
     if (!publiable) continue;
-    if (lignes.some((l) => l[2] === entree.id)) continue; // déjà vérifiée plus haut
+    if (lignes.some((l) => l[2] === entree.id)) continue;
     for (const grief of chargeable(entree.id, entree)) {
       erreurs.push(`scène « ${entree.id} » (manifeste, hors carte) : ${grief}`);
     }
@@ -274,7 +182,7 @@ function verifie() {
   return { erreurs, lignes, essayables };
 }
 
-/** Utilisé par build.js : jette si le contrat est rompu. */
+
 function exigeCoherence() {
   const { erreurs } = verifie();
   if (erreurs.length) {

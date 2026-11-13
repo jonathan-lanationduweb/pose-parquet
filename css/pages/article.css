@@ -1,4 +1,3 @@
-/* Gabarit éditorial : guide, tutoriel, page motif */
 .article-header {
   padding-block: clamp(1.5rem, 1rem + 2vw, 3rem) clamp(2rem, 1.5rem + 2vw, 3.5rem);
 }
@@ -18,8 +17,6 @@
   aspect-ratio: 16 / 7;
 }
 .article-cover img { width: 100%; height: 100%; object-fit: cover; }
-
-/* Colonne de lecture centrée dans un conteneur large */
 .article-layout { max-width: var(--wrap); margin-inline: auto; }
 
 .article-aside { display: grid; gap: var(--sp-6); align-content: start; }
@@ -68,16 +65,12 @@
   transform: scaleX(var(--progress, 0));
   transform-origin: left;
 }
-
-/* Signature et méthode éditoriale */
 .article-byline {
   margin: var(--sp-4) 0 0;
   font-size: var(--fs-sm);
   color: var(--text-muted);
 }
 .article-byline strong { color: var(--text); font-weight: 600; }
-
-/* Sources et références */
 .article-sources {
   margin-top: var(--sp-7);
   padding-top: var(--sp-5);
@@ -88,8 +81,6 @@
 .article-sources__list li { display: grid; gap: 0.15rem; }
 .article-sources__list a { font-weight: 500; }
 .article-sources__list span { font-size: var(--fs-sm); color: var(--text-muted); }
-
-/* Passerelle article → outil */
 .tool-bridge {
   margin-top: var(--sp-7);
   padding: clamp(1.25rem, 1rem + 1vw, 1.85rem);
@@ -104,11 +95,7 @@
   color: var(--text-muted);
 }
 .tool-bridge__text { margin: 0 0 var(--sp-4); max-width: 52ch; }
-
-/* Les tableaux larges défilent, ils n’élargissent pas la page */
 .article-layout, .article-layout > *, .prose { min-width: 0; }
-
-/* Une carte à la fois sur mobile, avec le bord de la suivante visible. */
 @media (max-width: 47.99rem) {
   .related__cards {
     grid-template-columns: none;
@@ -125,15 +112,6 @@
   }
   .related__cards > .card { min-width: 0; scroll-snap-align: start; }
 }
-
-/*
- * Sommaire sur mobile et tablette.
- *
- * La colonne latérale passe sous l'article en dessous de 64rem : son sommaire
- * arrivait après le dernier paragraphe, là où il ne sert plus. Ici, une barre
- * repliée en tête d'article, qui reste sous l'en-tête pendant la lecture et
- * dit dans quelle section on se trouve. Un choix la referme.
- */
 .toc-mobile { display: none; }
 @media (max-width: 63.99rem) {
   .article-aside .toc { display: none; }
@@ -206,12 +184,9 @@
   .toc-mobile a[data-active="true"] { color: var(--text); font-weight: 600; }
   .toc-mobile .toc__sub a { padding-left: var(--sp-4); font-size: 0.88rem; }
 }
-/* Un titre visé depuis le sommaire ne doit pas finir caché sous la barre. */
 @media (max-width: 63.99rem) {
   .prose h2, .prose h3 { scroll-margin-top: calc(var(--header-h) + 4.5rem); }
 }
-
-/* Pages légales : fiches « libellé : valeur » (éditeur, hébergeur, responsable). */
 .legal-fiche {
   display: grid;
   grid-template-columns: minmax(10rem, 14rem) minmax(0, 1fr);

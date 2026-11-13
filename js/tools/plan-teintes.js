@@ -1,4 +1,4 @@
-/* Fichier généré par _generator/plan-teintes.js depuis le catalogue Premibel : ne pas modifier. */
+
 export const PLAN_TEINTES = [
   {
     "id": "chene-craie",

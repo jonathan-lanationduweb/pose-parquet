@@ -1,6 +1,6 @@
 import { qsa, on } from '../utils/dom.js';
 
-/** Onglets avec navigation clavier (fleches, Home, End). */
+
 export function initTabs(root) {
   const tabs = qsa('[role="tab"]', root);
   const panels = qsa('[role="tabpanel"]', root);

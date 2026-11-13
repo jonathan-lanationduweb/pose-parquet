@@ -1,49 +1,7 @@
-/**
- * Éclairement repris de la photo.
- *
- * C'est la pièce qui manquait pour que le parquet cesse d'avoir l'air collé.
- *
- * L'approche naïve — multiplier la texture par la luminance du pixel d'origine
- * — reporte tout : la lumière du soleil, mais aussi **les lames de l'ancien
- * sol**. Le résultat garde en filigrane le parquet qu'on voulait remplacer, et
- * l'œil le voit immédiatement : deux trames se superposent.
- *
- * On sépare donc les deux :
- *
- *   basse fréquence   la lumière de la pièce — soleil, ombres portées,
- *                     dégradé vers le fond, obscurcissement sous les meubles.
- *                     C'est ce qu'on garde, et c'est ce qui ancre le parquet
- *                     dans la scène.
- *
- *   haute fréquence   le détail de l'ancien revêtement : joints, veines,
- *                     nœuds. C'est ce qu'on jette — sauf sa partie claire,
- *                     réservée aux finitions brillantes, parce qu'un reflet de
- *                     fenêtre est large et clair là où un joint est fin et
- *                     sombre.
- *
- * La lumière est traitée **en couleur**, pas en niveaux de gris : le soleil de
- * fin de journée est chaud, la lumière d'une baie sur un jardin est verte, un
- * angle à l'ombre est bleuté. Un parquet éclairé par une lumière neutre alors
- * que toute la pièce baigne dans une lumière chaude se voit immédiatement, même
- * quand on ne sait pas dire pourquoi.
- *
- * S'y ajoute l'ombre de contact au pied des murs et des meubles : un sol n'est
- * jamais aussi clair contre une plinthe qu'en pleine pièce. Sans elle, le
- * parquet a l'air posé par-dessus la photo ; avec elle, il a l'air dessous.
- *
- * Tout est calculé sur une image réduite (la lumière d'une pièce n'a pas besoin
- * de 1600 px) et **normalisé par le masque du sol** : sans quoi un mur clair
- * contaminerait la première rangée de lames.
- */
-
-/** Côté maximal de la carte : au-delà, on décrit du détail, plus de la lumière. */
 const MAP_MAX = 460;
 
-/**
- * Flou par boîte séparable, appliqué trois fois : très proche d'un gaussien.
- * Les canaux et les poids sont floutés ensemble, puis divisés — un pixel hors
- * du sol pèse zéro, il ne peut donc pas éclaircir le bord de la zone.
- */
+
+
 function blurWeighted(channels, weight, width, height, radius, passes = 3) {
   const buffers = channels.map((c) => Float32Array.from(c));
   const spare = channels.map(() => new Float32Array(channels[0].length));
@@ -90,7 +48,7 @@ function blurWeighted(channels, weight, width, height, radius, passes = 3) {
   return { channels: buffers, weight: w };
 }
 
-/** Médiane pondérée d'une liste de [valeur, poids]. */
+
 function medianePonderee(paires) {
   paires.sort((a, b) => a[0] - b[0]);
   const total = paires.reduce((s, p) => s + p[1], 0);
@@ -102,25 +60,8 @@ function medianePonderee(paires) {
   return paires.length ? paires[paires.length - 1][0] : 0;
 }
 
-/**
- * Photo importée : ce qui, sous le cadre, n'est manifestement pas du sol.
- *
- * Tant que le visiteur n'a pas retiré ses meubles au pinceau, le cadre couvre
- * un canapé, un tapis, un pied de table. L'éclairement les lisait comme de la
- * LUMIÈRE : un canapé gris devenait une grande ombre floue sur le parquet
- * (visible sur la recette du salon, cadre de départ), un tapis clair une
- * tache de soleil, et la moyenne de référence en sortait faussée.
- *
- * Le sol est la matière majoritaire sous le cadre, et il est à peu près
- * uniforme en teinte. On prend donc sa luminance et sa chromaticité
- * médianes, et on retire leur poids aux cellules qui s'en écartent nettement
- * — très sombres (< 0,5 × la médiane), d'une autre teinte (un tapis blanc,
- * un canapé gris, une plante), ou d'une clarté que le soleil n'atteint pas
- * (> 4 ×). Le flou pondéré qui suit comble ces trous avec la lumière du sol
- * voisin. Les vraies ombres (0,5 à 0,9 de la médiane) et les taches de
- * soleil, de la teinte du bois, sont gardées : un premier réglage à 2,4 ×
- * éteignait la tache de soleil de la pièce « contraste ».
- */
+
+
 function ecarterLesObjets(chan, weight, count) {
   const lum = [];
   const rn = [];
@@ -152,9 +93,9 @@ function ecarterLesObjets(chan, weight, count) {
     let k = 1;
     if (rapport < 0.5) k *= Math.max(0, (rapport - 0.3) / 0.2);
     else if (rapport > 4) k *= Math.max(0, 1 - (rapport - 4) / 1.5);
-    // Teinte : un tapis blanc ou un canapé gris sur du chêne s'écartent
-    // d'environ 0,15 ; une ombre de jour, plus bleue, de 0,05 à 0,07 — elle
-    // doit rester (un seuil à 0,035 aplatissait les ombres de « contraste »).
+
+
+
     if (teinte > 0.075) k *= Math.max(0, 1 - (teinte - 0.075) / 0.055);
     k = Math.max(0.02, k);
     if (k < 1) {
@@ -166,19 +107,8 @@ function ecarterLesObjets(chan, weight, count) {
   }
 }
 
-/**
- * Carte d'éclairement d'une scène.
- *
- * @param {ImageData} source            photo d'origine
- * @param {Uint8ClampedArray} coverage  couverture du sol, taille image
- * @param {object} light                scene.light
- * @returns {{width:number,height:number,rgba:Float32Array,reference:number,
- *            sample:(x,y,out)=>Float32Array, luminance:(x,y)=>number}}
- *
- * `rgba` contient, par pixel de la carte réduite :
- *   0,1,2 → gain par canal (1 = éclairement moyen du sol)
- *   3     → ombre de contact (1 = pleine pièce, < 1 le long des bords)
- */
+
+
 export function buildShadingMap(source, coverage, light) {
   const fullW = source.width;
   const fullH = source.height;
@@ -191,7 +121,7 @@ export function buildShadingMap(source, coverage, light) {
   const stepY = fullH / height;
   const count = width * height;
 
-  /* Sous-échantillonnage par moyenne de bloc, pondérée par le masque. */
+
   const chan = [new Float32Array(count), new Float32Array(count), new Float32Array(count)];
   const weight = new Float32Array(count);
   for (let y = 0; y < height; y += 1) {
@@ -227,14 +157,14 @@ export function buildShadingMap(source, coverage, light) {
 
   if (light.robust) ecarterLesObjets(chan, weight, count);
 
-  /* ---- Éclairement : basse fréquence, en couleur ---- */
+
 
   const radius = Math.max(2, Math.round(light.blurRadius * width));
   const blurred = blurWeighted(chan, weight, width, height, radius);
 
-  // Référence : la couleur moyenne du sol. L'éclairement est un rapport à
-  // cette moyenne, jamais une valeur absolue — le parquet garde donc sa propre
-  // teinte, seule la modulation vient de la photo.
+
+
+
   const totals = [0, 0, 0];
   let mass = 0;
   for (let i = 0; i < count; i += 1) {
@@ -245,30 +175,30 @@ export function buildShadingMap(source, coverage, light) {
   const refRgb = totals.map((t) => (mass > 0 ? Math.max(12, t / mass) : 128));
   const reference = 0.2126 * refRgb[0] + 0.7152 * refRgb[1] + 0.0722 * refRgb[2];
 
-  /* ---- Ombre de contact : la couverture du sol, floutée ---- */
 
-  // Une plinthe, un pied de meuble : l'éclairement y est réduit sur quelques
-  // centimètres. Flouter la couverture donne exactement cette décroissance,
-  // et pour rien : la carte est déjà là.
+
+
+
+
   const solid = new Float32Array(count);
   for (let i = 0; i < count; i += 1) solid[i] = weight[i] > 0 ? 1 : 0;
   const ones = new Float32Array(count).fill(1);
   const contactRadius = Math.max(1, Math.round(width * 0.012));
   const contact = blurWeighted([solid], ones, width, height, contactRadius, 2).channels[0];
 
-  /* ---- Assemblage ---- */
+
 
   const rgba = new Float32Array(count * 4);
   for (let i = 0; i < count; i += 1) {
     const p = i * 4;
     const known = blurred.weight[i] > 1e-4;
     for (let c = 0; c < 3; c += 1) {
-      // Les trous (aucun pixel de sol alentour) reçoivent un éclairement
-      // neutre : au pire, le parquet y garde sa couleur propre.
+
+
       rgba[p + c] = known ? blurred.channels[c][i] / blurred.weight[i] / refRgb[c] : 1;
     }
-    // `contact` vaut 1 en pleine zone et décroît vers les bords ; on ne garde
-    // que l'assombrissement, dosé par la scène.
+
+
     rgba[p + 3] = 1 - light.contact * (1 - Math.min(1, contact[i]));
   }
 
@@ -301,7 +231,7 @@ export function buildShadingMap(source, coverage, light) {
     reference,
     referenceRgb: refRgb,
     sample,
-    /** Éclairement en luminance seule : sert au repérage de la direction. */
+
     luminance(x, y) {
       sample(x, y, scratch);
       return 0.2126 * scratch[0] + 0.7152 * scratch[1] + 0.0722 * scratch[2];
@@ -309,18 +239,8 @@ export function buildShadingMap(source, coverage, light) {
   };
 }
 
-/**
- * Résidu clair de la photo, à pleine résolution.
- *
- * `luminance du pixel − éclairement basse fréquence`, borné aux valeurs
- * positives. Ne subsiste donc que ce qui est **plus clair** que l'éclairement
- * local : les reflets de fenêtre, la traînée du soleil sur un sol verni. Les
- * joints et les veines de l'ancien parquet, qui sont plus sombres, sont
- * écartés — c'est exactement ce qu'on cherche à ne pas reproduire.
- *
- * Ce résidu n'est appliqué qu'aux finitions brillantes, et à faible dose : le
- * réalisme compte plus que l'effet.
- */
+
+
 export function buildGlossMap(source, coverage, shading) {
   const width = source.width;
   const height = source.height;

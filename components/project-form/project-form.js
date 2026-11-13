@@ -1,19 +1,3 @@
-/**
- * Composant « formulaire projet » — autonome et remplaçable.
- *
- * Dépendances : uniquement son fichier de configuration et une fonction
- * d'envoi. Aucune page ne connaît sa structure interne : elle déclare un point
- * de montage `[data-project-form]` et c'est tout.
- *
- *   import { mountProjectForm } from './project-form.js';
- *   mountProjectForm(document.querySelector('[data-project-form]'));
- *
- * L'envoi ne passe plus par une fonction injectée : le composant appelle
- * directement l'API du plugin WordPress, via `js/forms/`. La couche
- * d'abstraction avait un intérêt tant qu'aucun destinataire n'existait ; elle
- * n'en a plus, et elle avait un coût — c'est elle qui portait le faux succès
- * en `localStorage`. Voir `docs/backend/front-integration.md`.
- */
 import { projectFormConfig } from './project-form.config.js';
 import { apiConfigured } from '../../js/forms/api-config.js';
 import { buildProjectPayload, visualizerFromParams, frontFieldFor } from '../../js/forms/project-payload.js';
@@ -108,11 +92,8 @@ const MOTIF_LABELS = {
   'point-de-hongrie': 'Point de Hongrie',
   'baton-rompu': 'bâton rompu',
 };
-/*
- * Les cinq réponses du champ « De quoi avez-vous besoin ? », pour la phrase
- * de reprise. Elles reprennent les libellés de la configuration, en minuscule
- * initiale : ils s'insèrent au milieu d'une phrase, pas en tête de bouton.
- */
+
+
 const BESOIN_LABELS = {
   produit: 'trouver un parquet',
   pose: 'faire poser',
@@ -127,47 +108,18 @@ const ANGLE_LABELS = {
   '-45': 'pose en diagonale',
 };
 
-/**
- * Reprise d'une simulation faite dans le Studio.
- *
- * Cinq champs courts transitent par l'URL — scène, produit, libellé, motif,
- * angle — et jamais la photo, qui ne quitte pas le navigateur. La convention
- * est celle de `js/forms/studio-handoff.js` : ce module la lit, il ne la
- * redéfinit pas. Les valeurs sont insérées comme texte, jamais comme HTML.
- *
- * Le nom du produit affiché ici vient de `libelle`. Un ancien lien qui portait
- * le nom commercial dans `parquet` ne le montrera plus — `parquet` porte
- * désormais l'identifiant — mais la reprise continue de s'afficher avec le
- * motif et l'angle : on perd un mot, pas un parcours.
- */
-/**
- * Reprise de ce qui vient du Mode Plan.
- *
- * Deux champs, et deux seulement : le sens de pose et la surface. Ce sont les
- * deux que la personne vient de décider en dessinant son plan, et les deux que
- * le formulaire lui redemanderait mot pour mot.
- *
- * Aucun contexte de Visualiseur n'est écrit : le Mode Plan ne pose aucune
- * référence réelle sur aucune photographie. Y inscrire un produit ou une scène
- * ferait croire à une simulation qui n'a pas eu lieu.
- *
- * Rend vrai si quelque chose a été repris, pour que l'appelant sache s'il doit
- * annoncer la reprise.
- */
+
+
+
+
 function prefillFromPlan(form) {
   const lu = readPlanParams(new URLSearchParams(window.location.search));
   if (!lu.present) return false;
 
   const repris = [];
 
-  /*
-   * Le besoin, quand le lien le connaît.
-   *
-   * Un tutoriel de pose qui propose de confier le chantier sait de quoi il
-   * parle : inutile de reposer la question. Ce n'est pas répondre à la place
-   * de la personne — le bouton radio est coché, visible, et se change d'un
-   * clic comme n'importe quelle autre réponse pré-remplie.
-   */
+
+
   if (lu.besoin) {
     const choix = form.querySelector(`input[name="besoin"][value="${lu.besoin}"]`);
     if (choix) {
@@ -179,8 +131,8 @@ function prefillFromPlan(form) {
   if (lu.pose) {
     const input = form.querySelector(`input[name="orientation"][value="${lu.pose}"]`);
     if (input) {
-      // Même raison que pour la reprise du Studio : le navigateur restaure
-      // l'état des champs après un rechargement, on repasse donc après lui.
+
+
       window.setTimeout(() => { input.checked = true; }, 0);
       repris.push(MOTIF_LABELS[lu.pose] || lu.pose);
     }
@@ -198,8 +150,8 @@ function prefillFromPlan(form) {
 
   const note = document.createElement('p');
   note.className = 'pf__from-studio';
-  /* Un lien qui ne transmet que le besoin (accueil, tutoriels) n'apporte aucun
-     calepinage : la phrase le nomme pour ce qu'il est. */
+
+
   const seulBesoin = Boolean(lu.besoin) && repris.length === 1 && !lu.pose && lu.surface === null;
   note.textContent = seulBesoin
     ? `Votre besoin : ${repris[0]}. À corriger si besoin.`
@@ -221,8 +173,8 @@ function prefillFromStudio(form, base = '../') {
   }
   if (orientation) {
     const input = form.querySelector(`input[name="orientation"][value="${orientation}"]`);
-    // Après un rechargement, le navigateur restaure lui-même l'état des champs
-    // et écrase ce que l'on vient d'écrire : on repasse donc juste après lui.
+
+
     if (input) window.setTimeout(() => { input.checked = true; }, 0);
   }
 
@@ -231,18 +183,13 @@ function prefillFromStudio(form, base = '../') {
   if (motif) parts.push(MOTIF_LABELS[motif] || motif);
   if (motif === 'lames' && ANGLE_LABELS[String(angle)]) parts.push(ANGLE_LABELS[String(angle)]);
 
-  // Ni produit reconnu ni motif : il n'y a rien à annoncer, et une phrase de
-  // reprise vide serait pire que pas de phrase. On a tout de même pu cocher
-  // un sens de pose : c'est une reprise, et l'appelant doit le savoir.
+
+
+
   if (!parts.length) return Boolean(orientation);
 
-  /*
-   * « Votre choix » : ce que le visiteur a composé dans le Studio, en carte.
-   *
-   * Une phrase de reprise ne montrait qu'un nom ; arrivé du Visualiseur, on
-   * doit REVOIR son parquet avant de décrire son chantier. La vignette vient
-   * du catalogue publié (jamais de l'URL), chargée seulement dans ce cas-là.
-   */
+
+
   const carte = document.createElement('div');
   carte.className = 'pf-choix';
   const details = [
@@ -284,28 +231,13 @@ function prefillFromStudio(form, base = '../') {
   return true;
 }
 
-/**
- * Paramètres d'acquisition, repris de la mémoire de visite.
- *
- * Ils étaient lus dans l'URL de CETTE page, et cela suffisait tant qu'on
- * arrivait sur le formulaire directement depuis une campagne. Un parcours
- * réel ne ressemble pas à cela : annonce → guide → Studio → formulaire, et à
- * la quatrième page les `utm_*` de la première ont disparu de l'adresse
- * depuis longtemps. La demande partait alors sans origine.
- *
- * `lead-context.js` les retient pour la durée de la visite, dans
- * `sessionStorage` : pas de cookie, rien qui survive à la fermeture de
- * l'onglet, rien qui suive quelqu'un d'un jour à l'autre. Cinq clés, celles
- * que le contrat prévoit, et rien d'autre — ni référent, ni historique.
- *
- * L'URL de la page reste lue par `ouvrirVisite()` : quelqu'un qui arrive
- * directement ici avec des `utm_*` est toujours servi.
- */
+
+
 function utmDeLaVisite() {
   return { ...contexteVisite().utm };
 }
 
-/** Phrases d'échec, par code d'erreur de l'adaptateur. */
+
 const MESSAGES_ECHEC = {
   not_configured:
     'Ce formulaire n’est pas encore relié à nos serveurs sur cette version du site : votre demande n’a pas été envoyée. Écrivez-nous depuis la page contact.',
@@ -313,12 +245,8 @@ const MESSAGES_ECHEC = {
   network: 'L’envoi n’a pas pu aboutir. Vérifiez votre connexion et réessayez.',
   timeout: 'L’envoi n’a pas pu aboutir. Vérifiez votre connexion et réessayez.',
   server: 'L’envoi n’a pas pu aboutir. Réessayez dans un instant.',
-  /*
-   * Pot de miel et jeton définitivement refusé : même phrase que pour une
-   * erreur générale. Dire « vous avez rempli le champ piège » apprendrait à un
-   * robot ce qu'il doit éviter la prochaine fois, et n'aiderait aucun humain —
-   * un humain n'a pas pu le remplir.
-   */
+
+
   submission_rejected: 'L’envoi n’a pas pu aboutir. Réessayez dans un instant.',
   form_token_invalid: 'L’envoi n’a pas pu aboutir. Rechargez la page et réessayez.',
   validation: 'Certains champs doivent être corrigés.',
@@ -332,26 +260,26 @@ export function mountProjectForm(root, options = {}) {
 
   root.classList.add('project-form');
   root.innerHTML = `
-    <!--
-      Plus de bandeau d'indisponibilité de l'envoi : il n'y a plus de
-      demande à envoyer. L'orientation se calcule
-      dans le navigateur ; l'enregistrement du parcours (statistiques) est un
-      plus, jamais une condition. Une API absente ou en panne ne bloque donc
-      plus personne.
-    -->
+
+
+
+
+
+
+
     <form class="pf" novalidate>
       <div class="pf__head">
         <p class="pf__count" aria-live="polite">Étape <b>1</b> sur ${config.steps.length}</p>
-        <!--
-          Ce qui vient après, nommé.
-          Savoir qu'il reste quatre étapes ne dit pas si elles sont longues.
-          Annoncer la suivante par son titre lève la seule question qui retient
-          vraiment avant de commencer : « qu'est-ce qu'on va encore me
-          demander ? ». L'attribut aria-hidden est voulu : les pastilles
-          portent déjà le titre de chaque étape dans leur aria-label, et le
-          compteur est aria-live —
-          répéter ici ferait un doublon à chaque changement d'étape.
-        -->
+
+
+
+
+
+
+
+
+
+
         <p class="pf__next" aria-hidden="true"></p>
         <ol class="pf__dots">
           ${config.steps
@@ -377,15 +305,15 @@ export function mountProjectForm(root, options = {}) {
         )
         .join('')}
 
-      <!--
-        Pot de miel : le champ que seul un robot remplit. Le raisonnement et le
-        choix de la technique de masquage sont dans project-form.css, sur la
-        classe .pf__trap — commentaire volontairement court ICI, parce que ce
-        bloc vit dans un littéral de gabarit et qu'un accent grave y refermerait
-        la chaîne. C'est exactement l'erreur qui a été faite en l'écrivant :
-        « display: none » entre accents graves a produit un SyntaxError et le
-        formulaire ne se montait plus du tout.
-      -->
+
+
+
+
+
+
+
+
+
       <div class="pf__trap" aria-hidden="true">
         <label for="${prefix}-website">Site web (ne pas remplir)</label>
         <input type="text" id="${prefix}-website" name="website" tabindex="-1"
@@ -401,7 +329,7 @@ export function mountProjectForm(root, options = {}) {
       <p class="pf__failure" role="alert" hidden tabindex="-1"></p>
     </form>
 
-    <!-- La conclusion du parcours : une orientation (js/forms/orientation.js). -->
+
     <div class="pf__result" data-result hidden tabindex="-1"></div>`;
 
   const form = root.querySelector('form');
@@ -420,42 +348,24 @@ export function mountProjectForm(root, options = {}) {
   const fieldsByName = new Map();
   config.steps.forEach((step) => step.fields.forEach((field) => fieldsByName.set(field.name, field)));
 
-  /*
-   * Deux reprises possibles, jamais les deux à la fois en pratique : on
-   * arrive du Studio ou du Mode Plan, pas des deux. L'ordre donne malgré tout
-   * la priorité au Studio, qui porte l'information la plus riche.
-   */
+
+
   if (!prefillFromStudio(form, base)) prefillFromPlan(form);
 
-  /* ---- Contexte de la visite, lu une fois ---- */
+
 
   const params = new URLSearchParams(window.location.search);
-  // Si la visite commence ici — lien direct, favori, courriel — c'est le seul
-  // moment où l'on peut encore enregistrer la page d'entrée et les UTM.
+
+
   ouvrirVisite();
   const utm = utmDeLaVisite();
   const visualizer = visualizerFromParams(params);
-  /*
-   * Le Studio a-t-il annoncé une référence à fiche réelle ?
-   *
-   * Lu ici et pas dans `visualizer` : cet objet-là est la charge envoyée à
-   * l'API, et son contenu est fixé par le contrat du serveur. Le drapeau sert
-   * à recommander une destination, il n'a rien à faire dans la demande.
-   */
+
+
   const ficheReelle = readHandoffParams(params).ficheProduit;
 
-  /*
-   * Le jeton anti-spam.
-   *
-   * Demandé DÈS LE MONTAGE, et pas au moment d'envoyer. Deux raisons, et la
-   * seconde est la vraie : le serveur refuse un jeton de moins de deux
-   * secondes, donc un « GET puis POST » collés se ferait rejeter
-   * systématiquement ; et une erreur de réseau au tout début se voit avant que
-   * le visiteur ait saisi quoi que ce soit, ce qui est le bon moment pour lui
-   * dire que le formulaire est indisponible.
-   *
-   * Il vit ici, dans cette fermeture. Nulle part ailleurs.
-   */
+
+
   let token = '';
   let tokenIssuedAt = 0;
   let tokenPromise = null;
@@ -466,18 +376,15 @@ export function mountProjectForm(root, options = {}) {
     tokenIssuedAt = issuedAt;
   };
 
-  /*
-   * L'API ne sert qu'à ENREGISTRER le parcours (statistiques, administration).
-   * Si elle manque ou ne répond pas, le visiteur obtient quand même son
-   * orientation : rien, dans ce qu'il voit, ne dépend du serveur ni d'un email.
-   */
+
+
   if (apiConfigured()) {
     tokenPromise = renewToken().catch(() => {});
   }
 
-  /** Vrai tant qu'une requête d'envoi est en vol. */
+
   let sending = false;
-  /** Vrai après un 201 : la demande est partie, on ne la renvoie pas. */
+
   let sent = false;
 
   const applyConditionalVisibility = () => {
@@ -567,15 +474,8 @@ export function mountProjectForm(root, options = {}) {
     }
   });
 
-  /**
-   * Affiche un échec et le fait annoncer.
-   *
-   * `prendreFocus` est faux quand un champ vient d'être désigné : c'est LUI
-   * qui doit recevoir le curseur, pas le message. Le bloc porte `role="alert"`,
-   * donc un lecteur d'écran l'annonce de toute façon, sans qu'on ait à y
-   * déplacer le focus — et déplacer le focus vers un texte qu'on ne peut pas
-   * corriger obligerait à retabuler jusqu'au champ.
-   */
+
+
   const montrerEchec = (texte, prendreFocus = true) => {
     status.textContent = '';
     failure.textContent = texte;
@@ -588,17 +488,8 @@ export function mountProjectForm(root, options = {}) {
     failure.textContent = '';
   };
 
-  /**
-   * Reporte les refus du serveur sur les champs concernés.
-   *
-   * Le serveur rend `fields: { email: "…", surface: "…" }` avec les noms de
-   * l'API ; le formulaire connaît les noms français. `frontFieldFor()` fait la
-   * traduction inverse, et le premier champ fautif reçoit le focus après avoir
-   * ramené son étape à l'écran — corriger un champ qu'on ne voit pas est
-   * impossible.
-   *
-   * @returns {boolean} vrai si au moins un champ a été désigné
-   */
+
+
   const appliquerErreursServeur = (fields) => {
     let premier = null;
 
@@ -610,7 +501,7 @@ export function mountProjectForm(root, options = {}) {
 
       container.dataset.invalid = 'true';
       const message = container.querySelector('.field__error');
-      // Le texte vient du serveur : il est posé comme TEXTE, jamais comme HTML.
+
       if (message && typeof raison === 'string' && raison !== '') message.textContent = raison;
       if (!premier) premier = { container, nom };
     }
@@ -628,19 +519,8 @@ export function mountProjectForm(root, options = {}) {
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
-    /*
-     * Deux verrous, et ils ne protègent pas de la même chose.
-     *
-     * `sending` bloque le double clic : le backend n'a pas encore de clé
-     * d'idempotence, donc deux requêtes parties ensemble créeraient deux
-     * demandes identiques chez le destinataire. Le bouton est désactivé, mais
-     * un `Entrée` maintenu ou un double clic très rapide peut passer avant que
-     * le navigateur ne l'applique — d'où ce test en tête de fonction.
-     *
-     * `sent` interdit de renvoyer une demande déjà partie. L'écran de
-     * confirmation remplace le formulaire, mais rien n'empêche un script ou un
-     * raccourci de resoumettre.
-     */
+
+
     if (sending || sent) return;
 
     const allValid = config.steps.every((step, index) => {
@@ -659,12 +539,8 @@ export function mountProjectForm(root, options = {}) {
     status.textContent = 'Préparation de votre orientation…';
 
     const donnees = new FormData(form);
-    /*
-     * La qualification est CALCULÉE au moment de l'envoi : elle dépend de ce
-     * que le visiteur vient de répondre — son délai, sa surface — autant que
-     * d'où il vient. `produitPremibel` se lit dans le contexte du Studio : une
-     * référence identifiée qui porte une fiche réelle.
-     */
+
+
     const qualification = champsQualification({
       besoin: String(donnees.get('besoin') || ''),
       produitPremibel: ficheReelle,
@@ -676,7 +552,7 @@ export function mountProjectForm(root, options = {}) {
     let reference = '';
     try {
       if (apiConfigured()) {
-        // Le jeton demandé au montage a pu ne pas être arrivé : on l'attend.
+
         if (tokenPromise) await tokenPromise;
         if (!token) await renewToken();
         const enregistre = await submitProject({
@@ -684,7 +560,7 @@ export function mountProjectForm(root, options = {}) {
             buildProjectPayload({
               formData: new FormData(form),
               formToken: token,
-              // Le serveur ne garde que le chemin ; on ne lui donne que cela.
+
               sourcePath: window.location.pathname,
               utm,
               visualizer,
@@ -697,12 +573,8 @@ export function mountProjectForm(root, options = {}) {
       }
     } catch (erreur) {
       const code = erreur instanceof SubmitError ? erreur.code : ERREURS.SERVEUR;
-      /*
-       * Seul un refus de VALIDATION arrête le parcours : une réponse est
-       * réellement à corriger, et le serveur dit laquelle. Toute autre panne
-       * (réseau, serveur, limite de débit) ne touche que nos statistiques —
-       * l'orientation, elle, ne dépend pas du serveur.
-       */
+
+
       if (code === ERREURS.VALIDATION && appliquerErreursServeur(erreur.fields)) {
         status.textContent = '';
         montrerEchec(MESSAGES_ECHEC.validation, false);
@@ -725,7 +597,7 @@ export function mountProjectForm(root, options = {}) {
     await montrerOrientation(donnees, qualification, reference);
   });
 
-  /* ---- Conclusion : l'orientation ---- */
+
 
   const titrePage = document.querySelector('.page-hero__title');
   const chapoPage = document.querySelector('.page-hero__lead');
@@ -737,11 +609,8 @@ export function mountProjectForm(root, options = {}) {
   };
   const studio = readHandoffParams(params);
 
-  /**
-   * Le parquet essayé dans le Visualiseur, avec sa vraie fiche Premibel.
-   * Lu dans le catalogue publié (le lien vient de là, jamais de l'URL de la
-   * page) ; si le catalogue ne répond pas, on renvoie au catalogue Premibel.
-   */
+
+
   async function produitDuStudio() {
     if (!studio.productId || !studio.ficheProduit) return null;
     try {
@@ -764,8 +633,8 @@ export function mountProjectForm(root, options = {}) {
     const departement = String(donnees.get('departement') || '').trim().toUpperCase();
     const idf = estIdf(departement);
     const [produit, partenaires] = await Promise.all([produitDuStudio(), etatPartenaires()]);
-    // Les liens commerciaux réglés dans WordPress (Mon site), écrits sur la page par le build,
-    // moins un partenaire que la surveillance a trouvé en panne ou en maintenance.
+
+
     const liens = {
       premibelUrl: root.dataset.premibelUrl || '',
       premibelActif: root.dataset.premibelActif !== '0' && partenaires.premibel,
@@ -791,7 +660,7 @@ export function mountProjectForm(root, options = {}) {
     const retourStudio = lienVisualiseur(base, studio);
 
     const surface = Number(donnees.get('surface')) > 0 ? `${Number(donnees.get('surface'))} m²` : '';
-    // La référence choisie : vignette, nom, SKU, motif, surface — seulement ce qui est connu.
+
     const ficheProduit = (pr) => {
       const details = [
         pr.sku ? `Réf. ${echapper(pr.sku)}` : '',
@@ -812,7 +681,7 @@ export function mountProjectForm(root, options = {}) {
         ${etape.produit ? ficheProduit(etape.produit) : ''}
         ${etape.cta ? `<a class="btn ${etape.numero === 1 || vue.etapes.length > 1 ? 'btn--accent' : 'btn--ghost'} pf-dest__cta" href="${echapper(etape.cta.url)}" target="_blank" rel="sponsored noopener" data-suivi="${etape.cible}">${echapper(etape.cta.libelle)}</a>` : ''}
       </article>`;
-    // Ce que le Visualiseur a préparé : référence, SKU, motif, orientation, pièce. Jamais la photo.
+
     const configStudio = [
       (produit && produit.nom) || studio.productLabel || '',
       produit && produit.sku ? `Réf. ${produit.sku}` : '',
@@ -837,7 +706,7 @@ export function mountProjectForm(root, options = {}) {
       </div>
       <p class="pf-result__orient">Pose-Parquet vous oriente : il ne transmet pas votre projet. Vous gardez la main, et aucune coordonnée ne vous a été demandée.</p>`;
 
-    // Mesure des clics sortants : contexte non personnel uniquement.
+
     resultat.querySelectorAll('a[data-suivi]').forEach((lien) => {
       lien.addEventListener('click', () => {
         const cible = lien.dataset.suivi;
@@ -855,7 +724,7 @@ export function mountProjectForm(root, options = {}) {
     });
     resultat.querySelector('[data-modifier]').addEventListener('click', () => modifier(vue.preciser));
 
-    // La page entière change de propos : le titre, le chapô, la colonne.
+
     if (titrePage) titrePage.textContent = 'Voici comment avancer.';
     if (chapoPage) chapoPage.textContent = 'Selon vos réponses, voici vers qui vous tourner pour la suite de votre projet.';
     if (colonne) {
@@ -871,7 +740,7 @@ export function mountProjectForm(root, options = {}) {
     resultat.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  /** Retour au formulaire, réponses conservées. */
+
   function modifier(preciser) {
     form.hidden = false;
     resultat.hidden = true;
@@ -879,46 +748,21 @@ export function mountProjectForm(root, options = {}) {
     submitBtn.disabled = false;
     status.textContent = '';
     effacerEchec();
-    // Un parcours modifié est un nouveau parcours : nouveau jeton.
+
     sent = false;
     if (apiConfigured()) tokenPromise = renewToken().catch(() => {});
     if (titrePage) titrePage.textContent = avant.titre;
     if (chapoPage) chapoPage.textContent = avant.chapo;
     if (colonne) { colonne.innerHTML = avant.colonne; delete colonne.dataset.etat; }
     delete root.dataset.etat;
-    // « Préciser mon besoin » ramène à la question du besoin.
+
     const etapeBesoin = config.steps.findIndex((s) => s.fields.some((f) => f.name === 'besoin'));
     show(preciser && etapeBesoin >= 0 ? etapeBesoin : 0);
     form.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  /**
-   * Pré-remplissage depuis l'URL (ex. retour du simulateur de pose).
-   *
-   * `website` en est EXCLU, et c'est une faille qu'il a fallu voir venir : ce
-   * pré-remplissage écrit dans tout champ dont le nom apparaît en paramètre
-   * d'URL. Un lien `?website=x` aurait donc rempli le pot de miel à l'insu du
-   * visiteur, et le serveur aurait refusé chacune de ses demandes avec un
-   * message générique — un déni de service en un lien, indétectable pour lui
-   * comme pour nous.
-   *
-   * `piece` en est exclu aussi, pour une raison différente. Depuis le Studio,
-   * `piece` porte un identifiant de SCÈNE (`sejour`, `chambre-parisienne`,
-   * `salon-angle`), et le formulaire a un champ `piece` qui est le TYPE de
-   * pièce déclaré par le visiteur. Les deux se ressemblent assez pour que
-   * `sejour` tombe juste par accident, et pas assez pour que ce soit une
-   * règle : `salon-angle` est un séjour, `bureau-vide` n'est pas une chambre.
-   * Deviner le type de pièce à partir du nom d'une photo, c'est le genre de
-   * coïncidence qui marche jusqu'au jour où elle décide à la place du visiteur.
-   * Le type de pièce reste donc une réponse, pas une déduction.
-   *
-   * `parquet` pour la même raison : le Studio y met l'identifiant d'une
-   * référence du catalogue (`chene-fume`), le formulaire y attend une famille
-   * (`massif`, `contrecolle`…). Aucune valeur ne coïncide, si bien que le
-   * pré-remplissage ne fait aujourd'hui que décocher le groupe — sans
-   * conséquence puisque rien n'y est coché d'avance. Le jour où une valeur par
-   * défaut y serait ajoutée, un lien venu du Studio l'effacerait en silence.
-   */
+
+
   const CHAMPS_NON_PREREMPLISSABLES = new Set(['website', 'piece', 'parquet']);
   const prefill = new URLSearchParams(window.location.search);
   prefill.forEach((value, key) => {

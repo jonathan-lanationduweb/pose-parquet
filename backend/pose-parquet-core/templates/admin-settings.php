@@ -1,17 +1,6 @@
 <?php
-/**
- * Gabarit de la page « Réglages », dans le socle commun : des cartes
- * groupées comme les Réglages d'Expert Parquet, sur DEUX colonnes —
- *
- *   Notifications      Site public
- *   Environnement      Mises à jour
- *   Rôles et droits (pleine largeur)
- *
- * Deux cartes s'enregistrent (Notifications, par la Settings API ; Site
- * public, par admin-post) ; les autres se lisent.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -26,8 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 global $wpdb;
-$site_ok   = isset( $_GET['pp-site-public'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-// La constante, si elle est définie, prime sur l'option de l'écran Mises à jour.
+$site_ok   = isset( $_GET['pp-site-public'] );
+
 $constante = defined( 'WP_AUTO_UPDATE_CORE' ) ? WP_AUTO_UPDATE_CORE : null;
 $majeures  = $constante !== null
 	? in_array( $constante, [ true, 'beta', 'rc', 'development', 'branch-development' ], true )
@@ -66,7 +55,7 @@ $roles     = [
 			<p class="adm-champ">
 				<label for="pp-site-public"><?php esc_html_e( 'Adresse du site public', 'pose-parquet-core' ); ?></label>
 				<input type="url" id="pp-site-public" name="pp_site_public" value="<?php echo esc_attr( (string) get_option( SitePublic::OPTION, '' ) ); ?>" placeholder="<?php echo esc_attr( SitePublic::defaut() ); ?>" />
-				<span class="description"><?php echo esc_html( sprintf( /* translators: %s: URL */ __( 'Vide : %s', 'pose-parquet-core' ), SitePublic::defaut() ) ); ?></span>
+				<span class="description"><?php echo esc_html( sprintf(   __( 'Vide : %s', 'pose-parquet-core' ), SitePublic::defaut() ) ); ?></span>
 			</p>
 			<p class="adm-champ">
 				<label for="pp-site-dossier"><?php esc_html_e( 'Dossier du site sur cette machine (développement)', 'pose-parquet-core' ); ?></label>
@@ -113,9 +102,9 @@ $roles     = [
 			<?php foreach ( $roles as [ $nom, $contenus, $projets, $reglages ] ) : ?>
 				<tr>
 					<th scope="row"><?php echo esc_html( $nom ); ?></th>
-					<td data-label="<?php esc_attr_e( 'Contenus', 'pose-parquet-core' ); ?>"><?php echo $contenus ? $oui() : $non(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe. ?></td>
-					<td data-label="<?php esc_attr_e( 'Projets', 'pose-parquet-core' ); ?>"><?php echo $projets ? $oui() : $non(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
-					<td data-label="<?php esc_attr_e( 'Réglages', 'pose-parquet-core' ); ?>"><?php echo $reglages ? $oui() : $non(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
+					<td data-label="<?php esc_attr_e( 'Contenus', 'pose-parquet-core' ); ?>"><?php echo $contenus ? $oui() : $non();  ?></td>
+					<td data-label="<?php esc_attr_e( 'Projets', 'pose-parquet-core' ); ?>"><?php echo $projets ? $oui() : $non();  ?></td>
+					<td data-label="<?php esc_attr_e( 'Réglages', 'pose-parquet-core' ); ?>"><?php echo $reglages ? $oui() : $non();  ?></td>
 				</tr>
 			<?php endforeach; ?>
 			</tbody>

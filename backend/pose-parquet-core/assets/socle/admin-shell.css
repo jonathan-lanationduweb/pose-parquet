@@ -1,27 +1,6 @@
-/*
- * SOCLE ADMIN — le cadre (menu de gauche). Commun à nos sites WordPress.
- *
- * Reprise du back-office Expert Parquet (assets/admin-menu.css) : colonne
- * presque noire, logotype en tête, entrées du module avec icône, intitulés
- * de rubrique, entrée courante à la couleur d'accent. Seuls changent, par
- * site, trois réglages posés par le module :
- *
- *   --adm-accent        couleur de l'entrée courante (une seule couleur de marque)
- *   --adm-accent-clair  survol des entrées
- *   --adm-logo          logotype sur fond sombre
- *
- * Chargée sur tout wp-admin (le menu est partout) ; rien d'autre que le menu
- * et la barre d'administration n'est touché. Préfixe « adm- » : neutre, pour
- * servir tel quel à chaque site.
- */
-
-/* Colonne */
 #adminmenuback, #adminmenuwrap, #adminmenu { background: #17181A; }
 #adminmenu .wp-submenu, #adminmenu .wp-has-current-submenu.opensub .wp-submenu { background: #1F2124; }
-/* Le menu du module ouvert se lit comme la suite de la colonne, pas comme une boîte. */
 #adminmenu .wp-has-current-submenu .wp-submenu { background: #17181A; }
-
-/* Logotype en tête de colonne (le vrai logo, version fond sombre) : cadré, aligné sur les icônes. */
 #adminmenu::before {
 	content: "";
 	display: block;
@@ -34,17 +13,11 @@
 	background-clip: content-box;
 	border-bottom: 1px solid rgba(255, 255, 255, .08);
 }
-/* Menu replié : le symbole seul, centré dans les 36 px. */
-/* Même hauteur de bloc que déplié (32 px + marges) : le menu ne saute pas quand WordPress replie la colonne. */
 .folded #adminmenu::before { margin-left: 0; margin-right: 0; background-image: var(--adm-symbole, none); background-position: center; background-size: auto 24px; }
 @media screen and (min-width: 783px) and (max-width: 960px) {
 	.auto-fold #adminmenu::before { margin-left: 0; margin-right: 0; background-image: var(--adm-symbole, none); background-position: center; background-size: auto 24px; }
 }
-
-/* « Pose Parquet » mène déjà au tableau de bord du module : son doublon dans le sous-menu est masqué. */
 #adminmenu #toplevel_page_pose-parquet-tableau .wp-submenu li.wp-first-item { display: none; }
-
-/* Entrée courante : fond à peine plus clair et filet sauge à gauche — pas de bloc plein. */
 #adminmenu li.current a.menu-top,
 #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
 #adminmenu .wp-has-current-submenu .wp-submenu .wp-submenu-head { background: #26292D; color: #fff; box-shadow: inset 3px 0 0 var(--adm-accent-clair, #72aee6); }
@@ -58,16 +31,11 @@
 #adminmenu .wp-submenu a:focus-visible { box-shadow: inset 0 0 0 2px var(--adm-accent-clair, #72aee6); outline: 0; }
 #adminmenu li.menu-top:hover, #adminmenu li.opensub > a.menu-top, #adminmenu li > a.menu-top:focus { color: var(--adm-accent-clair, #72aee6); }
 #adminmenu li.menu-top:hover .wp-menu-image:before, #adminmenu li.opensub > a.menu-top .wp-menu-image:before { color: var(--adm-accent-clair, #72aee6); }
-
-/* Icônes des entrées du module */
 #adminmenu .wp-submenu .adm-menu-icone { font-size: 16px; width: 16px; height: 16px; margin: -2px 10px 0 0; vertical-align: middle; opacity: .7; }
 #adminmenu .wp-submenu li.current .adm-menu-icone, #adminmenu .wp-submenu a:hover .adm-menu-icone { opacity: 1; }
 #adminmenu .wp-submenu li a { padding: 7px 12px; font-size: 13px; line-height: 1.4; }
-/* Entrée sur deux lignes (« Catalogue Premibel ») : le texte reste aligné à droite de l'icône. */
 #adminmenu .wp-submenu li a:has(> .adm-menu-icone) { display: flex; align-items: flex-start; }
 #adminmenu .wp-submenu li a:has(> .adm-menu-icone) .adm-menu-icone { flex: none; margin-top: 1px; }
-
-/* Intitulés de rubrique */
 #adminmenu .wp-submenu li a .adm-menu-section,
 #adminmenu .wp-submenu li .adm-menu-section {
 	display: block;
@@ -82,19 +50,11 @@
 #adminmenu .wp-submenu li.adm-menu-section-item { margin-top: 8px; border-top: 1px solid rgba(255, 255, 255, .07); }
 #adminmenu .wp-submenu li.adm-menu-section-item > a { pointer-events: none; background: transparent !important; }
 #adminmenu .wp-submenu li.adm-menu-section-item:first-of-type { margin-top: 0; border-top: 0; }
-
-/* Barre d'administration : rappel de maintenance */
 #wpadminbar .adm-barre-maintenance > .ab-item { color: var(--adm-accent-clair, #72aee6) !important; }
-
-/* Pas de pointeur blanc vers le contenu : l'entrée active est marquée par son filet. */
 #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu::after,
 #adminmenu li.current a.menu-top::after { display: none; }
-/* Un seul filet à la fois : sur un écran du module, c'est l'entrée de l'écran qui est marquée, pas « Pose Parquet ». */
-/* (menu déplié seulement : replié, « Pose Parquet » est la seule entrée visible et garde sa marque) */
 @media screen and (min-width: 961px), screen and (max-width: 782px) {
 	body:not(.folded) #adminmenu #toplevel_page_pose-parquet-tableau:has(.wp-submenu li.current:not(.wp-first-item)) > a.menu-top { background: transparent; box-shadow: none; }
 }
-
-/* Libellés du module sur une ligne (« Catalogue Premibel ») : écart icône / texte et marge droite resserrés, rien d'autre. */
 #adminmenu .wp-submenu li a:has(> .adm-menu-icone) { padding-right: 4px; }
 #adminmenu .wp-submenu .adm-menu-icone { margin-right: 8px; }

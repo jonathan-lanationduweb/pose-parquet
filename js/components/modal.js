@@ -16,7 +16,7 @@ function close(modal) {
   if (lastFocused) lastFocused.focus();
 }
 
-/** Modale generique : [data-modal-open="id"] ouvre #id. */
+
 export function initModals() {
   const modals = qsa('[data-modal]');
   if (!modals.length) return;
@@ -41,7 +41,7 @@ export function initModals() {
   });
 }
 
-/** Lightbox de galerie : reutilise la modale media. */
+
 export function initLightbox() {
   const modal = qs('[data-lightbox]');
   if (!modal) return;

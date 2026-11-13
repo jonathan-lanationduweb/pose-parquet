@@ -1,36 +1,36 @@
 name: Déployer sur GitHub Pages
 
-# Le site est statique et servi tel quel depuis la racine du dépôt.
-# Ce workflow ne s'exécute qu'une fois GitHub Pages activé sur le dépôt
-# (Settings → Pages → Source : GitHub Actions).
-#
-# TROIS VARIABLES DE DÉPÔT pilotent ce déploiement
-# (Settings → Secrets and variables → Actions → Variables) :
-#
-#   SITE_ENVIRONMENT   'production' ou 'staging'. Absente = staging.
-#   WP_EXPORT_URL      export HTTPS WordPress ; obligatoire en production.
-#   API_BASE_URL       racine REST du backend, ex.
-#                      https://admin.pose-parquet.com/wp-json/pose-parquet/v1
-#                      Facultative pour le parcours d’orientation sans enregistrement.
-#
-# Aucune de ces variables n'est un secret : ce sont des adresses publiques. Elles sont
-# des VARIABLES et non des valeurs écrites dans le dépôt parce qu'elles
-# décrivent un environnement, pas le produit — et parce qu'un environnement
-# doit pouvoir changer sans relecture de code.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
-  # « Publier le site » dans WordPress (Pose Parquet → Publication), en
-  # production : le plugin envoie un repository_dispatch avec un jeton qui ne
-  # quitte jamais le serveur WordPress (wp-config.php). Voir
-  # docs/backend/publication-wordpress.md.
+
+
+
+
   repository_dispatch:
     types: [wordpress-publish]
-  # Chaque nuit (02:17 UTC, hors des heures pleines de GitHub) : catalogue
-  # Premibel resynchronisé, références retirées chez Premibel désactivées,
-  # site et sitemap republiés. Voir l'étape « Synchroniser le catalogue ».
+
+
+
   schedule:
     - cron: '17 2 * * *'
 
@@ -51,15 +51,15 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # Défaut sûr : en l'absence de déclaration, on est en préproduction et on
-      # n'indexe pas. Se tromper dans ce sens coûte un référencement retardé ;
-      # se tromper dans l'autre met en ligne une préproduction indexée, et
-      # désindexer prend des semaines.
+
+
+
+
       SITE_ENVIRONMENT: ${{ vars.SITE_ENVIRONMENT || 'staging' }}
       API_BASE_URL: ${{ vars.API_BASE_URL }}
-      # Export public des contenus WordPress publiés, ex.
-      # https://admin.pose-parquet.com/wp-json/pose-parquet/v1/contenus
-      # Absente en staging = reconstruction depuis l’instantané du dépôt.
+
+
+
       WP_EXPORT_URL: ${{ vars.WP_EXPORT_URL }}
 
     steps:
@@ -69,12 +69,12 @@ jobs:
       - name: Configurer Pages
         uses: actions/configure-pages@v5
 
-      # WordPress est la source éditoriale : quand son export est déclaré, le
-      # site est reconstruit à partir de lui à CHAQUE déploiement (push comme
-      # publication depuis WordPress) — sinon un push republierait l'ancien
-      # instantané du dépôt. `contenus.js` valide l'export avant d'écrire quoi
-      # que ce soit : une erreur structurante fait échouer le job ICI, avant
-      # tout artefact, et le site en ligne reste celui d'avant.
+
+
+
+
+
+
       - name: Installer Node
         uses: actions/setup-node@v4
         with:
@@ -83,16 +83,16 @@ jobs:
       - name: Vérifier la configuration avant toute publication
         run: node _generator/config-deploiement.js --verifier
 
-      # Le catalogue Premibel est relu à CHAQUE déploiement (nuit, push,
-      # publication WordPress) : un push ne republie donc jamais une référence
-      # que Premibel a retirée entre-temps. Pillow sert aux vignettes des
-      # nouvelles références. En cas d'échec (Premibel injoignable, export
-      # suspect), sync-premibel.js n'écrit rien : le site part du dernier
-      # catalogue valide du dépôt, et l'avertissement reste visible ici.
-      # Python de l'action officielle : celui d'Ubuntu refuse `pip install`
-      # hors environnement virtuel (PEP 668). Ni Python ni Pillow ne peuvent
-      # bloquer un déploiement : sans eux, seules les vignettes des
-      # NOUVELLES références manquent, et le site se publie quand même.
+
+
+
+
+
+
+
+
+
+
       - name: Installer Python
         uses: actions/setup-python@v5
         continue-on-error: true
@@ -111,7 +111,7 @@ jobs:
       - name: Tirer le contenu WordPress, valider, construire
         if: env.WP_EXPORT_URL != ''
         env:
-          # Le générateur écrit dans SITE_ROOT : le dépôt extrait ici.
+
           SITE_ROOT: ${{ github.workspace }}
         run: node _generator/contenus.js "$WP_EXPORT_URL"
 
@@ -127,12 +127,12 @@ jobs:
 
       - name: Vérifier que rien d'interne n'a suivi
         run: |
-          # Une exclusion oubliée ne doit pas se découvrir en production.
+
           fuites=0
 
-          # Temporaires de l'ecriture atomique du generateur : retires apres
-          # chaque ecriture, mais une construction interrompue peut en laisser
-          # un, et cela n'a rien a faire dans un artefact public.
+
+
+
           temporaires=$(find _site -name '.*.tmp' | head -5)
           if [ -n "$temporaires" ]; then
             echo "::error::des fichiers temporaires du generateur sont dans l'artefact :"
@@ -147,17 +147,17 @@ jobs:
             fi
           done
           [ "$fuites" -eq 0 ] || exit 1
-          # L'arbre distribué, lui, DOIT contenir son js — c'est ce que les
-          # pages chargent. Une exclusion trop large le briserait en silence.
+
+
           ls _site/assets/dist/*/js/main.js >/dev/null 2>&1 \
             || { echo "::error::assets/dist/<empreinte>/js/main.js absent : l'exclusion a mordu sur l'arbre distribué"; exit 1; }
           echo "Artefact : $(find _site -type f | wc -l) fichiers, $(du -sh _site | cut -f1)"
 
-      # Retirer des fichiers d'un artefact demande une preuve, pas une
-      # intuition : on relit chaque page publiée et on vérifie que TOUT ce
-      # qu'elle référence existe réellement dans l'artefact. Le contrôle ne
-      # porte pas seulement sur les trois dossiers retirés — il attrape
-      # n'importe quelle ressource manquante, d'où qu'elle vienne.
+
+
+
+
+
       - name: Vérifier qu'aucune ressource référencée ne manque
         run: |
           python3 - <<'PY'
@@ -177,7 +177,7 @@ jobs:
                       html = f.read()
                   for brut in motif.findall(html):
                       u = urlparse(brut)
-                      # Externe, ancre, mailto, data: — hors de notre ressort.
+
                       if u.scheme or brut.startswith(("#", "//", "mailto:", "tel:")):
                           continue
                       cible = unquote(u.path)
@@ -186,7 +186,7 @@ jobs:
                       base = RACINE if cible.startswith("/") else dossier
                       resolu = os.path.normpath(os.path.join(base, cible.lstrip("/")))
                       controlees += 1
-                      # Un chemin en dossier vaut son index.html.
+
                       if os.path.isdir(resolu):
                           resolu = os.path.join(resolu, "index.html")
                       if not os.path.exists(resolu):
@@ -201,27 +201,27 @@ jobs:
           print("Aucune ressource manquante.")
           PY
 
-      # Adresse du backend.
-      #
-      # Un seul fichier est réécrit, et il ne contient que de la configuration.
-      # Le code métier (js/forms/api-config.js) n'est jamais touché par un
-      # déploiement : il lit window.POSE_PARQUET_CONFIG, que ce fichier pose.
+
+
+
+
+
       - name: Écrire la configuration publique sans interpolation de code
         run: node _generator/config-deploiement.js _site
 
-      # Les fichiers du dépôt décrivent toujours la PRODUCTION : canoniques en
-      # pose-parquet.com, robots en « index, follow », sitemap complet. C'est
-      # volontaire — un noindex écrit dans les sources finirait tôt ou tard
-      # copié en production le jour de la mise en ligne.
-      #
-      # C'est donc le déploiement qui marque une préproduction. Le signal était
-      # jusqu'ici la PRÉSENCE D'UN FICHIER CNAME, ce qui mélangeait deux choses
-      # sans rapport : « ce site a un nom de domaine » et « ce site est la
-      # production ». Un domaine peut être posé sur une préproduction, et une
-      # production peut tourner un temps sans domaine. Le signal est désormais
-      # déclaré, et le CNAME n'est plus qu'un contrôle de cohérence.
-      #
-      # Voir docs/seo-environnements.md.
+
+
+
+
+
+
+
+
+
+
+
+
+
       - name: Marquer la préproduction (noindex)
         if: ${{ vars.SITE_ENVIRONMENT != 'production' }}
         run: |
@@ -231,14 +231,14 @@ jobs:
           find _site -name '*.html' -print0 | xargs -0 --no-run-if-empty sed -i -E \
             's#<meta name="robots" content="[^"]*" />#<meta name="robots" content="noindex, nofollow" />#'
 
-          # Contrôle réel de la balise, et non du texte.
-          #
-          # L'ancien contrôle comptait les fichiers contenant la chaîne
-          # « noindex, nofollow » n'importe où. Or le gabarit porte un
-          # commentaire HTML qui contient exactement ces mots : le compte était
-          # donc toujours égal au nombre de pages, que le sed ait fonctionné ou
-          # non. Une preuve qui ne peut pas échouer ne prouve rien. On compte
-          # désormais la BALISE, et on échoue s'il en manque une seule.
+
+
+
+
+
+
+
+
           total=$(find _site -name '*.html' | wc -l)
           marquees=$(grep -rlF '<meta name="robots" content="noindex, nofollow" />' _site --include='*.html' | wc -l)
           echo "Pages : $marquees / $total portent la balise noindex."
@@ -259,7 +259,7 @@ jobs:
           fi
           grep -qF '<meta name="robots" content="index, follow" />' _site/index.html \
             || { echo "::error::L'accueil n'est pas indexable — vérifier _generator/layout.js"; exit 1; }
-          # La 404 ne doit jamais être indexable, même en production.
+
           grep -qF '<meta name="robots" content="noindex' _site/404.html \
             || { echo "::error::404.html doit être en noindex"; exit 1; }
           [ -f _site/sitemap.xml ] || { echo "::error::sitemap.xml absent en production"; exit 1; }

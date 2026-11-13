@@ -1,17 +1,3 @@
-/**
- * Mode Plan — simulateur de sens de pose.
- *
- * Rendu SVG pur, sans dépendance. L’UI est construite par le composant afin
- * qu’une page n’ait qu’un point de montage à déclarer :
- *   <div data-visualizer data-mode="compact"></div>
- *
- * Les motifs proviennent de js/tools/patterns.js : en ajouter un suffit
- * à l’exposer ici (sélecteur, rendu, conseil).
- *
- * Le calcul est inchangé : surface, taux de chutes, nombre de lames et
- * géométrie des motifs viennent des mêmes formules qu’avant. Ce fichier ne
- * traite que la présentation — disposition, libellés, échelle du dessin.
- */
 import { PATTERNS, getPattern, patternThumb } from './patterns.js';
 import { clamp } from '../utils/dom.js';
 import icons from '../utils/icons.js';
@@ -20,12 +6,8 @@ import { buildPlanParams } from '../forms/plan-handoff.js';
 import { emettre } from '../analytics/events.js';
 import { PLAN_TEINTES } from './plan-teintes.js';
 
-/*
- * Les teintes sont celles du catalogue Premibel (une par famille de rendu
- * présente dans le catalogue actif), générées au build par
- * _generator/plan-teintes.js : resynchroniser le catalogue met le nuancier
- * à jour sans toucher à ce fichier.
- */
+
+
 const TONES = Object.fromEntries(PLAN_TEINTES.map((t) => [t.id, t]));
 const TONE_LABELS = PLAN_TEINTES.map(({ id, label, references }) => ({
   id,
@@ -35,7 +17,7 @@ const TONE_LABELS = PLAN_TEINTES.map(({ id, label, references }) => ({
 const premiere = (...ids) => ids.find((id) => TONES[id]) || PLAN_TEINTES[0].id;
 const TONE_DEFAUT = premiere('chene-naturel');
 
-/** Passerelle de teintes entre le visualiseur photo (6 teintes génériques) et le mode plan. */
+
 const TONE_TO_PLAN = {
   clair: premiere('chene-sable', 'chene-craie', 'chene-nude'),
   naturel: TONE_DEFAUT,
@@ -67,7 +49,7 @@ const DEFAULTS = {
 const PLANK_MIN = 7;
 const PLANK_MAX = 26;
 
-/** Marge autour de la pièce, en proportion de son plus grand côté. */
+
 const PAD_RATIO = 0.09;
 
 const svgEl = (name, attrs = {}) => {
@@ -76,7 +58,7 @@ const svgEl = (name, attrs = {}) => {
   return node;
 };
 
-/** Nombres à la française : la virgule décimale, comme sur les cotes du plan. */
+
 const fr = (value, digits = 2) => value.toFixed(digits).replace('.', ',');
 
 const toneColor = (id) => {
@@ -97,13 +79,13 @@ export class FloorVisualizer {
       ...options,
       ...this.readUrlState(),
     };
-    /** Groupes de boutons indexés par clé d’état, pour la resynchronisation. */
+
     this.controls = {};
     this.build();
     this.render();
   }
 
-  /** Permet de partager une configuration via l’URL (#motif=...). */
+
   readUrlState() {
     const hash = new URLSearchParams(window.location.hash.slice(1));
     const state = {};
@@ -120,7 +102,7 @@ export class FloorVisualizer {
   set(patch) {
     Object.assign(this.state, patch);
     this.render();
-    // On partage les choix avec le visualiseur photo (et inversement).
+
     const shared = {};
     if (patch.pattern) shared.pattern = PLAN_TO_PATTERN[patch.pattern] || 'lames';
     if (patch.tone) shared.tone = planToTone(patch.tone);
@@ -141,25 +123,13 @@ export class FloorVisualizer {
     this.canvas = document.createElement('div');
     this.canvas.className = 'visualizer__canvas';
 
-    // Une liste de définitions : chaque chiffre garde son intitulé, y compris
-    // pour un lecteur d’écran qui parcourt la page repère par repère.
+
+
     this.readout = document.createElement('dl');
     this.readout.className = 'visualizer__readout';
 
-    /*
-     * Ce que le relève dit à qui ne le voit pas.
-     *
-     * Les quatre chiffres se recalculent à chaque mouvement de curseur. Une
-     * région `aria-live` posée sur la liste elle-même lirait donc chaque
-     * pixel de glissement : insupportable, et vite coupé par l'utilisateur.
-     *
-     * On annonce donc une PHRASE, une seule, et seulement quand la main
-     * s'arrête. `polite` attend une pause dans la lecture ; `aria-atomic`
-     * fait relire l'ensemble plutôt que le seul mot qui a changé.
-     *
-     * La liste de définitions, elle, reste muette et consultable repère par
-     * repère : les deux usages ne se gênent pas.
-     */
+
+
     this.annonce = document.createElement('p');
     this.annonce.className = 'visually-hidden';
     this.annonce.setAttribute('role', 'status');
@@ -191,10 +161,8 @@ export class FloorVisualizer {
     }
   }
 
-  /**
-   * Un groupe de réglage : son titre, et à droite du titre la valeur courante
-   * quand il y en a une à lire (la largeur de lame, par exemple).
-   */
+
+
   buildGroup(title, value) {
     const group = document.createElement('div');
     group.className = 'visualizer__group';
@@ -219,8 +187,8 @@ export class FloorVisualizer {
       button.dataset.pattern = pattern.id;
       button.setAttribute('aria-pressed', String(pattern.id === this.state.pattern));
       button.innerHTML = `${patternThumb(pattern.id, { w: 72, h: 48 })}<span>${pattern.label}</span>`;
-      // La vignette est décorative ici : son propre libellé doublerait celui
-      // du bouton, qui annoncerait « Motif Bâton rompu, Bâton rompu ».
+
+
       const thumb = button.querySelector('svg');
       thumb.removeAttribute('role');
       thumb.removeAttribute('aria-label');
@@ -265,14 +233,14 @@ export class FloorVisualizer {
       input.value = String(this.state[key]);
       input.inputMode = 'decimal';
       input.addEventListener('input', () => {
-        // Un champ momentanément vide est une saisie en cours, pas une pièce
-        // de un mètre : on garde la dernière valeur valide jusqu’à la suivante.
+
+
         const raw = input.value.trim();
         if (raw === '') return;
         this.set({ [key]: clamp(Number(raw) || this.state[key], 1, 25) });
       });
-      // Au relâchement, le champ affiche la valeur réellement dessinée : sans
-      // cela, saisir 40 laissait « 40 » à l’écran pour un plan borné à 25 m.
+
+
       input.addEventListener('change', () => {
         input.value = String(this.state[key]);
       });
@@ -312,17 +280,14 @@ export class FloorVisualizer {
 
     input.addEventListener('input', () => this.set({ plankWidth: Number(input.value) }));
     label.append(input);
-    // Les bornes restent hors du <label> : dedans, le nom accessible du
-    // curseur devenait « Largeur de lame en centimètres 7 cm 26 cm ».
+
+
     group.append(label, bounds);
     return group;
   }
 
-  /**
-   * Un groupe de boutons exclusifs pour une clé d’état. Les boutons sont
-   * mémorisés dans `this.controls[key]` : la resynchronisation retrouve ainsi
-   * son groupe par son nom, et non par sa position dans le panneau.
-   */
+
+
   buildButtonGroup(key, title, options, { className, decorate, ariaLabel } = {}) {
     const group = this.buildGroup(title);
     const list = document.createElement('div');
@@ -362,7 +327,7 @@ export class FloorVisualizer {
         button.classList.add('tone-swatch');
         if (option.title) button.title = option.title;
         const dot = document.createElement('i');
-        // La pastille montre la couleur qui sera réellement peinte au sol.
+
         dot.style.setProperty('--tone', toneColor(option.id));
         dot.setAttribute('aria-hidden', 'true');
         button.append(dot);
@@ -388,17 +353,8 @@ export class FloorVisualizer {
       emettre('start_project', { contexte: 'mode-plan', pattern: this.state.pattern });
     });
 
-    /*
-     * Une phrase, pas un troisieme bouton.
-     *
-     * Le Mode Plan est l'endroit du site ou la question « et qui va poser ? »
-     * arrive naturellement : on vient de calculer une surface, un nombre de
-     * lames, un taux de chutes. Mais deux boutons qui menent tous les deux au
-     * formulaire ne donneraient pas un choix, ils donneraient une hesitation.
-     *
-     * La phrase prepare la question ; le bouton existant l'emporte avec le
-     * calepinage, et c'est le formulaire qui demande le besoin et la zone.
-     */
+
+
     const note = document.createElement('p');
     note.className = 'visualizer__aide';
     note.textContent = 'Besoin d’aide pour la pose ? Décrivez votre projet : nous orientons selon votre région.';
@@ -407,26 +363,21 @@ export class FloorVisualizer {
     return group;
   }
 
-  /**
-   * Retour aux valeurs par défaut.
-   *
-   * Le retour passe par `set()`, donc l’état partagé avec le visualiseur photo
-   * est remis à zéro lui aussi. Sans cela, un rechargement de page ressortait
-   * le motif et la teinte que l’on venait justement d’abandonner.
-   */
+
+
   reset() {
     this.set({ ...DEFAULTS });
     this.syncControls();
   }
 
-  /** Réaligne un groupe de boutons sur l’état courant. */
+
   syncGroup(key) {
     (this.controls[key] || []).forEach((button) => {
       button.setAttribute('aria-pressed', String(button.dataset.value === this.state[key]));
     });
   }
 
-  /** Réaligne tous les contrôles sur l’état courant (après réinitialisation). */
+
   syncControls() {
     if (this.dimInputs) {
       Object.entries(this.dimInputs).forEach(([key, input]) => {
@@ -438,7 +389,7 @@ export class FloorVisualizer {
     this.updatePatternButtons();
   }
 
-  /** Géométrie : la pièce est dessinée en centimètres, longueur sur X. */
+
   geometry() {
     const length = this.state.length * 100;
     const width = this.state.width * 100;
@@ -477,7 +428,7 @@ export class FloorVisualizer {
     if (this.state.window !== 'none') defs.append(this.buildLightGradient(length, width));
     svg.append(defs);
 
-    // Sol
+
     svg.append(svgEl('rect', { x: 0, y: 0, width: length, height: width, fill: '#efece5' }));
 
     const group = svgEl('g', { 'clip-path': `url(#${clip.id})` });
@@ -495,7 +446,7 @@ export class FloorVisualizer {
     });
     svg.append(group);
 
-    // Nappe de lumière issue de la fenêtre
+
     if (this.state.window !== 'none') {
       svg.append(
         svgEl('rect', {
@@ -510,7 +461,7 @@ export class FloorVisualizer {
       );
     }
 
-    // Murs
+
     svg.append(
       svgEl('rect', {
         x: 0,
@@ -529,26 +480,16 @@ export class FloorVisualizer {
 
     this.canvas.innerHTML = '';
     this.canvas.append(svg);
-    // La proportion du plan sert à borner sa hauteur sans laisser de bandes
-    // vides : voir la note sur --plan-ratio dans css/components/visualizer.css.
+
+
     this.canvas.style.setProperty('--plan-ratio', (boxWidth / boxHeight).toFixed(3));
 
     this.updateReadout(ctx, pattern);
     this.updatePatternButtons();
     if (this.plankOutput) this.plankOutput.textContent = `${plankWidth} cm`;
     if (this.projectLink) {
-      /*
-       * Le sens de pose voyage sous `pose`, et non plus sous `orientation`.
-       *
-       * `orientation` était déjà pris — c'est le nom que le Studio donne à son
-       * ANGLE DE RENDU, en degrés. Le lien écrivait donc `orientation=diagonale`
-       * là où le formulaire attendait `orientation=45`, et le sens de pose
-       * n'arrivait jamais : `Number('diagonale')` ne vaut rien, la valeur était
-       * écartée sans bruit. Le plan partait avec sa surface et sans son motif.
-       *
-       * Deux notions, deux noms. Voir js/forms/plan-handoff.js, qui porte la
-       * convention pour l'outil comme pour le formulaire.
-       */
+
+
       const query = buildPlanParams({
         pose: this.state.pattern,
         surface: this.state.length * this.state.width,
@@ -558,9 +499,9 @@ export class FloorVisualizer {
     }
   }
 
-  /** Préfixe de chemin fourni par la page (data-base), pour les liens internes. */
+
   base() {
-    // Seulement « ../ » répété : une valeur libre (« javascript:… ») deviendrait un lien piégé.
+
     const base = this.root.dataset.base || '';
     return /^(?:\.\.\/)*$/.test(base) ? base : '';
   }
@@ -604,14 +545,8 @@ export class FloorVisualizer {
     }
   }
 
-  /**
-   * La fenêtre : le trait de mur, le verre, et son nom.
-   *
-   * Le libellé était centré sur le trait à 0,045 fois le grand côté : il
-   * débordait à moitié hors de la pièce sur les murs latéraux, et pesait
-   * presque autant que les cotes. Il est ramené à 0,03, posé du bon côté du
-   * mur, et cerné de la couleur du fond pour rester lisible sur le parquet.
-   */
+
+
   buildWindow(length, width) {
     const wall = this.state.window;
     const seg = this.wallSegment(wall, length, width, 0.42);
@@ -656,13 +591,8 @@ export class FloorVisualizer {
     return [gap, arc];
   }
 
-  /**
-   * Les cotes.
-   *
-   * Les libellés passent sous le trait de cote et à sa gauche, c’est-à-dire
-   * dans la marge, plutôt qu’entre le trait et le mur : la pièce récupère
-   * l’espace, et la cote reste lisible à 0,033 fois le grand côté.
-   */
+
+
   buildDimensionLines(length, width, pad) {
     const size = Math.max(length, width) * 0.033;
     const offset = pad * 0.55;
@@ -748,15 +678,8 @@ export class FloorVisualizer {
     );
   }
 
-  /**
-   * Annonce différée du relevé.
-   *
-   * 700 ms après le dernier changement : assez pour qu'un glissement de
-   * curseur ne produise qu'une phrase, assez peu pour qu'un clic sur un motif
-   * soit confirmé sans attente perçue. Une annonce identique à la
-   * précédente n'est pas réécrite : certains lecteurs d'écran relisent une
-   * région dès qu'on y touche, même pour y remettre le même texte.
-   */
+
+
   annoncer(phrase) {
     if (!this.annonce || phrase === this.derniereAnnonce) return;
     clearTimeout(this.minuteurAnnonce);

@@ -1,23 +1,3 @@
-/**
- * Schéma d'une scène.
- *
- * Une scène, c'est tout ce qu'il faut savoir d'une photographie pour y poser
- * un parquet : où est le sol, comment il fuit vers l'horizon, ce qui doit
- * rester devant, comment la pièce est éclairée.
- *
- * Ces données arrivent aujourd'hui de deux endroits :
- *   - data/scenes/*.json  : pièces d'exemple, calibrées à la main ;
- *   - la sélection de l'utilisateur sur sa propre photo.
- *
- * Elles arriveront un jour d'un service d'analyse (voir
- * docs/future-ai-api-contract.md). Le moteur de rendu ne saura toujours pas
- * d'où elles viennent : c'est tout l'intérêt de normaliser ici, une fois.
- *
- * Toutes les coordonnées sont normalisées (0 → 1 sur l'image), jamais en
- * pixels. Les valeurs légèrement hors bornes sont volontaires : un plan de
- * sol se prolonge très souvent au-delà du cadre.
- */
-
 import { CADRE_DEPART, METRES_DEFAUT, contourDuCadre, dimensionsDuCadre, planDuCadre } from './cadre-photo.js';
 
 export const SCHEMA = 'pose-parquet/scene@1';
@@ -25,25 +5,13 @@ export const SCHEMA = 'pose-parquet/scene@1';
 const clone = (points) => points.map((p) => ({ x: p.x, y: p.y }));
 const num = (value, fallback) => (Number.isFinite(value) ? value : fallback);
 
-/**
- * Une zone de sol : un plan de perspective et un contour.
- *
- * Le plan et le contour sont deux choses différentes, et c'est ce qui permet
- * de traiter proprement une pièce vue à travers une ouverture :
- *   - `plane.quad` est un repère. Il donne la fuite et l'échelle, et peut
- *     déborder très largement de ce qui est visible ;
- *   - `mask` est la surface réellement peinte, aussi découpée qu'il faut.
- *
- * `surfaceId` est la clé de la continuité : deux zones qui la partagent sont
- * le même sol, donc le même matériau. `plane.origin`, en mètres dans le repère
- * du sol, décale la trame — c'est ce qui aligne les lames de part et d'autre
- * d'une porte.
- */
+
+
 function normalizeZone(raw, index, planes) {
-  // Un plan peut être partagé : deux pièces en enfilade sur la même dalle
-  // sont un seul plan de sol vu à travers une ouverture. Le déclarer une fois
-  // et le référencer garantit une continuité exacte, là où deux plans
-  // calibrés séparément laisseraient un décalage au raccord.
+
+
+
+
   const plane = (raw.planeRef && planes[raw.planeRef]) || raw.plane || {};
   if (raw.planeRef && !planes[raw.planeRef]) {
     throw new Error(`Zone « ${raw.id || index} » : plan « ${raw.planeRef} » introuvable`);
@@ -68,8 +36,8 @@ function normalizeZone(raw, index, planes) {
         width: num(plane.meters && plane.meters.width, 4.2),
         depth: num(plane.meters && plane.meters.depth, 4),
       },
-      // Décalage de la trame, en mètres de sol. Sert à prolonger un parquet
-      // d'une zone à l'autre sans que le raccord se voie.
+
+
       origin: {
         u: num(plane.origin && plane.origin.u, 0),
         v: num(plane.origin && plane.origin.v, 0),
@@ -80,21 +48,15 @@ function normalizeZone(raw, index, planes) {
       polygon: Array.isArray(polygon) && polygon.length >= 3 ? clone(polygon) : clone(quad),
       holes: Array.isArray(mask.holes) ? mask.holes.filter((h) => Array.isArray(h) && h.length >= 3).map(clone) : [],
     },
-    // Le contour édité par l'utilisateur, quand il en a tracé un : il prend le
-    // pas sur `mask.polygon` sans l'écraser, donc « revenir au contour
-    // d'origine » reste possible.
+
+
+
     runtimeMask: null,
   };
 }
 
-/**
- * Un objet qui doit rester devant le parquet.
- *
- * Ce n'est volontairement pas un trou de masque : un occulteur vaut pour
- * toutes les zones et survit à une correction du contour. Le rendu y restaure
- * les pixels de la photo — un canapé n'est donc jamais repeint, quelle que
- * soit la zone sur laquelle il se trouve.
- */
+
+
 function normalizeOccluder(raw, index) {
   if (!Array.isArray(raw.polygon) || raw.polygon.length < 3) return null;
   return {
@@ -109,11 +71,8 @@ function normalizeOccluder(raw, index) {
   };
 }
 
-/**
- * Normalise une scène, d'où qu'elle vienne.
- * Lève si la scène est inutilisable : mieux vaut un message qu'un rendu faux.
- * @returns {object} SceneData
- */
+
+
 export function normalizeScene(raw) {
   if (!raw || typeof raw !== 'object') throw new Error('Scène vide');
   if (raw.schema && raw.schema.split('@')[0] !== SCHEMA.split('@')[0]) {
@@ -127,8 +86,8 @@ export function normalizeScene(raw) {
     .sort((a, b) => a.order - b.order);
   if (!zones.length) throw new Error('Une scène doit compter au moins une zone de sol');
 
-  // Les surfaces sont déduites des zones si elles ne sont pas déclarées : une
-  // scène minimale (photo importée) n'a pas à les écrire.
+
+
   const declared = new Map((raw.surfaces || []).map((s) => [s.id, s]));
   const surfaces = [...new Set(zones.map((z) => z.surfaceId))].map((id) => ({
     id,
@@ -142,7 +101,7 @@ export function normalizeScene(raw) {
     schema: SCHEMA,
     id: raw.id || raw.sceneId || 'scene',
     label: raw.label || 'Ma pièce',
-    source: raw.source || 'manual', // manual | precalibrated | ai
+    source: raw.source || 'manual',
     confidence: Number.isFinite(raw.confidence) ? raw.confidence : null,
 
     image: {
@@ -167,12 +126,8 @@ export function normalizeScene(raw) {
     floorZones: zones,
     occluders: (Array.isArray(raw.occluders) ? raw.occluders : []).map(normalizeOccluder).filter(Boolean),
 
-    /**
-     * Profondeur. `plane` = calculée depuis le plan du sol, ce qui est exact
-     * pour les pixels de sol et suffit à faire varier la netteté et l'échelle
-     * avec l'éloignement. Une carte d'image (`kind: 'image'`) viendra plus
-     * tard décrire aussi ce qui n'est pas le sol, pour trier les occlusions.
-     */
+
+
     depth: {
       kind: (raw.depth && raw.depth.kind) || (raw.depthMap ? 'image' : 'plane'),
       file: (raw.depth && raw.depth.file) || (raw.depthMap && raw.depthMap.file) || null,
@@ -180,40 +135,36 @@ export function normalizeScene(raw) {
       far: num(raw.depth && raw.depth.far, null),
     },
 
-    /**
-     * Éclairement. `photo-luma` : on relit la lumière dans la photo elle-même.
-     * `blurRadius`, en fraction de la largeur d'image, sépare l'éclairement du
-     * détail — c'est ce qui empêche les lames de l'ancien sol de réapparaître
-     * en fantôme sous le nouveau parquet.
-     */
+
+
     light: {
       kind: light.kind || 'photo-luma',
       strength: num(light.strength, 1),
       blurRadius: num(light.blurRadius, 0.035),
-      // Lumière d'ambiance : la part de l'éclairement qui ne vient pas
-      // directement de la fenêtre mais du rebond sur les murs et le plafond.
-      //
-      // Sans elle, le gain appliqué au bois descend aussi bas que la photo,
-      // et un parquet foncé dans une zone peu éclairée s'effondre vers le
-      // noir : on ne lit plus un sol sombre, on lit un trou. Aucune pièce
-      // réelle ne se comporte comme ça — un sol foncé reçoit toujours de la
-      // lumière indirecte, et c'est elle qui le rattache à la pièce.
-      //
-      // Le gain devient `ambient + (1 - ambient) · gain` : les ombres se
-      // relèvent, les tons moyens et les hautes lumières ne bougent pas.
+
+
+
+
+
+
+
+
+
+
+
       ambient: num(light.ambient, 0.22),
-      // Part de la **couleur** de la lumière reportée sur le parquet, en plus
-      // de son intensité. 0 : éclairement en niveaux de gris, le bois garde
-      // une teinte neutre au milieu d'une pièce dorée — et ça se voit.
-      // 1 : le bois prend toute la dominante de la photo, y compris ses
-      // défauts de balance des blancs. La moitié tient le juste milieu.
+
+
+
+
+
       tint: num(light.tint, 0.5),
-      // Assombrissement au pied des murs et des meubles.
+
       contact: num(light.contact, 0.35),
-      // Lecture robuste de la lumière (photo importée) : un canapé foncé ou
-      // un tapis clair encore sous le cadre ne doit pas être pris pour une
-      // ombre ou une tache de soleil. Les pièces calibrées n'en ont pas
-      // besoin — leurs objets sont déjà détourés.
+
+
+
+
       robust: light.robust === true,
     },
 
@@ -221,21 +172,12 @@ export function normalizeScene(raw) {
   };
 }
 
-/**
- * Cadre de départ pour une photo dont on ne sait rien : un cadre EN
- * PERSPECTIVE, entièrement dans l'image (voir js/scene/cadre-photo.js). Le
- * précédent, frontal et bord à bord, donnait un fond large de 88 % du devant :
- * une pièce sans profondeur, le parquet « plaqué » du 06/10/2026.
- * Même valeur que `DEFAULT_FRAME` (js/scene/editor.js).
- */
+
+
 export const DEFAULT_QUAD = CADRE_DEPART.map((p) => ({ ...p }));
 
-/**
- * Cadre de départ d'un SECOND sol (pièce voisine, couloir) : un sol vu par
- * une ouverture ne descend pas jusqu'au bas de la photo, son contour reste
- * donc le cadre lui-même — et un grand cadre se resserre plus vite qu'un
- * petit ne s'agrandit.
- */
+
+
 export const CADRE_SECOND_SOL = [
   { x: 0.06, y: 0.5 },
   { x: 0.94, y: 0.5 },
@@ -243,18 +185,11 @@ export const CADRE_SECOND_SOL = [
   { x: 0.0, y: 1.0 },
 ];
 
-/**
- * Scène minimale : une photo, une zone, un plan déduit du cadre.
- * C'est le point de départ de la correction manuelle — et exactement ce qu'un
- * service d'analyse renverra en mieux.
- *
- * Le contour prolonge les côtés du cadre jusqu'au bas de la photo, et les
- * dimensions du plan sont lues dans la photo (modèle de caméra) au lieu d'un
- * 4,20 × 4 m fixe.
- */
+
+
 export function createBlankScene({ width, height, quad = DEFAULT_QUAD, meters, label = 'Ma pièce' } = {}) {
-  // Les poignées (`cadre`) et le plan sont deux choses : le plan est le
-  // rectangle de sol qu'elles désignent (voir `planDuCadre`).
+
+
   const plan = planDuCadre(quad, width || 1, height || 1) || quad;
   const scene = normalizeScene({
     id: `upload-${Date.now().toString(36)}`,
@@ -276,27 +211,15 @@ export function createBlankScene({ width, height, quad = DEFAULT_QUAD, meters, l
   return scene;
 }
 
-/**
- * Dimensions d'un plan posé sur une photo, en mètres : lues dans la
- * perspective du cadre, ou celles de l'ancien plan fixe si le cadre ne décrit
- * pas un sol (coin au-dessus de l'horizon).
- */
+
+
 export function metresDuCadre(quad, width, height) {
   const lues = dimensionsDuCadre(quad, width, height);
   return lues ? { width: lues.width, depth: lues.depth } : { ...METRES_DEFAUT };
 }
 
-/**
- * Ajoute une zone de sol à une scène existante.
- *
- * Sert quand l'utilisateur déclare un second sol sur sa photo — une pièce
- * aperçue derrière une porte, un couloir. Par défaut la nouvelle zone rejoint
- * la **même surface** que la première : c'est le cas courant, un seul parquet
- * pour tout l'étage, et cela évite de demander à l'utilisateur de comprendre la
- * notion de surface pour obtenir le résultat attendu.
- *
- * @returns {object} la zone créée, déjà présente dans scene.floorZones
- */
+
+
 export function addZone(scene, { label, quad, surfaceId, meters } = {}) {
   const index = scene.floorZones.length;
   const zone = normalizeZone(
@@ -318,7 +241,7 @@ export function addZone(scene, { label, quad, surfaceId, meters } = {}) {
   return zone;
 }
 
-/** Retire une zone. La scène doit toujours en garder au moins une. */
+
 export function removeZone(scene, zoneId) {
   if (scene.floorZones.length <= 1) return false;
   const index = scene.floorZones.findIndex((zone) => zone.id === zoneId);
@@ -330,9 +253,9 @@ export function removeZone(scene, zoneId) {
   return true;
 }
 
-/** Zones d'une même surface, de la plus lointaine à la plus proche. */
+
 export const zonesOfSurface = (scene, surfaceId) =>
   scene.floorZones.filter((zone) => zone.surfaceId === surfaceId);
 
-/** Contour effectivement peint pour une zone (édition de l'utilisateur incluse). */
+
 export const zonePolygon = (zone) => zone.runtimeMask || zone.mask.polygon;

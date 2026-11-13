@@ -1,13 +1,6 @@
 <?php
-/**
- * Statuts d'une demande — l'unique source de vérité.
- *
- * Valeur stockée en base à gauche, libellé d'administration à droite. Tout ce
- * qui a besoin d'un statut (schéma, REST, écrans, emails à venir) passe par
- * cette classe : une valeur écrite ailleurs en dur est un bug.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -27,14 +20,11 @@ final class Status {
 	public const LOST       = 'lost';
 	public const SPAM       = 'spam';
 
-	/** Statut d'une demande qui vient d'arriver. */
+
 	public const DEFAULT = self::NEW_;
 
-	/**
-	 * Valeur → libellé, dans l'ordre d'affichage voulu en administration.
-	 *
-	 * @return array<string,string>
-	 */
+
+
 	public static function labels(): array {
 		return [
 			self::NEW_       => __( 'Nouveau', 'pose-parquet-core' ),
@@ -47,7 +37,7 @@ final class Status {
 		];
 	}
 
-	/** @return string[] */
+
 	public static function all(): array {
 		return array_keys( self::labels() );
 	}

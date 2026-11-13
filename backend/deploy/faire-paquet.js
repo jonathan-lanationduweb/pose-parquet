@@ -1,5 +1,5 @@
 'use strict';
-// Construction par liste autorisée, portable Windows/Linux. Jamais de suppression.
+
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
@@ -34,7 +34,7 @@ function copier(source, relatif) {
   manifeste.push({ fichier: relatif, octets: stat.size, sha256: crypto.createHash('sha256').update(fs.readFileSync(source)).digest('hex') });
 }
 
-// Empêche qu'une destination dans un arbre copié ne provoque une récursion.
+
 const sources = type === 'plugin'
   ? ['pose-parquet-core.php', 'uninstall.php', 'src', 'templates', 'assets'].map(n => [path.join(root, 'backend/pose-parquet-core', n), `pose-parquet-core/${n}`])
   : [...publicFiles.map(n => [path.join(root, n), n]), ...publicDirs.map(n => [path.join(root, n), n]),
@@ -54,6 +54,6 @@ if (type === 'site') {
   fs.writeFileSync(path.join(destination, '.nojekyll'), '');
   if (fs.existsSync(path.join(root, 'CNAME'))) copier(path.join(root, 'CNAME'), 'CNAME');
 }
-// Le manifeste reste hors de l'artefact public.
+
 fs.writeFileSync(`${destination}.manifest.json`, JSON.stringify({ type, fichiers: manifeste }, null, 2) + '\n');
 console.log(`${type} : ${manifeste.length} fichiers ; manifeste SHA-256 créé hors du paquet.`);

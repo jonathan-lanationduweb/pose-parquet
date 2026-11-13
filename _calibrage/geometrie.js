@@ -1,70 +1,12 @@
-/**
- * Géométrie de calibrage — outil interne, jamais chargé par le site.
- *
- * Ce module regroupe les mesures qui transforment une photographie en plan de
- * sol. Elles vivaient dans `calibrage.js`, mêlées à son interface ; les
- * extraire permet de calibrer une scène **en script**, sans cliquer, ce qui
- * était devenu nécessaire : à la main, six nouvelles pièces représentaient
- * des centaines de relevés.
- *
- * ## Le principe
- *
- * On ne devine ni la perspective ni les dimensions. On relève dans l'image
- * deux familles de droites du sol — pieds de murs, plinthes, seuils, joints de
- * lames. Deux droites parallèles dans la pièce se croisent dans l'image en
- * leur **point de fuite** : c'est une mesure, pas une hypothèse, et elle ne
- * suppose aucun horizon.
- *
- * De là tout se déduit :
- *
- *   - la droite qui joint deux points de fuite de directions horizontales
- *     **est** l'horizon ;
- *   - deux directions perpendiculaires donnent la focale, par
- *     `focaleParOrthogonalite()` ;
- *   - focale + hauteur d'œil donnent la profondeur de chaque point du sol,
- *     donc les mètres du quadrilatère, par `mesureQuad()`.
- *
- * ## Ce qui fait preuve
- *
- * Une calibration juste se vérifie, elle ne se décrète pas. Deux contrôles
- * sont fournis et doivent tous deux passer :
- *
- *   1. **concordance des côtés opposés** — les deux largeurs mesurées du
- *      quadrilatère doivent tomber sur la même valeur, et les deux
- *      profondeurs aussi. C'est ce qui prouve que le quadrilatère est bien
- *      l'image d'un rectangle ;
- *   2. **invariance de l'étendue** — l'étendue du sol visible, en mètres, ne
- *      doit pas dépendre du rectangle de référence choisi. Deux relevés sur
- *      deux rectangles différents de la même pièce doivent s'accorder.
- *
- * Un écart de quelques pour cent sur l'un des deux veut dire que le relevé
- * est faux, pas qu'il est imprécis.
- */
-
-/* ------------------------------------------------------------------ */
-/* Briques                                                             */
-/* ------------------------------------------------------------------ */
-
-/** Intersection de deux droites (point + direction). `null` si parallèles. */
 export function intersecte(p1, d1, p2, d2) {
   const den = d1.x * d2.y - d1.y * d2.x;
-  if (Math.abs(den) < 1e-9) return null; // parallèles à l'écran : fuite à l'infini
+  if (Math.abs(den) < 1e-9) return null;
   const t = ((p2.x - p1.x) * d2.y - (p2.y - p1.y) * d2.x) / den;
   return { x: p1.x + t * d1.x, y: p1.y + t * d1.y };
 }
 
-/**
- * Droite au plus près d'une série de points, en moindres carrés **totaux**.
- *
- * La régression ordinaire y = ax + b ne sait pas représenter une droite
- * verticale, et se dégrade bien avant : le pied du mur d'un couloir est
- * presque vertical dans l'image. On passe donc par l'axe principal du nuage,
- * qui n'a pas d'orientation privilégiée.
- *
- * `residuMax` est en pixels : au-delà de 2 ou 3, les points relevés ne sont
- * pas alignés et la droite ne veut rien dire. C'est le garde-fou qui a fait
- * écarter les relevés pris sur un sol réfléchissant.
- */
+
+
 export function ajusteDroite(points) {
   const n = points.length;
   if (n < 2) return null;
@@ -80,7 +22,7 @@ export function ajusteDroite(points) {
     sxy += dx * dy;
     syy += dy * dy;
   }
-  // Axe principal du nuage : vecteur propre dominant de la matrice de covariance.
+
   const angle = 0.5 * Math.atan2(2 * sxy, sxx - syy);
   const d = { x: Math.cos(angle), y: Math.sin(angle) };
   const ecarts = points.map((p) => Math.abs((p.x - mx) * d.y - (p.y - my) * d.x));
@@ -93,21 +35,8 @@ export function ajusteDroite(points) {
   };
 }
 
-/**
- * Focale, en pixels, déduite de deux directions **perpendiculaires dans la
- * pièce**.
- *
- * Pour deux points de fuite v1 et v2 de directions orthogonales, et c le
- * point principal (centre de l'image) :
- *
- *     (v1 − c) · (v2 − c) = − f²
- *
- * Le produit scalaire doit donc être négatif : les deux fuites encadrent le
- * centre de l'image. S'il est positif, les deux directions relevées ne sont
- * pas perpendiculaires — ou l'une des deux est fausse. On renvoie `null`
- * plutôt qu'une racine carrée d'un nombre négatif : une focale inventée
- * contaminerait toutes les mesures qui suivent.
- */
+
+
 export function focaleParOrthogonalite(vpU, vpV, largeur, hauteur) {
   const cx = largeur / 2;
   const cy = hauteur / 2;
@@ -122,18 +51,8 @@ export function focaleParOrthogonalite(vpU, vpV, largeur, hauteur) {
   };
 }
 
-/**
- * Quadrilatère de plan construit à partir de la géométrie de la pièce.
- *
- * Le quatrième coin n'est pas choisi : il est **imposé** par la perspective —
- * intersection de (alongU → vpV) et de (alongV → vpU). C'est ce qui garantit
- * que le quadrilatère est l'image d'un rectangle, donc que l'homographie a un
- * sens. Un quadrilatère dont on place les quatre coins à l'œil n'est presque
- * jamais l'image d'un rectangle, et le parquet s'y pose en biais.
- *
- * Ordre attendu par le moteur : fond-gauche, fond-droite, proche-droite,
- * proche-gauche.
- */
+
+
 export function quadDepuisPiece({ vpU, vpV, corner, alongU, alongV }) {
   const dir = (a, b) => ({ x: b.x - a.x, y: b.y - a.y });
   const fourth = intersecte(alongU, dir(alongU, vpV), alongV, dir(alongV, vpU));
@@ -142,21 +61,12 @@ export function quadDepuisPiece({ vpU, vpV, corner, alongU, alongV }) {
   return [round(corner), round(alongU), round(fourth), round(alongV)];
 }
 
-/* ------------------------------------------------------------------ */
-/* Mesure en mètres                                                    */
-/* ------------------------------------------------------------------ */
 
-/**
- * Point du sol, en mètres, dans le repère de la caméra.
- *
- * La profondeur se lit sur l'écart à **l'horizon**, jamais sur l'écart au
- * centre de l'image : `z = f · h / (y − y_horizon)`. La confusion des deux a
- * déjà produit une pièce de 44 m pour 6 m réels — l'erreur est silencieuse,
- * elle donne des nombres d'allure raisonnable jusqu'à ce qu'on les compare.
- *
- * Un point au-dessus de l'horizon, ou trop près, n'est pas sur le sol visible :
- * on renvoie `null`.
- */
+
+
+
+
+
 export function pointAuSol(p, { horizonY, focalPx, hauteurM, largeur, hauteur }) {
   const y = p.y * hauteur;
   const dy = y - horizonY * hauteur;
@@ -166,21 +76,15 @@ export function pointAuSol(p, { horizonY, focalPx, hauteurM, largeur, hauteur })
   return { X, z };
 }
 
-/**
- * Dimensions réelles d'un quadrilatère de sol, et les deux preuves.
- *
- * `concordance` est l'écart relatif entre les deux côtés opposés qui devraient
- * mesurer la même chose. En dessous de 1 %, le quadrilatère est bien l'image
- * d'un rectangle. Au-delà de 3 %, le relevé est à refaire : ce n'est pas du
- * bruit de mesure, c'est une droite mal placée.
- */
+
+
 export function mesureQuad(quad, camera) {
   const sol = quad.map((p) => pointAuSol(p, camera));
   if (sol.some((s) => !s)) {
     return { ok: false, raison: 'un coin du quadrilatère est au-dessus de l’horizon' };
   }
   const dist = (a, b) => Math.hypot(a.X - b.X, a.z - b.z);
-  // fond-gauche(0) fond-droite(1) proche-droite(2) proche-gauche(3)
+
   const largeurFond = dist(sol[0], sol[1]);
   const largeurProche = dist(sol[3], sol[2]);
   const profondeurDroite = dist(sol[1], sol[2]);
@@ -204,13 +108,8 @@ export function mesureQuad(quad, camera) {
   };
 }
 
-/**
- * Étendue du sol réellement visible, en mètres — la seconde preuve.
- *
- * Elle se calcule sur le contour du masque, pas sur le quadrilatère : c'est
- * elle qui doit rester la même quel que soit le rectangle de référence, et
- * c'est elle qu'on recoupe en comptant les lames dans l'image.
- */
+
+
 export function etendueVisible(polygon, camera) {
   const pts = polygon.map((p) => pointAuSol(p, camera)).filter(Boolean);
   if (pts.length < 3) return null;
@@ -226,18 +125,12 @@ export function etendueVisible(polygon, camera) {
   };
 }
 
-/* ------------------------------------------------------------------ */
-/* Relevés sur l'image                                                 */
-/* ------------------------------------------------------------------ */
 
-/**
- * Direction locale des lames (ou de toute texture orientée), par le tenseur de
- * structure d'une fenêtre de l'image.
- *
- * `coherence` (rapport des valeurs propres) dit si la mesure vaut quelque
- * chose : sur une zone lisse ou bruitée elle tombe vers zéro, et il faut
- * choisir un autre point. En dessous de 0,3, ne pas s'en servir.
- */
+
+
+
+
+
 export function orientationLocale(photo, nx, ny, radiusPx = 60) {
   const w = photo.width;
   const h = photo.height;
@@ -273,18 +166,15 @@ export function orientationLocale(photo, nx, ny, radiusPx = 60) {
   const l1 = tr / 2 + disc;
   const l2 = tr / 2 - disc;
   const coherence = l1 > 1e-6 ? (l1 - l2) / (l1 + l2) : 0;
-  // Vecteur propre dominant = direction du gradient ; les joints sont à 90°.
+
   const gAngle = 0.5 * Math.atan2(2 * jxy, jxx - jyy);
   const angle = ((gAngle * 180) / Math.PI + 90 + 180) % 180;
   const rad = (angle * Math.PI) / 180;
   return { angle: +angle.toFixed(2), coherence: +coherence.toFixed(3), dir: { x: Math.cos(rad), y: Math.sin(rad) } };
 }
 
-/**
- * Point de fuite de la direction des lames.
- * Trois points ou plus : médiane des intersections deux à deux, bien plus
- * robuste qu'une seule paire.
- */
+
+
 export function fuiteDesLames(photo, points, radiusPx = 60) {
   const w = photo.width;
   const h = photo.height;
@@ -311,19 +201,8 @@ export function fuiteDesLames(photo, points, radiusPx = 60) {
   };
 }
 
-/**
- * Pied de mur sur une colonne de l'image.
- *
- * On cherche la ligne où la couleur bascule du mur vers le sol, sur la teinte
- * (les sols en bois sont plus chauds que les murs) autant que sur la
- * luminance. Puis on remonte jusqu'au pied de la pente, car le contour doit
- * passer **sous** la plinthe : posé sur son milieu, il laisse apparaître
- * l'ancien sol dessous, ce qui saute aux yeux.
- *
- * `force` est l'amplitude du basculement. Faible, le relevé n'est pas fiable —
- * c'est le cas sur un parquet foncé très réfléchissant, où les reflets créent
- * des gradients plus forts que la jonction mur/sol.
- */
+
+
 export function piedDeMur(photo, nx, y0n, y1n) {
   const width = photo.width;
   const height = photo.height;
@@ -354,7 +233,7 @@ export function piedDeMur(photo, nx, y0n, y1n) {
   return { ny: +(rows[start].y / height).toFixed(4), force: +score[peak].toFixed(1) };
 }
 
-/** Relevé d'une série de colonnes, prêt à ajuster en droite. */
+
 export function releveColonnes(photo, colonnes, y0, y1) {
   return colonnes
     .map((nx) => {

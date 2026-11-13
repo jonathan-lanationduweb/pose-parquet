@@ -1,15 +1,12 @@
-/* En-tête : transparent au-dessus du hero, pilule de navigation centrée */
 .site-header {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: var(--z-header);
-  /* Le jeton dont `--header-h` se déduit : voir tokens.css. */
   padding-block: var(--header-pad);
   color: var(--text);
   transition: background var(--dur-3) var(--ease-out), color var(--dur-3) var(--ease-out),
               box-shadow var(--dur-3) var(--ease-out), padding var(--dur-3) var(--ease-out);
 }
-/* Au-dessus d'un visuel plein écran : texte clair, fond transparent */
 .site-header[data-over="true"] { color: #fff; }
 .site-header[data-scrolled="true"] {
   background: color-mix(in srgb, var(--bg) 88%, transparent);
@@ -40,16 +37,11 @@
   line-height: 1;
   justify-self: start;
 }
-/* Symbole d'identité : proportions réelles (106 × 197), pas un carré — un
-   symbole étiré n'est plus le symbole. Pas d'animation au survol : le repère
-   de marque n'a pas à bouger. */
 .brand__mark {
   width: 13px; height: 24px;
   align-self: center;
   flex: none;
 }
-/* Logo choisi dans WordPress (Mon site → Logo principal) : il remplace le
-   symbole et le nom, à la hauteur de la ligne d'en-tête, sans déformation. */
 .brand__logo {
   display: block;
   align-self: center;
@@ -58,8 +50,6 @@
 }
 .brand strong { font-weight: 400; }
 .brand span { opacity: 0.55; }
-
-/* Pilule de navigation */
 .nav { display: none; justify-self: center; }
 @media (min-width: 62rem) { .nav { display: block; } }
 
@@ -109,8 +99,6 @@
 .header__cta:hover { background: currentColor; }
 .header__cta:hover span { color: var(--bg); }
 .site-header[data-over="true"] .header__cta:hover span { color: var(--c-ink); }
-
-/* Bouton menu — il doit rester visible et cliquable panneau ouvert */
 body[data-drawer-open="true"] .site-header {
   z-index: calc(var(--z-drawer) + 10);
   background: transparent;
@@ -140,7 +128,6 @@ body[data-drawer-open="true"] .header__cta { display: none; }
   background: currentColor;
   transition: transform var(--dur-2) var(--ease-out), opacity var(--dur-1) linear;
 }
-/* Panneau sombre ouvert : croix blanc cassé, bordure visible, jamais au hover seulement */
 .nav-toggle[aria-expanded="true"] {
   color: var(--text-invert);
   border-color: color-mix(in srgb, var(--text-invert) 55%, transparent);
@@ -149,8 +136,6 @@ body[data-drawer-open="true"] .header__cta { display: none; }
 .nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
 .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
 .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
-
-/* Panneau plein écran */
 .drawer {
   position: fixed;
   inset: 0;

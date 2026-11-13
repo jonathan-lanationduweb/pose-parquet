@@ -1,11 +1,3 @@
-/*
- * Page de maintenance — une seule feuille, deux lecteurs :
- *   - WordPress (templates/maintenance-page.php) l'insère telle quelle ;
- *   - le générateur du site statique (_generator/wordpress.js) aussi.
- * Les @font-face sont déclarées par chacun (chemins différents) ; ici, rien
- * que la mise en page. Une image pleine hauteur, le logo, un titre, un texte,
- * deux liens. Ni compte à rebours, ni animation, ni formulaire.
- */
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
 body {

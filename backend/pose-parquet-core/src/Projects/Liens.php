@@ -1,22 +1,6 @@
 <?php
-/**
- * Les liens rapides d'un projet orienté, dans l'administration.
- *
- * Pose-Parquet ne transmet rien : il oriente. Depuis la liste des projets,
- * on peut donc ouvrir ce vers quoi le visiteur a été orienté — la fiche du
- * parquet chez Premibel, la page de devis d'Allure Design — exactement selon
- * la règle publique :
- *
- *   premibel        → Premibel
- *   allure_design   → Allure Design, en Île-de-France seulement
- *   mixed           → les deux, en Île-de-France seulement pour Allure Design
- *   undetermined    → aucun lien
- *
- * Le produit vient du catalogue PUBLIÉ par le site (data/products.premibel.json),
- * lu dans le dossier local du site s'il est réglé, sinon sur le site public :
- * jamais d'une adresse stockée avec le projet. Une adresse qui n'est pas sur
- * premibel.fr est ignorée.
- */
+
+
 
 declare(strict_types=1);
 
@@ -35,14 +19,11 @@ final class Liens {
 
 	private const CACHE = 'pp_catalogue_produits';
 
-	/** @var array<string,array{nom:string,url:string}>|null */
+
 	private static ?array $produits = null;
 
-	/**
-	 * Le catalogue réduit à id → nom, fiche. Mis en cache une heure.
-	 *
-	 * @return array<string,array{nom:string,url:string}>
-	 */
+
+
 	public static function produits(): array {
 		if ( self::$produits !== null ) {
 			return self::$produits;
@@ -54,7 +35,7 @@ final class Liens {
 		$corps = '';
 		$local = Apercu::dossier();
 		if ( $local && is_readable( $local . '/data/products.premibel.json' ) ) {
-			$corps = (string) file_get_contents( $local . '/data/products.premibel.json' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			$corps = (string) file_get_contents( $local . '/data/products.premibel.json' );
 		} else {
 			$r = \PoseParquet\Core\Admin\SitePublic::lire( SitePublic::url() . 'data/products.premibel.json', [ 'timeout' => 6 ] );
 			if ( ! is_wp_error( $r ) && (int) wp_remote_retrieve_response_code( $r ) === 200 ) {
@@ -84,7 +65,7 @@ final class Liens {
 		return str_starts_with( $url, 'https://' ) && ( $hote === 'premibel.fr' || str_ends_with( $hote, '.premibel.fr' ) );
 	}
 
-	/** Le nom du parquet choisi dans le Visualiseur, s'il est au catalogue ; son identifiant sinon. */
+
 	public static function produit( array $row ): string {
 		$id = (string) ( $row['product_id'] ?? '' );
 		if ( $id === '' ) {
@@ -93,11 +74,8 @@ final class Liens {
 		return self::produits()[ $id ]['nom'] ?? $id;
 	}
 
-	/**
-	 * Les liens rapides d'un projet, selon sa destination et sa zone.
-	 *
-	 * @return array<int,array{cible:string,libelle:string,url:string}>
-	 */
+
+
 	public static function de( array $row ): array {
 		$destination = (string) ( $row['lead_destination'] ?? '' );
 		$liens       = [];
@@ -108,7 +86,7 @@ final class Liens {
 				? [ 'cible' => 'premibel', 'libelle' => __( 'Voir le produit chez Premibel', 'pose-parquet-core' ), 'url' => $fiche ]
 				: [ 'cible' => 'premibel', 'libelle' => __( 'Voir les parquets Premibel', 'pose-parquet-core' ), 'url' => (string) ( $site['premibel_url'] ?? '' ) ?: Maintenance::PREMIBEL_URL ];
 		}
-		// Allure Design : jamais hors Île-de-France, quelle que soit la destination stockée.
+
 		if ( in_array( $destination, [ 'allure_design', 'mixed' ], true ) && LeadRouting::en_idf( $row ) ) {
 			$liens[] = [ 'cible' => 'allure_design', 'libelle' => __( 'Continuer avec Allure Design', 'pose-parquet-core' ), 'url' => Maintenance::ALLURE_URL ];
 		}

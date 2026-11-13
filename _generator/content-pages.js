@@ -1,17 +1,3 @@
-/**
- * Textes des pages du site : titre affiché (H1), chapô, SEO — et les blocs
- * éditoriaux de l'accueil, d'À propos, de la méthode et du contact, en
- * CHAMPS STRUCTURÉS (voir plus bas et textes.js).
- *
- * Valeurs par défaut, celles du dépôt. Quand un instantané WordPress existe
- * (data/wordpress/contenus.json), _generator/wordpress.js remplace ces valeurs
- * par celles saisies dans « Pose Parquet → Pages ». La structure des pages
- * (sections, grilles, composants) reste écrite dans build.js : on modifie des
- * textes, pas une mise en page.
- *
- * `h1` et `chapo` valent null pour l'accueil : son en-tête est une
- * composition (home.js), seul son SEO se règle ici.
- */
 const PAGES = {
   "accueil": {
     "nom": "Accueil",
@@ -85,13 +71,8 @@ const PAGES = {
     "titre": "Contacter Pose Parquet : question ou correction",
     "description": "Contacter l'équipe éditoriale de Pose Parquet : question, correction, proposition de contenu ou d'outil."
   },
-  /*
-   * Pages dont le SEO était écrit en dur dans le générateur. Les valeurs par
-   * défaut sont les textes publiés jusqu'ici, à l'identique : rien ne change
-   * sur le site tant que personne ne les modifie dans WordPress.
-   * `h1` / `chapo` à null : l'en-tête est une composition (outil plein écran),
-   * seul son SEO se règle ici.
-   */
+
+
   "motifs": {
     "nom": "Motifs",
     "adresse": "/motifs/",
@@ -139,11 +120,8 @@ const PAGES = {
   }
 };
 
-/*
- * Les six fiches motif : leur SEO, leur titre et leur chapô se règlent aussi
- * dans WordPress (le corps de la fiche reste celui du dépôt). Clé
- * « motif-<slug> », valeurs par défaut prises dans content-motifs.js.
- */
+
+
 const { MOTIFS: FICHES_MOTIF } = require('./content-motifs');
 FICHES_MOTIF.forEach((m, i) => {
   PAGES[`motif-${m.slug}`] = {
@@ -157,18 +135,8 @@ FICHES_MOTIF.forEach((m, i) => {
   };
 });
 
-/*
- * CHAMPS STRUCTURÉS — les blocs éditoriaux pilotés depuis WordPress.
- *
- * Chaque page déclare ici ce qui s'y modifie, groupe par groupe, dans l'ordre
- * où les sections apparaissent. WordPress affiche ces champs comme
- * formulaire (Pose Parquet → Pages), sans pouvoir ajouter, retirer ni
- * déplacer une section : la structure reste celle de build.js et home.js.
- * Pas de HTML libre : les types sont décrits dans textes.js.
- *
- * Les valeurs par défaut sont les textes publiés. `valeurs` est rempli au
- * chargement, puis remplacé par WordPress (wordpress.js → appliquer).
- */
+
+
 const { defauts } = require('./textes');
 
 const c = (groupe) => (cle, libelle, type, max, defaut, aide) => ({ cle, groupe, libelle, type, max, defaut, ...(aide ? { aide } : {}) });
@@ -177,9 +145,8 @@ const hero = c('En-tête (hero)');
 const pourquoi = c('Section « Pourquoi ce site »');
 const passerelle = c('Section passerelle (Premibel / Allure Design)');
 const projet = c('Section projet (fin de page)');
-/* Dans les textes de l'accueil, {guides}, {motifs}, {parquets}, {motifs_outils}
-   (ou {guides_lettres}, {motifs_lettres}, {motifs_outils_lettres}) sont
-   remplacés au build par les nombres réels : aucun chiffre ne se périme. */
+
+
 const NOMBRES = 'Nombres calculés : {guides}, {motifs}, {parquets}, {motifs_outils} — ou en lettres : {guides_lettres}, {motifs_lettres}, {motifs_outils_lettres}.';
 PAGES['accueil'].champs = [
   hero('hero_eyebrow', 'Surtitre', 'texte', 60, 'Média indépendant sur la pose de parquet'),
@@ -297,21 +264,8 @@ PAGES['contact'].champs = [
   r3('r3_cta', 'Bouton projet', 'texte', 40, 'Décrire mon projet'),
 ];
 
-/*
- * PAGES LÉGALES.
- *
- * Les informations que seul l'éditeur connaît (raison sociale, SIREN,
- * adresse, directeur de la publication, hébergeur du WordPress, durée de
- * conservation) sont livrées avec la valeur A_COMPLETER : rien n'est inventé.
- * Tant qu'il en reste une, la validation de publication le signale, et
- * REFUSE la publication en production (valider-wordpress.js) : le site ne
- * peut pas partir en ligne avec des mentions légales incomplètes.
- *
- * Les textes par défaut décrivent ce que fait réellement le site (vérifié
- * dans le code au 05/11/2026) : aucun cookie de mesure ni de publicité,
- * aucun script tiers, un formulaire sans coordonnées. Ce sont des modèles à
- * faire relire : ils ne remplacent pas un conseil juridique.
- */
+
+
 const A_COMPLETER = '[À compléter]';
 PAGES['mentions-legales'] = {
   nom: 'Mentions légales',

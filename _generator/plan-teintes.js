@@ -1,14 +1,3 @@
-/**
- * Teintes du Mode Plan, tirées du catalogue Premibel.
- *
- * Chaque référence Premibel visualisable est rattachée à une famille de
- * rendu (data/render-families.json), qui porte sa couleur de base. Le Mode
- * Plan propose une pastille par famille réellement présente dans le
- * catalogue Premibel actif : quand le catalogue est resynchronisé, la liste
- * suit au build suivant, sans retoucher le code de l'outil.
- *
- * Sortie : js/tools/plan-teintes.js (fichier généré, à ne pas modifier).
- */
 const fs = require('fs');
 const path = require('path');
 const { ecrireTexte } = require('./eol');
@@ -16,7 +5,7 @@ const { ecrireTexte } = require('./eol');
 const RACINE = path.join(__dirname, '..');
 const lire = (relatif) => JSON.parse(fs.readFileSync(path.join(RACINE, relatif), 'utf8'));
 
-/** rgb (0-255) → teinte, saturation, luminosité en entiers, comme le Mode Plan les attend. */
+
 function hsl([r, g, b]) {
   const [R, G, B] = [r / 255, g / 255, b / 255];
   const max = Math.max(R, G, B);
@@ -54,7 +43,7 @@ function teintesPlan() {
         ...hsl(f.texture.base),
       };
     })
-    // Du plus clair au plus foncé : l'ordre dans lequel on lit un nuancier.
+
     .sort((a, b) => b.luminance - a.luminance)
     .map(({ luminance, ...t }) => t);
 }
@@ -64,7 +53,7 @@ function ecrirePlanTeintes() {
   if (!teintes.length) throw new Error('Mode Plan : aucune teinte Premibel trouvée (catalogue vide ?).');
   ecrireTexte(
     path.join(RACINE, 'js', 'tools', 'plan-teintes.js'),
-    `/* Fichier généré par _generator/plan-teintes.js depuis le catalogue Premibel : ne pas modifier. */
+    `
 export const PLAN_TEINTES = ${JSON.stringify(teintes, null, 2)};
 `
   );

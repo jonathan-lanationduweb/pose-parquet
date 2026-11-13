@@ -1,23 +1,6 @@
 <?php
-/**
- * Validation et normalisation d'une demande reçue de l'API publique.
- *
- * Aucune confiance dans le navigateur : la validation du front est un confort,
- * celle-ci fait foi. Le validateur distingue, dans ses messages, un champ
- * absent, un type invalide, une valeur hors liste, une longueur dépassée et
- * une valeur hors plage — parce qu'un front qui casse doit pouvoir lire
- * pourquoi.
- *
- * Il rend soit des erreurs par champ, soit un tableau NORMALISÉ prêt pour le
- * dépôt : chaînes nettoyées et bornées, surface entière, région déduite de la
- * zone, consentement transformé en booléen. Il ne touche pas à la base et ne
- * connaît pas WordPress au-delà de `sanitize_text_field` et `is_email`.
- *
- * Champs inconnus : refusés (422). Champs réservés au serveur (status,
- * reference, dates) : refusés aussi, avec un message distinct — voir Fields.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -29,10 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Validator {
 
-	/**
-	 * @param mixed $input corps JSON décodé
-	 * @return array{ok:bool,data:array<string,mixed>,errors:array<string,string>}
-	 */
+
+
 	public static function validate( mixed $input ): array {
 		if ( ! is_array( $input ) || array_is_list( $input ) ) {
 			return self::fail( [ '_' => 'Le corps de la requête doit être un objet JSON.' ] );
@@ -41,7 +22,7 @@ final class Validator {
 		$errors = [];
 		$data   = [];
 
-		/* Champs réservés et inconnus : on les nomme tous, pas seulement le premier. */
+
 		foreach ( array_keys( $input ) as $key ) {
 			$key = (string) $key;
 			if ( in_array( $key, Fields::RESERVED, true ) ) {
@@ -51,14 +32,14 @@ final class Validator {
 			}
 		}
 
-		/* Présence des obligatoires. */
+
 		foreach ( Fields::ROOT as $name => $required ) {
 			if ( $required && ! self::present( $input, $name ) ) {
 				$errors[ $name ] = 'Champ obligatoire absent.';
 			}
 		}
 
-		/* Listes fermées. */
+
 		foreach ( array_keys( Fields::ENUMS ) as $name ) {
 			if ( ! self::present( $input, $name ) || isset( $errors[ $name ] ) ) {
 				continue;
@@ -76,31 +57,15 @@ final class Validator {
 			$data[ $name ] = $value;
 		}
 
-		/*
-		 * Département : la seule donnée géographique, et la source de la région.
-		 *
-		 * `Departements::normaliser()` passe d'abord : elle met « 2a » en
-		 * majuscules et « 6 » en « 06 », pour qu'une saisie correcte ne soit
-		 * pas refusée sur une question de forme.
-		 */
+
+
 		self::texte( $input, 'department', 3, $errors, $data, static function ( string $v ) {
 			$v = Departements::normaliser( $v );
 			return preg_match( '/^(0[1-9]|[1-8][0-9]|9[0-5]|2[AB]|97[1-6])$/', $v ) ? $v : null;
 		}, 'Numéro de département invalide (ex. 75, 2A, 974).' );
 
-		/*
-		 * La région se DÉDUIT, elle ne se reçoit pas.
-		 *
-		 * Une région envoyée aurait été une région qu'on peut contredire :
-		 * `department=35` avec `region=Île-de-France` faisait partir un
-		 * chantier breton chez une entreprise francilienne. Le champ a
-		 * disparu du contrat — une région reçue est refusée plus haut comme
-		 * champ inconnu — et ce qui est stocké vient d'ici.
-		 *
-		 * Un numéro hors nomenclature — 975, qui passe le motif sans être un
-		 * département — ne reçoit AUCUNE région plutôt qu'une région devinée.
-		 * Vide veut dire « on ne sait pas ».
-		 */
+
+
 		if ( isset( $data['department'] ) ) {
 			$region = Departements::region( $data['department'] );
 			if ( $region !== '' ) {
@@ -108,7 +73,7 @@ final class Validator {
 			}
 		}
 
-		/* Textes libres, bornés. Les noms de personnes ne sont pas transformés au-delà du nettoyage. */
+
 		self::texte( $input, 'city', Fields::MAX_CITY, $errors, $data );
 		self::texte( $input, 'firstName', Fields::MAX_NAME, $errors, $data );
 		self::texte( $input, 'lastName', Fields::MAX_NAME, $errors, $data );
@@ -119,7 +84,7 @@ final class Validator {
 		self::texte( $input, 'utmContent', Fields::MAX_UTM, $errors, $data );
 		self::texte( $input, 'utmTerm', Fields::MAX_UTM, $errors, $data );
 
-		/* Email : validation WordPress, minuscules sur le domaine. */
+
 		if ( self::present( $input, 'email' ) ) {
 			$email = is_string( $input['email'] ) ? trim( $input['email'] ) : '';
 			if ( ! is_string( $input['email'] ) ) {
@@ -134,12 +99,8 @@ final class Validator {
 			}
 		}
 
-		/*
-		 * Téléphone : formats français usuels — 0X XX XX XX XX, +33 X XX XX XX XX,
-		 * avec espaces, points ou tirets. On conserve la saisie nettoyée (utile à
-		 * lire) ; on refuse ce qui n'est manifestement pas un numéro. Pas de
-		 * moteur international : le formulaire est français et le dit.
-		 */
+
+
 		if ( self::present( $input, 'phone' ) ) {
 			if ( ! is_string( $input['phone'] ) ) {
 				$errors['phone'] = 'Type invalide : chaîne attendue.';
@@ -148,8 +109,8 @@ final class Validator {
 				$chiffres = preg_replace( '/[^0-9+]/', '', $phone );
 				if ( strlen( $phone ) > Fields::MAX_PHONE ) {
 					$errors['phone'] = sprintf( 'Longueur maximale dépassée (%d caractères).', Fields::MAX_PHONE );
-				// Le format international est vérifié sur la SAISIE (chiffres et séparateurs seulement), pas sur sa version
-				// réduite aux chiffres : « +33612345678<svg onload=…> » passait, puisque ses seuls chiffres étaient valides.
+
+
 				} elseif ( ! preg_match( '/^(?:\+33|0)[1-9](?:[\s.\-]?\d{2}){4}$/', $phone ) && ! ( preg_match( '/^\+[\d\s.\-()]+$/', $phone ) && preg_match( '/^\+\d{8,15}$/', $chiffres ) ) ) {
 					$errors['phone'] = 'Numéro de téléphone invalide.';
 				} else {
@@ -158,7 +119,7 @@ final class Validator {
 			}
 		}
 
-		/* Surface : entier de 1 à 2000 m², comme le champ du formulaire. */
+
 		if ( self::present( $input, 'surface' ) ) {
 			$s = $input['surface'];
 			if ( is_string( $s ) && preg_match( '/^\d+$/', trim( $s ) ) ) {
@@ -173,7 +134,7 @@ final class Validator {
 			}
 		}
 
-		/* Consentement : la preuve, pas la date — la date, c'est le serveur. */
+
 		if ( self::present( $input, 'consent' ) ) {
 			if ( $input['consent'] === true ) {
 				$data['consent'] = true;
@@ -184,7 +145,7 @@ final class Validator {
 			}
 		}
 
-		/* URL d'origine : chemin seulement, sans requête ni fragment. */
+
 		if ( self::present( $input, 'sourceUrl' ) ) {
 			if ( ! is_string( $input['sourceUrl'] ) ) {
 				$errors['sourceUrl'] = 'Type invalide : chaîne attendue.';
@@ -201,16 +162,8 @@ final class Validator {
 			}
 		}
 
-		/*
-		 * Page d'entree : chemin seulement, comme sourceUrl.
-		 *
-		 * Le front n'envoie deja qu'un chemin, mais le serveur ne se repose pas
-		 * la-dessus : `wp_parse_url` reduit ici une URL complete a son chemin,
-		 * ce qui ecarte d'un coup l'hote, le port, la requete et le fragment.
-		 * Une requete conservee ferait entrer dans la base les parametres d'une
-		 * page d'arrivee, donc potentiellement un jeton ou une adresse glissee
-		 * dans un lien de campagne.
-		 */
+
+
 		if ( self::present( $input, 'entryPage' ) ) {
 			if ( ! is_string( $input['entryPage'] ) ) {
 				$errors['entryPage'] = 'Type invalide : chaîne attendue.';
@@ -227,7 +180,7 @@ final class Validator {
 			}
 		}
 
-		/* Visualiseur : facultatif, structure contrôlée, jamais interprété. */
+
 		if ( self::present( $input, 'visualizer' ) ) {
 			self::visualizer( $input['visualizer'], $errors, $data );
 		}
@@ -235,14 +188,8 @@ final class Validator {
 		return $errors ? self::fail( $errors ) : [ 'ok' => true, 'data' => $data, 'errors' => [] ];
 	}
 
-	/**
-	 * Texte libre : chaîne, nettoyée, bornée, éventuellement transformée.
-	 *
-	 * @param array<string,mixed>  $input
-	 * @param array<string,string> $errors
-	 * @param array<string,mixed>  $data
-	 * @param null|callable(string):(string|null) $transforme rend null si invalide
-	 */
+
+
 	private static function texte( array $input, string $name, int $max, array &$errors, array &$data, ?callable $transforme = null, string $message = '', bool $multiligne = false ): void {
 		if ( ! self::present( $input, $name ) || isset( $errors[ $name ] ) ) {
 			return;
@@ -252,7 +199,7 @@ final class Validator {
 			$errors[ $name ] = 'Type invalide : chaîne attendue.';
 			return;
 		}
-		// Pas de HTML en base : les balises tombent, le texte reste.
+
 		$value = $multiligne ? sanitize_textarea_field( $value ) : sanitize_text_field( $value );
 		if ( mb_strlen( $value ) > $max ) {
 			$errors[ $name ] = sprintf( 'Longueur maximale dépassée (%d caractères).', $max );
@@ -268,11 +215,8 @@ final class Validator {
 		$data[ $name ] = $value;
 	}
 
-	/**
-	 * @param mixed                $v
-	 * @param array<string,string> $errors
-	 * @param array<string,mixed>  $data
-	 */
+
+
 	private static function visualizer( mixed $v, array &$errors, array &$data ): void {
 		if ( ! is_array( $v ) || array_is_list( $v ) ) {
 			$errors['visualizer'] = 'Type invalide : objet attendu.';
@@ -313,28 +257,8 @@ final class Validator {
 			if ( ! is_array( $v['config'] ) ) {
 				$errors['visualizer.config'] = 'Type invalide : objet attendu.';
 			} else {
-				/*
-				 * Deux temps, et l'ordre compte.
-				 *
-				 * D'abord on REFUSE ce qui est hors bornes : une chaîne trop
-				 * longue, un empilement trop profond. Le refus est explicite,
-				 * en 422, parce que tronquer en silence ferait perdre une
-				 * donnée sans que personne l'apprenne — ni le visiteur, ni
-				 * nous. Le plafond de 4 Ko existait déjà pour cette raison ; le
-				 * contourner en coupant chaque valeur l'aurait vidé de son
-				 * sens.
-				 *
-				 * Ensuite seulement on NETTOIE ce qui reste — balises,
-				 * caractères de contrôle — et on mesure le résultat. Mesurer
-				 * avant de nettoyer laisserait passer un contenu que le
-				 * nettoyage rallonge : une esperluette devient `&amp;`.
-				 *
-				 * Ce nettoyage est arrivé avec les libellés d'affichage :
-				 * depuis, la fiche d'administration LIT deux clés de ce carnet
-				 * pour nommer la scène et le parquet. Un carnet qu'on relit
-				 * mérite d'être propre dès l'écriture, même s'il est aussi
-				 * échappé à l'affichage. Les deux, pas l'un ou l'autre.
-				 */
+
+
 				$souci = self::config_hors_bornes( $v['config'], 1 );
 				if ( $souci !== null ) {
 					$errors['visualizer.config'] = $souci;
@@ -354,20 +278,8 @@ final class Validator {
 		}
 	}
 
-	/**
-	 * Cherche ce qui, dans le carnet, dépasse les bornes admises.
-	 *
-	 * Renvoie le message d'erreur à afficher, ou `null` si tout va bien. Les
-	 * clés comptent autant que les valeurs : une clé est du texte, elle finit
-	 * elle aussi dans une page.
-	 *
-	 * La profondeur est bornée parce que la limite d'octets ne suffit pas —
-	 * un objet imbriqué mille fois tient dans très peu de place et coûte cher
-	 * à parcourir.
-	 *
-	 * @param array<mixed> $config
-	 * @param int          $depth  profondeur courante, 1 pour la racine
-	 */
+
+
 	private static function config_hors_bornes( array $config, int $depth ): ?string {
 		if ( $depth > Fields::MAX_VISUALIZER_DEPTH ) {
 			return sprintf( 'Configuration trop imbriquée (%d niveaux maximum).', Fields::MAX_VISUALIZER_DEPTH );
@@ -391,21 +303,8 @@ final class Validator {
 		return null;
 	}
 
-	/**
-	 * Nettoie le carnet `visualizer.config`, sans en imposer la forme.
-	 *
-	 * Le serveur ne décide pas de ce que le front y met — c'est le principe de
-	 * ce champ. Il décide en revanche de ce qui peut y entrer : du texte
-	 * simple, des nombres, des booléens, et rien qui exécute quoi que ce soit.
-	 *
-	 * Les chaînes et les clés passent par `sanitize_text_field()`, qui retire
-	 * les balises et les caractères de contrôle. Aucune troncature ici : ce qui
-	 * dépassait a déjà été refusé par `config_hors_bornes()`, en amont.
-	 *
-	 * @param array<mixed> $config
-	 * @param int          $depth   profondeur courante, 1 pour la racine
-	 * @return array<mixed>
-	 */
+
+
 	private static function sanitize_config( array $config, int $depth ): array {
 		if ( $depth > Fields::MAX_VISUALIZER_DEPTH ) {
 			return [];
@@ -415,8 +314,8 @@ final class Validator {
 		foreach ( $config as $cle => $valeur ) {
 			$cle_propre = is_int( $cle ) ? $cle : sanitize_text_field( (string) $cle );
 
-			// Une clé qui ne survit pas au nettoyage — « <script> » seul, par
-			// exemple — n'avait rien à faire là : sa valeur part avec elle.
+
+
 			if ( $cle_propre === '' ) {
 				continue;
 			}
@@ -428,14 +327,14 @@ final class Validator {
 			} elseif ( is_array( $valeur ) ) {
 				$out[ $cle_propre ] = self::sanitize_config( $valeur, $depth + 1 );
 			}
-			// Tout autre type — objet, ressource — est simplement écarté : il
-			// n'aurait pas survécu au JSON de toute façon.
+
+
 		}
 
 		return $out;
 	}
 
-	/** Présent = clé existante et valeur non nulle, non vide si chaîne. */
+
 	private static function present( array $input, string $name ): bool {
 		if ( ! array_key_exists( $name, $input ) || $input[ $name ] === null ) {
 			return false;
@@ -443,10 +342,8 @@ final class Validator {
 		return ! ( is_string( $input[ $name ] ) && trim( $input[ $name ] ) === '' );
 	}
 
-	/**
-	 * @param array<string,string> $errors
-	 * @return array{ok:bool,data:array<string,mixed>,errors:array<string,string>}
-	 */
+
+
 	private static function fail( array $errors ): array {
 		return [ 'ok' => false, 'data' => [], 'errors' => $errors ];
 	}

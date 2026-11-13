@@ -1,28 +1,3 @@
-/**
- * Visualiseur produit — l'UX validée, branchée directement sur le moteur.
- *
- * Ce module remplace le prototype `tools/product-concept.html` de
- * pose-parquet-ai comme base technique. Le prototype pilotait le Studio dans
- * une iframe par un pont `window.__studio`, avec des captures statiques en
- * amorce : deux applications, deux viewports à synchroniser, un cache de
- * captures, une renégociation au rechargement. Ici il n'y a qu'UNE page :
- *
- *   catalogue Premibel  →  matériau  →  renderer.paint(canvas)  →  écran
- *
- * Les modules de scène (`js/scene/*`) sont importés tels quels ; aucun n'est
- * dupliqué, aucun faux parquet n'est dessiné ici. Le viewport transforme un
- * seul conteneur dont la photo, le rendu et la version B sont les enfants :
- * ils ne peuvent pas se désynchroniser.
- *
- * Direction visuelle (V2) : LA PIÈCE EST LE PRODUIT. Au repos, trois objets
- * flottants seulement — une capsule d'outils en haut, une barre produit en
- * bas, un zoom discret — et rien de permanent sur les côtés. Tout le reste
- * vit dans un tiroir qui monte du bas et laisse la pièce visible.
- *
- * Une seule source de vérité : `state`. Chaque geste modifie `state`, puis
- * `paintChrome()` et `schedule()` en déduisent l'écran. Aucun état n'est lu
- * dans le DOM.
- */
 import { qs, on, echapper } from '../utils/dom.js';
 import { analyzeScene, loadSceneIndex, scenesBibliotheque } from '../scene/analyzer.js';
 import { motifParDefaut } from '../scene/motifs-regles.js';
@@ -35,13 +10,13 @@ import { loadCatalog, swatchFor } from '../studio/catalog.js';
 import { createViewport, ZOOM_MAX } from './viewport.js';
 import { loadTours } from './tour.js';
 
-/** Les cinq références pilote Premibel, dans l'ordre du catalogue. */
+
 const PILOT = ['POINF36005', 'BTRPF39009', 'CHENF39031', 'CHENF36014', 'CHENF36015'];
 
 const PATTERNS = { lames: 'Lames', 'point-de-hongrie': 'Point de Hongrie', 'baton-rompu': 'Bâton rompu' };
 
-/* Le moteur tourne le motif dans le plan du sol (`config.angle`) : ces trois
-   valeurs ont un effet réel, vérifié à l'écran. */
+
+
 const ORIENTATIONS = [
   [0, '0°', 'Dans la longueur', '<path d="M3 5h28M3 10h28M3 15h28" />'],
   [45, '45°', 'En diagonale', '<path d="M3 17L17 3M11 17L25 3M19 17L31 5" />'],
@@ -50,17 +25,16 @@ const ORIENTATIONS = [
 
 const REGROUPEMENT_MS = 70;
 
-/* Ce qui manque, dit sans jargon et sans barrer la route. Le sol d'une photo
-   personnelle n'est pas connu : on ne le devine pas, et on ne s'en explique
-   pas sur un écran entier. */
+
+
 const NOTE_IMPORT = 'Votre pièce est prête. La pose du parquet sur vos propres photos arrivera avec l’analyse de pièce.';
 const NOTE_SANS_SOL = 'Le rendu sur votre propre photo sera disponible après analyse de la pièce.';
 const DEV = (() => {
   try { return new URLSearchParams(window.location.search).get('dev') === '1'; } catch { return false; }
 })();
 
-/* Une seule épaisseur de trait, une seule grille : l'iconographie ne doit
-   pas se voir. */
+
+
 const svg = (path, size = 18) =>
   `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
 const ICON = {
@@ -80,21 +54,20 @@ const ICON = {
 const heart = (on, size = 18) =>
   `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${on ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON.heart}</svg>`;
 
-/** « Point de Hongrie Zeus Naturel 92x12x520 » → « Point de Hongrie Zeus Naturel ». */
+
 const nomCourt = (material) =>
   String(material.name || material.id).replace(/\s*\d+\s*[x×]\s*\d+(?:\s*[x×]\s*\d+)?\s*(?:mm)?\s*$/i, '').trim();
 
 export async function mountProduct(root) {
   const base = root.dataset.base || '../';
 
-  /* ---------------- Données ---------------- */
+
   const renderer = createSceneRenderer();
   const catalog = await loadCatalog(base);
   const sceneIndex = await loadSceneIndex(base);
   const rooms = scenesBibliotheque(sceneIndex);
-  /* Visites de pièce : le contrat existe, les photos pas encore. `visites` est
-     vide aujourd'hui, donc `state.tour` reste `null` et l'écran est
-     exactement celui d'avant. Voir js/product/tour.js. */
+
+
   const visites = await loadTours(base, rooms.map((r) => r.id));
   const products = PILOT.map((id) => catalog.get(id)).filter(Boolean);
   if (!products.length) throw new Error('Aucune référence pilote dans le catalogue');
@@ -105,60 +78,55 @@ export async function mountProduct(root) {
     return d.widthMm || Math.round((material.plank && material.plank.width || 0) * 1000);
   };
 
-  /* ---------------- L'état : une seule source de vérité ---------------- */
+
   const state = {
-    /* LA PIÈCE AFFICHÉE, quelle que soit sa provenance. Une photo importée
-       n'est pas un second mode ni un second écran : c'est une pièce.
-         { type: 'demo',     id, label }
-         { type: 'uploaded', url, fileName, width, height } */
+
+
     room: null,
-    /* La scène calibrée de cette pièce, ou `null` quand son sol est inconnu.
-       Sans masque réel, le moteur ne pose rien : c'est le seul interrupteur. */
+
+
     scene: null,
-    /* Le point de vue occupé, quand la pièce fait partie d'une visite :
-       { tourId, viewpointId, room, connections }. `null` partout aujourd'hui —
-       aucune pièce n'est visitable, et rien ne s'affiche à ce titre. */
+
+
     tour: null,
     product: products[0].id,
     rendererSettings: { angle: 0 },
-    comparison: null,            /* { b: productId } */
+    comparison: null,
     favoriteIds: new Set(),
-    originalMode: 'off',         /* 'off' | 'ba' : avant / après */
+    originalMode: 'off',
     ui: {
-      panel: null,               /* 'catalog' | 'custom' | 'rooms' — le tiroir */
+      panel: null,
       menu: false,
-      picking: false,            /* le prochain choix de produit devient B */
+      picking: false,
       immersive: false,
       panning: false,
       split: 0.5,
-      catalogueView: 'all',      /* 'all' | 'favourites' */
+      catalogueView: 'all',
       patternFilter: null,
       busy: false,
       status: '',
     },
-    /* Numéro de la dernière intention : un chargement asynchrone qui revient
-       avec un autre numéro est périmé et ne s'applique pas. */
+
+
     intent: 0,
     lastMs: null,
-    /* Nombre de rendus aboutis : sert aux parcours de test pour attendre un
-       VRAI rendu, pas un statut qui n'a pas encore bougé. */
+
+
     renders: 0,
   };
 
-  /* Provenance de la pièce, et la seule question qui gouverne le rendu. */
+
   const importee = () => Boolean(state.room && state.room.type === 'uploaded');
   const posable = () => Boolean(state.scene);
-  /* Un nom de fichier vient de l'utilisateur, un nom de produit d'un export
-     fournisseur : ni l'un ni l'autre ne devient du HTML. `echapper` est
-     l'echappeur central de js/utils/dom.js — il traite aussi l'apostrophe,
-     ce que la version locale qui vivait ici ne faisait pas. */
+
+
   const txt = echapper;
 
-  /* ---------------- DOM ---------------- */
+
   root.className = 'pv';
   root.innerHTML = `
     <header class="pv__header">
-      <a class="pv__brand" href="${base}index.html"><span class="pv__mark">✦</span><span class="pv__name"><b>Pose Parquet</b><small>Visualisez. Imaginez. Réalisez.</small></span></a>
+      <a class="pv__brand" href="${base}index.html"><span class="pv__mark">✦</span><span class="pv__name"><h1 class="pv__title">Visualiseur Parquet</h1><small>Visualisez. Imaginez. Réalisez.</small></span></a>
       <button class="hbtn" type="button" data-h-rooms>${svg(ICON.room)}<span>Changer de pièce</span></button>
       <button class="hbtn" type="button" data-h-fav aria-pressed="false">${heart(false)}<span>Favoris</span><span class="cnt" data-fav-count hidden>0</span></button>
       <button class="hbtn hbtn--icon" type="button" data-h-menu aria-expanded="false" aria-label="Menu">${svg(ICON.menu)}</button>
@@ -206,8 +174,8 @@ export async function mountProduct(root) {
         <div class="pv-drawer__head">
           <h2 data-drawer-title></h2>
           <span class="pv-drawer__count" data-drawer-count></span>
-          <!-- Le libellé est posé par `drawerHead` : il nomme Premibel quand
-               l'adresse est bien celle de Premibel, et reste neutre sinon. -->
+
+
           <a class="pv-drawer__link" data-drawer-link hidden target="_blank" rel="noopener noreferrer"><span data-drawer-link-label></span> ${svg(ICON.arrow, 14)}</a>
           <button class="pv-drawer__close" type="button" data-close aria-label="Fermer">${svg(ICON.close)}</button>
         </div>
@@ -234,7 +202,7 @@ export async function mountProduct(root) {
   const fileInput = $('[data-file]');
   const drawer = $('[data-drawer]');
 
-  /* ---------------- Viewport ---------------- */
+
   const sceneSize = () => {
     if (state.scene && renderer.size) return { w: renderer.size.width, h: renderer.size.height };
     if (importee()) return { w: state.room.width, h: state.room.height };
@@ -252,25 +220,24 @@ export async function mountProduct(root) {
     },
   });
 
-  /* ---------------- Rendu ---------------- */
+
   let pending = false;
   let regroupement = 0;
   let t0 = 0;
 
   const paintConfig = (productId) => {
     const material = productOf(productId);
-    /* `width: null` : la largeur vient du produit lui-même — `toMaterial()`
-       a fait de ses dimensions réelles le profil de son motif. Un Zeus de
-       92 × 520 mm est un chevron de 92 × 520 mm, pas un réglage. */
-    // Une reference = un motif : le visualiseur produit ne propose pas de
-    // choix libre, changer de motif y revient a changer de reference. On
-    // passe malgre tout par la regle, pour que la garantie soit la meme
-    // partout et ne depende pas de la forme de cette interface-ci.
+
+
+
+
+
+
     return { material, materialId: productId, pattern: motifParDefaut(material), angle: state.rendererSettings.angle, width: null, scale: 1 };
   };
 
-  /* Le statut ne vit plus dans une pastille à part : il n'apparaît que quand
-     il dit quelque chose, dans la barre produit. */
+
+
   function setStatus(text, kind) {
     state.ui.busy = kind === 'busy';
     state.ui.status = kind === 'ok' ? '' : text;
@@ -282,8 +249,8 @@ export async function mountProduct(root) {
     const okA = renderer.paint(canvasA, paintConfig(state.product), null, 1);
     const okB = state.comparison ? renderer.paint(canvasB, paintConfig(state.comparison.b), null, 1) : true;
     if ((!okA || !okB) && renderer.enAttente) {
-      /* Les cartes se fabriquent dans le worker : `quandCartesPretes`
-         repeindra, en relisant l'état courant — le dernier choix gagne. */
+
+
       setStatus('Préparation du rendu…', 'busy');
       paintChrome();
       return;
@@ -300,7 +267,7 @@ export async function mountProduct(root) {
     pending = true;
     setTimeout(paintAll, 0);
   }
-  /** Regroupe les demandes rapprochées : trois clics rapides = un rendu. */
+
   function demandeRendu() {
     clearTimeout(regroupement);
     if (!t0) t0 = performance.now();
@@ -308,7 +275,7 @@ export async function mountProduct(root) {
   }
   quandCartesPretes(() => { if (renderer.ready && state.scene) schedule(); });
 
-  /* ---------------- Chrome : tout se déduit de l'état ---------------- */
+
   function poserSwatch(host) {
     host.querySelectorAll('[data-swatch]').forEach((slot) => {
       const material = productOf(slot.dataset.swatch);
@@ -321,11 +288,11 @@ export async function mountProduct(root) {
     });
   }
 
-  /** La barre produit : un seul objet, au bas de la pièce. */
+
   function barHtml() {
     const m = productOf(state.product);
-    /* Sur une photo personnelle, la barre dit la pièce, pas un parquet qui
-       n'est pas posé : ses actions de rendu n'y figurent pas. */
+
+
     if (importee()) {
       return `
         <span class="bar__tx">
@@ -369,8 +336,8 @@ export async function mountProduct(root) {
   function paintChrome() {
     const enPiece = Boolean(state.room);
     const hasRender = posable() && canvasA.width > 0;
-    /* La capsule reste : le plein écran vaut pour toute pièce. Ce qui n'aurait
-       aucun sens sans parquet posé — avant/après, comparer — s'efface. */
+
+
     $('[data-tools]').hidden = !enPiece;
     $('[data-seg]').hidden = !hasRender;
     $('[data-tools-sep]').hidden = !hasRender;
@@ -390,19 +357,19 @@ export async function mountProduct(root) {
     root.querySelectorAll('[data-ba]').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.ba === 'ba') === (state.originalMode === 'ba'))));
     $('[data-cmp]').setAttribute('aria-pressed', String(Boolean(state.comparison)));
 
-    /* la barre produit */
+
     const bar = $('[data-bar]');
     bar.hidden = !enPiece;
     bar.classList.toggle('pv-bar--cmp', Boolean(state.comparison));
     if (!bar.hidden) { bar.innerHTML = barHtml(); poserSwatch(bar); }
 
-    /* favoris */
+
     const n = state.favoriteIds.size;
     $('[data-fav-count]').textContent = String(n);
     $('[data-fav-count]').hidden = n === 0;
     $('[data-h-fav]').setAttribute('aria-pressed', String(n > 0));
 
-    /* le tiroir et le menu */
+
     drawer.hidden = !state.ui.panel;
     document.body.classList.toggle('drawer-open', Boolean(state.ui.panel));
     document.body.classList.toggle('panning', state.ui.panning);
@@ -413,18 +380,10 @@ export async function mountProduct(root) {
     if (state.ui.panel === 'custom') paintCustom();
   }
 
-  /**
-   * @param {string} title
-   * @param {string} count
-   * @param {object|null} material la référence dont on montre la fiche, s'il y en a une
-   */
-  /**
-   * Le lien vers la fiche, en fin de ligne de référence dans la barre.
-   *
-   * Rend une chaîne vide quand la référence n'a pas de fiche : les douze
-   * parquets de démonstration ne renvoient nulle part, et il vaut mieux une
-   * ligne plus courte qu'un lien inventé.
-   */
+
+
+
+
   function ficheBarre(m) {
     const f = ficheProduit(fiche(m));
     if (!f) return '';
@@ -435,14 +394,8 @@ export async function mountProduct(root) {
     $('[data-drawer-title]').textContent = title;
     $('[data-drawer-count]').textContent = count || '';
     const a = $('[data-drawer-link]');
-    /*
-     * Le nom de l'entreprise n'est pas écrit dans le gabarit.
-     *
-     * « Voir la fiche Premibel » affirme chez qui l'on envoie le visiteur. Le
-     * catalogue est un fichier de données : le jour où il vient d'un export,
-     * rien ne garantit que toutes les fiches soient au même domaine. C'est
-     * donc l'adresse qui décide du libellé — voir js/commerce/premibel.js.
-     */
+
+
     const fiche = ficheProduit(material);
     a.hidden = !fiche;
     if (fiche) {
@@ -451,7 +404,7 @@ export async function mountProduct(root) {
     }
   }
 
-  /* ---------------- Pièces ---------------- */
+
   function paintRooms() {
     drawerHead('Changer de pièce', '', null);
     $('[data-drawer-body]').innerHTML = `<div class="gal">
@@ -478,7 +431,7 @@ export async function mountProduct(root) {
     try {
       const scene = await analyzeScene({ sceneId: id, base });
       const prepared = await loadImage(`${base}assets/images/${scene.image.file}`);
-      if (intent !== state.intent) return;          /* une autre intention est passée */
+      if (intent !== state.intent) return;
       renderer.setScene(scene, prepared);
       libererPhoto();
       state.scene = scene;
@@ -486,8 +439,8 @@ export async function mountProduct(root) {
       state.tour = visites.pourScene(id);
       canvasPhoto.width = prepared.width; canvasPhoto.height = prepared.height;
       canvasPhoto.getContext('2d').drawImage(prepared.canvas, 0, 0);
-      /* La couche A prend ses dimensions dès maintenant : la photo d'origine
-         s'affiche à sa place finale, le rendu vient la remplacer sans saut. */
+
+
       canvasA.width = prepared.width; canvasA.height = prepared.height;
       viewport.scheduleFit();
       toast(state.room.label);
@@ -502,20 +455,16 @@ export async function mountProduct(root) {
     }
   }
 
-  /* ---------------- Photo importée ---------------- */
-  /** Libère l'URL de la photo précédente : un import n'en laisse jamais deux. */
+
+
   function libererPhoto() {
     if (state.room && state.room.type === 'uploaded' && state.room.url) {
-      try { URL.revokeObjectURL(state.room.url); } catch { /* déjà libérée */ }
+      try { URL.revokeObjectURL(state.room.url); } catch {   }
     }
   }
 
-  /**
-   * L'utilisateur vient d'importer sa photo : il est DÉJÀ dans sa photo.
-   * Aucun écran intermédiaire, aucune modale, aucune action de plus à faire —
-   * la photo devient la pièce du viewport, et ce qui manque se dit dans une
-   * note qui s'efface. Le sol inconnu interdit le rendu, rien d'autre.
-   */
+
+
   async function importPhoto(file) {
     if (!file) return;
     const intent = ++state.intent;
@@ -523,12 +472,12 @@ export async function mountProduct(root) {
     try {
       const prepared = await loadFile(file);
       if (intent !== state.intent) return;
-      /* La poignée que l'analyse de pièce consommera le jour où elle existe. */
+
       const url = URL.createObjectURL(file);
       libererPhoto();
       state.scene = null;
-      /* Une photo personnelle n'est la vue d'aucune visite : on n'invente pas
-         de déplacement hors de son cadre. */
+
+
       state.tour = null;
       state.room = { type: 'uploaded', url, fileName: prepared.name, width: prepared.width, height: prepared.height };
       state.comparison = null;
@@ -537,8 +486,8 @@ export async function mountProduct(root) {
       setStatus('', 'ok');
       canvasPhoto.width = prepared.width; canvasPhoto.height = prepared.height;
       canvasPhoto.getContext('2d').drawImage(prepared.canvas, 0, 0);
-      /* Aucun parquet sur une photo dont on ne connaît pas le sol : on
-         n'invente pas de rendu, la couche A reste vide. */
+
+
       canvasA.width = 0; canvasA.height = 0; canvasB.width = 0; canvasB.height = 0;
       viewport.scheduleFit();
       paintChrome();
@@ -549,7 +498,7 @@ export async function mountProduct(root) {
     }
   }
 
-  /* ---------------- Catalogue ---------------- */
+
   const presentPatterns = () => [...new Set(products.map((p) => p.defaultPattern))];
   function visibleProducts() {
     const favs = state.ui.catalogueView === 'favourites';
@@ -571,8 +520,8 @@ export async function mountProduct(root) {
         <button class="chip" type="button" data-filter="" aria-pressed="${!state.ui.patternFilter}">Tous</button>
         ${presentPatterns().map((k) => `<button class="chip" type="button" data-filter="${k}" aria-pressed="${state.ui.patternFilter === k}">${PATTERNS[k]}</button>`).join('')}
       </div>`;
-    /* Sur une photo personnelle le catalogue reste consultable — références,
-       favoris, fiches — et le dit avant le premier clic. */
+
+
     const avis = posable() ? '' : `<p class="grid__note">${NOTE_SANS_SOL}</p>`;
     $('[data-drawer-body]').innerHTML = `${filtres}${avis}<div class="grid" data-prods>${list.map((p) => {
       const on = p.id === state.product && !state.ui.picking;
@@ -590,7 +539,7 @@ export async function mountProduct(root) {
     const material = productOf(id);
     if (!material) return;
     emettre('select_product', { productId: id, contexte: 'visualiseur-produit' });
-    /* Pas de masque réel : le choix est retenu, aucun parquet n'est inventé. */
+
     if (!posable()) {
       state.product = id;
       state.ui.picking = false;
@@ -599,7 +548,7 @@ export async function mountProduct(root) {
       return;
     }
     if (state.ui.picking) {
-      /* Comparer une référence à elle-même n'a aucun sens. */
+
       if (id === state.product) { toast('Choisissez une autre référence que celle déjà posée'); return; }
       state.intent += 1;
       state.comparison = { b: id };
@@ -618,7 +567,7 @@ export async function mountProduct(root) {
     paintChrome();
   }
 
-  /* ---------------- Personnaliser ---------------- */
+
   const otherWith = (pred) => products.find((p) => p.id !== state.product && pred(p));
   function paintCustom() {
     const m = productOf(state.product);
@@ -650,7 +599,7 @@ export async function mountProduct(root) {
     </div>`;
   }
 
-  /* ---------------- Comparaison, avant / après ---------------- */
+
   function startCompare() {
     if (state.comparison) {
       state.intent += 1;
@@ -682,7 +631,7 @@ export async function mountProduct(root) {
   let dragging = false;
   on(split, 'pointerdown', (e) => {
     dragging = true;
-    try { if (split.setPointerCapture) split.setPointerCapture(e.pointerId); } catch { /* sans capture */ }
+    try { if (split.setPointerCapture) split.setPointerCapture(e.pointerId); } catch {   }
   });
   const lacher = () => { dragging = false; };
   ['pointerup', 'pointercancel'].forEach((t) => { on(split, t, lacher); on(stage, t, lacher); });
@@ -693,8 +642,8 @@ export async function mountProduct(root) {
     paintChrome();
   });
 
-  /* Pendant un déplacement de la pièce, le chrome s'efface un peu : on
-     regarde le sol, pas les boutons. Il revient à la fin du geste. */
+
+
   let panTimer = 0;
   on(stage, 'pointerdown', (e) => {
     if (e.target.closest('.pv-tools, .pv-bar, .pv-zoom, .pv-drawer, .pv-note, .pv-split')) return;
@@ -709,18 +658,18 @@ export async function mountProduct(root) {
   on(stage, 'pointerup', finPan);
   on(stage, 'pointercancel', finPan);
 
-  /* ---------------- Favoris ---------------- */
+
   function toggleFav(id) {
     if (state.favoriteIds.has(id)) state.favoriteIds.delete(id); else state.favoriteIds.add(id);
     paintChrome();
   }
 
-  /* ---------------- Tiroir et menu ---------------- */
+
   function closeAll() {
     state.ui.panel = null;
     state.ui.menu = false;
-    /* Fermer le catalogue sans choisir B annule le choix de B : sinon le
-       clic suivant poserait une comparaison au lieu de changer de sol. */
+
+
     state.ui.picking = false;
     paintChrome();
   }
@@ -728,12 +677,12 @@ export async function mountProduct(root) {
     state.ui.menu = false;
     state.ui.picking = false;
     if (which === 'catalog') state.ui.catalogueView = 'all';
-    /* Re-toucher le bouton du tiroir ouvert le referme. */
+
     state.ui.panel = state.ui.panel === which ? null : which;
     paintChrome();
   }
 
-  /* ---------------- Plein écran ---------------- */
+
   let calmTimer = 0;
   const wake = () => {
     document.body.classList.remove('calm');
@@ -758,7 +707,7 @@ export async function mountProduct(root) {
   });
   on(stage, 'pointermove', wake);
 
-  /* ---------------- Toast ---------------- */
+
   let toastTimer = 0;
   function toast(message) {
     const el = $('[data-toast]');
@@ -768,15 +717,15 @@ export async function mountProduct(root) {
     toastTimer = setTimeout(() => el.classList.remove('on'), 1700);
   }
 
-  /* ---------------- Note discrète ---------------- */
+
   let noteTimer = 0;
-  /** Deux lignes en bas de la pièce, qui s'effacent seules et ne bloquent
-      rien : le viewport reste manipulable à travers elles. */
+
+
   function note(message) {
     const el = $('[data-note]');
     $('[data-note-text]').textContent = message;
     el.hidden = false;
-    /* Un tour d'horloge avant la classe : la note glisse au lieu d'apparaître. */
+
     setTimeout(() => el.classList.add('on'), 0);
     clearTimeout(noteTimer);
     noteTimer = setTimeout(fermerNote, 9000);
@@ -789,7 +738,7 @@ export async function mountProduct(root) {
   }
   on($('[data-note-close]'), 'click', fermerNote);
 
-  /* ---------------- Câblage ---------------- */
+
   on($('[data-menu-import]'), 'click', () => { closeAll(); fileInput.click(); });
   on(fileInput, 'change', () => { importPhoto(fileInput.files && fileInput.files[0]); fileInput.value = ''; });
   ['dragover', 'dragenter'].forEach((t) => on(document, t, (e) => e.preventDefault()));
@@ -821,13 +770,8 @@ export async function mountProduct(root) {
 
   on(root, 'click', (e) => {
     const t = e.target;
-    /*
-     * Le départ vers une fiche produit.
-     *
-     * Avant les autres cas et sans `return` : le lien doit suivre son cours
-     * normalement — nouvel onglet, clic milieu, ouverture au clavier — on ne
-     * fait qu'en prendre note au passage.
-     */
+
+
     if (t.closest('[data-fiche], [data-drawer-link]')) {
       suivreClic(fiche(productOf(state.product)), 'visualiseur-produit');
     }
@@ -865,9 +809,8 @@ export async function mountProduct(root) {
     else if (e.key === 'f' || e.key === 'F') { e.preventDefault(); setImmersive(!state.ui.immersive); }
   });
 
-  /* Quelle version tourne ? En `?dev=1` la question ne se pose plus : le
-     commit, la branche, la page et l'empreinte du bundle passent en console.
-     Sans `?dev=1`, rien n'est demandé au réseau et rien n'est écrit. */
+
+
   if (DEV) {
     (async () => {
       const signature = { page: location.pathname, bundle: null, ui: 'v2' };
@@ -877,7 +820,7 @@ export async function mountProduct(root) {
         signature.bundle = trouve ? trouve[1] : 'inconnu';
         const rep = await fetch(`${base}assets/dev-build.json`, { cache: 'no-store' });
         if (rep.ok) Object.assign(signature, await rep.json());
-      } catch { /* pas de signature de build : la page reste utilisable */ }
+      } catch {   }
       window.__pvBuild = signature;
       console.info('[visualiseur produit] build', signature);
     })();
@@ -885,11 +828,11 @@ export async function mountProduct(root) {
 
   paintChrome();
 
-  /* Première impression : une pièce et un parquet, pas un écran d'accueil.
-     La première pièce de la bibliothèque s'ouvre d'elle-même. */
+
+
   if (rooms.length) openRoom(rooms[0].id);
 
-  /* Poignée de diagnostic : seulement en `?dev=1`, pour les parcours Chrome. */
+
   if (DEV) {
     window.__pv = {
       state, renderer, catalog, products: products.map((p) => p.id), viewport,

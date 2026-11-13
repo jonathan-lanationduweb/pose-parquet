@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex, nofollow" />
 <title>Revue des matières — outil interne</title>
-<style>
-  :root { color-scheme: dark; --line: #2c3230; --ink: #e6ebe8; --dim: #9aa5a0; }
+<style>:root { color-scheme: dark; --line: #2c3230; --ink: #e6ebe8; --dim: #9aa5a0; }
   * { box-sizing: border-box; }
   body { margin: 0; font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; background: #141817; color: var(--ink); }
   header { position: sticky; top: 0; z-index: 5; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
@@ -25,8 +24,6 @@
   .etat[data-e="unavailable"] { background: #4a2222; color: #f0a3a3; }
   .etat[data-g="bloquant"]    { background: #4a2222; color: #f0a3a3; }
   .etat[data-g="signalement"] { background: #3d3a1c; color: #ded08a; }
-
-  /* Trois vues par matière, à largeur strictement égale. */
   .lignes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0 14px; align-items: start; }
   @media (max-width: 900px) { .lignes { grid-template-columns: 1fr; } }
   figure { margin: 0; background: #0d0f0f; border-radius: 8px; overflow: hidden; }
@@ -66,27 +63,7 @@
 <div id="out"></div>
 <pre id="log"></pre>
 
-<script type="module">
-/**
- * Revue des matières — et contrôle du catalogue.
- *
- * Deux besoins, une page :
- *
- * 1. **Comparer des produits à scène constante.** `scene-review.html` répond à
- *    la question « cette pièce est-elle crédible ? ». Celle-ci répond à
- *    « cette matière est-elle crédible, et se distingue-t-elle de sa voisine ? ».
- *    Trois vues par produit : un gros plan au premier plan, la pièce entière,
- *    et le fond de pièce — parce qu'une matière peut très bien tenir de près et
- *    se dissoudre au loin, ou l'inverse.
- *
- * 2. **Valider le catalogue.** Le rapport en tête liste ce qui manque fiche par
- *    fiche. Un produit invalide ne casse pas le visualiseur : il est écarté au
- *    chargement, et il apparaît ici. Le jour où le catalogue vient d'un ERP,
- *    c'est le premier endroit à regarder.
- *
- * Page interne : ni liée, ni indexée, ni déployée.
- */
-import { analyzeScene, loadSceneIndex } from '../js/scene/analyzer.js';
+<script type="module">import { analyzeScene, loadSceneIndex } from '../js/scene/analyzer.js';
 import { createSceneRenderer } from '../js/scene/renderer.js';
 import { loadImage } from '../js/scene/image-loader.js';
 import { loadCatalog } from '../js/studio/catalog.js';
@@ -96,12 +73,8 @@ const BASE = '../';
 const $ = (id) => document.getElementById(id);
 const log = (line) => { $('log').textContent += line + '\n'; };
 
-/**
- * Trois cadrages, choisis pour ce qu'ils révèlent.
- * Le gros plan montre le veinage et les joints ; la pièce montre l'intégration ;
- * le fond montre ce qui survit à la réduction — c'est là que les matières
- * faibles deviennent un aplat.
- */
+
+
 const CADRAGES = [
   { cle: 'pres', label: 'Gros plan', box: [0.18, 0.80, 0.34, 0.19], zoom: 2 },
   { cle: 'piece', label: 'La pièce', box: [0, 0, 1, 1], zoom: 1 },
@@ -114,10 +87,10 @@ const renderer = createSceneRenderer();
 $('state').textContent = `${renderer.backend} · aniso ×${renderer.anisotropy} · ${catalog.products.length} produits · ${catalog.source}`;
 
 index.scenes.forEach((e) => $('scene').append(new Option(e.id, e.id)));
-// La chambre est la scène validée sur les cinq critères : c'est la référence.
+
 $('scene').value = index.scenes.some((e) => e.id === 'chambre') ? 'chambre' : index.scenes[0].id;
 
-/* ---------------- Contrôle du catalogue ---------------- */
+
 
 function afficherValidation() {
   const toutes = [...catalog.products, ...catalog.rejected];
@@ -150,7 +123,7 @@ function afficherValidation() {
   log(`motifs connus du moteur : ${KNOWN_PATTERNS.join(', ')}`);
 }
 
-/* ---------------- Rendu des matières ---------------- */
+
 
 const crop = (src, box, zoom) => {
   const sw = box[2] * src.width;
@@ -175,7 +148,7 @@ async function run() {
   const prepared = await loadImage(`${BASE}assets/images/${scene.image.file}`);
   renderer.setScene(scene, prepared);
 
-  // L'original, une fois, comme repère.
+
   const ref = document.createElement('canvas');
   ref.width = prepared.width;
   ref.height = prepared.height;
@@ -208,8 +181,8 @@ async function run() {
     $('out').appendChild(titre);
 
     if (!dispo) {
-      // On ne dessine pas un motif que la référence ne propose pas : ce serait
-      // exactement la promesse fausse que la couche produit sert à éviter.
+
+
       log(`${material.id.padEnd(16)} ${motif} indisponible — non rendu`);
       continue;
     }

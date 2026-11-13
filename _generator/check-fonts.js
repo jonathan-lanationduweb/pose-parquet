@@ -1,24 +1,3 @@
-/**
- * Contrôle : les polices auto-hébergées sont-elles chacune uniques et utiles ?
- *
- *   node _generator/check-fonts.js
- *
- * POURQUOI CE CONTRÔLE EXISTE. Le relevé du 28/09/2026 a trouvé six fichiers
- * Inter pour deux contenus : le même binaire, recopié sous trois noms parce
- * que Google Fonts déclare trois graisses pour une police variable. Trois
- * noms, trois URL, aucun partage de cache — l'accueil téléchargeait 184 Ko de
- * polices là où 90 suffisaient.
- *
- * Rien ne pouvait le voir. Le build était reproductible, les pages valides,
- * les contrôles au vert : deux fichiers identiques sous des noms différents
- * ne cassent rien, ils coûtent. C'est exactement le genre de défaut qui
- * mérite un contrôle, parce qu'il ne se manifeste jamais de lui-même.
- *
- *   §1  aucune police n'est livrée deux fois sous deux noms
- *   §2  chaque fichier présent est déclaré, chaque déclaration a son fichier
- *   §3  ce que le gabarit précharge existe
- *   §4  une police variable est déclarée avec une plage, pas une graisse
- */
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -43,7 +22,7 @@ function verifier(nom, condition, detail = '') {
 
 const titre = (t) => console.log(`\n== ${t} ==`);
 
-/** `fvar` présent dans le répertoire de tables woff2 → police variable. */
+
 function estVariable(buffer) {
   if (buffer.toString('ascii', 0, 4) !== 'wOF2') return false;
   const nbTables = buffer.readUInt16BE(12);
@@ -79,7 +58,7 @@ const lus = fichiers.map((nom) => {
 });
 const declarees = faces();
 
-/* ------------------------------------------------------------------ */
+
 titre('Unicité : un contenu, un fichier');
 
 const parEmpreinte = new Map();
@@ -100,7 +79,7 @@ verifier(
     : ''
 );
 
-/* ------------------------------------------------------------------ */
+
 titre('Cohérence : fichiers et déclarations se correspondent');
 
 const declares = new Set(declarees.map((f) => f.fichier));
@@ -123,7 +102,7 @@ verifier(
   declarees.length > 0
 );
 
-/* ------------------------------------------------------------------ */
+
 titre('Préchargement : ce que le gabarit demande existe');
 
 for (const famille of ['Instrument Serif', 'Inter']) {
@@ -141,7 +120,7 @@ for (const famille of ['Instrument Serif', 'Inter']) {
   );
 }
 
-/* Et le gabarit produit doit bien pointer dessus. */
+
 const layout = fs.readFileSync(path.join(RACINE, '_generator', 'layout.js'), 'utf8');
 verifier(
   'aucun nom de police écrit en dur dans le gabarit',
@@ -149,7 +128,7 @@ verifier(
   (layout.match(/assets\/fonts\/[a-z0-9-]+\.woff2/gi) || []).join(', ')
 );
 
-/* ------------------------------------------------------------------ */
+
 titre('Variables : déclarées avec une plage, pas une graisse');
 
 for (const f of lus.filter((x) => x.variable)) {
@@ -169,7 +148,7 @@ verifier(
   })
 );
 
-/* ------------------------------------------------------------------ */
+
 console.log('');
 const total = lus.reduce((s, f) => s + f.taille, 0);
 console.log(

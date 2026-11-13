@@ -1,28 +1,11 @@
-/**
- * Contrôle des images de toutes les pages générées.
- *
- * Un `<img>` peut être parfaitement écrit et pointer vers un fichier qui
- * n'existe pas — c'est ce qui produit les grands rectangles gris. Ce script
- * parcourt le site généré et vérifie, pour chaque `<img>` et chaque `<source>`,
- * que le fichier est bien là et qu'il a une taille plausible.
- *
- * Il ne dit rien de la **pertinence** d'une image : une photo de bois brut sur
- * une page « pose en diagonale » passe ce contrôle sans problème. La revue
- * éditoriale reste manuelle.
- *
- *   node _generator/check-images.js
- *
- * Sortie : une ligne par problème, puis un résumé. Code de sortie 1 s'il reste
- * un problème bloquant, pour pouvoir l'enchaîner dans un script.
- */
 const fs = require('fs');
 const path = require('path');
 
 const { exclusions } = require('./arborescence');
 
 const RACINE = path.resolve(__dirname, '..');
-/** Dossiers qui ne sont pas du site publié : le plancher commun, plus les
-    dossiers de ressources où aucune page ne vit. */
+
+
 const IGNORES = exclusions(['assets', 'docs', 'data', 'js', 'css']);
 
 function pagesHtml(dossier = RACINE, trouvees = []) {
@@ -37,22 +20,22 @@ function pagesHtml(dossier = RACINE, trouvees = []) {
   return trouvees;
 }
 
-/** Résout une URL d'image telle qu'un navigateur le ferait depuis la page. */
+
 function resoudre(page, url) {
-  if (/^(https?:)?\/\//.test(url) || url.startsWith('data:')) return null; // externe
+  if (/^(https?:)?\/\//.test(url) || url.startsWith('data:')) return null;
   if (url.startsWith('/')) return path.join(RACINE, url.slice(1));
   return path.resolve(path.dirname(page), url);
 }
 
-/** Dimensions réelles d'un fichier image, lues dans son en-tête. */
+
 function dimensions(fichier) {
   const buf = fs.readFileSync(fichier);
   if (buf.length < 16) return null;
-  // PNG
+
   if (buf[0] === 0x89 && buf.toString('ascii', 1, 4) === 'PNG') {
     return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
   }
-  // JPEG : on parcourt les segments jusqu'au SOF
+
   if (buf[0] === 0xff && buf[1] === 0xd8) {
     let i = 2;
     while (i < buf.length - 9) {
@@ -65,7 +48,7 @@ function dimensions(fichier) {
     }
     return null;
   }
-  // WebP (VP8X / VP8 / VP8L)
+
   if (buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') {
     const type = buf.toString('ascii', 12, 16);
     if (type === 'VP8X') return { w: (buf.readUIntLE(24, 3) & 0xffffff) + 1, h: (buf.readUIntLE(27, 3) & 0xffffff) + 1 };
@@ -76,7 +59,7 @@ function dimensions(fichier) {
     }
     return null;
   }
-  // SVG : pas de pixels, on se contente de vérifier qu'il y a une racine
+
   if (buf.toString('utf8', 0, 400).includes('<svg')) return { w: -1, h: -1 };
   return null;
 }
@@ -91,7 +74,7 @@ for (const page of pages) {
   const relPage = path.relative(RACINE, page).replace(/\\/g, '/');
   const dire = (gravite, quoi) => problemes.push({ page: relPage, gravite, quoi });
 
-  // <img src> et <img srcset>
+
   for (const m of html.matchAll(/<img\b([^>]*)>/g)) {
     nbImages += 1;
     const attrs = m[1];
@@ -104,7 +87,7 @@ for (const page of pages) {
     if (!d) dire('signalement', `format non reconnu : ${src}`);
     else if (d.w === 0 || d.h === 0) dire('bloquant', `image de taille nulle : ${src}`);
 
-    // width/height : sans eux la page saute au chargement
+
     if (!/\swidth="\d+"/.test(attrs) || !/\sheight="\d+"/.test(attrs)) {
       dire('signalement', `width/height absents : ${src}`);
     }
@@ -116,7 +99,7 @@ for (const page of pages) {
     }
   }
 
-  // <source srcset> des <picture>
+
   for (const m of html.matchAll(/<source\b([^>]*)>/g)) {
     nbSources += 1;
     const srcset = (m[1].match(/\ssrcset="([^"]+)"/) || [])[1];
@@ -129,14 +112,14 @@ for (const page of pages) {
     }
   }
 
-  // Images d'Open Graph : elles ne s'affichent pas sur le site mais cassent
-  // les partages, et personne ne le voit jamais.
+
+
   for (const m of html.matchAll(/<meta\s+property="og:image"\s+content="([^"]+)"/g)) {
-    // Une URL Open Graph est absolue : après avoir retiré l'origine, le chemin
-    // se résout depuis la **racine du site**, pas depuis la page. Résolu depuis
-    // la page, `assets/images/og-default.jpg` devenait
-    // `motifs/assets/images/og-default.jpg` et le contrôle signalait 28 images
-    // manquantes qui existaient toutes.
+
+
+
+
+
     const chemin = m[1].replace(/^https?:\/\/[^/]+\//, '');
     const f = path.join(RACINE, chemin);
     if (!fs.existsSync(f)) dire('signalement', `og:image introuvable : ${m[1]}`);

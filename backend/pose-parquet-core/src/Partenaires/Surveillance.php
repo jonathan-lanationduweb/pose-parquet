@@ -1,24 +1,6 @@
 <?php
-/**
- * Surveillance des sites partenaires (Premibel, Allure Design).
- *
- * Toutes les quinze minutes, WordPress ouvre la page d'accueil de chaque
- * partenaire affiché sur le site. Un site injoignable, en erreur serveur ou
- * en maintenance n'est plus proposé aux visiteurs : le site public lit l'état
- * par GET /pose-parquet/v1/partenaires et masque les liens vers lui ; le
- * formulaire « Mon projet » ne l'oriente plus vers ce partenaire.
- *
- * Prudence dans les deux sens :
- *   - il faut DEUX contrôles ratés de suite pour retirer un partenaire (une
- *     lenteur passagère ne le fait pas disparaître) ; un seul contrôle réussi
- *     le remet en place ;
- *   - un état inconnu (WordPress jamais passé, API injoignable) vaut
- *     « disponible » : une panne de NOTRE côté ne doit pas cacher les autres.
- *
- * Les adresses contrôlées sont celles de Mon site → Liens commerciaux,
- * acceptées seulement sur le domaine officiel du partenaire : aucune saisie
- * ne peut faire interroger un autre serveur par WordPress.
- */
+
+
 
 declare(strict_types=1);
 
@@ -33,13 +15,11 @@ final class Surveillance {
 	public const HOOK      = 'pose_parquet_verifier_partenaires';
 	public const INTERVALLE = 'pose_parquet_15_minutes';
 	public const OPTION    = 'pose_parquet_partenaires';
-	/** Contrôles ratés consécutifs avant de retirer un partenaire. */
+
 	public const ECHECS_MAX = 2;
 
-	/**
-	 * Partenaires connus : clé, nom, domaines officiels, adresse par défaut,
-	 * réglages Mon site (adresse, affichage).
-	 */
+
+
 	public const PARTENAIRES = [
 		'premibel' => [
 			'nom'      => 'Premibel',
@@ -57,11 +37,8 @@ final class Surveillance {
 		],
 	];
 
-	/**
-	 * Signes d'une page de maintenance ou « bientôt disponible ». Volontairement
-	 * stricts : le mot « maintenance » seul dans un texte (l'entretien d'un
-	 * parquet) ne compte pas, seulement dans le titre de la page.
-	 */
+
+
 	private const SIGNES_MAINTENANCE = [
 		'#<title[^>]*>[^<]*(maintenance|coming soon|bient[oô]t disponible|en construction)[^<]*</title>#iu',
 		'#woocommerce-coming-soon#i',
@@ -70,12 +47,12 @@ final class Surveillance {
 	];
 
 	public static function register(): void {
-		add_filter( 'cron_schedules', [ self::class, 'intervalle' ] ); // phpcs:ignore WordPress.WP.CronInterval
+		add_filter( 'cron_schedules', [ self::class, 'intervalle' ] );
 		add_action( self::HOOK, [ self::class, 'verifier' ] );
 		add_action( 'init', [ self::class, 'planifier' ] );
 	}
 
-	/** @param array<string,array<string,mixed>> $s */
+
 	public static function intervalle( array $s ): array {
 		$s[ self::INTERVALLE ] = [ 'interval' => 15 * MINUTE_IN_SECONDS, 'display' => __( 'Toutes les 15 minutes', 'pose-parquet-core' ) ];
 		return $s;
@@ -91,7 +68,7 @@ final class Surveillance {
 		wp_clear_scheduled_hook( self::HOOK );
 	}
 
-	/** L'adresse contrôlée : celle de Mon site si elle est sur le domaine officiel, sinon celle par défaut. */
+
 	public static function adresse( string $cle ): string {
 		$p      = self::PARTENAIRES[ $cle ];
 		$saisie = (string) ( \PoseParquet\Core\Site\MonSite::valeurs()[ $p['url'] ] ?? '' );
@@ -105,17 +82,14 @@ final class Surveillance {
 		return $p['defaut'];
 	}
 
-	/** Le partenaire est-il affiché sur le site (Mon site) ? Un partenaire masqué n'est pas contrôlé. */
+
 	public static function affiche( string $cle ): bool {
 		$v = \PoseParquet\Core\Site\MonSite::valeurs()[ self::PARTENAIRES[ $cle ]['afficher'] ] ?? true;
 		return ! in_array( $v, [ false, 0, '0', '', 'non' ], true );
 	}
 
-	/**
-	 * Diagnostic d'une réponse : null si le site est utilisable, sinon la raison.
-	 *
-	 * @param array<string,mixed>|\WP_Error $r
-	 */
+
+
 	public static function diagnostic( $r ): ?string {
 		if ( is_wp_error( $r ) ) {
 			return __( 'site injoignable', 'pose-parquet-core' ) . ' (' . $r->get_error_message() . ')';
@@ -125,7 +99,7 @@ final class Surveillance {
 			return __( 'site en maintenance (HTTP 503)', 'pose-parquet-core' );
 		}
 		if ( $code >= 400 || $code === 0 ) {
-			return sprintf( /* translators: %d : code HTTP */ __( 'site en erreur (HTTP %d)', 'pose-parquet-core' ), $code );
+			return sprintf(   __( 'site en erreur (HTTP %d)', 'pose-parquet-core' ), $code );
 		}
 		$corps = substr( (string) wp_remote_retrieve_body( $r ), 0, 300000 );
 		foreach ( self::SIGNES_MAINTENANCE as $motif ) {
@@ -136,7 +110,7 @@ final class Surveillance {
 		return null;
 	}
 
-	/** Contrôle planifié (ou lancé depuis l'écran Catalogue). */
+
 	public static function verifier(): array {
 		$etat = self::etat_brut();
 		foreach ( array_keys( self::PARTENAIRES ) as $cle ) {
@@ -169,19 +143,19 @@ final class Surveillance {
 		return $etat;
 	}
 
-	/** @return array<string,array<string,mixed>> */
+
 	public static function etat_brut(): array {
 		$e = get_option( self::OPTION, [] );
 		return is_array( $e ) ? $e : [];
 	}
 
-	/** Disponible, sauf preuve du contraire. */
+
 	public static function disponible( string $cle ): bool {
 		$e = self::etat_brut()[ $cle ] ?? null;
 		return ! is_array( $e ) || ! empty( $e['disponible'] );
 	}
 
-	/** Réponse publique : des booléens et une date, rien d'autre (ni raison, ni adresse). */
+
 	public static function repondre(): \WP_REST_Response {
 		$etat  = self::etat_brut();
 		$dates = array_filter( array_map( static fn( $e ) => is_array( $e ) ? (int) ( $e['verifie'] ?? 0 ) : 0, $etat ) );

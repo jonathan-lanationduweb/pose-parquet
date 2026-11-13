@@ -1,71 +1,11 @@
-/**
- * Couche PRODUIT : la fiche commerciale d'une référence de parquet.
- *
- * Quatre choses sont distinctes dans ce moteur, et les confondre est
- * exactement ce qui empêche d'y brancher un vrai catalogue :
- *
- *   A. la SCÈNE         — la pièce : géométrie du sol, contour, occlusions,
- *                         éclairement        (js/scene/schema.js, data/scenes/)
- *   B. le MOTIF de pose — lames droites, point de Hongrie, bâton rompu
- *   C. le PRODUIT       — la référence vendue : essence, gamme, teinte,
- *                         finition, dimensions, motifs autorisés  (ce fichier)
- *   D. le RENDU matière — ce qui dessine la surface : famille de rendu, ou
- *                         vraies cartes      (data/render-families.json)
- *
- * Un export Premibel fournira **C**. Il ne fournira jamais **D** : personne ne
- * saisit un `grainAlpha` dans un ERP. D'où la **famille de rendu** — le
- * produit dit à quelle famille visuelle il appartient, la famille porte le
- * dessin. C'est la charnière sans laquelle chaque nouvelle référence
- * obligeait à écrire un bloc de texture à la main.
- *
- * Ce module est le **point de branchement unique** de la couche produit, au
- * même titre que `analyzer.js` pour les scènes.
- *
- * ## Deux règles qui ne se négocient pas
- *
- * **Une photo de fiche produit n'est pas une texture de sol.** L'image
- * principale d'une fiche WooCommerce est cadrée pour une vignette : perspective,
- * ombres portées, fond, recadrage. La répéter sur 30 m² de sol donne une bouillie
- * qui répète ses ombres. `visual.thumbnail` et `visual.sample` servent au
- * catalogue ; seuls `visual.albedo`, `visual.normal`, `visual.roughness` et
- * `visual.plankVariants` alimentent le rendu, et ils doivent avoir été
- * préparés pour ça — raccordables, à plat, sans ombre.
- *
- * **Les motifs autorisés ne s'inventent pas.** Un produit n'existe pas en
- * point de Hongrie parce que le moteur sait le dessiner : il existe en point de
- * Hongrie parce que le fabricant le débite. Faute d'information, on ne propose
- * que la pose droite et on le signale — jamais l'inverse.
- */
 import { lienSur } from '../utils/dom.js';
 
-/* ------------------------------------------------------------------ */
-/* Schéma                                                              */
-/* ------------------------------------------------------------------ */
 
-/**
- * Fiche canonique. `null` signifie « non renseigné », jamais « zéro » : une
- * largeur absente doit se voir, pas se confondre avec une lame de 0 mm.
- *
- *   id                identifiant interne stable, jamais réutilisé
- *   externalId        identifiant dans le système source (ID produit WP)
- *   sku               référence commerciale
- *   name              libellé affiché
- *   slug              forme utilisable en URL, pour les liens profonds
- *   woodSpecies       chêne, frêne, noyer…
- *   range             gamme / collection
- *   tone              clair, naturel, miel, foncé…
- *   finish            huilé mat, vernis satiné, brossé…
- *   parquetType       massif, contrecollé, stratifié
- *   dimensions        { widthMm, lengthMm, thicknessMm }
- *   compatiblePatterns motifs réellement disponibles pour cette référence
- *   defaultPattern    celui proposé à l'ouverture
- *   visual            { familyId, thumbnail, sample, albedo, normal,
- *                       roughness, plankVariants }
- *   visualStatus      'ready' | 'approximate' | 'unavailable'
- *   displayOrder      tri du catalogue, croissant
- *   active            false = hors catalogue public
- *   warnings          ce qui manquait dans la fiche source
- */
+
+
+
+
+
 export const PRODUCT_FIELDS = [
   'id', 'externalId', 'sku', 'name', 'slug',
   'woodSpecies', 'range', 'tone', 'finish', 'parquetType',
@@ -73,35 +13,19 @@ export const PRODUCT_FIELDS = [
   'visual', 'visualStatus', 'displayOrder', 'active',
 ];
 
-/** Motifs que le moteur sait poser. Un motif inconnu est écarté. */
+
 export const KNOWN_PATTERNS = ['lames', 'point-de-hongrie', 'baton-rompu'];
 
-/**
- * Niveau de fidélité du rendu d'un produit.
- *
- * `ready`        de vraies cartes matière préparées pour le sol, OU un profil
- *                matière construit pour CETTE référence, comparé à sa photo
- *                et validé (`data/material-profiles.json`, voir
- *                `validerProfilMatiere`).
- * `approximate`  une famille de rendu partagée en tient lieu.
- * `unavailable`  ni l'un ni l'autre : le produit n'est pas proposé.
- *
- * La distinction existe pour une raison simple : **il ne faut jamais laisser
- * croire qu'un rendu procédural représente fidèlement une référence réelle.**
- * Ce que l'interface en fait — masquer, ou afficher « aperçu indicatif » — se
- * décidera plus tard ; la donnée, elle, doit exister dès maintenant.
- */
+
+
 export const VISUAL_STATUS = ['ready', 'approximate', 'unavailable'];
 
-/* ------------------------------------------------------------------ */
-/* Profils matière validés                                             */
-/* ------------------------------------------------------------------ */
 
-/**
- * Les réglages de dessin que le moteur lit RÉELLEMENT (js/scene/texture.js).
- * Un profil n'en déclare ni plus ni moins : une clé inconnue serait un réglage
- * que personne ne dessine, et laisserait croire qu'il compte.
- */
+
+
+
+
+
 export const TEXTURE_KEYS = {
   base: 'rgb', grain: 'rgb',
   warm: [0, 30], spread: [0, 40],
@@ -109,31 +33,15 @@ export const TEXTURE_KEYS = {
   knots: [0, 4], knotSize: [0, 0.2], knotDepth: [0, 1],
   contrast: [0, 2], bevel: [0, 0.08], joint: [0, 1], sheen: [0, 0.2], cracks: [0, 0.6],
 };
-/** Finition : les deux grandeurs que `createMaterial` accepte d'un profil. */
+
 const SURFACE_KEYS = { roughness: [0.05, 1], clearcoat: [0, 0.6] };
-/** Les points que la comparaison visuelle doit avoir tous validés. */
+
 export const CONTROLES_MATIERE = ['motif', 'largeur', 'couleur', 'variation', 'finition', 'comparaison'];
-/** Écart de couleur maximal (ΔE CIE76) entre la tuile et le sol de la photo de référence. */
+
 export const SEUIL_DELTA_E = 8;
 
-/**
- * Un profil matière mérite-t-il « Rendu fidèle » pour cette fiche ?
- *
- * La règle est stricte, et chaque point est vérifiable sans regarder une
- * image : le regard a eu lieu avant, il est consigné dans le profil.
- *
- *   - verdict `ready`, daté ;
- *   - la fiche et le profil parlent du même produit : motif, largeur et
- *     longueur identiques. Si Premibel change une dimension, le profil ne vaut
- *     plus et la fiche redevient « indicatif » d'elle-même ;
- *   - réglages de dessin complets, connus et bornés ;
- *   - la référence est la photo de CETTE fiche (sa vignette locale), propre au
- *     produit — et elle sert au regard, jamais au sol ;
- *   - chaque point de contrôle validé, aucune contradiction relevée ;
- *   - écart de couleur mesuré sous le seuil.
- *
- * @returns {{ok: boolean, raisons: string[]}}
- */
+
+
 export function validerProfilMatiere(profil, fiche) {
   const raisons = [];
   const non = (r) => raisons.push(r);
@@ -180,9 +88,9 @@ export function validerProfilMatiere(profil, fiche) {
   return { ok: raisons.length === 0, raisons };
 }
 
-/* ------------------------------------------------------------------ */
-/* Normalisation                                                       */
-/* ------------------------------------------------------------------ */
+
+
+
 
 const first = (...values) => values.find((v) => v !== undefined && v !== null && v !== '');
 
@@ -191,31 +99,8 @@ const num = (v) => {
   return Number.isFinite(n) ? n : null;
 };
 
-/**
- * Une dimension, en millimètres, **à unité explicite**.
- *
- * L'unité canonique est le millimètre : celle des fiches techniques et des ERP,
- * et une largeur de lame en millimètres entiers ne souffre pas d'arrondi.
- *
- * Ce qui est accepté :
- *
- *   120          + `unit: 'mm'`   → 120
- *   "120mm"                       → 120
- *   "1,9 m"                       → 1900
- *   "12 cm"                       → 120
- *   "455 à 910mm"                 → { mm: 683, rangeMm: [455, 910] }
- *
- * Ce qui est **refusé** : un nombre nu, sans unité connue. La version
- * précédente devinait — « moins de 3, ce sont des mètres » — et c'est
- * exactement le genre de règle qui marche sur un prototype puis se retourne
- * contre vous sur un vrai catalogue. Une fiche Premibel réelle porte
- * « Longueur : 1,38mm » là où le produit mesure 1380 mm : l'heuristique aurait
- * « corrigé » la valeur en silence et personne n'aurait jamais vu la donnée
- * fausse. Avec des unités explicites, 1,38 mm reste 1,38 mm — invraisemblable,
- * donc signalé.
- *
- * @returns {{mm:number|null, rangeMm:number[]|null, probleme:string|null}}
- */
+
+
 const UNITES = { mm: 1, millimetre: 1, millimètre: 1, cm: 10, centimetre: 10, centimètre: 10, m: 1000, metre: 1000, mètre: 1000 };
 
 function dimension(valeur, unite) {
@@ -224,9 +109,9 @@ function dimension(valeur, unite) {
   }
   const texte = String(valeur).trim().toLowerCase().replace(/\s+/g, ' ');
 
-  // Intervalle : « 455 à 910mm », « 455-910 mm ». Une longueur variable est une
-  // information, pas un défaut : on garde les bornes et on retient la moyenne
-  // pour le rendu.
+
+
+
   const inter = texte.match(/^([\d.,]+)\s*(?:à|a|-|–)\s*([\d.,]+)\s*([a-zà-ÿ]*)$/);
   if (inter) {
     const u = UNITES[inter[3] || String(unite || '').toLowerCase()];
@@ -253,9 +138,9 @@ function dimension(valeur, unite) {
   return { mm: Math.round(n * u), rangeMm: null, probleme: null };
 }
 
-/** Bornes de vraisemblance, en millimètres. Au-delà, la donnée est fausse. */
+
 const PLAUSIBLE = {
-  widthMm: [40, 1200],      // 1200 : une dalle Versailles, écartée plus loin
+  widthMm: [40, 1200],
   lengthMm: [200, 3000],
   thicknessMm: [5, 40],
 };
@@ -268,13 +153,8 @@ const slugify = (s) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 
-/**
- * Motifs réellement disponibles.
- *
- * Rien n'est déduit : si la source ne dit rien, on ne propose que la pose
- * droite. Proposer un point de Hongrie qui n'existe pas au catalogue serait
- * une promesse fausse faite à quelqu'un qui prépare un chantier.
- */
+
+
 function patternsOf(raw, warnings) {
   const brut = raw.compatiblePatterns ?? raw.motifs_autorises ?? raw.motifsAutorises ?? raw.patterns;
   const nonSupporte = first(raw.unsupportedPattern, raw.motif_non_supporte);
@@ -286,22 +166,17 @@ function patternsOf(raw, warnings) {
     .map((m) => String(m).trim())
     .filter((m) => KNOWN_PATTERNS.includes(m));
   if (!liste.length) {
-    // Un produit dont le motif est connu mais non pris en charge par le moteur
-    // n'a pas « aucun motif reconnu » : il a un motif que nous ne savons pas
-    // poser. Le dire autrement serait faux.
+
+
+
     if (!nonSupporte) warnings.push('aucun motif reconnu : pose droite seule');
     return [];
   }
   return [...new Set(liste)];
 }
 
-/**
- * Rapproche une fiche d'une famille de rendu, et **dit par quel chemin**.
- *
- * La dernière étape garantit qu'une référence inconnue reçoive toujours une
- * apparence plausible plutôt qu'aucune. C'est un rapprochement, pas une
- * vérité : une gamme qui compte visuellement doit déclarer sa famille.
- */
+
+
 export function resolveFamily(fiche, familles) {
   const cles = Object.keys(familles);
   if (!cles.length) return { id: null, reason: 'aucune famille chargée' };
@@ -328,14 +203,8 @@ export function resolveFamily(fiche, familles) {
   return { id: proche, reason: `luminance la plus proche de ${cible}` };
 }
 
-/**
- * Normalise une fiche, quelle que soit sa forme d'origine.
- *
- * Trois formes acceptées : la source historique de `data/parquets.json`, la
- * forme canonique, et un `snake_case` d'export d'ERP. On ne jette jamais : un
- * catalogue de production comporte toujours des fiches incomplètes, et il vaut
- * mieux les afficher signalées que faire tomber la page.
- */
+
+
 export function normalizeProduct(raw, familles = {}, profils = {}) {
   const warnings = [];
 
@@ -344,9 +213,9 @@ export function normalizeProduct(raw, familles = {}, profils = {}) {
   const name = first(raw.name, raw.nom, raw.libelle, raw.label, id);
   if (!name) warnings.push('libellé absent');
 
-  // Dimensions : unité explicite exigée. `dimensionUnit` permet à une source
-  // qui livre des nombres nus de déclarer son unité une fois pour toutes ;
-  // `data/parquets.json`, en mètres, s'en sert.
+
+
+
   const uniteSource = first(raw.dimensionUnit, raw.dimensions && raw.dimensions.unit, raw.unite_dimensions);
   const lire = (nom, ...candidats) => {
     const brut = first(...candidats);
@@ -355,9 +224,9 @@ export function normalizeProduct(raw, familles = {}, profils = {}) {
     else if (d.mm !== null) {
       const [min, max] = PLAUSIBLE[nom];
       if (d.mm < min || d.mm > max) {
-        // Rejetée, pas seulement signalée : une valeur fausse utilisée est pire
-        // qu'une valeur absente. Sans longueur, le moteur en dérive une
-        // plausible ; avec une longueur de 1 mm il dessinerait n'importe quoi.
+
+
+
         warnings.push(`${nom} rejetée, invraisemblable : ${d.mm} mm (attendu ${min}–${max})`);
         return { mm: null, rangeMm: null, probleme: null };
       }
@@ -388,11 +257,11 @@ export function normalizeProduct(raw, familles = {}, profils = {}) {
     range: first(raw.range, raw.gamme, raw.collection) || null,
     tone: first(raw.tone, raw.teinte, raw.couleur) || null,
     toneSource: first(raw.toneSource) || null,
-    // « Finition » et « Aspect » sont deux informations distinctes chez
-    // Premibel, et les écraser dans un seul champ perdrait la moitié du sens :
-    // « Verni » dit la brillance, « Brossé » dit le traitement de surface. Un
-    // brossé n'est pas un niveau de brillance — c'est un grain ouvert, souvent
-    // mat, et un « Verni brossé » existe.
+
+
+
+
+
     finish: first(raw.finish, raw.finition) || null,
     surfaceTreatment: first(raw.surfaceTreatment, raw.treatment, raw.aspect, raw.traitement_surface) || null,
     parquetType: first(raw.parquetType, raw.type_parquet, raw.typeParquet, raw.type) || null,
@@ -401,31 +270,31 @@ export function normalizeProduct(raw, familles = {}, profils = {}) {
     defaultPattern,
     visual: {
       familyId: first(rawVisual.familyId, raw.visualFamily, raw.famille_rendu, raw.familleRendu, raw.renderFamily) || null,
-      // Catalogue : ces deux-là ne touchent jamais le sol.
+
       thumbnail: first(rawVisual.thumbnail, raw.thumbnail, raw.image) || null,
       image: first(rawVisual.image, raw.image) || null,
       sample: first(rawVisual.sample, raw.sample, raw.samplePhoto) || null,
-      // Rendu : préparées pour être projetées, raccordables, sans ombre.
+
       albedo: first(rawVisual.albedo, raw.albedo, raw.maps && raw.maps.albedo) || null,
       normal: first(rawVisual.normal, raw.normal, raw.maps && raw.maps.normal) || null,
       roughness: first(rawVisual.roughness, raw.roughness, raw.maps && raw.maps.roughness) || null,
       plankVariants: rawVisual.plankVariants || raw.plankVariants || null,
     },
-    // Lien vers la fiche du fabricant. N'existe que pour une vraie référence :
-    // c'est ce qui permet à l'interface de ne proposer « Voir la référence »
-    // que là où la référence affichée est réellement celle-là.
-    //
-    // Filtré ici, au point d'entrée unique du catalogue, et pas au moment de
-    // l'affichage : le jour où cette valeur vient d'un export fournisseur,
-    // c'est le `href` de trois écrans qui est en jeu, et un `javascript:` y
-    // deviendrait du code au clic. Une adresse refusée vaut `null`, donc pas
-    // de lien du tout — jamais un lien mort ni un lien piégé.
+
+
+
+
+
+
+
+
+
     productUrl: lienSur(first(raw.productUrl, raw.product_url, raw.url)),
-    // Motif que le produit possède réellement mais que le moteur ne sait pas
-    // poser — Versailles, notamment. On l'inscrit plutôt que de transformer
-    // arbitrairement une dalle en pose droite.
+
+
+
     unsupportedPattern: first(raw.unsupportedPattern, raw.motif_non_supporte) || null,
-    /* Pourquoi une fiche n'a pas de rendu, quand la source le dit (synchronisation Premibel). */
+
     visualReason: first(raw.visualReason) || null,
     source: first(raw.source, raw.origine) || null,
     displayOrder: num(first(raw.displayOrder, raw.ordre_affichage, raw.ordreAffichage, raw.order)) ?? 0,
@@ -433,29 +302,20 @@ export function normalizeProduct(raw, familles = {}, profils = {}) {
     warnings,
   };
 
-  /*
-   * Une fiche que sa source déclare SANS rendu ne reçoit pas de famille par
-   * défaut. Sans cette garde, `resolveFamily` lui trouvait « la luminance la
-   * plus proche » : chaque référence du catalogue synchronisé serait devenue
-   * « approximate », c'est-à-dire visualisable avec un bois qui n'est pas le
-   * sien.
-   */
+
+
   const declareeSansRendu = first(raw.visualStatus, raw.visual_status) === 'unavailable' && !fiche.visual.familyId && !fiche.visual.albedo;
   const famille = declareeSansRendu ? { id: null, reason: 'aucun rendu déclaré par la source' } : resolveFamily(fiche, familles);
   fiche.visual.familyId = famille.id;
   fiche.visual.familyReason = famille.reason;
 
-  // Paramètres de dessin : ceux de la fiche s'ils existent (les douze
-  // références actuelles les portent en ligne), sinon ceux de la famille.
+
+
   fiche.visual.params = declareeSansRendu ? null : raw.texture || (familles[famille.id] && familles[famille.id].texture) || null;
   fiche.patternProfiles = first(raw.patternProfiles, raw.profils_motifs, raw.profilsMotifs) || null;
 
-  /*
-   * Profil matière : le seul chemin procédural vers « Rendu fidèle ». Validé
-   * ici, au point d'entrée unique — le Studio, l'accueil et les compteurs du
-   * générateur voient donc le même statut. Un profil refusé ne fait rien
-   * d'autre qu'expliquer pourquoi : la fiche garde sa famille.
-   */
+
+
   fiche.materialProfile = null;
   const profil = profils[fiche.sku] || profils[fiche.id];
   if (profil && !declareeSansRendu) {
@@ -469,12 +329,12 @@ export function normalizeProduct(raw, familles = {}, profils = {}) {
     }
   }
 
-  // Niveau de fidélité.
-  //
-  // Un motif que le moteur ne sait pas poser rend le produit indisponible, quel
-  // que soit son rendu : mieux vaut ne pas le montrer que de le montrer faux.
-  // C'est le cas des dalles Versailles — les transformer en pose droite serait
-  // représenter autre chose que le produit.
+
+
+
+
+
+
   const declare = first(raw.visualStatus, raw.visual_status);
   if (fiche.unsupportedPattern) {
     fiche.visualStatus = 'unavailable';
@@ -485,18 +345,18 @@ export function normalizeProduct(raw, familles = {}, profils = {}) {
     fiche.visualStatus = 'unavailable';
     warnings.push('aucun rendu disponible');
   }
-  // Une fiche peut se déclarer plus prudente que ce que le calcul conclut,
-  // jamais plus optimiste : on ne se décrète pas fidèle.
-  // Seule exception : « approximate », que la synchronisation écrit faute de
-  // mieux, cède devant un profil validé — c'est précisément ce que le profil
-  // apporte. « unavailable » ne cède jamais.
+
+
+
+
+
   const cede = declare === 'approximate' && fiche.materialProfile;
   if (declare && !cede && VISUAL_STATUS.indexOf(declare) > VISUAL_STATUS.indexOf(fiche.visualStatus)) {
     fiche.visualStatus = declare;
   }
 
-  // Sans largeur, aucun rendu à l'échelle n'est possible : le produit ne peut
-  // pas être proposé, même avec une belle famille de rendu.
+
+
   if (fiche.dimensions.widthMm === null && fiche.visualStatus !== 'unavailable') {
     fiche.visualStatus = 'unavailable';
     warnings.push('largeur inutilisable : rendu à l’échelle impossible');
@@ -505,36 +365,18 @@ export function normalizeProduct(raw, familles = {}, profils = {}) {
   return fiche;
 }
 
-/**
- * Adapte une fiche canonique à la forme attendue par `createMaterial()`.
- *
- * Le moteur continue de lire `boardWidth`, `texture`, `compatiblePatterns`… On
- * ne le réécrit pas : la couche produit s'y raccorde. Le jour où un vrai
- * catalogue arrive, c'est cette fonction — et elle seule — qui fait le pont.
- *
- * Les dimensions repassent en mètres ici, et **seulement ici** : le moteur
- * travaille en mètres de sol, la fiche en millimètres.
- */
-/**
- * Profils de motif dérivés des dimensions réelles de la fiche.
- *
- * Un produit vendu en point de Hongrie 92 × 520 mm doit se rendre en
- * 92 × 520 mm. Sans ce profil, `patternProfile()` retombait sur la valeur
- * générique de 90 mm pour tous les chevrons — géométriquement proche, mais ce
- * n'était plus le produit.
- *
- * Pour un produit qui déclare plusieurs motifs (le cas existe : une lame de
- * 133 × 665 mm vendue en pose droite *et* en bâton rompu), c'est le même
- * élément physique dans les deux cas, donc le même profil.
- */
+
+
+
+
 function profilsDepuisDimensions(fiche) {
   const w = fiche.dimensions.widthMm;
   const l = fiche.dimensions.lengthMm;
   if (w === null) return null;
   const profil = { width: w / 1000 };
   if (l !== null) profil.length = l / 1000;
-  // Une matière validée est dessinée à sa longueur réelle, et à l'angle relevé
-  // pour un point de Hongrie (voir `dimensionsDessinees` dans texture.js).
+
+
   const mp = fiche.materialProfile;
   if (mp && l !== null) profil.exactLength = true;
   const out = {};
@@ -552,25 +394,25 @@ export function toMaterial(fiche) {
     slug: fiche.slug,
     wood: fiche.woodSpecies,
     tone: fiche.tone,
-    // Le moteur reçoit les deux informations concaténées parce que
-    // `finishProfile()` raisonne sur des mots-clés — « Verni » et « Brossé »
-    // ne donnent pas le même profil, et « Verni brossé » encore un autre.
+
+
+
     finish: [fiche.finish, fiche.surfaceTreatment].filter(Boolean).join(' ') || null,
     boardWidth: fiche.dimensions.widthMm !== null ? fiche.dimensions.widthMm / 1000 : null,
     boardLength: fiche.dimensions.lengthMm !== null ? fiche.dimensions.lengthMm / 1000 : null,
     defaultPattern: fiche.defaultPattern,
     compatiblePatterns: fiche.compatiblePatterns,
     texture: fiche.visual.params,
-    // Finition relevée par le profil validé ; sinon `createMaterial` la déduit
-    // du libellé (« Verni », « Brossé »…).
+
+
     ...((fiche.materialProfile && fiche.materialProfile.surface) || {}),
-    // Les dimensions du produit SONT les dimensions du motif.
-    //
-    // Un point de Hongrie Premibel de 92 × 520 mm, c'est un chevron de
-    // 92 × 520 mm — pas la valeur générique de 90 mm que le moteur dérivait
-    // faute de mieux. On fabrique donc un profil par motif autorisé à partir
-    // des dimensions réelles de la fiche. Les matières de démonstration, qui
-    // déclarent déjà leurs profils, gardent les leurs.
+
+
+
+
+
+
+
     patternProfiles: fiche.patternProfiles || profilsDepuisDimensions(fiche),
     maps: {
       albedo: fiche.visual.albedo,
@@ -586,33 +428,14 @@ export function toMaterial(fiche) {
   };
 }
 
-/* ------------------------------------------------------------------ */
-/* Chargement                                                          */
-/* ------------------------------------------------------------------ */
 
-/**
- * Charge le catalogue produit et les familles de rendu.
- *
- * Les sources sont **déclarées** dans `data/render-families.json` (champ
- * `catalogues`), pas devinées : sonder l'existence d'un fichier laissait un 404
- * dans la console de toutes les pages.
- *
- * Plusieurs sources cohabitent, et c'est voulu pendant la phase pilote : les
- * matières de démonstration restent en place — les cartes Inspiration et
- * l'avant/après de l'accueil les citent par identifiant — et les vraies
- * références Premibel s'y ajoutent. Chaque fiche porte l'origine dont elle
- * vient, ce qui permet à l'interface de ne proposer un lien fabricant que là
- * où il existe vraiment.
- *
- * Les fiches `unavailable` sont écartées comme les inactives.
- */
-/**
- * Un même fichier de catalogue n'est lu qu'une fois par session.
- *
- * `loadCatalog` relit `data/parquets.json` pour ses métadonnées de motifs
- * après que `loadProducts` l'a déjà chargé : deux requêtes pour le même
- * octet au démarrage du Studio, mesuré. La promesse est partagée par URL.
- */
+
+
+
+
+
+
+
 const fichiers = new Map();
 export function lireJson(url) {
   if (!fichiers.has(url)) {
@@ -627,19 +450,8 @@ export function lireJson(url) {
   return fichiers.get(url);
 }
 
-/**
- * Cette fiche est-elle proposée au visiteur ?
- *
- * Nommée et exportée pour une raison précise : `_generator/catalogue.js`
- * applique exactement ce prédicat pour écrire dans les textes du site le
- * nombre de parquets que le Studio offre. Le site a annoncé « douze
- * parquets » pendant que le tiroir en présentait vingt-six — un nombre écrit
- * à la main ne se met pas à jour tout seul, et un nombre recalculé avec une
- * AUTRE règle se trompe autrement. Une règle, un endroit.
- *
- * @param {{active?: boolean, id?: string, visualStatus?: string}} fiche
- * @returns {boolean}
- */
+
+
 export const estProposable = (fiche) =>
   Boolean(fiche && fiche.active && fiche.id && fiche.visualStatus !== 'unavailable');
 
@@ -648,7 +460,7 @@ export async function loadProducts(base = '') {
     .then((r) => (r.ok ? r.json() : {}))
     .catch(() => ({}));
   const families = manifeste.familles || {};
-  // Profils matière validés, déclarés par le manifeste comme les catalogues.
+
   const profils = manifeste.profils ? ((await lireJson(`${base}${manifeste.profils}`).catch(() => ({}))).profils || {}) : {};
   const sources = Array.isArray(manifeste.catalogues)
     ? manifeste.catalogues
@@ -667,19 +479,12 @@ export async function loadProducts(base = '') {
   return { products, rejected: toutes.filter((f) => !products.includes(f)), families, source };
 }
 
-/* ------------------------------------------------------------------ */
-/* Contrôle du catalogue                                               */
-/* ------------------------------------------------------------------ */
 
-/**
- * Valide un catalogue et rend un rapport.
- *
- * Le but n'est pas de refuser des fiches : c'est de **savoir** ce qui manque
- * avant que ça se voie à l'écran. Un produit invalide ne doit jamais casser le
- * visualiseur — il est écarté, et il apparaît ici.
- *
- * @returns {{ok:boolean, total:number, problemes:object[], parStatut:object}}
- */
+
+
+
+
+
 export function validateCatalog(fiches, families = {}) {
   const problemes = [];
   const vus = new Set();
@@ -697,9 +502,9 @@ export function validateCatalog(fiches, families = {}) {
     else if (f.dimensions.widthMm < PLAUSIBLE.widthMm[0] || f.dimensions.widthMm > PLAUSIBLE.widthMm[1]) {
       dire('bloquant', `largeur invraisemblable : ${f.dimensions.widthMm} mm`);
     } else if (f.dimensions.widthMm > 400 && !f.unsupportedPattern) {
-      // Au-delà de 400 mm ce n'est plus une lame, c'est un panneau. Légitime
-      // pour une dalle Versailles — mais le motif doit alors être déclaré non
-      // supporté, sinon la fiche et le moteur ne parlent pas du même objet.
+
+
+
       dire('bloquant', `largeur de ${f.dimensions.widthMm} mm sans motif non supporté déclaré`);
     }
     if (f.dimensions.lengthMm !== null && f.dimensions.lengthMm < f.dimensions.widthMm) {
@@ -724,7 +529,7 @@ export function validateCatalog(fiches, families = {}) {
     if (!VISUAL_STATUS.includes(f.visualStatus)) dire('bloquant', `statut visuel inconnu : ${f.visualStatus}`);
     parStatut[f.visualStatus] = (parStatut[f.visualStatus] || 0) + 1;
 
-    // Signalements, sans gravité : la fiche fonctionne, elle est incomplète.
+
     if (!f.sku) dire('signalement', 'référence commerciale absente');
     if (!f.externalId) dire('signalement', 'identifiant source absent');
     if (!f.range) dire('signalement', 'gamme absente');

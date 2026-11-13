@@ -2,7 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-// Les variables Actions sont des données, jamais du JavaScript interpolé.
+
 function adresse(raw, nom) {
   const u = new URL(raw);
   if (u.protocol !== 'https:' || u.username || u.password || u.hash || u.search || /[\s<>"'\\]/.test(raw)) {
@@ -44,7 +44,7 @@ if (require.main === module) {
     if (process.argv[2] !== '--verifier') {
       const dossier = path.resolve(process.argv[2] || path.join(root, '_site'));
       if (!fs.statSync(dossier).isDirectory()) throw new Error('Dossier artefact absent.');
-      fs.writeFileSync(path.join(dossier, 'config.js'), `/* Configuration publique de déploiement. */\nwindow.POSE_PARQUET_CONFIG = ${JSON.stringify(config)};\n`);
+      fs.writeFileSync(path.join(dossier, 'config.js'), `\nwindow.POSE_PARQUET_CONFIG = ${JSON.stringify(config)};\n`);
     }
     console.log('Configuration de déploiement validée.');
   } catch (e) { console.error(e.message); process.exitCode = 1; }

@@ -1,17 +1,6 @@
 <?php
-/**
- * Import des CHAMPS STRUCTURÉS (pages) et de « Mon site », sans rien écraser.
- *
- *   node _generator/exporter-wordpress.js
- *   php backend/pose-parquet-core/tools/importer-champs.php <racine WordPress> data/wordpress/import.json
- *
- * Les schémas sont remplacés (ils viennent du code du site) ; une valeur déjà
- * saisie dans WordPress est conservée ; seules les clés nouvelles reçoivent la
- * valeur par défaut. Les contenus (guides, corps, images…) ne sont pas touchés.
- *
- * En ligne de commande seulement. S'exécute en tant que premier
- * administrateur du site (il faut le droit de publier et de téléverser).
- */
+
+
 
 if ( PHP_SAPI !== 'cli' ) {
 	exit( 1 );
@@ -39,7 +28,7 @@ if ( ! is_array( $donnees ) || (int) ( $donnees['version'] ?? 0 ) !== 1 ) {
 }
 
 $import = new PoseParquet\Core\Contenus\Importer();
-// Les pages nouvelles du site d'abord (créées, jamais écrasées), puis leurs champs.
+
 $nouvelles = $import->pages_manquantes( $donnees );
 $compte    = $import->champs( $donnees );
 foreach ( $import->journal() as $ligne ) {

@@ -1,26 +1,3 @@
-/**
- * Masques d'une scène.
- *
- * Une scène peut compter plusieurs zones de sol : la pièce du premier plan,
- * celle que l'on aperçoit derrière une ouverture, un couloir. Chacune a son
- * propre plan de perspective, mais elles ne se recouvrent pas — ce sont des
- * morceaux de sol distincts.
- *
- * On en tire donc deux cartes seulement, quel que soit le nombre de zones :
- *
- *   labels    quelle zone possède ce pixel (0 = aucune, 1..n = index + 1)
- *   coverage  couverture antialiasée du sol (0 → 255)
- *
- * et une troisième pour ce qui doit rester devant :
- *
- *   occlusion  255 = restituer la photo d'origine (meuble, tapis, plinthe)
- *
- * Deux cartes plutôt qu'un masque par zone : la mémoire ne dépend plus du
- * nombre de zones, et le moteur de rendu fait un seul passage sur l'image.
- *
- * Le tracé se fait sur un canevas hors écran, en une passe par zone puis une
- * lecture unique — lire un canevas est de loin l'opération la plus coûteuse.
- */
 import { zonePolygon } from './schema.js';
 
 const MAX_HISTORY = 60;
@@ -45,9 +22,9 @@ export function createSceneMasks(scene, width, height) {
   const coverage = new Uint8ClampedArray(width * height);
   const occlusion = new Uint8ClampedArray(width * height);
 
-  /** Contours courants, par zone : l'édition ne touche pas la scène d'origine. */
+
   const polygons = new Map(scene.floorZones.map((zone) => [zone.id, zonePolygon(zone).map((p) => ({ ...p }))]));
-  /** @type {{zoneId:string, mode:'add'|'remove', radius:number, points:{x:number,y:number}[]}[]} */
+
   let strokes = [];
   let redoStack = [];
 
@@ -56,7 +33,7 @@ export function createSceneMasks(scene, width, height) {
   let hasOcclusion = false;
   let dirty = true;
 
-  /* ---------------- Tracé ---------------- */
+
 
   const paintStroke = (stroke, only) => {
     ctx.save();
@@ -84,11 +61,8 @@ export function createSceneMasks(scene, width, height) {
     ctx.restore();
   };
 
-  /**
-   * Dessine une zone : contour, moins ses trous, plus ses retouches.
-   * Renvoie la boîte englobante lue sur le canevas, pour que le rendu ne
-   * parcoure jamais l'image entière.
-   */
+
+
   function drawZone(zone) {
     ctx.clearRect(0, 0, width, height);
     const polygon = polygons.get(zone.id);
@@ -120,9 +94,9 @@ export function createSceneMasks(scene, width, height) {
       for (let i = 0, p = 3; i < labels.length; i += 1, p += 4) {
         const a = data[p];
         if (a <= 2) continue;
-        // Les zones ne se recouvrent pas ; en cas de chevauchement résiduel,
-        // la plus proche (index le plus élevé) gagne — c'est ce que l'œil
-        // attend d'un sol vu par-dessus un autre.
+
+
+
         labels[i] = label;
         if (a > coverage[i]) coverage[i] = a;
         const x = i % width;
@@ -154,15 +128,15 @@ export function createSceneMasks(scene, width, height) {
         : { ...box };
     });
 
-    /* Occlusions : données de scène, valables pour toutes les zones. */
+
     occlusion.fill(0);
     hasOcclusion = false;
     if (scene.occluders.length) {
       ctx.clearRect(0, 0, width, height);
       ctx.fillStyle = '#fff';
       scene.occluders.forEach((occluder) => {
-        // Un liseré adouci évite l'arête de découpe, qui trahit tout de suite
-        // un montage. Le flou est exprimé en fraction de largeur d'image.
+
+
         const blur = Math.max(0, occluder.feather * width);
         ctx.save();
         if (blur > 0.4) ctx.filter = `blur(${blur.toFixed(2)}px)`;
@@ -203,17 +177,14 @@ export function createSceneMasks(scene, width, height) {
       ensure();
       return hasOcclusion ? occlusion : null;
     },
-    /** Boîte englobante d'une zone, ou de toutes si aucun id n'est donné. */
+
     box(zoneId) {
       ensure();
       return zoneId ? boxes.get(zoneId) || null : unionBox;
     },
 
-    /**
-     * Déclare une zone apparue après coup — l'utilisateur qui ajoute un second
-     * sol sur sa photo, ou un service d'analyse qui en renvoie un de plus.
-     * Sans cela la zone existerait dans la scène mais n'aurait aucun contour.
-     */
+
+
     registerZone(zone) {
       if (polygons.has(zone.id)) return;
       polygons.set(zone.id, zonePolygon(zone).map((p) => ({ ...p })));
@@ -233,7 +204,7 @@ export function createSceneMasks(scene, width, height) {
       polygons.set(zoneId, points.map((p) => ({ ...p })));
       dirty = true;
     },
-    /** Ajoute un point sur le segment le plus proche du clic. */
+
     insertPointNear(zoneId, point) {
       const polygon = polygons.get(zoneId);
       if (!polygon || polygon.length < 2) return -1;
@@ -270,8 +241,8 @@ export function createSceneMasks(scene, width, height) {
       dirty = true;
     },
 
-    /* Retouches au pinceau : elles appartiennent à une zone, puisqu'un pixel
-       de sol a besoin d'un plan de perspective pour être peint. */
+
+
     beginStroke(zoneId, mode, radius, point) {
       redoStack = [];
       strokes.push({ zoneId, mode, radius, points: [point] });

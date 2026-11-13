@@ -1,4 +1,3 @@
-/** Cycle clavier, arrière-plan inerte et restitution du focus des fenêtres. */
 export function activateDialog(dialog, { onClose, initialFocus } = {}) {
   const previous = document.activeElement;
   const muted = [];

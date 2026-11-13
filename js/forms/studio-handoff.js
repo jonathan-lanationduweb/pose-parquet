@@ -1,87 +1,3 @@
-/**
- * Le passage du Studio au formulaire : une seule convention, écrite une fois.
- *
- * Trois endroits parlent de cette URL — le Studio qui la fabrique
- * (`js/studio/app.js`), le formulaire qui l'affiche
- * (`components/project-form/project-form.js`) et la charge qui part à l'API
- * (`js/forms/project-payload.js`). Ils s'étaient mis à ne plus dire tout à
- * fait la même chose, et cela s'est vu en recette : le Studio envoyait
- * `parquet=Chêne+Fumé`, la charge attendait un identifiant sous ce nom, la
- * validation refusait le libellé, et la fiche WordPress affichait un motif et
- * un angle sans jamais nommer ni la scène ni le parquet. Personne n'avait
- * tort ; il manquait un endroit où la règle soit écrite une seule fois.
- *
- * ## La convention
- *
- *   piece          identifiant de la scène        sejour
- *   libelle-piece  nom de la scène, pour l'humain Séjour et salle à manger
- *   parquet        identifiant du produit         chene-fume
- *   libelle        nom commercial, pour l'humain  Chêne Fumé
- *   motif          motif de pose                  point-de-hongrie
- *   orientation    angle du rendu, en degrés      90
- *   fiche          la référence a une fiche réelle 1
- *
- * ## `fiche` : pourquoi le Studio le dit et le formulaire ne le devine pas
- *
- * Le formulaire ne charge pas le catalogue — il n'en a besoin pour rien
- * d'autre, et lui faire télécharger vingt-six références pour répondre à une
- * seule question serait payer cher une information que le Studio possède
- * déjà. Le Studio, lui, sait si la référence ouverte porte une fiche produit
- * réelle : il l'écrit.
- *
- * Cette valeur sert à RECOMMANDER une destination commerciale, jamais à
- * déclencher quoi que ce soit. Une URL fabriquée à la main peut donc faire
- * recommander Premibel pour un parquet de démonstration ; le pire qui puisse
- * en résulter est une ligne mal orientée dans une liste, qu'un humain
- * corrige d'un menu déroulant. Aucun envoi, aucune commande, aucune donnée
- * transmise à un tiers ne dépend de ce drapeau.
- *
- * ## Pourquoi des libellés en plus des identifiants
- *
- * Les identifiants sont la vérité technique et ne bougent pas ; ils partent
- * dans `scene_id` et `product_id`, et rien ne les remplace. Les libellés sont
- * un **instantané d'affichage** : ils disent ce que le visiteur avait sous les
- * yeux au moment de son envoi. Une référence renommée l'an prochain, une
- * scène retitrée, un produit retiré du catalogue — la demande, elle, garde son
- * libellé d'origine. C'est ce qui permet à une fiche commerciale de rester
- * lisible des mois plus tard sans dépendre d'un catalogue que le serveur ne
- * connaît pas.
- *
- * Le corollaire : un libellé venu du navigateur n'est pas une donnée de
- * confiance. Le serveur le borne, le nettoie et l'échappe à l'affichage.
- *
- * `parquet` porte l'IDENTIFIANT, jamais le libellé. Ce n'est pas un choix
- * nouveau : les liens profonds qui ouvrent le Studio depuis la page
- * Inspiration écrivent déjà `?piece=sejour&parquet=chene-fume`, et le Studio
- * les valide contre son catalogue. Faire porter à `parquet` un libellé dans
- * l'autre sens aurait donné deux significations au même nom selon la
- * direction du voyage. Le nom humain a donc son propre paramètre, `libelle`,
- * et les deux rôles restent séparés : l'un identifie, l'autre s'affiche.
- *
- * ## Ce qui ne voyage pas
- *
- * La photo importée dans le Studio. Jamais, sous aucune forme : ni base64, ni
- * blob, ni data URL, ni masque, ni `SceneData`. Une URL ne transporte que cinq
- * champs courts, et c'est très volontaire.
- *
- * ## Angle et sens de pose
- *
- * `orientation` est l'angle du rendu du Studio, en degrés. Ce n'est PAS le
- * `installationType` du formulaire métier, qui est un sens de pose choisi par
- * le visiteur (`longueur`, `point-de-hongrie`…). Les deux mots se ressemblent,
- * les deux notions non, et elles voyagent ensemble sans se confondre : l'angle
- * finit dans `visualizer.orientation`, le sens de pose dans
- * `installationType`.
- */
-
-/**
- * Noms des paramètres d'URL. La seule liste qui fasse foi.
- *
- * `label` porte le nom du PRODUIT et garde son nom court : il existait avant
- * le libellé de scène et des demandes déjà enregistrées s'y réfèrent. Le
- * renommer par symétrie aurait cassé la lecture de ces demandes pour la seule
- * satisfaction d'une table alignée.
- */
 export const PARAMS = {
   scene: 'piece',
   sceneLabel: 'libelle-piece',
@@ -92,77 +8,27 @@ export const PARAMS = {
   fiche: 'fiche',
 };
 
-/**
- * Longueur maximale d'un libellé, en caractères.
- *
- * Cent vingt : « Point de Hongrie Couronne Impériale 92x15x520 », la référence
- * la plus longue du catalogue, en fait 45. Le plafond laisse donc largement la
- * place à un nom commercial bavard tout en refusant qu'une URL fabriquée à la
- * main serve à gonfler la charge. Le serveur applique la même limite.
- */
+
+
 export const MAX_LIBELLE = 120;
 
-/** Motifs de pose que le Visualiseur sait rendre. */
+
 export const MOTIFS = new Set(['lames', 'point-de-hongrie', 'baton-rompu']);
 
-/** Angles que le panneau Orientation propose, en degrés. */
+
 export const ANGLES = new Set([0, 90, 45, -45]);
 
-/**
- * Forme d'un identifiant : la même règle que celle du serveur.
- *
- * Un libellé commercial ne la passe pas — « Chêne Fumé » a un espace et un
- * accent — et c'est exactement le garde-fou qu'on veut : si un libellé arrive
- * là où un identifiant est attendu, il est écarté au lieu d'être stocké comme
- * s'il en était un.
- *
- * ## Pourquoi le drapeau `i`
- *
- * Les identifiants de démonstration sont en minuscules — `chene-fume` — et la
- * règle l'était aussi. Les quatorze références réelles portent leur référence
- * fournisseur, en majuscules : `CHENF36006`. Elles échouaient donc toutes au
- * test, et `parquet` n'était jamais écrit dans le lien vers le formulaire :
- * la seule moitié du catalogue qui désigne un produit achetable arrivait en
- * base sans identifiant, avec son seul libellé.
- *
- * Le serveur, lui, acceptait déjà les deux casses — `/^[a-z0-9][a-z0-9_\-]*$/i`
- * dans Validator.php. C'est le front qui était plus strict que le contrat
- * qu'il servait, et c'est le front qui se corrige.
- *
- * Ce que le garde-fou refuse reste identique : l'espace et l'accent ne sont
- * dans aucune des deux casses.
- */
+
+
 const ID_VALIDE = /^[a-z0-9][a-z0-9_-]{0,59}$/i;
 
-/** Vrai si cette chaîne peut être un identifiant de scène ou de produit. */
+
 export function estIdentifiant(valeur) {
   return typeof valeur === 'string' && ID_VALIDE.test(valeur);
 }
 
-/**
- * Fabrique la requête, côté Studio.
- *
- * Chaque champ n'est écrit que s'il est réellement exploitable : une scène
- * absente (le visiteur a importé sa propre photo), un produit inconnu du
- * catalogue ou un angle hors des quatre valeurs du panneau ne partent pas.
- * Mieux vaut un paramètre manquant qu'un paramètre faux — le formulaire et la
- * fiche savent tous les deux se passer d'une information, pas se méfier d'une
- * information inventée.
- *
- * Un libellé n'est écrit qu'accompagné de son identifiant : un nom seul ne
- * désigne rien de vérifiable, et le stocker donnerait à la fiche un air de
- * précision qu'elle n'aurait pas.
- *
- * @param {object} etat
- * @param {string|null} [etat.sceneId]      identifiant de la scène ouverte
- * @param {string|null} [etat.sceneLabel]   nom de la scène ouverte
- * @param {string|null} [etat.productId]    identifiant du parquet actif
- * @param {string|null} [etat.productLabel] nom commercial du parquet actif
- * @param {string|null} [etat.pattern]      motif de pose
- * @param {number|null} [etat.angle]        angle du rendu, en degrés
- * @param {boolean} [etat.ficheProduit]      la référence porte une fiche réelle
- * @returns {URLSearchParams}
- */
+
+
 export function buildHandoffParams({ sceneId, sceneLabel, productId, productLabel, pattern, angle, ficheProduit } = {}) {
   const params = new URLSearchParams();
 
@@ -184,29 +50,15 @@ export function buildHandoffParams({ sceneId, sceneLabel, productId, productLabe
   const entier = Number(angle);
   if (Number.isInteger(entier) && ANGLES.has(entier)) params.set(PARAMS.angle, String(entier));
 
-  // Écrit seulement s'il est vrai, et seulement avec son identifiant : un
-  // drapeau sans référence ne qualifierait rien.
+
+
   if (ficheProduit && estIdentifiant(productId)) params.set(PARAMS.fiche, '1');
 
   return params;
 }
 
-/**
- * Relit la requête, côté formulaire.
- *
- * Toute valeur douteuse devient `null` : c'est plus honnête qu'une valeur
- * approximative, et cela évite qu'un identifiant fantaisiste finisse en base.
- *
- * Un ancien lien qui portait le libellé dans `parquet` — la forme d'avant ce
- * correctif — n'y perd que le nom du produit : `productId` reste vide, le
- * motif et l'angle passent, et le formulaire fonctionne. Une dégradation, pas
- * une panne.
- *
- * @param {URLSearchParams} params
- * @returns {{sceneId: string|null, sceneLabel: string|null, productId: string|null,
- *            productLabel: string|null, pattern: string|null, angle: number|null,
- *            present: boolean}}
- */
+
+
 export function readHandoffParams(params) {
   const lire = (nom) => (params.get(nom) || '').trim();
 
@@ -225,23 +77,19 @@ export function readHandoffParams(params) {
 
   const lecture = {
     sceneId: estIdentifiant(scene) ? scene : null,
-    // Un libellé sans identifiant valide n'est pas retenu : il ne pourrait
-    // que décorer une donnée absente.
+
+
     sceneLabel: estIdentifiant(scene) && nomScene ? nomScene : null,
     productId: estIdentifiant(produit) ? produit : null,
     productLabel: libelle || null,
     pattern: MOTIFS.has(motif) ? motif : null,
     angle,
-    // Comme le libellé : sans identifiant valide, le drapeau ne désigne rien.
+
     ficheProduit: estIdentifiant(produit) && params.get(PARAMS.fiche) === '1',
   };
 
-  /*
-   * `present` répond à « le visiteur vient-il du Studio ? ». On regarde les
-   * paramètres BRUTS et non les valeurs retenues : quelqu'un qui arrive avec
-   * un ancien lien, ou avec un produit que le catalogue ne connaît plus, vient
-   * bel et bien du Studio, et le formulaire doit le lui dire.
-   */
+
+
   lecture.present = Boolean(scene || nomScene || produit || libelle || motif || angleBrut);
 
   return lecture;

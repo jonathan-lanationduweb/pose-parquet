@@ -1,8 +1,7 @@
 import { qs, qsa, on } from '../utils/dom.js';
 
-/**
- * Sommaire d'article : genere les entrees depuis les titres et suit la lecture.
- */
+
+
 export function initToc(root) {
   const article = document.getElementById(root.dataset.tocFor || 'article-content');
   if (!article) return;
@@ -22,7 +21,7 @@ export function initToc(root) {
   });
 
   const links = qsa('a', list);
-  // Sommaire mobile (replié en haut de l'article) : la barre dit où l'on en est, et se referme après un choix.
+
   const courant = qs('[data-toc-courant]', root);
   if (root.tagName === 'DETAILS') {
     links.forEach((link) => on(link, 'click', () => { root.open = false; }));
@@ -40,12 +39,8 @@ export function initToc(root) {
   );
   headings.forEach((heading) => observer.observe(heading));
 
-  /*
-   * La section courante de la barre mobile : le dernier titre passé sous la
-   * barre. Calculée au défilement plutôt que par l'observateur ci-dessus, qui
-   * ne voit qu'une bande étroite de l'écran et rate une section entière après
-   * un grand saut (lien du sommaire, retour en arrière).
-   */
+
+
   if (courant) {
     let prevu = false;
     const majCourant = () => {
@@ -61,7 +56,7 @@ export function initToc(root) {
   }
 }
 
-/** Barre de progression de lecture. */
+
 export function initReadingProgress() {
   const bar = qs('[data-reading-progress]');
   const article = document.getElementById('article-content');

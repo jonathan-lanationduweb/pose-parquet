@@ -1,19 +1,3 @@
-/**
- * Migration : les contenus du dépôt, prêts à être importés dans WordPress.
- *
- *   node _generator/exporter-wordpress.js
- *     → data/wordpress/import.json
- *   php backend/pose-parquet-core/tools/importer-contenus.php <racine WordPress> data/wordpress/import.json
- *   php backend/pose-parquet-core/tools/importer-champs.php   <racine WordPress> data/wordpress/import.json
- *     (champs structurés et « Mon site » seulement, sans rien écraser)
- *
- * Tout ce que le site publie aujourd'hui part : titre, slug, résumé, chapô,
- * corps (le HTML RENDU, composants compris), image et son crédit, SEO,
- * catégorie, date, FAQ, liens connexes. Les URLs ne bougent pas : le slug est
- * repris tel quel, et le générateur reconstruit les mêmes chemins.
- *
- * Ce script ne touche ni au site ni à WordPress : il écrit un fichier.
- */
 const fs = require('fs');
 const path = require('path');
 const { GUIDES } = require('./content-guides');
@@ -25,7 +9,7 @@ const { PHOTOS, INSPIRATION_PHOTOS } = require('./photos');
 const RACINE = path.join(__dirname, '..');
 const SORTIE = path.join(RACINE, 'data', 'wordpress', 'import.json');
 
-/** L'image d'origine (pleine taille) d'une clé de PHOTOS, si elle est sur le disque. */
+
 function image(cle) {
   const p = PHOTOS[cle];
   if (!p) return null;
@@ -34,7 +18,7 @@ function image(cle) {
   return { fichier, source: cle, alt: p.alt || '', credit: p.credit || '' };
 }
 
-/** La date injectée par build.js pour les tutoriels (ils n'en ont pas dans leurs données). */
+
 const DATE_TUTORIELS = '2026-08-16';
 
 const donnees = {
@@ -97,7 +81,7 @@ const donnees = {
         motif: (i.config && i.config.pattern) || '',
         orientation: (i.config && i.config.orientation) || 0,
       },
-      // L'alt et le crédit de la CARTE (ils peuvent différer de ceux de la photo dans PHOTOS).
+
       image: Object.assign(image(i.image) || {}, { alt: i.alt, credit: i.credit }),
     };
   }),
@@ -112,16 +96,16 @@ const donnees = {
     titre: p.titre,
     description: p.description,
     corps: p.corps || null,
-    // Champs structurés : schéma et valeurs par défaut (content-pages.js).
-    // Importés par tools/importer-champs.php, qui n'écrase aucune saisie.
+
+
     champs: p.champs || null,
   })),
-  // « Mon site » : schéma et valeurs par défaut (content-site.js).
+
   site: SITE_CHAMPS,
   maintenance: { image: image('room-piece-arcades') },
 };
 
-// Garde-fous : rien ne part incomplet.
+
 const manques = [];
 for (const g of [...donnees.guides, ...donnees.tutoriels]) {
   if (!g.slug || !g.h1 || !g.corps) manques.push(g.slug || '?');

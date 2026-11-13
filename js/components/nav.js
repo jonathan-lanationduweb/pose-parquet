@@ -1,8 +1,7 @@
 import { qs, qsa, on, trapFocus } from '../utils/dom.js';
 
-/**
- * En-tête : état scrollé, superposition au visuel de tête, menu plein écran.
- */
+
+
 export function initNav() {
   const header = qs('[data-header]');
   if (!header) return;
@@ -31,9 +30,9 @@ export function initNav() {
     document.body.dataset.drawerOpen = String(open);
     if (open) {
       header.dataset.over = 'false';
-      // Le premier lien de la LISTE, pas le premier lien du tiroir : celui-ci
-      // était le lien d'évitement « Aller au contenu », ce qui envoyait le
-      // lecteur d'écran hors du menu qu'il venait d'ouvrir.
+
+
+
       const first = qs('.drawer__list a', drawer) || qs('a, button', drawer);
       if (first) first.focus();
     } else {
@@ -53,8 +52,8 @@ export function initNav() {
       setOpen(false);
       toggle.focus();
     }
-    // Le bouton de fermeture vit dans l'en-tête, hors du panneau : on l'inclut
-    // explicitement dans le cycle, sinon on ne peut pas l'atteindre au clavier.
+
+
     if (event.key === 'Tab') trapFocus([toggle, drawer], event);
   });
 
@@ -65,7 +64,7 @@ export function initNav() {
   });
 }
 
-/** Marque le lien de navigation correspondant à la page courante. */
+
 export function markCurrentNav() {
   const path = window.location.pathname.replace(/index\.html$/, '');
   qsa('[data-nav-section]').forEach((link) => {

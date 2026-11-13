@@ -1,15 +1,3 @@
-/**
- * Calque de correction du sol : cadre, contour, pinceau.
- *
- * Ces règles vivent dans leur propre composant parce que **deux bundles** en
- * ont besoin : la feuille du site (css/main.css) et celle de l'application
- * (css/studio.css). Elles étaient auparavant noyées dans
- * components/visualizer-photo.css, que seule la première importait : dans
- * l'application, le calque se retrouvait sans positionnement, tombait dans le
- * flux sous la photo, et les poignées devenaient inatteignables. « Corriger le
- * sol » ne fonctionnait donc pas là où il sert le plus.
- */
-
 .floor-mask {
   position: absolute;
   inset: 0;
@@ -25,9 +13,6 @@
   position: absolute;
   inset: 0;
 }
-/* Contour seul, sans voile : on règle le sol en regardant le VRAI rendu.
-   L'ancien remplissage (blanc-vert à 28 %) délavait le parquet pendant tout
-   le réglage — c'est lui qui le faisait paraître clair et transparent. */
 .floor-mask__shape {
   fill: none;
   stroke: #f2efe8;
@@ -85,33 +70,18 @@
 }
 .floor-mask__cursor[data-mode="remove"] { border-style: dashed; }
 .floor-mask__cursor[data-mode="add"] { background: rgba(139, 160, 136, 0.25); }
-
-/* Zone de prise de 44 px autour d'un cercle visuel de 30 px : le doigt
-   attrape la poignée sans qu'elle masque davantage la photo. */
 .floor-mask__handle::before {
   content: "";
   position: absolute;
   inset: -7px;
   border-radius: var(--r-pill);
 }
-
-/* Marge de saisie : 22 px autour de la photo, soit la marge que la scène lui
-   laisse pendant l'édition. Les points y sont ramenés au bord de l'image. */
 .floor-mask__marge {
   position: absolute;
   inset: -22px;
 }
 .floor-mask[data-mode="off"] .floor-mask__marge { display: none; }
-
-/* Pendant l'édition, un doigt peint ou pose un point : il ne fait pas défiler
-   la page. Sans cela, `touch-action: pan-y` hérité de la scène transformait un
-   trait vertical au pinceau en défilement, et le navigateur coupait le geste. */
 .floor-mask:not([data-mode="off"]) { touch-action: none; }
-
-/* Poignée d'un point situé hors de l'écran (coin de perspective d'une scène
-   pré-calibrée) : affichée sur le bord de la zone visible, bordure pointillée
-   et flèche vers le vrai point. La flèche tourne avec `--angle`, posé par
-   l'éditeur ; la valeur du point, elle, n'est jamais modifiée. */
 .floor-mask__fleche {
   display: none;
   position: absolute;
@@ -125,8 +95,6 @@
 .floor-mask__fleche::after {
   content: "";
   position: absolute;
-  /* Pointe à 20 px du centre : elle reste dans la marge de 22 px laissée
-     autour de la zone saisissable, donc à l'écran. */
   left: 13px;
   top: -5px;
   border-top: 5px solid transparent;
@@ -134,9 +102,6 @@
   border-left: 7px solid #f2efe8;
   filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.9));
 }
-/* Poignée écartée de son point parce qu'une autre était au même endroit :
-   un trait fin la relie au vrai point, marqué d'un petit rond. On voit ainsi
-   quel coin on déplace. Rien ne s'affiche quand les poignées sont espacées. */
 .floor-mask__lien {
   display: none;
   position: absolute;
@@ -163,7 +128,6 @@
   box-shadow: 0 0 0 1.5px #16181a;
 }
 .floor-mask__handle[data-decale]:not([data-hors]) .floor-mask__lien { display: block; }
-/* La poignée tenue passe devant les autres. */
 .floor-mask__handle[data-active="true"] { z-index: 2; }
 .floor-mask__handle[data-hors] { border-style: dashed; border-color: #f2efe8; background: #16181a; }
 .floor-mask__handle[data-hors] .floor-mask__fleche { display: block; }

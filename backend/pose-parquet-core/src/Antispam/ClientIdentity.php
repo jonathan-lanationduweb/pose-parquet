@@ -1,21 +1,6 @@
 <?php
-/**
- * Identité réseau d'un client, sous forme non réversible.
- *
- * Par défaut, seule REMOTE_ADDR compte : c'est la seule adresse que le
- * serveur constate lui-même. X-Forwarded-For, X-Real-IP, CF-Connecting-IP
- * sont des en-têtes que n'importe quel client direct peut écrire — s'y fier
- * sans reverse proxy de confiance revient à laisser le robot choisir son
- * identité. Le jour où WordPress sera derrière un proxy connu, le filtre
- * `pose_parquet_client_ip` permettra de lire l'en-tête adéquat, à cet
- * endroit et nulle part ailleurs.
- *
- * L'adresse n'est jamais conservée : elle passe dans un HMAC avec un sel du
- * site et seul le condensat circule (clés de transient, journal). Pas d'IP
- * en base, pas d'IP en log, pas d'IP dans un nom de clé.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -27,48 +12,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class ClientIdentity {
 
-	/** Condensat hexadécimal (32 caractères) de l'adresse du client courant. */
-	public static function resolve(): string {
-		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? (string) $_SERVER['REMOTE_ADDR'] : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 
-		/**
-		 * Adresse du client à retenir pour la limite de débit.
-		 *
-		 * À n'utiliser que derrière un reverse proxy de confiance, pour lire
-		 * l'en-tête qu'il pose. Voir docs/backend/antispam.md.
-		 *
-		 * @param string $ip REMOTE_ADDR
-		 */
+	public static function resolve(): string {
+		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? (string) $_SERVER['REMOTE_ADDR'] : '';
+
+
+
 		$ip = (string) apply_filters( 'pose_parquet_client_ip', $ip );
 
 		return self::hash( self::regrouper( $ip ) );
 	}
 
-	/**
-	 * Une adresse IPv6 compte pour son réseau /64.
-	 *
-	 * Un abonné reçoit en général tout un /64 : 2^64 adresses. Comptées une à
-	 * une, la limite de débit ne s'appliquait plus — un robot changeait
-	 * d'adresse à chaque envoi. Le /64 est l'unité qu'un fournisseur attribue :
-	 * c'est elle qui identifie un client. IPv4 reste compté à l'adresse.
-	 */
+
+
 	public static function regrouper( string $ip ): string {
 		$ip = trim( $ip );
 		if ( ! str_contains( $ip, ':' ) ) {
 			return $ip;
 		}
-		$binaire = @inet_pton( $ip ); // phpcs:ignore WordPress.PHP.NoSilencedErrors -- adresse invalide : on garde la chaîne.
+		$binaire = @inet_pton( $ip );
 		if ( $binaire === false || strlen( $binaire ) !== 16 ) {
 			return $ip;
 		}
-		// Une IPv4 encapsulée (::ffff:a.b.c.d) reste une IPv4.
+
 		if ( str_starts_with( $binaire, str_repeat( "\0", 10 ) . "\xff\xff" ) ) {
 			return (string) inet_ntop( substr( $binaire, 12 ) );
 		}
 		return (string) inet_ntop( substr( $binaire, 0, 8 ) . str_repeat( "\0", 8 ) ) . '/64';
 	}
 
-	/** Le même condensat pour la même adresse tant que les sels du site ne changent pas. */
+
 	public static function hash( string $ip ): string {
 		return substr( hash_hmac( 'sha256', trim( $ip ), wp_salt( 'auth' ) . '|pose-parquet-client' ), 0, 32 );
 	}

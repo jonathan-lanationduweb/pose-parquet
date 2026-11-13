@@ -1,13 +1,6 @@
 <?php
-/**
- * GET /pose-parquet/v1/form-token — un jeton temporel signé pour le formulaire.
- *
- * Publique, sans session, minuscule, jamais mise en cache. Le front l'appelle
- * au chargement du formulaire et renvoie `token` dans `formToken` à la
- * soumission. Les durées annoncées sont celles de Antispam\FormToken.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 

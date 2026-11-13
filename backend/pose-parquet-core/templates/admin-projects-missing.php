@@ -1,14 +1,6 @@
 <?php
-/**
- * Gabarit affiché quand l'identifiant de l'URL ne correspond à aucune demande.
- *
- * Une page, pas un `wp_die` : le cas normal est un favori vers une demande
- * supprimée, ou une URL retapée de travers, et l'utilisateur doit pouvoir
- * repartir vers la liste d'un clic.
- *
- * @var array{notice:?array} $view
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 

@@ -1,13 +1,3 @@
-/**
- * Télécharge les photographies du site depuis Pexels vers assets/images/.
- *
- *   node _generator/fetch-photos.js           # ne télécharge que ce qui manque
- *   node _generator/fetch-photos.js --force   # retélécharge tout
- *
- * Écrit également assets/images/CREDITS.md (auteurs et liens sources).
- * Aucune dépendance externe, aucune clé d'API : les fichiers proviennent du
- * CDN public de Pexels aux dimensions demandées.
- */
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
@@ -40,7 +30,7 @@ function download(url, dest, redirects = 0) {
   });
 }
 
-/** Récupère une page et renvoie son contenu (utilisé pour retrouver une URL d'image). */
+
 function fetchText(url) {
   return new Promise((resolve, reject) => {
     https
@@ -54,10 +44,8 @@ function fetchText(url) {
   });
 }
 
-/**
- * Quelques fichiers Pexels ne suivent pas le nom de fichier standard :
- * on retombe alors sur l'URL déclarée par la page de la photo.
- */
+
+
 async function resolveUrl(photo) {
   const html = await fetchText(photoPage(photo.id));
   const match = html.match(/https:\/\/images\.pexels\.com\/photos\/\d+\/[^"?]+\.(?:jpeg|jpg|png)/);
@@ -67,7 +55,7 @@ async function resolveUrl(photo) {
   return `${match[0]}?auto=compress&cs=tinysrgb${fm}${crop}&fit=crop&w=${photo.w}&h=${photo.h}`;
 }
 
-/** Télécharge un fichier s'il manque ; renvoie sa taille. */
+
 async function ensure(photo, dest) {
   if (!FORCE && fs.existsSync(dest)) return { size: fs.statSync(dest).size, fresh: false };
   let size;
@@ -85,16 +73,8 @@ async function main() {
 
   const jobs = [
     ...Object.entries(PHOTOS).map(([name, photo]) => ({ name, photo })),
-    /*
-     * Une carte d'inspiration se telecharge d'apres SA photo, pas d'apres son
-     * champ `id`.
-     *
-     * Les deux devraient dire la meme chose ; deux cartes avaient garde
-     * l'identifiant de l'image precedente apres un remplacement, et
-     * `inspi-N.jpg` montrait alors une autre piece que la carte. On part donc
-     * de l'entree `PHOTOS[image]`, qui est celle que la page affiche, et on
-     * ne garde de la carte que le cadrage du carrousel.
-     */
+
+
     ...INSPIRATION_PHOTOS.map((carte, index) => {
       const source = (carte.image && PHOTOS[carte.image]) || carte;
       return {
@@ -109,8 +89,8 @@ async function main() {
   let total = 0;
 
   for (const { name, photo } of jobs) {
-    // Visuel produit pour le site, pas téléchargé : un rendu du moteur, par
-    // exemple, qu un --force ne doit surtout pas écraser.
+
+
     if (photo.local) {
       const manquants = [`${name}.jpg`, ...variantsFor(name, photo).flatMap((v) => [`${name}-${v.w}.jpg`, `${name}-${v.w}.webp`])]
         .filter((f) => !fs.existsSync(path.join(DIR, f)));
@@ -119,13 +99,13 @@ async function main() {
       skipped += 1;
       continue;
     }
-    // Fichier de référence (repli des navigateurs sans srcset)
+
     const base = await ensure(photo, path.join(DIR, `${name}.jpg`));
     total += base.size;
     if (base.fresh) downloaded += 1;
     else skipped += 1;
 
-    // Déclinaisons réactives : trois largeurs, en JPEG et en WebP
+
     for (const variant of variantsFor(name, photo)) {
       for (const [ext, fm] of [
         ['jpg', null],

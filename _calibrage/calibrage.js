@@ -1,24 +1,10 @@
-/**
- * Outil interne de calibrage des scènes.
- *
- * Sert à préparer à la main ce qu'un service d'analyse produira plus tard :
- * zones de sol, plans de perspective, trous, occlusions. La page n'est ni
- * liée, ni indexée, ni construite — elle vit dans _calibrage/ et n'est
- * chargée que par le développeur.
- *
- * Elle sert aussi de banc d'essai entre les deux moteurs de rendu.
- */
 import { analyzeScene, loadSceneIndex } from '../js/scene/analyzer.js';
 import { createSceneRenderer } from '../js/scene/renderer.js';
 import { createMaterial } from '../js/scene/material.js';
 import { loadImage } from '../js/scene/image-loader.js';
 import { zoneTransform } from '../js/scene/geometry.js';
-/**
- * Les mesures de calibrage vivent dans geometrie.js : elles servent aussi à
- * calibrer une scène en script, sans passer par cette interface. C'était
- * nécessaire — à la main, six nouvelles pièces représentaient des centaines
- * de relevés.
- */
+
+
 import {
   intersecte, ajusteDroite, focaleParOrthogonalite, quadDepuisPiece,
   pointAuSol, mesureQuad, etendueVisible,
@@ -93,7 +79,7 @@ function draw() {
   } · ${ms.toFixed(1)} ms`;
 }
 
-/* ---------------- Repères ---------------- */
+
 
 const ns = 'http://www.w3.org/2000/svg';
 const el = (name, attrs) => {
@@ -144,9 +130,9 @@ function paintOverlay() {
 }
 
 
-/* ---------------- Orientation réelle du plancher ---------------- */
 
-/** Relevé d'une série de colonnes, journalisé et prêt à coller dans une scène. */
+
+
 function releve(colonnes, y0, y1) {
   const rows = releveColonnes(renderer.photo, colonnes, y0, y1);
   const pixels = rows.map((r) => ({ x: r.x * renderer.size.width, y: r.y * renderer.size.height }));
@@ -161,13 +147,10 @@ function releve(colonnes, y0, y1) {
 
 
 
-/* ---------------- Loupe ---------------- */
 
-/**
- * Une capture d'écran est réduite : à 1 pixel écran pour 2 pixels de canevas,
- * on ne peut juger ni la netteté des lames au fond, ni la propreté d'un bord.
- * La loupe recopie une portion du rendu à l'échelle voulue.
- */
+
+
+
 let loupeOn = false;
 let focus = { x: 0.5, y: 0.82 };
 
@@ -175,8 +158,8 @@ function paintLoupe() {
   const target = $('loupe');
   target.hidden = !loupeOn;
   target.style.display = loupeOn ? 'block' : 'none';
-  // La loupe remplace la vue d'ensemble : les deux côte à côte ne tiennent
-  // pas à l'écran, et on ne regarde jamais les deux en même temps.
+
+
   document.querySelector('main').style.display = loupeOn ? 'none' : 'block';
   if (!loupeOn) return;
   const zoom = Number($('loupe-zoom').value) || 2;
@@ -190,8 +173,8 @@ function paintLoupe() {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, target.width, target.height);
   ctx.drawImage(source, sx, sy, w, h, 0, 0, target.width, target.height);
-  // Grille cotée en coordonnées normalisées de l'image : c'est elle qui
-  // permet de relever un point au centième sans calcul mental.
+
+
   ctx.font = '13px ui-monospace, monospace';
   ctx.lineWidth = 1;
   const gridStep = zoom >= 4 ? 0.005 : 0.01;
@@ -222,9 +205,9 @@ function paintLoupe() {
   drawLines(false);
   drawLines(true);
 
-  // Contours de la scène, dans le repère de la loupe : c'est le seul moyen de
-  // vérifier qu'une limite tombe bien au pied d'une plinthe, et pas 15 px
-  // au-dessus. À l'échelle de la vue d'ensemble, cet écart ne se voit pas.
+
+
+
   if (scene && showOverlay) {
     const toLoupe = (p) => [
       ((p.x * source.width - sx) / w) * target.width,
@@ -268,7 +251,7 @@ function paintLoupe() {
   ctx.fillText(`×${zoom} · centre ${focus.x.toFixed(3)}, ${focus.y.toFixed(3)} · pas de grille ${gridStep}`, 10, 20);
 }
 
-/** Rend la photo brute : indispensable pour relever le bas des murs. */
+
 function showPhoto() {
   const canvas = $('out');
   canvas.width = renderer.size.width;
@@ -277,18 +260,18 @@ function showPhoto() {
   paintLoupe();
 }
 
-/* ---------------- Relevé du bas des murs ---------------- */
 
 
 
-/* ---------------- Banc d'essai ---------------- */
+
+
 
 async function bench() {
   const canvas = document.createElement('canvas');
   const cfg = config();
   const runs = 7;
   const time = (fn) => {
-    fn(); // premier passage : compilation, textures, caches
+    fn();
     const t0 = performance.now();
     for (let i = 0; i < runs; i += 1) fn();
     return (performance.now() - t0) / runs;
@@ -302,7 +285,7 @@ async function bench() {
   if (renderer.backend === 'webgl2') {
     const glTime = time(() => renderer.paint(canvas, cfg));
     log(`  WebGL 2                      : ${glTime.toFixed(1)} ms   (×${(cpuFull / glTime).toFixed(1)})`);
-    // Changement de matériau : c'est là que se joue le confort d'usage
+
     let i = 0;
     const swap = time(() => {
       i += 1;
@@ -318,7 +301,7 @@ async function bench() {
   }
 }
 
-/* ---------------- Événements ---------------- */
+
 
 $('scene').addEventListener('change', () => load($('scene').value));
 ['material', 'pattern', 'angle'].forEach((id) =>
@@ -354,8 +337,8 @@ $('dump').addEventListener('click', async () => {
   log('  scène copiée dans le presse-papiers');
 });
 
-// Lecture directe des coordonnées sous le curseur : c'est avec ça qu'on
-// calibre, en relevant les points sur la photo.
+
+
 $('wrap').addEventListener('mousemove', (event) => {
   const rect = $('wrap').getBoundingClientRect();
   const x = (event.clientX - rect.left) / rect.width;

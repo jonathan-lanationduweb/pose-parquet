@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="fr">
 <head>
-    <script>/* Maintenance désactivée : cette page renvoie vers le site. Aperçu : ?apercu=1 */if(!/[?&]apercu=1(&|$)/.test(location.search))location.replace('./');</script>
+    <script>if(!/[?&]apercu=1(&|$)/.test(location.search))location.replace('./');</script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex" />
@@ -9,14 +9,6 @@
 <style>
 @font-face { font-family: "Instrument Serif"; font-style: normal; font-weight: 400; font-display: swap; src: url("assets/fonts/instrument-serif-400-3.woff2") format("woff2"); }
 @font-face { font-family: "Inter"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("assets/fonts/inter-var-1.woff2") format("woff2"); }
-/*
- * Page de maintenance — une seule feuille, deux lecteurs :
- *   - WordPress (templates/maintenance-page.php) l'insère telle quelle ;
- *   - le générateur du site statique (_generator/wordpress.js) aussi.
- * Les @font-face sont déclarées par chacun (chemins différents) ; ici, rien
- * que la mise en page. Une image pleine hauteur, le logo, un titre, un texte,
- * deux liens. Ni compte à rebours, ni animation, ni formulaire.
- */
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
 body {

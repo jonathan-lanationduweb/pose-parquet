@@ -1,12 +1,6 @@
 <?php
-/**
- * Suite « contenus éditoriaux et maintenance » (06/10/2026).
- *
- *   php tests/run-contenus.php <racine WordPress>
- *
- * Ne crée rien de durable : les contenus de test sont supprimés à la fin, la
- * maintenance est remise dans l'état trouvé.
- */
+
+
 
 declare(strict_types=1);
 
@@ -28,7 +22,7 @@ use PoseParquet\Core\Security\Roles;
 $admins = get_users( [ 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ] );
 wp_set_current_user( (int) $admins[0] );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Types et droits' );
 foreach ( Types::all() as $type ) {
 	$o = get_post_type_object( $type );
@@ -43,12 +37,12 @@ foreach ( [ 'editor', 'author', 'contributor', 'subscriber', Roles::MANAGER ] as
 	$verifie( "rôle « $role » : aucun droit sur les contenus", ! $r || ! $r->has_cap( Capabilities::EDIT_CONTENTS ) );
 }
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Menu (ordre de la maquette)' );
 global $submenu, $menu;
 $submenu = [];
 $menu    = [];
-\PoseParquet\Core\Admin\Menu::add_pages(); // hors contexte admin, les crochets du menu ne sont pas posés : on construit directement.
+\PoseParquet\Core\Admin\Menu::add_pages();
 $libelles = array_map( static fn( array $e ): string => wp_strip_all_tags( $e[0] ), $submenu['pose-parquet-tableau'] ?? [] );
 $verifie( 'Tableau de bord, Guides, Tutoriels, Inspirations, Articles, Pages, Images, Projets, Catalogue, Maintenance, Réglages', $libelles === [ 'Tableau de bord', 'Guides', 'Tutoriels', 'Inspirations', 'Articles', 'Pages', 'Images', 'Projets', 'Catalogue Premibel', 'Mon site', 'Maintenance', 'Publication', 'Réglages' ], implode( ', ', $libelles ) );
 $verifie( 'Projets garde son adresse (page=pose-parquet)', in_array( 'pose-parquet', array_column( $submenu['pose-parquet-tableau'] ?? [], 2 ), true ) );
@@ -59,7 +53,7 @@ $attendu  = [ 'Tableau de bord', 'Contenu', 'Guides', 'Tutoriels', 'Inspirations
 $verifie( 'socle : rubriques Contenu / Activité / Produits / Site, comme Expert Parquet', $libelles === $attendu, implode( ', ', $libelles ) );
 $verifie( 'socle : une rubrique n’est pas un lien (capability read, adresse vide)', ( $submenu['pose-parquet-tableau'][1][3] ?? null ) === '' && str_contains( (string) $submenu['pose-parquet-tableau'][1][0], 'adm-menu-section' ) );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Socle commun' );
 $marque = \PoseParquet\Core\Admin\Socle::marque();
 $verifie( 'marque : nom, logotype présent, accent sauge de la DA', $marque['nom'] === 'Pose Parquet' && is_file( POSE_PARQUET_DIR . '/assets/socle/logo-on-dark.png' ) && $marque['accent'] === '#46594A' );
@@ -74,7 +68,7 @@ $verifie( 'panneau maintenance : interrupteur confirmé, jeton, action dédiée'
 $verifie( 'bascule : action admin-post dédiée déclarée', has_action( 'admin_post_pp_maintenance_basculer' ) !== false );
 $verifie( 'catalogue : écran de consultation déclaré, action de relecture seulement', has_action( 'admin_post_pp_catalogue_actualiser' ) !== false && ! has_action( 'admin_post_pp_catalogue_modifier' ) );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Images dans l’éditeur' );
 $init = \PoseParquet\Core\Contenus\Edition::base_des_images( [ 'x' => 1 ], 'excerpt' );
 $verifie( 'autre éditeur : réglages inchangés', $init === [ 'x' => 1 ] );
@@ -94,7 +88,7 @@ if ( $piece ) {
 	$verifie( 'image de la médiathèque : réécrite en ../assets/images/wp-<id>.jpg et listée pour le pull', $sortie === '<img src="../assets/images/wp-' . $piece . '.jpg" alt="">' && isset( $medias[ $piece ] ) );
 }
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Champs : nettoyage' );
 $verifie( 'texte : balises retirées', Champs::nettoyer( [ 'type' => 'text', 'max' => 50 ], '<b>Titre</b><script>x</script>' ) === 'Titre' );
 $verifie( 'texte : borné', mb_strlen( Champs::nettoyer( [ 'type' => 'text', 'max' => 10 ], str_repeat( 'é', 30 ) ) ) === 10 );
@@ -102,7 +96,7 @@ $verifie( 'liste fermée : valeur inconnue refusée', Champs::nettoyer( [ 'type'
 $verifie( 'slug : normalisé', Champs::nettoyer( [ 'type' => 'slug', 'max' => 60 ], 'Chêne Naturel !' ) === 'chene-naturel' );
 $verifie( 'json : rejeté s’il est invalide', Champs::nettoyer( [ 'type' => 'json' ], '{pas du json' ) === '' );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'HTML transmis au site : liste fermée' );
 $sale = '<p style="color:red" class="callout inventee" onclick="x()">Texte</p><script>alert(1)</script><aside class="callout callout--warning"><p>ok</p></aside><iframe src="x"></iframe><a href="javascript:alert(1)">lien</a><input type="text" name="x">';
 $propre = Html::filtrer( $sale );
@@ -112,7 +106,7 @@ $verifie( 'composant encadré conservé', str_contains( $propre, '<aside class="
 $verifie( 'lien javascript: neutralisé', ! str_contains( $propre, 'javascript:' ) );
 $verifie( 'champ de saisie hors comparateur retiré', ! str_contains( $propre, '<input' ) );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Cycle d’un guide : brouillon, publication, image, export' );
 $cat = wp_insert_term( 'Catégorie de test ' . wp_generate_password( 6, false ), Types::CAT_GUIDE );
 $id  = wp_insert_post( wp_slash( [ 'post_type' => Types::GUIDE, 'post_title' => 'Guide de test', 'post_name' => 'guide-de-test-suite', 'post_status' => 'draft', 'post_content' => '<p>Corps</p>', 'post_excerpt' => 'Résumé' ] ), true );
@@ -136,7 +130,7 @@ $verifie( 'export : aucune donnée personnelle ni identifiant d’auteur', ! arr
 wp_delete_post( $id, true );
 wp_delete_term( (int) $cat['term_id'], Types::CAT_GUIDE );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Maintenance' );
 $avant = get_option( Reglages::OPTION, null );
 update_option( Reglages::OPTION, [ 'actif' => true, 'titre' => 'T', 'message' => 'M', 'image' => 0, 'premibel' => true, 'allure' => false ] );
@@ -158,7 +152,7 @@ if ( $avant === null ) {
 	update_option( Reglages::OPTION, $avant );
 }
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Champs structurés (pages, Mon site)' );
 $schema = Structure::schema( [
 	[ 'cle' => 'titre', 'groupe' => 'G', 'libelle' => 'Titre', 'type' => 'texte', 'max' => 10, 'defaut' => 'Défaut' ],
@@ -178,8 +172,8 @@ $verifie( 'email invalide refusé', $v['mail'] === 'a@b.fr' );
 $verifie( 'oui-non', $v['oui'] === false );
 $verifie( 'clé hors schéma ignorée', ! array_key_exists( 'intrus', $v ) );
 
-$accueil = get_posts( [ 'post_type' => Types::PAGE, 'meta_key' => '_pp_cle', 'meta_value' => 'accueil', 'fields' => 'ids', 'posts_per_page' => 1 ] ); // phpcs:ignore
-$a_propos = get_posts( [ 'post_type' => Types::PAGE, 'meta_key' => '_pp_cle', 'meta_value' => 'a-propos', 'fields' => 'ids', 'posts_per_page' => 1 ] ); // phpcs:ignore
+$accueil = get_posts( [ 'post_type' => Types::PAGE, 'meta_key' => '_pp_cle', 'meta_value' => 'accueil', 'fields' => 'ids', 'posts_per_page' => 1 ] );
+$a_propos = get_posts( [ 'post_type' => Types::PAGE, 'meta_key' => '_pp_cle', 'meta_value' => 'a-propos', 'fields' => 'ids', 'posts_per_page' => 1 ] );
 $verifie( 'accueil : 21 champs importés (hero, passerelle, projet)', $accueil && count( Export::schema_page( get_post( (int) $accueil[0] ) ) ) === 21 );
 $verifie( 'À propos : champs structurés, plus de corps libre', $a_propos && count( Export::schema_page( get_post( (int) $a_propos[0] ) ) ) === 20 && get_post_meta( (int) $a_propos[0], '_pp_corps_editable', true ) === '0' );
 $export = Export::donnees();
@@ -200,7 +194,7 @@ if ( is_readable( $fichier ) ) {
 }
 update_post_meta( (int) $accueil[0], '_pp_champs', wp_slash( (string) $avant ) );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Aperçu public, fichiers du site, duplication' );
 $gabarit = '<html><head><meta name="robots" content="index, follow" /><title>%%PP_TITRE%%</title></head><body class="page"><h1>%%PP_H1%%</h1>%%PP_COUVERTURE%%<div>%%PP_CORPS%%</div><ul><li>Niveau %%PP_NIVEAU%%</li><li>%%PP_OUTILS%%</li></ul></body></html>';
 $brouillon = wp_insert_post( [ 'post_type' => Types::TUTORIEL, 'post_status' => 'draft', 'post_title' => 'Titre <script>', 'post_content' => 'Corps du brouillon' ] );

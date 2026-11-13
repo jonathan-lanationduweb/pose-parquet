@@ -1,26 +1,6 @@
 <?php
-/**
- * Suite « administration des demandes » (lot 4).
- *
- *   php tests/run-admin.php <racine WordPress>
- *
- * Ce qui est vérifié : la liste (ordre, pagination, filtre, recherche, compte),
- * les accès par identifiant et par référence, le changement de statut avec sa
- * trace et sa protection contre l'écrasement concurrent, les notes internes,
- * les droits des trois rôles, le nonce, l'échappement à l'affichage, et le
- * comportement sur mille lignes.
- *
- * Les poignées d'écriture (`Admin\Actions`) sont appelées POUR DE VRAI, avec
- * leur `$_POST`, leur nonce et leur redirection. Deux filtres rendent cela
- * possible en ligne de commande : `wp_redirect` et `wp_die_handler` lèvent une
- * exception au lieu de terminer le processus. C'est le seul moyen de tester le
- * code qui protège réellement l'écran, plutôt qu'une copie de ce code.
- *
- * Toutes les lignes créées ici portent la référence « ADMINTEST » dans leur
- * nom de famille et sont supprimées à la fin.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -47,21 +27,21 @@ use PoseParquet\Core\Security\Roles;
 
 [ $verifie, $section, $bilan ] = pp_test_outils();
 
-/** Marqueur des lignes de ce test. */
+
 const PP_MARQUE = 'ADMINTEST';
 
-/* ------------------------------------------------------------------ */
-/* Outils : sortie contrôlée des poignées admin                        */
-/* ------------------------------------------------------------------ */
 
-/** Levée à la place d'une redirection. */
+
+
+
+
 final class PpRedirection extends \Exception {
 	public function __construct( public readonly string $url ) {
 		parent::__construct( 'redirection' );
 	}
 }
 
-/** Levée à la place d'un wp_die. */
+
 final class PpArret extends \Exception {}
 
 add_filter( 'wp_redirect', static function ( $url ) {
@@ -72,10 +52,8 @@ add_filter( 'wp_die_handler', static fn(): callable => static function ( $messag
 	throw new PpArret( is_wp_error( $message ) ? $message->get_error_message() : (string) $message );
 }, 1 );
 
-/**
- * Appelle une poignée admin et rend le code de notice de sa redirection,
- * ou 'DIE' si elle a refusé, ou 'AUCUNE' si elle n'a rien fait.
- */
+
+
 $appelle = static function ( callable $poignee ): string {
 	try {
 		$poignee();
@@ -92,19 +70,19 @@ $appelle = static function ( callable $poignee ): string {
 	return 'AUCUNE';
 };
 
-/** Prépare $_POST et $_REQUEST pour une poignée. */
+
 $poste = static function ( array $champs ): void {
 	$_POST    = $champs;
 	$_REQUEST = $champs;
 };
 
-/* ------------------------------------------------------------------ */
-/* Fixtures                                                            */
-/* ------------------------------------------------------------------ */
+
+
+
 
 $repo = new Repository();
 
-/** Insère une demande de test et rend son identifiant. */
+
 $cree = static function ( array $surcharge = [] ) use ( $repo ): int {
 	$now  = current_time( 'mysql', true );
 	$base = [
@@ -139,19 +117,19 @@ $cree = static function ( array $surcharge = [] ) use ( $repo ): int {
 	return $id;
 };
 
-/** Supprime toutes les lignes de test. */
+
 $nettoie = static function () use ( $repo ): int {
 	global $wpdb;
 	$projets = Schema::table( 'projects' );
 	$hist    = Schema::table( 'history' );
 	$notes   = Schema::table( 'notes' );
 
-	$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$projets} WHERE last_name = %s", PP_MARQUE ) ); // phpcs:ignore
+	$ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$projets} WHERE last_name = %s", PP_MARQUE ) );
 	foreach ( array_chunk( array_map( 'intval', $ids ?: [] ), 200 ) as $lot ) {
 		$in = implode( ',', array_fill( 0, count( $lot ), '%d' ) );
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$hist} WHERE project_id IN ({$in})", $lot ) ); // phpcs:ignore
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$notes} WHERE project_id IN ({$in})", $lot ) ); // phpcs:ignore
-		$wpdb->query( $wpdb->prepare( "DELETE FROM {$projets} WHERE id IN ({$in})", $lot ) ); // phpcs:ignore
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$hist} WHERE project_id IN ({$in})", $lot ) );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$notes} WHERE project_id IN ({$in})", $lot ) );
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$projets} WHERE id IN ({$in})", $lot ) );
 	}
 
 	return count( $ids ?: [] );
@@ -159,7 +137,7 @@ $nettoie = static function () use ( $repo ): int {
 
 $nettoie();
 
-/* ================================================================== */
+
 $section( 'Pré-requis' );
 
 $verifie( 'plugin en version 0.7.0', POSE_PARQUET_VERSION === '0.7.0', POSE_PARQUET_VERSION );
@@ -168,7 +146,7 @@ $verifie( 'table des notes présente', ( Schema::status()['notes'] ?? false ) ==
 $verifie( 'classes du lot chargées', class_exists( ProjectsPage::class ) && class_exists( Actions::class ) && class_exists( Notes::class ) && class_exists( StatusService::class ) );
 $verifie( 'page Réglages toujours déclarée', Settings::PAGE === 'pose-parquet-settings' );
 
-/* ================================================================== */
+
 $section( 'Rôle gestionnaire' );
 
 Roles::ensure();
@@ -183,7 +161,7 @@ $verifie( 'il ne gère pas les extensions', ! (bool) $role_gestion?->has_cap( 'a
 $verifie( 'il ne gère pas les utilisateurs', ! (bool) $role_gestion?->has_cap( 'list_users' ) );
 $verifie( 'idempotent : un second ensure() ne change rien', ( Roles::ensure() ?? true ) && count( (array) get_role( Roles::MANAGER )->capabilities ) === count( Roles::manager_caps() ) );
 
-/* ================================================================== */
+
 $section( 'Utilisateurs de test' );
 
 $fabrique_utilisateur = static function ( string $login, string $role ) : int {
@@ -210,7 +188,7 @@ $verifie( 'administrateur de test créé', $admin_id > 0 );
 $verifie( 'gestionnaire de test créé', $gestionnaire > 0 );
 $verifie( 'abonné de test créé', $abonne > 0 );
 
-/* ================================================================== */
+
 $section( 'Droits par rôle' );
 
 $droits = static function ( int $user_id ): array {
@@ -238,7 +216,7 @@ $verifie( 'abonné : aucune lecture', ! $d['view'] );
 $verifie( 'abonné : aucune modification', ! $d['manage'] );
 $verifie( 'abonné : aucun réglage', ! $d['settings'] );
 
-/* ================================================================== */
+
 $section( 'URL directe : la page se défend elle-même' );
 
 wp_set_current_user( $abonne );
@@ -269,12 +247,12 @@ try {
 }
 $verifie( 'gestionnaire : la liste s’affiche', $passe && str_contains( $html_gestion, 'wp-list-table' ) );
 
-/* ================================================================== */
+
 $section( 'Liste : ordre, pagination, compte' );
 
 wp_set_current_user( $admin_id );
 
-// Vingt-cinq demandes échelonnées dans le temps, pour deux pages.
+
 $ids = [];
 for ( $i = 0; $i < 25; $i++ ) {
 	$ids[] = $cree( [
@@ -303,7 +281,7 @@ $ids_p2 = array_column( $page2, 'id' );
 $verifie( 'aucune ligne en double entre deux pages', array_intersect( $ids_p1, $ids_p2 ) === [] );
 $verifie( 'aucune ligne oubliée', count( array_unique( array_merge( $ids_p1, $ids_p2 ) ) ) === 25 );
 
-// Ordre total : deux demandes à la même seconde ne doivent pas se mélanger.
+
 $meme_seconde = gmdate( 'Y-m-d H:i:s' );
 $jumeau_a     = $cree( [ '__created_at' => $meme_seconde ] );
 $jumeau_b     = $cree( [ '__created_at' => $meme_seconde ] );
@@ -317,7 +295,7 @@ $verifie( 'à égalité de date, le plus grand id passe devant', array_search( $
 
 $verifie( 'page au-delà de la dernière : aucune ligne', $repo->search( $args + [ 'page' => 99 ] ) === [] );
 
-/* ================================================================== */
+
 $section( 'Liste : filtre par statut' );
 
 $repo->update_status_if( $ids[0], Status::NEW_, Status::TO_CONTACT, current_time( 'mysql', true ) );
@@ -337,16 +315,11 @@ $verifie( 'total des compteurs = total de la liste', (int) $compteurs['all'] ===
 $verifie( 'les sept statuts sont présents, même à zéro', count( array_intersect_key( $compteurs, array_flip( Status::all() ) ) ) === 7 );
 $verifie( 'statut inventé : ignoré, pas d’erreur', $repo->count_search( $args + [ 'status' => 'inexistant' ] ) === 27 );
 
-/* ================================================================== */
+
 $section( 'Liste : recherche' );
 
-/*
- * Valeurs volontairement improbables. La suite tournait d'abord avec
- * « Amandine » et « Bordeaux », et elle a echoue le jour ou la base contenait
- * un jeu de recette portant les memes prenoms et les memes villes : les
- * assertions attendaient une ligne et en trouvaient quatre. Un test qui
- * suppose la base vide n'est pas un test, c'est une coincidence.
- */
+
+
 $cible = $cree( [
 	'firstName'  => 'Zephyrine',
 	'email'      => 'zephyrine.unique@example.test',
@@ -356,12 +329,8 @@ $cible = $cree( [
 ] );
 $ref   = (string) $repo->find_by_id( $cible )['reference'];
 
-/*
- * wpdb rend TOUJOURS des chaines, y compris pour un bigint. Comparer
- * `array_column( $rows, 'id' )` a `[ $id ]` avec `===` echoue donc sur le TYPE
- * et non sur la valeur : une comparaison qui a l'air juste et ne teste rien.
- * `$ids_de()` normalise en entiers une fois pour toutes.
- */
+
+
 $ids_de = static fn( array $rows ): array => array_map( 'intval', array_column( $rows, 'id' ) );
 $par    = static fn( string $terme ): array => $repo->search( [ 'search' => $terme ] );
 
@@ -376,7 +345,7 @@ $verifie( 'par nom de famille', count( $par( PP_MARQUE ) ) === Repository::PER_P
 $verifie( 'recherche insensible à la casse', $ids_de( $par( 'ZEPHYRINE' ) ) === [ $cible ] );
 $verifie( 'terme sans résultat : liste vide', $par( 'zzzzzzintrouvable' ) === [] );
 
-// Le caractère générique de LIKE ne doit pas s'échapper du terme.
+
 $verifie( 'le « % » est traité comme un caractère, pas comme un joker', $par( '%' ) === [] );
 $verifie( 'le « _ » aussi', $par( 'Zephyrin_' ) === [] );
 
@@ -389,7 +358,7 @@ $verifie(
 	(int) $repo->counts_by_status( [ 'search' => 'Zephyrine', 'status' => Status::SPAM ] )['all'] === 1
 );
 
-/* ================================================================== */
+
 $section( 'Accès par identifiant et par référence' );
 
 $verifie( 'find_by_id trouve', (int) ( $repo->find_by_id( $cible )['id'] ?? 0 ) === $cible );
@@ -398,7 +367,7 @@ $verifie( 'find_by_reference trouve', (int) ( $repo->find_by_reference( $ref )['
 $verifie( 'find_by_reference : référence inconnue → null', $repo->find_by_reference( 'PP-1900-000001' ) === null );
 $verifie( 'la référence a la forme attendue', (bool) preg_match( '/^PP-\d{4}-\d{6}$/', $ref ), $ref );
 
-/* ================================================================== */
+
 $section( 'Changement de statut' );
 
 $sujet = $cree();
@@ -422,7 +391,7 @@ $verifie( 'la base n’a pas bougé', (string) $repo->find_by_id( $sujet )['stat
 $r = StatusService::change( 999000111, Status::NEW_, Status::LOST );
 $verifie( 'demande inexistante refusée', $r['code'] === StatusService::NOT_FOUND, $r['code'] );
 
-/* ================================================================== */
+
 $section( 'Historique : ordre et contenu' );
 
 $narration = $cree();
@@ -441,11 +410,11 @@ $verifie( 'aucun nom d’utilisateur copié dans la table', ! array_key_exists( 
 $verifie( 'l’auteur se résout depuis wp_users', View::author( $admin_id ) === get_userdata( $admin_id )->display_name );
 $verifie( 'utilisateur supprimé : mention explicite, pas un vide', str_contains( View::author( 987654 ), '987654' ) );
 
-/* ================================================================== */
+
 $section( 'Concurrence : le second n’écrase pas le premier' );
 
 $dispute = $cree();
-// A lit la fiche : statut « new ». B lit la même fiche : statut « new ».
+
 $vu_par_a = (string) $repo->find_by_id( $dispute )['status'];
 $vu_par_b = $vu_par_a;
 
@@ -462,11 +431,11 @@ $verifie(
 	str_contains( Notices::pending() ?? [] ? '' : '', '' ) || true
 );
 
-// La garde tient aussi au niveau du dépôt, sans passer par le service.
+
 $verifie( 'UPDATE conditionnel : condition fausse → rien', ! $repo->update_status_if( $dispute, Status::NEW_, Status::LOST, current_time( 'mysql', true ) ) );
 $verifie( 'UPDATE conditionnel : condition vraie → une ligne', $repo->update_status_if( $dispute, Status::CONTACTED, Status::QUALIFIED, current_time( 'mysql', true ) ) );
 
-/* ================================================================== */
+
 $section( 'Notes internes' );
 
 $carnet = $cree();
@@ -502,13 +471,13 @@ $verifie( 'aucune méthode de suppression de note dans le dépôt', ! method_exi
 $verifie( 'aucune méthode de modification de note dans le dépôt', ! method_exists( Repository::class, 'update_note' ) );
 $verifie( 'aucune poignée admin de suppression', ! method_exists( Actions::class, 'delete_note' ) );
 
-/* ================================================================== */
+
 $section( 'Poignées admin : nonce, PRG, droits' );
 
 wp_set_current_user( $admin_id );
 $prg = $cree();
 
-// Nonce valide.
+
 $poste( [
 	'action'          => Actions::UPDATE_STATUS,
 	'project_id'      => (string) $prg,
@@ -520,7 +489,7 @@ $code = $appelle( [ Actions::class, 'update_status' ] );
 $verifie( 'nonce valide : statut mis à jour', $code === Notices::STATUS_UPDATED, $code );
 $verifie( 'la redirection est un GET vers la fiche', (string) $repo->find_by_id( $prg )['status'] === Status::TO_CONTACT );
 
-// Nonce absent.
+
 $statut_avant = (string) $repo->find_by_id( $prg )['status'];
 $poste( [
 	'action'          => Actions::UPDATE_STATUS,
@@ -532,7 +501,7 @@ $code = $appelle( [ Actions::class, 'update_status' ] );
 $verifie( 'nonce absent : refus', $code === 'DIE', $code );
 $verifie( 'aucune écriture sur refus de nonce', (string) $repo->find_by_id( $prg )['status'] === $statut_avant );
 
-// Nonce invalide.
+
 $poste( [
 	'action'          => Actions::UPDATE_STATUS,
 	'project_id'      => (string) $prg,
@@ -544,7 +513,7 @@ $code = $appelle( [ Actions::class, 'update_status' ] );
 $verifie( 'nonce invalide : refus', $code === 'DIE', $code );
 $verifie( 'aucune écriture sur nonce invalide', (string) $repo->find_by_id( $prg )['status'] === $statut_avant );
 
-// Nonce d'une AUTRE demande : signé, mais pas pour celle-ci.
+
 $autre = $cree();
 $poste( [
 	'action'          => Actions::UPDATE_STATUS,
@@ -557,7 +526,7 @@ $code = $appelle( [ Actions::class, 'update_status' ] );
 $verifie( 'nonce d’une autre demande : refus', $code === 'DIE', $code );
 $verifie( 'aucune écriture', (string) $repo->find_by_id( $prg )['status'] === $statut_avant );
 
-// Note : nonce valide puis absent.
+
 $poste( [
 	'action'     => Actions::ADD_NOTE,
 	'project_id' => (string) $prg,
@@ -577,7 +546,7 @@ $code = $appelle( [ Actions::class, 'add_note' ] );
 $verifie( 'note : nonce absent → refus', $code === 'DIE', $code );
 $verifie( 'aucune note écrite', count( $repo->notes_of( $prg ) ) === 1 );
 
-// Note vide via la poignée : message, pas d'écriture.
+
 $poste( [
 	'action'     => Actions::ADD_NOTE,
 	'project_id' => (string) $prg,
@@ -588,7 +557,7 @@ $code = $appelle( [ Actions::class, 'add_note' ] );
 $verifie( 'note vide : message d’erreur', $code === Notices::NOTE_EMPTY, $code );
 $verifie( 'toujours une seule note', count( $repo->notes_of( $prg ) ) === 1 );
 
-// Statut périmé via la poignée.
+
 $poste( [
 	'action'          => Actions::UPDATE_STATUS,
 	'project_id'      => (string) $prg,
@@ -599,7 +568,7 @@ $poste( [
 $code = $appelle( [ Actions::class, 'update_status' ] );
 $verifie( 'statut périmé : message « modifiée entre-temps »', $code === Notices::STATUS_STALE, $code );
 
-// Abonné avec un nonce valide : le droit manque, donc refus.
+
 wp_set_current_user( $abonne );
 $poste( [
 	'action'          => Actions::UPDATE_STATUS,
@@ -622,10 +591,10 @@ $poste( [
 ] );
 $code = $appelle( [ Actions::class, 'update_status' ] );
 $verifie( 'gestionnaire : autorisé à changer le statut', $code === Notices::STATUS_UPDATED, $code );
-// `end()` attend une variable par référence : lui passer directement le retour
-// de `history_of()` produit une notice « Only variables should be passed by
-// reference ». La variable intermédiaire ne change rien au test, elle rend
-// seulement l’appel légal.
+
+
+
+
 $historique = $repo->history_of( $prg );
 $dernier    = end( $historique );
 $verifie( 'et signé à son nom', (int) $dernier['user_id'] === $gestionnaire );
@@ -633,7 +602,7 @@ $verifie( 'et signé à son nom', (int) $dernier['user_id'] === $gestionnaire );
 $_POST    = [];
 $_REQUEST = [];
 
-/* ================================================================== */
+
 $section( 'Échappement à l’affichage' );
 
 wp_set_current_user( $admin_id );
@@ -651,29 +620,17 @@ $fiche = (string) ob_get_clean();
 
 $verifie( 'la fiche s’affiche', str_contains( $fiche, 'pp-detail' ) );
 $verifie( 'aucune balise script exécutable', ! preg_match( '/<script[^>]*>\s*alert/i', $fiche ) );
-/*
- * On ne peut pas exiger l'absence du TEXTE « onerror= » : la ville de test
- * contient cette chaine, et une fois echappee elle s'affiche telle quelle, ce
- * qui est exactement le comportement voulu. Ce qu'il faut exiger, c'est
- * qu'aucune BALISE ne porte cet attribut.
- */
+
+
 $verifie( 'aucun attribut onerror dans une balise', ! preg_match( '/<[^>]*onerror/i', $fiche ) );
 $verifie( 'le texte dangereux est present mais inerte', str_contains( $fiche, 'onerror=alert(1)' ) && str_contains( $fiche, '&lt;img' ) );
 $verifie( 'le prénom est échappé', str_contains( $fiche, '&lt;script&gt;' ) );
-/*
- * La note, elle, ne contient plus aucune balise : `sanitize_textarea_field`
- * les a retirees a l'ENREGISTREMENT. Une note ne peut donc pas porter de
- * script, meme echappe — la barriere agit avant le stockage, en plus de
- * l'echappement a l'affichage.
- */
+
+
 $note_stockee = (string) ( $repo->notes_of( $piege )[0]['content'] ?? '' );
 $verifie( 'la note stockee ne contient aucune balise', $note_stockee !== '' && ! str_contains( $note_stockee, '<' ), $note_stockee );
-/*
- * Le CORPS d'une balise script disparait aussi, pas seulement ses chevrons :
- * `wp_strip_all_tags` jette le contenu de script et style. « alert » ne
- * survit donc pas, et c'est le bon comportement — il ne resterait sinon qu'un
- * texte trompeur. Ce qui survit est le texte legitime.
- */
+
+
 $verifie( 'le texte legitime survit', str_contains( $note_stockee, 'Bonjour' ) && str_contains( $note_stockee, 'gras' ) && str_contains( $note_stockee, 'fin.' ), $note_stockee );
 $verifie( 'le corps du script a disparu, pas seulement ses balises', ! str_contains( $note_stockee, 'alert' ), $note_stockee );
 $verifie( 'le message garde son texte, sans ses balises actives', str_contains( $fiche, '&lt;b&gt;gras&lt;/b&gt;' ) );
@@ -693,7 +650,7 @@ $verifie( 'identifiant inconnu : page « introuvable », pas d’erreur PHP', st
 
 $_GET = [];
 
-/* ================================================================== */
+
 $section( 'Notices : un code, pas une phrase' );
 
 $_GET = [ Notices::ARG => Notices::STATUS_UPDATED ];
@@ -706,7 +663,7 @@ $_GET = [ Notices::ARG => '<script>alert(1)</script>' ];
 $verifie( 'aucune phrase ne vient de l’URL', Notices::pending() === null );
 $_GET = [];
 
-/* ================================================================== */
+
 $section( 'Dates : fuseau du site, pas UTC brut' );
 
 $ancien_fuseau = get_option( 'timezone_string' );
@@ -714,7 +671,7 @@ update_option( 'timezone_string', 'Europe/Paris' );
 update_option( 'date_format', 'd/m/Y' );
 update_option( 'time_format', 'H:i' );
 
-// 1er juillet 2026 à 10:00 UTC = 12:00 à Paris (heure d'été).
+
 $rendu = View::date( '2026-07-01 10:00:00' );
 $verifie( 'la date est rendue au fuseau du site', str_contains( $rendu, '12:00' ), $rendu );
 $verifie( 'et au format du site', str_starts_with( $rendu, '01/07/2026' ), $rendu );
@@ -724,7 +681,7 @@ $verifie( 'date courte sans heure', View::date_short( '2026-07-01 10:00:00' ) ==
 
 update_option( 'timezone_string', $ancien_fuseau );
 
-/* ================================================================== */
+
 $section( 'Affichage : surface, libellés, champs vides' );
 
 $verifie( 'surface entière sans décimale', View::surface( '42.00' ) === '42 m²', View::surface( '42.00' ) );
@@ -746,7 +703,7 @@ $verifie( 'les sections vides disparaissent (Visualiseur)', ! str_contains( $fic
 $verifie( 'les sections vides disparaissent (Acquisition)', ! str_contains( $fiche_vide, 'Acquisition' ) );
 $verifie( 'un champ essentiel vide reste affiché', str_contains( $fiche_vide, '>Département<' ) );
 
-/* ================================================================== */
+
 $section( 'Visualiseur : lisible, jamais de JSON brut' );
 
 $avec_vis = $cree( [
@@ -771,7 +728,7 @@ $verifie( 'le motif est traduit', str_contains( $fiche_vis, 'Point de Hongrie' )
 $verifie( 'l’orientation est affichée', str_contains( $fiche_vis, '45°' ) );
 $verifie( 'le JSON de configuration n’est PAS montré', ! str_contains( $fiche_vis, 'ne-doit-pas-paraitre' ) );
 
-/* ================================================================== */
+
 $section( 'États des emails sur la fiche' );
 
 $mails = $cree();
@@ -797,7 +754,7 @@ $fiche_skip = (string) ob_get_clean();
 $_GET       = [];
 $verifie( 'confirmation désactivée : « Désactivée »', str_contains( $fiche_skip, 'Désactivée' ) );
 
-/* ================================================================== */
+
 $section( 'Suppression de demande : volontairement absente' );
 
 $verifie( 'aucune méthode de suppression dans le dépôt', ! method_exists( Repository::class, 'delete_project' ) );
@@ -810,7 +767,7 @@ $_GET       = [];
 $verifie( 'aucun lien « Supprimer » dans la liste', stripos( $liste_html, 'Supprimer' ) === false );
 $verifie( 'aucune action groupée', stripos( $liste_html, 'bulk' ) === false && ! str_contains( $liste_html, 'type="checkbox"' ) );
 
-/* ================================================================== */
+
 $section( 'Mille demandes : pagination serveur et durée' );
 
 global $wpdb;
@@ -819,7 +776,7 @@ $maintenant    = current_time( 'mysql', true );
 $deja          = $repo->count_search( [ 'search' => PP_MARQUE ] );
 $a_creer       = 1000;
 
-// Insertion par lots : mille INSERT unitaires prendraient une minute pour rien.
+
 for ( $lot = 0; $lot < $a_creer; $lot += 100 ) {
 	$valeurs = [];
 	$params  = [];
@@ -844,7 +801,7 @@ for ( $lot = 0; $lot < $a_creer; $lot += 100 ) {
 			$maintenant
 		);
 	}
-	$wpdb->query( $wpdb->prepare( // phpcs:ignore
+	$wpdb->query( $wpdb->prepare(
 		"INSERT INTO {$table_projets} (status,first_name,last_name,email,phone,department,city,housing_type,room_type,support_type,parquet_type,installation_type,created_at,updated_at) VALUES " . implode( ',', $valeurs ),
 		$params
 	) );
@@ -887,18 +844,18 @@ printf(
 	$total_charge
 );
 
-// La requête de liste utilise-t-elle un index pour son tri ?
-$plan = $wpdb->get_row( "EXPLAIN SELECT id FROM {$table_projets} WHERE status = 'new' ORDER BY created_at DESC, id DESC LIMIT 20", ARRAY_A ); // phpcs:ignore
+
+$plan = $wpdb->get_row( "EXPLAIN SELECT id FROM {$table_projets} WHERE status = 'new' ORDER BY created_at DESC, id DESC LIMIT 20", ARRAY_A );
 $verifie(
 	'le filtre par statut passe par un index',
 	is_array( $plan ) && (string) ( $plan['key'] ?? '' ) !== '',
 	'clé : ' . (string) ( $plan['key'] ?? 'aucune' )
 );
 
-// Aucune requête ne ramène tout : on le vérifie sur la forme du SQL produit.
+
 $verifie( 'la liste borne toujours par LIMIT', str_contains( strtoupper( $wpdb->last_query ), 'LIMIT' ) || true );
 
-/* ================================================================== */
+
 $section( 'Journal : identifiants, jamais de personne' );
 
 $verifie(
@@ -914,10 +871,10 @@ $verifie(
 	! str_contains( (string) file_get_contents( POSE_PARQUET_DIR . '/src/Admin/Actions.php' ), "'note' => \$brut" )
 );
 
-/* ================================================================== */
+
 $section( 'Qualification : schéma, filtre, arbitrage' );
 
-/* Le schéma 4 a bien posé ses colonnes. */
+
 global $wpdb;
 $colonnes = $wpdb->get_col( 'SHOW COLUMNS FROM ' . \PoseParquet\Core\Database\Schema::table( 'projects' ) );
 foreach ( [ 'entry_page', 'utm_content', 'utm_term', 'lead_source', 'lead_need', 'lead_destination' ] as $colonne ) {
@@ -926,7 +883,7 @@ foreach ( [ 'entry_page', 'utm_content', 'utm_term', 'lead_source', 'lead_need',
 $index = $wpdb->get_results( 'SHOW INDEX FROM ' . \PoseParquet\Core\Database\Schema::table( 'projects' ) . " WHERE Key_name = 'lead_destination'" );
 $verifie( 'index sur lead_destination', count( $index ) === 1, count( $index ) . ' index' );
 
-/* Les trois listes fermées, telles que le front les connaît. */
+
 $verifie(
 	'destinations : les quatre du contrat',
 	Fields::enum( 'leadDestination' ) === [ 'premibel', 'allure_design', 'mixed', 'undetermined' ]
@@ -938,7 +895,7 @@ $verifie(
 );
 $verifie( 'origines : douze familles de pages', count( Fields::enum( 'leadSource' ) ) === 12 );
 
-/* Une demande qualifiée, et une qui ne l'est pas. */
+
 $qualifie = $cree( [
 	'leadSource'      => 'motif',
 	'leadNeed'        => 'produit',
@@ -957,13 +914,8 @@ $verifie( 'page d’entrée enregistrée', (string) $ligne['entry_page'] === '/m
 $verifie( 'utm_content enregistré', (string) $ligne['utm_content'] === 'variante-b' );
 $verifie( 'utm_term enregistré', (string) $ligne['utm_term'] === 'parquet point de hongrie' );
 
-/*
- * Le filtre de la liste.
- *
- * C'est le tri quotidien : « ce qui part chez Premibel », « ce qui reste à
- * qualifier ». On vérifie qu'il sélectionne, et surtout qu'une valeur
- * inventée dans l'URL ne vide pas la page — elle ne doit rien filtrer.
- */
+
+
 $tous = $repo->count_search( [ 'search' => PP_MARQUE ] );
 $verifie(
 	'filtre destination = premibel',
@@ -978,7 +930,7 @@ $verifie(
 	$repo->count_search( [ 'search' => PP_MARQUE, 'destination' => 'chez-le-voisin' ] ) === $tous
 );
 
-/* La liste rapporte bien les trois colonnes : sans elles, l'écran serait vide. */
+
 $page = $repo->search( [ 'search' => PP_MARQUE, 'page' => 1 ] );
 $verifie(
 	'la liste ramène lead_source, lead_need et lead_destination',
@@ -987,14 +939,8 @@ $verifie(
 		&& array_key_exists( 'lead_destination', $page[0] )
 );
 
-/*
- * L'arbitrage humain.
- *
- * La recommandation vient du parcours ; la décision revient à une personne.
- * On vérifie qu'elle peut la changer, et que le changement laisse une trace
- * lisible dans les notes — c'est ce qui permet de savoir, trois semaines plus
- * tard, que ce lead n'a pas été orienté par une règle mais par quelqu'un.
- */
+
+
 wp_set_current_user( $admin_id );
 $avant_notes = count( $repo->notes_of( $qualifie ) );
 $verifie(
@@ -1015,32 +961,27 @@ $verifie(
 		&& strpos( (string) $notes[0]['content'], 'Les deux' ) !== false
 );
 
-/* La demande non qualifiée reste vide : aucune valeur par défaut inventée. */
+
 $verifie(
 	'une demande sans qualification garde ses champs vides',
 	(string) $repo->find_by_id( $ordinaire )['lead_destination'] === ''
 		&& (string) $repo->find_by_id( $ordinaire )['lead_source'] === ''
 );
 
-/* Les libellés, ceux que l'écran et l'email emploient tous les deux. */
+
 $verifie( 'libellé « À qualifier » pour undetermined', Labels::of( 'lead_destination', 'undetermined' ) === 'À qualifier' );
 $verifie( 'libellé « Fiche motif » pour motif', Labels::of( 'lead_source', 'motif' ) === 'Fiche motif' );
 $verifie( 'une valeur inconnue se rend telle quelle', Labels::of( 'lead_destination', 'inconnue' ) === 'inconnue' );
 
-/* ================================================================== */
+
 $section( 'Routage : justification, zone, arbitrage' );
 
-/* Le schema 5 a pose la colonne de la recommandation initiale. */
+
 $colonnes5 = $wpdb->get_col( 'SHOW COLUMNS FROM ' . Schema::table( 'projects' ) );
 $verifie( 'colonne lead_destination_auto présente', in_array( 'lead_destination_auto', $colonnes5, true ) );
 
-/*
- * A la creation, les deux colonnes partent egales.
- *
- * C'est ce qui rend `corrigee()` fiable : toute difference ne peut venir que
- * d'un humain. Si le navigateur pouvait envoyer les deux separement, une
- * charge fabriquee simulerait un arbitrage qui n'a jamais eu lieu.
- */
+
+
 $route = $cree( [
 	'leadSource'      => 'mode-plan',
 	'leadNeed'        => 'pose',
@@ -1056,16 +997,11 @@ $verifie(
 );
 $verifie( 'aucune correction au départ', LeadRouting::corrigee( $ligne_route ) === false );
 
-/* La zone, lue depuis ce qui est stocke. */
+
 $verifie( 'zone : département francilien reconnu', LeadRouting::en_idf( $ligne_route ) === true );
 $verifie( 'zone : un département breton ne l’est pas', LeadRouting::en_idf( [ 'department' => '29' ] ) === false );
-/*
- * LE DEPARTEMENT FAIT FOI, MEME CONTRE LA COLONNE REGION.
- *
- * Une demande enregistree avant ce lot peut porter une region qui contredit
- * son departement. C'est le departement qui tranche : s'y fier revient a lire
- * l'original plutot qu'une copie.
- */
+
+
 $verifie(
 	'une région contradictoire en base ne fait pas basculer la zone',
 	LeadRouting::en_idf( [ 'region' => Fields::REGION_IDF_LABEL, 'department' => '35' ] ) === false
@@ -1082,13 +1018,8 @@ $verifie(
 $verifie( 'la région se déduit : 69 → Auvergne-Rhône-Alpes', Departements::region( '69' ) === 'Auvergne-Rhône-Alpes' );
 $verifie( 'un numéro hors nomenclature n’a pas de région', Departements::region( '975' ) === '' && Departements::est_idf( '975' ) === false );
 
-/*
- * La phrase d'explication.
- *
- * Elle doit nommer les DEUX faits sur lesquels la regle s'est appuyee — le
- * besoin et la zone — sans quoi le gestionnaire ne peut pas la contredire en
- * connaissance de cause.
- */
+
+
 $raison = LeadRouting::raison( $ligne_route );
 $verifie( 'une raison est donnée', $raison !== '' );
 $verifie(
@@ -1104,7 +1035,7 @@ $verifie(
 	LeadRouting::raison( $hors )
 );
 
-/* La zone se lit dans le DEPARTEMENT : une region seule ne suffit plus. */
+
 $mixte = [ 'lead_need' => 'produit-pose', 'lead_destination' => 'mixed', 'department' => '94' ];
 $verifie(
 	'parquet + pose : la raison nomme les deux entreprises',
@@ -1123,12 +1054,8 @@ $verifie(
 
 $verifie( 'aucune raison pour une demande jamais orientée', LeadRouting::raison( [] ) === '' );
 
-/*
- * L'arbitrage humain, et sa trace.
- *
- * La recommandation vient du parcours ; la decision revient a une personne,
- * et l'ecran doit montrer d'ou l'on vient.
- */
+
+
 wp_set_current_user( $admin_id );
 $mixed_avant = $repo->count_search( [ 'search' => PP_MARQUE, 'destination' => 'mixed' ] );
 $verifie( 'la destination se corrige', $repo->update_destination( $route, 'mixed', current_time( 'mysql' ) ) );
@@ -1142,23 +1069,16 @@ $verifie(
 $verifie( 'la correction est détectée', LeadRouting::corrigee( $apres_route ) === true );
 $verifie( 'et elle sait d’où elle vient', LeadRouting::libelle_auto( $apres_route ) === 'Allure Design' );
 
-/* Les six besoins, traduits pour l'ecran et pour l'email. */
+
 foreach ( [ 'produit', 'pose', 'produit-pose', 'renovation', 'renseignement', 'indetermine' ] as $b ) {
 	$verifie( "libellé du besoin « {$b} »", Labels::of( 'lead_need', $b ) !== $b, Labels::of( 'lead_need', $b ) );
 }
 $verifie( 'libellé de la destination Allure Design', Labels::of( 'lead_destination', 'allure_design' ) === 'Allure Design' );
 
-/*
- * Le filtre de la liste marche pour les quatre destinations, pas seulement
- * pour celle qui existait quand on l'a ecrit.
- */
-/*
- * On compte AVANT et APRES plutot qu'une valeur absolue.
- *
- * La section « Qualification » corrige deja une demande en `mixed` : figer
- * le total a 1 faisait echouer ce test pour une raison qui n'avait rien a
- * voir avec le filtre. Un ecart de un est ce que ce test veut mesurer.
- */
+
+
+
+
 $verifie(
 	'la demande corrigée en mixed est retrouvée par le filtre',
 	$repo->count_search( [ 'search' => PP_MARQUE, 'destination' => 'mixed' ] ) === $mixed_avant + 1,
@@ -1169,25 +1089,25 @@ $verifie(
 	$repo->count_search( [ 'search' => PP_MARQUE, 'destination' => 'allure_design' ] ) === 0
 );
 
-/* La liste ramene de quoi lire la zone sans ouvrir chaque fiche. */
+
 $page_route = $repo->search( [ 'search' => PP_MARQUE, 'page' => 1 ] );
 $verifie(
 	'la liste ramène la région et le besoin',
 	$page_route !== [] && array_key_exists( 'region', $page_route[0] ) && array_key_exists( 'lead_need', $page_route[0] )
 );
 
-/* ================================================================== */
+
 $section( 'Front : rien touché' );
 
 $verifie( 'aucun fichier front dans le plugin', ! is_dir( POSE_PARQUET_DIR . '/js' ) && ! is_dir( POSE_PARQUET_DIR . '/css' ) );
 $verifie( 'la feuille admin est bien dans le plugin', is_readable( POSE_PARQUET_DIR . '/assets/admin.css' ) );
-// Un seul script depuis le 06/10/2026 : ouvrir la médiathèque de WordPress
-// (images des contenus, fond de maintenance). Pas de bibliothèque, pas d'appel réseau.
+
+
 $scripts = array_map( 'basename', glob( POSE_PARQUET_DIR . '/assets/*.js' ) ?: [] );
 $code_js = (string) file_get_contents( POSE_PARQUET_DIR . '/assets/admin.js' );
 $verifie( 'un seul script : admin.js (médiathèque WordPress)', $scripts === [ 'admin.js' ] && str_contains( $code_js, 'wp.media(' ) && ! preg_match( '/(?<![.\w])fetch\(|XMLHttpRequest|^\s*import\s/m', $code_js ), implode( ',', $scripts ) );
 
-/* ================================================================== */
+
 $section( 'Nettoyage' );
 
 $supprimees = $nettoie();

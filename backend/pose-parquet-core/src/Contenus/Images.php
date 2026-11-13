@@ -1,13 +1,6 @@
 <?php
-/**
- * « Il manque des images » : l'état de l'image d'un contenu, en un mot.
- *
- * Trois états, lus au moment de l'affichage, jamais stockés :
- *   ok              une image de la médiathèque, fichier présent ;
- *   manquante       aucune image choisie ;
- *   fichier_absent  une image était choisie, mais elle a été supprimée de la
- *                   médiathèque ou son fichier n'est plus sur le disque.
- */
+
+
 
 declare(strict_types=1);
 
@@ -40,12 +33,8 @@ final class Images {
 		return $fichier && file_exists( $fichier ) ? self::OK : self::FICHIER_ABSENT;
 	}
 
-	/**
-	 * Identifiants des contenus d'un type sans image utilisable : pour le
-	 * filtre « Image manquante » des listes et pour le tableau de bord.
-	 *
-	 * @return int[]
-	 */
+
+
 	public static function sans_image( string $type ): array {
 		$ids = get_posts(
 			[

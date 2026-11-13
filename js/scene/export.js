@@ -1,10 +1,3 @@
-/**
- * Enregistrement du rendu.
- *
- * Compose l'image visible (rendu simple ou comparaison), y ajoute une mention
- * discrète, puis déclenche un téléchargement. Tout se passe dans le
- * navigateur : aucun envoi, aucune conversion côté serveur.
- */
 const MENTION = 'Simulation — pose-parquet.com';
 
 function label(ctx, text, x, y, align) {
@@ -21,15 +14,8 @@ function label(ctx, text, x, y, align) {
   ctx.fillText(text, align === 'right' ? x - padX : x + padX, y + 1);
 }
 
-/**
- * @param {object} o
- * @param {HTMLCanvasElement} o.primary   rendu principal (version A)
- * @param {HTMLCanvasElement} [o.secondary] rendu de la version B
- * @param {HTMLImageElement|HTMLCanvasElement} [o.photo] photo d'origine
- * @param {'off'|'photo'|'ab'} o.mode
- * @param {number} o.ratio  position du curseur, 0 → 1
- * @returns {HTMLCanvasElement}
- */
+
+
 export function composeRender({ primary, secondary, photo, mode = 'off', ratio = 0.5 }) {
   const out = document.createElement('canvas');
   out.width = primary.width;
@@ -69,7 +55,7 @@ export function composeRender({ primary, secondary, photo, mode = 'off', ratio =
   return out;
 }
 
-/** Déclenche le téléchargement d'un canevas en JPEG. */
+
 export function downloadCanvas(canvas, filename = 'simulation-parquet.jpg') {
   return new Promise((resolve) => {
     const finish = (url, revoke) => {

@@ -1,20 +1,6 @@
 <?php
-/**
- * Migration : importe dans WordPress les contenus exportés du dépôt
- * (`node _generator/exporter-wordpress.js` → data/wordpress/import.json).
- *
- * Rejouable sans doublon : un contenu est retrouvé par son type et son slug
- * (une page par sa clé), une image par sa clé d'origine (`_pp_source_key`).
- * Rejouer met à jour ; rien n'est supprimé.
- *
- * Le corps est importé tel que le site le publie (HTML rendu, composants
- * compris), avec son empreinte (`_pp_import_hash`) : tant que personne ne le
- * modifie dans WordPress, l'export le rend octet pour octet — le site
- * reconstruit est identique.
- *
- * Exécuté en ligne de commande, en tant qu'administrateur (le HTML des
- * articles n'est pas filtré par kses : c'est celui du dépôt).
- */
+
+
 
 declare(strict_types=1);
 
@@ -28,15 +14,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Importer {
 
-	/** @var string[] */
+
 	private array $journal = [];
 
-	/** @return string[] */
+
 	public function journal(): array {
 		return $this->journal;
 	}
 
-	/** @param array<string,mixed> $d contenu de import.json */
+
 	public function importer( array $d ): array {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		require_once ABSPATH . 'wp-admin/includes/media.php';
@@ -70,25 +56,10 @@ final class Importer {
 		return $compte;
 	}
 
-	/**
-	 * Champs structurés et « Mon site » SEULEMENT, sans rien écraser.
-	 *
-	 * Le schéma vient du dépôt : il est toujours remplacé (c'est du code). Les
-	 * valeurs, elles, sont des saisies : une valeur déjà présente dans
-	 * WordPress est conservée, seules les clés nouvelles reçoivent la valeur
-	 * par défaut du dépôt. Rejouable autant de fois qu'on veut.
-	 *
-	 * @param array<string,mixed> $d contenu de import.json
-	 * @return array{pages:int,site:int,ajoutes:int}
-	 */
-	/**
-	 * Crée les pages que le site a gagnées depuis le dernier import, et elles
-	 * seules. Une page déjà présente n'est pas touchée : ses textes sont des
-	 * saisies. C'est ce qui permet d'ajouter une page (mentions légales, blog…)
-	 * sur un WordPress en service sans écraser le reste.
-	 *
-	 * @param array<string,mixed> $d contenu de import.json
-	 */
+
+
+
+
 	public function pages_manquantes( array $d ): int {
 		$crees = 0;
 		foreach ( (array) ( $d['pages'] ?? [] ) as $p ) {
@@ -96,7 +67,7 @@ final class Importer {
 			if ( $cle === '' ) {
 				continue;
 			}
-			$ids = get_posts( [ 'post_type' => Types::PAGE, 'post_status' => 'any', 'meta_key' => '_pp_cle', 'meta_value' => $cle, 'posts_per_page' => 1, 'fields' => 'ids' ] ); // phpcs:ignore WordPress.DB.SlowDBQuery
+			$ids = get_posts( [ 'post_type' => Types::PAGE, 'post_status' => 'any', 'meta_key' => '_pp_cle', 'meta_value' => $cle, 'posts_per_page' => 1, 'fields' => 'ids' ] );
 			if ( $ids ) {
 				continue;
 			}
@@ -114,7 +85,7 @@ final class Importer {
 				continue;
 			}
 			$cle = sanitize_key( (string) $p['cle'] );
-			$ids = get_posts( [ 'post_type' => Types::PAGE, 'post_status' => 'any', 'meta_key' => '_pp_cle', 'meta_value' => $cle, 'posts_per_page' => 1, 'fields' => 'ids' ] ); // phpcs:ignore WordPress.DB.SlowDBQuery
+			$ids = get_posts( [ 'post_type' => Types::PAGE, 'post_status' => 'any', 'meta_key' => '_pp_cle', 'meta_value' => $cle, 'posts_per_page' => 1, 'fields' => 'ids' ] );
 			if ( ! $ids ) {
 				$this->journal[] = 'page absente ' . $cle . ' (importer d’abord les contenus)';
 				continue;
@@ -126,7 +97,7 @@ final class Importer {
 			$compte['ajoutes'] += count( $apres ) - count( $avant );
 			$this->meta( $id, '_pp_champs_def', $this->json( $schema ) );
 			$this->meta( $id, '_pp_champs', $this->json( $apres ) );
-			// Une page passée en champs structurés n'a plus de corps libre.
+
 			if ( empty( $p['corps'] ) ) {
 				$this->meta( $id, '_pp_corps_editable', '0' );
 			}
@@ -161,13 +132,13 @@ final class Importer {
 		return $ids ? (int) $ids[0] : 0;
 	}
 
-	/** @param array<string,mixed> $champs */
+
 	private function enregistrer( string $type, int $id, array $champs ): int {
 		$champs['post_type'] = $type;
 		if ( $id ) {
 			$champs['ID'] = $id;
 		}
-		// wp_insert_post attend des données « slashées ».
+
 		$resultat = $id ? wp_update_post( wp_slash( $champs ), true ) : wp_insert_post( wp_slash( $champs ), true );
 		if ( is_wp_error( $resultat ) ) {
 			throw new \RuntimeException( $type . ' : ' . $resultat->get_error_message() );
@@ -183,7 +154,7 @@ final class Importer {
 		return (string) wp_json_encode( $v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 	}
 
-	/** @param array<string,mixed> $a */
+
 	private function article( string $type, array $a ): void {
 		$slug = sanitize_title( (string) $a['slug'] );
 		$id   = $this->enregistrer(
@@ -227,7 +198,7 @@ final class Importer {
 		$this->journal[] = $type . ' ' . $slug . ' #' . $id;
 	}
 
-	/** @param array<string,mixed> $i */
+
 	private function inspiration( array $i ): void {
 		$slug = sanitize_title( (string) $i['cle'] );
 		$id   = $this->enregistrer(
@@ -262,10 +233,10 @@ final class Importer {
 		$this->journal[] = 'inspiration ' . $slug . ' #' . $id;
 	}
 
-	/** @param array<string,mixed> $p */
+
 	private function page( array $p ): void {
 		$cle   = sanitize_key( (string) $p['cle'] );
-		$ids   = get_posts( [ 'post_type' => Types::PAGE, 'post_status' => 'any', 'meta_key' => '_pp_cle', 'meta_value' => $cle, 'posts_per_page' => 1, 'fields' => 'ids' ] ); // phpcs:ignore WordPress.DB.SlowDBQuery
+		$ids   = get_posts( [ 'post_type' => Types::PAGE, 'post_status' => 'any', 'meta_key' => '_pp_cle', 'meta_value' => $cle, 'posts_per_page' => 1, 'fields' => 'ids' ] );
 		$corps = isset( $p['corps'] ) && is_string( $p['corps'] ) ? $p['corps'] : '';
 		$id    = $this->enregistrer(
 			Types::PAGE,
@@ -292,10 +263,10 @@ final class Importer {
 		$this->journal[] = 'page ' . $cle . ' #' . $id;
 	}
 
-	/** @param array<string,mixed>|null $image */
+
 	private function couverture( int $post_id, ?array $image ): void {
 		if ( ! $image || empty( $image['fichier'] ) ) {
-			return; // Pas d'image dans le dépôt : l'admin affichera « Image manquante ».
+			return;
 		}
 		$id = $this->image( $image );
 		if ( $id ) {
@@ -303,15 +274,12 @@ final class Importer {
 		}
 	}
 
-	/**
-	 * Une image du dépôt dans la médiathèque, une seule fois par clé d'origine.
-	 *
-	 * @param array<string,mixed> $image { fichier, source, alt, credit }
-	 */
+
+
 	private function image( array $image ): int {
 		$source = sanitize_key( (string) ( $image['source'] ?? '' ) );
 		if ( $source !== '' ) {
-			$deja = get_posts( [ 'post_type' => 'attachment', 'post_status' => 'inherit', 'meta_key' => '_pp_source_key', 'meta_value' => $source, 'posts_per_page' => 1, 'fields' => 'ids' ] ); // phpcs:ignore WordPress.DB.SlowDBQuery
+			$deja = get_posts( [ 'post_type' => 'attachment', 'post_status' => 'inherit', 'meta_key' => '_pp_source_key', 'meta_value' => $source, 'posts_per_page' => 1, 'fields' => 'ids' ] );
 			if ( $deja ) {
 				return (int) $deja[0];
 			}
@@ -321,12 +289,12 @@ final class Importer {
 			$this->journal[] = 'image introuvable ' . $fichier;
 			return 0;
 		}
-		// media_handle_sideload déplace le fichier : on lui donne une copie.
+
 		$copie = wp_tempnam( basename( $fichier ) );
 		copy( $fichier, $copie );
 		$id = media_handle_sideload( [ 'name' => basename( $fichier ), 'tmp_name' => $copie ], 0, (string) ( $image['alt'] ?? '' ) );
 		if ( is_wp_error( $id ) ) {
-			@unlink( $copie ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			@unlink( $copie );
 			$this->journal[] = 'image refusée ' . basename( $fichier ) . ' : ' . $id->get_error_message();
 			return 0;
 		}

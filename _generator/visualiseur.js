@@ -1,28 +1,14 @@
-/**
- * Deux pages, deux rôles :
- *
- *  - outils/visualiseur.html : la landing. C'est elle qui porte le H1, les
- *    explications, la FAQ et les données structurées. Elle se termine par un
- *    seul appel à l'action.
- *  - outils/studio.html      : l'application. Aucune prose, aucun pied de
- *    page, aucun fil d'Ariane — juste l'outil.
- *
- * Le nom public est **Visualiseur Parquet**. « Studio » ne subsiste que comme
- * nom technique — le fichier de l'application et les classes CSS — parce que
- * l'URL est déjà indexée et qu'un identifiant interne n'a pas à porter le
- * nom commercial.
- */
 const { SITE, layout, appLayout, breadcrumb } = require('./layout');
 const { NB_PIECES_LETTRES } = require('./scenes');
 const { NB_PREMIBEL, NB_PREMIBEL_VISU, NB_PREMIBEL_FIDELE, NB_MOTIFS, NB_DEMONSTRATION, enLettres } = require('./catalogue');
 const { MAX_VERSIONS } = require('../js/studio/app.js');
-/** « cinq » devient « Cinq » : ce nombre ouvre une phrase. */
+
 const MAJ_PIECES = NB_PIECES_LETTRES.charAt(0).toUpperCase() + NB_PIECES_LETTRES.slice(1);
 const { faq, faqJsonLd, tip } = require('./ui');
 const { ICON } = require('./home');
 
 const STUDIO_URL = 'studio.html';
-// Titres Google, descriptions et titre affiché : réglables dans WordPress (Pages).
+
 const { PAGES } = require('./content-pages');
 
 function buildStudioPage(write) {
@@ -31,7 +17,7 @@ function buildStudioPage(write) {
     appLayout({
       title: PAGES['studio'].titre,
       description: PAGES['studio'].description,
-      h1: 'Studio : essayer un parquet dans une pièce',
+      h1: 'Visualiseur Parquet',
       path: 'outils/studio.html',
       depth: 1,
       jsonld: [
@@ -52,17 +38,14 @@ function buildStudioPage(write) {
   );
 }
 
-/**
- * Le Visualiseur produit : l'UX validee sur le prototype pose-parquet-ai,
- * branchee DIRECTEMENT sur le moteur de cette page. Pas d'index : c'est un
- * parcours en cours de validation, atteignable par lien.
- */
+
+
 function buildProductPage(write) {
   write(
     'outils/visualiseur-produit.html',
     appLayout({
       app: 'product',
-      // Prototype en validation, atteignable par lien : seul outil hors de l'index.
+
       robots: 'noindex, follow',
       title: 'Visualiseur produit · Pose Parquet',
       h1: 'Visualiseur produit',
@@ -95,17 +78,8 @@ function buildVisualiseurPage(write) {
     },
     {
       q: 'Les parquets proposés existent-ils vraiment ?',
-      /*
-       * Cette réponse disait « douze références de démonstration » alors que
-       * le catalogue en compte vingt-six, dont quatorze relevées sur des
-       * fiches produit réelles. Fausse sur le nombre et sur la nature — et
-       * reprise telle quelle dans les données structurées FAQPage, donc
-       * susceptible d'être citée par un moteur de recherche.
-       *
-       * Les deux moitiés sont maintenant comptées séparément, et la réserve
-       * qui compte — le rendu approche la teinte, il ne remplace pas un
-       * échantillon — est dite pour les deux.
-       */
+
+
       a: `Des références réelles. Le catalogue compte ${NB_PREMIBEL} parquets Premibel ; ${NB_PREMIBEL_VISU} peuvent être essayés dans la pièce, les autres renvoient vers leur fiche. Pour la plupart, le rendu est indicatif : il reprend la couleur et la largeur de lame de la référence avec une famille de bois calculée par le moteur. ${NB_PREMIBEL_FIDELE} en rendu fidèle portent une matière construite pour elles et comparée à leur photo — teinte, veinage, nœuds, longueur réelle des lames. Dans les deux cas, le rendu sert à choisir une direction, pas à valider une commande sans avoir vu un échantillon. Les ${NB_DEMONSTRATION} parquets de démonstration du moteur ne servent plus qu’aux exemples, et sont toujours signalés comme tels.`,
     },
     {

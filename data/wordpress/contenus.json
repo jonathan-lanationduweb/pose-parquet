@@ -1603,7 +1603,47 @@
  "site": {
   "nom": "Pose Parquet",
   "baseline": "Comprendre, préparer, visualiser et réussir la pose de son parquet.",
-  "logo": null,
+  "logo": {
+   "id": 246,
+   "source": null,
+   "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/11/Logo_Pose_Parquet_Sol_Durable.png",
+   "largeur": 1774,
+   "hauteur": 887,
+   "alt": "",
+   "credit": "",
+   "tailles": [
+    {
+     "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/11/Logo_Pose_Parquet_Sol_Durable-150x150.png",
+     "largeur": 150,
+     "hauteur": 150
+    },
+    {
+     "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/11/Logo_Pose_Parquet_Sol_Durable-300x150.png",
+     "largeur": 300,
+     "hauteur": 150
+    },
+    {
+     "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/11/Logo_Pose_Parquet_Sol_Durable-768x384.png",
+     "largeur": 768,
+     "hauteur": 384
+    },
+    {
+     "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/11/Logo_Pose_Parquet_Sol_Durable-1024x512.png",
+     "largeur": 1024,
+     "hauteur": 512
+    },
+    {
+     "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/11/Logo_Pose_Parquet_Sol_Durable-1536x768.png",
+     "largeur": 1536,
+     "hauteur": 768
+    },
+    {
+     "url": "http://pose-parquet-dev.local/wp-content/uploads/2026/11/Logo_Pose_Parquet_Sol_Durable.png",
+     "largeur": 1774,
+     "hauteur": 887
+    }
+   ]
+  },
   "favicon": null,
   "cta_projet": "Décrire mon projet",
   "cta_projet_afficher": true,

@@ -1,15 +1,3 @@
-/**
- * Catalogue de parquets.
- *
- * Les références viennent de data/parquets.json : le catalogue est une
- * donnée, pas du code. Ajouter vingt, cent ou cinq cents références ne
- * demande donc aucune modification d'interface — la recherche, les filtres et
- * la fabrication des échantillons à la demande sont déjà là.
- *
- * Chaque carte affiche un véritable échantillon de bois, dessiné par le même
- * moteur que le sol : ce que l'on voit dans la vignette est ce que l'on
- * obtient dans la pièce.
- */
 import { buildSwatch } from '../scene/texture.js';
 import { lireJson } from '../scene/product.js';
 import { createMaterial } from '../scene/material.js';
@@ -18,26 +6,14 @@ import { echapper } from '../utils/dom.js';
 import { avertir } from '../utils/diagnostic.js';
 import { suivreClic } from '../commerce/premibel.js';
 
-/**
- * Charge le catalogue en passant par la **couche produit**.
- *
- * Les références traversent désormais `js/scene/product.js`, qui les ramène à
- * une fiche canonique — essence, gamme, teinte, finition, largeur de lame,
- * motifs autorisés, famille de rendu — avant que le moteur n'en fasse un
- * matériau. C'est ce qui permettra de substituer un export Premibel à
- * `data/parquets.json` sans toucher ni l'interface ni le rendu : seule la
- * source change.
- *
- * La forme rendue reste celle qu'attendait le reste de l'outil (`parquets`,
- * `byId`, `get(id)`, `patterns`), augmentée de `products` et `families` pour ce
- * qui a besoin des données commerciales.
- */
+
+
 export async function loadCatalog(base = '') {
   const { products, rejected, families, source } = await loadProducts(base);
   if (!products.length) throw new Error('Catalogue indisponible');
 
-  // Les motifs de pose ne sont pas une donnée de produit : ils décrivent des
-  // façons de poser et restent décrits une seule fois.
+
+
   const meta = await lireJson(`${base}data/parquets.json`).catch(() => ({}));
 
   const parquets = products.map((fiche) => createMaterial(toMaterial(fiche)));
@@ -45,29 +21,16 @@ export async function loadCatalog(base = '') {
 
   const incomplets = products.filter((f) => f.warnings.length);
   if (incomplets.length) {
-    /*
-     * Une fiche incomplète ne doit pas faire tomber la page, mais elle ne doit
-     * pas passer inaperçue non plus : le jour où le catalogue vient d'un ERP,
-     * c'est ici qu'on verra les trous.
-     *
-     * En diagnostic seulement, depuis le 28/09/2026 : ce message nommait une
-     * référence interne et le détail d'une règle de validation dans la console
-     * de chaque visiteur. Il s'adresse à qui peut corriger la donnée, pas à
-     * qui regarde un parquet.
-     */
+
+
     avertir(
       '[catalogue] fiches incomplètes :',
       incomplets.map((f) => `${f.id} (${f.warnings.join(', ')})`).join(' · ')
     );
   }
 
-  /*
-   * Les références réelles que le moteur ne sait pas rendre (essence sans
-   * famille, motif non déclaré, Versailles…). Elles ne sont PAS visualisables —
-   * aucun bouton ne le prétend — mais elles existent chez Premibel : le tiroir
-   * les liste, avec leur fiche. Seules les références actives à adresse
-   * officielle y entrent.
-   */
+
+
   const references = rejected
     .filter((f) => f.active && f.source === 'premibel' && f.productUrl)
     .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
@@ -75,36 +38,15 @@ export async function loadCatalog(base = '') {
   return { ...meta, base, parquets, byId, get: (id) => byId.get(id), products, rejected, references, families, source };
 }
 
-/** Vignette de matériau, fabriquée une seule fois puis réutilisée. */
+
 const swatches = new Map();
 export function swatchFor(material, options) {
   if (!swatches.has(material.id)) swatches.set(material.id, buildSwatch(material, options));
   return swatches.get(material.id);
 }
 
-/**
- * Le tiroir du catalogue — toutes les références, visualisables ou non.
- *
- * PHOTO ≠ RENDU. Une référence Premibel s'identifie par sa photo commerciale
- * (vignette locale, jamais une texture) ; le rendu du parquet dans la pièce est
- * l'affaire de la scène, et la carte dit ce qu'il vaut :
- *   - « Rendu indicatif »            famille procédurale de même couleur ;
- *   - « Rendu fidèle »               matière construite pour la référence et
- *                                    validée (data/material-profiles.json) ;
- *   - « Visualisation non disponible » — le PARQUET existe et s'achète ; c'est
- *     seulement l'essai qui n'est pas possible. La carte mène à sa fiche.
- * Les parquets de démonstration n'ont pas de photo : leur vignette est leur
- * échantillon calculé, et ils le disent.
- *
- * NAVIGATION. Trois vues — Tous, Visualisables, Autres parquets — plutôt qu'une
- * annexe repliée : 183 références réelles ne sont pas des notes de bas de page.
- * Recherche (nom, référence, essence, finition, motif), filtres derrière un
- * bouton « Filtres », trois tris (Pertinence, A–Z, Largeur), un compteur.
- *
- * PERFORMANCE. Les photos et les échantillons ne se chargent qu'à l'approche de
- * l'écran (IntersectionObserver sur la fenêtre), un échantillon calculé par
- * image au plus. Aucune photo n'est demandée pour une carte filtrée.
- */
+
+
 export function createCatalog(host, catalog, { onSelect, onVisible }) {
   const base = catalog.base || '';
   const LIB_MOTIF = { lames: 'Lames droites', 'point-de-hongrie': 'Point de Hongrie', 'baton-rompu': 'Bâton rompu' };
@@ -112,7 +54,7 @@ export function createCatalog(host, catalog, { onSelect, onVisible }) {
   const largeurClasse = (w) => (!w ? null : w < 100 ? 'etroite' : w <= 160 ? 'moyenne' : 'large');
   const LIB_LARGEUR = { etroite: 'Étroite (< 10 cm)', moyenne: 'Moyenne (10 à 16 cm)', large: 'Large (> 16 cm)' };
 
-  /* Une entrée par référence, visualisable ou non, décrite de la même façon. */
+
   const entree = (fiche, material) => {
     const statut = material
       ? (fiche.source === 'premibel' ? (fiche.visualStatus === 'ready' ? 'ready' : 'approximate') : 'demo')
@@ -135,15 +77,8 @@ export function createCatalog(host, catalog, { onSelect, onVisible }) {
       ordre: Number.isFinite(fiche.displayOrder) ? fiche.displayOrder : 1000,
     };
   };
-  /*
-   * LE CATALOGUE PUBLIC NE CONTIENT QUE DES RÉFÉRENCES PREMIBEL.
-   *
-   * Les parquets de démonstration du moteur restent chargés — les cartes
-   * Inspiration et les anciens liens profonds (`?parquet=chene-dore`) les
-   * ouvrent toujours — mais ils ne sont plus listés ici : mêlés aux références
-   * réelles, ils passaient pour des produits. Ouverts par un lien, le Studio
-   * les signale comme démonstration (voir `syncSelected`).
-   */
+
+
   const entrees = [
     ...catalog.parquets.filter((m) => m.product && m.product.source === 'premibel').map((m) => entree(m.product, m)),
     ...(catalog.references || []).map((f) => entree(f, null)),
@@ -203,7 +138,7 @@ export function createCatalog(host, catalog, { onSelect, onVisible }) {
 
   const etat = { vue: 'tous', texte: '', teinte: 'all', essence: 'all', motif: 'all', finition: 'all', largeur: 'all', tri: 'pertinence' };
 
-  /* Teinte : le vocabulaire du site, en pastilles. */
+
   [{ id: 'all', label: 'Toutes' }, ...(catalog.tones || [])].forEach((item) => {
     const b = document.createElement('button');
     b.type = 'button';
@@ -219,10 +154,8 @@ export function createCatalog(host, catalog, { onSelect, onVisible }) {
     filtersEl.appendChild(b);
   });
 
-  /*
-   * Listes de filtres — créées seulement si la donnée le permet : au moins
-   * 70 pour cent des références la portent, et elle a au moins deux valeurs.
-   */
+
+
   const DIMENSIONS = [
     { cle: 'essence', label: 'Essence', valeurs: (e) => (e.essence ? [e.essence] : []), libelle: (v) => v },
     { cle: 'motif', label: 'Motif', valeurs: (e) => e.motifs, libelle: (v) => LIB_MOTIF[v] || v },
@@ -245,8 +178,8 @@ export function createCatalog(host, catalog, { onSelect, onVisible }) {
     selects.appendChild(label);
   });
 
-  /* Fermé par défaut, partout : le panneau latéral est étroit, et la grille
-     doit être la première chose vue. Le bouton dit combien de filtres sont actifs. */
+
+
   const ouvrir = (oui) => { panel.hidden = !oui; toggle.setAttribute('aria-expanded', String(oui)); };
   ouvrir(false);
   toggle.addEventListener('click', () => ouvrir(panel.hidden));
@@ -264,19 +197,15 @@ export function createCatalog(host, catalog, { onSelect, onVisible }) {
   tri.addEventListener('change', () => { etat.tri = tri.value; ordonner(); apply(); });
   search.addEventListener('input', () => { etat.texte = search.value; apply(); });
 
-  /* ---------- Cartes ---------- */
+
   const BADGES = {
     approximate: ['approx', 'Rendu indicatif'],
     ready: ['ready', 'Rendu fidèle'],
     unavailable: ['none', 'Visualisation non disponible'],
     demo: ['demo', 'Démonstration'],
   };
-  /*
-   * Repli sans photo : une étiquette graphique, pas une fausse texture.
-   * Fond uni de la famille de teinte, initiales de l'essence, motif en toutes
-   * lettres et la mention « Photo non disponible » — rien qui puisse passer
-   * pour le parquet lui-même.
-   */
+
+
   const repli = (e) => {
     const initiales = (e.essence || e.nom || '?').split(/\s+/).map((m) => m[0]).join('').slice(0, 2).toUpperCase();
     const motif = e.motifs.length === 1 ? LIB_MOTIF[e.motifs[0]] : '';
@@ -321,7 +250,7 @@ export function createCatalog(host, catalog, { onSelect, onVisible }) {
     return el;
   }
 
-  /* ---------- Chargement à l'approche de l'écran ---------- */
+
   function paintSwatch(e) {
     const slot = e.el.querySelector('.cat__media');
     const swatch = swatchFor(e.material);
@@ -345,13 +274,13 @@ export function createCatalog(host, catalog, { onSelect, onVisible }) {
   function charger(e) {
     if (e.pret) return;
     if (e.vignette) {
-      /* Une photo : le navigateur la décode hors du fil principal. */
+
       const img = e.el.querySelector('img[data-src]');
       if (img) { img.src = img.dataset.src; img.removeAttribute('data-src'); }
       img && img.addEventListener('error', () => { img.insertAdjacentHTML('afterend', repli(e)); img.remove(); }, { once: true });
       e.pret = true;
     } else if (e.statut === 'demo' && !file.includes(e)) {
-      /* Un échantillon calculé : un par image, après l'affichage de la grille. */
+
       file.push(e);
       if (!planifie) { planifie = true; requestAnimationFrame(() => setTimeout(vider, 0)); }
     }
@@ -367,7 +296,7 @@ export function createCatalog(host, catalog, { onSelect, onVisible }) {
 
   entrees.forEach((e) => { const el = carte(e); parElement.set(el, e); if (observer) observer.observe(el); });
 
-  /* ---------- Ordre, filtres, compteur ---------- */
+
   const rang = { ready: 0, approximate: 1, demo: 2, unavailable: 3 };
   function ordonner() {
     const cmpNom = (a, b) => a.nom.localeCompare(b.nom, 'fr');
@@ -395,7 +324,7 @@ export function createCatalog(host, catalog, { onSelect, onVisible }) {
         (etat.largeur === 'all' || largeurClasse(e.largeur) === etat.largeur);
       e.el.hidden = !ok;
       if (ok) visibles += 1;
-      /* Une carte réaffichée qui n'a pas encore sa photo se fait réobserver. */
+
       if (ok && !e.pret && observer) observer.observe(e.el);
     }
     const nbFiltres = ['teinte', 'essence', 'motif', 'finition', 'largeur'].filter((k) => etat[k] !== 'all').length;
@@ -412,7 +341,7 @@ export function createCatalog(host, catalog, { onSelect, onVisible }) {
   host.appendChild(wrap);
   apply();
 
-  /* Filet : dans un onglet en arrière-plan, l'observateur ne se déclenche pas. */
+
   window.setTimeout(() => {
     entrees.filter((e) => !e.el.hidden).slice(0, 12).forEach(charger);
   }, 900);
@@ -423,7 +352,7 @@ export function createCatalog(host, catalog, { onSelect, onVisible }) {
     setActive(id) {
       cartesVisualisables.forEach((e) => e.el.setAttribute('aria-pressed', String(e.material.id === id)));
     },
-    /** Références voisines : préparées à l'avance pour que le clic soit instantané. */
+
     neighbours(id) {
       const index = catalog.parquets.findIndex((item) => item.id === id);
       return [catalog.parquets[index + 1], catalog.parquets[index - 1]].filter(Boolean);

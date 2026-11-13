@@ -1,16 +1,6 @@
 <?php
-/**
- * Les champs propres à chaque type de contenu, et comment on les nettoie.
- *
- * Une seule table pour trois usages : l'enregistrement des métadonnées
- * (Types), l'écran d'édition (Edition) et l'export vers le site (Export).
- * Un champ absent d'ici n'existe pas : rien d'autre n'est lu dans `$_POST`.
- *
- * Tous les champs sont du TEXTE. Aucun ne reçoit de HTML : le design vient du
- * code du site, pas de ce qu'on saisit ici. Seul le contenu principal (éditeur
- * classique) accepte du HTML, filtré à l'export par une liste fermée
- * (Contenus\Html).
- */
+
+
 
 declare(strict_types=1);
 
@@ -26,7 +16,7 @@ final class Champs {
 	public const META_DESCRIPTION = '_pp_meta_description';
 	public const INTRO            = '_pp_intro';
 
-	/** Valeurs prévues par le site public (filtres de la page Inspiration). */
+
 	public const PIECES = [
 		'sejour'  => 'Séjour',
 		'chambre' => 'Chambre',
@@ -47,13 +37,8 @@ final class Champs {
 	public const TAILLES      = [ 'wide' => 'Large', 'md' => 'Moyenne', 'sm' => 'Petite' ];
 	public const NIVEAUX      = [ 'Accessible' => 'Accessible', 'Intermédiaire' => 'Intermédiaire', 'Confirmé' => 'Confirmé' ];
 
-	/**
-	 * Définitions par type. `ui` : où le champ s'affiche (seo | cote | carte |
-	 * cache). Les champs `cache` sont conservés tels qu'importés (FAQ, liens
-	 * connexes…) : rien n'est perdu, mais ils ne s'éditent pas encore ici.
-	 *
-	 * @return array<string,array<string,array<string,mixed>>>
-	 */
+
+
 	public static function definitions(): array {
 		$seo = [
 			self::META_TITLE       => [ 'type' => 'text', 'max' => 160, 'label' => 'Meta title', 'ui' => 'seo' ],
@@ -99,12 +84,12 @@ final class Champs {
 			],
 			Types::PAGE        => $seo + [
 				'_pp_h1'      => [ 'type' => 'text', 'max' => 140, 'label' => 'Titre affiché sur la page (H1)', 'ui' => 'principal' ],
-				// L'accueil n'a ni H1 ni chapô modifiables : son en-tête est une composition.
+
 				'_pp_textes'  => [ 'type' => 'bool', 'ui' => 'cache' ],
 				'_pp_cle'     => [ 'type' => 'slug', 'max' => 40, 'ui' => 'cache' ],
 				'_pp_adresse' => [ 'type' => 'text', 'max' => 120, 'ui' => 'cache' ],
 				'_pp_corps_editable' => [ 'type' => 'bool', 'ui' => 'cache' ],
-				// Champs structurés (Structure) : schéma reçu du dépôt, valeurs saisies.
+
 				'_pp_champs_def'     => [ 'type' => 'json', 'ui' => 'cache' ],
 				'_pp_champs'         => [ 'type' => 'json', 'ui' => 'cache' ],
 				'_pp_import_hash'    => [ 'type' => 'hash', 'ui' => 'cache' ],
@@ -112,17 +97,13 @@ final class Champs {
 		];
 	}
 
-	/** @return array<string,array<string,mixed>> */
+
 	public static function pour( string $type ): array {
 		return self::definitions()[ $type ] ?? [];
 	}
 
-	/**
-	 * Nettoie une valeur selon sa définition. Ne lève jamais : une valeur
-	 * invalide devient vide (ou la première option d'une liste).
-	 *
-	 * @param array<string,mixed> $def
-	 */
+
+
 	public static function nettoyer( array $def, mixed $valeur ): string {
 		$valeur = is_scalar( $valeur ) ? (string) $valeur : '';
 		$max    = (int) ( $def['max'] ?? 0 );

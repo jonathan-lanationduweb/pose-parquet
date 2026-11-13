@@ -1,30 +1,3 @@
-/**
- * Moteur de rendu — WebGL 2, sans bibliothèque.
- *
- * Même chaîne que le moteur Canvas, mêmes données, même résultat attendu.
- * Trois choses le distinguent, et ce sont les trois raisons de l'écrire :
- *
- * 1. **Filtrage anisotrope matériel.** En perspective rasante, un pixel du
- *    fond de pièce couvre une longue bande de texture. Un moteur logiciel doit
- *    choisir : filtrer large (le fond devient une bouillie) ou serré (il
- *    fourmille). Le GPU sait échantillonner le long du grand axe, gratuitement.
- *    C'est exactement le défaut qui faisait ressembler le rendu à une image
- *    plaquée : les lames du fond n'avaient plus de lames.
- *
- * 2. **Le coût ne dépend plus du nombre de zones.** Une scène à quatre plans
- *    coûte quatre quadrilatères, pas quatre parcours d'image.
- *
- * 3. **Le matériau est un uniforme.** Changer de parquet, c'est changer deux
- *    textures : le rendu suit le doigt au lieu de se recalculer.
- *
- * Pas de Three.js : nous projetons des quadrilatères texturés avec un shader
- * maison — pas de graphe de scène, pas de caméra 3D, pas de chargeur, pas de
- * système de lumières. Le raisonnement complet est dans
- * docs/renderer-canvas-vs-webgl.md.
- *
- * Le moteur Canvas reste en place : il sert quand WebGL 2 manque, et il sert
- * de référence — les deux doivent donner la même image.
- */
 import { zoneTransform, tileLight } from './geometry.js';
 import { TILE_METERS, patternProfile } from './texture.js';
 
@@ -211,13 +184,13 @@ function link(gl, vertex, fragment) {
   return prog;
 }
 
-/** Nos matrices sont écrites en lignes, GLSL les attend en colonnes. */
+
 const transpose = (m) => new Float32Array([m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]]);
 
-/** Matrice carré unité → rectangle de pixels : la surface à rastériser. */
+
 const rectMatrix = (box) => [box.x1 - box.x0, 0, box.x0, 0, box.y1 - box.y0, box.y0, 0, 0, 1];
 
-/** float32 → half float, pour la carte d'éclairement. */
+
 function toHalf(values) {
   const out = new Uint16Array(values.length);
   const view = new DataView(new ArrayBuffer(4));
@@ -234,7 +207,7 @@ function toHalf(values) {
   return out;
 }
 
-/** Un seul contexte pour tout l'outil : un onglet n'en accorde qu'une poignée. */
+
 let shared = null;
 
 export function glAvailable() {
@@ -257,7 +230,7 @@ export function createGlRenderer() {
     depth: false,
     stencil: false,
     premultipliedAlpha: false,
-    preserveDrawingBuffer: true, // le canevas est relu pour l'export et la comparaison
+    preserveDrawingBuffer: true,
     powerPreference: 'high-performance',
   });
   if (!gl) {
@@ -364,7 +337,7 @@ export function createGlRenderer() {
       upload(tex.photo, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, imageData.width, imageData.height, imageData.data);
     },
 
-    /** Étiquettes, couverture et occlusion tiennent dans une seule texture. */
+
     setMasks(masks) {
       const labels = masks.labels;
       const coverage = masks.coverage;
@@ -391,7 +364,7 @@ export function createGlRenderer() {
       upload(tex.gloss, gl.R8, gl.RED, gl.UNSIGNED_BYTE, size.width, size.height, glossBytes);
     },
 
-    /** Cartes du matériau. Les mipmaps sont fabriquées par le GPU. */
+
     setMaterial(id, maps) {
       if (currentMaterial === id) return;
       const side = maps.albedo[0].size;
@@ -400,16 +373,14 @@ export function createGlRenderer() {
       currentMaterial = id;
     },
 
-    /**
-     * Peint la scène : la photo, puis chaque zone de la plus lointaine à la
-     * plus proche. Chaque zone n'écrit que ses propres pixels.
-     */
+
+
     draw({ scene, masks, surfaces, lightDir }) {
       const { width, height } = size;
       gl.viewport(0, 0, width, height);
       gl.disable(gl.DEPTH_TEST);
 
-      // Fond : la photo, à l'identique.
+
       gl.disable(gl.BLEND);
       gl.useProgram(blit);
       gl.bindVertexArray(blitVao);
@@ -437,11 +408,11 @@ export function createGlRenderer() {
         const transform = zoneTransform(zone, width, height);
         if (!transform) return;
 
-        // On rastérise la **boîte du masque**, pas le quadrilatère du plan.
-        // Le plan est un repère : il donne la fuite et l'échelle, et il est
-        // fréquent que le sol visible le dépasse — un mur qui rentre, un
-        // angle qui déborde du cadre. Se limiter au quadrilatère laissait
-        // justement des bandes de sol d'origine sur les côtés.
+
+
+
+
+
         const rect = rectMatrix(box);
 
         const config = surface.config;
@@ -456,9 +427,9 @@ export function createGlRenderer() {
         gl.uniform2f(u.uOrigin, zone.plane.origin.u, zone.plane.origin.v);
         gl.uniform2f(u.uRot, Math.cos(angle), Math.sin(angle));
         gl.uniform1f(u.uTileMeters, TILE_METERS * (config.scale || 1));
-        // Rupture de périodicité : réservée à la pose droite, dont les rangées
-        // de lames sont indépendantes. Un chevron traverse les rangées, un
-        // décalage les briserait.
+
+
+
         const profil = patternProfile(surface.material, config.pattern, config.width || null);
         const droit = config.pattern === 'lames';
         gl.uniform1f(u.uRowsPerTile, droit ? Math.max(1, Math.round(TILE_METERS / profil.width)) : 1);

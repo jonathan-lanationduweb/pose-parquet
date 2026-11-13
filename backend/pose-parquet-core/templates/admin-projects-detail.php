@@ -1,19 +1,6 @@
 <?php
-/**
- * Gabarit de la fiche d'une demande. Reçoit `$view` de Admin\Projects.
- *
- * Une page métier, pas un empilement de meta-boxes : les informations sont
- * groupées comme on les utilise au téléphone — qui appeler, quoi lui dire du
- * projet, puis ce qui s'est passé depuis.
- *
- * Les champs facultatifs vides ne sont PAS rendus. Une fiche criblée de « — »
- * demande au lecteur de trier le vide du plein à chaque coup d'œil ; ce qui
- * est absent n'a pas à occuper une ligne. Les champs essentiels, eux, restent
- * toujours affichés, même vides : leur absence est une information.
- *
- * @var array{project:array,history:array,notes:array,statuses:array,notice:?array,can_edit:bool,note_max:int,back_url:string,visualizer:array,acquisition:array} $view
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -31,7 +18,7 @@ $id        = (int) $p['id'];
 $reference = (string) ( $p['reference'] ?? '' );
 $nom       = trim( (string) $p['first_name'] . ' ' . (string) $p['last_name'] );
 
-/** Une ligne de définition, omise si la valeur est vide et le champ facultatif. */
+
 $ligne = static function ( string $libelle, string $valeur, bool $toujours = false ): void {
 	if ( $valeur === '' && ! $toujours ) {
 		return;
@@ -39,7 +26,7 @@ $ligne = static function ( string $libelle, string $valeur, bool $toujours = fal
 	echo '<div class="pp-field"><dt>' . esc_html( $libelle ) . '</dt><dd>' . esc_html( $valeur !== '' ? $valeur : '—' ) . '</dd></div>';
 };
 
-/** État d'un email : un mot, et la date quand elle existe. */
+
 $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 	$mots = [
 		'sent'    => __( 'Envoyée', 'pose-parquet-core' ),
@@ -70,7 +57,7 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 		<span class="pp-sub">
 			<?php
 			printf(
-				/* translators: %s : date de réception. */
+
 				esc_html__( 'Reçue le %s', 'pose-parquet-core' ),
 				esc_html( View::date( $p['created_at'] ) )
 			);
@@ -103,8 +90,8 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 						<dd>
 							<?php
 							$tel = (string) $p['phone'];
-							// `tel:` n'accepte ni espace ni point : on ne garde que
-							// les chiffres et un éventuel préfixe international.
+
+
 							$tel_href = preg_replace( '/[^\d+]/', '', $tel );
 							?>
 							<?php if ( $tel !== '' && (string) $tel_href !== '' ) : ?>
@@ -206,7 +193,7 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 						<?php wp_nonce_field( Actions::nonce_action( Actions::UPDATE_STATUS, $id ) ); ?>
 						<input type="hidden" name="action" value="<?php echo esc_attr( Actions::UPDATE_STATUS ); ?>" />
 						<input type="hidden" name="project_id" value="<?php echo esc_attr( (string) $id ); ?>" />
-						<?php /* Le statut lu au rendu : le serveur refusera si la base a bougé depuis. */ ?>
+						<?php   ?>
 						<input type="hidden" name="expected_status" value="<?php echo esc_attr( (string) $p['status'] ); ?>" />
 						<label for="pp-status"><?php esc_html_e( 'Nouveau statut', 'pose-parquet-core' ); ?></label>
 						<select id="pp-status" name="new_status">
@@ -225,18 +212,8 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 			</section>
 
 			<?php
-			/*
-			 * Qualification commerciale.
-			 *
-			 * Juste sous le statut, avant les emails : quand on ouvre une
-			 * demande, les deux premières questions sont « où en est-on ? » et
-			 * « à qui est-ce ? ». Les avoir côte à côte évite de descendre la
-			 * page pour la seconde.
-			 *
-			 * La carte ne s'affiche pas pour une demande d'avant le schéma 4 :
-			 * elle n'aurait que des cases vides et un menu déroulant proposant
-			 * d'inventer une destination pour un lead qu'on n'a pas qualifié.
-			 */
+
+
 			$pp_besoin      = (string) ( $view['lead_need'] ?? '' );
 			$pp_destination = (string) ( $view['destination'] ?? '' );
 			?>
@@ -246,15 +223,8 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 					<dl class="pp-fields">
 						<?php
 						$ligne( __( 'Besoin', 'pose-parquet-core' ), View::label( 'lead_need', $pp_besoin ), true );
-						/*
-						 * Département d'abord, région ensuite.
-						 *
-						 * Dans cet ordre parce que c'est l'ordre de la déduction : le
-						 * département est la donnée, la région en est la conséquence.
-						 * Les deux ne peuvent plus se contredire — la région affichée
-						 * ici est recalculée depuis le département, pas relue d'une
-						 * colonne qui pourrait dater d'avant cette règle.
-						 */
+
+
 						$ligne( __( 'Département', 'pose-parquet-core' ), (string) ( $p['department'] ?? '' ), true );
 						$ligne( __( 'Région', 'pose-parquet-core' ), LeadRouting::region( $p ), true );
 						$ligne(
@@ -268,16 +238,8 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 					</dl>
 
 					<?php
-					/*
-					 * Pourquoi cette destination.
-					 *
-					 * « Destination : Allure Design » seul laisse deviner s'il faut
-					 * faire confiance. Les deux faits sur lesquels la règle s'est
-					 * appuyée — le besoin et la zone — permettent de la contredire en
-					 * connaissance de cause. Une recommandation dont on ne voit pas le
-					 * raisonnement finit suivie sans être lue, ou ignorée sans être
-					 * examinée.
-					 */
+
+
 					$pp_raison = LeadRouting::raison( $p );
 					?>
 					<?php if ( $pp_raison !== '' ) : ?>
@@ -288,7 +250,7 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 						<p class="pp-sub">
 							<?php
 							printf(
-								/* translators: %s : destination recommandée automatiquement. */
+
 								esc_html__( 'Corrigée à la main. La règle avait recommandé : %s.', 'pose-parquet-core' ),
 								esc_html( LeadRouting::libelle_auto( $p ) )
 							);
@@ -352,13 +314,13 @@ $etat_mail = static function ( string $statut, ?string $sent_at ): string {
 									$ancien = $event['old_status'] === null ? '' : View::status( (string) $event['old_status'] );
 									if ( $ancien === '' ) {
 										echo esc_html( sprintf(
-											/* translators: %s : statut initial. */
+
 											__( 'Création — %s', 'pose-parquet-core' ),
 											View::status( (string) $event['new_status'] )
 										) );
 									} else {
 										echo esc_html( sprintf(
-											/* translators: 1 : ancien statut, 2 : nouveau statut. */
+
 											__( '%1$s → %2$s', 'pose-parquet-core' ),
 											$ancien,
 											View::status( (string) $event['new_status'] )

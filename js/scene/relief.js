@@ -1,16 +1,3 @@
-/**
- * Carte de relief dérivée de l'albedo : pentes du bois (R, G) et rugosité (B).
- *
- * Module sans DOM, volontairement : il est appelé par `material.js` sur le fil
- * principal ET par `texture-worker.js` dans un Web Worker. Tout ce dont il a
- * besoin est un tableau de pixels et deux nombres.
- */
-
-/**
- * @param {{size:number,data:Uint8ClampedArray}} mip niveau d'albedo
- * @param {{relief:number,roughness:number}} surface réglages du matériau
- * @returns {{size:number,data:Uint8ClampedArray}}
- */
 export function reliefFromAlbedo(mip, { relief, roughness }) {
   const size = mip.size;
   const src = mip.data;
@@ -32,7 +19,7 @@ export function reliefFromAlbedo(mip, { relief, roughness }) {
       const p = (row + x) * 4;
       out[p] = 128 + dx * amp;
       out[p + 1] = 128 + dy * amp;
-      // Une zone sombre (joint, veine ouverte) est plus mate qu'une zone claire
+
       out[p + 2] = Math.round(255 * Math.min(1, roughness * (1.25 - luma[row + x] * 0.45)));
       out[p + 3] = 255;
     }

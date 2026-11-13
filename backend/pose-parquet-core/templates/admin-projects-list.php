@@ -1,17 +1,6 @@
 <?php
-/**
- * Gabarit de la liste des projets orientés. Reçoit `$view` de Admin\Projects.
- *
- * Le site public est une PASSERELLE : il ne demande plus de coordonnées. Les
- * colonnes Client, Téléphone et Ville ont donc laissé la place à ce qui
- * décrit un parcours : Date, Référence, Origine, Besoin, Zone, Produit,
- * Destination (avec les liens rapides vers Premibel / Allure Design, selon la
- * règle publique) et Statut. Les coordonnées des anciens projets restent
- * lisibles sur leur fiche. Sous 782 px, chaque ligne s'empile (admin.css).
- *
- * @var array{rows:array,counts:array,total:int,page:int,pages:int,per_page:int,status:string,search:string,mail:string,statuses:array,notice:?array,can_edit:bool} $view
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -33,14 +22,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php Notices::output( $view['notice'] ); ?>
 
 	<?php
-	/*
-	 * Une liste filtrée doit dire qu'elle l'est.
-	 *
-	 * On arrive ici depuis l'écran « État », par le lien d'une alerte, et sans
-	 * ce bandeau la page ressemblerait à la liste complète amputée sans raison.
-	 * Le filtre porte sur le sort des notifications, pas sur le statut de la
-	 * demande : les deux se cumulent, et les onglets ci-dessus le conservent.
-	 */
+
+
 	if ( ( $view['mail'] ?? '' ) !== '' ) :
 		$libelle_mail = $view['mail'] === 'failed'
 			? __( 'Projets dont une notification a définitivement échoué.', 'pose-parquet-core' )
@@ -55,14 +38,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php endif; ?>
 
 	<?php
-	/*
-	 * Filtre « destination recommandée ».
-	 *
-	 * Sous les onglets de statut et non parmi eux : ce sont deux axes
-	 * différents. Le statut dit où en est le traitement, la destination dit à
-	 * qui la demande revient — et on veut pouvoir croiser les deux, par
-	 * exemple « nouvelles ET à qualifier ».
-	 */
+
+
 	$pp_dest_actuelle = (string) ( $view['dest'] ?? '' );
 	?>
 	<ul class="subsubsub pp-filters pp-filters--destination">
@@ -139,7 +116,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<span class="displaying-num">
 				<?php
 				printf(
-					/* translators: %s : nombre de demandes. */
+
 					esc_html( _n( '%s projet', '%s projets', (int) $view['total'], 'pose-parquet-core' ) ),
 					esc_html( number_format_i18n( (int) $view['total'] ) )
 				);
@@ -162,9 +139,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>
 
 	<?php
-	// L'email n'est un canal que s'il est réellement configuré : sinon, aucun drapeau « email en échec ».
+
 	$pp_email_actif = (bool) ( Diagnostics::report()['production_ready'] ?? false );
-	// L'essentiel d'abord (référence, besoin, zone, destination, statut), le détail ensuite.
+
 	$pp_colonnes    = [
 		'ref'         => __( 'Référence', 'pose-parquet-core' ),
 		'besoin'      => __( 'Besoin', 'pose-parquet-core' ),
@@ -231,10 +208,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</td>
 					<td class="pp-col-destination" data-label="<?php echo esc_attr( $pp_colonnes['destination'] ); ?>"><div class="pp-cellule">
 						<?php
-						/*
-						 * Une demande d'avant le schéma 4 n'a pas de destination : sa
-						 * cellule reste vide plutôt que d'afficher « À qualifier ».
-						 */
+
+
 						echo esc_html( View::label( 'lead_destination', (string) ( $row['lead_destination'] ?? '' ) ) ?: '—' );
 						if ( ( $row['lead_destination'] ?? '' ) !== '' && $dept !== '' && ! LeadRouting::en_idf( $row ) ) {
 							echo ' <span class="pp-sub">' . esc_html__( '(hors IDF)', 'pose-parquet-core' ) . '</span>';

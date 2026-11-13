@@ -1,6 +1,6 @@
 import { qsa, on } from '../utils/dom.js';
 
-/** Accordeon accessible : un panneau ouvert a la fois (option data-multiple). */
+
 export function initAccordion(root) {
   const multiple = root.dataset.multiple === 'true';
   const items = qsa('.accordion__item', root);

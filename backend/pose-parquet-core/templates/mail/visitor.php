@@ -1,12 +1,6 @@
 <?php
-/**
- * Corps de l'accusé de réception au visiteur.
- *
- * @var string $first_name
- * @var string $reference
- * @var string $summary
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 

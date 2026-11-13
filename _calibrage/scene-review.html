@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex, nofollow" />
 <title>Revue visuelle des scènes — outil interne</title>
-<style>
-  :root { color-scheme: dark; --line: #2c3230; --ink: #e6ebe8; --dim: #9aa5a0; }
+<style>:root { color-scheme: dark; --line: #2c3230; --ink: #e6ebe8; --dim: #9aa5a0; }
   * { box-sizing: border-box; }
   body { margin: 0; font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; background: #141817; color: var(--ink); }
   header { position: sticky; top: 0; z-index: 5; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
@@ -17,9 +16,6 @@
        border-top: 1px solid var(--line); display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
   h2 .verdict { font-size: 11px; padding: 2px 8px; border-radius: 999px; }
   h2 .note { color: var(--dim); font-weight: 400; }
-
-  /* Cinq colonnes strictement identiques : c'est la condition pour comparer.
-     Aucun redimensionnement propre à une colonne. */
   .grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; padding: 0 14px; align-items: start; }
   @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   figure { margin: 0; background: #0d0f0f; border-radius: 8px; overflow: hidden; }
@@ -83,28 +79,7 @@
 <div id="out"></div>
 <pre id="log"></pre>
 
-<script type="module">
-/**
- * Source visuelle de contrôle qualité des scènes de démonstration.
- *
- * Elle existe parce qu'une mesure de pixels ne dit pas si un parquet a l'air
- * d'appartenir à la pièce. « Le mur est identique à l'octet » prouve qu'on n'a
- * rien débordé ; ça ne prouve ni que la perspective suit l'architecture, ni
- * que l'échelle des lames est plausible, ni qu'un chevron reste crédible.
- *
- * Chaque scène est affichée en cinq vues **au même cadrage et à la même
- * taille** : original, pose droite en chêne naturel, pose droite en chêne
- * fumé, point de Hongrie, bâton rompu. Les colonnes sont strictement
- * identiques — un redimensionnement différent d'une colonne à l'autre suffit
- * à masquer un défaut d'échelle.
- *
- * Les statuts sous chaque vue viennent de `VERDICTS`, tenu à la main. Rien
- * n'est déclaré « Validé » par le programme : un rendu n'est validé que
- * lorsqu'un humain l'a regardé et l'a écrit ici.
- *
- * Page interne : ni liée, ni indexée, ni déployée.
- */
-import { analyzeScene, loadSceneIndex, statutDe } from '../js/scene/analyzer.js';
+<script type="module">import { analyzeScene, loadSceneIndex, statutDe } from '../js/scene/analyzer.js';
 import { createSceneRenderer } from '../js/scene/renderer.js';
 import { loadImage } from '../js/scene/image-loader.js';
 import { loadCatalog } from '../js/studio/catalog.js';
@@ -113,7 +88,7 @@ const BASE = '../';
 const $ = (id) => document.getElementById(id);
 const log = (line) => { $('log').textContent += line + '\n'; };
 
-/** Les cinq vues de contrôle, dans cet ordre, pour toutes les scènes. */
+
 const VUES = [
   { cle: 'original', label: 'Original', original: true },
   { cle: 'droit-naturel', label: 'Droit naturel', material: 'chene-naturel', pattern: 'lames' },
@@ -124,25 +99,12 @@ const VUES = [
 
 const CRITERES = ['Perspective', 'Échelle', 'Masque', 'Lumière', 'Motif'];
 
-/**
- * Produits de contrôle, du plus clair au plus foncé.
- *
- * Le rendu doit tenir sur toute la plage de teintes : un clair qui part au
- * délavé et un foncé qui part au gris sont deux façons de rater la même
- * chose — l'intégration à la lumière de la pièce.
- */
+
+
 const PRODUITS_TEST = ['chene-craie', 'chene-sable', 'chene-naturel', 'chene-miel', 'chene-tabac', 'chene-fume'];
 
-/**
- * Jugement humain, vue par vue et critère par critère.
- *
- * `valide` : regardé, rien à reprendre.
- * `correct` : acceptable, un défaut mineur subsiste et il est nommé en note.
- * `a-revoir` : défaut visible, la scène n'est pas livrable en l'état.
- *
- * Tout ce qui n'est pas écrit ici vaut `a-revoir` : l'absence de jugement
- * n'est pas une validation.
- */
+
+
 const TOUT_VALIDE = { Perspective: 'valide', 'Échelle': 'valide', Masque: 'valide', 'Lumière': 'valide', Motif: 'valide' };
 
 const VERDICTS = {
@@ -258,16 +220,16 @@ const etatDe = (sceneId, vueCle, critere) => {
   return v.vues[vueCle][critere] || 'a-revoir';
 };
 
-// Le catalogue passe par la **couche produit** (js/scene/product.js), donc par
-// exactement le même chemin que l'application. Une fiche mal formée se verrait
-// ici avant de se voir en production.
+
+
+
 const catalog = await loadCatalog(BASE);
 const materials = catalog.parquets;
 const index = await loadSceneIndex(BASE);
 const renderer = createSceneRenderer();
 $('state').textContent = `${renderer.backend} · aniso ×${renderer.anisotropy}`;
 
-/** Luminance moyenne des pixels de sol d'une zone : repère un écart entre zones. */
+
 function zoneLuma(canvas, masks, zoneIndex) {
   const { width, height } = canvas;
   const data = canvas.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, width, height).data;
@@ -289,8 +251,8 @@ async function renderScene(entry) {
   renderer.setScene(scene, prepared);
 
   const juge = VERDICTS[entry.id] || { note: '', vues: {} };
-  // Une scène n'est validée que si **toutes** les vues et **tous** les critères
-  // ont été regardés et jugés au moins « correct ».
+
+
   const etats = VUES.filter((v) => !v.original)
     .flatMap((v) => CRITERES.map((c) => etatDe(entry.id, v.cle, c)));
   const verdict = etats.every((e) => e === 'valide')
@@ -345,10 +307,10 @@ async function renderScene(entry) {
     grid.appendChild(fig);
   }
 
-  // Deuxième rangée : la même scène en pose droite avec plusieurs produits.
-  // Elle sert à autre chose que la première : on y vérifie que la teinte ne
-  // décide pas de la crédibilité — un rendu qui ne tient que sur le chêne
-  // naturel n'est pas un rendu, c'est un réglage heureux.
+
+
+
+
   const bande = document.createElement('div');
   bande.className = 'grid produits';
   $('out').appendChild(bande);

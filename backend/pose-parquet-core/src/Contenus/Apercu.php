@@ -1,28 +1,6 @@
 <?php
-/**
- * Voir un contenu comme le site le montrera, avant de le publier — et voir
- * les illustrations du site dans l'éditeur, sans serveur de développement.
- *
- * 1. LES FICHIERS DU SITE, DEPUIS WORDPRESS.
- *    Les illustrations des articles importés gardent leurs chemins du site
- *    (« ../assets/images/x.jpg ») : c'est ce que le site publie. Pour que
- *    l'éditeur et l'aperçu les affichent, il leur faut une adresse de base où
- *    « ../assets/… » existe :
- *      - en local, le DOSSIER du site (Réglages → Site public) : WordPress en
- *        sert les fichiers publics par une route en lecture seule,
- *        /wp-json/pose-parquet/v1/site/assets/… — plus besoin de serve.js ;
- *      - sinon, le site public lui-même (https://pose-parquet.com/).
- *    Aucun fichier n'est copié, aucune adresse enregistrée n'est réécrite.
- *
- * 2. L'APERÇU PUBLIC D'UN GUIDE OU D'UN TUTORIEL.
- *    Le générateur publie la page d'article avec des repères à la place des
- *    textes (data/apercu/guide.tpl, tutoriel.tpl — voir build.js,
- *    buildGabaritsApercu). WordPress y place le contenu ENREGISTRÉ (brouillon
- *    compris), échappé, corps filtré, et sert la page à l'éditeur connecté
- *    seulement, en noindex. La mise en page reste celle du site.
- *
- * 3. DUPLIQUER COMME BROUILLON.
- */
+
+
 
 declare(strict_types=1);
 
@@ -51,7 +29,7 @@ final class Apercu {
 		'js'    => 'text/javascript; charset=utf-8',
 		'woff2' => 'font/woff2',
 	];
-	/** Les types de contenu qui ont une page d'article sur le site. */
+
 	public const GABARITS = [ Types::GUIDE => 'guide', Types::TUTORIEL => 'tutoriel', Types::ARTICLE => 'article' ];
 
 	public static function register(): void {
@@ -61,7 +39,7 @@ final class Apercu {
 		add_filter( 'post_row_actions', [ self::class, 'actions_de_ligne' ], 20, 2 );
 	}
 
-	/* ------------------------------------------------------------ fichiers */
+
 
 	public static function route( string $namespace ): void {
 		register_rest_route(
@@ -70,22 +48,16 @@ final class Apercu {
 			[
 				'methods'             => 'GET',
 				'callback'            => [ self::class, 'fichier' ],
-				// Les fichiers publics du site : ceux que pose-parquet.com sert à tout le monde.
+
 				'permission_callback' => '__return_true',
 			]
 		);
 	}
 
-	/** Le dossier local du site, s'il est réglé et ressemble bien au site. */
+
 	public static function dossier(): ?string {
-		/*
-		 * Jamais sur un serveur. Ce réglage sert au poste de développement : il
-		 * active la publication locale (Node lance `_generator/publier.js` du
-		 * dossier) et une route publique de fichiers. Sur un serveur, un compte
-		 * administrateur volé aurait pu le faire pointer vers ses propres
-		 * scripts — de l'exécution de code, même là où l'édition de fichiers est
-		 * interdite. Sur un serveur, on publie par GitHub.
-		 */
+
+
 		if ( \PoseParquet\Core\Security\Environnement::sur_serveur() ) {
 			return null;
 		}
@@ -97,12 +69,12 @@ final class Apercu {
 		return $reel && is_dir( $reel . '/assets' ) && is_file( $reel . '/index.html' ) ? $reel : null;
 	}
 
-	/** L'adresse où « assets/… » et « data/… » existent : la route locale, sinon le site public. */
+
 	public static function base(): string {
 		return self::dossier() ? rest_url( 'pose-parquet/v1/site/' ) : SitePublic::url();
 	}
 
-	/** Un fichier public du site, lu dans le dossier local. Rien d'autre que assets/, liste fermée d'extensions. */
+
 	public static function fichier( \WP_REST_Request $r ): \WP_Error {
 		$racine = self::dossier();
 		$chemin = (string) $r['chemin'];
@@ -121,31 +93,31 @@ final class Apercu {
 		header( 'Cache-Control: private, max-age=300' );
 		header( 'Access-Control-Allow-Origin: *' );
 		if ( $ext === 'svg' ) {
-			// Un SVG servi depuis le domaine de WordPress ne doit rien exécuter.
+
 			header( "Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; img-src data:" );
 		}
-		readfile( $fichier ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile
+		readfile( $fichier );
 		exit;
 	}
 
-	/* ------------------------------------------------------------ aperçu */
+
 
 	public static function url( int $post_id ): string {
 		return wp_nonce_url( admin_url( 'admin-post.php?action=' . self::ACTION . '&post=' . $post_id ), self::ACTION . '_' . $post_id );
 	}
 
-	/** Le gabarit d'article publié par le générateur. */
+
 	private static function gabarit( string $nom ): ?string {
 		$racine = self::dossier();
 		if ( $racine && is_readable( $racine . '/data/apercu/' . $nom . '.tpl' ) ) {
-			return (string) file_get_contents( $racine . '/data/apercu/' . $nom . '.tpl' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			return (string) file_get_contents( $racine . '/data/apercu/' . $nom . '.tpl' );
 		}
 		$r = \PoseParquet\Core\Admin\SitePublic::lire( SitePublic::url() . 'data/apercu/' . $nom . '.tpl', [ 'timeout' => 6 ] );
 		return ! is_wp_error( $r ) && (int) wp_remote_retrieve_response_code( $r ) === 200 ? (string) wp_remote_retrieve_body( $r ) : null;
 	}
 
 	public static function afficher(): void {
-		$id   = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- vérifié juste après.
+		$id   = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
 		$post = $id ? get_post( $id ) : null;
 		if ( ! $post || ! isset( self::GABARITS[ $post->post_type ] ) || ! current_user_can( 'edit_post', $id ) ) {
 			wp_die( esc_html__( 'Aperçu indisponible.', 'pose-parquet-core' ), '', [ 'response' => 403 ] );
@@ -158,20 +130,14 @@ final class Apercu {
 		nocache_headers();
 		header( 'X-Robots-Tag: noindex, nofollow' );
 		header( 'Content-Type: text/html; charset=utf-8' );
-		/*
-		 * Bac à sable : la page est servie depuis le domaine de l'administration,
-		 * avec les scripts du site public. Sans isolement, un script du gabarit
-		 * distant (ou glissé dans un contenu) s'exécutait avec la session de
-		 * l'éditeur — lire un jeton, créer un compte. `sandbox` sans
-		 * `allow-same-origin` lui donne une origine opaque : il tourne, mais ne
-		 * touche ni aux cookies ni à l'administration.
-		 */
+
+
 		header( 'Content-Security-Policy: sandbox allow-scripts allow-popups allow-popups-to-escape-sandbox' );
-		echo self::remplir( $html, $post ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- chaque valeur est échappée dans remplir().
+		echo self::remplir( $html, $post );
 		exit;
 	}
 
-	/** Les repères du gabarit, remplacés par le contenu enregistré. */
+
 	public static function remplir( string $html, \WP_Post $post ): string {
 		$meta  = static fn( string $cle ): string => (string) get_post_meta( $post->ID, $cle, true );
 		$tax   = Types::taxonomie( $post->post_type );
@@ -203,7 +169,7 @@ final class Apercu {
 				'%%PP_CATEGORIE%%'   => esc_html( is_array( $terms ) && $terms ? $terms[0]->name : '' ),
 				'%%PP_LECTURE%%'     => esc_html( $meta( '_pp_lecture' ) ?: max( 1, (int) round( $mots / 200 ) ) . ' min' ),
 				'%%PP_DATE_ISO%%'    => esc_attr( mysql2date( 'Y-m-d', $post->post_date, false ) ),
-				// Date locale (un brouillon n'a pas de date GMT tant qu'il n'est pas publié).
+
 				'%%PP_DATE%%'        => esc_html( mysql2date( 'j F Y', $post->post_date ) ),
 				'%%PP_COUVERTURE%%'  => $src ? '<div class="article-cover"><img src="' . esc_url( $src ) . '" alt="" /></div>' : '',
 				'%%PP_CORPS%%'       => $corps,
@@ -219,7 +185,7 @@ final class Apercu {
 		return (string) preg_replace( '/(<body[^>]*>)/', '$1' . $bandeau, $html, 1 );
 	}
 
-	/** Dans la boîte « Publier » : l'aperçu, à côté de l'état. */
+
 	public static function bouton( \WP_Post $post ): void {
 		if ( ! isset( self::GABARITS[ $post->post_type ] ) || $post->post_status === 'auto-draft' ) {
 			return;
@@ -228,7 +194,7 @@ final class Apercu {
 		echo '<span class="description adm-apercu-note">' . esc_html__( 'Montre la dernière version enregistrée.', 'pose-parquet-core' ) . '</span></div>';
 	}
 
-	/** Dans les listes : Aperçu et Dupliquer. */
+
 	public static function actions_de_ligne( array $actions, \WP_Post $post ): array {
 		if ( ! isset( self::GABARITS[ $post->post_type ] ) || ! current_user_can( 'edit_post', $post->ID ) ) {
 			return $actions;
@@ -238,11 +204,11 @@ final class Apercu {
 		return $actions;
 	}
 
-	/* ------------------------------------------------------------ duplication */
 
-	/** Copie un guide ou un tutoriel en BROUILLON : textes, champs, image, catégorie. */
+
+
 	public static function dupliquer(): void {
-		$id   = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- vérifié juste après.
+		$id   = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
 		$post = $id ? get_post( $id ) : null;
 		$objet = $post ? get_post_type_object( $post->post_type ) : null;
 		if ( ! $post || ! $objet || ! isset( self::GABARITS[ $post->post_type ] ) || ! current_user_can( 'edit_post', $id ) || ! current_user_can( $objet->cap->create_posts ) ) {

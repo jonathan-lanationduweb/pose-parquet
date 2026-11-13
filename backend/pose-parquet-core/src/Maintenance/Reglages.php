@@ -1,16 +1,6 @@
 <?php
-/**
- * Mode maintenance : réglages, écran d'administration, aperçu.
- *
- * Une option, six valeurs : actif, titre, message, image de fond (médiathèque)
- * et deux liens à afficher (Premibel, Allure Design). L'écran reprend la
- * maquette : formulaire à gauche, aperçu de la page publique à droite.
- *
- * Où la page s'affiche réellement :
- *   - sur le WordPress lui-même (Maintenance\Page), en HTTP 503 ;
- *   - sur le site statique, par le générateur, qui lit ces réglages dans
- *     l'export des contenus (voir docs/backend/wordpress-contenus.md).
- */
+
+
 
 declare(strict_types=1);
 
@@ -34,7 +24,7 @@ final class Reglages {
 	public const PREMIBEL_URL = 'https://www.premibel.fr/parquet/';
 	public const ALLURE_URL   = 'https://www.allure-design.com/demander-un-devis/';
 
-	/** @return array{actif:bool,titre:string,message:string,image:int,premibel:bool,allure:bool} */
+
 	public static function defauts(): array {
 		return [
 			'actif'    => false,
@@ -46,7 +36,7 @@ final class Reglages {
 		];
 	}
 
-	/** @return array{actif:bool,titre:string,message:string,image:int,premibel:bool,allure:bool} */
+
 	public static function lire(): array {
 		$v = get_option( self::OPTION, [] );
 		$v = is_array( $v ) ? $v : [];
@@ -63,7 +53,7 @@ final class Reglages {
 		add_action( 'admin_post_' . self::BASCULER, [ self::class, 'basculer' ] );
 	}
 
-	/** Pour l'export : ce que le site statique doit afficher. */
+
 	public static function pour_export(): array {
 		$m = self::lire();
 		return [
@@ -86,12 +76,12 @@ final class Reglages {
 		$m         = self::lire();
 		$image_url = $m['image'] ? (string) wp_get_attachment_image_url( (int) $m['image'], 'medium' ) : '';
 		$apercu    = wp_nonce_url( admin_url( 'admin-post.php?action=' . self::APERCU ), self::APERCU );
-		$retour     = isset( $_GET['pp-maintenance'] ) ? sanitize_key( wp_unslash( $_GET['pp-maintenance'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$retour     = isset( $_GET['pp-maintenance'] ) ? sanitize_key( wp_unslash( $_GET['pp-maintenance'] ) ) : '';
 		$enregistre = $retour === 'ok';
 		require POSE_PARQUET_DIR . '/templates/admin-maintenance.php';
 	}
 
-	/** Enregistrement : droit, jeton, nettoyage de chaque valeur. */
+
 	public static function enregistrer(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
 			wp_die( esc_html__( 'Vous n’avez pas les droits nécessaires.', 'pose-parquet-core' ), '', [ 'response' => 403 ] );
@@ -108,8 +98,8 @@ final class Reglages {
 		update_option(
 			self::OPTION,
 			[
-				// L'état se bascule par l'interrupteur (basculer()) ; ce formulaire
-				// n'enregistre que le contenu de la page, comme sur le socle.
+
+
 				'actif'    => self::actif(),
 				'titre'    => mb_substr( $titre !== '' ? $titre : $d['titre'], 0, 120 ),
 				'message'  => mb_substr( $message !== '' ? $message : $d['message'], 0, 600 ),
@@ -123,11 +113,8 @@ final class Reglages {
 		exit;
 	}
 
-	/**
-	 * Interrupteur Activé / Désactivé : son propre formulaire, confirmé, comme
-	 * le panneau de maintenance d'Expert Parquet. Le contenu de la page ne
-	 * change pas.
-	 */
+
+
 	public static function basculer(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
 			wp_die( esc_html__( 'Vous n’avez pas les droits nécessaires.', 'pose-parquet-core' ), '', [ 'response' => 403 ] );
@@ -139,26 +126,19 @@ final class Reglages {
 		exit;
 	}
 
-	/**
-	 * Où en est le site public, face au réglage de WordPress. Le réglage change
-	 * tout de suite ; le site statique, seulement à la publication.
-	 *
-	 *   en_ligne                réglage désactivé, site publié ouvert
-	 *   maintenance_a_publier   réglage activé, pas encore publié
-	 *   en_maintenance          réglage activé et publié
-	 *   reactivation_a_publier  réglage désactivé, site publié encore en maintenance
-	 */
+
+
 	public static function etat_public(): string {
 		$actif   = self::actif();
 		$publiee = \PoseParquet\Core\Publication\Publication::maintenance_publiee();
-		$publiee = $publiee ?? $actif; // état publié inconnu : on ne suppose pas d'écart.
+		$publiee = $publiee ?? $actif;
 		if ( $actif ) {
 			return $publiee ? 'en_maintenance' : 'maintenance_a_publier';
 		}
 		return $publiee ? 'reactivation_a_publier' : 'en_ligne';
 	}
 
-	/** @return array{0:string,1:string} libellé et variante (ok | attente | ko) de etat_public(). */
+
 	public static function libelle_public( string $etat ): array {
 		return [
 			'en_ligne'               => [ __( 'Site en ligne', 'pose-parquet-core' ), 'ok' ],
@@ -168,11 +148,8 @@ final class Reglages {
 		][ $etat ] ?? [ __( 'Site en ligne', 'pose-parquet-core' ), 'ok' ];
 	}
 
-	/**
-	 * Le panneau « Page de maintenance » du socle : interrupteur, puis deux
-	 * états distincts — le réglage de WordPress et le site public — et, quand
-	 * ils diffèrent, la publication à faire, avec son bouton.
-	 */
+
+
 	public static function panneau( bool $compact = false ): void {
 		$actif  = self::actif();
 		$public = self::etat_public();
@@ -187,7 +164,7 @@ final class Reglages {
 			$actif ? __( 'Désactiver la maintenance ? Il faudra ensuite publier le site pour le rouvrir au public.', 'pose-parquet-core' ) : __( 'Activer la maintenance ? Après publication, les visiteurs verront la page de maintenance. Vous garderez l’accès à WordPress et au vrai site.', 'pose-parquet-core' )
 		);
 		echo '</div>';
-		// Deux états, deux lignes : ce que WordPress a enregistré, ce que voient les visiteurs.
+
 		\PoseParquet\Core\Admin\Socle::etat(
 			[
 				[ __( 'Configuration WordPress', 'pose-parquet-core' ), $actif ? __( 'Maintenance activée', 'pose-parquet-core' ) : __( 'Maintenance désactivée', 'pose-parquet-core' ) ],
@@ -207,20 +184,20 @@ final class Reglages {
 			} elseif ( $pub['statut'] === 'echec' && $pub['raison'] !== '' ) {
 				echo '<p class="adm-alerte-ligne adm-alerte-ligne--ko"><span class="dashicons dashicons-warning" aria-hidden="true"></span>' . esc_html__( 'La dernière publication a échoué :', 'pose-parquet-core' ) . ' ' . esc_html( $pub['raison'] ) . '</p>';
 			}
-			// Le moteur de publication existant, pas un second : le même bouton que l'écran Publication.
-			// Sur le tableau de bord, le panneau Publication juste au-dessus le porte déjà.
+
+
 			if ( ! $compact ) {
-				echo '<div class="adm-panneau__publier">' . \PoseParquet\Core\Publication\Publication::bouton( $pub ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- composé et échappé dans bouton().
+				echo '<div class="adm-panneau__publier">' . \PoseParquet\Core\Publication\Publication::bouton( $pub ) . '</div>';
 			}
 		}
 		if ( $compact ) {
-			// Comme la maquette : un bouton secondaire vers l'écran complet (titre, message, image, aperçu).
+
 			echo '<p class="adm-panneau__lien"><a class="adm-bouton" href="' . esc_url( self::url() ) . '"><span class="dashicons dashicons-admin-generic" aria-hidden="true"></span>' . esc_html__( 'Configurer la page de maintenance', 'pose-parquet-core' ) . '</a></p>';
 		}
 		echo '</div>';
 	}
 
-	/** Aperçu, dans le cadre de droite de l'écran : la vraie page, sans 503. */
+
 	public static function apercu(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
 			wp_die( '', '', [ 'response' => 403 ] );

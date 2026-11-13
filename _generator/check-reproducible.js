@@ -1,22 +1,3 @@
-/**
- * Contrôle : le build est-il reproductible d'une machine à l'autre ?
- *
- * Le défaut corrigé était mesurable et mesuré : l'empreinte des assets portait
- * sur les copies de travail telles que le checkout les avait posées. Sur
- * Windows, `core.autocrlf=true` (le défaut de Git for Windows) les pose en
- * CRLF ; sous Linux elles sont en LF. Le même commit produisait donc des noms
- * de bundles différents, et `assets/dist/studio.<empreinte>.css` avait même des
- * fins de ligne mixtes, parce que `css/studio-app.css` était en CRLF et les
- * cinq autres feuilles du Visualiseur en LF.
- *
- * Ce script vérifie que ce ne peut plus arriver. Il ne remplace pas
- * `.gitattributes` : il vérifie que le générateur s'en passe. Les deux
- * ensemble font la reproductibilité — l'un empêche le CRLF d'arriver, l'autre
- * le rend sans conséquence s'il arrive quand même.
- *
- * Usage : node _generator/check-reproducible.js [--rapide]
- *   --rapide  saute la double construction complète (§11), qui prend ~20 s
- */
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -45,9 +26,9 @@ function titre(texte) {
   console.log(`\n== ${texte} ==`);
 }
 
-/* ------------------------------------------------------------------ */
-/* §9 — Unité : trois écritures d'un même contenu logique              */
-/* ------------------------------------------------------------------ */
+
+
+
 
 titre('Empreinte de texte : insensible aux fins de ligne');
 
@@ -68,8 +49,8 @@ verifier(
 
 titre('Empreinte de binaire : octet pour octet, aucune transformation');
 
-// Les mêmes octets que ci-dessus, mais présentés comme un binaire : ils
-// DOIVENT se distinguer. Normaliser un binaire, c'est le corrompre.
+
+
 const binLF = Buffer.from([0x61, 0x0a, 0x62]);
 const binCRLF = Buffer.from([0x61, 0x0d, 0x0a, 0x62]);
 verifier(
@@ -78,8 +59,8 @@ verifier(
   `${eol.empreinte(binLF)} vs ${eol.empreinte(binCRLF)}`
 );
 
-// Un PNG réel : la faute historique était `[...tampons].join('')`, qui décode
-// chaque image en UTF-8. On vérifie que l'empreinte porte bien sur les octets.
+
+
 const png = path.join(RACINE, 'assets', 'icons', 'favicon-32.png');
 if (fs.existsSync(png)) {
   const octets = fs.readFileSync(png);
@@ -92,9 +73,9 @@ if (fs.existsSync(png)) {
   verifier('un PNG est classé binaire', !eol.estTexte(png));
 }
 
-/* ------------------------------------------------------------------ */
-/* §10 — Fichiers réels du projet                                      */
-/* ------------------------------------------------------------------ */
+
+
+
 
 titre('Fichiers réels : LF et CRLF donnent la même empreinte');
 
@@ -124,9 +105,9 @@ for (const [type, relatif] of ECHANTILLONS) {
   verifier(`${type} : ${relatif}`, meme, eol.empreinte(canonique));
 }
 
-/* ------------------------------------------------------------------ */
-/* Types : la liste du module et celle de .gitattributes s'accordent    */
-/* ------------------------------------------------------------------ */
+
+
+
 
 titre('Types : le module et .gitattributes disent la même chose');
 
@@ -157,9 +138,9 @@ verifier(
   contradictions.join(' ')
 );
 
-/* ------------------------------------------------------------------ */
-/* Encodage — §7                                                       */
-/* ------------------------------------------------------------------ */
+
+
+
 
 titre('Encodage : tout le texte suivi est en UTF-8');
 
@@ -191,13 +172,13 @@ if (suivis.length) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* §12 — Simulation d'un checkout CRLF                                 */
-/* ------------------------------------------------------------------ */
+
+
+
 
 titre('Simulation : un checkout CRLF donne les mêmes noms d’assets');
 
-/** Copie les sources nécessaires au calcul des assets, en forçant les EOL. */
+
 function copierSources(destination, finDeLigne) {
   const dossiers = ['css', 'js', 'components', path.join('assets', 'icons')];
   for (const dossier of dossiers) {
@@ -234,8 +215,8 @@ try {
     fs.mkdirSync(racine, { recursive: true });
     copierSources(racine, forme);
 
-    // Le module d'assets garde un manifeste global : on le recharge à neuf
-    // pour chaque forme, sinon le second appel verrait l'état du premier.
+
+
     delete require.cache[require.resolve('./assets')];
     const { buildAssets } = require('./assets');
     manifestes[forme] = buildAssets(racine, { pageCss: [] });
@@ -248,8 +229,8 @@ try {
   verifier('empreinte de l’arbre JS identique', a.js === b.js, `${a.js} vs ${b.js}`);
   verifier('empreinte des icônes identique', a.icons === b.icons, `${a.icons} vs ${b.icons}`);
 
-  // Et le contenu écrit, pas seulement son nom : un même nom pour deux
-  // contenus différents serait pire que deux noms.
+
+
   const lireDist = (racine) => {
     const dist = path.join(racine, 'assets', 'dist');
     const sortie = [];
@@ -277,29 +258,18 @@ try {
   delete require.cache[require.resolve('./assets')];
 }
 
-/* ------------------------------------------------------------------ */
-/* §11 — Écriture atomique et reprise des verrous                      */
-/* ------------------------------------------------------------------ */
+
+
+
 
 titre('Écriture : atomique, et patiente avec Windows');
 
-/*
- * POURQUOI CETTE SECTION.
- *
- * Mesure avant correction : 4 constructions sur 25 échouaient, toujours de la
- * même façon — `UNKNOWN` sur `open`, toujours sur un fichier qui venait
- * d'être réécrit. Le générateur écrit désormais à côté puis renomme, et
- * réessaie les verrous transitoires.
- *
- * Une reprise que rien n'éprouve ne vaut rien : elle ne s'exécute qu'un jour
- * sur dix, et le jour où elle se trompe personne ne le sait. On lui donne
- * donc ici les cas qu'elle doit traiter, et surtout ceux qu'elle ne doit PAS
- * traiter — masquer un ENOENT serait pire que l'échec d'origine.
- */
+
+
 
 const bacEcriture = fs.mkdtempSync(path.join(os.tmpdir(), 'pp-ecriture-'));
 try {
-  /* Le cas nominal : le contenu arrive, et rien ne traîne. */
+
   const cible = path.join(bacEcriture, 'page.html');
   eol.ecrireTexte(cible, 'Bonjour\r\nmonde');
   verifier('le contenu est écrit', fs.readFileSync(cible, 'utf8') === 'Bonjour\nmonde');
@@ -309,16 +279,16 @@ try {
     fs.readdirSync(bacEcriture).join(', ')
   );
 
-  /* Un fichier déjà présent est remplacé, pas complété. */
+
   eol.ecrireTexte(cible, 'court');
   verifier('une réécriture remplace entièrement', fs.readFileSync(cible, 'utf8') === 'court');
 
-  /* Le dossier manquant est créé. */
+
   const profond = path.join(bacEcriture, 'a', 'b', 'c.html');
   eol.ecrireTexte(profond, 'x');
   verifier('les dossiers intermédiaires sont créés', fs.existsSync(profond));
 
-  /* ---- La reprise, cas par cas ---- */
+
 
   const erreur = (code) => Object.assign(new Error(`faux ${code}`), { code });
 
@@ -346,13 +316,8 @@ try {
     verifier(`${code} : le message dit que l’abandon est délibéré`, /abandon après/.test(vu.message));
   }
 
-  /*
-   * CE QU'ON NE RÉESSAIE JAMAIS.
-   *
-   * Un dossier absent, un droit refusé pour de bon, un disque plein : attendre
-   * 250 ms n'arrange rien et brouille le diagnostic. Ces erreurs remontent à
-   * la première tentative, telles quelles.
-   */
+
+
   for (const code of ['ENOENT', 'EISDIR', 'ENOSPC', 'EROFS', 'EMFILE']) {
     let n = 0;
     let vu = null;
@@ -365,18 +330,18 @@ try {
     verifier(`${code} : le message n’est pas maquillé`, !/abandon après/.test(vu.message));
   }
 
-  /* Une erreur sans code — une exception de génération — passe aussi tout droit. */
+
   let sansCode = 0;
   try {
     eol.avecReprises(() => { sansCode += 1; throw new Error('gabarit invalide'); }, 'essai');
-  } catch { /* attendu */ }
+  } catch {   }
   verifier('une erreur sans code n’est pas réessayée', sansCode === 1, `${sansCode} tentative(s)`);
 
-  /* Les attentes sont bornées et réellement respectées. */
+
   const debut = Date.now();
   try {
     eol.avecReprises(() => { throw erreur('EBUSY'); }, 'essai');
-  } catch { /* attendu */ }
+  } catch {   }
   const duree = Date.now() - debut;
   const somme = eol.ATTENTES_MS.reduce((a, b) => a + b, 0);
   verifier(
@@ -385,13 +350,8 @@ try {
     `${duree} ms`
   );
 
-  /*
-   * Le nom du temporaire ne peut pas être pris pour une page.
-   *
-   * Les parcours du générateur ne collectent que les `.html` : un nom qui
-   * finit par `.tmp` leur est invisible. Le point initial l'écarte en plus des
-   * listings, et le pid évite que deux constructions se marchent dessus.
-   */
+
+
   const source = path.join(bacEcriture, 'source.js');
   fs.writeFileSync(source, 'const a = 1;\n');
   eol.copierCanonique(source, path.join(bacEcriture, 'copie.js'));
@@ -401,14 +361,14 @@ try {
   fs.rmSync(bacEcriture, { recursive: true, force: true });
 }
 
-/* ------------------------------------------------------------------ */
-/* §12 — Double construction                                           */
-/* ------------------------------------------------------------------ */
+
+
+
 
 if (!RAPIDE) {
   titre('Double construction : deux passes donnent le même site');
 
-  /** Empreinte de tout ce que le générateur écrit, chemins compris. */
+
   function empreinteDuSite() {
     const cibles = ['assets/dist', 'index.html', 'robots.txt', 'sitemap.xml', 'data/contenus.json'];
     const lignes = [];
@@ -439,7 +399,7 @@ if (!RAPIDE) {
   console.log('\n(double construction sautée : --rapide)');
 }
 
-/* ------------------------------------------------------------------ */
+
 
 console.log('');
 if (echecs.length) {

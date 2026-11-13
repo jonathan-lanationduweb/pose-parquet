@@ -1,33 +1,3 @@
-/**
- * WordPress, source éditoriale du site statique.
- *
- *   node _generator/wordpress.js pull [url]   tire l'export et les images nouvelles
- *     → data/wordpress/contenus.json          (instantané, à versionner)
- *     → assets/images/wp-<id>[-<largeur>].jpg  (images téléversées dans WordPress,
- *        couvertures et images insérées dans le corps d'un article)
- *   node _generator/build.js                  construit le site AVEC cet instantané
- *   node _generator/contenus.js               les deux d'un coup (+ validation)
- *
- * L'export est VALIDÉ avant d'écrire l'instantané (valider-wordpress.js) :
- * une erreur structurante arrête tout et laisse l'instantané précédent.
- *
- * Pourquoi un instantané plutôt qu'un appel à chaque build : le build reste
- * reproductible et hors ligne (même commit, mêmes octets — check-reproducible),
- * et un WordPress indisponible n'empêche ni de construire ni de publier. On
- * tire quand on veut publier ce qui a été saisi.
- *
- * Sans instantané (ou avec PP_SANS_WORDPRESS=1), le build est exactement celui
- * d'avant : les contenus du dépôt (content-*.js, photos.js, content-pages.js).
- *
- * Règles de fusion — le design ne vient jamais de WordPress :
- *   - WordPress fournit des TEXTES (titres, chapôs, résumés, corps filtrés,
- *     SEO), des IMAGES et quelques choix fermés (catégorie, pièce, motif…) ;
- *   - la mise en page, les composants et les gabarits restent dans build.js ;
- *   - un contenu importé et non retouché ressort octet pour octet ;
- *   - une page publiée qui disparaît de WordPress (brouillon, corbeille) est
- *     CONSERVÉE depuis le dépôt, avec un avertissement : on ne casse pas une
- *     URL indexée par un clic. La retirer est une décision de code.
- */
 const fs = require('fs');
 const path = require('path');
 const { SITE_CHAMPS, REGLAGES } = require('./content-site');
@@ -46,10 +16,10 @@ function charger() {
   return d;
 }
 
-/** Nom de fichier local d'une image téléversée dans WordPress. */
+
 const nomWp = (image) => `wp-${image.id}`;
 
-/** Les largeurs retenues pour une image WordPress (au plus trois, ≤ 1600 px). */
+
 function largeursRetenues(image) {
   const toutes = (image.tailles || []).filter((t) => t.largeur >= 400 && t.largeur <= 1600);
   const choix = [];
@@ -60,11 +30,8 @@ function largeursRetenues(image) {
   return choix.sort((a, b) => a.largeur - b.largeur);
 }
 
-/**
- * Déclare dans PHOTOS l'image d'un contenu, et rend la clé à utiliser.
- * - image importée du dépôt (source connue) : sa clé d'origine, fichiers inchangés ;
- * - image téléversée dans WordPress : `wp-<id>`, fichiers tirés par `pull`.
- */
+
+
 function declarerImage(PHOTOS, image, avertir) {
   if (!image) return null;
   if (image.source && PHOTOS[image.source]) return image.source;
@@ -86,12 +53,12 @@ function declarerImage(PHOTOS, image, avertir) {
   return cle;
 }
 
-/** Couverture d'un article : `cover-<slug>`, éventuellement alias d'une autre image. */
+
 function couverture(PHOTOS, slug, image, avertir) {
   const cle = `cover-${slug}`;
   const choisie = declarerImage(PHOTOS, image, avertir);
   if (!choisie) {
-    delete PHOTOS[cle]; // Pas d'image : la carte s'affiche sans photo, comme aujourd'hui.
+    delete PHOTOS[cle];
     return;
   }
   if (choisie === cle) {
@@ -101,23 +68,19 @@ function couverture(PHOTOS, slug, image, avertir) {
   PHOTOS[cle] = { ...PHOTOS[choisie], alias: choisie, alt: image.alt || PHOTOS[choisie].alt || '' };
 }
 
-/**
- * Temps de lecture laissé vide dans WordPress : estimé sur le corps (200 mots
- * par minute), plutôt qu'un « de lecture » orphelin dans l'en-tête.
- */
+
+
 function lectureEstimee(html) {
   const mots = String(html || '').replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
   return `${Math.max(1, Math.round(mots / 200))} min`;
 }
 
-/** Fichier local d'une image d'identité (logo, favicon) : l'original, avec son extension. */
+
 const fichierIdentite = (image) => `wp-${image.id}${(path.extname(new URL(image.url).pathname) || '.png').toLowerCase()}`;
 const TYPES_IMAGE = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.gif': 'image/gif' };
 
-/**
- * Valeur d'un champ structuré venue de WordPress, ou undefined pour garder la
- * valeur par défaut. L'export a été validé au pull ; ici on reste prudent.
- */
+
+
 function valeurChamp(def, v, avertir, lieu) {
   if (v === undefined || v === null) return undefined;
   if (def.type === 'oui-non') return typeof v === 'boolean' ? v : undefined;
@@ -133,36 +96,20 @@ function valeurChamp(def, v, avertir, lieu) {
   return typeof v === 'string' && v.trim() ? v : undefined;
 }
 
-/** Remplace le contenu d'un tableau sans changer sa référence (d'autres modules la tiennent). */
+
 function remplacer(tableau, nouveau) {
   tableau.splice(0, tableau.length, ...nouveau);
 }
 
-/**
- * Fusionne l'instantané dans les contenus du dépôt.
- * @returns {{ actif: boolean, maintenance: object|null, avertissements: string[] }}
- */
-/*
- * Les textes simples venus de WordPress — titres, résumés, FAQ, textes
- * alternatifs, libellés — sont insérés tels quels dans les gabarits, en texte
- * comme en attribut, et dans le JSON-LD. Un compte WordPress volé (ou un
- * WordPress compromis) pouvait y glisser une balise ou fermer un attribut :
- * du script sur toutes les pages du site public.
- *
- * Ces champs n'ont aucune raison de contenir du HTML. Les trois caractères
- * qui en font sont donc remplacés par leur équivalent typographique, qui se
- * lit pareil et ne s'interprète jamais : ‹ › ”. Pas d'entités HTML : ces
- * valeurs servent aussi hors HTML (JSON-LD, sitemap) où « &lt; » se lirait.
- *
- * Restent intacts : le corps (`corps`, du HTML déjà filtré par WordPress et
- * revérifié par valider-wordpress.js), les champs structurés (`champs`,
- * échappés par textes.js), les adresses et identifiants techniques.
- */
+
+
+
+
 const INTACTS = new Set(['corps', 'champs', 'url', 'id', 'fichier', 'sha']);
 function texteSur(valeur, cle = '') {
   if (INTACTS.has(cle)) return valeur;
   if (typeof valeur === 'string') {
-    // eslint-disable-next-line no-control-regex
+
     return valeur.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').replace(/</g, '‹').replace(/>/g, '›').replace(/"/g, '”');
   }
   if (Array.isArray(valeur)) return valeur.map((v) => texteSur(v));
@@ -174,7 +121,7 @@ function texteSur(valeur, cle = '') {
 
 function appliquer({ GUIDES, TUTOS, ARTICLES = [], PAGES, INSPIRATION_PHOTOS, PHOTOS }) {
   const brut = charger();
-  // Le site (Mon site) et la maintenance ont leurs propres échappements : on ne les touche pas.
+
   const wp = brut && {
     ...brut,
     guides: texteSur(brut.guides || []),
@@ -187,7 +134,7 @@ function appliquer({ GUIDES, TUTOS, ARTICLES = [], PAGES, INSPIRATION_PHOTOS, PH
   const avertir = (m) => avertissements.push(m);
   if (!wp) return { actif: false, maintenance: null, avertissements };
 
-  /* ---- Guides ---- */
+
   const parSlug = new Map(GUIDES.map((g) => [g.slug, g]));
   const guides = (wp.guides || []).map((g) => {
     const base = parSlug.get(g.slug) || { slug: g.slug, cover: { seed: 0, variant: 0 }, tags: [], related: [], faq: [] };
@@ -216,7 +163,7 @@ function appliquer({ GUIDES, TUTOS, ARTICLES = [], PAGES, INSPIRATION_PHOTOS, PH
   }
   remplacer(GUIDES, guides);
 
-  /* ---- Tutoriels ---- */
+
   const tutoParSlug = new Map(TUTOS.map((t) => [t.slug, t]));
   const tutos = (wp.tutoriels || []).map((t) => {
     const base = tutoParSlug.get(t.slug) || { slug: t.slug, tools: [], faq: [] };
@@ -245,7 +192,7 @@ function appliquer({ GUIDES, TUTOS, ARTICLES = [], PAGES, INSPIRATION_PHOTOS, PH
   }
   remplacer(TUTOS, tutos);
 
-  /* ---- Blog : uniquement WordPress, le dépôt n'a pas d'article ---- */
+
   remplacer(
     ARTICLES,
     (wp.articles || []).map((a) => {
@@ -268,7 +215,7 @@ function appliquer({ GUIDES, TUTOS, ARTICLES = [], PAGES, INSPIRATION_PHOTOS, PH
     })
   );
 
-  /* ---- Mon site : identité, en-tête, pied de page, liens commerciaux ---- */
+
   if (wp.site && typeof wp.site === 'object') {
     for (const def of SITE_CHAMPS) {
       const v = valeurChamp(def, wp.site[def.cle], avertir, 'Mon site');
@@ -276,16 +223,16 @@ function appliquer({ GUIDES, TUTOS, ARTICLES = [], PAGES, INSPIRATION_PHOTOS, PH
     }
   }
 
-  /* ---- Pages : des textes, jamais une mise en page ---- */
+
   for (const p of wp.pages || []) {
     const cible = PAGES[p.cle];
-    if (!cible) continue; // Une page que le code ne construit pas n'est publiée nulle part.
+    if (!cible) continue;
     if (p.titre) cible.titre = p.titre;
     if (p.description) cible.description = p.description;
     if (cible.h1 !== null && p.h1) cible.h1 = p.h1;
     if (cible.chapo !== null && p.chapo) cible.chapo = p.chapo;
     if (typeof cible.corps === 'string' && typeof p.corps === 'string' && p.corps.trim()) cible.corps = p.corps;
-    // Champs structurés : seulement ceux que le gabarit déclare.
+
     if (cible.champs && p.champs && typeof p.champs === 'object') {
       for (const def of cible.champs) {
         const v = valeurChamp(def, p.champs[def.cle], avertir, `page « ${p.cle} »`);
@@ -294,7 +241,7 @@ function appliquer({ GUIDES, TUTOS, ARTICLES = [], PAGES, INSPIRATION_PHOTOS, PH
     }
   }
 
-  /* ---- Inspirations ---- */
+
   const inspiParCle = new Map(INSPIRATION_PHOTOS.map((i) => [i.image, i]));
   const inspirations = (wp.inspirations || []).map((i) => {
     const base = inspiParCle.get(i.cle) || {};
@@ -323,7 +270,7 @@ function appliquer({ GUIDES, TUTOS, ARTICLES = [], PAGES, INSPIRATION_PHOTOS, PH
   }).filter(Boolean);
   if (inspirations.length) remplacer(INSPIRATION_PHOTOS, inspirations);
 
-  /* ---- Maintenance ---- */
+
   const m = wp.maintenance || null;
   let maintenance = null;
   if (m) {
@@ -333,17 +280,15 @@ function appliquer({ GUIDES, TUTOS, ARTICLES = [], PAGES, INSPIRATION_PHOTOS, PH
   return { actif: true, maintenance, avertissements };
 }
 
-/* ------------------------------------------------------------------ */
-/* Page de maintenance du site statique                                */
-/* ------------------------------------------------------------------ */
+
+
+
 
 const SYMBOL_PATH = 'M0 0H0.3396V0.5584L0 0.6396ZM0 0.6599L0.3396 0.5787V1H0ZM0.4057 0H0.7453V0.2437L0.4057 0.3249ZM0.4057 0.3452L0.7453 0.264V1H0.4057ZM0.8208 0H1V0.5584L0.8208 0.6012ZM0.8208 0.6215L1 0.5787V1H0.8208Z';
 const echapper = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-/**
- * La page de maintenance, même gabarit et même feuille de style que celle
- * servie par WordPress (backend/pose-parquet-core/assets/maintenance.css).
- */
+
+
 function pageMaintenance(m) {
   const css = fs.readFileSync(path.join(RACINE, 'backend', 'pose-parquet-core', 'assets', 'maintenance.css'), 'utf8');
   const liens = [];
@@ -378,9 +323,9 @@ ${liens.map(([url, titre, sous, classe]) => `      <a class="pm__lien pm__lien--
 `;
 }
 
-/* ------------------------------------------------------------------ */
-/* pull                                                                */
-/* ------------------------------------------------------------------ */
+
+
+
 
 async function telecharger(url, cible) {
   const r = await fetch(url);
@@ -394,7 +339,7 @@ async function tirer(url = URL_DEFAUT) {
   const d = await r.json();
   if (!d || d.version !== 1) throw new Error('Export WordPress : version inconnue.');
 
-  // Validation AVANT d'écrire quoi que ce soit : une erreur laisse le site tel qu'il est.
+
   const { erreurs, avertissements } = valider(d);
   avertissements.forEach((m) => console.warn(`[avertissement] ${m}`));
   if (erreurs.length) {
@@ -402,7 +347,7 @@ async function tirer(url = URL_DEFAUT) {
     throw new Error(`Export WordPress refusé : ${erreurs.length} erreur(s). L'instantané précédent est conservé.`);
   }
 
-  // Images téléversées dans WordPress (sans clé d'origine) : on les rapatrie.
+
   const images = [
     ...(d.guides || []).map((x) => x.image),
     ...(d.tutoriels || []).map((x) => x.image),
@@ -410,8 +355,8 @@ async function tirer(url = URL_DEFAUT) {
     ...(d.inspirations || []).map((x) => x.image),
     d.maintenance && d.maintenance.image,
   ].filter((i) => i && !i.source);
-  // Images de la médiathèque insérées dans un corps : l'export a réécrit leur
-  // adresse en ../assets/images/wp-<id>.jpg, quelle que soit leur origine.
+
+
   images.push(...[...(d.guides || []), ...(d.tutoriels || []), ...(d.articles || []), ...(d.pages || [])].flatMap((x) => x.medias || []));
   let n = 0;
   for (const image of images) {
@@ -426,7 +371,7 @@ async function tirer(url = URL_DEFAUT) {
       if (!fs.existsSync(f)) await telecharger(t.url, f);
     }
   }
-  // Logo et favicon : l'original, avec son extension (pas de déclinaisons).
+
   for (const image of [d.site && d.site.logo, d.site && d.site.favicon].filter((i) => i && typeof i === 'object')) {
     const f = path.join(IMAGES, fichierIdentite(image));
     if (!fs.existsSync(f)) {

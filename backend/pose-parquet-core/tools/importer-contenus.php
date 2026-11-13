@@ -1,13 +1,6 @@
 <?php
-/**
- * Import des contenus du dépôt dans WordPress (migration, rejouable).
- *
- *   node _generator/exporter-wordpress.js
- *   php backend/pose-parquet-core/tools/importer-contenus.php <racine WordPress> data/wordpress/import.json
- *
- * En ligne de commande seulement. S'exécute en tant que premier
- * administrateur du site (il faut le droit de publier et de téléverser).
- */
+
+
 
 if ( PHP_SAPI !== 'cli' ) {
 	exit( 1 );

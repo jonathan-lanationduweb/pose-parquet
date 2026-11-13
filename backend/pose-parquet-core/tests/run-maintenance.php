@@ -1,23 +1,6 @@
 <?php
-/**
- * Suite « Maintenance : aller ET retour » (08/10/2026).
- *
- *   php tests/run-maintenance.php <racine WordPress>
- *
- * Le bug d'origine : la maintenance activée puis désactivée, le site public
- * ne revenait pas. Cette suite couvre le RETOUR (true → false), pas seulement
- * l'activation :
- *
- *   1. réglage, export, écart avec le site publié, libellés (sans publier) ;
- *   2. deux VRAIES publications locales, par le moteur existant
- *      (Publication::lancer) : ON publié → site en maintenance, puis OFF
- *      publié → site normal (pages sans porte, maintenance.json à false,
- *      maintenance.html qui renvoie vers l'accueil).
- *
- * La partie 2 ne tourne que si le site part d'un état propre (maintenance
- * désactivée, rien à publier) : elle le laisse exactement ainsi. Le réglage et
- * le journal des publications sont remis dans l'état trouvé.
- */
+
+
 
 declare(strict_types=1);
 
@@ -54,7 +37,7 @@ $basculer = static function () use ( $appelle ): void {
 	$appelle( [ Reglages::class, 'basculer' ] );
 	$_POST = $_REQUEST = [];
 };
-// Le formulaire « Contenu de la page », tel que le navigateur l'envoie : sans aucun champ d'état.
+
 $enregistrer = static function () use ( $appelle ): void {
 	$m     = Reglages::lire();
 	$_POST = $_REQUEST = [ 'action' => Reglages::ACTION, '_wpnonce' => wp_create_nonce( Reglages::ACTION ), 'pp_titre' => $m['titre'], 'pp_message' => $m['message'], 'pp_image' => (string) $m['image'], 'pp_premibel' => '1', 'pp_allure' => '1' ];
@@ -67,14 +50,14 @@ $panneau      = static function (): string {
 	Reglages::panneau();
 	return (string) ob_get_clean();
 };
-// Ce que le site a publié, simulé dans le cache de l'instantané publié (aucun fichier touché).
+
 $simuler_publie = static function ( bool $actif ): void {
 	$d = Publication::export_courant();
 	$d['maintenance']['actif'] = $actif;
-	set_transient( 'pp_publication_publie', $d, 2 * MINUTE_IN_SECONDS ); // Publication::CACHE_PUB (privée)
+	set_transient( 'pp_publication_publie', $d, 2 * MINUTE_IN_SECONDS );
 };
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Réglage et export : false → true → false' );
 update_option( Reglages::OPTION, array_merge( Reglages::lire(), [ 'actif' => false ] ), false );
 $simuler_publie( false );
@@ -112,14 +95,14 @@ $simuler_publie( false );
 $verifie( 'retour publié : « Site en ligne »', Reglages::etat_public() === 'en_ligne' && str_contains( $panneau(), 'Site en ligne' ) );
 Publication::oublier_cache();
 
-// Réglage remis tel qu'il était.
+
 if ( $reglage_avant === null ) {
 	delete_option( Reglages::OPTION );
 } else {
 	update_option( Reglages::OPTION, $reglage_avant, false );
 }
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Vraies publications : ON publié, puis OFF publié → site normal' );
 $racine  = (string) Apercu::dossier();
 $propre  = ! Reglages::actif() && $publie_reel === false && Publication::mode() === 'local' && ! get_option( Publication::VERROU ) && ! Publication::changements();
@@ -165,7 +148,7 @@ if ( ! $propre ) {
 	$verifie( 'OFF : Site en ligne, rien à publier', Reglages::etat_public() === 'en_ligne' && ! Publication::changements() );
 }
 
-// Journal remis tel qu'il était (les deux publications de test n'y restent pas).
+
 if ( $memoire_avant !== null ) {
 	update_option( Publication::OPTION, $memoire_avant, false );
 }

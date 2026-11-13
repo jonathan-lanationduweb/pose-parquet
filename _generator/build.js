@@ -1,4 +1,3 @@
-/* Génération des pages statiques de pose-parquet.com */
 const fs = require('fs');
 const path = require('path');
 const { SITE, layout, breadcrumb } = require('./layout');
@@ -20,18 +19,14 @@ const { resolveSources } = require('./sources');
 const { NB_PIECES, PIECES, HORS_BIBLIOTHEQUE } = require('./scenes');
 const { NB_PREMIBEL_VISU, NB_PREMIBEL_FIDELE, enLettres } = require('./catalogue');
 const { MAX_VERSIONS } = require('../js/studio/app.js');
-/* Les motifs du Mode Plan viennent de la liste que l'outil lui-même déroule. */
+
 const NB_MOTIFS_PLAN = require('../js/tools/patterns.js').PATTERNS.length;
 const { buildAssets, verifierRattachements } = require('./assets');
 const { exclusions } = require('./arborescence');
 const { ecrireTexte } = require('./eol');
 const { picture } = require('./responsive');
-/*
- * WordPress, source éditoriale : si un instantané existe
- * (data/wordpress/contenus.json, tiré par `node _generator/wordpress.js pull`),
- * ses textes, images et réglages remplacent ceux du dépôt AVANT toute
- * construction. Sans instantané, rien ne change. Voir wordpress.js.
- */
+
+
 const WORDPRESS = require('./wordpress');
 const SOURCE_WP = WORDPRESS.appliquer({ GUIDES, TUTOS, ARTICLES, PAGES, INSPIRATION_PHOTOS, PHOTOS });
 SOURCE_WP.avertissements.forEach((m) => console.warn(`[wordpress] ${m}`));
@@ -39,37 +34,26 @@ const MAINTENANCE_ACTIVE = Boolean(SOURCE_WP.maintenance && SOURCE_WP.maintenanc
 
 const ROOT = process.env.SITE_ROOT || path.join(process.env.USERPROFILE || '', 'Desktop', 'pose-parquet.com');
 
-/*
- * Toutes les sorties texte du site passent par ici, et toutes sortent en LF.
- *
- * Le HTML nait de literaux de gabarit ecrits dans les fichiers de ce dossier :
- * sans normalisation, il heriterait des fins de ligne de `_generator/*.js`
- * telles que le checkout les a posees, et le site genere differerait d'une
- * machine a l'autre. Voir eol.js.
- */
-/*
- * Maintenance activée dans WordPress : chaque page renvoie vers
- * maintenance.html, sauf en aperçu (`?apercu=1`, mémorisé par un cookie de
- * session). Sur un hébergement statique (GitHub Pages) c'est tout ce qu'on peut
- * faire — sans statut 503. Avec un serveur, la règle 503 est dans
- * docs/backend/wordpress-contenus.md ; serve.js l'applique en local.
- */
+
+
+
+
 function porteMaintenance(relPath, content) {
   if (!MAINTENANCE_ACTIVE || !relPath.endsWith('.html') || relPath === 'maintenance.html' || relPath === '404.html') return content;
   const prefixe = '../'.repeat(relPath.split('/').length - 1);
-  const porte = `<script>/* Maintenance activée (WordPress → Pose Parquet → Maintenance). Voir le vrai site : ?apercu=1 */(function(){try{if(/[?&]apercu=1(&|$)/.test(location.search))document.cookie='pp_apercu=1; path=/; SameSite=Lax';if(/(^|; )pp_apercu=1/.test(document.cookie))return;}catch(e){}location.replace('${prefixe}maintenance.html');})();</script>`;
+  const porte = `<script>(function(){try{if(/[?&]apercu=1(&|$)/.test(location.search))document.cookie='pp_apercu=1; path=/; SameSite=Lax';if(/(^|; )pp_apercu=1/.test(document.cookie))return;}catch(e){}location.replace('${prefixe}maintenance.html');})();</script>`;
   return content.replace('<head>', `<head>
     ${porte}`);
 }
 const { responsiveTables } = require('./tables');
-const write = (relPath, content) => ecrireTexte(path.join(ROOT, relPath), porteMaintenance(relPath, /\.(html|tpl)$/.test(relPath) ? responsiveTables(content) : content));
+const write = (relPath, content) => ecrireTexte(path.join(ROOT, relPath), porteMaintenance(relPath, /\.(html|tpl)$/.test(relPath) ? responsiveTables(content).replace(/<!--[\s\S]*?-->/g, '').replace(/^[\t ]+$/gm, '') : content));
 
 const frDate = (iso) =>
   new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 
-/* ------------------------------------------------------------------ */
-/* Visuels                                                             */
-/* ------------------------------------------------------------------ */
+
+
+
 
 function stripeRoom(width, height, angle, label) {
   return `<g>
@@ -139,22 +123,22 @@ function buildDiagrams() {
   const dir = path.join(ROOT, 'assets', 'images');
   fs.mkdirSync(dir, { recursive: true });
 
-  // Schemas explicatifs : vectoriels, produits pour le site.
+
   ecrireTexte(path.join(dir, 'guide-sens-proportions.svg'), proportionsFigure());
   ecrireTexte(path.join(dir, 'lumiere-avant.svg'), lightFigure('across'));
   ecrireTexte(path.join(dir, 'lumiere-apres.svg'), lightFigure('along'));
 
-  // Les icônes sont produites par _generator/make-icons.js et ne sont
-  // jamais écrasées ici.
 
-  // Les photographies sont telechargees par _generator/fetch-photos.js
-  // et ne sont jamais ecrasees par ce script.
+
+
+
+
   fs.mkdirSync(path.join(ROOT, 'assets', 'videos'), { recursive: true });
 }
 
-/* ------------------------------------------------------------------ */
-/* Données transverses                                                 */
-/* ------------------------------------------------------------------ */
+
+
+
 
 const INSPIRATIONS = INSPIRATION_PHOTOS;
 
@@ -172,26 +156,15 @@ const motifName = (motif) => {
 
 const photoAlt = (name) => (PHOTOS[name] && PHOTOS[name].alt) || '';
 
-/**
- * Cet article a-t-il une couverture fiable ?
- *
- * L'audit visuel a trouve des couvertures qui montraient autre chose que ce
- * que leur page raconte — un mur perce pour un tutoriel de pose, une pose
- * flottante pour un tutoriel de collage. Quand l'image juste n'existe pas
- * encore, la cle est retiree de `photos.js` sous un bloc IMAGE_REQUIRED qui
- * dit ce qu'il faudrait, et les gabarits s'en apercoivent ici.
- *
- * Consequences : la page se passe de couverture, la carte garde son cadre
- * mais reste un aplat. Un vide assume vaut mieux qu'une photographie qui
- * enseigne le geste inverse.
- */
+
+
 const aUneCouverture = (slug) => Boolean(PHOTOS[`cover-${slug}`]);
 
 const guideBySlug = (slug) => GUIDES.find((guide) => guide.slug === slug);
 
-/* ------------------------------------------------------------------ */
-/* Fragments                                                           */
-/* ------------------------------------------------------------------ */
+
+
+
 
 function articleCard(item, base, hrefDir, badge) {
   return `<article class="card" data-tags="${(item.tags || []).join(' ')}" data-reveal>
@@ -240,9 +213,9 @@ function ctaBand(base, titre = 'Un projet de pose à préparer ?') {
     </section>`;
 }
 
-/* ------------------------------------------------------------------ */
-/* Gabarit éditorial                                                   */
-/* ------------------------------------------------------------------ */
+
+
+
 
 function editorialPage(item, options) {
   const { section, sectionLabel, dir, aside, jsonldType = 'Article' } = options;
@@ -262,8 +235,8 @@ function editorialPage(item, options) {
 
   const published = item.date || '2026-08-01';
   const updated = item.updated || published;
-  // La couverture sert d'image de partage et d'image de l'article pour Google
-  // (recommandée pour les résultats enrichis) ; sans couverture, l'image du site.
+
+
   const couverture = aUneCouverture(item.slug)
     ? `assets/images/${PHOTOS[`cover-${item.slug}`].alias || `cover-${item.slug}`}.jpg`
     : 'assets/images/og-default.jpg';
@@ -381,9 +354,9 @@ ${item.body}
   });
 }
 
-/* ------------------------------------------------------------------ */
-/* Pages                                                               */
-/* ------------------------------------------------------------------ */
+
+
+
 
 function asideGuide() {
   return `<div class="aside-box">
@@ -398,11 +371,8 @@ function asideGuide() {
             </div>`;
 }
 
-/**
- * Le blog : actualités et articles écrits dans WordPress (Pose Parquet →
- * Articles). Même gabarit que les guides. Sans article publié, la page
- * /blog/ reste en ligne (son adresse ne casse pas) mais n'est pas indexée.
- */
+
+
 function buildBlog() {
   const aside = asideGuide();
   ARTICLES.forEach((article) => {
@@ -448,7 +418,7 @@ function buildBlog() {
   );
 }
 
-/** Les nombres d'un texte saisi : {guides}, {guides_lettres}, {Guides_lettres} (majuscule). */
+
 const nombresGuides = (texte) =>
   String(texte == null ? '' : texte)
     .replace(/\{guides\}/g, String(GUIDES.length))
@@ -464,7 +434,7 @@ function buildGuides() {
     );
   });
 
-  /* Maquette du 14/11/2026 (pose-parquet-page-guides.pdf). */
+
   const lienGuide = (slug, repli) => (GUIDES.some((g) => g.slug === slug) ? `${slug}.html` : repli);
   const ORDRE_GUIDES = [
     {
@@ -614,25 +584,8 @@ function buildGuides() {
   );
 }
 
-/*
- * Du motif éditorial au motif que le moteur sait poser.
- *
- * Les six fiches décrivent six écritures au sol ; le Visualiseur n'en dessine
- * que trois. « Dans la longueur », « dans la largeur » et « en diagonale »
- * sont trois orientations d'une même pose à lames droites — le moteur les
- * obtient en tournant `lames`, pas en changeant de motif.
- *
- * L'ANGLE N'EST PAS FORCÉ, et c'est délibéré. Dans le Studio, l'angle est
- * relatif au plan du sol de la photographie, pas aux murs de la pièce : rien
- * ne garantit que 0° suive la longueur de CETTE pièce-là. Envoyer
- * `orientation=0` pour « dans la longueur » afficherait donc un rendu faux
- * une fois sur deux. La diagonale, elle, reste diagonale quelle que soit la
- * pièce — mais par cohérence on laisse le visiteur régler l'angle, ce que le
- * panneau Orientation fait en un clic.
- *
- * Ce que le lien promet est donc seulement ce qu'il tient : ouvrir le
- * Visualiseur sur le bon motif.
- */
+
+
 const MOTIF_VERS_STUDIO = {
   longueur: 'lames',
   largeur: 'lames',
@@ -643,15 +596,8 @@ const MOTIF_VERS_STUDIO = {
 
 function buildMotifs() {
   MOTIFS.forEach((motif) => {
-    /*
-     * La sortie produit d'une fiche motif.
-     *
-     * Elle mène au Visualiseur et non directement chez un marchand : à ce
-     * stade le visiteur cherche à voir, pas à acheter. C'est une fois le
-     * parquet posé sur sa photo que la fiche produit a du sens — et c'est là
-     * qu'elle apparaît. Griller l'étape reviendrait à répondre « achetez »
-     * à quelqu'un qui demande « à quoi ça ressemble ».
-     */
+
+
     const motifStudio = MOTIF_VERS_STUDIO[motif.pattern];
     const aside = `<div class="aside-box">
               <h3>${motif.h1} en chiffres</h3>
@@ -677,7 +623,7 @@ function buildMotifs() {
     const reglages = PAGES[`motif-${motif.slug}`] || {};
     const item = {
       ...motif,
-      // Titre Google, description, titre affiché et chapô : réglables dans WordPress (Pages).
+
       title: reglages.titre || motif.title,
       description: reglages.description || motif.description,
       h1: reglages.h1 || motif.h1,
@@ -699,8 +645,8 @@ function buildMotifs() {
 
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'Motifs' }]);
   const MOTIFS_EN_V = ['point-de-hongrie', 'baton-rompu'];
-  /* Maquette du 14/11/2026 (pose-parquet-page-motifs.pdf) : la phrase et le
-     niveau de chutes affichés sur la carte, propres à cette page. */
+
+
   const CARTES_MOTIFS = {
     'pose-droite': ['Toutes les lames parallèles, à joints décalés. Le motif de référence : sobre, économique, compatible avec tous les formats.', 'Chutes faibles · ≈ 5 %'],
     'pose-longueur': ['La pose droite orientée dans le plus grand axe de la pièce. Elle prolonge l’espace et limite les coupes.', 'Chutes faibles · ≈ 5 %'],
@@ -865,23 +811,23 @@ function asideTuto(tuto) {
               <p>Vérifiez la planéité et l'humidité du support : c'est la cause de la majorité des désordres.</p>
               <a class="btn btn--ghost btn--sm" href="../guides/preparer-son-sol-avant-la-pose.html">Préparer le support</a>
             </div>
-            <!--
-              La sortie chantier, sur les tutoriels et nulle part ailleurs.
 
-              Un tutoriel de pose est le seul endroit du site où quelqu'un
-              peut légitimement changer d'avis en lisant : découvrir le nombre
-              d'étapes, l'outillage, les points de contrôle, et décider que ce
-              n'est pas pour lui. Lui proposer là de confier le chantier
-              répond à une question qu'il vient de se poser.
 
-              Dans un guide de décision — « quel sens de pose ? » — la même
-              proposition serait hors sujet : on y cherche à comprendre, pas à
-              déléguer.
 
-              Le lien mène au formulaire, pas chez le poseur : c'est ce qui
-              permet de qualifier le besoin et la zone avant d'orienter. Voir
-              js/commerce/allure.js.
-            -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             <div class="aside-box">
               <h3>Vous préférez confier la pose ?</h3>
               <p>Décrivez votre projet : nous orientons vers un poseur selon votre région. En Île-de-France, la pose et la rénovation sont assurées par Allure Design.</p>
@@ -901,8 +847,8 @@ function buildTutos() {
 
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'Tutoriels' }]);
 
-  /* Maquette du 13/11/2026 (pose-parquet-page-tutoriels.pdf). Les phrases de
-     présentation propres à cette page ; à défaut, le résumé du tutoriel. */
+
+
   const ACCROCHES = {
     'poser-un-parquet-flottant': 'Le tutoriel de référence : sous-couche, jeu de dilatation, coupes de périphérie et plinthes, avec les points de contrôle à chaque étape.',
     'coller-un-parquet-contrecolle': 'La pose la plus stable et la plus silencieuse, compatible plancher chauffant.',
@@ -1126,42 +1072,17 @@ function buildTutos() {
   );
 }
 
-/**
- * L'adresse du Studio pour une carte, et les quatre conditions qui l'autorisent.
- *
- * Une carte ne l'obtient que si elle déclare un `sceneId` ET que cette scène
- * est publiable dans le manifeste — géométrie ET rendu validés. Deux raisons
- * de le vérifier ICI plutôt que dans les données : la liste des inspirations
- * ne sait pas ce que vaut une scène, et une scène rétrogradée à la revue doit
- * faire disparaître le bouton sans que personne y pense.
- *
- * Pas de repli. Une carte sans scène correspondante n'est pas cliquable : elle
- * reste une inspiration, ce qu'elle a toujours été.
- */
+
+
 function lienStudio(item) {
   if (!item.visualizerAvailable || !item.sceneId) return null;
-  /*
-   * La scène peut être publiable sans figurer dans « Changer de pièce » :
-   * c'est le cas du couloir en enfilade, dont le sol ne fait que 7 pour
-   * cent du cadre. Ne chercher que dans la bibliothèque rendait sa carte
-   * muette alors que check-inspiration la comptait essayable — le contrôle
-   * et la page ne regardaient pas la même liste.
-   */
+
+
   const scene =
     PIECES.find((p) => p.id === item.sceneId) || HORS_BIBLIOTHEQUE.find((p) => p.id === item.sceneId);
   if (!scene) return null;
-  /*
-   * La condition qui manquait, et dont l'absence a produit huit faux liens :
-   * la scene doit ouvrir LE MEME FICHIER que la carte affiche. On compare
-   * fichier contre fichier, pas identifiant contre identifiant.
-   *
-   * Et on JETTE au lieu de retomber en silence. Les trois conditions
-   * precedentes rendent la carte muette — une scene retrogradee a la revue
-   * doit faire disparaitre le lien sans que personne y pense. Celle-ci est
-   * d'une autre nature : une carte qui se declare essayable en montrant une
-   * autre photo que le Studio est exactement le defaut qu'on vient de
-   * reparer. Le site ne se construit pas tant qu'elle n'est pas corrigee.
-   */
+
+
   const attendu = `${item.image}.jpg`;
   if (scene.file !== attendu) {
     throw new Error(
@@ -1179,30 +1100,8 @@ function lienStudio(item) {
   return `../outils/studio.html?${params}`;
 }
 
-/**
- * Une carte d'inspiration : la photographie, puis ce qu'elle montre.
- *
- * La page présentait huit ambiances dans un carrousel où une seule dominait ;
- * sept restaient derrière deux flèches. Elle les pose désormais toutes à
- * plat : une à la une, sa voisine, puis une grille. On voit tout en faisant
- * défiler la page, sans apprendre une interaction — et le filtre ne cache
- * rien derrière un compteur.
- *
- * La légende dit ce que la PHOTOGRAPHIE montre, motif réel et teinte réelle,
- * et le Studio s'ouvre sur cette même configuration. Les données ont été
- * corrigées en regardant chaque fichier, voir _generator/photos.js.
- *
- * Toute la carte est la cible ; « Essayer dans le Studio » est une
- * affordance, pas un second lien : un seul arrêt de tabulation par ambiance.
- * Une carte sans scène publiable s'agrandit au lieu de promettre un essai.
- *
- * `sizes` suit la grille : la une occupe deux tiers de la largeur sur grand
- * écran, les autres un tiers ; sur tablette la une en prend 58 pour cent et
- * la grille passe à deux colonnes ; sur téléphone la une et sa voisine sont
- * pleine largeur, et les six autres passent en format compact, photo à
- * gauche sur 42 pour cent de la carte — six cartes pleine largeur faisaient
- * 2 800 px à elles seules, soit trois écrans de téléphone pour six liens.
- */
+
+
 const TAILLES_INSPIRATION = {
   une: '(min-width: 62rem) min(66vw, 1040px), (min-width: 48rem) 58vw, 100vw',
   voisine: '(min-width: 62rem) min(33vw, 520px), (min-width: 48rem) 42vw, 100vw',
@@ -1215,11 +1114,8 @@ function carteInspiration(item, { variante = 'grille', priority = false } = {}) 
   }
   const href = lienStudio(item);
   const vue = picture(item.image, { base: '../', alt: item.alt, sizes: TAILLES_INSPIRATION[variante], priority });
-  /*
-   * Un lien peut contenir des blocs (titre en <h3>), un bouton ne peut
-   * contenir que du texte en ligne : la carte non essayable n'a donc pas de
-   * titre de section, ce qui est juste — elle n'ouvre rien.
-   */
+
+
   const corps = href
     ? `<div class="insp-card__body">
                   <h3 class="insp-card__title">${item.title}</h3>
@@ -1249,21 +1145,13 @@ function carteInspiration(item, { variante = 'grille', priority = false } = {}) 
             </article>`;
 }
 
-/*
- * Ordre d'affichage. Les données gardent leur ordre — `fetch-photos` et
- * l'accueil s'y réfèrent par index — et la page choisit ce qu'elle met en
- * avant : la chambre parisienne, parce que son point de Hongrie se lit sans
- * légende ; la pièce aux arcades à côté, parce que son bâton rompu est
- * l'autre motif en V, et que les deux côte à côte apprennent la différence.
- */
+
+
 const UNE_INSPIRATION = 'room-chambre-parisienne';
 const VOISINE_INSPIRATION = 'room-piece-arcades';
 
-/*
- * Les filtres se déduisent des étiquettes : un motif ou une pièce sans carte
- * n'a pas de pastille, et une étiquette sans libellé arrête la construction
- * plutôt que de laisser une carte qu'aucun filtre ne peut atteindre.
- */
+
+
 const LIBELLES_MOTIF = [
   ['droite', 'Lames droites'],
   ['hongrie', 'Point de Hongrie'],
@@ -1276,9 +1164,8 @@ const LIBELLES_PIECE = [
   ['couloir', 'Couloir et entrée'],
 ];
 
-/* Les trois motifs que les photographies montrent, dessinés par le moteur du
-   Plan (js/tools/patterns.js) : un rendu géométrique ne se trompe pas de
-   motif, là où une photo « générique » peut montrer l'autre V. */
+
+
 const CHOIX_MOTIFS = [
   { thumb: 'longueur', href: '../motifs/pose-droite.html', titre: 'Lames droites',
     texte: 'Une seule direction, des joints décalés : le bois et la lumière parlent.' },
@@ -1325,7 +1212,7 @@ function buildInspiration() {
     ? `${total} ambiances, toutes essayables dans le Studio`
     : `${total} ambiances, ${essayables} essayables dans le Studio`;
 
-  /* La loupe n'existe que s'il reste une ambiance qui n'ouvre pas le Studio. */
+
   const lightbox = essayables < total
     ? `
       <div class="modal modal--media" data-modal data-lightbox id="lightbox" role="dialog" aria-modal="true" aria-label="Visuel agrandi">
@@ -1337,9 +1224,8 @@ function buildInspiration() {
       </div>`
     : '';
 
-  /* Trois lignes basses : le rendu à gauche, le nom et le lien à droite. Une
-     carte de catalogue en 4/3 par motif faisait 800 px sur téléphone pour
-     trois liens ; la section doit se traverser, pas se visiter. */
+
+
   const choixMotifs = CHOIX_MOTIFS.map(
     (m) => `<a class="motif-pick__item" href="${m.href}">
               <span class="motif-pick__viz" data-pattern-thumb="${m.thumb}"></span>
@@ -1441,21 +1327,8 @@ function buildTools() {
     ['Questionnaire sens de pose', 'Cinq questions, une recommandation.'],
   ];
 
-  /*
-   * LA PAGE OUTILS — 2 octobre 2026.
-   *
-   * Elle montrait les deux outils en blocs de même poids, puis une feuille de
-   * route de six outils futurs sur une section entière : à la lecture, trois
-   * blocs comparables dont un « bientôt ». Et l'aperçu du Visualiseur partait
-   * d'une boîte de 0 px que le script remplissait d'un coup — 535 px qui
-   * poussaient tout le reste.
-   *
-   * Désormais : l'OUTIL PRINCIPAL d'abord, en grand, avec son aperçu réel
-   * (le même composant que l'accueil, squelette réservé dans le HTML) ; puis
-   * l'outil COMPLÉMENTAIRE, le Mode Plan, avec son vrai plan interactif ; puis,
-   * en note discrète, ce qui viendra. Aucune photographie de décoration : la
-   * page montre les outils eux-mêmes.
-   */
+
+
   const capitale = (s) => s.replace(/^./, (x) => x.toUpperCase());
   const bodyIndex = `      ${crumbsIndex.html}
       <header class="page-hero page-hero--tools">
@@ -1628,13 +1501,13 @@ function buildProjet() {
   const crumbs = breadcrumb('../', [{ label: 'Accueil', href: 'index.html' }, { label: 'Mon projet' }]);
   const points = [
     'Quatre étapes courtes, aucune coordonnée demandée.',
-    // Pose Parquet oriente ensuite vers Premibel ou Allure Design : « pas à
-    // vendre » disait vrai pour le formulaire, mais pouvait se lire comme une
-    // absence de suite commerciale. Celle-ci décrit ce qui se passe.
+
+
+
     'Aucune obligation : le formulaire sert à comprendre votre besoin avant de vous orienter.',
     'Les réponses techniques acceptent « je ne sais pas ».',
-    // Pose-Parquet ne rappelle personne : le parcours se termine par une
-    // orientation que le visiteur suit lui-même (js/forms/orientation.js).
+
+
     'À la fin, vous voyez vers qui vous tourner : Premibel pour le parquet, Allure Design pour la pose en Île-de-France.',
   ];
 
@@ -1652,7 +1525,7 @@ function buildProjet() {
       <section class="section section--flush-top">
         <div class="wrap">
           <div class="project-intro">
-            <!-- Les liens commerciaux de Mon site (WordPress), pour l'écran d'orientation : js/forms/orientation.js. -->
+
             <div data-project-form data-base="../" data-premibel-url="${T.attribut(REGLAGES.premibel_url)}" data-premibel-actif="${REGLAGES.premibel_afficher ? '1' : '0'}" data-allure-actif="${REGLAGES.allure_afficher ? '1' : '0'}">
               <noscript>
                 <p>Le formulaire nécessite JavaScript. Pour choisir un parquet : <a href="${T.attribut(REGLAGES.premibel_url)}">${T.texte(REGLAGES.premibel_libelle)}</a>. Pour la pose ou la rénovation à Paris et en Île-de-France : <a href="https://www.allure-design.com/demander-un-devis/">${T.texte(REGLAGES.allure_libelle)}</a>.</p>
@@ -1678,7 +1551,7 @@ function buildProjet() {
       depth: 1,
       css: ['css/pages/project.css', 'components/project-form/project-form.css'],
       jsonld: [crumbs.jsonld],
-      // Seule page qui parle au backend : seule page qui charge config.js.
+
       runtimeConfig: true,
       body,
     })
@@ -1702,15 +1575,15 @@ function buildContact() {
 
       <section class="section section--flush-top">
         <div class="wrap">
-          <!--
-            TROIS RAISONS D'ÉCRIRE, TROIS CHEMINS.
 
-            Une question sur un contenu et une demande de chantier n'ont pas le
-            même destinataire. La seconde passe par le formulaire projet : c'est
-            lui qui qualifie le besoin et la zone, puis oriente vers Premibel ou
-            Allure Design. Un courriel commercial ici ne ferait que retarder la
-            réponse.
-          -->
+
+
+
+
+
+
+
+
           <div class="contact-routes">
             <div class="contact-route">
               <p class="eyebrow">${T.texte(v.r1_eyebrow)}</p>
@@ -1758,15 +1631,8 @@ function buildContact() {
   );
 }
 
-/*
- * La règle d'orientation, telle qu'elle est publiée sur /a-propos/.
- *
- * Elle est écrite UNE fois dans `js/forms/lead-context.js`, appliquée par le
- * formulaire, et redite ici pour le lecteur. Deux écritures, donc un risque
- * de divergence : `check-routage` relit ce tableau dans la page construite et
- * le compare, case par case, à ce que rend `destinationRecommandee`. Si la
- * règle change et que cette page ne suit pas, le contrôle échoue.
- */
+
+
 const LIBELLE_DESTINATION = {
   premibel: 'Premibel',
   allure_design: 'Allure Design',
@@ -1783,8 +1649,8 @@ const ORIENTATION = [
 
 function buildApropos() {
   const v = PAGES['a-propos'].valeurs;
-  // Un partenaire désactivé dans « Mon site » reste nommé (le tableau dit qui
-  // fait quoi), sans lien.
+
+
   const nomLie = (cle) =>
     REGLAGES[`${cle}_afficher`]
       ? `<a href="${T.attribut(REGLAGES[`${cle}_url`])}" rel="sponsored noopener">${T.texte(REGLAGES[`${cle}_libelle`])}</a>`
@@ -2025,20 +1891,8 @@ function buildMethode() {
   );
 }
 
-/*
- * GABARITS D'APERÇU — l'aperçu public d'un guide ou d'un tutoriel depuis
- * WordPress, avant publication.
- *
- * WordPress ne sait pas mettre en page un article : c'est le travail de ce
- * générateur. Il publie donc la page d'article elle-même — même gabarit,
- * mêmes feuilles, même en-tête — avec des repères %%PP_…%% à la place des
- * textes. WordPress remplace les repères par le brouillon (échappé, corps
- * filtré) et sert la page à l'éditeur connecté, avec une <base> vers les
- * fichiers du site. Voir backend/pose-parquet-core/src/Contenus/Apercu.php.
- *
- * Écrits sans la porte de maintenance (ce ne sont pas des pages du site) et
- * dans data/apercu/, que rien ne lie.
- */
+
+
 const DATE_REPERE = '2001-01-01';
 function buildGabaritsApercu() {
   const item = (extra) => ({
@@ -2112,12 +1966,8 @@ function buildHome() {
 }
 
 function build404() {
-  /*
-   * `section--below-header` : la 404 est la seule page dont le <main> commence
-   * par une section nue, sans fil d'Ariane ni hero pour dégager l'en-tête fixe.
-   * Le modificateur vit dans css/global.css, avec les autres poids de section —
-   * pas une marge écrite ici pour cette page seule.
-   */
+
+
   const body = `      <section class="section section--below-header">
         <div class="wrap-text u-center">
           <p class="eyebrow">Erreur 404</p>
@@ -2137,12 +1987,8 @@ function build404() {
       description: 'La page demandée est introuvable. Retrouvez les guides, les motifs et le simulateur de pose.',
       path: '404.html',
       depth: 0,
-      /*
-       * `noindex, follow` : une page d'erreur n'a aucune raison de figurer dans
-       * les résultats de recherche, mais ses liens vers l'accueil, les guides
-       * et le simulateur restent de vrais liens qu'un moteur peut suivre.
-       * `nofollow` les gaspillerait sans rien protéger.
-       */
+
+
       robots: 'noindex, follow',
       body,
     })
@@ -2206,48 +2052,18 @@ Sitemap: ${SITE.domain}/sitemap.xml
   buildRuntimeConfig();
 }
 
-/**
- * `config.js` — le seul fichier que le déploiement a le droit de réécrire.
- *
- * Le problème qu'il résout : l'adresse du backend n'est pas la même en
- * développement, en préproduction et en production, et elle n'est pas encore
- * connue pour les deux dernières. Jusqu'ici la seule façon de la définir était
- * `js/forms/api-config.js`, c'est-à-dire du code métier — donc un commit, une
- * relecture et une reconstruction pour ce qui est une donnée d'environnement.
- *
- * Ce fichier est volontairement NEUTRE dans le dépôt : il crée l'objet de
- * configuration sans y poser `apiBaseUrl`. L'absence de la clé laisse
- * `api-config.js` décider par son tableau d'hôtes, exactement comme avant. Le
- * déploiement, lui, remplace ce seul fichier quand la variable
- * `API_BASE_URL` est définie — voir .github/workflows/deploy-pages.yml.
- *
- * Il est chargé uniquement par la page qui en a besoin (le formulaire projet),
- * en script classique donc avant les modules, et sans empreinte dans son nom :
- * un nom stable est précisément ce qui permet de le remplacer au déploiement.
- */
+
+
 function buildRuntimeConfig() {
   write(
     'config.js',
-    `/*
- * Configuration d'environnement — généré par _generator/build.js.
- *
- * Neutre par défaut : aucune adresse d'API n'est posée ici, et c'est voulu.
- * Le tableau des hôtes de js/forms/api-config.js décide alors seul, et un
- * environnement sans backend affiche honnêtement son indisponibilité.
- *
- * Le déploiement remplace ce fichier — et lui seul — pour brancher l'API :
- *
- *   window.POSE_PARQUET_CONFIG.apiBaseUrl =
- *     'https://admin.pose-parquet.com/wp-json/pose-parquet/v1';
- *
- * Ne rien écrire ici à la main : la prochaine construction l'effacerait.
- */
+    `
 window.POSE_PARQUET_CONFIG = window.POSE_PARQUET_CONFIG || {};
 `
   );
 }
 
-/* ------------------------------------------------------------------ */
+
 
 
 function buildDataIndex() {
@@ -2264,10 +2080,9 @@ function buildDataIndex() {
   write('data/contenus.json', JSON.stringify(index, null, 2));
 }
 
-/* Les assets sont construits en premier : le HTML a besoin de leurs empreintes.
-   Toutes les feuilles de page entrent dans le bundle unique, dans l'ordre où
-   elles étaient chargées auparavant — la cascade est donc identique. */
-/* Le nuancier du Mode Plan suit le catalogue Premibel : regénéré avant d'empaqueter les scripts. */
+
+
+
 require('./plan-teintes').ecrirePlanTeintes();
 const build = buildAssets(ROOT, {
   pageCss: [
@@ -2276,20 +2091,8 @@ const build = buildAssets(ROOT, {
     'css/pages/tools.css',
     'css/pages/project.css',
     'css/pages/home.css',
-    /*
-     * `components/project-form/project-form.css` N'EST PLUS ici.
-     *
-     * Elle y était restée quand la feuille est devenue un paquet de page
-     * (BUNDLES_PAGE, entrée « formulaire »). Elle partait donc deux fois : dans
-     * le paquet global servi aux 32 pages, et dans le paquet dédié servi à
-     * /projet/. Les 7,5 Ko que le découpage devait retirer étaient toujours
-     * payés par tout le site, et la seule page qui s'en sert les téléchargeait
-     * en double.
-     *
-     * Les feuilles qui restent dans cette liste sont celles qu'aucun marqueur
-     * ne peut rattacher : elles s'appliquent à des familles de pages entières
-     * (listing, article, outils, projet, accueil) et non à un composant.
-     */
+
+
   ],
 });
 
@@ -2300,11 +2103,8 @@ buildGuides();
 buildMotifs();
 buildTutos();
 buildBlog();
-/*
- * Le contrat Inspiration → Studio est vérifié AVANT d'écrire la page : une
- * carte qui se déclare essayable en montrant une autre photo que celle que le
- * Studio ouvrira arrête la construction. Voir check-inspiration.js.
- */
+
+
 exigeCoherence();
 buildInspiration();
 buildTools();
@@ -2314,11 +2114,8 @@ buildContact();
 buildApropos();
 buildMethode();
 buildPagesLegales(write, { GUIDES, TUTOS, MOTIFS, ARTICLES });
-/*
- * Pages légales incomplètes : signalé à chaque build, BLOQUANT en production.
- * Un site ne part pas en ligne avec « [À compléter] » dans ses mentions
- * légales — l'erreur arrête le workflow avant tout déploiement.
- */
+
+
 {
   const { A_COMPLETER } = require('./content-pages');
   const manquants = ['mentions-legales', 'confidentialite'].flatMap((cle) =>
@@ -2336,29 +2133,18 @@ buildGabaritsApercu();
 build404();
 buildMeta();
 
-/*
- * État du catalogue Premibel pour l'administration WordPress (lecture seule,
- * Pose Parquet → Catalogue Premibel). Déterministe : voir etat-catalogue.js.
- */
+
+
 write('data/catalogue-etat.json', `${JSON.stringify(require('./etat-catalogue').etatCatalogue(), null, 1)}
 `);
 
-/*
- * Page de maintenance du site statique : écrite dès qu'un instantané WordPress
- * existe (pour pouvoir la prévisualiser), active seulement si WordPress le dit.
- * Même gabarit et même feuille que la page servie par WordPress.
- */
-/*
- * Le visiteur que la porte a renvoyé ici garde maintenance.html dans sa barre
- * d'adresse : sans retour, il resterait sur « Le site revient bientôt » après
- * la réouverture, même en rechargeant. Maintenance désactivée, la page renvoie
- * donc vers l'accueil (sauf en aperçu, `?apercu=1`) ; activée, elle relit
- * assets/maintenance.json au chargement, pour qu'une copie gardée en cache ne
- * retienne personne une fois le site rouvert.
- */
+
+
+
+
 const RETOUR_SITE = MAINTENANCE_ACTIVE
-  ? `<script>/* Maintenance : si le site a été rouvert depuis, retour à l'accueil. */(function(){if(!/\\/maintenance\\.html$/.test(location.pathname)||!window.fetch)return;fetch('assets/maintenance.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(m){if(m&&m.actif===false)location.replace('./');}).catch(function(){});})();</script>`
-  : `<script>/* Maintenance désactivée : cette page renvoie vers le site. Aperçu : ?apercu=1 */if(!/[?&]apercu=1(&|$)/.test(location.search))location.replace('./');</script>`;
+  ? `<script>(function(){if(!/\\/maintenance\\.html$/.test(location.pathname)||!window.fetch)return;fetch('assets/maintenance.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(m){if(m&&m.actif===false)location.replace('./');}).catch(function(){});})();</script>`
+  : `<script>if(!/[?&]apercu=1(&|$)/.test(location.search))location.replace('./');</script>`;
 if (SOURCE_WP.maintenance) {
   write('maintenance.html', WORDPRESS.pageMaintenance(SOURCE_WP.maintenance).replace('<head>', `<head>
     ${RETOUR_SITE}`));
@@ -2366,20 +2152,8 @@ if (SOURCE_WP.maintenance) {
 `);
 }
 
-/*
- * Signature de build, pour le développement seulement.
- *
- * Une revue humaine a un jour comparé des captures à un rapport sans pouvoir
- * dire QUELLE application les avait produites : deux interfaces existaient sur
- * la machine — le prototype UX de pose-parquet-ai et le produit intégré — et
- * elles se ressemblaient assez pour être confondues. Ce fichier lève
- * l'ambiguïté : ouvert avec `?dev=1`, le visualiseur écrit en console le
- * commit, la branche, la page et l'empreinte du bundle qu'il exécute.
- *
- * Il n'est PAS publié : `.gitignore` l'exclut, et la page ne le lit qu'en mode
- * développement. En production la signature se réduit à ce que la page porte
- * déjà — son chemin et l'empreinte de son bundle.
- */
+
+
 function ecrireSignature() {
   const git = (args, defaut) => {
     try { return require('child_process').execFileSync('git', args, { cwd: ROOT, encoding: 'utf8' }).trim(); }
@@ -2389,8 +2163,8 @@ function ecrireSignature() {
     commit: git(['rev-parse', 'HEAD'], 'inconnu'),
     commitCourt: git(['rev-parse', '--short', 'HEAD'], 'inconnu'),
     branch: git(['rev-parse', '--abbrev-ref', 'HEAD'], 'inconnue'),
-    /* `sitemap.xml` est re-tamponne par CE build : le juger salirait
-       toujours l'arbre. Voir la convention dans _generator/README.md. */
+
+
     propre: git(['status', '--porcelain'], '')
       .split(String.fromCharCode(10)).map((l) => l.trim())
       .filter((l) => l && !l.endsWith('sitemap.xml')).length === 0
@@ -2404,14 +2178,8 @@ function ecrireSignature() {
 }
 ecrireSignature();
 
-/*
- * Le découpage du CSS ne vaut que s'il est vérifié.
- *
- * On relit les pages écrites et on compare, pour chaque feuille rattachée, la
- * présence du marqueur et celle du lien. Une divergence arrête la
- * construction : mieux vaut ne rien publier qu'une page dont le composant
- * principal est sans style.
- */
+
+
 const horsParcours = exclusions(['assets', 'backend', 'docs', 'design', 'components']);
 const pagesEcrites = (function lister(dossier, prefixe) {
   const out = [];
@@ -2433,6 +2201,7 @@ if (anomalies.length) {
   process.exit(1);
 }
 
+require('./check-headings').verifierTitres(ROOT);
 console.log('Site généré dans', ROOT);
 console.log(`Assets : ${build.css} (${Math.round(build.sizes.css / 1024)} Ko), ${build.js} (${build.sizes.js} modules)`);
 console.log(

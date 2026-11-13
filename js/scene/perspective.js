@@ -1,19 +1,3 @@
-/**
- * Homographie 4 points (projection perspective).
- *
- * On calcule la matrice qui envoie le carré unité (0,0) (1,0) (1,1) (0,1)
- * sur le quadrilatère du sol défini par l'utilisateur, puis son inverse :
- * le rendu parcourt les pixels de l'image et remonte aux coordonnées du sol.
- * C'est ce qui donne la perspective — une lame proche paraît plus grande
- * qu'une lame au fond de la pièce.
- */
-
-/**
- * Matrice 3×3 (carré unité → quadrilatère).
- * @param {{x:number,y:number}[]} quad 4 points, dans l'ordre :
- *        fond-gauche, fond-droite, proche-droite, proche-gauche
- * @returns {number[]} [a, b, c, d, e, f, g, h, 1]
- */
 export function squareToQuad(quad) {
   const [p0, p1, p2, p3] = quad;
   const dx1 = p1.x - p2.x;
@@ -46,7 +30,7 @@ export function squareToQuad(quad) {
   ];
 }
 
-/** Inverse d'une matrice 3×3 donnée à plat. */
+
 export function invert(m) {
   const [a, b, c, d, e, f, g, h, i] = m;
   const A = e * i - f * h;
@@ -68,7 +52,7 @@ export function invert(m) {
   ];
 }
 
-/** Applique une matrice à un point (renvoie les coordonnées déshomogénéisées). */
+
 export function apply(m, x, y) {
   const w = m[6] * x + m[7] * y + m[8];
   return {
@@ -77,7 +61,7 @@ export function apply(m, x, y) {
   };
 }
 
-/** Boîte englobante entière d'un quadrilatère, bornée à la taille du canevas. */
+
 export function bounds(quad, width, height) {
   const xs = quad.map((p) => p.x);
   const ys = quad.map((p) => p.y);
@@ -89,7 +73,7 @@ export function bounds(quad, width, height) {
   };
 }
 
-/** Aire d'un polygone (formule du lacet) — sert à valider une sélection. */
+
 export function area(points) {
   let sum = 0;
   for (let i = 0; i < points.length; i += 1) {

@@ -1,4 +1,3 @@
-/* Fil d'Ariane */
 .breadcrumb { padding-top: calc(var(--header-h) + clamp(0.8rem, 0.5rem + 1vw, 1.6rem)); }
 .breadcrumb ol {
   display: flex;
@@ -15,8 +14,6 @@
 .breadcrumb a { text-decoration: none; }
 .breadcrumb a:hover { color: var(--text); text-decoration: underline; }
 .breadcrumb [aria-current="page"] { color: var(--text); }
-
-/* Un fil d'Ariane suivi d'un hero de page : on évite le double espacement */
 .breadcrumb + .page-hero,
 .breadcrumb + .article-header,
 .breadcrumb + .tool-hero { padding-top: clamp(1.5rem, 1rem + 2vw, 3rem); }

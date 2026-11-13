@@ -1,14 +1,10 @@
 <?php
-/**
- * Outils partagés par les scripts de test : chargement de WordPress, compteur
- * de vérifications, requête valide de référence.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
-/** Charge WordPress depuis la racine passée en argument, ou sort en code 2. */
+
 function pp_test_bootstrap( array $argv, string $usage ): string {
 	$wp_root = rtrim( $argv[1] ?? '', '/\\' );
 	if ( ! $wp_root || ! is_file( $wp_root . '/wp-load.php' ) ) {
@@ -24,11 +20,8 @@ function pp_test_bootstrap( array $argv, string $usage ): string {
 	return $wp_root;
 }
 
-/**
- * Rend [ $verifie, $section, $bilan ].
- *
- * @return array{0:callable,1:callable,2:callable}
- */
+
+
 function pp_test_outils(): array {
 	$echecs  = 0;
 	$reussis = 0;
@@ -52,33 +45,21 @@ function pp_test_outils(): array {
 	return [ $verifie, $section, $bilan ];
 }
 
-/**
- * La requête que le formulaire réel produirait, une fois traduite en JSON API :
- * champs métier **et** champs techniques (jeton), tels qu'ils arrivent sur
- * POST /projects.
- *
- * @return array<string,mixed>
- */
+
+
 function pp_requete_valide( array $surcharge = [] ): array {
 	return array_replace( pp_requete_metier(), [
-		// Jeton émis il y a dix secondes : passé l'âge minimum, loin de l'expiration.
+
 		'formToken' => PoseParquet\Core\Antispam\FormToken::issue( time() - 10 ),
 	], $surcharge );
 }
 
-/**
- * La même requête sans les champs techniques : ce que le validateur métier
- * voit, une fois SubmissionService passé.
- *
- * @return array<string,mixed>
- */
+
+
 function pp_requete_metier( array $surcharge = [] ): array {
 	return array_replace( [
-		/*
-		 * Plus de `zone` ni de `region` : le contrat ne les accepte plus.
-		 * Le departement est la seule donnee geographique, et la region s'en
-		 * deduit cote serveur — ici, Bretagne.
-		 */
+
+
 		'department'       => '35',
 		'city'             => 'Rennes',
 		'housingType'      => 'appartement',

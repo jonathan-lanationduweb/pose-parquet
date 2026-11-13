@@ -1,24 +1,6 @@
 <?php
-/**
- * Champs STRUCTURÉS : des blocs éditoriaux sans HTML libre ni mise en page.
- *
- * Le schéma (quels champs, de quel type, quelle longueur, dans quel groupe)
- * n'est pas écrit ici : il vient du dépôt du site (content-pages.js,
- * content-site.js), qui sait ce qu'il peut afficher, et arrive par l'import
- * (tools/importer-champs.php). WordPress l'affiche comme formulaire, nettoie
- * ce qu'on saisit, et le rend à l'export. Il ne peut ni ajouter, ni retirer,
- * ni déplacer une section.
- *
- * Types (identiques à _generator/textes.js) :
- *   texte, long        texte brut
- *   riche              texte + **gras**, *italique*, `code`
- *   lien               texte + [libellé] : l'adresse du lien est fixée par le site
- *   lignes             une entrée par ligne
- *   url, email         adresses vérifiées
- *   oui-non, image     interrupteur, image de la médiathèque
- *
- * Servi par l'édition des pages (Edition) et l'écran « Mon site » (Site\MonSite).
- */
+
+
 
 declare(strict_types=1);
 
@@ -32,12 +14,8 @@ final class Structure {
 
 	public const TYPES = [ 'texte', 'long', 'riche', 'lien', 'lignes', 'url', 'email', 'oui-non', 'image' ];
 
-	/**
-	 * Un schéma reçu du dépôt, réduit à ce qu'on sait afficher.
-	 *
-	 * @param mixed $brut
-	 * @return array<int,array<string,mixed>>
-	 */
+
+
 	public static function schema( mixed $brut ): array {
 		$brut = is_string( $brut ) ? json_decode( $brut, true ) : $brut;
 		$out  = [];
@@ -47,7 +25,7 @@ final class Structure {
 			}
 			$cle = (string) $d['cle'];
 			if ( ! preg_match( '/^[a-z0-9_]{1,40}$/', $cle ) ) {
-				continue; // Une clé invalide n'est pas réparée : elle est écartée.
+				continue;
 			}
 			$out[] = [
 				'cle'     => $cle,
@@ -62,7 +40,7 @@ final class Structure {
 		return $out;
 	}
 
-	/** Valeurs par défaut d'un schéma (celles que le site publie aujourd'hui). */
+
 	public static function defauts( array $schema ): array {
 		$out = [];
 		foreach ( $schema as $d ) {
@@ -71,15 +49,8 @@ final class Structure {
 		return $out;
 	}
 
-	/**
-	 * Nettoie ce qui arrive du formulaire, champ par champ du schéma — rien
-	 * d'autre n'est lu. Une adresse invalide n'est pas enregistrée : l'ancienne
-	 * valeur reste, et le refus est rendu pour être affiché.
-	 *
-	 * @param array<string,mixed> $recu
-	 * @param array<string,mixed> $avant
-	 * @return array{0:array<string,mixed>,1:string[]} [valeurs, refus]
-	 */
+
+
 	public static function nettoyer( array $schema, array $recu, array $avant ): array {
 		$out   = [];
 		$refus = [];
@@ -123,19 +94,15 @@ final class Structure {
 						$out[ $cle ] = $borne( $email );
 					}
 					break;
-				default: // long, riche, lien : du texte, jamais de balise.
+				default:
 					$out[ $cle ] = $borne( sanitize_textarea_field( is_scalar( $v ) ? (string) $v : '' ) );
 			}
 		}
 		return [ $out, $refus ];
 	}
 
-	/**
-	 * Pour l'export : les valeurs du schéma seulement ; une image devient sa
-	 * description (adresse, dimensions), ou null.
-	 *
-	 * @return array<string,mixed>
-	 */
+
+
 	public static function pour_export( array $schema, array $valeurs ): array {
 		$out = [];
 		foreach ( $schema as $d ) {
@@ -154,7 +121,7 @@ final class Structure {
 		return $out;
 	}
 
-	/** Aide de saisie selon le type : ce que le site fera du texte. */
+
 	private static function aide_type( string $type ): string {
 		return [
 			'riche'  => __( 'Mise en valeur : **gras**, *italique*. Pas de HTML.', 'pose-parquet-core' ),
@@ -163,11 +130,8 @@ final class Structure {
 		][ $type ] ?? '';
 	}
 
-	/**
-	 * Le formulaire, groupe par groupe, avec les composants du socle.
-	 *
-	 * @param array<string,mixed> $valeurs
-	 */
+
+
 	public static function formulaire( array $schema, array $valeurs, string $nom ): void {
 		$groupe = null;
 		foreach ( $schema as $d ) {

@@ -1,24 +1,11 @@
-/**
- * Contrôle des liens et des références internes du site généré.
- *
- * Parcourt toutes les pages HTML publiques et vérifie que chaque `href`,
- * `src`, `srcset` et `poster` interne pointe sur un fichier qui existe. Les
- * ancres (`#id`) sont vérifiées contre les `id` de la page cible.
- *
- * Ce n'est pas un test de rendu : un lien peut exister et mener au mauvais
- * endroit. La validation finale se fait dans le navigateur ; ce script sert à
- * ce que le navigateur n'ait pas à trouver les 404 tout seul.
- *
- *   node _generator/check-links.js
- */
 const fs = require('fs');
 const path = require('path');
 
 const { exclusions } = require('./arborescence');
 
 const ROOT = path.join(__dirname, '..');
-/* Le plancher commun (dossiers en point, outillage) vient d'arborescence.js ;
-   ici s'y ajoute ce qui n'est pas une page du site. */
+
+
 const IGNORER = exclusions(['assets', 'components', 'design', 'backend', 'docs']);
 
 function pages(dir = ROOT, out = []) {
@@ -69,9 +56,9 @@ for (const page of pages()) {
       problemes.push(`${rel} → ${ref} : FICHIER ABSENT`);
       continue;
     }
-    // `#motif=baton-rompu` n'est pas une ancre : c'est un paramètre lu par
-    // `floor-visualizer.js` (URLSearchParams sur location.hash). On ne le
-    // vérifie pas contre les id de la page.
+
+
+
     if (ancre && !ancre.includes('=') && cible.endsWith('.html') && !ids(cible).has(ancre)) {
       problemes.push(`${rel} → ${ref} : ANCRE #${ancre} INTROUVABLE`);
     }

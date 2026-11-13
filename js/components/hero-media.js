@@ -1,11 +1,8 @@
 import { qs, on } from '../utils/dom.js';
 import { prefersReducedMotion } from '../utils/motion.js';
 
-/**
- * Video du hero : chargee seulement si une source est fournie et si
- * l'utilisateur n'a pas demande a reduire les animations. L'image reste
- * le fallback affiche par defaut (aucun CLS).
- */
+
+
 export function initHeroMedia() {
   const media = qs('[data-hero-media]');
   if (!media) return;

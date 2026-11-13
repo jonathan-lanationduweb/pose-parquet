@@ -4,8 +4,7 @@
 <meta charset="utf-8" />
 <meta name="robots" content="noindex, nofollow" />
 <title>Recette front — sonde multi-pages, multi-largeurs</title>
-<style>
-  :root { color-scheme: dark; }
+<style>:root { color-scheme: dark; }
   body { margin: 0; background: #101212; color: #e8e6df; font: 12px/1.5 ui-monospace, monospace; }
   header { padding: 8px 10px; border-bottom: 1px solid #2a2e2e; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
   #cadre { position: fixed; right: 0; top: 40px; border: 1px solid #333; background: #fff; transform-origin: top right; }
@@ -22,30 +21,7 @@
 <iframe id="cadre" title="page sous test"></iframe>
 <pre id="out"></pre>
 
-<script>
-/**
- * Sonde de recette : charge chaque page publique dans un cadre à la largeur
- * demandée et relève ce qu'un œil ne verrait qu'en scrollant trente-trois
- * pages à dix largeurs. Elle NE remplace pas le regard : elle dit où poser
- * les yeux. Les captures d'écran restent la validation.
- *
- * Ce qu'elle mesure, par page et par largeur :
- *   - débordement horizontal du document ;
- *   - éléments qui sortent du cadre (hors SVG internes et pistes défilantes
- *     volontairement larges) ;
- *   - blocs de texte étroits (moins de 120 px pour plus de 24 caractères) —
- *     c'est la signature des colonnes écrasées qu'on a déjà connues ;
- *   - texte rogné (nowrap dont le contenu dépasse) ;
- *   - cibles tactiles interactives de moins de 40 px de côté (sous 768 px) ;
- *   - texte de moins de 12 px ;
- *   - images cassées (naturalWidth 0) ou déformées (rapport CSS ≠ rapport
- *     natif à plus de 3 %) ;
- *   - chevauchements de titres avec le texte suivant ;
- *   - hiérarchie de titres (saut de niveau) ;
- *   - hauteur totale du document, pour repérer les pages démesurées ;
- *   - liens sans texte ni aria-label ; boutons vides.
- */
-const PAGES = [
+<script>const PAGES = [
   '/', '/guides/', '/guides/quel-sens-de-pose-choisir.html', '/guides/parquet-massif-ou-contrecolle.html',
   '/guides/point-de-hongrie-ou-baton-rompu.html', '/guides/poser-parquet-sens-de-la-lumiere.html',
   '/guides/preparer-son-sol-avant-la-pose.html', '/guides/erreurs-a-eviter-avant-de-poser.html',

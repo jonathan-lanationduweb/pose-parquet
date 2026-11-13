@@ -1,17 +1,7 @@
 import { qs, qsa, on } from '../utils/dom.js';
 
-/**
- * Carrousel horizontal, JavaScript natif.
- *
- * Deux modes :
- *  - « free » (défaut, et seul mode sur mobile) : swipe tactile natif,
- *    glisser-déposer souris, boutons, clavier.
- *  - « scroll » : la position horizontale est pilotée par le scroll vertical
- *    de la page (voir js/components/scroll-carousel.js). Le glisser est
- *    désactivé et les boutons déplacent la page, pour éviter tout conflit.
- *
- * Renvoie une petite API utilisée par le pilote scroll.
- */
+
+
 export function initCarousel(root) {
   const viewport = qs('[data-carousel-viewport]', root);
   if (!viewport) return null;
@@ -23,16 +13,8 @@ export function initCarousel(root) {
   const count = qs('[data-carousel-count]', root);
   if (!slides.length) return null;
 
-  /**
-   * Les diapositives réellement présentes à l'écran.
-   *
-   * Sur la page Inspiration, les filtres masquent des diapositives avec
-   * l'attribut `hidden`. Compter la liste figée du départ afficherait alors
-   * « 01 / 08 » sur un carrousel qui n'en montre plus que trois, et la largeur
-   * d'un pas se calculerait sur une diapositive invisible, donc large de zéro.
-   * Ailleurs — le carrousel des guides, par exemple — rien n'est masqué et
-   * cette fonction rend exactement la liste d'origine.
-   */
+
+
   const presentes = () => slides.filter((s) => !s.hidden && s.getBoundingClientRect().width > 0);
 
   let mode = 'free';
@@ -65,22 +47,15 @@ export function initCarousel(root) {
     }
     if (count) {
       const total = presentes().length || slides.length;
-      /*
-       * En bout de piste, la dernière diapositive est à l'écran sans que son
-       * bord gauche puisse atteindre celui de la fenêtre : le calcul par
-       * division annonçait alors « 07 / 08 » devant la huitième. Quand il n'y
-       * a plus rien à faire défiler, c'est la dernière, sans discussion.
-       */
+
+
       const index = max > 4 && viewport.scrollLeft >= max - 8 ? total : Math.min(currentIndex() + 1, total);
       count.textContent = `${String(index).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
     }
   };
 
-  /**
-   * Défilement programmé. Tween maison plutôt que scrollTo({behavior:'smooth'}) :
-   * le scroll-snap « mandatory » annule les animations natives déclenchées en JS,
-   * et requestAnimationFrame peut être suspendu selon l'état de la fenêtre.
-   */
+
+
   let snapTimer = null;
   let tween = null;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -130,7 +105,7 @@ export function initCarousel(root) {
   on(viewport, 'scroll', update, { passive: true });
   on(window, 'resize', update);
 
-  // ---- Glisser-déposer souris (le tactile utilise le scroll natif) ----
+
   let pointerId = null;
   let startX = 0;
   let startLeft = 0;
@@ -178,7 +153,7 @@ export function initCarousel(root) {
     true
   );
 
-  // ---- Clavier ----
+
   on(viewport, 'keydown', (event) => {
     const actions = {
       ArrowRight: () => go(1),
@@ -198,12 +173,12 @@ export function initCarousel(root) {
     root,
     viewport,
     slides,
-    /** Diapositives visibles a l'instant t — les filtres s'en servent. */
+
     presentes,
     step,
     maxScroll,
     update,
-    /** Bascule entre pilotage libre et pilotage par le scroll de la page. */
+
     setMode(nextMode, handlers = {}) {
       mode = nextMode;
       onNavigate = handlers.onNavigate || null;

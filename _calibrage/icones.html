@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex, nofollow" />
 <title>Contrôle des icônes — outil interne</title>
-<style>
-  body { margin: 0; font: 13px/1.5 ui-monospace, Menlo, monospace; background: #f2efe8; color: #16181a; }
+<style>body { margin: 0; font: 13px/1.5 ui-monospace, Menlo, monospace; background: #f2efe8; color: #16181a; }
   h1 { font: 600 15px/1.4 ui-monospace, monospace; padding: 14px 18px; margin: 0; border-bottom: 1px solid #d8d3c8; }
   section { padding: 18px; border-bottom: 1px solid #d8d3c8; }
   section.dark { background: #16181a; color: #f2efe8; border-color: #333; }
@@ -14,7 +13,6 @@
   .row { display: flex; gap: 26px; align-items: flex-end; flex-wrap: wrap; margin-top: 12px; }
   figure { margin: 0; text-align: center; }
   figcaption { margin-top: 6px; font-size: 11px; opacity: 0.65; }
-  /* image-rendering: pixelated pour juger la grille de pixels réelle */
   img.zoom { image-rendering: pixelated; }
   .tabbar { display: flex; align-items: center; gap: 8px; background: #fff; border-radius: 8px 8px 0 0; padding: 7px 12px; width: 260px; box-shadow: 0 1px 3px #0002; }
   .tabbar span { font: 12px/1 system-ui, sans-serif; color: #202124; }
@@ -63,8 +61,7 @@
   </div>
 </section>
 
-<script>
-  const sizes = [16, 24, 32, 48];
+<script>const sizes = [16, 24, 32, 48];
   const build = (host, zoom) => {
     host.innerHTML = sizes.map((s) => `
       <figure>

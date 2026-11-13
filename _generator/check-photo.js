@@ -1,21 +1,3 @@
-/**
- * Contrôle : le mode « Ma photo » — coordonnées, cadre, découplage, affichage.
- *
- *   node _generator/check-photo.js
- *
- * POURQUOI. Le 05/10/2026, sur une photo importée, un coin du sol ne pouvait
- * pas être ramené au bord : l'éditeur reconstruisait ses poignées à chaque
- * mouvement (la poignée tenue perdait la capture du pointeur après un pas),
- * le cadre de départ posait deux coins hors de l'image (rognés, insaisissables)
- * et le tiroir couvrait la photo. Ce contrôle vérifie ce qui se teste sans
- * navigateur ; le comportement réel (glisser souris et doigt aux quatre coins,
- * 320 à 1920 px) a été recetté dans Chrome — voir le rapport de la mission.
- *
- *   §1  écran → image → écran : bords atteints, aller-retour < 1 px
- *   §2  le cadre de départ est large, dans l'image, et valide
- *   §3  la validation de « Terminer » refuse un cadre croisé ou minuscule
- *   §4  ce qui a causé le blocage ne revient pas (garde-fous dans le code)
- */
 const fs = require('fs');
 const path = require('path');
 
@@ -32,11 +14,11 @@ function verifier(nom, condition, detail = '') {
 }
 const titre = (t) => console.log(`\n== ${t} ==`);
 
-/* ------------------------------------------------------------------ */
+
 titre('§1 Écran → image → écran');
-// Boîtes d'affichage de la photo : panneau ouvert / fermé, téléphone, tablette,
-// photos paysage, portrait, carrée, panoramique. La boîte est celle de l'IMAGE
-// affichée (aucune bande de letterbox : la couche épouse le canevas).
+
+
+
 const BOITES = [
   { nom: 'bureau, tiroir ouvert, paysage 3:2', left: 22, top: 137, width: 1012, height: 675 },
   { nom: 'bureau, tiroir fermé, paysage 3:2', left: 214, top: 88, width: 1012, height: 675 },
@@ -51,10 +33,10 @@ for (const r of BOITES) {
     .map(([x, y]) => EDITEUR.versImage(x, y, r));
   const attendus = [[0, 0], [1, 0], [1, 1], [0, 1]];
   verifier(`${r.nom} : les quatre bords de l'écran donnent x, y ∈ {0, 1}`,
-    // À 1e-9 près : une boîte à coordonnées décimales donne 0,9999999999999998,
-    // soit un millionième de pixel — le bord est atteint.
+
+
     coins.every((p, i) => Math.abs(p.x - attendus[i][0]) < 1e-9 && Math.abs(p.y - attendus[i][1]) < 1e-9), JSON.stringify(coins));
-  // Un doigt qui dépasse le bord s'arrête AU bord de l'image, ni avant ni après.
+
   const dehors = EDITEUR.versImage(r.left - 80, r.top + r.height + 80, r);
   verifier(`${r.nom} : au-delà du bord, le point reste au bord (0, 1)`, dehors.x === 0 && dehors.y === 1, JSON.stringify(dehors));
   let pire = 0;
@@ -68,8 +50,8 @@ for (const r of BOITES) {
   }
   verifier(`${r.nom} : aller-retour écran → image → écran, écart max ${pire.toExponential(1)} px (< 1 px)`, pire < 1);
 }
-// Panneau ouvert ou fermé : la même portion de photo, deux boîtes différentes,
-// les mêmes coordonnées image.
+
+
 {
   const [ouvert, ferme] = BOITES;
   const p = { x: 0.37, y: 0.81 };
@@ -78,14 +60,14 @@ for (const r of BOITES) {
   verifier('tiroir ouvert / fermé : un même point du sol garde ses coordonnées image', Math.abs(a.x - b.x) < 1e-9 && Math.abs(a.y - b.y) < 1e-9);
 }
 
-/* ------------------------------------------------------------------ */
+
 titre('§2 Cadre de départ');
 const dansImage = (q) => q.every((p) => p.x >= 0 && p.x <= 1 && p.y >= 0 && p.y <= 1);
 const aire = (q) => Math.abs(q.reduce((s, p, i) => s + p.x * q[(i + 1) % 4].y - q[(i + 1) % 4].x * p.y, 0)) / 2;
 verifier('DEFAULT_QUAD (schéma) = DEFAULT_FRAME (éditeur)', JSON.stringify(SCHEMA.DEFAULT_QUAD) === JSON.stringify(EDITEUR.DEFAULT_FRAME));
 verifier('cadre par défaut entièrement dans l’image', dansImage(SCHEMA.DEFAULT_QUAD));
-// Le cadre ne donne plus que la fuite : ce qui doit être LARGE au départ,
-// c'est la zone peinte (le contour, prolongé jusqu'au bas de la photo).
+
+
 const aireP = (q) => Math.abs(q.reduce((s, p, i) => s + p.x * q[(i + 1) % q.length].y - q[(i + 1) % q.length].x * p.y, 0)) / 2;
 const scenePhoto = SCHEMA.createBlankScene({ width: 1600, height: 1067 });
 const zonePhoto = scenePhoto.floorZones[0];
@@ -98,7 +80,7 @@ verifier('photo importée (analyseur « manual ») : le cadre de départ commun,
   && JSON.stringify(zonePhoto.cadre) === JSON.stringify(SCHEMA.DEFAULT_QUAD));
 verifier('cadre par défaut valide pour « Terminer »', EDITEUR.problemeCadre(SCHEMA.DEFAULT_QUAD) === null);
 
-/* ------------------------------------------------------------------ */
+
 titre('§2 bis Photo importée : une perspective crédible (06/10/2026)');
 const CADRE = require('../js/scene/cadre-photo.js');
 const pts = (a) => a.map(([x, y]) => ({ x, y }));
@@ -112,9 +94,9 @@ const largeurPx = (a, b, W, H) => Math.hypot((b.x - a.x) * W, (b.y - a.y) * H);
   verifier('le cadre de départ n’est pas signalé « plat », l’ancien l’est', !CADRE.cotesParalleles(CADRE.CADRE_DEPART, 1600, 1067) && CADRE.cotesParalleles(ancien, 1600, 1067));
   verifier('poignées tirées aux coins d’une photo large : conseil « plat »', CADRE.cotesParalleles(pts([[0.1, 0.5], [0.9, 0.5], [1, 1], [0, 1]]), 1600, 1067));
 }
-// Les poignées du bas glissent le long des côtés : le plan reste le MÊME
-// rectangle de sol. Vérifié sur la pièce « salon en angle », calibrée à la
-// main : coin avant gauche hors photo à (−0,2258 ; 0,75).
+
+
+
 {
   const calib = JSON.parse(lire('data/scenes/salon-angle.json'));
   const zc = calib.floorZones[0];
@@ -126,8 +108,8 @@ const largeurPx = (a, b, W, H) => Math.hypot((b.x - a.x) * W, (b.y - a.y) * H);
   verifier(`poignée du bas posée le long du côté : le rectangle de sol est retrouvé (écart ${ecart.toFixed(1)} px sur 1600)`, ecart < 4);
   verifier('poignées retournées (devant au-dessus du fond) : aucun plan inventé', CADRE.planDuCadre(pts([[0.2, 0.8], [0.8, 0.8], [0.9, 0.6], [0.1, 0.6]]), 1600, 1067) === null);
 }
-// Dimensions lues dans la photo : sur les pièces calibrées à deux points de
-// fuite, les proportions du sol sont celles mesurées à la main.
+
+
 {
   const index = JSON.parse(lire('data/scenes/index.json'));
   const ids = (index.scenes || index).map((s) => s.id || s);
@@ -156,7 +138,7 @@ const largeurPx = (a, b, W, H) => Math.hypot((b.x - a.x) * W, (b.y - a.y) * H);
   verifier('éclairement robuste aux objets : réservé aux photos importées', /light: \{ robust: true \}/.test(lire('js/scene/schema.js')) && /robust: light\.robust === true/.test(lire('js/scene/schema.js')) && /if \(light\.robust\) ecarterLesObjets/.test(lire('js/scene/shading.js')));
 }
 
-/* ------------------------------------------------------------------ */
+
 titre('§3 Terminer : un sol utilisable');
 const P = (a) => a.map(([x, y]) => ({ x, y }));
 verifier('cadre croisé refusé', EDITEUR.problemeCadre(P([[0.1, 0.5], [0.9, 0.5], [0.1, 1], [0.9, 1]])) !== null);
@@ -165,10 +147,10 @@ verifier('trois points confondus refusés', EDITEUR.problemeCadre(P([[0.2, 0.5],
 verifier('cadre aux quatre coins de l’image accepté', EDITEUR.problemeCadre(P([[0, 0], [1, 0], [1, 1], [0, 1]])) === null);
 verifier('cadre en trapèze de perspective accepté', EDITEUR.problemeCadre(P([[0.05, 0.515], [0.57, 0.553], [1, 1], [0, 1]])) === null);
 
-/* ------------------------------------------------------------------ */
+
 titre('§3 bis Scènes pré-calibrées : point réel et poignée affichée');
-// Zone saisissable typique d'un téléphone de 390 px : la photo plus 8 px de
-// marge de chaque côté, en fractions de l'image.
+
+
 const ZONE = { x0: -0.02, x1: 1.02, y0: -0.03, y1: 1.03 };
 const cas = [
   ['x = −0,2 → bord gauche', { x: -0.2, y: 0.6 }, { x: ZONE.x0, y: 0.6 }, 'gauche'],
@@ -188,7 +170,7 @@ const uiVisible = EDITEUR.projeterPoignee(visible, ZONE);
 verifier('point hors photo mais visible à l’écran : affiché à sa place, sans indicateur', uiVisible.x === visible.x && uiVisible.hors === null);
 const dansPhoto = EDITEUR.projeterPoignee({ x: 0, y: 1 }, { x0: 0, x1: 1, y0: 0, y1: 1 });
 verifier('photo importée : un point au bord exact n’est jamais déplacé', dansPhoto.x === 0 && dansPhoto.y === 1 && dansPhoto.hors === null);
-// Glisser : la valeur enregistrée reste la valeur réelle, jamais la valeur affichée.
+
 const d0 = EDITEUR.deplacerPoint({ x: -0.2, y: 1.25 }, 0, 0);
 verifier('prise sans mouvement : le point garde −0,2 et 1,25 (pas de saut vers la poignée)', d0.x === -0.2 && d0.y === 1.25);
 const d1 = EDITEUR.deplacerPoint({ x: 1.25, y: 0.8 }, -0.05, 0.01);
@@ -200,11 +182,11 @@ verifier('ramené dans la photo : la valeur suit (0,65)', Math.abs(d3.x - 0.65) 
 const d4 = EDITEUR.deplacerPoint({ x: 0.3, y: 0.5 }, -0.5, 0.9);
 verifier('photo importée : bornes [0, 1] inchangées, bords atteints exactement', d4.x === 0 && d4.y === 1);
 
-/* ------------------------------------------------------------------ */
+
 titre('§3 ter Poignées trop proches : écartées à l’affichage seulement');
 {
-  // Seuil = diamètre de la zone de prise, lu dans la feuille de style : cercle
-  // de 30 px + marge de saisie de 7 px de chaque côté.
+
+
   const css = lire('css/components/floor-editor.css');
   const largeur = Number((css.match(/\.floor-mask__handle \{[^}]*?width: (\d+)px;/) || [])[1]);
   const marge = Number((css.match(/\.floor-mask__handle::before \{[^}]*?inset: -(\d+)px;/) || [])[1]);
@@ -214,27 +196,27 @@ titre('§3 ter Poignées trop proches : écartées à l’affichage seulement');
   const ecran = { x0: -8, y0: -8, x1: 400, y1: 300 };
   const memes = (a, b) => a.every((p, i) => p.x === b[i].x && p.y === b[i].y);
 
-  // CAS 1 — poignées espacées : rien ne bouge.
+
   const espaces = [{ x: 40, y: 200 }, { x: 260, y: 200 }, { x: 300, y: 240 }, { x: 40, y: 260 }];
   verifier('CAS 1 — centres à plus de 44 px : positions affichées inchangées', memes(EDITEUR.deconflire(espaces, S, ecran), espaces));
 
-  // CAS 2 — le salon en angle à 390 px : 13 px entre les deux poignées de gauche.
+
   const proches = [{ x: 41.9, y: 220.8 }, { x: 275.7, y: 220.8 }, { x: 316.3, y: 243.1 }, { x: 29.1, y: 223.6 }];
   const vus = EDITEUR.deconflire(proches, S, ecran);
   const minPaires = (l) => Math.min(...l.flatMap((a, i) => l.slice(i + 1).map((b) => dist(a, b))));
   verifier(`CAS 2 — centres à ${dist(proches[0], proches[3]).toFixed(0)} px : deux cibles distinctes (${minPaires(vus).toFixed(1)} px ≥ ${S})`, minPaires(vus) >= S - 0.05);
   verifier('CAS 2 — les poignées déjà espacées ne bougent pas', vus[1].x === proches[1].x && vus[2].y === proches[2].y);
 
-  // CAS 3 — points confondus : toujours deux contrôles.
+
   const confondus = EDITEUR.deconflire([{ x: 100, y: 100 }, { x: 100, y: 100 }], S, ecran);
   verifier('CAS 3 — points mathématiques identiques : deux contrôles sélectionnables', dist(confondus[0], confondus[1]) >= S - 0.05);
   const auBord = EDITEUR.deconflire([{ x: -8, y: 150 }, { x: -8, y: 152 }], S, ecran);
   verifier('point hors image ramené au bord + autre point au bord : deux contrôles dans l’écran',
     dist(auBord[0], auBord[1]) >= S - 0.05 && auBord.every((p) => p.x >= ecran.x0 && p.y >= ecran.y0 && p.y <= ecran.y1));
 
-  // CAS 4 et 5 — glisser A (puis B) : seul SON point réel bouge. Le glisser
-  // agit sur `prise.point`, le point de la poignée saisie, jamais sur un
-  // voisin ; l'affichage n'écrit jamais dans les points.
+
+
+
   const reels = [{ x: 0.0575, y: 0.6532 }, { x: 0.7331, y: 0.6532 }, { x: 0.8506, y: 0.7498 }, { x: 0.0206, y: 0.6654 }];
   for (const [nom, k] of [['CAS 4 — glisser la poignée haute gauche (A)', 0], ['CAS 5 — glisser la poignée basse gauche (B)', 3]]) {
     const apres = reels.map((p) => ({ ...p }));
@@ -244,11 +226,11 @@ titre('§3 ter Poignées trop proches : écartées à l’affichage seulement');
   verifier('CAS 4/5 — l’affichage n’écrit jamais dans les points (positions d’affichage calculées à part)',
     /const affiche = |let affiche = /.test(codeEditeurDeconf()) && !/points\[index\] = .*affiche/.test(codeEditeurDeconf()));
 
-  // CAS 6 — une fois éloignées, plus aucun écart d'affichage.
+
   const eloignes = [{ x: 41.9, y: 220.8 }, { x: 275.7, y: 220.8 }, { x: 316.3, y: 243.1 }, { x: 29.1, y: 290 }];
   verifier('CAS 6 — après éloignement (> 44 px) : écart d’affichage supprimé', memes(EDITEUR.deconflire(eloignes, S, ecran), eloignes));
 
-  // Poignée tenue : elle reste sous le doigt, ce sont les autres qui s'écartent.
+
   const tenue = EDITEUR.deconflire(proches, S, ecran, 0);
   verifier('poignée tenue : elle ne bouge pas, l’autre s’écarte d’elle', tenue[0].x === proches[0].x && tenue[0].y === proches[0].y && dist(tenue[0], tenue[3]) >= S - 0.05);
   verifier('écart figé à la prise, relâché au lâcher', /tenue = \{\s*index,/.test(codeEditeurDeconf()) && /tenue = null;\s*placerPoignees\(activePoints\(\)\);/.test(codeEditeurDeconf()));
@@ -258,7 +240,7 @@ titre('§3 ter Poignées trop proches : écartées à l’affichage seulement');
 }
 function codeEditeurDeconf() { return lire('js/scene/editor.js'); }
 
-/* ------------------------------------------------------------------ */
+
 titre('§4 Garde-fous');
 const codeEditeur = lire('js/scene/editor.js');
 verifier('les poignées ne sont pas reconstruites pendant un glisser', /if \(cle !== construits\)/.test(codeEditeur) && /placerPoignees\(points\)/.test(codeEditeur));

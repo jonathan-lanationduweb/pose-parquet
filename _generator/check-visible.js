@@ -1,15 +1,3 @@
-/**
- * Contrôle : ce que le visiteur VOIT reste conforme aux règles validées.
- *
- *   node _generator/check-visible.js        (après le build)
- *
- * POURQUOI. Le 05/10/2026, des captures prises dans Chrome contredisaient des
- * rapports au vert : un aperçu collé à gauche avec une colonne vide, une
- * démonstration présentée comme une fiche au-dessus du catalogue Premibel, un
- * bandeau « ne peut pas encore envoyer » alors que l'API répondait. Chacun de
- * ces états est verrouillé ici. Le comportement réel (Chrome, 390 à 1920 px,
- * envoi POST 201) a été recetté ; ce contrôle empêche qu'il régresse.
- */
 const fs = require('fs');
 const path = require('path');
 
@@ -27,16 +15,12 @@ function verifier(nom, condition, detail = '') {
 }
 const titre = (t) => console.log(`\n== ${t} ==`);
 
-/* ------------------------------------------------------------------ */
+
 titre('Formulaire : l’état affiché suit la réponse de l’API');
 const apiConfig = lire('js/forms/api-config.js');
 const formulaire = lire('components/project-form/project-form.js');
-/*
- * 06/10/2026 : le formulaire ne « fait plus une demande », il oriente
- * (js/forms/orientation.js). L'API n'enregistre que des statistiques : son
- * absence ou sa panne ne bloque plus rien, et il n'y a plus de bandeau
- * « ne peut pas encore envoyer votre demande ». Voir check-orientation.js.
- */
+
+
 verifier('l’API est testée par /health (statut « ok » exigé)', /apiUrl\('\/health'\)/.test(apiConfig) && /corps\.status === 'ok'/.test(apiConfig));
 verifier('1. plus aucun bandeau « ne peut pas envoyer » : rien à envoyer, tout s’oriente dans le navigateur',
   !/pf__offline/.test(formulaire) && !/ne peut pas encore envoyer/.test(formulaire) && !/submitBtn\.disabled = true;\s*submitBtn\.title/.test(formulaire));
@@ -45,7 +29,7 @@ verifier('2. API absente ou en panne : l’orientation s’affiche quand même (
   && /await montrerOrientation\(donnees, qualification, reference\);/.test(formulaire));
 verifier('hôte local non autorisé : jamais relié en production', /if \(Object\.prototype\.hasOwnProperty\.call\(PAR_HOTE, h\)\) return false;/.test(apiConfig));
 
-/* ------------------------------------------------------------------ */
+
 titre('Studio : démonstration ≠ catalogue Premibel');
 const fiches = [...CATALOGUE.proposes, ...CATALOGUE.rejetes];
 const demos = fiches.filter((f) => f.source !== 'premibel');
@@ -65,13 +49,13 @@ verifier(`5. chaque référence Premibel visualisable a son CTA « Voir ce parqu
 verifier('5. badge de la sélection : fidèle seulement si ready', /fiche\.visualStatus === 'ready' \? 'Rendu fidèle' : 'Rendu indicatif'/.test(app));
 const indispo = premibel.filter((f) => f.visualStatus === 'unavailable');
 verifier(`6. les ${indispo.length} « Autres parquets » ne sont jamais proposés au rendu`, indispo.every((f) => !PRODUIT.estProposable(f)));
-// Seule une carte AVEC matériau appelle le rendu (onSelect) ; une référence
-// indisponible n'a pas de matériau et devient un lien vers sa fiche.
+
+
 verifier('6. une carte indisponible est un lien vers la fiche, pas un bouton de rendu',
   /if \(e\.material\) \{[\s\S]*?onSelect\(e\.material\)[\s\S]*?\} else \{\s*el = document\.createElement\('a'\);\s*el\.href = e\.url;/.test(catalogJs));
 verifier('l’adresse suit la sélection (aucune démonstration ne reste dans l’URL)', /function syncUrl\(\)/.test(app) && /syncUrl\(\);/.test(app));
 
-/* ------------------------------------------------------------------ */
+
 titre('7. Motif toujours compatible avec le produit');
 let incoherents = 0;
 const proposes = CATALOGUE.proposes;
@@ -85,7 +69,7 @@ for (const f of proposes.slice(0, 400)) {
 verifier(`aucun couple produit / motif impossible après normalisation (${proposes.length} produits × 3 motifs)`, incoherents === 0, `${incoherents} cas`);
 verifier('changement de produit et lien profond passent par normaliserConfig', (app.match(/normaliserConfig\(/g) || []).length >= 2);
 
-/* ------------------------------------------------------------------ */
+
 titre('Pages construites');
 const accueil = lire('index.html');
 const cssVz = lire('css/components/visualizer-photo.css');

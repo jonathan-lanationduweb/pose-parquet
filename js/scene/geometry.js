@@ -1,22 +1,7 @@
-/**
- * Géométrie d'une zone de sol, partagée par les deux moteurs de rendu.
- *
- * Les deux ont besoin exactement des mêmes nombres — c'est la condition pour
- * qu'ils donnent la même image, et donc pour que le moteur Canvas reste une
- * référence utilisable.
- */
 import { squareToQuad, invert } from './perspective.js';
 
-/**
- * Repère de perspective d'une zone, en pixels image.
- *
- * `jac` est le jacobien du plan au centre du quadrilatère : de combien de
- * pixels l'image se déplace quand on avance d'un mètre sur le sol. Il varie
- * lentement, une seule évaluation au centre suffit largement pour orienter
- * la lumière.
- *
- * @returns {{H:number[], M:number[], jac:number[], center:{x,y}}|null}
- */
+
+
 export function zoneTransform(zone, width, height) {
   const quad = zone.plane.quad.map((p) => ({ x: p.x * width, y: p.y * height }));
   const H = squareToQuad(quad);
@@ -42,15 +27,8 @@ export function zoneTransform(zone, width, height) {
   };
 }
 
-/**
- * D'où vient la lumière, lu dans la carte d'éclairement.
- *
- * Le gradient dominant de la lumière pointe vers sa source : une fenêtre à
- * gauche laisse un dégradé qui décroît vers la droite. Aucun modèle, aucune
- * estimation savante — juste la photo, moyennée.
- *
- * @returns {{x:number,y:number}} direction unitaire, en repère image
- */
+
+
 export function lightDirection(shading) {
   const { width, height, rgba } = shading;
   const lum = (index) => {
@@ -67,23 +45,14 @@ export function lightDirection(shading) {
     }
   }
   const length = Math.hypot(gx, gy);
-  // Éclairage diffus, pas de direction franche : lumière d'en haut à gauche,
-  // la convention qui trahit le moins.
+
+
   if (length < 1e-3) return { x: -0.55, y: -0.83 };
   return { x: gx / length, y: gy / length };
 }
 
-/**
- * Direction de la lumière ramenée dans le repère de la tuile.
- *
- * Le relief est décrit dans la tuile, la lumière est mesurée dans l'image :
- * sans ce passage, les chanfreins d'une zone vue de biais seraient éclairés du
- * mauvais côté.
- *
- * @param {number[]} jac      jacobien de la zone
- * @param {{x,y}} dir         direction de la lumière, repère image
- * @param {number} angleRad   orientation du motif
- */
+
+
 export function tileLight(jac, dir, angleRad) {
   const det = jac[0] * jac[3] - jac[1] * jac[2];
   const inv = Math.abs(det) > 1e-9 ? 1 / det : 0;

@@ -1,20 +1,8 @@
-/**
- * Configuration du formulaire projet.
- *
- * Ce fichier décrit 100 % des étapes et des champs : le composant
- * (project-form.js) ne connaît que ce schéma. Pour remplacer ce formulaire
- * par celui d'un partenaire, il suffit de démonter le composant du point de
- * montage `[data-project-form]` — aucune page ne dépend de sa structure interne.
- */
-
 export const projectFormConfig = {
   id: 'projet',
   title: 'Décrire mon projet',
-  /*
-   * Le formulaire ne « fait pas une demande » : il qualifie le projet pour
-   * montrer vers qui se tourner (js/forms/orientation.js). Le bouton dit donc
-   * ce qui se passe vraiment au clic.
-   */
+
+
   submitLabel: 'Voir comment avancer',
   steps: [
     {
@@ -22,25 +10,8 @@ export const projectFormConfig = {
       title: 'Où se situe le projet ?',
       hint: 'Le département suffit : il dit qui peut intervenir.',
       fields: [
-        /*
-         * ZONE ET RÉGION ONT DISPARU DE LA SAISIE.
-         *
-         * Elles demandaient trois fois la même chose : une zone, puis une
-         * région, puis un département. Trois réponses possibles pour un seul
-         * fait — « hors Île-de-France » avec un 75 était une combinaison
-         * parfaitement saisissable — et l'orientation commerciale dépendait
-         * alors de celui des trois champs qu'on décidait de croire.
-         *
-         * Le département suffit et ne se contredit pas : la région s'en
-         * déduit, côté front pour l'orientation et côté serveur pour le
-         * stockage. Voir js/forms/departements.js.
-         *
-         * LA VILLE A SUIVI (lot « passerelle commerciale »). Facultative, elle
-         * ne servait ni à l'orientation (le département suffit) ni à
-         * personne : Pose-Parquet ne se déplace pas et ne transmet pas le
-         * projet. On ne demande pas ce dont on n'a pas l'usage. Le serveur
-         * l'accepte toujours absente (champ facultatif du contrat).
-         */
+
+
         {
           name: 'departement',
           label: 'Département',
@@ -164,26 +135,8 @@ export const projectFormConfig = {
       title: 'De quoi avez-vous besoin, et pour quand ?',
       hint: 'Une estimation suffit : elle sert à vous orienter vers la bonne entreprise.',
       fields: [
-        /*
-         * La question qui décide de l'orientation.
-         *
-         * Elle a sa place ICI et non dans une sixième étape. Cette étape-ci
-         * n'en portait qu'une, le délai : c'était la plus maigre du parcours,
-         * et une étape entière pour un seul bouton radio se traverse comme
-         * une formalité. Deux questions courtes la remettent au niveau des
-         * trois autres. Le parcours compte quatre étapes depuis que celle des
-         * coordonnées a disparu.
-         *
-         * Obligatoire, comme les autres boutons radio du formulaire. C'est un
-         * seul geste, et c'est le seul champ dont dépend l'orientation : le
-         * déduire du reste donnait une réponse juste environ une fois sur
-         * deux — quelqu'un qui a regardé un parquet dans le Visualiseur
-         * cherche parfois un poseur, pas une référence.
-         *
-         * L'ordre des réponses n'est pas neutre : du plus simple au plus
-         * large, et « je ne sais pas encore » en dernier pour qu'il soit une
-         * sortie et non le premier réflexe.
-         */
+
+
         {
           name: 'besoin',
           label: 'De quoi avez-vous besoin ?',
@@ -212,19 +165,8 @@ export const projectFormConfig = {
         },
       ],
     },
-    /*
-     * PLUS D'ÉTAPE « VOS COORDONNÉES ».
-     *
-     * Elle demandait prénom, nom, email, téléphone et un consentement « à
-     * être recontacté » — pour une réponse que personne chez Pose-Parquet ne
-     * fait : le parcours se termine par une orientation vers Premibel ou
-     * Allure Design, que le visiteur rejoint lui-même. Aucune de ces données
-     * ne servait à l'orientation (elle se calcule sur le besoin et le
-     * département). On ne collecte pas de données personnelles « au cas où ».
-     *
-     * Le jour où une transmission réelle à une entreprise existera, une étape
-     * de contact pourra revenir — en disant à QUI les coordonnées partent.
-     */
+
+
   ],
 };
 

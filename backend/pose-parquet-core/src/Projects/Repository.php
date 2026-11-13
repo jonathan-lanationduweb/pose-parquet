@@ -1,15 +1,6 @@
 <?php
-/**
- * Accès aux tables pp_projects et pp_project_history.
- *
- * Seule classe du plugin qui écrit dans ces tables. Elle reçoit des données
- * DÉJÀ validées et normalisées (Validator) et ne re-valide rien : son travail
- * est le SQL — préparé, sur des noms de tables issus de Schema, jamais d'une
- * entrée. Elle expose aussi les trois verbes de transaction pour que Service
- * puisse rendre atomiques l'insertion, la référence et l'historique.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -24,15 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Repository {
 
-	/**
-	 * Insère la demande, sans référence (NULL) : Service la pose juste après,
-	 * une fois l'identifiant connu.
-	 *
-	 * @param array<string,mixed> $data       sortie de Validator::validate()['data']
-	 * @param string|null         $consent_at datetime serveur, format MySQL ; null sans consentement
-	 * @param string              $now        datetime serveur, format MySQL
-	 * @return int identifiant créé, 0 en cas d'échec
-	 */
+
+
 	public function insert_project( array $data, ?string $consent_at, string $now ): int {
 		global $wpdb;
 
@@ -53,15 +37,8 @@ final class Repository {
 			$formats[]      = $api === 'surface' ? '%d' : '%s';
 		}
 
-		/*
-		 * La recommandation initiale, figee a la creation.
-		 *
-		 * Recopiee de `lead_destination` plutot que recue du navigateur : une
-		 * charge fabriquee pourrait sinon annoncer une recommandation
-		 * differente de la destination, et faire croire a un arbitrage humain
-		 * qui n'a jamais eu lieu. Les deux colonnes partent forcement egales ;
-		 * seule l'administration peut ensuite les faire diverger.
-		 */
+
+
 		if ( isset( $data['leadDestination'] ) ) {
 			$row['lead_destination_auto'] = $data['leadDestination'];
 			$formats[]                    = '%s';
@@ -80,13 +57,8 @@ final class Repository {
 				$formats[]          = '%d';
 			}
 			if ( isset( $v['config'] ) ) {
-				/*
-				 * Carnet du front, nettoyé par le validateur avant d arriver ici.
-				 * Le serveur n en impose pas la forme, mais il n est plus vrai qu il
-				 * ne le lit jamais : depuis les libellés d affichage, la fiche
-				 * d administration y cherche `nomScene` et `nom` pour nommer la
-				 * scène et le parquet. Deux clés connues dans un carnet libre.
-				 */
+
+
 				$row['visualizer_config'] = wp_json_encode( $v['config'] );
 				$formats[]                = '%s';
 			}
@@ -111,10 +83,8 @@ final class Repository {
 		return $updated === 1;
 	}
 
-	/**
-	 * Événement d'historique. old_status NULL marque la création ; user_id 0
-	 * marque une action sans utilisateur connecté (le formulaire public).
-	 */
+
+
 	public function insert_history( int $project_id, ?string $old_status, string $new_status, int $user_id, string $now, string $comment = '' ): bool {
 		global $wpdb;
 
@@ -134,9 +104,8 @@ final class Repository {
 		return (bool) $ok;
 	}
 
-	/**
-	 * État d'un email de la demande (`internal` ou `visitor`) : un mot et une date, jamais un contenu.
-	 */
+
+
 	public function set_mail_status( int $id, string $type, string $status, ?string $sent_at ): bool {
 		global $wpdb;
 
@@ -154,32 +123,32 @@ final class Repository {
 		return $updated !== false;
 	}
 
-	/** @return array<string,mixed>|null ligne brute de pp_projects */
+
 	public function find_by_id( int $id ): ?array {
 		global $wpdb;
 
 		$table = Schema::table( 'projects' );
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), ARRAY_A );
 
 		return $row ?: null;
 	}
 
-	/** @return array<string,mixed>|null */
+
 	public function find_by_reference( string $reference ): ?array {
 		global $wpdb;
 
 		$table = Schema::table( 'projects' );
-		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE reference = %s", $reference ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE reference = %s", $reference ), ARRAY_A );
 
 		return $row ?: null;
 	}
 
-	/** @return array<int,array<string,mixed>> événements, du plus ancien au plus récent */
+
 	public function history_of( int $project_id ): array {
 		global $wpdb;
 
 		$table = Schema::table( 'history' );
-		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE project_id = %d ORDER BY id ASC", $project_id ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE project_id = %d ORDER BY id ASC", $project_id ), ARRAY_A );
 
 		return $rows ?: [];
 	}
@@ -189,42 +158,25 @@ final class Repository {
 
 		$table = Schema::table( 'projects' );
 
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
 	}
 
-	/* ================================================================== */
-	/* Liste d'administration : filtre, recherche, pagination             */
-	/* ================================================================== */
 
-	/** Colonnes lues par la liste. `SELECT *` y ramènerait le message et le JSON du Visualiseur pour rien. */
+
+
+
+
 	private const LIST_COLUMNS = 'id, reference, status, first_name, last_name, email, phone, city, department,'
 		. ' room_type, surface, internal_mail_status, visitor_mail_status, created_at,'
-		/* Qualification : trois mots courts, lus a chaque ligne de la liste. */
-		/*
-		 * `region` et `department` rejoignent la liste : la destination depend
-		 * de la zone, et une colonne « Destination » sans moyen de verifier
-		 * d'ou vient le projet oblige a ouvrir chaque fiche.
-		 */
+
+
+
 		. ' lead_source, lead_need, lead_destination, lead_destination_auto, region,'
-		/* Le parquet choisi dans le Visualiseur : colonne « Produit » et lien Premibel. */
+
 		. ' product_id';
 
-	/**
-	 * Construit le WHERE commun à `search()` et `count_search()`.
-	 *
-	 * Une seule fonction pour les deux, sinon le compte total finit par ne plus
-	 * décrire la page affichée — et une pagination qui ment est pire qu'absente.
-	 *
-	 * La recherche est un LIKE sur sept colonnes. C'est assumé pour cette
-	 * version : `reference`, `email` et `department` sont indexés, les trois
-	 * autres ne le sont pas, et un LIKE `%terme%` ne peut de toute façon pas
-	 * utiliser un index B-tree. Mesuré sur mille lignes, la requête reste sous
-	 * la milliseconde ; le jour où le volume l'exigera, ce sera un index
-	 * FULLTEXT sur nom/email, pas un index par colonne posé à l'aveugle.
-	 *
-	 * @param array{status?:string,search?:string,mail?:string,destination?:string} $args
-	 * @return array{0:string,1:array<int,mixed>} clause (sans le mot WHERE) et paramètres
-	 */
+
+
 	private function where( array $args ): array {
 		$clauses = [];
 		$params  = [];
@@ -235,18 +187,8 @@ final class Repository {
 			$params[]  = $status;
 		}
 
-		/*
-		 * Filtre sur le sort des notifications.
-		 *
-		 * `failed` d'un côté OU de l'autre : une demande dont seule la
-		 * confirmation visiteur a échoué mérite d'apparaître, même si la
-		 * notification interne est partie. C'est ce filtre que vise le lien
-		 * « X notification(s) en échec » de l'écran État — un lead perdu en
-		 * silence est ce qu'on cherche à rendre impossible.
-		 *
-		 * La valeur n'est pas interpolée : elle est comparée à une liste
-		 * écrite ici, et seule cette liste produit une clause.
-		 */
+
+
 		$mail = (string) ( $args['mail'] ?? '' );
 		if ( in_array( $mail, [ Notifier::STATUS_FAILED, Notifier::STATUS_PENDING ], true ) ) {
 			$clauses[] = '(internal_mail_status = %s OR visitor_mail_status = %s)';
@@ -254,18 +196,8 @@ final class Repository {
 			$params[]  = $mail;
 		}
 
-		/*
-		 * Filtre sur la destination recommandee.
-		 *
-		 * « Montre-moi ce qui part chez Premibel », « montre-moi ce qui reste a
-		 * qualifier » : c'est le tri quotidien, et c'est pour lui que la
-		 * colonne porte un index.
-		 *
-		 * Comme pour le sort des notifications, la valeur n'est jamais
-		 * interpolee : elle est confrontee a la liste fermee de Fields, et
-		 * seule une valeur de cette liste produit une clause. Une valeur
-		 * inventee dans l'URL ne filtre rien plutot que de vider la page.
-		 */
+
+
 		$destination = (string) ( $args['destination'] ?? '' );
 		if ( in_array( $destination, Fields::enum( 'leadDestination' ), true ) ) {
 			$clauses[] = 'lead_destination = %s';
@@ -275,7 +207,7 @@ final class Repository {
 		$search = trim( (string) ( $args['search'] ?? '' ) );
 		if ( $search !== '' ) {
 			global $wpdb;
-			// Borné : au-delà, c'est un collage accidentel, pas une recherche.
+
 			$search = mb_substr( $search, 0, self::SEARCH_MAX );
 			$like   = '%' . $wpdb->esc_like( $search ) . '%';
 			$champs = [ 'reference', 'first_name', 'last_name', 'email', 'phone', 'city', 'department' ];
@@ -290,22 +222,14 @@ final class Repository {
 		return [ $clauses ? implode( ' AND ', $clauses ) : '', $params ];
 	}
 
-	/** Longueur maximale d'un terme de recherche, en caractères. */
+
 	public const SEARCH_MAX = 100;
 
-	/** Demandes par page de la liste d'administration. */
+
 	public const PER_PAGE = 20;
 
-	/**
-	 * Une page de demandes, la plus récente d'abord.
-	 *
-	 * `created_at DESC, id DESC` : la date seule ne suffit pas à ordonner deux
-	 * demandes arrivées dans la même seconde, et une pagination dont l'ordre
-	 * n'est pas total répète ou saute des lignes entre deux pages.
-	 *
-	 * @param array{status?:string,search?:string,mail?:string,destination?:string,page?:int,per_page?:int} $args
-	 * @return array<int,array<string,mixed>>
-	 */
+
+
 	public function search( array $args = [] ): array {
 		global $wpdb;
 
@@ -323,16 +247,13 @@ final class Repository {
 		$params[] = $per_page;
 		$params[] = $offset;
 
-		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$rows = $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A );
 
 		return $rows ?: [];
 	}
 
-	/**
-	 * Nombre de demandes répondant aux mêmes critères que `search()`.
-	 *
-	 * @param array{status?:string,search?:string,mail?:string,destination?:string} $args
-	 */
+
+
 	public function count_search( array $args = [] ): int {
 		global $wpdb;
 
@@ -341,26 +262,18 @@ final class Repository {
 		$sql                = "SELECT COUNT(*) FROM {$table}" . ( $where ? " WHERE {$where}" : '' );
 
 		if ( ! $params ) {
-			return (int) $wpdb->get_var( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			return (int) $wpdb->get_var( $sql );
 		}
 
-		return (int) $wpdb->get_var( $wpdb->prepare( $sql, $params ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		return (int) $wpdb->get_var( $wpdb->prepare( $sql, $params ) );
 	}
 
-	/**
-	 * Nombre de demandes par statut, y compris les statuts à zéro.
-	 *
-	 * Un GROUP BY, pas sept COUNT : la liste d'administration affiche les sept
-	 * onglets à chaque affichage. La recherche courante est appliquée pour que
-	 * les compteurs décrivent ce que les onglets vont réellement montrer.
-	 *
-	 * @param array{search?:string} $args
-	 * @return array<string,int> statut → nombre, plus la clé `all`
-	 */
+
+
 	public function counts_by_status( array $args = [] ): array {
 		global $wpdb;
 
-		// Le statut ne filtre pas les compteurs de statut : ce serait circulaire.
+
 		unset( $args['status'] );
 		[ $where, $params ] = $this->where( $args );
 		$table              = Schema::table( 'projects' );
@@ -368,8 +281,8 @@ final class Repository {
 			. ( $where ? " WHERE {$where}" : '' ) . ' GROUP BY status';
 
 		$rows = $params
-			? $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-			: $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			? $wpdb->get_results( $wpdb->prepare( $sql, $params ), ARRAY_A )
+			: $wpdb->get_results( $sql, ARRAY_A );
 
 		$counts = array_fill_keys( Status::all(), 0 );
 		$total  = 0;
@@ -386,17 +299,8 @@ final class Repository {
 		return $counts;
 	}
 
-	/**
-	 * Où en sont les notifications, tous types confondus.
-	 *
-	 * Un compteur par état et par type d'email, lu au moment de l'affichage.
-	 * C'est le seul indicateur honnête dont dispose la page « État » : le plugin
-	 * ne connaît pas le transport et ne peut pas affirmer qu'un email est
-	 * arrivé. Il sait seulement ce que `wp_mail()` lui a répondu, et c'est
-	 * exactement ce que ces colonnes conservent.
-	 *
-	 * @return array<string,array<string,int>> type → état → nombre
-	 */
+
+
 	public function counts_by_mail_status(): array {
 		global $wpdb;
 
@@ -407,8 +311,8 @@ final class Repository {
 		];
 
 		foreach ( [ Notifier::TYPE_INTERNAL => 'internal_mail_status', Notifier::TYPE_VISITOR => 'visitor_mail_status' ] as $type => $colonne ) {
-			// Nom de colonne issu d'une liste écrite ici, jamais d'une entrée.
-			$rows = $wpdb->get_results( "SELECT {$colonne} AS s, COUNT(*) AS n FROM {$table} GROUP BY {$colonne}", ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+			$rows = $wpdb->get_results( "SELECT {$colonne} AS s, COUNT(*) AS n FROM {$table} GROUP BY {$colonne}", ARRAY_A );
 			foreach ( $rows ?: [] as $row ) {
 				$counts[ $type ][ (string) $row['s'] ] = (int) $row['n'];
 			}
@@ -417,32 +321,14 @@ final class Repository {
 		return $counts;
 	}
 
-	/**
-	 * Change la destination recommandée d'une demande.
-	 *
-	 * Pas de verrou d'optimisme ici, contrairement au statut, et c'est
-	 * délibéré. Le statut décrit une progression : l'écraser fait perdre le
-	 * travail de quelqu'un. La destination est un aiguillage, et le dernier
-	 * humain qui tranche a raison — deux gestionnaires qui la changent en même
-	 * temps ne se contredisent pas, ils sont d'accord ou le second corrige.
-	 *
-	 * La trace, elle, n'est pas perdue : l'appelant écrit une note interne,
-	 * datée et signée. La table d'historique, elle, reste réservée aux
-	 * transitions de statut — ses colonnes `old_status` / `new_status` sont
-	 * NOT NULL et y loger autre chose aurait demandé de la déformer.
-	 *
-	 * La valeur n'est pas validée ici : l'appelant l'a confrontée à
-	 * `Fields::enum( 'leadDestination' )`, et une couche de données n'a pas à
-	 * connaître les listes éditoriales.
-	 *
-	 * @return bool vrai si une ligne a bougé
-	 */
+
+
 	public function update_destination( int $id, string $destination, string $now ): bool {
 		global $wpdb;
 
 		$table   = Schema::table( 'projects' );
 		$updated = $wpdb->query( $wpdb->prepare(
-			"UPDATE {$table} SET lead_destination = %s, updated_at = %s WHERE id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			"UPDATE {$table} SET lead_destination = %s, updated_at = %s WHERE id = %d",
 			$destination,
 			$now,
 			$id
@@ -451,26 +337,14 @@ final class Repository {
 		return $updated === 1;
 	}
 
-	/**
-	 * Change le statut — à condition qu'il soit encore celui qu'on croit.
-	 *
-	 * C'est toute la protection contre l'écrasement concurrent, et elle tient
-	 * dans le WHERE : `WHERE id = ? AND status = ?`. Deux gestionnaires ouvrent
-	 * la même fiche, le premier passe la demande à `contacted`, le second
-	 * envoie encore `new → lost` depuis sa page périmée — sa condition ne
-	 * s'applique plus à aucune ligne, l'UPDATE ne touche rien, et il reçoit un
-	 * refus au lieu d'écraser silencieusement le travail du premier. Aucun
-	 * numéro de version, aucune colonne de plus : la valeur attendue EST le
-	 * jeton d'optimisme, et le SGBD arbitre.
-	 *
-	 * @return bool vrai si une ligne a bougé
-	 */
+
+
 	public function update_status_if( int $id, string $expected_old, string $new_status, string $now ): bool {
 		global $wpdb;
 
 		$table   = Schema::table( 'projects' );
 		$updated = $wpdb->query( $wpdb->prepare(
-			"UPDATE {$table} SET status = %s, updated_at = %s WHERE id = %d AND status = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			"UPDATE {$table} SET status = %s, updated_at = %s WHERE id = %d AND status = %s",
 			$new_status,
 			$now,
 			$id,
@@ -480,13 +354,10 @@ final class Repository {
 		return $updated === 1;
 	}
 
-	/* ---- Notes internes ---- */
 
-	/**
-	 * Ajoute une note. Le contenu arrive déjà nettoyé et borné (voir Notes).
-	 *
-	 * @return int identifiant créé, 0 en cas d'échec
-	 */
+
+
+
 	public function insert_note( int $project_id, int $user_id, string $content, string $now ): int {
 		global $wpdb;
 
@@ -504,25 +375,18 @@ final class Repository {
 		return $ok ? (int) $wpdb->insert_id : 0;
 	}
 
-	/**
-	 * Notes d'une demande, la plus récente d'abord.
-	 *
-	 * L'ordre est l'inverse de celui de l'historique, et c'est voulu :
-	 * l'historique est le récit de la vie de la demande, qui se lit du début ;
-	 * les notes sont un carnet de travail, où ce qui compte est la dernière.
-	 *
-	 * @return array<int,array<string,mixed>>
-	 */
+
+
 	public function notes_of( int $project_id ): array {
 		global $wpdb;
 
 		$table = Schema::table( 'notes' );
-		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE project_id = %d ORDER BY id DESC", $project_id ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE project_id = %d ORDER BY id DESC", $project_id ), ARRAY_A );
 
 		return $rows ?: [];
 	}
 
-	/* ---- Transaction : InnoDB requis, sinon les verbes sont sans effet et Service le sait. ---- */
+
 
 	public function begin(): bool {
 		global $wpdb;
@@ -539,7 +403,7 @@ final class Repository {
 		$wpdb->query( 'ROLLBACK' );
 	}
 
-	/** Vrai si pp_projects est en InnoDB (donc transactionnelle). Mémorisé par requête. */
+
 	public function supports_transactions(): bool {
 		static $supports = null;
 		if ( $supports !== null ) {

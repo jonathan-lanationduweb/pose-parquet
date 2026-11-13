@@ -1,22 +1,4 @@
-"""
-Empreinte de vignettes : de quoi reconnaître une même photo sous deux SKU.
-
-    python _generator/vignette-empreintes.py < chemins.txt > empreintes.json
-
-Une ligne par chemin de fichier en entrée ; en sortie, un objet JSON
-{ chemin: { "empreinte": "<64 hex>", "couleur": [r, g, b] } }.
-
-- empreinte : dHash 256 bits (niveaux de gris 17 × 16, gradient horizontal).
-  Robuste au réencodage et au redimensionnement ; deux photos identiques
-  diffèrent de 0 à 9 bits sur le catalogue Premibel.
-- couleur : moyenne RGB. Une même scène dont le SOL a été recoloré garde une
-  empreinte voisine mais change de couleur moyenne — ce n'est pas la même
-  photo produit, et ce champ permet de le dire.
-
-Utilisé par _generator/sync-premibel.js, comme vignette-webp.py, et seulement
-par la synchronisation : le build et les contrôles relisent le résultat dans
-_generator/premibel-thumbs.json.
-"""
+pass
 import json
 import sys
 
@@ -33,7 +15,7 @@ for ligne in sys.stdin.read().splitlines():
         continue
     try:
         im = Image.open(chemin).convert("RGB")
-    except Exception as erreur:  # noqa: BLE001
+    except Exception as erreur:
         sys.stderr.write(f"{chemin} : {erreur}\n")
         continue
     g = im.convert("L").resize((17, 16), Image.LANCZOS)

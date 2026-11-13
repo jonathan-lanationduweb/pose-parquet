@@ -1,100 +1,65 @@
-/**
- * Génère les icônes du site à partir du symbole d'identité — Concept C.
- *
- *   node _generator/make-icons.js
- *
- * Le symbole : trois lames verticales de largeurs inégales, séparées par des
- * joints, et traversées par des ruptures diagonales décalées — le rythme d'un
- * parquet réduit à sa structure. Pas de lettre, pas de chevron, pas de maison,
- * pas d'outil.
- *
- * La géométrie ci-dessous n'est pas dessinée à l'estime : elle est **relevée au
- * pixel** sur la planche d'identité validée, en décodant l'image et en mesurant
- * les bords de chaque lame et les bornes de chaque rupture. D'où des fractions
- * d'apparence bizarre : ce sont des mesures, pas des valeurs choisies.
- *
- * Rasteriseur maison : aucune dépendance, encodage PNG via zlib (Node),
- * anti-crénelage par suréchantillonnage 4×4.
- */
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 
 const DIR = path.join(__dirname, '..', 'assets', 'icons');
 
-/* ------------------------------------------------------------------ */
-/* Couleurs                                                            */
-/* ------------------------------------------------------------------ */
 
-const INK = [22, 24, 26]; // --c-ink, charbon du site
-const BONE = [242, 239, 232]; // --c-bone, blanc cassé du site
-const GOLD = [200, 145, 82]; // relevé sur la planche, variante fond sombre
 
-/* ------------------------------------------------------------------ */
-/* Géométrie du symbole, relevée sur la planche                        */
-/* ------------------------------------------------------------------ */
 
-/**
- * Mesures brutes, en pixels de la planche.
- * Boîte du symbole : x 394→499, y 158→354, soit 106 × 197.
- */
+
+const INK = [22, 24, 26];
+const BONE = [242, 239, 232];
+const GOLD = [200, 145, 82];
+
+
+
+
+
+
+
 const M = {
   width: 106,
   height: 197,
-  // Bords gauche/droit des trois lames. Largeurs 36, 36, 19 : l'inégalité est
-  // voulue, c'est elle qui empêche le symbole d'être une simple grille.
+
+
   bars: [
     [0, 36],
     [43, 79],
     [87, 106],
   ],
-  /**
-   * Une rupture par lame, repérée par son ordonnée au bord **droit** de la
-   * lame. Deux hauteurs seulement : les lames extrêmes sont coupées à 110, la
-   * centrale bien plus haut, à 48. C'est ce décalage qui fait lire des joints
-   * de bout de parquet.
-   */
+
+
   ruptures: [
     { bar: 0, yRight: 110 },
     { bar: 1, yRight: 48 },
     { bar: 2, yRight: 110 },
   ],
-  // Pente commune aux trois ruptures : 16 px de descente pour 36 px vers la
-  // gauche, soit environ 24° sous l'horizontale.
+
+
   slopeRun: 36,
   slopeRise: 16,
-  // Largeur des joints, mesurée horizontalement. Les joints verticaux sont plus
-  // épais (7 à 8 px) que les ruptures (9 px à l'horizontale, donc environ
-  // 3,7 px perpendiculairement) : les diagonales se lisent comme des traits de
-  // scie, pas comme des joints.
+
+
+
+
   jointWidth: 7.5,
   ruptureWidth: 9,
 };
 
-const ASPECT = M.width / M.height; // 0,538 — nettement vertical
+const ASPECT = M.width / M.height;
 
-/**
- * Aspect optiquement corrigé selon la taille.
- *
- * À 16 px, l'aspect réel donnerait un symbole large de 6 px pour trois lames et
- * deux joints : illisible. Les familles d'icônes soignées élargissent toujours
- * un peu le dessin aux petites tailles. On interpole donc vers un aspect plus
- * trapu, sans jamais toucher au nombre de lames, à leur inégalité ni aux
- * ruptures : l'identité est intacte, la proportion respire.
- */
+
+
 function opticalAspect(size) {
-  const t = Math.max(0, Math.min(1, (72 - size) / 56)); // 1 à 16 px, 0 à 72 px
+  const t = Math.max(0, Math.min(1, (72 - size) / 56));
   return ASPECT + (0.72 - ASPECT) * t;
 }
 
 const BAR_TOTAL = M.bars.reduce((sum, [a, b]) => sum + (b - a), 0);
 
-/**
- * Dispose le symbole dans un carré de `size` pixels.
- *
- * Aux petites tailles, les bords de lame sont accrochés à la grille de pixels :
- * sans cela, trois lames de 2,04 px donnent trois gris différents.
- */
+
+
 function layout(size, coverage) {
   const aspect = opticalAspect(size);
   let height = size * coverage;
@@ -134,60 +99,45 @@ function layout(size, coverage) {
   };
 }
 
-/** Pente des ruptures, en fractions de la boîte du symbole. */
+
 const SLOPE = (M.slopeRise / M.height) / (M.slopeRun / M.width);
 
-/**
- * Le symbole couvre-t-il ce point ?
- *
- * @param {number} nx position dans la boîte du symbole, 0 → 1
- * @param {number} ny idem, vertical
- * @param {object} box résultat de layout()
- * @param {number} minRupture épaisseur minimale d'une rupture, en fraction de
- *        largeur : garantit qu'elle survive à 16 px.
- */
+
+
 function insideSymbol(nx, ny, box, minRupture) {
   if (nx < 0 || nx > 1 || ny < 0 || ny > 1) return false;
   const index = box.bars.findIndex(([a, b]) => nx >= a && nx <= b);
-  if (index < 0) return false; // dans un joint vertical
+  if (index < 0) return false;
 
   const rupture = M.ruptures.find((r) => r.bar === index);
   if (!rupture) return true;
 
-  // Ordonnée de la rupture à cette abscisse, dans le repère de la lame telle
-  // qu'elle est réellement disposée (accrochage à la grille compris).
+
+
   const [barA, barB] = box.bars[index];
-  const t = (barB - nx) / Math.max(1e-6, barB - barA); // 0 au bord droit, 1 au gauche
+  const t = (barB - nx) / Math.max(1e-6, barB - barA);
   const barWidthTrue = (M.bars[index][1] - M.bars[index][0]) / M.width;
   const yTop = rupture.yRight / M.height + t * barWidthTrue * SLOPE;
   const bandX = Math.max(M.ruptureWidth / M.width, minRupture);
   return ny < yTop || ny > yTop + bandX * SLOPE;
 }
 
-/** Distance signée à un carré arrondi (négative à l'intérieur). */
+
 function roundedRect(px, py, size, radius) {
   const q = Math.abs(px - size / 2) - (size / 2 - radius);
   const r = Math.abs(py - size / 2) - (size / 2 - radius);
   return Math.hypot(Math.max(q, 0), Math.max(r, 0)) + Math.min(Math.max(q, r), 0) - radius;
 }
 
-/**
- * Dessine une icône en RGBA.
- *
- * @param {number} size côté en pixels
- * @param {object} o
- * @param {'rounded'|'square'} o.shape fond
- * @param {number[]} o.ground couleur de fond
- * @param {number[]} o.mark   couleur du symbole
- * @param {number} o.coverage hauteur du symbole, en fraction du côté
- */
+
+
 function drawIcon(size, { shape = 'rounded', ground = BONE, mark = INK, coverage = 0.66 } = {}) {
   const S = 4;
   const data = Buffer.alloc(size * size * 4);
   const box = layout(size, coverage);
   const radius = shape === 'rounded' ? size * 0.2 : 0;
-  // À 16 px, une rupture de 9/106 de largeur ne fait pas un demi-pixel : on la
-  // force à environ un pixel, sinon le dessin perd ses ruptures.
+
+
   const minRupture = box.crisp ? 1.7 / Math.max(1, box.width) : 0;
 
   for (let y = 0; y < size; y += 1) {
@@ -223,17 +173,14 @@ function drawIcon(size, { shape = 'rounded', ground = BONE, mark = INK, coverage
   return data;
 }
 
-/* ------------------------------------------------------------------ */
-/* SVG                                                                 */
-/* ------------------------------------------------------------------ */
+
+
+
 
 const f = (v) => Number(v.toFixed(4));
 
-/**
- * Le symbole en chemins SVG, dans un repère 0 → 1.
- * Chaque lame est découpée par sa rupture en deux quadrilatères — c'est-à-dire
- * en deux morceaux de lame, ce qu'ils sont.
- */
+
+
 function symbolPaths() {
   const band = (M.ruptureWidth / M.width) * SLOPE;
   return M.bars
@@ -254,7 +201,7 @@ function symbolPaths() {
 
 const hex = (c) => `#${c.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
 
-/** Symbole seul, sans fond : c'est cette version que l'interface utilise. */
+
 function symbolSvg() {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${M.width} ${M.height}" fill="currentColor" role="img" aria-label="Pose Parquet">
   <title>Pose Parquet</title>
@@ -263,14 +210,8 @@ function symbolSvg() {
 `;
 }
 
-/**
- * Favicon : fond crème, symbole charbon.
- *
- * Volontairement **pas** de bascule en mode sombre : un carré crème se détache
- * aussi bien sur une barre d'onglets claire que sombre, alors qu'un symbole
- * doré sur charbon perd sa lisibilité à 16 px. La variante dorée existe dans
- * l'interface, sur les surfaces sombres, là où elle a du sens.
- */
+
+
 function faviconSvg() {
   const coverage = 0.74;
   const w = coverage * opticalAspect(32);
@@ -286,9 +227,9 @@ function faviconSvg() {
 `;
 }
 
-/** Icône « maskable » Android : fond plein, symbole dans la zone de sécurité. */
+
 function maskableSvg() {
-  const coverage = 0.5; // 80 % du côté seulement est garanti visible
+  const coverage = 0.5;
   const w = coverage * ASPECT;
   const x = ((1 - w) / 2) * 512;
   const y = ((1 - coverage) / 2) * 512;
@@ -302,9 +243,9 @@ function maskableSvg() {
 `;
 }
 
-/* ------------------------------------------------------------------ */
-/* Encodage PNG minimal                                                */
-/* ------------------------------------------------------------------ */
+
+
+
 
 function crc32(buf) {
   const table =
@@ -351,9 +292,9 @@ function encodePng(size, rgba) {
   ]);
 }
 
-/* ------------------------------------------------------------------ */
-/* Sortie                                                              */
-/* ------------------------------------------------------------------ */
+
+
+
 
 const targets = [
   { name: 'favicon-16.png', size: 16, options: { coverage: 0.82 } },
@@ -364,7 +305,7 @@ const targets = [
   { name: 'icon-192.png', size: 192, options: { coverage: 0.6 } },
   { name: 'icon-512.png', size: 512, options: { coverage: 0.6 } },
   { name: 'maskable-512.png', size: 512, options: { shape: 'square', coverage: 0.5 } },
-  // Variante dorée sur charbon : icône d'application sur fond sombre.
+
   { name: 'icon-512-dark.png', size: 512, options: { ground: INK, mark: GOLD, coverage: 0.6 } },
 ];
 

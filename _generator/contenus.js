@@ -1,17 +1,3 @@
-/**
- * Publier ce qui a été saisi dans WordPress, en une commande :
- *
- *   node _generator/contenus.js [url de l'export]      (commande unique)
- *
- *   1. récupère l'export WordPress (contenus, pages, Mon site, maintenance)
- *      et les images nouvelles ;
- *   2. le valide — une erreur structurante arrête tout ici, l'instantané et le
- *      site restent ceux d'avant ; les avertissements s'affichent ;
- *   3. construit le site.
- *
- * Les commandes unitaires restent : `node _generator/wordpress.js pull`, puis
- * `node _generator/build.js`.
- */
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { tirer } = require('./wordpress');

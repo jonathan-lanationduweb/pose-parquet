@@ -1,15 +1,6 @@
 <?php
-/**
- * « Gestion du site » : le tableau de bord du module, dans le socle commun
- * (référence : la maquette du socle LNDW, EP_Admin_Contenu::gestion_du_site).
- *
- * Simple : une rangée de raccourcis (chaque partie du site, ce qu'elle
- * contient, l'action courante), les derniers contenus et projets, et en
- * colonne droite l'état du site (publication, maintenance, orientations,
- * catalogue). Pas de graphique, pas d'indicateur décoratif. L'attention ne
- * marque que ce qui demande une action (images manquantes). Chaque bloc ne
- * s'affiche qu'à qui a le droit d'y agir.
- */
+
+
 
 declare(strict_types=1);
 
@@ -62,11 +53,8 @@ final class Tableau {
 		echo '<div class="wrap adm-gestion pp-admin">';
 		Socle::entete( __( 'Gestion du site', 'pose-parquet-core' ), __( 'Gérez les contenus, l’identité et la publication du site Pose Parquet depuis WordPress.', 'pose-parquet-core' ) );
 
-		/*
-		 * Les raccourcis : une carte par partie du site, avec ce qu'il y a et
-		 * l'action la plus courante. C'est l'écran d'accueil, pas un relevé de
-		 * statistiques (référence : « Gestion du site » du socle).
-		 */
+
+
 		$cartes = [];
 		if ( $contenus ) {
 			$liste    = static fn( string $type ): string => admin_url( 'edit.php?post_type=' . $type );
@@ -101,9 +89,9 @@ final class Tableau {
 
 		echo '<div class="adm-grille"><div>';
 		if ( $contenus ) {
-			// Ce qui manque d'abord, s'il manque quelque chose.
+
 			if ( $sans ) {
-				// Le nombre est déjà sur le raccourci « Images » : ici, la liste suffit.
+
 				Socle::carte_ouvrir( __( 'À compléter', 'pose-parquet-core' ) );
 				echo '<ul class="adm-sans-image">';
 				foreach ( $sans as $id_sans ) {
@@ -113,7 +101,7 @@ final class Tableau {
 				Socle::carte_fermer();
 			}
 
-			// Derniers contenus modifiés, tous types confondus.
+
 			$derniers = get_posts(
 				[
 					'post_type'      => array_keys( $noms ),
@@ -133,9 +121,9 @@ final class Tableau {
 						? (string) get_the_post_thumbnail( $d, [ 80, 60 ], [ 'class' => 'adm-derniers__vignette', 'alt' => '' ] )
 						: '<span class="adm-derniers__vignette adm-derniers__vignette--vide" aria-hidden="true"><span class="dashicons ' . ( Types::avec_couverture( $d->post_type ) ? 'dashicons-format-image' : 'dashicons-media-default' ) . '"></span></span>';
 					$publie   = $d->post_status === 'publish';
-					echo '<tr><th scope="row"><a class="adm-derniers__titre" href="' . esc_url( (string) get_edit_post_link( $d->ID ) ) . '">' . $vignette . '<span>' . esc_html( get_the_title( $d ) ) . '</span></a></th>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- vignette composée par WordPress ou ci-dessus.
+					echo '<tr><th scope="row"><a class="adm-derniers__titre" href="' . esc_url( (string) get_edit_post_link( $d->ID ) ) . '">' . $vignette . '<span>' . esc_html( get_the_title( $d ) ) . '</span></a></th>';
 					echo '<td data-label="' . esc_attr__( 'Type', 'pose-parquet-core' ) . '">' . esc_html( $noms[ $d->post_type ] ?? '' ) . '</td>';
-					echo '<td data-label="' . esc_attr__( 'Statut', 'pose-parquet-core' ) . '">' . Socle::badge( $publie ? __( 'Publié', 'pose-parquet-core' ) : __( 'Brouillon', 'pose-parquet-core' ), $publie ? 'ok' : 'neutre' ) . '</td>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe.
+					echo '<td data-label="' . esc_attr__( 'Statut', 'pose-parquet-core' ) . '">' . Socle::badge( $publie ? __( 'Publié', 'pose-parquet-core' ) : __( 'Brouillon', 'pose-parquet-core' ), $publie ? 'ok' : 'neutre' ) . '</td>';
 					echo '<td data-label="' . esc_attr__( 'Modifié', 'pose-parquet-core' ) . '" class="adm-discret">' . esc_html( wp_date( 'j M Y à H:i', (int) get_post_modified_time( 'U', true, $d ) ) ) . '</td></tr>';
 				}
 				echo '</tbody></table></div>';
@@ -152,7 +140,7 @@ final class Tableau {
 				$statuts = Status::labels();
 				echo '<div class="adm-defilement"><table class="adm-table adm-table--empilable"><thead><tr><th>' . esc_html__( 'Référence', 'pose-parquet-core' ) . '</th><th>' . esc_html__( 'Besoin', 'pose-parquet-core' ) . '</th><th>' . esc_html__( 'Orientation', 'pose-parquet-core' ) . '</th><th>' . esc_html__( 'Statut', 'pose-parquet-core' ) . '</th><th>' . esc_html__( 'Date', 'pose-parquet-core' ) . '</th></tr></thead><tbody>';
 				foreach ( $recents as $p ) {
-					// Comme la liste des projets : une demande sans destination (avant le schéma 4) affiche « — », pas « À qualifier ».
+
 					$dest = (string) ( $p['lead_destination'] ?? '' );
 					echo '<tr><th scope="row"><a class="adm-ref" href="' . esc_url( View::detail_url( (int) $p['id'] ) ) . '">' . esc_html( (string) $p['reference'] ) . '</a></th>';
 					echo '<td data-label="' . esc_attr__( 'Besoin', 'pose-parquet-core' ) . '">' . esc_html( Labels::of( 'lead_need', (string) ( $p['lead_need'] ?? '' ) ) ?: '—' ) . '</td>';
@@ -171,7 +159,7 @@ final class Tableau {
 			Maintenance::panneau( true );
 		}
 		if ( $projets ) {
-			// Orientations : vers qui le site a envoyé les visiteurs (lead_destination). Quatre nombres, la liste filtrée en lien.
+
 			$orientations = [
 				'premibel'      => __( 'Premibel', 'pose-parquet-core' ),
 				'allure_design' => __( 'Allure Design', 'pose-parquet-core' ),
@@ -193,7 +181,7 @@ final class Tableau {
 				echo '<p class="adm-catalogue-resume"><strong>' . esc_html( number_format_i18n( (int) ( $d['produits'] ?? 0 ) ) ) . '</strong> ' . esc_html__( 'références', 'pose-parquet-core' ) . '</p>';
 				echo '<p class="adm-catalogue-detail">' . esc_html(
 					sprintf(
-						/* translators: 1: visualisables, 2: rendu fidèle */
+
 						__( '%1$s visualisables · %2$s fidèles', 'pose-parquet-core' ),
 						number_format_i18n( (int) ( $d['visualisables'] ?? 0 ) ),
 						number_format_i18n( (int) ( $d['statuts']['ready'] ?? 0 ) )

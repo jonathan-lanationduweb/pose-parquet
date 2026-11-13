@@ -1,32 +1,3 @@
-/*
- * Feuille de style des écrans « Demandes ».
- *
- * Volontairement courte, et posée SUR les styles de l'administration
- * WordPress plutôt qu'à leur place : les tableaux gardent `wp-list-table`, les
- * boutons `button-primary`, les onglets `subsubsub`. On n'ajoute que ce qui
- * manque — une grille pour la fiche, des pastilles de statut, et le repli des
- * colonnes secondaires en petite largeur.
- *
- * Aucune police, aucune couleur de marque : cette interface appartient à
- * WordPress, et un gestionnaire ne doit pas avoir à réapprendre où sont les
- * choses.
- */
-
-/* ---- Liste ---- */
-
-/*
- * `clear: both` n'est pas décoratif : c'est la correction d'un débordement.
- *
- * Les onglets de filtre portent la classe WordPress `subsubsub`, que
- * l'administration met en `float: left`. Un conteneur flex placé à côté d'un
- * flottant ne le chevauche pas : il se range à côté, et sa largeur disponible
- * tombe à ce qui reste. Les onglets prenant toute la ligne, il restait zéro.
- * Mesuré à 768 × 1024 : `.pp-search` faisait 0 px de large, posé au bord droit
- * du contenu, et son bouton de 191 px sortait du cadre — 164 px de
- * débordement horizontal. Le champ de recherche était réduit à 26 px.
- *
- * En dégageant le flottant, le formulaire retrouve sa ligne et sa largeur.
- */
 .pp-admin .pp-search {
 	clear: both;
 	margin: 0.75rem 0 0.25rem;
@@ -48,8 +19,6 @@
 	font-weight: 600;
 	font-variant-numeric: tabular-nums;
 }
-
-/* Deuxième ligne d'une cellule : l'email sous le nom, la date sous l'auteur. */
 .pp-admin .pp-sub {
 	display: block;
 	color: #646970;
@@ -60,11 +29,6 @@
 .pp-admin .pp-history .pp-sub {
 	display: inline;
 }
-
-/* Pastille de statut. Le fond reste neutre : sept couleurs vives sur une liste
-   de vingt lignes, c'est un sapin de Noël, pas une information. Seuls les deux
-   états qui terminent une demande sont grisés, et « spam » barré. */
-/* Même mesure que les badges du socle (adm-badge) : 22 px, rayon 3 px. */
 .pp-admin .pp-status {
 	display: inline-flex;
 	align-items: center;
@@ -80,7 +44,6 @@
 	line-height: 1;
 	white-space: nowrap;
 }
-/* Nouveau : information (bleu). À contacter : attention (orange). */
 .pp-admin .pp-status--new {
 	border-color: #a9c7e3;
 	background: #eaf2fa;
@@ -105,11 +68,6 @@
 	color: #b32d2e;
 	font-size: 0.8em;
 }
-
-/*
- * Liste des projets orientés : huit colonnes, largeurs fixées pour que la
- * Destination (et ses liens rapides) garde la place de se lire.
- */
 .pp-table--projets .pp-col-date { width: 92px; }
 .pp-table--projets .pp-col-ref { width: 136px; }
 .pp-table--projets .pp-col-origine { width: 120px; }
@@ -117,11 +75,6 @@
 .pp-table--projets .pp-col-zone { width: 110px; }
 .pp-table--projets .pp-col-statut { width: 110px; }
 .pp-table--projets td { vertical-align: top; }
-/*
- * Sous 1280 px, les largeurs fixes ne laissaient presque rien au Produit et à
- * la Destination (mesuré à 1024 : une lettre par ligne). Le tableau reprend
- * une mise en page automatique ; sous 782 px, chaque ligne devient une fiche.
- */
 @media (max-width: 1280px) {
 	.pp-table--projets { table-layout: auto; }
 	.pp-table--projets th { width: auto !important; }
@@ -137,11 +90,6 @@
 		flex: 1 1 12rem;
 	}
 }
-
-/*
- * Sous 782 px : chaque projet devient une fiche empilée, libellé à gauche,
- * valeur à droite. Pas de défilement horizontal.
- */
 @media (max-width: 782px) {
 	.pp-table--projets thead { display: none; }
 	.pp-table--projets, .pp-table--projets tbody, .pp-table--projets tr, .pp-table--projets td { display: block; width: auto !important; }
@@ -153,8 +101,6 @@
 	.pp-table--projets td .pp-liens { align-items: flex-end; }
 	.pp-table--projets td > * { min-width: 0; }
 }
-
-/* ---- Fiche ---- */
 
 .pp-detail .pp-ref-title {
 	font-variant-numeric: tabular-nums;
@@ -198,11 +144,6 @@
 	font-size: 0.9rem;
 	margin: 1rem 0 0.3rem;
 }
-
-/*
- * Les champs sont une liste de définitions, pas un tableau : ce sont des
- * paires libellé/valeur, et un lecteur d'écran les annonce correctement.
- */
 .pp-detail .pp-fields {
 	margin: 0;
 	display: grid;
@@ -261,17 +202,9 @@
 .pp-detail .pp-note-body {
 	margin: 0;
 }
-
-/* Contenus, tableau de bord, maintenance, réglages : composants du socle
-   commun (assets/socle/admin-composants.css). */
-
-/* Fiche projet : mêmes cartes que le socle (filet, rayon, titres 15 px). */
 .pp-detail .pp-card { border-color: #dcdcde; padding: 0.25rem 1rem 1rem; }
 .pp-detail .pp-card h2 { font-size: 15px; font-weight: 600; }
 .pp-detail .pp-ref-title { font-weight: 600; }
-
-/* Tablette (783–1280 px) : l'origine puis la date s'effacent pour que Produit, Destination et Statut restent lisibles d'un coup d'œil
-   (ils restent sur la fiche du projet et dans la fiche mobile). */
 @media (min-width: 783px) and (max-width: 1280px) {
 	.pp-table--projets .pp-col-origine { display: none; }
 }

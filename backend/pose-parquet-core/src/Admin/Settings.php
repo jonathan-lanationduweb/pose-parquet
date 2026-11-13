@@ -1,19 +1,6 @@
 <?php
-/**
- * Réglages du plugin — page « Pose Parquet → Réglages ».
- *
- * Une option, `pose_parquet_settings`, deux réglages, parce que ce lot n'en
- * a besoin que de deux : l'adresse qui reçoit les demandes, et l'envoi ou non
- * d'une confirmation au visiteur. Settings API WordPress : enregistrement,
- * section, champs, page d'options, nonce et capability gérés par options.php
- * — la capability requise est ramenée de `manage_options` à
- * `pp_manage_settings` par le filtre prévu à cet effet.
- *
- * Aucune adresse n'est écrite dans le code : la valeur par défaut est
- * l'adresse d'administration du site.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -38,7 +25,7 @@ final class Settings {
 
 	public static function register(): void {
 		add_action( 'admin_init', [ self::class, 'register_settings' ] );
-		// options.php exige manage_options par défaut ; notre capability suffit.
+
 		add_filter( 'option_page_capability_' . self::GROUP, static fn(): string => Capabilities::MANAGE_SETTINGS );
 	}
 
@@ -53,16 +40,11 @@ final class Settings {
 			self::SECTION,
 			__( 'Emails', 'pose-parquet-core' ),
 			static function (): void {
-				/*
-				 * L'état RÉEL du canal, en tête : le site public est une passerelle,
-				 * le parcours du visiteur ne dépend d'aucun email. Tant que
-				 * l'adresse est de test ou qu'aucun transport n'est déclaré, l'email
-				 * est « À configurer » — pas un canal de suivi. L'infrastructure
-				 * (file, nouvelles tentatives) reste en place pour plus tard.
-				 */
+
+
 				$diag   = Diagnostics::report();
 				$actif  = (bool) ( $diag['production_ready'] ?? false );
-				echo '<p class="adm-etat-ligne">' . esc_html__( 'État :', 'pose-parquet-core' ) . ' ' . Socle::badge( $actif ? __( 'Actif', 'pose-parquet-core' ) : __( 'À configurer', 'pose-parquet-core' ), $actif ? 'ok' : 'attente' ) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- badge() échappe.
+				echo '<p class="adm-etat-ligne">' . esc_html__( 'État :', 'pose-parquet-core' ) . ' ' . Socle::badge( $actif ? __( 'Actif', 'pose-parquet-core' ) : __( 'À configurer', 'pose-parquet-core' ), $actif ? 'ok' : 'attente' ) . '</p>';
 				echo '<p class="adm-carte__aide">' . esc_html__( 'Un email à l’équipe à chaque nouveau projet orienté.', 'pose-parquet-core' ) . '</p>';
 			},
 			self::PAGE
@@ -78,18 +60,12 @@ final class Settings {
 					esc_attr( self::OPTION ),
 					esc_attr( self::notification_email() )
 				);
-				/*
-				 * Le champ n'est jamais vide — il hérite de `admin_email` — donc
-				 * rien, dans ce qu'il montre, ne distingue une adresse choisie
-				 * d'une adresse jamais regardée. C'est exactement le piège qui
-				 * enverrait les demandes de production vers une adresse de
-				 * développement. On le dit ici, à l'endroit où la décision se
-				 * prend.
-				 */
-				// Une ligne, la plus grave seulement : une adresse de test l'emporte sur une adresse héritée.
+
+
+
 				$diagnostic = Diagnostics::report();
 				if ( ! $diagnostic['deliverable'] ) {
-					echo '<p class="adm-alerte-ligne adm-alerte-ligne--ko"><span class="dashicons dashicons-warning" aria-hidden="true"></span>' . esc_html( sprintf( /* translators: %s : adresse */ __( '%s est une adresse de test : aucun email réel ne sera remis.', 'pose-parquet-core' ), self::notification_email() ) ) . '</p>';
+					echo '<p class="adm-alerte-ligne adm-alerte-ligne--ko"><span class="dashicons dashicons-warning" aria-hidden="true"></span>' . esc_html( sprintf(   __( '%s est une adresse de test : aucun email réel ne sera remis.', 'pose-parquet-core' ), self::notification_email() ) ) . '</p>';
 				} elseif ( ! $diagnostic['explicit'] ) {
 					echo '<p class="adm-alerte-ligne"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span>' . esc_html__( 'Adresse héritée du site : enregistrez pour la confirmer.', 'pose-parquet-core' ) . '</p>';
 				}
@@ -117,13 +93,8 @@ final class Settings {
 		);
 	}
 
-	/**
-	 * Nettoie ce qui arrive du formulaire. Une adresse invalide n'est pas
-	 * enregistrée : l'ancienne reste, et l'administrateur voit pourquoi.
-	 *
-	 * @param mixed $input
-	 * @return array{notification_email:string,visitor_confirmation:bool}
-	 */
+
+
 	public static function sanitize( mixed $input ): array {
 		$actuel = self::all();
 		$input  = is_array( $input ) ? $input : [];
@@ -140,7 +111,7 @@ final class Settings {
 			$email = $actuel[ self::KEY_NOTIFICATION_EMAIL ];
 		}
 
-		// Case à cocher : absente du POST quand décochée.
+
 		$confirmation = ! empty( $input[ self::KEY_VISITOR_CONFIRMATION ] );
 
 		return [
@@ -149,23 +120,17 @@ final class Settings {
 		];
 	}
 
-	/** @return array{notification_email:string,visitor_confirmation:bool} */
+
 	public static function defaults(): array {
 		return [
 			self::KEY_NOTIFICATION_EMAIL  => (string) get_option( 'admin_email', '' ),
-			/*
-			 * Désactivée par défaut : l'accusé part vers l'adresse SAISIE par le
-			 * visiteur. Un robot pouvait s'en servir pour faire envoyer, depuis
-			 * le domaine du site, des emails à des tiers (relais de spam, domaine
-			 * mis en liste noire). Le formulaire actuel ne demande d'ailleurs plus
-			 * de coordonnées. À activer en connaissance de cause, avec une
-			 * protection anti-robot (Turnstile) devant le formulaire.
-			 */
+
+
 			self::KEY_VISITOR_CONFIRMATION => false,
 		];
 	}
 
-	/** @return array{notification_email:string,visitor_confirmation:bool} */
+
 	public static function all(): array {
 		$defaults = self::defaults();
 		$stored   = get_option( self::OPTION, [] );
@@ -188,17 +153,17 @@ final class Settings {
 		return self::all()[ self::KEY_VISITOR_CONFIRMATION ];
 	}
 
-	/** Une adresse de réception valide existe-t-elle (réglée ou héritée du site) ? */
+
 	public static function is_configured(): bool {
 		return (bool) is_email( self::notification_email() );
 	}
 
-	/** Écriture directe (tests, scripts) : passe par le même nettoyage que le formulaire. */
+
 	public static function update( array $values ): bool {
 		return update_option( self::OPTION, self::sanitize( $values + self::all() ), false );
 	}
 
-	/** Page « Réglages ». */
+
 	public static function render(): void {
 		if ( ! current_user_can( Capabilities::MANAGE_SETTINGS ) ) {
 			wp_die( esc_html__( 'Vous n’avez pas les droits nécessaires.', 'pose-parquet-core' ) );

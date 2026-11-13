@@ -1,29 +1,3 @@
-/**
- * Contrôle du catalogue Premibel synchronisé.
- *
- *   node _generator/check-catalogue-premibel.js
- *
- * Il relit `data/products.premibel.json` tel que `sync-premibel.js` l'a écrit,
- * puis tel que le moteur le comprend (`normalizeProduct`), et vérifie :
- *
- *   §1  l'enveloppe   — source, date de génération, endpoint, rapport ;
- *   §2  l'identité    — chaque fiche ACTIVE a id, sku, nom, slug ; SKU, slug et
- *                        identifiant source uniques ; id === sku (liens profonds) ;
- *   §3  les adresses  — productUrl : HTTPS et domaine Premibel (même règle que
- *                        le navigateur, `premibel-hotes.js`) ; aucune URL d'image
- *                        distante dans le fichier public ;
- *   §3b les vignettes — chemin local sûr, fichier présent, vrai WebP, taille
- *                        raisonnable, jamais 0 octet ;
- *   §4  les motifs    — uniquement des motifs connus ; motif par défaut dans la liste ;
- *                        un Versailles ne déclare aucun motif posable ;
- *   §5  le rendu      — statut parmi ready / approximate / unavailable ; un
- *                        « approximate » cite une famille existante ; un
- *                        « unavailable » dit pourquoi ; aucun « ready » sans carte ;
- *                        une photo produit n'est jamais une carte de texture ;
- *   §6  aucun prix    — aucune clé de prix, de tarif ou de promotion, à aucun niveau ;
- *   §7  le moteur     — ce que le Studio proposera correspond au fichier : seules
- *                        les fiches actives et non « unavailable » sont proposées.
- */
 'use strict';
 
 const fs = require('fs');
@@ -133,13 +107,13 @@ const texte = fs.readFileSync(path.join(RACINE, 'data/products.premibel.json'), 
 verifier('aucun montant en euros dans le fichier', !/\d+[.,]\d{2}\s*(€|EUR)\b|price_html|currency_/i.test(texte));
 
 titre('Ce que le moteur en fera');
-// Avec les profils matière validés, exactement comme le Studio lit le catalogue.
+
 const profilsMatiere = manifeste.profils ? lire(manifeste.profils).profils || {} : {};
 const normalisees = fiches.map((r) => PRODUIT.normalizeProduct({ source: 'premibel', ...r }, familles, profilsMatiere));
 const proposees = normalisees.filter(PRODUIT.estProposable);
 const attendues = fiches.filter((f) => f.active && f.visualStatus !== 'unavailable');
 verifier(`le moteur propose exactement les ${attendues.length} fiches actives visualisables`, proposees.length === attendues.length, `${proposees.length} proposées`);
-// Seule requalification admise : « approximate » → « ready » par un profil validé.
+
 const statutChange = normalisees.filter((n, i) => n.visualStatus !== fiches[i].visualStatus && fiches[i].visualStatus !== 'ready' && !(n.materialProfile && n.visualStatus === 'ready'));
 verifier('le moteur ne requalifie aucun statut, hors profil matière validé', statutChange.length === 0, statutChange.slice(0, 10).map((n) => `${n.id}:${n.visualStatus}`).join(', '));
 const validation = PRODUIT.validateCatalog(proposees, familles);
@@ -158,7 +132,7 @@ const appJs = fs.readFileSync(path.join(RACINE, 'js/studio/app.js'), 'utf8');
 verifier('une démonstration ouverte par lien est signalée « Démonstration »', /selected__status--demo">Démonstration/.test(appJs));
 
 titre('Accueil : la sélection éditoriale');
-// La vitrine choisit, pour chaque motif, la première référence encore en vente (js/scene/vitrine.js).
+
 const VITRINE = require('../js/scene/vitrine.js');
 const paires = VITRINE.choisirVitrine((id) => fiches.find((x) => x.id === id) || null).map((p) => ({ id: p.material, motif: p.pattern }));
 verifier(`${paires.length} références sur l'accueil, une par motif`, paires.length === VITRINE.VITRINE.length);
@@ -187,11 +161,11 @@ const indexVignettes = JSON.parse(fs.readFileSync(path.join(__dirname, 'premibel
 const converties = Object.values(indexVignettes).filter((v) => v.converti).length;
 console.log(`       ${sansVignette.length} repli(s), ${converties} vignette(s) converties depuis JPEG/PNG`);
 
-/* ------------------------------------------------------------------ */
-/* Qualité des vignettes : placeholders, bandeaux, photos partagées.    */
-/* ERROR fait échouer ; WARNING se lit, ne bloque pas : deux variantes   */
-/* d'un même produit ont le droit de partager leur photo.               */
-/* ------------------------------------------------------------------ */
+
+
+
+
+
 titre('Qualité des vignettes');
 const QUALITE = require('./vignettes-qualite.js');
 const affichees = actives.filter((f) => f.thumbnail);

@@ -1,5 +1,5 @@
 <?php
-/** Audit CLI en lecture seule. Aucun secret n'est affiché, aucun email envoyé. */
+
 declare(strict_types=1);
 if ( PHP_SAPI !== 'cli' ) { http_response_code(403); exit(2); }
 $racine = rtrim($argv[1] ?? '', '/\\');

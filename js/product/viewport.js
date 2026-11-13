@@ -1,40 +1,10 @@
-/**
- * Viewport : pan et zoom 2D sur la scène.
- *
- * Un seul état `{ z, x, y }` pilote TOUT ce qui est dans la scène — la photo,
- * le rendu, la version B d'une comparaison — parce que ces couches sont les
- * enfants d'un même conteneur et reçoivent la même transformation. Il n'y a
- * rien à synchroniser : c'est structurel.
- *
- *   z = 1   la photo COUVRE le cadre. C'est « 100 % », le cadrage immersif.
- *           Un geste ne descend jamais en dessous : il n'y a aucune raison de
- *           faire apparaître du vide en zoomant.
- *   z < 1   toute la photo est visible, avec des bandes. Seule la commande
- *           explicite « Ajuster » y mène.
- *
- * Deux règles héritées d'une stabilisation mesurée :
- *
- *   - le point sous le curseur reste sous le curseur pendant un zoom ;
- *   - l'ÉTAT est commis tout de suite, l'image seule est interpolée, par
- *     minuteur. `requestAnimationFrame` ne porte jamais d'état : il ne se
- *     déclenche pas dans un onglet qui ne peint pas, et cinq commandes étaient
- *     mortes pour cette seule raison.
- *
- * Ce n'est pas de la 3D : on ne se déplace pas dans la pièce, le point de vue
- * ne change pas.
- */
 import { clamp as borne } from '../utils/dom.js';
 
 export const ZOOM_MIN = 1;
 export const ZOOM_MAX = 5;
 
-/**
- * @param {object} o
- * @param {HTMLElement} o.stage          le cadre : reçoit les gestes
- * @param {() => HTMLElement[]} o.layers les éléments à transformer
- * @param {() => {w:number,h:number}} o.sceneSize taille intrinsèque de la scène
- * @param {(vp: {z:number,x:number,y:number}) => void} [o.onChange]
- */
+
+
 export function createViewport({ stage, layers, sceneSize, onChange }) {
   const REDUCED = (() => {
     try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
@@ -42,20 +12,20 @@ export function createViewport({ stage, layers, sceneSize, onChange }) {
   })();
 
   let vp = { z: 1, x: 0, y: 0 };
-  let shown = null;       /* ce qui est AFFICHÉ pendant une interpolation */
+  let shown = null;
   let anim = null;
   let pendingFit = false;
 
   const box = () => stage.getBoundingClientRect();
 
-  /** Échelle à laquelle la photo couvre le cadre : la base de 100 %. */
+
   function coverScale() {
     const b = box();
     const { w, h } = sceneSize();
     if (!b.width || !b.height || !w || !h) return 1;
     return Math.max(b.width / w, b.height / h);
   }
-  /** Échelle à laquelle la photo tient entière dans le cadre. */
+
   function containScale() {
     const b = box();
     const { w, h } = sceneSize();
@@ -64,11 +34,11 @@ export function createViewport({ stage, layers, sceneSize, onChange }) {
   }
   const zContain = () => containScale() / coverScale();
   const cssScale = () => coverScale() * vp.z;
-  /* Plancher d'un geste : jamais sous la couverture, jamais plus bas qu'on
-     n'est déjà (depuis « Ajuster », zoomer en arrière ne saute pas à 100 %). */
+
+
   const zoomFloor = () => Math.min(ZOOM_MIN, vp.z);
 
-  /** Borne la translation : la scène couvre le cadre, ou se centre. */
+
   function clamp(v) {
     const b = box();
     const { w, h } = sceneSize();
@@ -119,7 +89,7 @@ export function createViewport({ stage, layers, sceneSize, onChange }) {
     step();
   }
 
-  /** Cadrage immersif : la photo remplit le cadre, centrée. « 100 % ». */
+
   function fitToView(animate) {
     pendingFit = false;
     const b = box();
@@ -127,19 +97,19 @@ export function createViewport({ stage, layers, sceneSize, onChange }) {
     const sc = coverScale();
     setVp({ z: 1, x: (b.width - w * sc) / 2, y: (b.height - h * sc) / 2 }, animate);
   }
-  /** Toute la photo : des bandes, mais rien de coupé. Sur demande seulement. */
+
   function fitAll(animate) {
     pendingFit = false;
     setVp({ z: zContain(), x: 0, y: 0 }, animate);
   }
-  /* Le recentrage d'ouverture est différé d'un tour, le temps que le cadre ait
-     une taille. Un geste fait d'ici là gagne. */
+
+
   function scheduleFit() {
     pendingFit = true;
     setTimeout(() => { if (pendingFit) fitToView(false); }, 0);
   }
 
-  /** Zoome en gardant le point (px, py) du cadre sous le curseur. */
+
   function zoomAt(factor, px, py, animate) {
     pendingFit = false;
     const b = box();
@@ -154,7 +124,7 @@ export function createViewport({ stage, layers, sceneSize, onChange }) {
     setVp({ z, x: cx - u * s1, y: cy - v * s1 }, animate);
   }
 
-  /* ---------------- Gestes ---------------- */
+
   const pointers = new Map();
   let pinch = null;
   const ignore = (e, extra) => e.target.closest(`.pv-tools, .pv-bar, .pv-zoom, .pv-note, .pv-split, .pv-drawer, .pv-menu${extra || ''}`);
@@ -163,7 +133,7 @@ export function createViewport({ stage, layers, sceneSize, onChange }) {
     if (ignore(e)) return;
     e.preventDefault();
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    try { if (stage.setPointerCapture) stage.setPointerCapture(e.pointerId); } catch { /* sans capture */ }
+    try { if (stage.setPointerCapture) stage.setPointerCapture(e.pointerId); } catch {   }
     stage.classList.add('grabbing');
     if (pointers.size === 2) {
       const [a, b] = [...pointers.values()];
@@ -194,7 +164,7 @@ export function createViewport({ stage, layers, sceneSize, onChange }) {
     if (!pointers.size) stage.classList.remove('grabbing');
   }
   function onWheel(e) {
-    /* La molette dans le tiroir fait defiler le tiroir, pas zoomer la piece. */
+
     if (e.target.closest('.pv-drawer, .pv-menu, .pv-bar')) return;
     e.preventDefault();
     const b = box();
@@ -216,10 +186,8 @@ export function createViewport({ stage, layers, sceneSize, onChange }) {
   stage.addEventListener('wheel', onWheel, { passive: false });
   stage.addEventListener('dblclick', onDouble);
 
-  /* Le cadre change de taille : on garde le zoom, on reborne la position.
-     `resize` ne dit rien d'un en-tête masqué ni d'un panneau du navigateur ;
-     l'observateur du cadre, si. Et un onglet caché ne reçoit ni l'un ni
-     l'autre : on reborne au retour. */
+
+
   const reborner = () => setVp(vp, false);
   window.addEventListener('resize', reborner);
   if (typeof ResizeObserver === 'function') new ResizeObserver(reborner).observe(stage);

@@ -1,18 +1,6 @@
 <?php
-/**
- * La page publique de maintenance, servie par WordPress.
- *
- * Quand la maintenance est activée, tout visiteur du site servi par
- * WordPress reçoit cette page avec un vrai statut **503 Service Unavailable**
- * et un en-tête `Retry-After` : les moteurs de recherche comprennent une
- * indisponibilité passagère et ne désindexent rien.
- *
- * Jamais bloqués : l'administration (`wp-admin`), la connexion
- * (`wp-login.php`), l'API REST, l'AJAX et le cron — ils ne passent pas par
- * `template_redirect`. Un utilisateur connecté qui gère le site voit le vrai
- * site, pour le prévisualiser, et une mention « Maintenance activée » dans la
- * barre d'administration.
- */
+
+
 
 declare(strict_types=1);
 
@@ -26,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Page {
 
-	/** Une heure : une mise à jour, pas une fermeture. */
+
 	public const RETRY_AFTER = 3600;
 
 	public static function register(): void {
@@ -34,7 +22,7 @@ final class Page {
 		add_action( 'admin_bar_menu', [ self::class, 'barre' ], 100 );
 	}
 
-	/** Qui voit le vrai site pendant la maintenance. */
+
 	public static function peut_contourner(): bool {
 		return current_user_can( Capabilities::MANAGE_SETTINGS ) || current_user_can( Capabilities::EDIT_CONTENTS );
 	}
@@ -61,16 +49,14 @@ final class Page {
 		);
 	}
 
-	/**
-	 * @param array{actif:bool,titre:string,message:string,image:int,premibel:bool,allure:bool} $m
-	 * @param bool $statut503 vrai pour la page publique ; faux pour l'aperçu
-	 */
+
+
 	public static function afficher( array $m, bool $statut503 ): void {
 		if ( $statut503 ) {
 			status_header( 503 );
 			header( 'Retry-After: ' . self::RETRY_AFTER );
 		}
-		if ( ! headers_sent() ) { // Rendu en ligne de commande (tests) : pas d'en-têtes.
+		if ( ! headers_sent() ) {
 			nocache_headers();
 			header( 'Content-Type: text/html; charset=utf-8' );
 			header( 'X-Robots-Tag: noindex' );

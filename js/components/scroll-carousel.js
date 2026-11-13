@@ -1,18 +1,7 @@
 import { qs, on } from '../utils/dom.js';
 
-/**
- * Carrousel piloté par le scroll vertical de la page.
- *
- * Principe (aucun détournement de la molette) :
- *  - la section reçoit une hauteur calculée = hauteur du bloc collant
- *    + distance horizontale à parcourir ;
- *  - le bloc interne est `position: sticky` ;
- *  - la progression verticale dans la section est convertie en `scrollLeft`.
- *
- * Le scroll de la page reste 100 % natif : on ne fait que lire `scrollY`.
- * Activé seulement sur écran large, sans « mouvement réduit », et désactivé
- * proprement (retour au carrousel classique) dans le cas contraire.
- */
+
+
 export function initScrollCarousel(section, api) {
   if (!api) return;
 
@@ -25,7 +14,7 @@ export function initScrollCarousel(section, api) {
 
   let active = false;
   let ticking = false;
-  let travel = 0; // distance verticale utile
+  let travel = 0;
   let horizontal = 0;
 
   const measure = () => {
@@ -46,13 +35,13 @@ export function initScrollCarousel(section, api) {
     if (ticking) return;
     ticking = true;
     window.requestAnimationFrame(apply);
-    // Filet : requestAnimationFrame peut être suspendu (fenêtre en arrière-plan).
+
     window.setTimeout(() => {
       if (ticking) apply();
     }, 120);
   };
 
-  /** Les boutons déplacent la page : une slide = une fraction du parcours. */
+
   const navigate = (direction) => {
     if (!Number.isFinite(direction)) {
       const rect = section.getBoundingClientRect();
@@ -105,7 +94,7 @@ export function initScrollCarousel(section, api) {
   });
 
   sync();
-  // Les images se chargent après coup : on remesure une fois posées.
+
   window.setTimeout(() => {
     if (active) {
       measure();

@@ -1,14 +1,8 @@
 import { qsa, on } from '../utils/dom.js';
 import { prefersReducedMotion } from '../utils/motion.js';
 
-/**
- * Apparition progressive au scroll.
- *
- * L'animation est décorative : le contenu ne doit jamais rester masqué.
- * IntersectionObserver assure le cas nominal, un contrôle géométrique au
- * scroll sert de filet (onglet initialement masqué, observer inactif), et
- * tout est révélé d'emblée si le mouvement réduit est demandé.
- */
+
+
 export function initReveal() {
   const items = qsa('[data-reveal]');
   if (!items.length) return;
@@ -39,22 +33,22 @@ export function initReveal() {
 
   items.forEach((item) => observer.observe(item));
 
-  // Filet de sécurité : révèle ce qui est déjà entré dans la fenêtre.
+
   let scheduled = false;
   const sweep = () => {
     scheduled = false;
     items.forEach((item) => {
       if (item.dataset.revealed === 'true') return;
       const rect = item.getBoundingClientRect();
-      // Tout ce qui est entré dans la fenêtre, ou déjà dépassé, doit être visible.
+
       if (rect.top < window.innerHeight * 0.95) {
         reveal(item);
         observer.unobserve(item);
       }
     });
   };
-  // setTimeout plutôt que requestAnimationFrame : le filet doit aussi
-  // fonctionner lorsque l'onglet n'est pas au premier plan.
+
+
   const schedule = () => {
     if (scheduled) return;
     scheduled = true;

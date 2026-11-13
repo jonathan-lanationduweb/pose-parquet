@@ -1,5 +1,3 @@
-/* Pages de rubrique : guides, tutoriels, motifs, inspiration, à propos */
-
 .listing-featured {
   display: grid;
   gap: clamp(1.5rem, 1rem + 2vw, 3rem);
@@ -8,8 +6,6 @@
 @media (min-width: 62rem) {
   .listing-featured { grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr); align-items: stretch; }
 }
-
-/* Grande carte à la une : image plein cadre, texte en surimpression */
 .feature-card {
   position: relative;
   display: grid;
@@ -48,8 +44,6 @@
 .feature-card p { color: rgba(255,255,255,0.82); max-width: 44ch; margin: 0; }
 
 .listing-side { display: grid; gap: var(--sp-5); align-content: start; }
-
-/* Liste compacte de liens (colonne latérale, dossiers) */
 .cluster-list { display: grid; border-top: 1px solid var(--line); }
 .cluster-list a {
   display: flex;
@@ -69,8 +63,6 @@
   letter-spacing: var(--tracking-display);
 }
 .cluster-list span { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--text-muted); white-space: nowrap; }
-
-/* Filtres */
 .filters { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: clamp(2rem, 1.5rem + 2vw, 3rem); }
 .filter-chip {
   padding: 0.5rem 1.05rem;
@@ -103,8 +95,6 @@
 
 .filter-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
 .filter-empty { margin-top: var(--sp-5); color: var(--text-muted); }
-
-/* ---------- Motifs : deux familles ---------- */
 .motif-family { display: grid; gap: var(--sp-5); }
 .motif-family + .motif-family { margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem); padding-top: clamp(2rem, 1.25rem + 2vw, 3rem); border-top: 1px solid var(--line); }
 .motif-family__head { display: grid; gap: var(--sp-3); max-width: 62ch; }
@@ -113,11 +103,8 @@
 @media (min-width: 62rem) {
   .motif-family--v { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); align-items: start; }
 }
-
-/* ---------- Méthode : principes ---------- */
 .method-intro { display: grid; gap: var(--sp-5) var(--sp-7); }
 @media (min-width: 52rem) { .method-intro { grid-template-columns: 1fr 1fr; } }
-/* Deux sections (H2) : taille H2, comme les autres titres de section. */
 .method-intro h2 { font-size: var(--fs-h2); line-height: var(--lh-h2); margin: 0 0 var(--sp-2); }
 .method-intro p { margin: 0; color: var(--text-soft); }
 .principles {
@@ -146,24 +133,12 @@
   letter-spacing: var(--tracking-eyebrow);
   color: var(--text-muted);
 }
-
-/* Les deux motifs en V se comparent côte à côte, jamais empilés en grand. */
 @media (min-width: 40rem) {
   .motif-family--v .motif-family__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 .motif-family--v .pattern-card__viz { aspect-ratio: 16 / 10; }
-
-/* Colonne latérale des listings : le titre garde sa ligne, la durée passe dessous si besoin. */
 .listing-side .cluster-list a { flex-wrap: wrap; row-gap: 0.15rem; }
 .listing-side .cluster-list strong { flex: 1 1 12rem; }
-
-/*
- * Motifs sur mobile : un défilement horizontal par famille.
- *
- * Empilées, les six fiches faisaient une page de plus de 4 000 px où l'on ne
- * comparait plus rien. On glisse d'un motif à l'autre ; la fiche suivante
- * dépasse du bord pour dire qu'il y en a d'autres.
- */
 @media (max-width: 39.99rem) {
   .motif-family__grid.grid {
     display: flex;
@@ -172,7 +147,6 @@
     scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain;
     scrollbar-width: none;
-    /* Jusqu'aux bords de l'écran, la première fiche alignée sur le texte. */
     margin-inline: calc(-1 * var(--gutter));
     padding: 0 var(--gutter) var(--sp-2);
     scroll-padding-inline: var(--gutter);
@@ -184,10 +158,6 @@
   }
   .motif-family__grid .pattern-card:hover { transform: none; }
 }
-
-/* ---------- Tutoriels, maquette du 13/11/2026 ---------- */
-
-/* Liste des autres tutoriels : titre, niveau, puis une phrase. */
 .cluster-list--accroche a { flex-wrap: wrap; row-gap: 0.25rem; }
 .cluster-list--accroche em {
   flex-basis: 100%;
@@ -196,8 +166,6 @@
   line-height: 1.45;
   color: var(--text-soft);
 }
-
-/* Quel tutoriel pour quel chantier : trois cartes cliquables. */
 .situations { display: grid; gap: var(--sp-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); }
 .situation {
   display: grid;
@@ -221,8 +189,6 @@
 .situation__titre { margin: 0; }
 .situation__texte { margin: 0; font-size: var(--fs-sm); line-height: 1.55; color: var(--text-soft); }
 .situations__note { margin: var(--sp-4) 0 0; font-size: var(--fs-sm); color: var(--text-soft); }
-
-/* L'outillage : deux listes côte à côte, une ligne par outil. */
 .outillage { display: grid; gap: var(--sp-5) clamp(2rem, 5vw, 5rem); grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
 .outillage__titre {
   margin: 0 0 var(--sp-3);
@@ -237,8 +203,6 @@
 .outillage__liste li { padding: 0.7rem 0; border-bottom: 1px solid var(--line); font-size: var(--fs-sm); line-height: 1.5; color: var(--text-soft); }
 .outillage__liste strong { color: var(--text); font-weight: 600; }
 .outillage__note { margin: var(--sp-4) 0 0; font-size: var(--fs-sm); color: var(--text-muted); }
-
-/* Questions fréquentes : deux colonnes de réponses, toutes visibles. */
 .faq-grille { display: grid; gap: var(--sp-5) clamp(2rem, 5vw, 5rem); grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 48rem) { .faq-grille { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .faq-grille__item { padding-top: var(--sp-4); border-top: 1px solid var(--line); }

@@ -1,36 +1,3 @@
-/**
- * Inspiration — page éditoriale : une à la une, une voisine, une grille.
- *
- * La version précédente faisait reposer toute la page sur un carrousel : une
- * ambiance dominait, la suivante affleurait, six restaient derrière deux
- * flèches. On ne découvre pas une collection de huit photographies en
- * cliquant sept fois. Ici tout est posé à plat et se lit en faisant défiler
- * la page ; la hiérarchie est dans la TAILLE des cartes, pas dans un ordre de
- * passage.
- *
- * DENSITÉ. La première version à plat faisait 6 000 px sur téléphone : huit
- * cartes pleine largeur, chacune presque un écran. Rien n'est caché pour
- * autant — pas de défileur obligatoire, pas de « voir plus » — mais les six
- * cartes de la grille passent en format compact sous 48rem (photo à gauche,
- * texte à droite), la voisine perd de la hauteur, la section des motifs
- * devient trois lignes basses, et les marges intérieures se resserrent. La
- * page doit se lire comme une progression : deux ambiances fortes, six plus
- * courtes, puis les motifs, puis la suite du parcours.
- *
- * L'identité sombre de la section est conservée : c'est elle qui fait tenir
- * les huit photographies ensemble, et le reste du site est clair.
- *
- * Cette feuille n'est servie qu'à la page qui porte `.spotlight` (voir
- * _generator/assets.js) : les règles de l'en-tête de page qui suivent ne
- * touchent donc que cette page.
- */
-
-/* ---------- En-tête de page, resserré ---------- */
-/*
- * Le fil d'Ariane porte déjà la hauteur du bandeau fixe : l'en-tête n'a pas
- * à l'ajouter une seconde fois. Il ne garde qu'un souffle au-dessus du titre.
- * Les deux colonnes se rapprochent — 59 / 41 au lieu de 65 / 35.
- */
 .page-hero--compact,
 .breadcrumb + .page-hero.page-hero--compact {
   padding-top: clamp(1rem, 0.5rem + 1.5vw, 2rem);
@@ -47,8 +14,6 @@
 @media (max-width: 47.99rem) {
   .page-hero--compact .page-hero__lead { font-size: var(--fs-base); }
 }
-
-/* ---------- La section sombre ---------- */
 .spotlight {
   background: var(--c-ink);
   color: var(--text-invert);
@@ -72,14 +37,6 @@
   letter-spacing: 0.08em;
   color: rgba(255, 255, 255, 0.72);
 }
-
-/* ---------- Filtres : Tout, puis Motif, puis Pièce ---------- */
-/*
- * Une barre infinie de pastilles ne hiérarchise rien. Les pastilles sont
- * rangées en deux groupes nommés, séparés d'un filet ; sur téléphone la
- * barre tient sur UNE ligne et défile horizontalement, en débordant des
- * marges pour que la dernière pastille affleure et dise qu'il y en a d'autres.
- */
 .spotlight .filter-bar--grouped {
   display: flex;
   flex-wrap: wrap;
@@ -140,17 +97,6 @@
     background: rgba(255, 255, 255, 0.2);
   }
 }
-
-/* ---------- La grille ---------- */
-/*
- * Douze colonnes. Sur grand écran la une en prend huit et sa voisine quatre,
- * puis trois cartes par rangée ; sur tablette sept et cinq, puis deux par
- * rangée ; sur téléphone une colonne.
- *
- * Quand un filtre est actif (`data-filtered`), la une et la voisine
- * reprennent le format commun : une carte dominante n'a de sens que devant
- * la collection complète.
- */
 .spotlight__une { margin-bottom: var(--sp-3); }
 .insp-grid {
   display: grid;
@@ -170,11 +116,7 @@
   .insp-card--voisine { grid-column: span 4; }
   .insp-grid[data-filtered="true"] .insp-card { grid-column: span 4; }
 }
-
-/* ---------- Une carte ---------- */
 .insp-card { margin: 0; display: flex; min-width: 0; }
-
-/* La surface entière est la cible : lien vers le Studio, ou loupe. */
 .insp-card__surface {
   display: flex;
   flex-direction: column;
@@ -204,14 +146,6 @@
 .insp-card__media img { display: block; width: 100%; height: 100%; }
 .insp-card__media img { object-fit: cover; transition: transform var(--dur-4) var(--ease-out); }
 .insp-card__surface:hover .insp-card__media img { transform: scale(1.03); }
-
-/*
- * À la une. Sur téléphone les deux cartes fortes sont pleine largeur en 16/9 :
- * la photo garde sa lecture, et la seconde ne prend plus un écran à elle
- * seule. À partir de la tablette, la voisine fixe la hauteur de la rangée
- * (format carré) et la une s'étire pour l'égaler ; en filtrage, les deux
- * reprennent le 3/2 commun.
- */
 .insp-card--une .insp-card__media,
 .insp-card--voisine .insp-card__media { aspect-ratio: 16 / 9; }
 @media (min-width: 48rem) {
@@ -224,7 +158,6 @@
     min-height: 0;
   }
 }
-/* La grille : 3/2 dès trois colonnes, le 4/3 allongeait chaque rangée de 40 px pour rien. */
 @media (min-width: 62rem) {
   .insp-card--grille .insp-card__media { aspect-ratio: 3 / 2; }
 }
@@ -259,8 +192,6 @@
   max-width: 52ch;
 }
 .insp-card--une .insp-card__text { font-size: var(--fs-base); }
-
-/* Pas de gros bouton plein : un lien souligné, qui réagit avec la carte. */
 .insp-card__try {
   display: inline-flex;
   align-items: center;
@@ -278,13 +209,6 @@
 .insp-card__surface:hover .insp-card__try { text-decoration-color: #fff; }
 .insp-card__surface:hover .insp-card__try svg { transform: translateX(3px); }
 .insp-card__credit { font-size: var(--fs-xs); color: rgba(255, 255, 255, 0.64); }
-
-/*
- * Format compact, téléphone seulement : la photo à gauche sur 42 pour cent,
- * le texte à droite, et la carte fait la hauteur de son texte — autour de
- * 10 rem au lieu de 28. Les six ambiances restent là, avec leur nom, leur
- * motif, leur teinte, leur phrase et leur lien ; seule la mise en page change.
- */
 @media (max-width: 47.99rem) {
   .insp-card--grille .insp-card__surface {
     flex-direction: row;
@@ -313,8 +237,6 @@
 }
 
 .spotlight__empty { color: rgba(255, 255, 255, 0.72); }
-
-/* Les crédits : une note, pas une section. */
 .spotlight__note {
   margin-top: clamp(1rem, 0.75rem + 0.8vw, 1.5rem);
   font-size: var(--fs-xs);
@@ -324,8 +246,6 @@
 .spotlight__note svg { width: 14px; height: 14px; flex: none; margin-top: 0.15rem; }
 .spotlight__note a,
 .spotlight__note code { color: inherit; }
-
-/* ---------- Choisir par motif : trois lignes basses ---------- */
 .section.motif-pick { padding-block: clamp(2rem, 1.25rem + 2vw, 3.25rem); }
 .motif-pick__head {
   display: flex;
@@ -381,19 +301,12 @@
   .motif-pick__item { grid-template-columns: 7rem minmax(0, 1fr); padding: 0.75rem; }
   .motif-pick__viz { aspect-ratio: 4 / 3; }
 }
-
-/* ---------- Conclusion ---------- */
-/* Le bloc conclut ; il ne refait pas un écran. */
 .section--inspi-cta { padding-block: clamp(1.25rem, 0.75rem + 1.5vw, 2.25rem) clamp(2rem, 1.25rem + 2vw, 3rem); }
 .cta-band.cta-band--compact { padding: clamp(1.5rem, 1.1rem + 2vw, 2.75rem); gap: var(--sp-5); }
 .cta-band.cta-band--compact p { margin-top: var(--sp-2); }
-
-/* ---------- Écran tactile ---------- */
 @media (pointer: coarse) {
   .spotlight .filter-chip { min-height: 2.75rem; }
 }
-
-/* ---------- Mouvement réduit ---------- */
 @media (prefers-reduced-motion: reduce) {
   .insp-card__surface,
   .insp-card__media img,
@@ -404,8 +317,6 @@
   .insp-card__surface:hover .insp-card__try svg,
   .motif-pick__item:hover { transform: none; }
 }
-
-/* ---------- Paysage court ---------- */
 @media (max-height: 30rem) and (min-width: 40rem) {
   .page-hero--compact { padding-top: var(--sp-3); padding-bottom: var(--sp-4); }
   .spotlight { padding-block: var(--sp-5); }

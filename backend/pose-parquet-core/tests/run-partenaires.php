@@ -1,13 +1,6 @@
 <?php
-/**
- * Suite « Sites partenaires » : surveillance de Premibel et Allure Design.
- *
- *   php tests/run-partenaires.php <racine WordPress>
- *
- * Aucune requête réelle : les réponses des partenaires sont simulées
- * (pre_http_request). L'état enregistré et les réglages Mon site sont remis
- * tels qu'ils étaient.
- */
+
+
 
 declare(strict_types=1);
 
@@ -21,7 +14,7 @@ use PoseParquet\Core\Site\MonSite;
 $etat_avant   = get_option( Surveillance::OPTION, null );
 $monsite_avant = get_option( MonSite::OPTION, null );
 
-/* Réponses simulées : une file par hôte, et l'adresse effectivement demandée. */
+
 $reponses  = [];
 $demandees = [];
 add_filter(
@@ -41,7 +34,7 @@ add_filter(
 );
 $page = static fn( int $code, string $corps = '<html><head><title>Accueil</title></head><body>ok</body></html>' ): array => [ 'response' => [ 'code' => $code, 'message' => '' ], 'body' => $corps, 'headers' => [], 'cookies' => [] ];
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Diagnostic d’une réponse' );
 $verifie( 'page normale : disponible', Surveillance::diagnostic( $page( 200 ) ) === null );
 $verifie( 'le mot « maintenance » dans le texte ne suffit pas', Surveillance::diagnostic( $page( 200, '<title>Entretien du parquet</title><p>La maintenance d’un parquet huilé…</p>' ) ) === null );
@@ -54,7 +47,7 @@ $verifie( 'WooCommerce « coming soon »', is_string( Surveillance::diagnostic( 
 $verifie( 'WordPress en mise à jour', is_string( Surveillance::diagnostic( $page( 200, 'Briefly unavailable for scheduled maintenance. Check back in a minute.' ) ) ) );
 $verifie( 'phrase « boutique en maintenance »', is_string( Surveillance::diagnostic( $page( 200, '<p>Notre boutique est actuellement en maintenance.</p>' ) ) ) );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Deux échecs pour retirer, un succès pour revenir' );
 delete_option( Surveillance::OPTION );
 $verifie( 'état inconnu : disponible (ouvert par défaut)', Surveillance::disponible( 'premibel' ) && Surveillance::disponible( 'allure' ) );
@@ -70,7 +63,7 @@ $reponses = [];
 Surveillance::verifier();
 $verifie( 'un succès : de retour', Surveillance::disponible( 'premibel' ) && (int) Surveillance::etat_brut()['premibel']['echecs'] === 0 );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Réponse publique' );
 $reponses = [ 'allure-design.com' => [ $page( 200, '<title>Maintenance</title>' ), $page( 200, '<title>Maintenance</title>' ) ] ];
 Surveillance::verifier();
@@ -85,7 +78,7 @@ $verifie( 'route GET publique enregistrée', isset( $routes['/pose-parquet/v1/pa
 $req = new WP_REST_Request( 'POST', '/pose-parquet/v1/partenaires' );
 $verifie( 'POST refusé', rest_get_server()->dispatch( $req )->get_status() >= 400 );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Adresses contrôlées : domaine officiel seulement' );
 $v = MonSite::valeurs();
 update_option( MonSite::OPTION, array_merge( is_array( $monsite_avant ) ? $monsite_avant : [], [ 'premibel_url' => 'https://evil.example.com/premibel.fr', 'allure_url' => 'http://www.allure-design.com/' ] ), false );
@@ -99,13 +92,13 @@ $reponses  = [];
 Surveillance::verifier();
 $verifie( 'partenaire masqué dans Mon site : non contrôlé', ! array_filter( $demandees, static fn( $u ) => str_contains( $u, 'allure-design.com' ) ) && ! empty( Surveillance::etat_brut()['allure']['ignore'] ) );
 
-/* ------------------------------------------------------------------ */
+
 $section( 'Planification' );
 Surveillance::planifier();
 $verifie( 'contrôle planifié', (bool) wp_next_scheduled( Surveillance::HOOK ) );
 $verifie( 'intervalle de 15 minutes déclaré', ( wp_get_schedules()[ Surveillance::INTERVALLE ]['interval'] ?? 0 ) === 900 );
 
-/* Remise en état. */
+
 if ( $monsite_avant === null ) {
 	delete_option( MonSite::OPTION );
 } else {

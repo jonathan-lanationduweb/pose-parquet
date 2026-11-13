@@ -1,20 +1,3 @@
-/**
- * Contrôle : « Décrivez votre projet » est une PASSERELLE, pas un guichet.
- *
- *   node _generator/check-orientation.js        (après le build)
- *
- * POURQUOI. Jusqu'au 06/10/2026, le parcours se terminait par « Nous avons
- * reçu votre demande et nous vous répondrons par email ou par téléphone » —
- * alors que personne chez Pose-Parquet ne traite ces demandes. Il demandait
- * aussi nom, email et téléphone pour cette réponse qui ne viendrait pas.
- *
- * Désormais : on comprend, on qualifie, on ORIENTE — Premibel pour le
- * parquet, Allure Design pour la pose en Île-de-France, les deux pour un
- * projet complet — et le visiteur y va lui-même. Ce contrôle verrouille :
- * aucune donnée personnelle demandée, aucune promesse de rappel ou de
- * transmission, une orientation juste pour chaque combinaison besoin × zone,
- * des liens officiels, une mesure des clics sans donnée personnelle.
- */
 const fs = require('fs');
 const path = require('path');
 
@@ -29,7 +12,7 @@ function verifier(nom, condition, detail = '') {
 }
 const titre = (t) => console.log(`\n== ${t} ==`);
 
-/** Le code sans ses commentaires : on juge ce qui s'affiche, pas ce qui s'explique. */
+
 const sansCommentaires = (src) => src
   .replace(/\/\*[\s\S]*?\*\//g, '')
   .replace(/<!--[\s\S]*?-->/g, '')
@@ -41,7 +24,7 @@ const REGLE = require('../js/forms/lead-context.js');
 const { EVENEMENTS } = require('../js/analytics/events.js');
 const ALLURE = require('../js/commerce/allure.js');
 
-/* ------------------------------------------------------------------ */
+
 titre('Aucune donnée personnelle demandée');
 const champs = projectFormConfig.steps.flatMap((s) => s.fields.map((f) => f.name));
 const PII = ['prenom', 'nom', 'email', 'telephone', 'consentement', 'message'];
@@ -52,7 +35,7 @@ const utiles = ['departement', 'piece', 'surface', 'parquet', 'orientation', 'be
 verifier('les réponses qui servent à orienter sont toutes demandées', utiles.every((n) => champs.includes(n)), utiles.filter((n) => !champs.includes(n)).join(', '));
 verifier('bouton final : « Voir comment avancer », pas « Envoyer ma demande »', projectFormConfig.submitLabel === 'Voir comment avancer');
 
-/* ------------------------------------------------------------------ */
+
 titre('Aucune promesse que personne ne tient');
 const formulaire = sansCommentaires(lire('components/project-form/project-form.js'));
 const orientationJs = sansCommentaires(lire('js/forms/orientation.js'));
@@ -71,7 +54,7 @@ verifier('titre de page après qualification : « Voici comment avancer. »', /t
 verifier('la colonne « Vous hésitez encore » cède la place à « Votre prochaine étape »', /<h3>Votre prochaine étape<\/h3>/.test(formulaire) && /colonne\.dataset\.etat = 'orientation'/.test(formulaire));
 verifier('aucune référence de parcours montrée au visiteur (personne ne la lui demandera)', !/Référence du parcours/.test(formulaire));
 
-/* ------------------------------------------------------------------ */
+
 titre('Une orientation juste pour chaque besoin × zone');
 const PRODUIT = { id: 'POINF39026', nom: 'Point de Hongrie Couronne Impériale 92x15x520', url: 'https://www.premibel.fr/parquet-flottant-chene-verni/POINF39026/', motif: 'point-de-hongrie' };
 const BESOINS = ['produit', 'pose', 'produit-pose', 'renovation', 'renseignement', 'indetermine'];
@@ -87,7 +70,7 @@ for (const besoin of BESOINS) {
       mixed: 'premibel+allure_design',
     }[destination];
     if (attendu && qui !== attendu) incoherences.push(`${besoin}/${idf ? 'IDF' : 'hors IDF'} : ${qui} au lieu de ${attendu}`);
-    // Jamais Allure Design pour un chantier hors Île-de-France.
+
     if (!idf && qui.includes('allure_design')) incoherences.push(`${besoin}/hors IDF : Allure Design proposé`);
     if (destination === 'undetermined' && !vue.preciser) incoherences.push(`${besoin}/${idf} : indéterminé sans « préciser »`);
   }
@@ -102,7 +85,7 @@ verifier('pose hors IDF : « prochaine étape » utile (un poseur de sa région)
 verifier('« à Paris et en Île-de-France » (et non « à Paris et Île-de-France »)', !/à Paris et Île/.test(JSON.stringify([poseHors, mixte, horsZone])) && /à Paris et en Île-de-France/.test(JSON.stringify(mixte)));
 verifier('indéterminé : « Votre projet demande encore une précision. »', O.orientation({ destination: 'undetermined', besoin: 'indetermine', idf: true }).titre === 'Votre projet demande encore une précision.');
 
-/* ------------------------------------------------------------------ */
+
 titre('Liens officiels, produit précis');
 const host = (u) => new URL(u).hostname;
 verifier('catalogue Premibel : https://www.premibel.fr/parquet/', O.PREMIBEL_CATALOGUE === 'https://www.premibel.fr/parquet/');
@@ -116,7 +99,7 @@ verifier('adresse de fiche hors domaine Premibel : ignorée, catalogue à la pla
 verifier('la fiche vient du catalogue publié, jamais de l’URL de la page', /fetch\(`\$\{base\}data\/products\.premibel\.json`/.test(formulaire) && /url: p\.productUrl/.test(formulaire));
 verifier('liens sortants dans un nouvel onglet, sans opener, marqués « sponsored »', /target="_blank" rel="sponsored noopener" data-suivi=/.test(formulaire));
 
-/* ------------------------------------------------------------------ */
+
 titre('Récapitulatif et Visualiseur');
 const recap = O.recapitulatif({ besoin: 'produit-pose', piece: 'sejour', surface: '35', parquet: 'inconnu', orientation: 'inconnu', produitNom: 'Couronne Impériale', motif: 'point-de-hongrie', departement: '92', idf: true, delai: '' });
 verifier('récapitulatif : besoin, pièce, surface, parquet, motif, zone', JSON.stringify(recap.map((l) => l.libelle)) === JSON.stringify(['Besoin', 'Pièce', 'Surface', 'Parquet', 'Motif', 'Zone']) && recap[2].valeur === '35 m²' && recap[5].valeur === 'Île-de-France (92)');
@@ -125,7 +108,7 @@ const retour = O.lienVisualiseur('../', { sceneId: 'sejour', productId: 'POINF39
 verifier('« Revoir dans le Visualiseur » rouvre la configuration (pièce, parquet, motif, orientation)', retour === '../outils/studio.html?piece=sejour&parquet=POINF39026&motif=point-de-hongrie&orientation=90', retour);
 verifier('la photo personnelle n’est jamais reprise', !/photo|image|data:/.test(retour) && /Votre photo n’a pas quitté votre navigateur\./.test(formulaire));
 
-/* ------------------------------------------------------------------ */
+
 titre('Mesure du parcours, sans donnée personnelle');
 verifier('événements connus : click_premibel, click_allure_design, view_orientation', ['click_premibel', 'click_allure_design', 'view_orientation', 'submit_project'].every((e) => EVENEMENTS.includes(e)));
 verifier('nom d’événement selon l’entreprise', O.evenementClic('premibel') === 'click_premibel' && O.evenementClic('allure_design') === 'click_allure_design');
@@ -135,7 +118,7 @@ verifier('aucune donnée personnelle dans le contexte', Object.keys(ctx).every((
 verifier('un clic Allure Design ne porte pas de produit', !('sku' in O.contexteClic({ cible: 'allure_design', produit: PRODUIT })));
 verifier('pas de double comptage : le suivi global ignore les liens qui se mesurent eux-mêmes', /!lien\.hasAttribute\('data-suivi'\)/.test(lire('js/commerce/allure.js')));
 
-/* ------------------------------------------------------------------ */
+
 titre('WordPress : stockage sans coordonnées');
 const champsPhp = lire('backend/pose-parquet-core/src/Projects/Fields.php');
 verifier('coordonnées et consentement facultatifs dans le contrat', ['firstName', 'lastName', 'email', 'phone', 'consent'].every((c) => new RegExp(`'${c}'\\s*=> false`).test(champsPhp)));

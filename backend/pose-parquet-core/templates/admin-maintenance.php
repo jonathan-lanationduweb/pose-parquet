@@ -1,20 +1,6 @@
 <?php
-/**
- * Écran « Maintenance », dans le socle commun (référence : le panneau de
- * maintenance d'Expert Parquet).
- *
- *   gauche : le panneau — interrupteur (son propre formulaire, confirmé),
- *            puis le contenu de la page (titre, message, image, liens) ;
- *   droite : l'aperçu de la page publique, et ce que la maintenance fait
- *            réellement (503, accès des administrateurs, site statique).
- *
- * @var array  $m          réglages
- * @var string $image_url  vignette de l'image de fond
- * @var string $apercu     URL de l'aperçu (avec jeton)
- * @var string $retour     retour d'une action (ok | active | desactivee)
- *                         (et ?pp-publication= au retour du bouton « Publier le site »)
- * @var bool   $enregistre vrai juste après un enregistrement
- */
+
+
 
 use PoseParquet\Core\Admin\Socle;
 use PoseParquet\Core\Maintenance\Reglages;
@@ -23,15 +9,15 @@ use PoseParquet\Core\Publication\Publication;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-// Le retour d'une action dit ce qui a changé dans WordPress, et ce qui reste à publier — jamais que le site public a changé s'il ne l'a pas fait.
+
 $public   = Reglages::etat_public();
 $messages = [
 	'ok'         => __( 'Page de maintenance enregistrée.', 'pose-parquet-core' ),
 	'active'     => $public === 'maintenance_a_publier' ? __( 'Maintenance activée dans WordPress. Publiez le site pour l’afficher aux visiteurs.', 'pose-parquet-core' ) : __( 'Maintenance activée.', 'pose-parquet-core' ),
 	'desactivee' => $public === 'reactivation_a_publier' ? __( 'Maintenance désactivée dans WordPress. Le site public est encore en maintenance : publiez cette modification pour le réactiver.', 'pose-parquet-core' ) : __( 'Maintenance désactivée.', 'pose-parquet-core' ),
 ];
-// Retour du bouton « Publier le site » du panneau (même moteur que l'écran Publication).
-$publication = isset( $_GET['pp-publication'] ) ? sanitize_key( wp_unslash( $_GET['pp-publication'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+$publication = isset( $_GET['pp-publication'] ) ? sanitize_key( wp_unslash( $_GET['pp-publication'] ) ) : '';
 $retours_publication = [
 	'lancee'       => [ 'success', __( 'Publication lancée. Cette page se met à jour toute seule.', 'pose-parquet-core' ) ],
 	'en_cours'     => [ 'warning', __( 'Une publication est déjà en cours : attendez qu’elle se termine.', 'pose-parquet-core' ) ],
@@ -42,7 +28,7 @@ $retours_publication = [
 <div class="wrap">
 	<?php Socle::entete( __( 'Maintenance', 'pose-parquet-core' ), __( 'Une page temporaire pour les visiteurs pendant vos mises à jour. L’administration reste accessible.', 'pose-parquet-core' ), '<button type="submit" form="pp-maintenance" class="adm-bouton adm-bouton--plein">' . esc_html__( 'Enregistrer', 'pose-parquet-core' ) . '</button>' ); ?>
 	<?php
-	// L'écart de maintenance est dit dans le panneau, avec son bouton ; le rappel général sert pour le reste.
+
 	if ( ! in_array( $public, [ 'maintenance_a_publier', 'reactivation_a_publier' ], true ) ) {
 		Publication::rappel();
 	}
@@ -52,7 +38,7 @@ $retours_publication = [
 	<?php endif; ?>
 	<?php
 	if ( $publication === 'lancee' ) {
-		// La page se recharge pendant la publication : le message suit son état réel.
+
 		$statut_pub = Publication::etat()['statut'];
 		$retours_publication['lancee'] = match ( $statut_pub ) {
 			'en_cours' => $retours_publication['lancee'],

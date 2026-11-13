@@ -1,17 +1,6 @@
 <?php
-/**
- * Création d'une demande : la seule séquence qui écrit une demande.
- *
- * valider → normaliser → insérer → référence → historique, sous une
- * transaction InnoDB. Si une étape échoue, rien n'est resté : pas de ligne
- * sans référence, pas de référence sans historique.
- *
- * Le service ne connaît ni HTTP ni JSON. Il rend un résultat typé que le
- * contrôleur traduit en réponse, et il est appelable tel quel depuis un test
- * ou un script CLI — c'est ainsi que la concurrence est éprouvée.
- *
- * @package PoseParquet\Core
- */
+
+
 
 declare(strict_types=1);
 
@@ -34,10 +23,8 @@ final class Service {
 		$this->repository = $repository ?? new Repository();
 	}
 
-	/**
-	 * @param mixed $input corps décodé de la requête
-	 * @return array{ok:bool,reference?:string,id?:int,code?:string,fields?:array<string,string>}
-	 */
+
+
 	public function create( mixed $input ): array {
 		$validation = Validator::validate( $input );
 		if ( ! $validation['ok'] ) {
@@ -45,7 +32,7 @@ final class Service {
 		}
 
 		$data = $validation['data'];
-		$now  = current_time( 'mysql', true ); // UTC serveur — la seule horloge qui compte.
+		$now  = current_time( 'mysql', true );
 		$year = (int) current_time( 'Y', true );
 
 		$repo          = $this->repository;
@@ -55,8 +42,8 @@ final class Service {
 			return [ 'ok' => false, 'code' => self::ERR_STORAGE ];
 		}
 
-		// Pas de consentement reçu, pas de date de consentement : la colonne
-		// reste NULL plutôt que d'affirmer un accord qui n'a pas été donné.
+
+
 		$id = $repo->insert_project( $data, ! empty( $data['consent'] ) ? $now : null, $now );
 		if ( $id <= 0 ) {
 			return $this->abandon( $transactional, 'Insertion refusée' );
@@ -78,12 +65,12 @@ final class Service {
 		return [ 'ok' => true, 'reference' => $reference, 'id' => $id ];
 	}
 
-	/** @return array{ok:bool,code:string} */
+
 	private function abandon( bool $transactional, string $etape, int $id = 0 ): array {
 		if ( $transactional ) {
 			$this->repository->rollback();
 		}
-		// Identifiant et étape : assez pour diagnostiquer, rien de la personne.
+
 		Logger::error( 'Création de demande interrompue', [ 'route' => 'projects.create', 'step' => $etape, 'project_id' => $id ] );
 
 		return [ 'ok' => false, 'code' => self::ERR_STORAGE ];
