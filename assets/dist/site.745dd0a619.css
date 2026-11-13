@@ -436,9 +436,13 @@ html[data-allure-indisponible] a[href*="allure-design.com"]:not([class]) {
 .brand__logo {
   display: block;
   align-self: center;
-  width: auto; height: 1.75rem; max-width: 11rem;
+  width: auto; height: 4.25rem; max-width: 10.5rem;
   object-fit: contain;
 }
+@media (max-width: 40rem) {
+  .brand__logo { height: 3.4rem; max-width: 8.5rem; }
+}
+.site-header[data-over="true"]:not([data-scrolled="true"]) .brand__logo { filter: brightness(0) invert(1); }
 .brand strong { font-weight: 400; }
 .brand span { opacity: 0.55; }
 .nav { display: none; justify-self: center; }

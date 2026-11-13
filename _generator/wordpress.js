@@ -76,6 +76,26 @@ function lectureEstimee(html) {
 }
 
 
+const dimensionsPng = (fichier) => {
+  const tete = fs.readFileSync(fichier).subarray(0, 24);
+  return { largeur: tete.readUInt32BE(16), hauteur: tete.readUInt32BE(20) };
+};
+
+function logoRogne(nom, avertir) {
+  const source = path.join(IMAGES, nom);
+  const cible = path.join(IMAGES, `${path.basename(nom, path.extname(nom))}-rogne.png`);
+  if (!fs.existsSync(cible)) {
+    const { spawnSync } = require('child_process');
+    const script = path.join(__dirname, 'rogner-logo.py');
+    const ok = ['python', 'python3', 'py'].some((python) => spawnSync(python, [script, source, cible], { timeout: 60000 }).status === 0);
+    if (!ok || !fs.existsSync(cible)) {
+      avertir('Logo : marges non rognées (Python et Pillow requis) — le logo est affiché tel quel.');
+      return null;
+    }
+  }
+  return { chemin: `assets/images/${path.basename(cible)}`, type: 'image/png', ...dimensionsPng(cible) };
+}
+
 const fichierIdentite = (image) => `wp-${image.id}${(path.extname(new URL(image.url).pathname) || '.png').toLowerCase()}`;
 const TYPES_IMAGE = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.gif': 'image/gif' };
 
@@ -90,6 +110,10 @@ function valeurChamp(def, v, avertir, lieu) {
     if (!fs.existsSync(path.join(IMAGES, nom))) {
       avertir(`${lieu} → ${def.libelle} : image #${v.id} absente du disque, lancez « node _generator/wordpress.js pull ».`);
       return undefined;
+    }
+    if (def.cle === 'logo') {
+      const rogne = logoRogne(nom, avertir);
+      if (rogne) return rogne;
     }
     return { chemin: `assets/images/${nom}`, type: TYPES_IMAGE[path.extname(nom)] || 'image/png', largeur: v.largeur || 0, hauteur: v.hauteur || 0 };
   }
