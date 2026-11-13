@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const RACINE = path.resolve(__dirname, '..');
-const lire = (rel) => fs.readFileSync(path.join(RACINE, rel), 'utf8');
+const lire = (rel) => { const pub = require('./routes').fichierPublic(rel); return fs.readFileSync(path.join(RACINE, fs.existsSync(path.join(RACINE, pub)) ? pub : rel), 'utf8'); };
 const sansCommentaires = (src) => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
 

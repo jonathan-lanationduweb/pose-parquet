@@ -105,7 +105,7 @@ const recap = O.recapitulatif({ besoin: 'produit-pose', piece: 'sejour', surface
 verifier('récapitulatif : besoin, pièce, surface, parquet, motif, zone', JSON.stringify(recap.map((l) => l.libelle)) === JSON.stringify(['Besoin', 'Pièce', 'Surface', 'Parquet', 'Motif', 'Zone']) && recap[2].valeur === '35 m²' && recap[5].valeur === 'Île-de-France (92)');
 verifier('« je ne sais pas » et les champs vides n’apparaissent pas', !recap.some((l) => /inconnu|undefined/.test(l.valeur)) && !recap.some((l) => l.libelle === 'Délai'));
 const retour = O.lienVisualiseur('../', { sceneId: 'sejour', productId: 'POINF39026', pattern: 'point-de-hongrie', angle: 90 });
-verifier('« Revoir dans le Visualiseur » rouvre la configuration (pièce, parquet, motif, orientation)', retour === '../outils/studio.html?piece=sejour&parquet=POINF39026&motif=point-de-hongrie&orientation=90', retour);
+verifier('« Revoir dans le Visualiseur » rouvre la configuration (pièce, parquet, motif, orientation)', retour === '../outils/studio/?piece=sejour&parquet=POINF39026&motif=point-de-hongrie&orientation=90', retour);
 verifier('la photo personnelle n’est jamais reprise', !/photo|image|data:/.test(retour) && /Votre photo n’a pas quitté votre navigateur\./.test(formulaire));
 
 

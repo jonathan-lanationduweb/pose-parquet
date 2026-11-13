@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Simulateur de pose de parquet : sens et motifs</title>
+    <meta name="description" content="Comparez différentes orientations de lames sur un plan et visualisez les effets des sens de pose de votre parquet." />
+
+
+
+
+
+
+
+
+
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href="https://pose-parquet.com/outils/simulateur-pose/" />
+    <meta name="theme-color" content="#fbf8f4" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Pose Parquet" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:title" content="Simulateur de pose de parquet : sens et motifs" />
+    <meta property="og:description" content="Comparez différentes orientations de lames sur un plan et visualisez les effets des sens de pose de votre parquet." />
+    <meta property="og:url" content="https://pose-parquet.com/outils/simulateur-pose/" />
+    <meta property="og:image" content="https://pose-parquet.com/assets/images/og-default.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="../../assets/icons/favicon-48.png?v=273889a7e3" sizes="48x48" type="image/png" />
+    <link rel="icon" href="../../assets/icons/favicon-32.png?v=273889a7e3" sizes="32x32" type="image/png" />
+    <link rel="icon" href="../../assets/icons/favicon-16.png?v=273889a7e3" sizes="16x16" type="image/png" />
+    <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png?v=273889a7e3" />
+    <link rel="manifest" href="../../site.webmanifest?v=273889a7e3" />
+    <link rel="preload" as="font" type="font/woff2" href="../../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="../../assets/fonts/inter-var-1.woff2" crossorigin />
+    <link rel="stylesheet" href="../../assets/dist/site.8ded59be59.css" />
+    <link rel="stylesheet" href="../../assets/dist/plan.d3c72c3d20.css" />
+
+
+
+
+    <script src="../../config.js"></script>
+    <script type="module" src="../../assets/dist/ec47d772ed/js/main.js"></script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/"},{"@type":"ListItem","position":2,"name":"Outils","item":"https://pose-parquet.com/outils/"},{"@type":"ListItem","position":3,"name":"Simulateur de pose"}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Le simulateur remplace-t-il un calepinage ?","acceptedAnswer":{"@type":"Answer","text":"Non. Il donne une représentation pédagogique fidèle du motif et une estimation des chutes, mais un calepinage de chantier tient compte des décrochés, des seuils et des tolérances réelles."}},{"@type":"Question","name":"Les quantités affichées sont-elles fiables ?","acceptedAnswer":{"@type":"Answer","text":"Ce sont des ordres de grandeur, calculés à partir de la surface, du motif et d'un format de lame moyen. Confirmez toujours avec le calepinage définitif avant de commander."}},{"@type":"Question","name":"Puis-je ajouter d’autres motifs ?","acceptedAnswer":{"@type":"Answer","text":"Le simulateur est construit autour d'un registre de motifs : chaque motif est une fonction indépendante, ce qui permet d'en ajouter sans toucher au reste du code."}}]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Simulateur de pose","applicationCategory":"DesignApplication","operatingSystem":"Navigateur web","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"url":"https://pose-parquet.com/outils/simulateur-pose/"}</script>
+  </head>
+  <body class="page">
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+    <header class="site-header" data-header data-over="false" data-scrolled="false">
+      <div class="wrap-wide site-header__inner">
+        <a class="brand" href="../../" aria-label="Pose Parquet, accueil">
+          <img class="brand__logo" src="../../assets/images/wp-246-rogne.png" alt="" width="480" height="233" />
+        </a>
+        <nav class="nav" aria-label="Navigation principale">
+          <ul class="nav__list">
+            <li><a class="nav__link" href="../../guides/" data-nav-section="guides">Guides</a></li>
+            <li><a class="nav__link" href="../../motifs/" data-nav-section="motifs">Motifs</a></li>
+            <li><a class="nav__link" href="../../tutoriels/" data-nav-section="tutoriels">Tutoriels</a></li>
+            <li><a class="nav__link" href="../../inspiration/" data-nav-section="inspiration">Inspiration</a></li>
+            <li><a class="nav__link" href="../" data-nav-section="outils">Outils</a></li>
+            <li><a class="nav__link" href="../../a-propos/" data-nav-section="a-propos">À propos</a></li>
+          </ul>
+        </nav>
+        <div class="header__actions">
+          <a class="header__cta" href="../../projet/"><span>Décrire mon projet</span></a>
+          <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false"
+            aria-controls="menu-mobile" aria-label="Ouvrir le menu">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </header>
+    <div class="drawer" id="menu-mobile" data-drawer data-open="false">
+      <nav class="drawer__list" aria-label="Navigation mobile">
+        <a class="drawer__link" href="../../guides/"><span>01</span>Guides</a>
+          <a class="drawer__link" href="../../motifs/"><span>02</span>Motifs</a>
+          <a class="drawer__link" href="../../tutoriels/"><span>03</span>Tutoriels</a>
+          <a class="drawer__link" href="../../inspiration/"><span>04</span>Inspiration</a>
+          <a class="drawer__link" href="../"><span>05</span>Outils</a>
+          <a class="drawer__link" href="../../a-propos/"><span>06</span>À propos</a>
+          <a class="drawer__link" href="../../contact/"><span>07</span>Contact</a>
+      </nav>
+      <div class="drawer__footer">
+        <a class="btn btn--light btn--block" href="../../projet/"><span>Décrire mon projet</span><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></svg></a>
+        <a class="btn btn--outline-light btn--block" href="../studio/"><span>Visualiser mon parquet</span></a>
+
+
+
+
+        <p class="drawer__meta">Guides, motifs et outils</p>
+      </div>
+    </div>
+    <main id="contenu">
+      <nav class="breadcrumb wrap-wide" aria-label="Fil d'Ariane"><ol><li><a href="../../">Accueil</a></li><li><a href="../">Outils</a></li><li><span aria-current="page">Simulateur de pose</span></li></ol></nav>
+      <header class="tool-hero wrap">
+        <p class="eyebrow">Mode plan · outil</p>
+        <h1>Une pièce. Plusieurs directions.</h1>
+        <p class="lead">Vue du dessus, à l'échelle : renseignez vos dimensions, placez la fenêtre et l'entrée, comparez les motifs. Les quantités affichées sont des estimations indicatives.</p>
+        <p class="u-mt-5"><a class="link-arrow" href="../visualiseur/">Plutôt voir le rendu dans une photo ? Ouvrir le visualiseur</a></p>
+      </header>
+
+      <section class="tool-shell" id="plan" aria-label="Plan de la pièce et réglages">
+        <div class="wrap-wide">
+          <div data-visualizer data-base="../../"></div>
+        </div>
+      </section>
+
+      <section class="section section--alt">
+        <div class="wrap">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Comment lire le résultat</p>
+              <h2>Trois repères à observer</h2>
+            </div>
+          </div>
+          <div class="grid grid--3">
+            <div class="tool-card"><h3>La direction dominante</h3><p>Le regard suit les lames. Vérifiez si cette direction accompagne l'entrée de la pièce ou la contredit.</p></div>
+            <div class="tool-card"><h3>Les joints face à la lumière</h3><p>La nappe lumineuse indique d'où vient la lumière. Des joints perpendiculaires aux rayons ressortent davantage.</p></div>
+            <div class="tool-card"><h3>Les chutes estimées</h3><p>Un motif orienté ou diagonal consomme plus de matière. Ce surplus se commande dès le premier lot.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="wrap-text">
+          <h2>Questions fréquentes</h2>
+          <div class="accordion" data-multiple="false">
+        <div class="accordion__item" data-open="true">
+          <h3><button class="accordion__trigger" type="button" aria-expanded="true">
+            <span>Le simulateur remplace-t-il un calepinage ?</span><span class="accordion__icon" aria-hidden="true"></span>
+          </button></h3>
+          <div class="accordion__panel"><div><p>Non. Il donne une représentation pédagogique fidèle du motif et une estimation des chutes, mais un calepinage de chantier tient compte des décrochés, des seuils et des tolérances réelles.</p></div></div>
+        </div><div class="accordion__item" data-open="false">
+          <h3><button class="accordion__trigger" type="button" aria-expanded="false">
+            <span>Les quantités affichées sont-elles fiables ?</span><span class="accordion__icon" aria-hidden="true"></span>
+          </button></h3>
+          <div class="accordion__panel"><div><p>Ce sont des ordres de grandeur, calculés à partir de la surface, du motif et d'un format de lame moyen. Confirmez toujours avec le calepinage définitif avant de commander.</p></div></div>
+        </div><div class="accordion__item" data-open="false">
+          <h3><button class="accordion__trigger" type="button" aria-expanded="false">
+            <span>Puis-je ajouter d’autres motifs ?</span><span class="accordion__icon" aria-hidden="true"></span>
+          </button></h3>
+          <div class="accordion__panel"><div><p>Le simulateur est construit autour d'un registre de motifs : chaque motif est une fonction indépendante, ce qui permet d'en ajouter sans toucher au reste du code.</p></div></div>
+        </div>
+      </div>
+        </div>
+      </section>
+      <section class="section">
+      <div class="wrap">
+        <div class="cta-band" data-reveal>
+          <div>
+            <h2>Un projet de pose à préparer ?</h2>
+            <p>Décrivez votre pièce, votre support et le rendu recherché en quatre étapes, sans laisser vos coordonnées : vous voyez aussitôt vers qui vous tourner.</p>
+          </div>
+          <div class="cta-band__actions">
+            <a class="btn btn--light" href="../../projet/">Décrire mon projet</a>
+            <a class="btn btn--outline-light" href="../studio/">Visualiser mon parquet</a>
+          </div>
+        </div>
+      </div>
+    </section>
+    </main>
+    <footer class="site-footer">
+      <div class="wrap-wide footer__inner">
+        <div class="footer__top">
+          <div class="footer__brand">
+            <a class="footer__logo-lien" href="../../" aria-label="Pose Parquet, accueil"><img class="footer__logo" src="../../assets/images/wp-246-rogne.png" alt="" width="480" height="233" loading="lazy" decoding="async" /></a>
+            <p class="footer__baseline">Guides et outils pour réussir la pose de son parquet.</p>
+          </div>
+          <nav class="footer__nav" aria-label="Pied de page">
+            <div class="footer__col" role="group" aria-labelledby="pied-col-0">
+              <p class="footer__col-titre" id="pied-col-0">Comprendre</p>
+              <ul>
+                <li><a href="../../guides/">Guides</a></li><li><a href="../../motifs/">Motifs</a></li><li><a href="../../tutoriels/">Tutoriels</a></li>
+              </ul>
+            </div><div class="footer__col" role="group" aria-labelledby="pied-col-1">
+              <p class="footer__col-titre" id="pied-col-1">Outils</p>
+              <ul>
+                <li><a href="../studio/">Visualiser ma pièce</a></li><li><a href="./">Mode Plan</a></li><li><a href="../../inspiration/">Inspiration</a></li>
+              </ul>
+            </div><div class="footer__col" role="group" aria-labelledby="pied-col-2">
+              <p class="footer__col-titre" id="pied-col-2">À propos</p>
+              <ul>
+                <li><a href="../../a-propos/methode-editoriale/">Notre méthode</a></li><li><a href="../../contact/">Contact</a></li><li><a href="../../projet/">Votre projet</a></li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+        <div class="footer__bottom">
+
+
+
+
+
+
+
+
+
+
+
+
+          <p>&copy; 2026 Pose Parquet — guides et outils pour préparer son projet.</p>
+
+
+
+
+
+
+
+
+          <p class="footer__orientation"><strong>Premibel</strong> pour les références de parquet, <strong>Allure&nbsp;Design</strong> pour la pose et la rénovation en Île-de-France : Pose Parquet oriente selon le besoin. <a href="../../a-propos/#liens-commerciaux">Nos liens commerciaux</a></p>
+          <p>Photographies sous licence Pexels</p>
+
+          <ul class="footer__legal">
+            <li><a href="../../mentions-legales/">Mentions légales</a></li>
+            <li><a href="../../confidentialite/">Confidentialité et cookies</a></li>
+            <li><a href="../../plan-du-site/">Plan du site</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,468 @@
+- generic [active] [ref=e1]:
+  - link "Aller au contenu" [ref=e2] [cursor=pointer]:
+    - /url: "#contenu"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "Pose Parquet, accueil" [ref=e5] [cursor=pointer]:
+        - /url: ./
+      - navigation "Navigation principale" [ref=e6]:
+        - list [ref=e7]:
+          - listitem [ref=e8]:
+            - link "Guides" [ref=e9] [cursor=pointer]:
+              - /url: guides/
+          - listitem [ref=e10]:
+            - link "Motifs" [ref=e11] [cursor=pointer]:
+              - /url: motifs/
+          - listitem [ref=e12]:
+            - link "Tutoriels" [ref=e13] [cursor=pointer]:
+              - /url: tutoriels/
+          - listitem [ref=e14]:
+            - link "Inspiration" [ref=e15] [cursor=pointer]:
+              - /url: inspiration/
+          - listitem [ref=e16]:
+            - link "Outils" [ref=e17] [cursor=pointer]:
+              - /url: outils/
+          - listitem [ref=e18]:
+            - link "À propos" [ref=e19] [cursor=pointer]:
+              - /url: a-propos/
+      - link "Décrire mon projet" [ref=e21] [cursor=pointer]:
+        - /url: projet/
+  - main [ref=e22]:
+    - generic [ref=e23]:
+      - img "Grande pièce vide au parquet clair traversée par la lumière" [ref=e26]
+      - generic [ref=e28]:
+        - paragraph [ref=e29]: Média indépendant sur la pose de parquet
+        - heading [level=1] [ref=e30]:
+          - text: "Poser un parquet : tout se décide"
+          - emphasis [ref=e31]: avant
+          - text: la première lame.
+        - generic [ref=e32]:
+          - generic [ref=e33]:
+            - paragraph [ref=e34]: "Sens de pose, motif, support, massif ou contrecollé : huit guides pour trancher avant de commander. Puis un simulateur gratuit pour voir le rendu dans votre pièce, à partir d’une photo — qui ne quitte jamais votre navigateur."
+            - generic [ref=e35]:
+              - link "Essayer le simulateur — gratuit" [ref=e36] [cursor=pointer]:
+                - /url: outils/studio/
+              - link "Lire les 8 guides" [ref=e40] [cursor=pointer]:
+                - /url: guides/
+            - paragraph [ref=e42]:
+              - text: Nous orientons vers
+              - strong [ref=e43]: Premibel
+              - text: pour les références et
+              - strong [ref=e44]: Allure Design
+              - text: pour la pose en Île-de-France.
+              - link "Pourquoi ?" [ref=e45] [cursor=pointer]:
+                - /url: a-propos/#liens-commerciaux
+          - list [ref=e46]:
+            - listitem [ref=e47]: 6 motifs détaillés
+            - listitem [ref=e48]: 8 guides pratiques
+            - listitem [ref=e49]: 203 parquets à essayer
+      - link "Découvrir" [ref=e50] [cursor=pointer]:
+        - /url: "#pourquoi"
+    - generic [ref=e54]:
+      - generic [ref=e55]: Pose droite
+      - generic [ref=e58]: Point de Hongrie
+      - generic [ref=e61]: Bâton rompu
+      - generic [ref=e64]: Diagonale
+      - generic [ref=e67]: Calepinage
+      - generic [ref=e70]: Pose collée
+      - generic [ref=e73]: Pose flottante
+      - generic [ref=e76]: Frise périphérique
+      - generic [ref=e79]: Ragréage
+      - generic [ref=e82]: Sens de la lumière
+      - generic [ref=e85]: Pose droite
+      - generic [ref=e88]: Point de Hongrie
+      - generic [ref=e91]: Bâton rompu
+      - generic [ref=e94]: Diagonale
+      - generic [ref=e97]: Calepinage
+      - generic [ref=e100]: Pose collée
+      - generic [ref=e103]: Pose flottante
+      - generic [ref=e106]: Frise périphérique
+      - generic [ref=e109]: Ragréage
+      - generic [ref=e112]: Sens de la lumière
+    - region "Un parquet, ça se répare mal." [ref=e115]:
+      - generic [ref=e117]:
+        - generic [ref=e118]:
+          - paragraph [ref=e119]: Pourquoi ce site
+          - heading "Un parquet, ça se répare mal." [level=2] [ref=e120]
+        - generic [ref=e121]:
+          - paragraph [ref=e122]: "Huit erreurs reviennent en boucle sur les chantiers de parquet. Toutes se corrigent avant la pose, aucune après. Un sens de lame mal choisi, un support mal préparé, un calepinage approximatif : des décisions de quelques minutes qui se regardent pendant quinze ans."
+          - paragraph [ref=e123]: "Pose Parquet est un média indépendant français consacré à la pose de parquet. Le site publie des guides, des fiches de motifs et des tutoriels, et met à disposition un simulateur gratuit permettant de visualiser un parquet dans sa propre pièce. Pose Parquet ne vend pas de parquet et n’en pose pas : il oriente vers Premibel pour les références et vers Allure Design pour la pose en Île-de-France, et perçoit une rémunération à ce titre."
+          - paragraph [ref=e124]:
+            - link "Notre méthode éditoriale" [ref=e125] [cursor=pointer]:
+              - /url: a-propos/methode-editoriale/
+    - region "Visualisez votre parquet chez vous, à partir d’une photo." [ref=e128]:
+      - generic [ref=e129]:
+        - generic [ref=e130]:
+          - generic [ref=e131]:
+            - paragraph [ref=e132]: Outil gratuit · aucune inscription
+            - heading "Visualisez votre parquet chez vous, à partir d’une photo." [level=2] [ref=e133]
+          - generic [ref=e134]:
+            - paragraph [ref=e135]: "Importez une photo de votre pièce, choisissez parmi 203 références et comparez les motifs au curseur. Six motifs sont documentés sur le site, dont cinq simulables dans nos outils. Le calcul se fait dans votre navigateur : votre photo n’est ni envoyée, ni stockée, ni analysée par un service tiers."
+            - paragraph [ref=e136]:
+              - link "Ouvrir le simulateur" [ref=e137] [cursor=pointer]:
+                - /url: outils/studio/
+              - 'link "Mode Plan : comparer les sens de pose" [ref=e141] [cursor=pointer]':
+                - /url: outils/simulateur-pose/
+        - paragraph [ref=e144]:
+          - strong [ref=e145]: Votre photo reste sur votre appareil.
+          - text: Contrairement aux simulateurs des fabricants, aucun envoi vers un serveur, aucun compte à créer, aucun catalogue imposé.
+        - generic [ref=e146]:
+          - 'figure "Chêne Colza 150x15, lames droites (rendu indicatif) — rendu calculé dans votre navigateur. Photo : Curtis Adams / Pexels." [ref=e147]':
+            - generic [ref=e148]:
+              - img "Séjour vide et lumineux ouvert sur une salle à manger" [ref=e149]
+              - generic [ref=e151]: Avant
+              - generic [ref=e152]: Après
+              - slider "Curseur de comparaison entre la pièce d’origine et le parquet simulé" [ref=e153]: "52"
+          - group "Aperçu d’autres finitions" [ref=e156]
+    - region "Les quatre décisions à prendre avant de poser votre parquet." [ref=e157]:
+      - generic [ref=e158]:
+        - generic [ref=e159]:
+          - generic [ref=e160]:
+            - paragraph [ref=e161]: Par où commencer
+            - heading "Les quatre décisions à prendre avant de poser votre parquet." [level=2] [ref=e162]
+          - paragraph [ref=e163]: Elles se prennent dans cet ordre. Commencez par celle qui vous concerne aujourd’hui.
+        - generic [ref=e164]:
+          - 'link "01 Comprendre la pose Support, sens de pose, massif ou contrecollé : ce qui se décide avant de commander. 8 guides" [ref=e165] [cursor=pointer]':
+            - /url: guides/
+            - generic [ref=e166]: "01"
+            - heading "Comprendre la pose" [level=3] [ref=e167]
+            - paragraph [ref=e168]: "Support, sens de pose, massif ou contrecollé : ce qui se décide avant de commander."
+            - generic [ref=e169]: 8 guides
+          - 'link "02 Choisir son motif De la pose droite au point de Hongrie : le motif fait le caractère de la pièce. 6 motifs" [ref=e173] [cursor=pointer]':
+            - /url: motifs/
+            - generic [ref=e174]: "02"
+            - heading "Choisir son motif" [level=3] [ref=e175]
+            - paragraph [ref=e176]: "De la pose droite au point de Hongrie : le motif fait le caractère de la pièce."
+            - generic [ref=e177]: 6 motifs
+          - 'link "03 Visualiser chez soi Votre photo, un parquet, un motif : le sol change à chaque clic. 203 parquets" [ref=e181] [cursor=pointer]':
+            - /url: outils/studio/
+            - generic [ref=e182]: "03"
+            - heading "Visualiser chez soi" [level=3] [ref=e183]
+            - paragraph [ref=e184]: "Votre photo, un parquet, un motif : le sol change à chaque clic."
+            - generic [ref=e185]: 203 parquets
+          - link "04 Préparer son chantier Quatre étapes courtes pour cadrer la pièce, le support et le besoin. Sans engagement" [ref=e189] [cursor=pointer]:
+            - /url: projet/
+            - generic [ref=e190]: "04"
+            - heading "Préparer son chantier" [level=3] [ref=e191]
+            - paragraph [ref=e192]: Quatre étapes courtes pour cadrer la pièce, le support et le besoin.
+            - generic [ref=e193]: Sans engagement
+    - region "Guides et tutoriels de pose de parquet." [ref=e197]:
+      - generic [ref=e198]:
+        - generic [ref=e199]:
+          - generic [ref=e200]:
+            - paragraph [ref=e201]: Guides et tutoriels
+            - heading "Guides et tutoriels de pose de parquet." [level=2] [ref=e202]
+          - paragraph [ref=e203]: Les guides tranchent les décisions d’achat. Les tutoriels déroulent le chantier, outillage et points de contrôle compris.
+        - generic [ref=e204]:
+          - generic [ref=e205]:
+            - generic [ref=e206]:
+              - 'heading "Guides : décider avant de commander" [level=3] [ref=e207]'
+              - link "Les 8 guides" [ref=e208] [cursor=pointer]:
+                - /url: guides/
+            - generic [ref=e211]:
+              - link "Quel sens de pose choisir pour son parquet ? Cinq critères suffisent à trancher, et ils ne se valent pas. Voici l'ordre dans lequel les regarder. Sens de pose · 9 min" [ref=e212] [cursor=pointer]:
+                - /url: guides/quel-sens-de-pose-choisir/
+                - generic [ref=e215]:
+                  - generic [ref=e216]: Quel sens de pose choisir pour son parquet ?
+                  - generic [ref=e217]: Cinq critères suffisent à trancher, et ils ne se valent pas. Voici l'ordre dans lequel les regarder.
+                  - generic [ref=e218]: Sens de pose · 9 min
+              - link "Comment préparer un sol avant la pose ? La plupart des désordres viennent du support, pas du parquet. Voici les contrôles à mener avant la première lame. Préparation · 10 min" [ref=e219] [cursor=pointer]:
+                - /url: guides/preparer-son-sol-avant-la-pose/
+                - generic [ref=e222]:
+                  - generic [ref=e223]: Comment préparer un sol avant la pose ?
+                  - generic [ref=e224]: La plupart des désordres viennent du support, pas du parquet. Voici les contrôles à mener avant la première lame.
+                  - generic [ref=e225]: Préparation · 10 min
+              - 'link "Parquet massif ou contrecollé : quelles différences pour la pose ? Le débat porte rarement sur le bon terrain : ce qui change vraiment, c''est la stabilité dimensionnelle. Comprendre · 8 min" [ref=e226] [cursor=pointer]':
+                - /url: guides/parquet-massif-ou-contrecolle/
+                - generic [ref=e229]:
+                  - generic [ref=e230]: "Parquet massif ou contrecollé : quelles différences pour la pose ?"
+                  - generic [ref=e231]: "Le débat porte rarement sur le bon terrain : ce qui change vraiment, c'est la stabilité dimensionnelle."
+                  - generic [ref=e232]: Comprendre · 8 min
+              - link "Les erreurs à éviter avant de poser un parquet Huit erreurs reviennent en boucle sur les chantiers. Toutes se corrigent avant la pose, aucune après. Préparation · 8 min" [ref=e233] [cursor=pointer]:
+                - /url: guides/erreurs-a-eviter-avant-de-poser/
+                - generic [ref=e236]:
+                  - generic [ref=e237]: Les erreurs à éviter avant de poser un parquet
+                  - generic [ref=e238]: Huit erreurs reviennent en boucle sur les chantiers. Toutes se corrigent avant la pose, aucune après.
+                  - generic [ref=e239]: Préparation · 8 min
+          - generic [ref=e240]:
+            - generic [ref=e241]:
+              - 'heading "Tutoriels : poser soi-même, étape par étape" [level=3] [ref=e242]'
+              - link "Tous les tutoriels" [ref=e243] [cursor=pointer]:
+                - /url: tutoriels/
+            - generic [ref=e246]:
+              - 'link "(01) Poser un parquet flottant, étape par étape Le tutoriel de référence : de la sous-couche aux plinthes, avec les points de contrôle. Accessible · 1 journée pour 20 m²" [ref=e247] [cursor=pointer]':
+                - /url: tutoriels/poser-un-parquet-flottant/
+                - generic [ref=e248]: (01)
+                - generic [ref=e249]:
+                  - generic [ref=e250]: Poser un parquet flottant, étape par étape
+                  - generic [ref=e251]: "Le tutoriel de référence : de la sous-couche aux plinthes, avec les points de contrôle."
+                  - generic [ref=e252]: Accessible · 1 journée pour 20 m²
+              - link "(02) Coller un parquet contrecollé La pose la plus stable et la plus silencieuse — et la moins tolérante à l'improvisation. Confirmé · 1 à 2 jours pour 20 m²" [ref=e253] [cursor=pointer]:
+                - /url: tutoriels/coller-un-parquet-contrecolle/
+                - generic [ref=e254]: (02)
+                - generic [ref=e255]:
+                  - generic [ref=e256]: Coller un parquet contrecollé
+                  - generic [ref=e257]: La pose la plus stable et la plus silencieuse — et la moins tolérante à l'improvisation.
+                  - generic [ref=e258]: Confirmé · 1 à 2 jours pour 20 m²
+              - link "(03) Réussir son calepinage Une heure de traçage évite deux jours de rattrapage. Accessible · 1 à 2 heures" [ref=e259] [cursor=pointer]:
+                - /url: tutoriels/reussir-le-calepinage/
+                - generic [ref=e260]: (03)
+                - generic [ref=e261]:
+                  - generic [ref=e262]: Réussir son calepinage
+                  - generic [ref=e263]: Une heure de traçage évite deux jours de rattrapage.
+                  - generic [ref=e264]: Accessible · 1 à 2 heures
+            - paragraph [ref=e265]:
+              - text: Vous préférez confier la pose ?
+              - link "Décrivez votre projet" [ref=e266] [cursor=pointer]:
+                - /url: projet/?besoin=pose
+              - text: .
+    - region "Le point de Hongrie, une flèche au sol." [ref=e267]:
+      - img "Pièce aux murs bleus ouverte sur un jardin, sol en point de Hongrie filant vers la baie" [ref=e270]
+      - generic [ref=e271]:
+        - generic [ref=e272]:
+          - paragraph [ref=e273]: Focus motif · 04
+          - heading "Le point de Hongrie, une flèche au sol." [level=2] [ref=e274]: Le point de Hongrie,une flèche au sol.
+          - generic [ref=e275]:
+            - link "Le guide du point de Hongrie" [ref=e276] [cursor=pointer]:
+              - /url: motifs/point-de-hongrie/
+            - link "Les 6 motifs de pose" [ref=e280] [cursor=pointer]:
+              - /url: motifs/
+        - list [ref=e283]:
+          - listitem [ref=e284]:
+            - generic [ref=e285]: "01"
+            - heading "Une flèche continue" [level=3] [ref=e286]
+            - paragraph [ref=e287]: Les lames, coupées en biais à leurs extrémités, forment une pointe qui file vers le fond de la pièce et guide le regard.
+          - listitem [ref=e288]:
+            - generic [ref=e289]: "02"
+            - heading "Un axe sans pardon" [level=3] [ref=e290]
+            - paragraph [ref=e291]: "Tout se joue au traçage : un écart minime en début de pose se cumule et finit par se voir sur toute la longueur."
+          - listitem [ref=e292]:
+            - generic [ref=e293]: "03"
+            - heading "Lames gauches et droites" [level=3] [ref=e294]
+            - paragraph [ref=e295]: Elles se commandent ensemble, en quantités égales, avec une marge de chutes plus large qu’une pose droite.
+    - region "Huit pièces, huit motifs de parquet en situation." [ref=e296]:
+      - generic [ref=e297]:
+        - generic [ref=e299]:
+          - generic [ref=e300]:
+            - paragraph [ref=e301]: Inspiration
+            - heading "Huit pièces, huit motifs de parquet en situation." [level=2] [ref=e302]
+          - generic [ref=e303]:
+            - generic [ref=e304]: 01 / 08
+            - button "Visuels précédents" [ref=e305] [cursor=pointer]
+            - button "Visuels suivants" [ref=e308] [cursor=pointer]
+            - link "Les 8 ambiances" [ref=e311] [cursor=pointer]:
+              - /url: inspiration/
+        - region "Galerie d’inspiration, utilisez les flèches du clavier" [ref=e315]:
+          - link "Séjour — Traversant, lames droites Séjour Traversant, lames droites" [ref=e317] [cursor=pointer]:
+            - /url: inspiration/#room-sejour
+            - img "Séjour — Traversant, lames droites" [ref=e319]
+            - generic [ref=e320]:
+              - generic [ref=e321]: Séjour
+              - generic [ref=e322]: Traversant, lames droites
+          - link "Chambre — Point de Hongrie Chambre Point de Hongrie" [ref=e324] [cursor=pointer]:
+            - /url: inspiration/#room-chambre-parisienne
+            - img "Chambre — Point de Hongrie" [ref=e326]
+            - generic [ref=e327]:
+              - generic [ref=e328]: Chambre
+              - generic [ref=e329]: Point de Hongrie
+          - link "Salon — Pièce en angle, lames de noyer Salon Pièce en angle, lames de noyer" [ref=e331] [cursor=pointer]:
+            - /url: inspiration/#room-salon-angle
+            - img "Salon — Pièce en angle, lames de noyer" [ref=e333]
+            - generic [ref=e334]:
+              - generic [ref=e335]: Salon
+              - generic [ref=e336]: Pièce en angle, lames de noyer
+          - link "Cuisine — Ouverte, lames larges Cuisine Ouverte, lames larges" [ref=e338] [cursor=pointer]:
+            - /url: inspiration/#room-cuisine-ouverte
+            - img "Cuisine — Ouverte, lames larges" [ref=e340]
+            - generic [ref=e341]:
+              - generic [ref=e342]: Cuisine
+              - generic [ref=e343]: Ouverte, lames larges
+          - link "Chambre — Lames droites, chêne foncé Chambre Lames droites, chêne foncé" [ref=e345] [cursor=pointer]:
+            - /url: inspiration/#room-chambre-claire
+            - img "Chambre — Lames droites, chêne foncé" [ref=e347]
+            - generic [ref=e348]:
+              - generic [ref=e349]: Chambre
+              - generic [ref=e350]: Lames droites, chêne foncé
+          - link "Couloir — Point de Hongrie dans l’axe Couloir Point de Hongrie dans l’axe" [ref=e352] [cursor=pointer]:
+            - /url: inspiration/#room-couloir-bleu
+            - img "Couloir — Point de Hongrie dans l’axe" [ref=e354]
+            - generic [ref=e355]:
+              - generic [ref=e356]: Couloir
+              - generic [ref=e357]: Point de Hongrie dans l’axe
+          - link "Pièce à arcades — Bâton rompu Pièce à arcades Bâton rompu" [ref=e359] [cursor=pointer]:
+            - /url: inspiration/#room-piece-arcades
+            - img "Pièce à arcades — Bâton rompu" [ref=e361]
+            - generic [ref=e362]:
+              - generic [ref=e363]: Pièce à arcades
+              - generic [ref=e364]: Bâton rompu
+          - link "Entrée — Lames dans l’axe Entrée Lames dans l’axe" [ref=e366] [cursor=pointer]:
+            - /url: inspiration/#room-entree-cadree
+            - img "Entrée — Lames dans l’axe" [ref=e368]
+            - generic [ref=e369]:
+              - generic [ref=e370]: Entrée
+              - generic [ref=e371]: Lames dans l’axe
+    - region "Questions fréquentes sur la pose de parquet." [ref=e375]:
+      - generic [ref=e376]:
+        - generic [ref=e377]:
+          - generic [ref=e378]:
+            - paragraph [ref=e379]: Questions fréquentes
+            - heading "Questions fréquentes sur la pose de parquet." [level=2] [ref=e380]
+          - paragraph [ref=e381]: Six questions qui reviennent avant chaque chantier, et les réponses que nous donnons.
+        - generic [ref=e382]:
+          - generic [ref=e383]:
+            - heading [level=3] [ref=e384]:
+              - button "Faut-il poser le parquet dans le sens de la lumière ou perpendiculairement à la fenêtre ?" [expanded] [ref=e385] [cursor=pointer]
+            - generic [ref=e389]:
+              - paragraph [ref=e390]: "Les deux formulations décrivent le même geste, ce qui explique la confusion fréquente. Les rayons entrent perpendiculairement au plan de la fenêtre : poser « dans le sens de la lumière » revient donc à orienter les lames perpendiculairement au mur qui porte la fenêtre. Les joints filent alors dans l’axe des rayons et se remarquent beaucoup moins."
+              - paragraph [ref=e391]:
+                - link "Le guide complet du sens de pose" [ref=e392] [cursor=pointer]:
+                  - /url: guides/quel-sens-de-pose-choisir/
+          - generic [ref=e395]:
+            - heading [level=3] [ref=e396]:
+              - button "Dans quel sens poser un parquet dans un couloir ?" [ref=e397] [cursor=pointer]
+            - paragraph [ref=e400]: "Dans la longueur, parallèlement aux murs. Une pose en travers multiplie les coupes, hache visuellement le passage et raccourcit l’espace. C’est le seul cas courant où la géométrie prime sur la lumière : un couloir se pose dans son axe, même si la fenêtre se trouve à son extrémité."
+          - generic [ref=e401]:
+            - heading [level=3] [ref=e402]:
+              - button "Quelle est la différence entre bâton rompu et point de Hongrie ?" [ref=e403] [cursor=pointer]
+            - generic:
+              - generic:
+                - paragraph [ref=e406]: "Le bâton rompu assemble des lames à bouts droits, posées perpendiculairement les unes aux autres : les extrémités se décalent et forment un zigzag. Le point de Hongrie utilise des lames coupées en biais qui se rejoignent bout à bout en une pointe continue. Il exige des lames gauches et droites, en quantités égales."
+                - paragraph [ref=e407]:
+                  - link "Les 6 motifs de pose" [ref=e408] [cursor=pointer]:
+                    - /url: motifs/
+          - generic [ref=e411]:
+            - heading [level=3] [ref=e412]:
+              - button "Combien de chutes faut-il prévoir ?" [ref=e413] [cursor=pointer]
+            - paragraph [ref=e416]: "Comptez de l’ordre de 5 % en pose droite et 10 à 15 % en diagonale ou en point de Hongrie, ces motifs multipliant les coupes d’angle en périphérie. Prévoyez la marge au moment de la commande : un complément acheté plus tard peut provenir d’un autre bain de teinte."
+          - generic [ref=e417]:
+            - heading [level=3] [ref=e418]:
+              - button "Peut-on poser du parquet sur du carrelage ?" [ref=e419] [cursor=pointer]
+            - generic:
+              - generic:
+                - paragraph [ref=e422]: "En pose flottante, c’est généralement possible si le carrelage est sain, adhérent et suffisamment plan. Contrôlez la planéité à la règle de deux mètres et vérifiez la hauteur disponible sous les portes et aux seuils : c’est le point qui bloque le plus souvent le projet, pas le support lui-même."
+                - paragraph [ref=e423]:
+                  - link "Préparer son sol avant la pose" [ref=e424] [cursor=pointer]:
+                    - /url: guides/preparer-son-sol-avant-la-pose/
+          - generic [ref=e427]:
+            - heading [level=3] [ref=e428]:
+              - button "Le simulateur est-il vraiment gratuit, et ma photo est-elle envoyée quelque part ?" [ref=e429] [cursor=pointer]
+            - generic:
+              - generic:
+                - paragraph [ref=e432]: "Le simulateur est gratuit et ne demande aucune inscription. Votre photo n’est ni envoyée, ni stockée, ni analysée par un service tiers : le rendu est calculé dans votre navigateur, sur votre appareil. Vous disposez de 203 références et de trois motifs de pose, avec un comparateur avant / après."
+                - paragraph [ref=e433]:
+                  - link "Ouvrir le simulateur" [ref=e434] [cursor=pointer]:
+                    - /url: outils/studio/
+    - region "Où acheter son parquet, et qui peut le poser." [ref=e437]:
+      - generic [ref=e438]:
+        - generic [ref=e439]:
+          - generic [ref=e440]:
+            - paragraph [ref=e441]: Après le choix
+            - heading "Où acheter son parquet, et qui peut le poser." [level=2] [ref=e442]
+          - paragraph [ref=e443]: Nous ne vendons pas de parquet et nous n’en posons pas. Nous vous aidons à savoir ce qu’il vous faut, puis nous vous adressons à ceux qui le font.
+        - generic [ref=e444]:
+          - article [ref=e445]:
+            - paragraph [ref=e446]: Trouver votre parquet
+            - heading "Références, essences, teintes et motifs" [level=3] [ref=e447]
+            - paragraph [ref=e448]: Le catalogue de parquets et le showroom de Premibel, notre partenaire pour les références produit.
+            - link "Voir le catalogue Premibel premibel.fr" [ref=e449] [cursor=pointer]:
+              - /url: https://www.premibel.fr/
+              - text: Voir le catalogue Premibel
+              - generic [ref=e450]: premibel.fr
+          - article [ref=e453]:
+            - paragraph [ref=e454]: Faire poser ou rénover
+            - heading "Pose de parquet à Paris et en Île-de-France" [level=3] [ref=e455]
+            - paragraph [ref=e456]: Pose de parquet, rénovation intérieure et aménagement par Allure Design, notre partenaire pose en Île-de-France.
+            - link "Décrire mon projet de pose" [ref=e457] [cursor=pointer]:
+              - /url: projet/?besoin=pose
+        - paragraph [ref=e460]:
+          - text: Besoin du parquet et de la pose ?
+          - link "Décrivez votre projet" [ref=e461] [cursor=pointer]:
+            - /url: projet/?besoin=produit-pose
+          - text: ": nous vous orientons vers les deux."
+          - link "Comprendre nos liens commerciaux" [ref=e462] [cursor=pointer]:
+            - /url: a-propos/#liens-commerciaux
+    - 'region "Faire poser son parquet : décrivez votre projet en 4 étapes." [ref=e463]':
+      - generic [ref=e465]:
+        - generic [ref=e466]:
+          - paragraph [ref=e467]: Votre projet
+          - 'heading "Faire poser son parquet : décrivez votre projet en 4 étapes." [level=2] [ref=e468]'
+          - paragraph [ref=e469]: Quatre questions courtes sur votre pièce, votre support et votre besoin. Aucune coordonnée demandée. À la fin, vous repartez avec une fiche projet claire — surface, support, motif, contraintes.
+          - list [ref=e470]:
+            - listitem [ref=e471]:
+              - generic [ref=e474]: Quatre étapes courtes, aucune coordonnée demandée.
+            - listitem [ref=e475]:
+              - generic [ref=e478]: « Je ne sais pas » est une réponse valable partout.
+            - listitem [ref=e479]:
+              - generic [ref=e482]: Votre projet est qualifié selon votre besoin et votre localisation.
+            - listitem [ref=e483]:
+              - generic [ref=e486]: Vous repartez avec une fiche projet exploitable, même si vous faites poser ailleurs.
+          - generic [ref=e487]:
+            - link "Décrire mon projet — 4 min, sans coordonnées" [ref=e488] [cursor=pointer]:
+              - /url: projet/
+            - link "Essayer le simulateur" [ref=e492] [cursor=pointer]:
+              - /url: outils/studio/
+        - img "Pièce lumineuse au parquet clair" [ref=e496]
+  - contentinfo [ref=e497]:
+    - generic [ref=e498]:
+      - generic [ref=e499]:
+        - generic [ref=e500]:
+          - link "Pose Parquet, accueil" [ref=e501] [cursor=pointer]:
+            - /url: ./
+          - paragraph [ref=e502]: Guides et outils pour réussir la pose de son parquet.
+        - navigation "Pied de page" [ref=e503]:
+          - group "Comprendre" [ref=e504]:
+            - paragraph [ref=e505]: Comprendre
+            - list [ref=e506]:
+              - listitem [ref=e507]:
+                - link "Guides" [ref=e508] [cursor=pointer]:
+                  - /url: guides/
+              - listitem [ref=e509]:
+                - link "Motifs" [ref=e510] [cursor=pointer]:
+                  - /url: motifs/
+              - listitem [ref=e511]:
+                - link "Tutoriels" [ref=e512] [cursor=pointer]:
+                  - /url: tutoriels/
+          - group "Outils" [ref=e513]:
+            - paragraph [ref=e514]: Outils
+            - list [ref=e515]:
+              - listitem [ref=e516]:
+                - link "Visualiser ma pièce" [ref=e517] [cursor=pointer]:
+                  - /url: outils/studio/
+              - listitem [ref=e518]:
+                - link "Mode Plan" [ref=e519] [cursor=pointer]:
+                  - /url: outils/simulateur-pose/
+              - listitem [ref=e520]:
+                - link "Inspiration" [ref=e521] [cursor=pointer]:
+                  - /url: inspiration/
+          - group "À propos" [ref=e522]:
+            - paragraph [ref=e523]: À propos
+            - list [ref=e524]:
+              - listitem [ref=e525]:
+                - link "Notre méthode" [ref=e526] [cursor=pointer]:
+                  - /url: a-propos/methode-editoriale/
+              - listitem [ref=e527]:
+                - link "Contact" [ref=e528] [cursor=pointer]:
+                  - /url: contact/
+              - listitem [ref=e529]:
+                - link "Votre projet" [ref=e530] [cursor=pointer]:
+                  - /url: projet/
+      - generic [ref=e531]:
+        - paragraph [ref=e532]: © 2026 Pose Parquet — guides et outils pour préparer son projet.
+        - paragraph [ref=e533]:
+          - strong [ref=e534]: Premibel
+          - text: pour les références de parquet,
+          - strong [ref=e535]: Allure Design
+          - text: "pour la pose et la rénovation en Île-de-France : Pose Parquet oriente selon le besoin."
+          - link "Nos liens commerciaux" [ref=e536] [cursor=pointer]:
+            - /url: a-propos/#liens-commerciaux
+        - paragraph [ref=e537]: Photographies sous licence Pexels
+        - list [ref=e538]:
+          - listitem [ref=e539]:
+            - link "Mentions légales" [ref=e540] [cursor=pointer]:
+              - /url: mentions-legales/
+          - listitem [ref=e541]:
+            - link "Confidentialité et cookies" [ref=e542] [cursor=pointer]:
+              - /url: confidentialite/
+          - listitem [ref=e543]:
+            - link "Plan du site" [ref=e544] [cursor=pointer]:
+              - /url: plan-du-site/

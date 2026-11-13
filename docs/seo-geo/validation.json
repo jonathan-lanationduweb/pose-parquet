@@ -1,0 +1,295 @@
+{
+  "head": "cad4392837afd3af7a8adc3ad3ea88841b555074",
+  "verdict": "VALIDÉ AVEC RÉSERVES",
+  "http": {
+    "checked": 35,
+    "errors": []
+  },
+  "preservation": {
+    "protectedFiles": 74,
+    "pagesCompared": 37,
+    "failures": []
+  },
+  "repeat": {
+    "builds": 2,
+    "files": 63,
+    "stable": true
+  },
+  "checks": [
+    {
+      "check": "check-fonts",
+      "code": 0,
+      "summary": " assets/fonts : 6 fichiers, 196 Ko au total (2 variable(s), 4 statique(s)). 10 vérifications réussies, 0 échec."
+    },
+    {
+      "check": "check-photo",
+      "code": 0,
+      "summary": "  OK   photo 100 % locale : aucun envoi réseau dans l’import  84 vérifications réussies, 0 échec."
+    },
+    {
+      "check": "check-images",
+      "code": 0,
+      "summary": "Aucune image manquante.  Rappel : ce contrôle ne juge pas la PERTINENCE d’une image."
+    },
+    {
+      "check": "check-motifs",
+      "code": 0,
+      "summary": " 70 vérifications réussies, 0 échec. 215 références, 645 paires produit × motif : aucune combinaison impossible ne peut être posée."
+    },
+    {
+      "check": "check-routage",
+      "code": 0,
+      "summary": " 97 vérifications réussies, 0 échec. 6 besoins × 2 zones : aucune demande n’est orientée vers une entreprise qui ne peut pas la traiter."
+    },
+    {
+      "check": "check-inspiration",
+      "code": 0,
+      "summary": " 8 / 8 inspirations essayables (plancher : 8). Contrat vérifié : chaque carte essayable ouvre sa propre photographie."
+    },
+    {
+      "check": "check-studio-api",
+      "code": 0,
+      "summary": "  OK   aucun fichier de test dans le bundle  Contrat conforme. Comportement : --script, à exécuter dans un studio ?perf=1."
+    },
+    {
+      "check": "check-chiffres",
+      "code": 0,
+      "summary": " 14 vérifications réussies, 0 échec. Le site annonce 9 pièces, 203 parquets Premibel à essayer sur 332, 8 guides, 6 motifs éditoriaux, 5 motifs simulés — et c'est ce qu'il offre."
+    },
+    {
+      "check": "check-links",
+      "code": 0,
+      "summary": "  https://www.pexels.com/license/   https://www.premibel.fr/   https://www.premibel.fr/parquet/"
+    },
+    {
+      "check": "check-reproducible",
+      "code": 0,
+      "summary": " 49 vérifications réussies, 0 échec. Même commit, checkout Windows ou Linux : mêmes empreintes."
+    }
+  ],
+  "browser": {
+    "tests": [
+      {
+        "test": "Avant / après",
+        "visible": true
+      },
+      {
+        "test": "Comparaison",
+        "dialog": 1,
+        "slider": "51"
+      },
+      {
+        "test": "Orientation",
+        "projectHref": "../../projet/?piece=chambre&libelle-piece=Chambre+ouverte+au+jardin&parquet=BTRPF39009&libelle=B%C3%A2ton+Rompu+Notting+Hill+Invisible+90x15x600&motif=baton-rompu&orientation=45&fiche=1"
+      },
+      {
+        "test": "Import photo local",
+        "heading": "Visualiseur Parquet · Ma photo",
+        "image": "data:image/jpeg;base64,/9j/4AAQS"
+      },
+      {
+        "test": "Mode Plan",
+        "href": "../../projet/?pose=diagonale&surface=23"
+      },
+      {
+        "test": "Formulaire",
+        "step4": 1
+      },
+      {
+        "test": "Retour formulaire",
+        "keptPattern": null
+      },
+      {
+        "test": "Choix conservé au retour",
+        "checked": true
+      },
+      {
+        "test": "Menu mobile",
+        "url": "http://127.0.0.1:8123/outils/"
+      },
+      {
+        "test": "Pied de page",
+        "url": "http://127.0.0.1:8123/a-propos/methode-editoriale/"
+      },
+      {
+        "test": "Menu desktop",
+        "url": "http://127.0.0.1:8123/motifs/"
+      },
+      {
+        "test": "Prototype conservé",
+        "h1": "Visualiseur Parquet"
+      }
+    ],
+    "responsive": [
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/",
+        "width": 375
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/guides/quel-sens-de-pose-choisir/",
+        "width": 375
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/tutoriels/poser-un-parquet-flottant/",
+        "width": 375
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/outils/simulateur-pose/",
+        "width": 375
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/",
+        "width": 390
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/guides/quel-sens-de-pose-choisir/",
+        "width": 390
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/tutoriels/poser-un-parquet-flottant/",
+        "width": 390
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/outils/simulateur-pose/",
+        "width": 390
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/",
+        "width": 430
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/guides/quel-sens-de-pose-choisir/",
+        "width": 430
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/tutoriels/poser-un-parquet-flottant/",
+        "width": 430
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/outils/simulateur-pose/",
+        "width": 430
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/",
+        "width": 768
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/guides/quel-sens-de-pose-choisir/",
+        "width": 768
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/tutoriels/poser-un-parquet-flottant/",
+        "width": 768
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/outils/simulateur-pose/",
+        "width": 768
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/",
+        "width": 1024
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/guides/quel-sens-de-pose-choisir/",
+        "width": 1024
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/tutoriels/poser-un-parquet-flottant/",
+        "width": 1024
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/outils/simulateur-pose/",
+        "width": 1024
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/",
+        "width": 1440
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/guides/quel-sens-de-pose-choisir/",
+        "width": 1440
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/tutoriels/poser-un-parquet-flottant/",
+        "width": 1440
+      },
+      {
+        "brokenImages": 0,
+        "h1": 1,
+        "overflow": false,
+        "url": "/outils/simulateur-pose/",
+        "width": 1440
+      }
+    ],
+    "consoleErrors": []
+  }
+}

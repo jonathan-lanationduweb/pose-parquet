@@ -126,7 +126,7 @@ final class Listes {
 							$args[ $cle ] = $valeur;
 						}
 					}
-					echo '<a href="' . esc_url( \PoseParquet\Core\Admin\SitePublic::url() . 'outils/studio.html?' . http_build_query( $args ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Essayer', 'pose-parquet-core' ) . ' <span aria-hidden="true">↗</span></a>';
+					echo '<a href="' . esc_url( \PoseParquet\Core\Admin\SitePublic::url() . 'outils/studio/?' . http_build_query( $args ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Essayer', 'pose-parquet-core' ) . ' <span aria-hidden="true">↗</span></a>';
 				} else {
 					echo '<span class="adm-discret">—</span>';
 				}

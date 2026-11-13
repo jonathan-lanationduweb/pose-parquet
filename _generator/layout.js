@@ -1,4 +1,5 @@
 const { assets } = require('./assets');
+const { cheminPublic, robot } = require('./routes');
 const { aPrecharger } = require('./polices');
 
 
@@ -234,7 +235,7 @@ function breadcrumb(p, trail) {
 
 function layout(page) {
   const p = page.depth === 0 ? '' : '../';
-  const canonical = `${SITE.domain}/${page.path}`.replace(/index\.html$/, '');
+  const canonical = `${SITE.domain}${cheminPublic(page.path)}`;
 
 
   const build = assets();
@@ -251,8 +252,8 @@ function layout(page) {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${page.title}</title>
-    <meta name="description" content="${page.description}" />
+    <title>${T.texte(page.title)}</title>
+    <meta name="description" content="${T.attribut(page.description)}" />
 
 
 
@@ -262,14 +263,14 @@ function layout(page) {
 
 
 
-    <meta name="robots" content="${page.robots || 'index, follow'}" />
+    <meta name="robots" content="${robot(page.robots)}" />
     <link rel="canonical" href="${canonical}" />
     <meta name="theme-color" content="#fbf8f4" />
     <meta property="og:type" content="${page.ogType || 'website'}" />
     <meta property="og:site_name" content="${SITE.name}" />
     <meta property="og:locale" content="fr_FR" />
-    <meta property="og:title" content="${page.ogTitle || page.title}" />
-    <meta property="og:description" content="${page.description}" />
+    <meta property="og:title" content="${T.attribut(page.ogTitle || page.title)}" />
+    <meta property="og:description" content="${T.attribut(page.description)}" />
     <meta property="og:url" content="${canonical}" />
     <meta property="og:image" content="${ogImage}" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -316,7 +317,7 @@ ${page.body}
 function appLayout(page) {
   const p = page.depth === 0 ? '' : '../';
   const build = assets();
-  const canonical = `${SITE.domain}/${page.path}`;
+  const canonical = `${SITE.domain}${cheminPublic(page.path)}`;
   const produit = page.app === 'product';
   const css = produit ? build.productCss : build.studioCss;
   const js = produit ? build.productJs : build.studioJs;
@@ -326,16 +327,16 @@ function appLayout(page) {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>${page.title}</title>
-    <meta name="description" content="${page.description}" />
-    <meta name="robots" content="${page.robots || 'index, follow'}" />
+    <title>${T.texte(page.title)}</title>
+    <meta name="description" content="${T.attribut(page.description)}" />
+    <meta name="robots" content="${robot(page.robots)}" />
     <link rel="canonical" href="${canonical}" />
     <meta name="theme-color" content="#262321" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="${SITE.name}" />
     <meta property="og:locale" content="fr_FR" />
-    <meta property="og:title" content="${page.title}" />
-    <meta property="og:description" content="${page.description}" />
+    <meta property="og:title" content="${T.attribut(page.title)}" />
+    <meta property="og:description" content="${T.attribut(page.description)}" />
     <meta property="og:url" content="${canonical}" />
     <meta property="og:image" content="${SITE.domain}/${page.ogImage || 'assets/images/og-default.jpg'}" />
     <meta name="twitter:card" content="summary_large_image" />${
@@ -356,7 +357,7 @@ ${favicon(p, build)}
   </head>
   <body class="app${produit ? ' app--product' : ''}">
 
-    <div ${mount} data-base="${p}">
+    <div ${mount} data-base="${p}"${REGLAGES.logo && REGLAGES.logo.chemin ? ` data-logo="${p}${T.attribut(REGLAGES.logo.chemin)}"` : ''}>
       <h1 class="app-loading-title">${page.h1 || page.title}</h1>
       <noscript>
         <p class="studio__noscript">Le visualiseur a besoin de JavaScript pour calculer le rendu dans votre navigateur.

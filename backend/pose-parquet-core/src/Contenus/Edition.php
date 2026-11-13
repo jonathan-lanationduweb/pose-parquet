@@ -302,7 +302,7 @@ final class Edition {
 			if ( $motif !== '' ) {
 				$args['motif'] = $motif;
 			}
-			echo '<p class="adm-note">' . esc_html__( 'Lien généré :', 'pose-parquet-core' ) . ' <code>outils/studio.html?' . esc_html( http_build_query( $args ) ) . '</code></p>';
+			echo '<p class="adm-note">' . esc_html__( 'Lien généré :', 'pose-parquet-core' ) . ' <code>outils/studio/?' . esc_html( http_build_query( $args ) ) . '</code></p>';
 		}
 	}
 

@@ -245,7 +245,7 @@ function controlerSource() {
     ok('la copie publiée est à jour', memeContenu,
       memeContenu ? '' : 'relancer node _generator/build.js');
     ok('la page du studio charge cet arbre',
-      fs.readFileSync(path.join(RACINE, 'outils', 'studio.html'), 'utf8')
+      fs.readFileSync(path.join(RACINE, require('./routes').fichierPublic('outils/studio.html')), 'utf8')
         .includes(`assets/dist/${empreintes[0]}/js/studio/main.js`));
 
     ok('aucun fichier de test dans le bundle',

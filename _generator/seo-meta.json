@@ -1,0 +1,134 @@
+{
+  "/": {
+    "title": "Pose de parquet : guides, conseils et simulateur",
+    "description": "Découvrez nos guides de pose de parquet, les techniques et motifs, et visualisez votre futur sol grâce à notre simulateur gratuit."
+  },
+  "/guides/": {
+    "title": "Guides de pose de parquet : conseils et techniques",
+    "description": "Sens de pose, préparation du sol, choix du parquet : découvrez nos guides pratiques pour préparer et réussir votre projet de parquet."
+  },
+  "/motifs/": {
+    "title": "Motifs de pose de parquet : les 6 styles à connaître",
+    "description": "Pose droite, diagonale, bâton rompu ou point de Hongrie : découvrez 6 motifs de pose de parquet et leurs différences."
+  },
+  "/tutoriels/": {
+    "title": "Tutoriels pose de parquet : étapes et méthodes",
+    "description": "Apprenez à poser votre parquet avec nos tutoriels étape par étape : pose flottante, pose collée et calepinage."
+  },
+  "/outils/": {
+    "title": "Outils gratuits pour préparer la pose de parquet",
+    "description": "Découvrez nos outils gratuits pour choisir un parquet, comparer les sens de pose et visualiser votre futur sol."
+  },
+  "/inspiration/": {
+    "title": "Inspirations parquet : idées de sols et motifs",
+    "description": "Découvrez des inspirations parquet pour le salon, la chambre ou la cuisine. Comparez les teintes, les motifs et les ambiances."
+  },
+  "/guides/quel-sens-de-pose-choisir/": {
+    "title": "Sens de pose du parquet : comment bien choisir ?",
+    "description": "Lumière, longueur de la pièce, circulation : découvrez les critères pour choisir le bon sens de pose de votre parquet."
+  },
+  "/guides/poser-parquet-sens-de-la-lumiere/": {
+    "title": "Parquet et lumière : dans quel sens poser les lames ?",
+    "description": "Faut-il poser le parquet dans le sens de la lumière ? Comprenez l'effet des fenêtres sur l'orientation des lames."
+  },
+  "/guides/preparer-son-sol-avant-la-pose/": {
+    "title": "Préparer un sol avant la pose d'un parquet : guide",
+    "description": "Planéité, humidité, nettoyage et ragréage : découvrez comment préparer votre support avant de poser un parquet."
+  },
+  "/guides/point-de-hongrie-ou-baton-rompu/": {
+    "title": "Point de Hongrie ou bâton rompu : les différences",
+    "description": "Comparez le point de Hongrie et le bâton rompu : forme des lames, rendu esthétique, contraintes de pose et techniques."
+  },
+  "/guides/erreurs-a-eviter-avant-de-poser/": {
+    "title": "Pose de parquet : 8 erreurs à éviter absolument",
+    "description": "Support mal préparé, mauvais sens de pose, humidité : découvrez les erreurs fréquentes avant la pose d'un parquet."
+  },
+  "/guides/parquet-massif-ou-contrecolle/": {
+    "title": "Parquet massif ou contrecollé : lequel choisir ?",
+    "description": "Massif ou contrecollé ? Comparez la structure, la stabilité, les techniques de pose et les contraintes de chaque parquet."
+  },
+  "/guides/sens-de-pose-couloir/": {
+    "title": "Dans quel sens poser du parquet dans un couloir ?",
+    "description": "Pose en longueur ou en largeur ? Découvrez comment orienter les lames dans un couloir selon sa forme et la lumière."
+  },
+  "/guides/sens-de-pose-piece-etroite/": {
+    "title": "Sens de pose du parquet dans une pièce étroite",
+    "description": "Comment orienter un parquet dans une pièce longue ou étroite ? Découvrez les effets visuels des différentes poses."
+  },
+  "/motifs/pose-droite/": {
+    "title": "Pose droite du parquet : principe et méthode",
+    "description": "Découvrez la pose droite du parquet : disposition des lames, avantages, préparation et conseils pour réussir la pose."
+  },
+  "/motifs/pose-longueur/": {
+    "title": "Parquet posé dans la longueur : quel résultat ?",
+    "description": "Poser son parquet dans la longueur peut transformer la perception d'une pièce. Découvrez dans quels cas choisir cette orientation."
+  },
+  "/motifs/pose-largeur/": {
+    "title": "Parquet posé dans la largeur : conseils de pose",
+    "description": "Découvrez les effets visuels d'un parquet posé dans la largeur et les critères à considérer avant de choisir cette orientation."
+  },
+  "/motifs/pose-diagonale/": {
+    "title": "Pose de parquet en diagonale : guide et conseils",
+    "description": "Découvrez comment fonctionne la pose de parquet en diagonale, ses avantages esthétiques et ses contraintes de découpe."
+  },
+  "/motifs/point-de-hongrie/": {
+    "title": "Parquet point de Hongrie : motif et technique",
+    "description": "Découvrez le parquet point de Hongrie : assemblage des lames, angles de coupe, préparation et particularités de ce motif."
+  },
+  "/motifs/baton-rompu/": {
+    "title": "Parquet bâton rompu : technique et pose",
+    "description": "Découvrez le motif bâton rompu, sa disposition en zigzag, ses différences avec le point de Hongrie et ses contraintes de pose."
+  },
+  "/tutoriels/poser-un-parquet-flottant/": {
+    "title": "Comment poser un parquet flottant ? Tutoriel complet",
+    "description": "Découvrez les étapes pour poser un parquet flottant : préparation du sol, sous-couche, assemblage des lames et finitions."
+  },
+  "/tutoriels/coller-un-parquet-contrecolle/": {
+    "title": "Pose collée d'un parquet contrecollé : tutoriel",
+    "description": "Apprenez les étapes de la pose collée d'un parquet contrecollé : préparation du support, encollage et mise en place des lames."
+  },
+  "/tutoriels/reussir-le-calepinage/": {
+    "title": "Calepinage parquet : méthode et conseils de pose",
+    "description": "Apprenez à réaliser un calepinage de parquet : calcul des rangées, alignement des lames et anticipation des découpes."
+  },
+  "/outils/visualiseur/": {
+    "title": "Simulateur parquet gratuit : visualisez votre sol",
+    "description": "Importez une photo de votre pièce et essayez différents parquets. Comparez les teintes et les motifs gratuitement."
+  },
+  "/outils/studio/": {
+    "title": "Visualiseur de parquet : essayez un sol sur photo",
+    "description": "Visualisez différents parquets dans votre pièce grâce à une photo. Découvrez les teintes et comparez les rendus."
+  },
+  "/outils/simulateur-pose/": {
+    "title": "Simulateur de pose de parquet : sens et motifs",
+    "description": "Comparez différentes orientations de lames sur un plan et visualisez les effets des sens de pose de votre parquet."
+  },
+  "/projet/": {
+    "title": "Projet de pose de parquet : préparez votre chantier",
+    "description": "Décrivez votre projet de parquet en quelques étapes : surface, support, type de pose et contraintes pour mieux préparer votre chantier."
+  },
+  "/a-propos/": {
+    "title": "À propos de Pose Parquet : guides et outils",
+    "description": "Découvrez Pose Parquet, notre mission éditoriale, nos guides pratiques et nos outils pour accompagner les projets de pose de parquet."
+  },
+  "/a-propos/methode-editoriale/": {
+    "title": "Notre méthode éditoriale et nos engagements",
+    "description": "Découvrez comment nous préparons nos guides de pose de parquet, vérifions nos informations et présentons nos partenaires."
+  },
+  "/contact/": {
+    "title": "Contactez Pose Parquet : question, correction ou projet",
+    "description": "Une question sur nos guides, nos outils ou notre site ? Retrouvez les informations pour contacter l'équipe Pose Parquet."
+  },
+  "/mentions-legales/": {
+    "title": "Mentions légales de Pose Parquet",
+    "description": "Consultez les mentions légales de Pose Parquet et les informations relatives à l'éditeur et à l'hébergement du site."
+  },
+  "/confidentialite/": {
+    "title": "Politique de confidentialité et cookies",
+    "description": "Consultez notre politique de confidentialité pour comprendre le traitement des données personnelles et l'utilisation des cookies."
+  },
+  "/plan-du-site/": {
+    "title": "Plan du site Pose Parquet : toutes les pages",
+    "description": "Retrouvez toutes les pages de Pose Parquet : guides, tutoriels, motifs de pose, simulateurs, inspirations et informations pratiques."
+  }
+}

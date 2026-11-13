@@ -560,4 +560,12 @@ const GUIDES = [
   },
 ];
 
+{
+  const SEO = require('./seo-meta.json');
+  for (const item of GUIDES) {
+    const m = SEO[`/guides/${item.slug}/`];
+    if (m) Object.assign(item, { title: m.title, description: m.description });
+  }
+}
+
 module.exports = { GUIDES };

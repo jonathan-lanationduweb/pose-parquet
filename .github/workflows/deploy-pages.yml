@@ -226,10 +226,10 @@ jobs:
         if: ${{ vars.SITE_ENVIRONMENT != 'production' }}
         run: |
           echo "SITE_ENVIRONMENT=$SITE_ENVIRONMENT : déploiement traité comme une préproduction."
-          printf 'User-agent: *\nDisallow: /\n' > _site/robots.txt
+          printf 'User-agent: *\nAllow: /\n' > _site/robots.txt
           rm -f _site/sitemap.xml
           find _site -name '*.html' -print0 | xargs -0 --no-run-if-empty sed -i -E \
-            's#<meta name="robots" content="[^"]*" />#<meta name="robots" content="noindex, nofollow" />#'
+            's#<meta name="robots" content="[^"]*" />#<meta name="robots" content="noindex, follow" />#'
 
 
 
@@ -240,14 +240,14 @@ jobs:
 
 
           total=$(find _site -name '*.html' | wc -l)
-          marquees=$(grep -rlF '<meta name="robots" content="noindex, nofollow" />' _site --include='*.html' | wc -l)
+          marquees=$(grep -rlF '<meta name="robots" content="noindex, follow" />' _site --include='*.html' | wc -l)
           echo "Pages : $marquees / $total portent la balise noindex."
           if [ "$marquees" -ne "$total" ]; then
             echo "::error::$((total - marquees)) page(s) ne sont pas en noindex :"
-            grep -rLF '<meta name="robots" content="noindex, nofollow" />' _site --include='*.html'
+            grep -rLF '<meta name="robots" content="noindex, follow" />' _site --include='*.html'
             exit 1
           fi
-          grep -q 'Disallow: /' _site/robots.txt || { echo "::error::robots.txt non marqué"; exit 1; }
+          grep -q 'Allow: /' _site/robots.txt || { echo "::error::robots.txt non marqué"; exit 1; }
           [ ! -f _site/sitemap.xml ] || { echo "::error::sitemap.xml toujours présent"; exit 1; }
 
       - name: Confirmer la production (index)
