@@ -448,6 +448,13 @@ function buildBlog() {
   );
 }
 
+/** Les nombres d'un texte saisi : {guides}, {guides_lettres}, {Guides_lettres} (majuscule). */
+const nombresGuides = (texte) =>
+  String(texte == null ? '' : texte)
+    .replace(/\{guides\}/g, String(GUIDES.length))
+    .replace(/\{guides_lettres\}/g, enLettres(GUIDES.length))
+    .replace(/\{Guides_lettres\}/g, enLettres(GUIDES.length).replace(/^./, (c) => c.toUpperCase()));
+
 function buildGuides() {
   GUIDES.forEach((guide) => {
     const aside = asideGuide();
@@ -456,6 +463,48 @@ function buildGuides() {
       editorialPage(guide, { section: 'guides', sectionLabel: 'Guides', dir: 'guides/', aside })
     );
   });
+
+  /* Maquette du 14/11/2026 (pose-parquet-page-guides.pdf). */
+  const lienGuide = (slug, repli) => (GUIDES.some((g) => g.slug === slug) ? `${slug}.html` : repli);
+  const ORDRE_GUIDES = [
+    {
+      titre: 'Avant de commander',
+      texte: 'Massif ou contrecollé, largeur de lame, essence, motif et sens de pose : ce qui se décide sur le papier et ne se rattrape plus une fois la commande partie.',
+      href: lienGuide('parquet-massif-ou-contrecolle', './'),
+    },
+    {
+      titre: 'Avant la première lame',
+      texte: 'Planéité, humidité, ragréage, acclimatation des lames dans la pièce : la plupart des désordres viennent du support, pas du parquet.',
+      href: lienGuide('preparer-son-sol-avant-la-pose', './'),
+    },
+    {
+      titre: 'Au moment de poser',
+      texte: 'Calepinage, coupes de rive, jeu de dilatation en périphérie : les gestes qui décident du rendu fini, et que les tutoriels déroulent pas à pas.',
+      href: '../tutoriels/',
+    },
+  ];
+  const FAQ_GUIDES = [
+    {
+      q: 'Par quel guide commencer ?',
+      a: 'Par le sens de pose si la pièce est déjà choisie, par la préparation du support si le chantier est proche. Les deux se lisent en moins de vingt minutes, et ce sont les deux décisions qu’on ne reprend pas après coup.',
+    },
+    {
+      q: 'Quel parquet choisir pour un plancher chauffant ?',
+      a: 'Un contrecollé de faible épaisseur, posé collé : il transmet mieux la chaleur et bouge moins qu’un massif. Vérifiez la résistance thermique admise et le mode de pose que le fabricant autorise pour la référence retenue.',
+    },
+    {
+      q: 'Peut-on poser du parquet dans une cuisine ou une salle de bains ?',
+      a: 'En cuisine, oui, avec une finition résistante et des joints soignés près des points d’eau. En salle de bains, cela demande une essence adaptée et une pose collée étanche : le guide de préparation détaille les contrôles.',
+    },
+    {
+      q: 'Faut-il poncer un ancien parquet ou le remplacer ?',
+      a: 'Un massif se ponce plusieurs fois tant que l’épaisseur au-dessus des rainures le permet. Un contrecollé n’offre que l’épaisseur de son parement, souvent deux à quatre millimètres : au-delà, c’est un remplacement.',
+    },
+    {
+      q: 'Combien de temps prévoir entre la commande et la pose ?',
+      a: 'Comptez l’acclimatation des lames dans la pièce, 48 heures au minimum, et le séchage d’un ragréage s’il y en a un. C’est ce délai, et non la pose elle-même, qui décale le plus souvent un chantier.',
+    },
+  ];
 
   const featured = GUIDES[0];
   const rest = GUIDES.slice(1);
@@ -466,9 +515,9 @@ function buildGuides() {
         <div class="wrap-wide page-hero__grid">
           <div>
             <p class="eyebrow">Guides</p>
-            <h1 class="page-hero__title">${PAGES['guides'].h1}</h1>
+            <h1 class="page-hero__title">${T.texte(PAGES['guides'].h1)}</h1>
           </div>
-          <p class="page-hero__lead">${PAGES['guides'].chapo}</p>
+          <p class="page-hero__lead">${T.texte(nombresGuides(PAGES['guides'].chapo))}</p>
         </div>
       </header>
 
@@ -479,7 +528,7 @@ function buildGuides() {
               ${aUneCouverture(featured.slug)
                 ? picture(`cover-${featured.slug}`, { base: '../', alt: '', sizes: '(min-width: 60rem) 45rem, 94vw', priority: true })
                 : ''}
-              <p class="eyebrow">${featured.category}</p>
+              <p class="eyebrow">${featured.category} · ${featured.reading}</p>
               <h2><a href="${featured.slug}.html">${featured.h1}</a></h2>
               <p>${featured.excerpt}</p>
             </article>
@@ -511,7 +560,44 @@ function buildGuides() {
           <p class="empty-note" data-filters-empty="liste-guides" hidden>Aucun guide ne correspond à ce filtre pour le moment.</p>
         </div>
       </section>
-      ${ctaBand('../')}`;
+
+      <section class="section" aria-labelledby="guides-ordre">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Par où commencer</p>
+              <h2 id="guides-ordre">Dans quel ordre les lire ?</h2>
+            </div>
+            <p class="lead">Les guides suivent l’ordre d’un chantier. Chaque étape ferme des options que la suivante ne rouvrira pas.</p>
+          </div>
+          <div class="situations">
+            ${ORDRE_GUIDES.map((x, i) => `<a class="situation" href="${x.href}">
+              <span class="situation__quand">0${i + 1}</span>
+              <h3 class="situation__titre">${x.titre}</h3>
+              <p class="situation__texte">${x.texte}</p>
+            </a>`).join('\n            ')}
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="guides-faq">
+        <div class="wrap-wide">
+          <div class="section-head section-head__row">
+            <div>
+              <p class="eyebrow">Questions fréquentes</p>
+              <h2 id="guides-faq">Avant de choisir son parquet</h2>
+            </div>
+            <p class="lead">Cinq questions qui reviennent avant la lecture des guides, et les réponses courtes.</p>
+          </div>
+          <div class="faq-grille">
+            ${FAQ_GUIDES.map((x) => `<div class="faq-grille__item">
+              <h3>${x.q}</h3>
+              <p>${x.a}</p>
+            </div>`).join('\n            ')}
+          </div>
+        </div>
+      </section>
+      ${ctaBand('../', 'Faire poser son parquet : décrivez votre projet en 4 étapes')}`;
 
   write(
     'guides/index.html',
@@ -522,7 +608,7 @@ function buildGuides() {
       path: 'guides/index.html',
       depth: 1,
       css: ['css/pages/listing.css'],
-      jsonld: [crumbs.jsonld],
+      jsonld: [crumbs.jsonld, faqJsonLd(FAQ_GUIDES)],
       body,
     })
   );
