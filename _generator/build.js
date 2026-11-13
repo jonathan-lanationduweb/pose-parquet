@@ -2017,31 +2017,41 @@ function build404() {
 }
 
 function buildMeta() {
-  const page = (url, priority, lastmod) => ({ url, priority, lastmod: lastmod && /^\d{4}-\d{2}-\d{2}/.test(lastmod) ? lastmod : null });
-  const article = (dir) => (item) =>
-    page(`${dir}/${item.slug}.html`, '0.7', item.updated || item.date);
+  const jour = (d) => (d && /^\d{4}-\d{2}-\d{2}/.test(d) ? d.slice(0, 10) : null);
+  const plusRecent = (...dates) => dates.map(jour).filter(Boolean).sort().pop() || null;
+  const datePage = (cle) => jour((PAGES[cle] || {}).modifie);
+  const dateItem = (item) => plusRecent(item.modifie, item.updated, item.date);
+  const page = (url, priority, lastmod) => ({ url, priority, lastmod: jour(lastmod) });
+  const article = (dir, cleDe = () => null) => (item) =>
+    page(`${dir}/${item.slug}.html`, '0.7', plusRecent(dateItem(item), cleDe(item) && datePage(cleDe(item))));
+
+  const dGuides = plusRecent(datePage('guides'), ...GUIDES.map(dateItem));
+  const dMotifs = plusRecent(datePage('motifs'), ...MOTIFS.map((m) => datePage(`motif-${m.slug}`)));
+  const dTutos = plusRecent(datePage('tutoriels'), ...TUTOS.map(dateItem));
+  const dBlog = plusRecent(datePage('blog'), ...ARTICLES.map(dateItem));
+  const dOutils = plusRecent(datePage('outils'), datePage('visualiseur'), datePage('simulateur'), datePage('studio'));
 
   const urls = [
-    page('index.html', '1.0'),
-    page('guides/index.html', '0.8'),
+    page('index.html', '1.0', plusRecent(datePage('accueil'), dGuides, dMotifs, dTutos, dBlog, dOutils)),
+    page('guides/index.html', '0.8', dGuides),
     ...GUIDES.map(article('guides')),
-    page('motifs/index.html', '0.8'),
-    ...MOTIFS.map(article('motifs')),
-    page('tutoriels/index.html', '0.8'),
+    page('motifs/index.html', '0.8', dMotifs),
+    ...MOTIFS.map(article('motifs', (m) => `motif-${m.slug}`)),
+    page('tutoriels/index.html', '0.8', dTutos),
     ...TUTOS.map(article('tutoriels')),
-    ...(ARTICLES.length ? [page('blog/index.html', '0.7'), ...ARTICLES.map(article('blog'))] : []),
-    page('inspiration/index.html', '0.8'),
-    page('outils/index.html', '0.8'),
-    page('outils/visualiseur.html', '0.9'),
-    page('outils/simulateur-pose.html', '0.8'),
-    page('outils/studio.html', '0.8'),
-    page('projet/index.html', '0.7'),
-    page('contact/index.html', '0.5'),
-    page('a-propos/index.html', '0.5'),
-    page('a-propos/methode-editoriale.html', '0.5'),
-    page('mentions-legales/index.html', '0.3'),
-    page('confidentialite/index.html', '0.3'),
-    page('plan-du-site/index.html', '0.3'),
+    ...(ARTICLES.length ? [page('blog/index.html', '0.7', dBlog), ...ARTICLES.map(article('blog'))] : []),
+    page('inspiration/index.html', '0.8', datePage('inspiration')),
+    page('outils/index.html', '0.8', dOutils),
+    page('outils/visualiseur.html', '0.9', datePage('visualiseur')),
+    page('outils/simulateur-pose.html', '0.8', datePage('simulateur')),
+    page('outils/studio.html', '0.8', datePage('studio')),
+    page('projet/index.html', '0.7', datePage('projet')),
+    page('contact/index.html', '0.5', datePage('contact')),
+    page('a-propos/index.html', '0.5', datePage('a-propos')),
+    page('a-propos/methode-editoriale.html', '0.5', datePage('methode-editoriale')),
+    page('mentions-legales/index.html', '0.3', datePage('mentions-legales')),
+    page('confidentialite/index.html', '0.3', datePage('confidentialite')),
+    page('plan-du-site/index.html', '0.3', plusRecent(datePage('plan-du-site'), dGuides, dMotifs, dTutos, dBlog)),
   ];
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

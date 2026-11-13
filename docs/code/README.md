@@ -30816,3 +30816,10 @@ Les éléments construits par JavaScript réservent leur place dans le HTML, pou
 
 Mesure locale après correction : 0 sur toutes les pages, 0,01 à 0,02 pour le Studio et le visualiseur produit (seuil Google : 0,1).
 
+## Dates du sitemap (13 novembre 2026)
+
+- WordPress exporte la date de dernière modification de chaque guide, tutoriel, article et page (`modifie`, `src/Contenus/Export.php`).
+- `buildMeta` (`_generator/build.js`) : un contenu prend sa dernière modification ; une page de liste (Guides, Motifs, Tutoriels, Blog, Outils) prend la plus récente de ses contenus ; l'accueil et le plan du site, la plus récente de tout le site. Aucune page ne prend la date du jour de construction.
+- La date « Mis à jour le » affichée sur les articles ne dépend pas de ce mécanisme.
+- Attention : pour dater une modification faite hors de l'administration, ne pas utiliser `wp_update_post()` sur les guides et tutoriels : l'enregistrement repasse le corps dans les filtres de WordPress, qui retirent les icônes SVG des encadrés et certains attributs. Mettre à jour `post_modified` directement en base.
+

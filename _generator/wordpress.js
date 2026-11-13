@@ -178,6 +178,7 @@ function appliquer({ GUIDES, TUTOS, ARTICLES = [], PAGES, INSPIRATION_PHOTOS, PH
       related: Array.isArray(g.related) ? g.related : base.related,
       faq: Array.isArray(g.faq) ? g.faq : base.faq,
       body: g.corps,
+      modifie: g.modifie || base.modifie,
     };
   });
   for (const g of GUIDES) {
@@ -206,6 +207,7 @@ function appliquer({ GUIDES, TUTOS, ARTICLES = [], PAGES, INSPIRATION_PHOTOS, PH
       tools: Array.isArray(t.outils) && t.outils.length ? t.outils : base.tools,
       faq: Array.isArray(t.faq) ? t.faq : base.faq,
       body: t.corps,
+      modifie: t.modifie || base.modifie,
       date: t.date,
     };
   });
@@ -236,6 +238,7 @@ function appliquer({ GUIDES, TUTOS, ARTICLES = [], PAGES, INSPIRATION_PHOTOS, PH
         tags: [],
         related: [],
         body: a.corps,
+        modifie: a.modifie,
       };
     })
   );
@@ -252,6 +255,7 @@ function appliquer({ GUIDES, TUTOS, ARTICLES = [], PAGES, INSPIRATION_PHOTOS, PH
   for (const p of wp.pages || []) {
     const cible = PAGES[p.cle];
     if (!cible) continue;
+    if (p.modifie) cible.modifie = p.modifie;
     if (p.titre) cible.titre = p.titre;
     if (p.description) cible.description = p.description;
     if (cible.h1 !== null && p.h1) cible.h1 = p.h1;
