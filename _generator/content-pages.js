@@ -565,5 +565,14 @@ for (const page of Object.values(PAGES)) {
   if (page.champs) page.valeurs = defauts(page.champs);
 }
 
+{
+  const SEO = require('./seo-meta.json');
+  const { cheminPublic } = require('./routes');
+  for (const p of Object.values(PAGES)) {
+    const m = p.adresse && SEO[cheminPublic(p.adresse.replace(/^\//, '') || 'index.html')];
+    if (m) Object.assign(p, { titre: m.title, description: m.description });
+  }
+}
+
 module.exports = { PAGES, A_COMPLETER };
 

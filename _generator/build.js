@@ -52,7 +52,39 @@ function porteMaintenance(relPath, content) {
     ${porte}`);
 }
 const { responsiveTables } = require('./tables');
-const write = (relPath, content) => ecrireTexte(path.join(ROOT, relPath), porteMaintenance(relPath, /\.(html|tpl)$/.test(relPath) ? responsiveTables(content).replace(/<!--[\s\S]*?-->/g, '').replace(/^[\t ]+$/gm, '') : content));
+const ROUTES = require('./routes');
+const write = (relPath, content) => {
+  if (relPath === 'data/contenus.json') content = JSON.stringify(ROUTES.donneesPubliques(JSON.parse(content)), null, 2);
+  if (relPath === 'sitemap.xml') content = ROUTES.absolue(content).replace(/^[\t ]+$/gm, '');
+  if (relPath === 'robots.txt') content = content.trimEnd() + '\n';
+  if (relPath.endsWith('.tpl')) content = ROUTES.htmlPublic('guides/apercu.html', content, 'guides/apercu.html');
+  if (!relPath.endsWith('.html')) return ecrireTexte(path.join(ROOT, relPath), content);
+  const rendu = porteMaintenance(relPath, responsiveTables(content).replace(/<!--[\s\S]*?-->/g, '').replace(/^[\t ]+$/gm, ''));
+  const destination = ROUTES.fichierPublic(relPath);
+  ecrireTexte(path.join(ROOT, destination), ROUTES.htmlPublic(relPath, rendu, destination));
+  if (destination !== relPath) {
+    const cible = ROUTES.reference(path.posix.basename(relPath), relPath, relPath);
+    const absolue = ROUTES.ORIGINE + ROUTES.cheminPublic(relPath);
+    ecrireTexte(
+      path.join(ROOT, relPath),
+      `<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Page déplacée</title>
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href="${absolue}" />
+    <meta http-equiv="refresh" content="0; url=${cible}" />
+  </head>
+  <body>
+    <h1>Page déplacée</h1>
+    <p>Cette page a changé d’adresse : <a href="${cible}">${absolue}</a>.</p>
+  </body>
+</html>
+`
+    );
+  }
+};
 
 const frDate = (iso) =>
   new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -272,8 +304,8 @@ function editorialPage(item, options) {
       description: item.description,
       image: `${SITE.domain}/${couverture}`,
       inLanguage: 'fr-FR',
-      datePublished: published,
-      dateModified: updated,
+      ...((Object.hasOwn(item, 'structuredDate') ? item.structuredDate : item.date) ? { datePublished: item.structuredDate || item.date } : {}),
+      ...(item.updated ? { dateModified: item.updated } : {}),
       author: { '@type': 'Organization', name: SITE.name, url: `${SITE.domain}/a-propos/` },
       publisher: { '@type': 'Organization', name: SITE.name },
       mainEntityOfPage: `${SITE.domain}/${dir}${item.slug}.html`,
@@ -630,6 +662,7 @@ function buildMotifs() {
       lead: reglages.chapo || motif.lead,
       category: 'Motifs',
       date: '2026-08-12',
+      structuredDate: null,
       related: ['point-de-hongrie-ou-baton-rompu', 'quel-sens-de-pose-choisir', 'preparer-son-sol-avant-la-pose'],
       body: `${motif.body}
       <h2 id="tester">Tester ce motif dans votre pièce</h2>
@@ -838,7 +871,7 @@ function asideTuto(tuto) {
 function buildTutos() {
   TUTOS.forEach((tuto) => {
     const aside = asideTuto(tuto);
-    const item = { ...tuto, category: 'Tutoriel', date: tuto.date || '2026-08-16', related: ['preparer-son-sol-avant-la-pose', 'erreurs-a-eviter-avant-de-poser', 'quel-sens-de-pose-choisir'] };
+    const item = { ...tuto, category: 'Tutoriel', date: tuto.date || '2026-08-16', structuredDate: tuto.date || null, related: ['preparer-son-sol-avant-la-pose', 'erreurs-a-eviter-avant-de-poser', 'quel-sens-de-pose-choisir'] };
     write(
       `tutoriels/${tuto.slug}.html`,
       editorialPage(item, { section: 'tutoriels', sectionLabel: 'Tutoriels', dir: 'tutoriels/', aside, jsonldType: 'HowTo' })
@@ -1931,6 +1964,7 @@ function buildHome() {
         {
           '@context': 'https://schema.org',
           '@type': 'WebSite',
+          '@id': `${SITE.domain}/#site`,
           name: SITE.name,
           url: SITE.domain,
           inLanguage: 'fr-FR',
@@ -1943,7 +1977,7 @@ function buildHome() {
           '@id': `${SITE.domain}/#organisation`,
           name: SITE.name,
           url: SITE.domain,
-          logo: `${SITE.domain}/assets/icons/icon-512.png`,
+          logo: `${SITE.domain}/${REGLAGES.logo && REGLAGES.logo.chemin || 'assets/icons/icon-512.png'}`,
         },
         faqJsonLd(FAQ_ACCUEIL()),
       ],
@@ -1983,8 +2017,7 @@ function build404() {
 }
 
 function buildMeta() {
-  const today = new Date().toISOString().slice(0, 10);
-  const page = (url, priority, lastmod) => ({ url, priority, lastmod: lastmod || today });
+  const page = (url, priority, lastmod) => ({ url, priority, lastmod: lastmod && /^\d{4}-\d{2}-\d{2}/.test(lastmod) ? lastmod : null });
   const article = (dir) => (item) =>
     page(`${dir}/${item.slug}.html`, '0.7', item.updated || item.date);
 
@@ -2017,7 +2050,7 @@ ${urls
   .map(
     (entry) => `  <url>
     <loc>${SITE.domain}/${entry.url.replace(/index\.html$/, '')}</loc>
-    <lastmod>${entry.lastmod}</lastmod>
+    ${entry.lastmod ? `<lastmod>${entry.lastmod}</lastmod>` : ''}
     <changefreq>monthly</changefreq>
     <priority>${entry.priority}</priority>
   </url>`
@@ -2032,7 +2065,7 @@ ${urls
     `User-agent: *
 Allow: /
 
-Sitemap: ${SITE.domain}/sitemap.xml
+${process.env.SITE_ENVIRONMENT === 'production' ? `Sitemap: ${SITE.domain}/sitemap.xml` : ''}
 `
   );
 

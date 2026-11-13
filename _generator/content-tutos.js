@@ -133,4 +133,12 @@ const TUTOS = [
   },
 ];
 
+{
+  const SEO = require('./seo-meta.json');
+  for (const item of TUTOS) {
+    const m = SEO[`/tutoriels/${item.slug}/`];
+    if (m) Object.assign(item, { title: m.title, description: m.description });
+  }
+}
+
 module.exports = { TUTOS };

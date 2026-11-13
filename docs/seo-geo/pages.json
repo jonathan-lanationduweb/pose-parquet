@@ -1,0 +1,282 @@
+[
+  {
+    "file": "a-propos/index.html",
+    "url": "/a-propos/",
+    "title": "À propos de Pose Parquet : guides et outils",
+    "description": "Découvrez Pose Parquet, notre mission éditoriale, nos guides pratiques et nos outils pour accompagner les projets de pose de parquet.",
+    "canonical": "https://pose-parquet.com/a-propos/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "a-propos/methode-editoriale/index.html",
+    "url": "/a-propos/methode-editoriale/",
+    "title": "Notre méthode éditoriale et nos engagements",
+    "description": "Découvrez comment nous préparons nos guides de pose de parquet, vérifions nos informations et présentons nos partenaires.",
+    "canonical": "https://pose-parquet.com/a-propos/methode-editoriale/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "blog/index.html",
+    "url": "/blog/",
+    "title": "Blog : actualités et conseils parquet | Pose Parquet",
+    "description": "Les articles de Pose Parquet : actualités, retours de chantier et conseils pratiques pour choisir et poser son parquet.",
+    "canonical": "https://pose-parquet.com/blog/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "confidentialite/index.html",
+    "url": "/confidentialite/",
+    "title": "Politique de confidentialité et cookies",
+    "description": "Consultez notre politique de confidentialité pour comprendre le traitement des données personnelles et l'utilisation des cookies.",
+    "canonical": "https://pose-parquet.com/confidentialite/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "contact/index.html",
+    "url": "/contact/",
+    "title": "Contactez Pose Parquet",
+    "description": "Une question sur nos guides, nos outils ou notre site ? Retrouvez les informations pour contacter l'équipe Pose Parquet.",
+    "canonical": "https://pose-parquet.com/contact/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "guides/erreurs-a-eviter-avant-de-poser/index.html",
+    "url": "/guides/erreurs-a-eviter-avant-de-poser/",
+    "title": "Pose de parquet : 8 erreurs à éviter absolument",
+    "description": "Support mal préparé, mauvais sens de pose, humidité : découvrez les erreurs fréquentes avant la pose d'un parquet.",
+    "canonical": "https://pose-parquet.com/guides/erreurs-a-eviter-avant-de-poser/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "guides/index.html",
+    "url": "/guides/",
+    "title": "Guides de pose de parquet : conseils et techniques",
+    "description": "Sens de pose, préparation du sol, choix du parquet : découvrez nos guides pratiques pour préparer et réussir votre projet de parquet.",
+    "canonical": "https://pose-parquet.com/guides/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "guides/parquet-massif-ou-contrecolle/index.html",
+    "url": "/guides/parquet-massif-ou-contrecolle/",
+    "title": "Parquet massif ou contrecollé : lequel choisir ?",
+    "description": "Massif ou contrecollé ? Comparez la structure, la stabilité, les techniques de pose et les contraintes de chaque parquet.",
+    "canonical": "https://pose-parquet.com/guides/parquet-massif-ou-contrecolle/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "guides/point-de-hongrie-ou-baton-rompu/index.html",
+    "url": "/guides/point-de-hongrie-ou-baton-rompu/",
+    "title": "Point de Hongrie ou bâton rompu : les différences",
+    "description": "Comparez le point de Hongrie et le bâton rompu : forme des lames, rendu esthétique, contraintes de pose et techniques.",
+    "canonical": "https://pose-parquet.com/guides/point-de-hongrie-ou-baton-rompu/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "guides/poser-parquet-sens-de-la-lumiere/index.html",
+    "url": "/guides/poser-parquet-sens-de-la-lumiere/",
+    "title": "Parquet et lumière : dans quel sens poser les lames ?",
+    "description": "Faut-il poser le parquet dans le sens de la lumière ? Comprenez l'effet des fenêtres sur l'orientation des lames.",
+    "canonical": "https://pose-parquet.com/guides/poser-parquet-sens-de-la-lumiere/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "guides/preparer-son-sol-avant-la-pose/index.html",
+    "url": "/guides/preparer-son-sol-avant-la-pose/",
+    "title": "Préparer un sol avant la pose d'un parquet : guide",
+    "description": "Planéité, humidité, nettoyage et ragréage : découvrez comment préparer votre support avant de poser un parquet.",
+    "canonical": "https://pose-parquet.com/guides/preparer-son-sol-avant-la-pose/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "guides/quel-sens-de-pose-choisir/index.html",
+    "url": "/guides/quel-sens-de-pose-choisir/",
+    "title": "Sens de pose du parquet : comment bien choisir ?",
+    "description": "Lumière, longueur de la pièce, circulation : découvrez les critères pour choisir le bon sens de pose de votre parquet.",
+    "canonical": "https://pose-parquet.com/guides/quel-sens-de-pose-choisir/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "guides/sens-de-pose-couloir/index.html",
+    "url": "/guides/sens-de-pose-couloir/",
+    "title": "Dans quel sens poser du parquet dans un couloir ?",
+    "description": "Pose en longueur ou en largeur ? Découvrez comment orienter les lames dans un couloir selon sa forme et la lumière.",
+    "canonical": "https://pose-parquet.com/guides/sens-de-pose-couloir/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "guides/sens-de-pose-piece-etroite/index.html",
+    "url": "/guides/sens-de-pose-piece-etroite/",
+    "title": "Sens de pose du parquet dans une pièce étroite",
+    "description": "Comment orienter un parquet dans une pièce longue ou étroite ? Découvrez les effets visuels des différentes poses.",
+    "canonical": "https://pose-parquet.com/guides/sens-de-pose-piece-etroite/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "index.html",
+    "url": "/",
+    "title": "Pose de parquet : guides, conseils et simulateur",
+    "description": "Découvrez nos guides de pose de parquet, les techniques et motifs, et visualisez votre futur sol grâce à notre simulateur gratuit.",
+    "canonical": "https://pose-parquet.com/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "inspiration/index.html",
+    "url": "/inspiration/",
+    "title": "Inspirations parquet : idées de sols et motifs",
+    "description": "Découvrez des inspirations parquet pour le salon, la chambre ou la cuisine. Comparez les teintes, les motifs et les ambiances.",
+    "canonical": "https://pose-parquet.com/inspiration/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "mentions-legales/index.html",
+    "url": "/mentions-legales/",
+    "title": "Mentions légales de Pose Parquet",
+    "description": "Consultez les mentions légales de Pose Parquet et les informations relatives à l'éditeur et à l'hébergement du site.",
+    "canonical": "https://pose-parquet.com/mentions-legales/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "motifs/baton-rompu/index.html",
+    "url": "/motifs/baton-rompu/",
+    "title": "Parquet bâton rompu : technique et pose",
+    "description": "Découvrez le motif bâton rompu, sa disposition en zigzag, ses différences avec le point de Hongrie et ses contraintes de pose.",
+    "canonical": "https://pose-parquet.com/motifs/baton-rompu/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "motifs/index.html",
+    "url": "/motifs/",
+    "title": "Motifs de pose de parquet : les 6 styles à connaître",
+    "description": "Pose droite, diagonale, bâton rompu ou point de Hongrie : découvrez 6 motifs de pose de parquet et leurs différences.",
+    "canonical": "https://pose-parquet.com/motifs/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "motifs/point-de-hongrie/index.html",
+    "url": "/motifs/point-de-hongrie/",
+    "title": "Parquet point de Hongrie : motif et technique",
+    "description": "Découvrez le parquet point de Hongrie : assemblage des lames, angles de coupe, préparation et particularités de ce motif.",
+    "canonical": "https://pose-parquet.com/motifs/point-de-hongrie/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "motifs/pose-diagonale/index.html",
+    "url": "/motifs/pose-diagonale/",
+    "title": "Pose de parquet en diagonale : guide et conseils",
+    "description": "Découvrez comment fonctionne la pose de parquet en diagonale, ses avantages esthétiques et ses contraintes de découpe.",
+    "canonical": "https://pose-parquet.com/motifs/pose-diagonale/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "motifs/pose-droite/index.html",
+    "url": "/motifs/pose-droite/",
+    "title": "Pose droite du parquet : principe et méthode",
+    "description": "Découvrez la pose droite du parquet : disposition des lames, avantages, préparation et conseils pour réussir la pose.",
+    "canonical": "https://pose-parquet.com/motifs/pose-droite/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "motifs/pose-largeur/index.html",
+    "url": "/motifs/pose-largeur/",
+    "title": "Parquet posé dans la largeur : conseils de pose",
+    "description": "Découvrez les effets visuels d'un parquet posé dans la largeur et les critères à considérer avant de choisir cette orientation.",
+    "canonical": "https://pose-parquet.com/motifs/pose-largeur/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "motifs/pose-longueur/index.html",
+    "url": "/motifs/pose-longueur/",
+    "title": "Parquet posé dans la longueur : quel résultat ?",
+    "description": "Poser son parquet dans la longueur peut transformer la perception d'une pièce. Découvrez dans quels cas choisir cette orientation.",
+    "canonical": "https://pose-parquet.com/motifs/pose-longueur/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "outils/index.html",
+    "url": "/outils/",
+    "title": "Outils gratuits pour préparer la pose de parquet",
+    "description": "Découvrez nos outils gratuits pour choisir un parquet, comparer les sens de pose et visualiser votre futur sol.",
+    "canonical": "https://pose-parquet.com/outils/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "outils/simulateur-pose/index.html",
+    "url": "/outils/simulateur-pose/",
+    "title": "Simulateur de pose de parquet : sens et motifs",
+    "description": "Comparez différentes orientations de lames sur un plan et visualisez les effets des sens de pose de votre parquet.",
+    "canonical": "https://pose-parquet.com/outils/simulateur-pose/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "outils/studio/index.html",
+    "url": "/outils/studio/",
+    "title": "Visualiseur de parquet : essayez un sol sur photo",
+    "description": "Visualisez différents parquets dans votre pièce grâce à une photo. Découvrez les teintes et comparez les rendus.",
+    "canonical": "https://pose-parquet.com/outils/studio/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "outils/visualiseur/index.html",
+    "url": "/outils/visualiseur/",
+    "title": "Simulateur parquet gratuit : visualisez votre sol",
+    "description": "Importez une photo de votre pièce et essayez différents parquets. Comparez les teintes et les motifs gratuitement.",
+    "canonical": "https://pose-parquet.com/outils/visualiseur/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "outils/visualiseur-produit/index.html",
+    "url": "/outils/visualiseur-produit/",
+    "title": "Visualiseur produit · Pose Parquet",
+    "description": "Essayez cinq références Premibel dans une pièce : la pièce occupe l’écran, le parquet change à chaque clic, tout est calculé dans votre navigateur.",
+    "canonical": "https://pose-parquet.com/outils/visualiseur-produit/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "plan-du-site/index.html",
+    "url": "/plan-du-site/",
+    "title": "Plan du site Pose Parquet : toutes les pages",
+    "description": "Retrouvez toutes les pages de Pose Parquet : guides, tutoriels, motifs de pose, simulateurs, inspirations et informations pratiques.",
+    "canonical": "https://pose-parquet.com/plan-du-site/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "projet/index.html",
+    "url": "/projet/",
+    "title": "Projet de pose de parquet : préparez votre chantier",
+    "description": "Décrivez votre projet de parquet en quelques étapes : surface, support, type de pose et contraintes pour mieux préparer votre chantier.",
+    "canonical": "https://pose-parquet.com/projet/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "tutoriels/coller-un-parquet-contrecolle/index.html",
+    "url": "/tutoriels/coller-un-parquet-contrecolle/",
+    "title": "Pose collée d'un parquet contrecollé : tutoriel",
+    "description": "Apprenez les étapes de la pose collée d'un parquet contrecollé : préparation du support, encollage et mise en place des lames.",
+    "canonical": "https://pose-parquet.com/tutoriels/coller-un-parquet-contrecolle/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "tutoriels/index.html",
+    "url": "/tutoriels/",
+    "title": "Tutoriels pose de parquet : étapes et méthodes",
+    "description": "Apprenez à poser votre parquet avec nos tutoriels étape par étape : pose flottante, pose collée et calepinage.",
+    "canonical": "https://pose-parquet.com/tutoriels/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "tutoriels/poser-un-parquet-flottant/index.html",
+    "url": "/tutoriels/poser-un-parquet-flottant/",
+    "title": "Comment poser un parquet flottant ? Tutoriel complet",
+    "description": "Découvrez les étapes pour poser un parquet flottant : préparation du sol, sous-couche, assemblage des lames et finitions.",
+    "canonical": "https://pose-parquet.com/tutoriels/poser-un-parquet-flottant/",
+    "robots": "noindex, follow"
+  },
+  {
+    "file": "tutoriels/reussir-le-calepinage/index.html",
+    "url": "/tutoriels/reussir-le-calepinage/",
+    "title": "Calepinage parquet : méthode et conseils de pose",
+    "description": "Apprenez à réaliser un calepinage de parquet : calcul des rangées, alignement des lames et anticipation des découpes.",
+    "canonical": "https://pose-parquet.com/tutoriels/reussir-le-calepinage/",
+    "robots": "noindex, follow"
+  }
+]

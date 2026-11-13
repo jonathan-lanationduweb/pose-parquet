@@ -4,7 +4,7 @@
     {
       "slug": "quel-sens-de-pose-choisir",
       "titre": "Quel sens de pose choisir pour son parquet ?",
-      "url": "guides/quel-sens-de-pose-choisir.html",
+      "url": "guides/quel-sens-de-pose-choisir/",
       "categorie": "Sens de pose",
       "tags": [
         "sens-de-pose",
@@ -16,7 +16,7 @@
     {
       "slug": "poser-parquet-sens-de-la-lumiere",
       "titre": "Poser un parquet dans le sens de la lumière",
-      "url": "guides/poser-parquet-sens-de-la-lumiere.html",
+      "url": "guides/poser-parquet-sens-de-la-lumiere/",
       "categorie": "Sens de pose",
       "tags": [
         "sens-de-pose",
@@ -28,7 +28,7 @@
     {
       "slug": "preparer-son-sol-avant-la-pose",
       "titre": "Comment préparer un sol avant la pose ?",
-      "url": "guides/preparer-son-sol-avant-la-pose.html",
+      "url": "guides/preparer-son-sol-avant-la-pose/",
       "categorie": "Préparation",
       "tags": [
         "preparation",
@@ -40,7 +40,7 @@
     {
       "slug": "point-de-hongrie-ou-baton-rompu",
       "titre": "Point de Hongrie ou bâton rompu ?",
-      "url": "guides/point-de-hongrie-ou-baton-rompu.html",
+      "url": "guides/point-de-hongrie-ou-baton-rompu/",
       "categorie": "Motifs",
       "tags": [
         "motifs",
@@ -52,7 +52,7 @@
     {
       "slug": "erreurs-a-eviter-avant-de-poser",
       "titre": "Les erreurs à éviter avant de poser un parquet",
-      "url": "guides/erreurs-a-eviter-avant-de-poser.html",
+      "url": "guides/erreurs-a-eviter-avant-de-poser/",
       "categorie": "Préparation",
       "tags": [
         "preparation",
@@ -64,7 +64,7 @@
     {
       "slug": "parquet-massif-ou-contrecolle",
       "titre": "Parquet massif ou contrecollé : quelles différences pour la pose ?",
-      "url": "guides/parquet-massif-ou-contrecolle.html",
+      "url": "guides/parquet-massif-ou-contrecolle/",
       "categorie": "Comprendre",
       "tags": [
         "comprendre",
@@ -76,7 +76,7 @@
     {
       "slug": "sens-de-pose-couloir",
       "titre": "Sens de pose dans un couloir",
-      "url": "guides/sens-de-pose-couloir.html",
+      "url": "guides/sens-de-pose-couloir/",
       "categorie": "Sens de pose",
       "tags": [
         "sens-de-pose",
@@ -88,7 +88,7 @@
     {
       "slug": "sens-de-pose-piece-etroite",
       "titre": "Sens de pose dans une pièce étroite",
-      "url": "guides/sens-de-pose-piece-etroite.html",
+      "url": "guides/sens-de-pose-piece-etroite/",
       "categorie": "Sens de pose",
       "tags": [
         "sens-de-pose",
@@ -102,7 +102,7 @@
     {
       "slug": "pose-droite",
       "titre": "La pose droite",
-      "url": "motifs/pose-droite.html",
+      "url": "motifs/pose-droite/",
       "motif": "longueur",
       "stats": {
         "Chutes": "faibles (ordre de 7 à 8 %)",
@@ -113,7 +113,7 @@
     {
       "slug": "pose-longueur",
       "titre": "La pose dans la longueur",
-      "url": "motifs/pose-longueur.html",
+      "url": "motifs/pose-longueur/",
       "motif": "longueur",
       "stats": {
         "Chutes": "faibles (ordre de 7 %)",
@@ -124,7 +124,7 @@
     {
       "slug": "pose-largeur",
       "titre": "La pose dans la largeur",
-      "url": "motifs/pose-largeur.html",
+      "url": "motifs/pose-largeur/",
       "motif": "largeur",
       "stats": {
         "Chutes": "faibles (ordre de 8 %)",
@@ -135,7 +135,7 @@
     {
       "slug": "pose-diagonale",
       "titre": "La pose en diagonale",
-      "url": "motifs/pose-diagonale.html",
+      "url": "motifs/pose-diagonale/",
       "motif": "diagonale",
       "stats": {
         "Chutes": "élevées (ordre de 12 à 15 %)",
@@ -146,7 +146,7 @@
     {
       "slug": "point-de-hongrie",
       "titre": "Le Point de Hongrie",
-      "url": "motifs/point-de-hongrie.html",
+      "url": "motifs/point-de-hongrie/",
       "motif": "point-de-hongrie",
       "stats": {
         "Chutes": "élevées (ordre de 12 à 15 %)",
@@ -157,7 +157,7 @@
     {
       "slug": "baton-rompu",
       "titre": "Le bâton rompu",
-      "url": "motifs/baton-rompu.html",
+      "url": "motifs/baton-rompu/",
       "motif": "baton-rompu",
       "stats": {
         "Chutes": "modérées (ordre de 10 à 12 %)",
@@ -170,21 +170,21 @@
     {
       "slug": "poser-un-parquet-flottant",
       "titre": "Poser un parquet flottant, étape par étape",
-      "url": "tutoriels/poser-un-parquet-flottant.html",
+      "url": "tutoriels/poser-un-parquet-flottant/",
       "niveau": "Accessible",
       "duree": "1 journée pour 20 m²"
     },
     {
       "slug": "coller-un-parquet-contrecolle",
       "titre": "Coller un parquet contrecollé",
-      "url": "tutoriels/coller-un-parquet-contrecolle.html",
+      "url": "tutoriels/coller-un-parquet-contrecolle/",
       "niveau": "Confirmé",
       "duree": "1 à 2 jours pour 20 m²"
     },
     {
       "slug": "reussir-le-calepinage",
       "titre": "Réussir son calepinage",
-      "url": "tutoriels/reussir-le-calepinage.html",
+      "url": "tutoriels/reussir-le-calepinage/",
       "niveau": "Accessible",
       "duree": "1 à 2 heures"
     }
@@ -193,13 +193,13 @@
     {
       "slug": "visualiseur",
       "titre": "Visualiseur Parquet",
-      "url": "outils/visualiseur.html",
+      "url": "outils/visualiseur/",
       "etat": "disponible"
     },
     {
       "slug": "simulateur-pose",
       "titre": "Simulateur de pose",
-      "url": "outils/simulateur-pose.html",
+      "url": "outils/simulateur-pose/",
       "etat": "disponible"
     }
   ]

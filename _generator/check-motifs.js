@@ -19,7 +19,7 @@ function verifier(nom, condition, detail = '') {
 }
 
 const titre = (t) => console.log(`\n== ${t} ==`);
-const lire = (rel) => fs.readFileSync(path.join(RACINE, rel), 'utf8');
+const lire = (rel) => { const pub = require('./routes').fichierPublic(rel); return fs.readFileSync(path.join(RACINE, fs.existsSync(path.join(RACINE, pub)) ? pub : rel), 'utf8'); };
 
 
 
@@ -346,7 +346,7 @@ const liensMotifs = [];
 for (const fichier of fs.readdirSync(path.join(RACINE, 'motifs'))) {
   if (!fichier.endsWith('.html') || fichier === 'index.html') continue;
   const html = lire(`motifs/${fichier}`);
-  for (const m of html.matchAll(/studio\.html\?motif=([a-z-]+)/g)) liensMotifs.push([fichier, m[1]]);
+  for (const m of html.matchAll(/studio(?:\.html|\/)\?motif=([a-z-]+)/g)) liensMotifs.push([fichier, m[1]]);
 }
 verifier('chaque fiche motif ouvre le Visualiseur', liensMotifs.length === 6, `${liensMotifs.length} lien(s)`);
 verifier(

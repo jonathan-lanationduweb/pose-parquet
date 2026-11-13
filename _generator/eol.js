@@ -119,7 +119,7 @@ function empreinteDeFichiers(chemins, racine) {
 const CODES_TRANSITOIRES = new Set(['UNKNOWN', 'EBUSY', 'EPERM', 'EACCES']);
 
 
-const ATTENTES_MS = [25, 75, 150];
+const ATTENTES_MS = [25, 75, 150, 300, 600, 900];
 
 
 

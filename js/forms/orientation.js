@@ -195,7 +195,7 @@ export function lienVisualiseur(base, { sceneId, productId, pattern, angle } = {
   if (pattern) params.set('motif', pattern);
   if (Number.isInteger(angle)) params.set('orientation', String(angle));
   const q = params.toString();
-  return `${base}outils/studio.html${q ? `?${q}` : ''}`;
+  return `${base}outils/studio/${q ? `?${q}` : ''}`;
 }
 
 

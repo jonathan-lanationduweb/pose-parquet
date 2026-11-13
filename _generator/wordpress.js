@@ -325,8 +325,15 @@ function pageMaintenance(m) {
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="robots" content="noindex" />
+<meta name="robots" content="noindex, follow" />
 <title>${echapper(m.titre)} — Pose Parquet</title>
+<meta name="description" content="Pose Parquet est temporairement en maintenance. Retrouvez bientôt nos guides et outils pour préparer votre projet de parquet." />
+<link rel="canonical" href="https://pose-parquet.com/maintenance.html" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Pose Parquet" />
+<meta property="og:title" content="${echapper(m.titre)} — Pose Parquet" />
+<meta property="og:description" content="Pose Parquet est temporairement en maintenance. Retrouvez bientôt nos guides et outils pour préparer votre projet de parquet." />
+<meta property="og:url" content="https://pose-parquet.com/maintenance.html" />
 <style>
 @font-face { font-family: "Instrument Serif"; font-style: normal; font-weight: 400; font-display: swap; src: url("assets/fonts/instrument-serif-400-3.woff2") format("woff2"); }
 @font-face { font-family: "Inter"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("assets/fonts/inter-var-1.woff2") format("woff2"); }
