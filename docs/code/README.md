@@ -30800,3 +30800,9 @@ Tous les textes ajoutés depuis les maquettes PDF sont des champs de « Pose Par
 
 Plus aucune couleur froide dans le CSS ni dans les dessins (Mode Plan, schémas des guides, Studio, galerie), à une exception volontaire : la vitre des fenêtres (`#7aa7b8`) dans les plans, qui doit se lire comme une vitre. Contrastes WCAG AA vérifiés sur chaque fond (minimum 4,7:1).
 
+## Rythme des fonds sur toutes les pages (13 novembre 2026)
+
+- Pages intérieures : le fil d'Ariane et l'en-tête de page (`.page-hero`, `.article-header`, `.tool-hero`) forment un bandeau crème `#f4ede4` pleine largeur (`css/components/breadcrumb.css`), comme les bandes de l'accueil.
+- Sections alternées : « Quel motif pour quelle pièce » (Motifs), « Dans quel ordre les lire » (Guides), « Quel tutoriel pour quel chantier » (Tutoriels) en `section--alt` ; « À lire ensuite » des articles en bande crème pleine largeur (`css/pages/article.css`).
+- Vignettes de motifs (`js/tools/patterns.js`) dessinées en tons de chêne au lieu du gris-beige.
+

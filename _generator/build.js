@@ -563,7 +563,7 @@ function buildGuides() {
         </div>
       </section>
 
-      <section class="section" aria-labelledby="guides-ordre">
+      <section class="section section--alt" aria-labelledby="guides-ordre">
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
@@ -779,7 +779,7 @@ function buildMotifs() {
         </div>
       </section>
 
-      <section class="section" aria-labelledby="motifs-pieces">
+      <section class="section section--alt" aria-labelledby="motifs-pieces">
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
@@ -981,7 +981,7 @@ function buildTutos() {
         </div>
       </section>
 
-      <section class="section" aria-labelledby="tuto-choix">
+      <section class="section section--alt" aria-labelledby="tuto-choix">
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
@@ -1001,7 +1001,7 @@ function buildTutos() {
         </div>
       </section>
 
-      <section class="section section--alt" aria-labelledby="tuto-methode">
+      <section class="section" aria-labelledby="tuto-methode">
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>
@@ -1016,7 +1016,7 @@ function buildTutos() {
         </div>
       </section>
 
-      <section class="section section--alt section--flush-top" aria-labelledby="tuto-outillage">
+      <section class="section section--flush-top" aria-labelledby="tuto-outillage">
         <div class="wrap-wide">
           <div class="section-head section-head__row">
             <div>

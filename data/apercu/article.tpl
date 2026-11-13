@@ -32,13 +32,13 @@
     <link rel="manifest" href="../site.webmanifest?v=273889a7e3" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../assets/dist/site.8ded59be59.css" />
+    <link rel="stylesheet" href="../assets/dist/site.63ca8786b0.css" />
 
 
 
 
     <script src="../config.js"></script>
-    <script type="module" src="../assets/dist/ec47d772ed/js/main.js"></script>
+    <script type="module" src="../assets/dist/0df6f1038e/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://pose-parquet.com/blog/"},{"@type":"ListItem","position":3,"name":"%%PP_H1%%"}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"%%PP_H1%%","description":"%%PP_DESCRIPTION%%","image":"https://pose-parquet.com/assets/images/og-default.jpg","inLanguage":"fr-FR","datePublished":"2001-01-01","author":{"@type":"Organization","name":"Pose Parquet","url":"https://pose-parquet.com/a-propos/"},"publisher":{"@type":"Organization","name":"Pose Parquet"},"mainEntityOfPage":"https://pose-parquet.com/blog/apercu.html"}</script>
   </head>
