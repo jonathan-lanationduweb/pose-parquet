@@ -17,3 +17,18 @@
 .breadcrumb + .page-hero,
 .breadcrumb + .article-header,
 .breadcrumb + .tool-hero { padding-top: clamp(1.5rem, 1rem + 2vw, 3rem); }
+
+.breadcrumb {
+  background: var(--bg-alt);
+  box-shadow: 0 0 0 100vmax var(--bg-alt);
+  clip-path: inset(0 -100vmax);
+}
+.breadcrumb + .page-hero,
+.breadcrumb + .article-header,
+.breadcrumb + .tool-hero {
+  background: var(--bg-alt);
+  padding-bottom: clamp(2.5rem, 2rem + 2vw, 4rem);
+}
+.breadcrumb + .page-hero + .section--flush-top,
+.breadcrumb + .tool-hero + .section--flush-top { padding-top: clamp(2.5rem, 2rem + 2vw, 4rem); }
+.breadcrumb + .article-header + .wrap-wide { padding-top: clamp(2rem, 1.5rem + 2vw, 3.5rem); }

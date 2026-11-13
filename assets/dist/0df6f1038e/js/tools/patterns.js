@@ -164,7 +164,7 @@ export function patternThumb(id, size = { w: 120, h: 90 }) {
   const shapes = planks
     .map(
       (plank) =>
-        `<polygon points="${plank.points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ')}" fill="hsl(${(34 + plank.shade * 8).toFixed(0)} ${(18 + plank.shade * 10).toFixed(0)}% ${(74 + plank.shade * 12).toFixed(0)}%)" stroke="rgba(60,50,40,.28)" stroke-width="0.7" />`
+        `<polygon points="${plank.points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ')}" fill="hsl(${(30 + plank.shade * 6).toFixed(0)} ${(40 + plank.shade * 12).toFixed(0)}% ${(70 + plank.shade * 12).toFixed(0)}%)" stroke="rgba(70,45,25,.3)" stroke-width="0.7" />`
     )
     .join('');
   return `<svg viewBox="0 0 ${size.w} ${size.h}" role="img" aria-label="Motif ${pattern.label}" preserveAspectRatio="xMidYMid slice"><defs><clipPath id="${uid}"><rect width="${size.w}" height="${size.h}" /></clipPath></defs><g clip-path="url(#${uid})">${shapes}</g></svg>`;
