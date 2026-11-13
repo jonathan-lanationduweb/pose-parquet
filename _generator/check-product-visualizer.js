@@ -372,7 +372,7 @@ function controlerSource() {
     ok('la copie publiée de app.js est à jour', fs.existsSync(publie) && fs.readFileSync(publie, 'utf8').replace(/\r\n/g, '\n') === app.replace(/\r\n/g, '\n'), 'relancer node _generator/build.js');
     const page = lire('outils/visualiseur-produit.html');
     ok('la page charge cet arbre et sa feuille', page.includes(`assets/dist/${arbres[0]}/js/product/main.js`) && /assets\/dist\/product\.[0-9a-f]+\.css/.test(page));
-    ok('la page monte [data-product]', /<div data-product data-base=/.test(page) && /app app--product/.test(page));
+    ok('la page monte [data-product]', /<div data-product\b[^>]*data-base=/.test(page) && /app app--product/.test(page));
   }
   const pilote = JSON.parse(lire('data/products.premibel-pilot.json'));
   const ids = ['POINF36005', 'BTRPF39009', 'CHENF39031', 'CHENF36014', 'CHENF36015'];
