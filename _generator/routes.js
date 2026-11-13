@@ -38,7 +38,7 @@ function reference(brut, source, destination = fichierPublic(source)) {
 
 function htmlPublic(source, html, destination = fichierPublic(source)) {
   const transformer = valeur => reference(valeur, source, destination);
-  let out = html.replace(/\b(href|src|poster|action|data-base|data-logo)=("([^"]*)"|'([^']*)')/gi, (tout, attribut, cite, double, simple) => {
+  let out = html.replace(/\b(href|src|poster|action|data-base|data-logo|data-logo-webp)=("([^"]*)"|'([^']*)')/gi, (tout, attribut, cite, double, simple) => {
     const guillemet = cite[0];
     return attribut + '=' + guillemet + transformer(double ?? simple) + guillemet;
   });

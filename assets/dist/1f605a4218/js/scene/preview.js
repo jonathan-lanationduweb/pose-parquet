@@ -1,6 +1,6 @@
 import { analyzeScene } from './analyzer.js';
 import { createSceneRenderer } from './renderer.js';
-import { loadImage } from './image-loader.js';
+import { loadSceneImage } from './image-loader.js';
 import { loadCatalog } from '../studio/catalog.js';
 import { motifEffectif, motifAutorise } from './motifs-regles.js';
 import { VITRINE } from './vitrine.js';
@@ -176,10 +176,11 @@ export function mountPreview(root) {
       if (!current) throw new Error('aucune référence de vitrine dans le catalogue');
       buildChips();
       const scene = await analyzeScene({ sceneId, base });
-      const prepared = downscale(await loadImage(`${base}assets/images/${scene.image.file}`));
+      const charge = await loadSceneImage(base, scene.image.file);
+      const prepared = downscale(charge);
       renderer.setScene(scene, prepared);
       syncLien();
-      photo.src = `${base}assets/images/${scene.image.file}`;
+      photo.src = charge.src;
       photo.alt = scene.image.alt;
       if (scene.image.credit) credit.textContent = `Photo : ${scene.image.credit}.`;
       draw();

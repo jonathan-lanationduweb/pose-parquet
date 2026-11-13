@@ -47,6 +47,8 @@ body.app--product {
   background: var(--ui); border-bottom: 1px solid var(--ui-line);
 }
 .pv__brand { display: flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; margin-right: auto; }
+.pv__brand > picture { display: contents; }
+.pv__brand > picture > source { display: none; }
 .pv__mark { width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-size: 13px; }
 .app-loading-title { margin: 1rem; font: 500 1rem/1.4 var(--font-sans); }
 .pv__title { margin: 0; display: block; font: 500 18px/1 var(--font-display); letter-spacing: -0.01em; }

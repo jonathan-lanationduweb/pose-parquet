@@ -30823,3 +30823,10 @@ Mesure locale après correction : 0 sur toutes les pages, 0,01 à 0,02 pour le S
 - La date « Mis à jour le » affichée sur les articles ne dépend pas de ce mécanisme.
 - Attention : pour dater une modification faite hors de l'administration, ne pas utiliser `wp_update_post()` sur les guides et tutoriels : l'enregistrement repasse le corps dans les filtres de WordPress, qui retirent les icônes SVG des encadrés et certains attributs. Mettre à jour `post_modified` directement en base.
 
+
+## Images en WebP (13 novembre 2026)
+
+- **Logo** : `rogner-logo.py` écrit à côté du PNG rogné une version `.webp` (qualité 90, environ 30 Ko au lieu de 78 Ko). `wordpress.js` relance le script si l'un des deux fichiers manque. L'en-tête, le pied de page, le Studio et le visualiseur produit affichent le logo dans un `<picture>` : WebP d'abord, PNG en secours. Les données structurées (JSON-LD) gardent le PNG.
+- **Mise en page du logo** : dans un conteneur flex, Chrome compte la balise `<source>` comme un élément vide et ajoute l'espacement (`gap`) devant le logo. Les règles `> picture { display: contents; }` et `> picture > source { display: none; }` (header.css, footer.css, studio-app.css, product-app.css) gardent le logo au même pixel qu'avant.
+- **Photos du Studio, du visualiseur produit et de l'aperçu** : `loadSceneImage()` (js/scene/image-loader.js) charge `room-xxx-1600.webp` (ou `-1120.webp` sur petit écran), puis le JPG de même taille, puis le JPG d'origine si le précédent échoue. `variantesScene()` donne la même liste d'adresses ; le Studio l'utilise pour la photo affichée pendant le chargement.
+- **Images restées en `<img>` simple dans le HTML** (photos dans le corps des guides, y compris celles saisies dans WordPress) : `_generator/images-webp.js` les entoure d'un `<picture>` au moment de la génération quand des variantes `nom-LARGEUR.webp` existent dans `assets/images`. Les images déjà dans un `<picture>`, celles qui ont un `srcset` et la photo de l'aperçu (`data-photo`, gérée par le script) ne sont pas touchées.

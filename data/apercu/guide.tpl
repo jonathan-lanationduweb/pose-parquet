@@ -32,13 +32,13 @@
     <link rel="manifest" href="../site.webmanifest?v=273889a7e3" />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/instrument-serif-400-3.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="../assets/fonts/inter-var-1.woff2" crossorigin />
-    <link rel="stylesheet" href="../assets/dist/site.9987aea2b2.css" />
+    <link rel="stylesheet" href="../assets/dist/site.d0d1565a70.css" />
 
 
 
 
     <script src="../config.js"></script>
-    <script type="module" src="../assets/dist/45063aad89/js/main.js"></script>
+    <script type="module" src="../assets/dist/1f605a4218/js/main.js"></script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://pose-parquet.com/"},{"@type":"ListItem","position":2,"name":"Guides","item":"https://pose-parquet.com/guides/"},{"@type":"ListItem","position":3,"name":"%%PP_H1%%"}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"%%PP_H1%%","description":"%%PP_DESCRIPTION%%","image":"https://pose-parquet.com/assets/images/og-default.jpg","inLanguage":"fr-FR","datePublished":"2001-01-01","author":{"@type":"Organization","name":"Pose Parquet","url":"https://pose-parquet.com/a-propos/"},"publisher":{"@type":"Organization","name":"Pose Parquet"},"mainEntityOfPage":"https://pose-parquet.com/guides/apercu.html"}</script>
   </head>
@@ -47,7 +47,7 @@
     <header class="site-header" data-header data-over="false" data-scrolled="false">
       <div class="wrap-wide site-header__inner">
         <a class="brand" href="../index.html" aria-label="Pose Parquet, accueil">
-          <img class="brand__logo" src="../assets/images/wp-246-rogne.png" alt="" width="480" height="233" />
+          <picture><source type="image/webp" srcset="../assets/images/wp-246-rogne.webp" /><img class="brand__logo" src="../assets/images/wp-246-rogne.png" alt="" width="480" height="233" /></picture>
         </a>
         <nav class="nav" aria-label="Navigation principale">
           <ul class="nav__list">
@@ -178,7 +178,7 @@
       <div class="wrap-wide footer__inner">
         <div class="footer__top">
           <div class="footer__brand">
-            <a class="footer__logo-lien" href="../index.html" aria-label="Pose Parquet, accueil"><img class="footer__logo" src="../assets/images/wp-246-rogne.png" alt="" width="480" height="233" loading="lazy" decoding="async" /></a>
+            <a class="footer__logo-lien" href="../index.html" aria-label="Pose Parquet, accueil"><picture><source type="image/webp" srcset="../assets/images/wp-246-rogne.webp" /><img class="footer__logo" src="../assets/images/wp-246-rogne.png" alt="" width="480" height="233" loading="lazy" decoding="async" /></picture></a>
             <p class="footer__baseline">Guides et outils pour réussir la pose de son parquet.</p>
           </div>
           <nav class="footer__nav" aria-label="Pied de page">

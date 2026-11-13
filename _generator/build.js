@@ -52,6 +52,7 @@ function porteMaintenance(relPath, content) {
     ${porte}`);
 }
 const { responsiveTables } = require('./tables');
+const { imagesWebp } = require('./images-webp');
 const ROUTES = require('./routes');
 const write = (relPath, content) => {
   if (relPath === 'data/contenus.json') content = JSON.stringify(ROUTES.donneesPubliques(JSON.parse(content)), null, 2);
@@ -59,7 +60,7 @@ const write = (relPath, content) => {
   if (relPath === 'robots.txt') content = content.trimEnd() + '\n';
   if (relPath.endsWith('.tpl')) content = ROUTES.htmlPublic('guides/apercu.html', content, 'guides/apercu.html');
   if (!relPath.endsWith('.html')) return ecrireTexte(path.join(ROOT, relPath), content);
-  const rendu = porteMaintenance(relPath, responsiveTables(content).replace(/<!--[\s\S]*?-->/g, '').replace(/^[\t ]+$/gm, ''));
+  const rendu = porteMaintenance(relPath, imagesWebp(responsiveTables(content), relPath).replace(/<!--[\s\S]*?-->/g, '').replace(/^[\t ]+$/gm, ''));
   const destination = ROUTES.fichierPublic(relPath);
   ecrireTexte(path.join(ROOT, destination), ROUTES.htmlPublic(relPath, rendu, destination));
   if (destination !== relPath) {
