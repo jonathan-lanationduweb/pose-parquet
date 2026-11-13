@@ -58,7 +58,7 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 .section--sage { background: var(--tint-sage); }
 .section--dark { background: var(--bg-invert); color: var(--text-invert); }
 .section--dark h1, .section--dark h2, .section--dark h3 { color: var(--text-invert); }
-.section--dark .lead { color: #c4c9c3; }
+.section--dark .lead { color: #d6cab9; }
 .eyebrow {
   font-family: var(--font-sans);
   font-size: var(--fs-xs);
@@ -80,7 +80,7 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
   opacity: 0.6;
 }
 .eyebrow--plain::before { content: none; }
-.section--dark .eyebrow { color: #9aa79c; }
+.section--dark .eyebrow { color: #b39f86; }
 
 .section-index {
   font-family: var(--font-sans);

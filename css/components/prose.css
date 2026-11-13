@@ -65,7 +65,7 @@
 .callout {
   border-radius: var(--r-card);
   --cl-bg: var(--c-sage-pale);
-  --cl-bd: #cdd8ca;
+  --cl-bd: #dfc5a3;
   --cl-fg: var(--c-sage-deep);
   margin: var(--sp-6) 0;
   padding: var(--sp-5);

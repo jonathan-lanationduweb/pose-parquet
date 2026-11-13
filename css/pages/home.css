@@ -169,3 +169,5 @@
 .faq-accueil { max-width: 62rem; }
 .faq-accueil .accordion__panel p + p { margin-top: var(--sp-3); }
 #pourquoi .section-head__row { align-items: start; }
+
+.entry--clay .entry__num, .entry--clay .entry__text { color: var(--c-ink-2); }

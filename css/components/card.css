@@ -20,7 +20,7 @@
 .feature-card--attente {
   background-image: repeating-linear-gradient(
     101deg,
-    rgba(22, 24, 26, 0.045) 0 1px,
+    rgba(27, 26, 24, 0.045) 0 1px,
     transparent 1px 2.35rem
   );
   background-color: var(--c-mineral);

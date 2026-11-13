@@ -15,7 +15,7 @@
 }
 .floor-mask__shape {
   fill: none;
-  stroke: #f2efe8;
+  stroke: #f4ede4;
   stroke-width: 1.6;
   filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.8));
   vector-effect: non-scaling-stroke;
@@ -27,8 +27,8 @@
   height: 30px;
   margin: -15px 0 0 -15px;
   border-radius: var(--r-pill);
-  border: 2px solid #16181a;
-  background: #f2efe8;
+  border: 2px solid #1b1a18;
+  background: #f4ede4;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
   cursor: grab;
   touch-action: none;
@@ -99,7 +99,7 @@
   top: -5px;
   border-top: 5px solid transparent;
   border-bottom: 5px solid transparent;
-  border-left: 7px solid #f2efe8;
+  border-left: 7px solid #f4ede4;
   filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.9));
 }
 .floor-mask__lien {
@@ -109,7 +109,7 @@
   top: 50%;
   width: var(--lien, 0px);
   height: 0;
-  border-top: 1.5px solid #f2efe8;
+  border-top: 1.5px solid #f4ede4;
   transform-origin: 0 50%;
   transform: rotate(var(--angle-lien, 0rad));
   filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.85));
@@ -124,10 +124,10 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #f2efe8;
-  box-shadow: 0 0 0 1.5px #16181a;
+  background: #f4ede4;
+  box-shadow: 0 0 0 1.5px #1b1a18;
 }
 .floor-mask__handle[data-decale]:not([data-hors]) .floor-mask__lien { display: block; }
 .floor-mask__handle[data-active="true"] { z-index: 2; }
-.floor-mask__handle[data-hors] { border-style: dashed; border-color: #f2efe8; background: #16181a; }
+.floor-mask__handle[data-hors] { border-style: dashed; border-color: #f4ede4; background: #1b1a18; }
 .floor-mask__handle[data-hors] .floor-mask__fleche { display: block; }
